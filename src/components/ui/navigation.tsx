@@ -9,6 +9,7 @@ const Navigation = () => {
     { label: 'Home', href: '#home' },
     { label: 'About', href: '#about' },
     { label: 'Programs', href: '#programs' },
+    { label: 'Training Video', href: '/video' },
     { label: 'Success Stories', href: '#stories' },
     { label: 'Community', href: '#community' },
   ];
@@ -62,16 +63,16 @@ const Navigation = () => {
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-border pt-4">
             <div className="flex flex-col space-y-4">
-              {navigationItems.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="text-foreground hover:text-primary transition-smooth font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.label}
-                </a>
-              ))}
+            {navigationItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="text-foreground hover:text-primary transition-smooth font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {item.label}
+              </a>
+            ))}
               <Button variant="default" className="bg-primary hover:bg-primary-dark w-full mt-4">
                 Join Community
               </Button>
