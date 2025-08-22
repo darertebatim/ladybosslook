@@ -4,10 +4,10 @@ import { ArrowRight, CheckCircle, Users, Clock } from 'lucide-react';
 
 const CTA = () => {
   const benefits = [
-    'Lifetime access to our private community',
-    'Monthly live coaching calls with experts',
-    'Exclusive networking events and workshops',
-    'Personalized success roadmap and mentoring',
+    'Complete self-confidence transformation program',
+    'Step-by-step confidence building exercises',
+    'Personal empowerment tools and techniques',
+    'Lifetime access to course materials',
     '30-day money-back guarantee'
   ];
 
@@ -30,12 +30,12 @@ const CTA = () => {
             </div>
             
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-              Ready to Transform Your Life and Business?
+              Ready to Unlock Your Courageous Character?
             </h2>
             
             <p className="text-xl text-white/90 leading-relaxed max-w-3xl mx-auto">
-              Don't let another year pass by wondering "what if." Join the LadyBoss Academy 
-              today and start building the successful, financially independent future you deserve.
+              Transform your self-doubt into unshakeable confidence. Join the Courageous Character Course 
+              and discover the fearless leader within you.
             </p>
           </div>
 
@@ -75,7 +75,7 @@ const CTA = () => {
                   size="lg"
                   className="w-full bg-secondary hover:bg-secondary-dark text-secondary-foreground font-semibold shadow-bold hover:shadow-glow transition-all duration-300 group"
                 >
-                  Join LadyBoss Academy Now
+                  Join Courageous Character Course
                   <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
 
