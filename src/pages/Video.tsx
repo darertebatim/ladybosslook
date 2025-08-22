@@ -41,13 +41,13 @@ const Video = () => {
           </div>
           
           <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-            Transform Your{' '}
-            <span className="gradient-text">Entrepreneurial Journey</span>
+            Build Your{' '}
+            <span className="gradient-text">Courageous Character</span>
           </h1>
           
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Watch this exclusive video to discover the strategies that have helped thousands of women 
-            build successful businesses and achieve financial independence.
+            A powerful 30-minute course designed specifically for Persian immigrant women ready to 
+            embrace their inner strength and become confident ladyboss leaders in their new homeland.
           </p>
         </div>
 
@@ -77,34 +77,34 @@ const Video = () => {
             <div className="md:col-span-2 space-y-6">
               <div>
                 <h2 className="font-display text-2xl font-bold mb-4">
-                  About This Training
+                  About This 30-Minute Course
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  This comprehensive training video covers the essential strategies and mindsets 
-                  that successful women entrepreneurs use to build thriving businesses. You'll learn 
-                  actionable techniques for overcoming common challenges, scaling your operations, 
-                  and creating sustainable income streams.
+                  This transformative course is specially crafted for Persian women who have courageously 
+                  immigrated and are ready to step into their power. Learn how to overcome cultural barriers, 
+                  build unshakeable confidence, and develop the courageous character needed to thrive as 
+                  a successful ladyboss in your new environment.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-3">What You'll Discover:</h3>
+                <h3 className="font-semibold mb-3">What You'll Master in 30 Minutes:</h3>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    The #1 mindset shift that separates successful entrepreneurs from struggling ones
+                    How to transform immigrant challenges into your greatest strengths as a leader
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    Proven strategies for building multiple income streams
+                    The Persian resilience framework for building unshakeable confidence
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    How to network effectively and build meaningful business relationships
+                    Navigating cultural bridges while staying true to your authentic self
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    Financial planning techniques for long-term wealth building
+                    Courageous communication techniques for commanding respect in any room
                   </li>
                 </ul>
               </div>
@@ -118,10 +118,10 @@ const Video = () => {
                     <BookOpen size={24} className="text-accent-foreground" />
                   </div>
                   <h3 className="font-display text-xl font-bold text-accent-foreground">
-                    Ready to Start?
+                    Build Your Courage
                   </h3>
                   <p className="text-accent-foreground/80 text-sm">
-                    Join our community and get access to exclusive resources and coaching.
+                    Join our sisterhood of courageous Persian ladybosses and unlock your full potential.
                   </p>
                   <Button 
                     className="w-full bg-primary hover:bg-primary-dark"
@@ -145,7 +145,7 @@ const Video = () => {
                     className="w-full"
                     onClick={() => {
                       navigator.share?.({
-                        title: 'LadyBoss Academy Training Video',
+                        title: 'Courageous Character Course - LadyBoss Academy',
                         url: window.location.href
                       }) || navigator.clipboard.writeText(window.location.href);
                     }}
