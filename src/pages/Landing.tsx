@@ -41,10 +41,11 @@ const Landing = () => {
   };
 
   const benefits = [
-    "Build unshakeable confidence",
-    "Overcome cultural barriers",
-    "Transform self-doubt into power",
-    "Navigate challenges like a leader"
+    "Overcome fear & self-doubt in any situation",
+    "Master assertive communication skills",
+    "Negotiate for what you deserve confidently",
+    "Build powerful professional connections",
+    "Lead with confidence in business & community"
   ];
 
   return (
@@ -56,22 +57,23 @@ const Landing = () => {
             <div className="space-y-3">
               <div className="inline-flex items-center bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
                 <Star className="w-4 h-4 mr-2" />
-                Exclusive Free Training
+                Mastermind Program - $497 Value
               </div>
               
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
-                Unlock Your
-                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"> Courageous Character</span>
+                Master
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"> Assertiveness & Confidence</span>
+                <br />as an Immigrant
               </h1>
               
               <p className="text-base md:text-lg text-muted-foreground">
-                A 30-minute masterclass for Persian women ready to build confidence and success in their new homeland.
+                Build the mindset & communication skills you need to succeed in the U.S. A comprehensive mastermind program for immigrant women ready to lead with confidence.
               </p>
             </div>
 
             {/* Benefits */}
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold">You'll discover:</h3>
+              <h3 className="text-lg font-semibold">In this mastermind, you'll master:</h3>
               <ul className="space-y-1">
                 {benefits.map((benefit, index) => (
                   <li key={index} className="flex items-start gap-2">
@@ -86,18 +88,18 @@ const Landing = () => {
             <div className="grid grid-cols-3 gap-3 py-3">
               <div className="text-center">
                 <Users className="w-5 h-5 text-primary mx-auto mb-1" />
-                <div className="text-lg font-bold">2,500+</div>
-                <div className="text-xs text-muted-foreground">Women Empowered</div>
+                <div className="text-lg font-bold">500+</div>
+                <div className="text-xs text-muted-foreground">Members</div>
               </div>
               <div className="text-center">
                 <Star className="w-5 h-5 text-primary mx-auto mb-1" />
-                <div className="text-lg font-bold">4.9/5</div>
-                <div className="text-xs text-muted-foreground">Success Rating</div>
+                <div className="text-lg font-bold">$497</div>
+                <div className="text-xs text-muted-foreground">Program Value</div>
               </div>
               <div className="text-center">
                 <Clock className="w-5 h-5 text-primary mx-auto mb-1" />
-                <div className="text-lg font-bold">30 Min</div>
-                <div className="text-xs text-muted-foreground">Training</div>
+                <div className="text-lg font-bold">8 Weeks</div>
+                <div className="text-xs text-muted-foreground">Mastermind</div>
               </div>
             </div>
           </div>
@@ -107,10 +109,10 @@ const Landing = () => {
             <Card className="border-2 border-primary/20 shadow-xl">
               <CardHeader className="text-center pb-3">
                 <CardTitle className="text-xl md:text-2xl">
-                  Get Instant Access
+                  Join the Mastermind
                 </CardTitle>
                 <CardDescription>
-                  Join thousands of empowered Persian women
+                  Transform your confidence & communication skills
                 </CardDescription>
               </CardHeader>
               
@@ -160,21 +162,21 @@ const Landing = () => {
                     className="w-full h-11 text-base font-semibold"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Getting Access..." : "Watch Free Training Now →"}
+                    {isLoading ? "Processing..." : "Join Mastermind - $497 →"}
                   </Button>
                 </form>
 
                 <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                   <Shield className="w-3 h-3" />
-                  <span>100% Free • No Spam • Unsubscribe Anytime</span>
+                  <span>Secure Payment • 30-Day Money Back Guarantee</span>
                 </div>
 
                 <div className="text-center pt-2">
                   <p className="text-sm text-muted-foreground italic">
-                    "This training changed everything for me."
+                    "This mastermind transformed my entire approach to business."
                   </p>
                   <p className="text-xs font-medium text-primary">
-                    - Shirin K., Marketing Director
+                    - Nasrin M., Business Owner
                   </p>
                 </div>
               </CardContent>
