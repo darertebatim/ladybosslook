@@ -42,20 +42,20 @@ const Programs = () => {
       popular: true
     },
     {
-      title: 'Elite Networking Mastermind',
-      description: 'Join an exclusive community of high-achieving women entrepreneurs for advanced networking, partnerships, and collaborative growth.',
+      title: 'Courageous Character Course',
+      description: 'Master assertiveness & confidence as an immigrant. Build the mindset & communication skills you need to succeed in the U.S.',
       image: networkingImage,
-      duration: '6 months',
-      participants: '500+',
-      rating: 4.8,
+      duration: '6 weeks',
+      participants: '1,800+',
+      rating: 4.9,
       features: [
-        'Monthly Mastermind Sessions',
-        'VIP Access to Events',
-        'Partnership Opportunities',
-        'Mentor Matching Program',
-        'Private Community Forum'
+        'Overcome Fear & Self-Doubt',
+        'Master Assertive Communication',
+        'Negotiate for What You Deserve',
+        'Build Powerful Connections',
+        'Lead with Confidence'
       ],
-      price: '$1,497',
+      price: '$497',
       popular: false
     }
   ];
