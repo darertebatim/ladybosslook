@@ -41,14 +41,13 @@ const Video = () => {
           </div>
           
           <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 px-2">
-            Master{' '}
-            <span className="gradient-text">Assertiveness & Confidence</span>
-            {' '}as an Immigrant
+            Build Your{' '}
+            <span className="gradient-text">Courageous Character</span>
           </h1>
           
           <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto px-4">
-            Build the mindset & communication skills you need to succeed in the U.S. A comprehensive 
-            mastermind program specifically designed for immigrant women ready to lead with confidence.
+            A powerful 30-minute course designed specifically for Persian immigrant women ready to 
+            embrace their inner strength and become confident ladyboss leaders in their new homeland.
           </p>
         </div>
 
@@ -60,7 +59,7 @@ const Video = () => {
                 width="100%"
                 height="100%"
                 src="https://www.youtube.com/embed/FYn1vYW1tP8?rel=0&modestbranding=1"
-                title="Assertiveness & Confidence Mastermind - LadyBoss Academy"
+                title="Courageous Character Course - LadyBoss Academy"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
@@ -78,37 +77,34 @@ const Video = () => {
             <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               <div>
                 <h2 className="font-display text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
-                  About This Mastermind Program
+                  About This 30-Minute Course
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Moving to a new country comes with challenges, from language barriers to cultural differences. 
-                  If you've ever felt hesitant to speak up, struggled with self-doubt, or found it difficult to 
-                  negotiate in business and life, this comprehensive 8-week mastermind program is designed for you.
+                  This transformative course is specially crafted for Persian women who have courageously 
+                  immigrated and are ready to step into their power. Learn how to overcome cultural barriers, 
+                  build unshakeable confidence, and develop the courageous character needed to thrive as 
+                  a successful ladyboss in your new environment.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-3 text-sm sm:text-base">What You'll Master in This Program:</h3>
+                <h3 className="font-semibold mb-3 text-sm sm:text-base">What You'll Master in 30 Minutes:</h3>
                 <ul className="space-y-2 sm:space-y-3 text-muted-foreground text-sm sm:text-base">
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    <span><strong>Overcome Fear & Self-Doubt:</strong> Develop a strong, confident mindset to succeed in any situation</span>
+                    <span>How to transform immigrant challenges into your greatest strengths as a leader</span>
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    <span><strong>Master Assertive Communication:</strong> Express yourself clearly and persuasively in personal and professional settings</span>
+                    <span>The Persian resilience framework for building unshakeable confidence</span>
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    <span><strong>Negotiate for What You Deserve:</strong> Gain the skills to ask for a raise, close deals, and establish boundaries</span>
+                    <span>Navigating cultural bridges while staying true to your authentic self</span>
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    <span><strong>Build Powerful Connections:</strong> Network and establish authority, even if English isn't your first language</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    <span><strong>Lead with Confidence:</strong> Step into leadership roles in your business and community</span>
+                    <span>Courageous communication techniques for commanding respect in any room</span>
                   </li>
                 </ul>
               </div>
@@ -122,18 +118,17 @@ const Video = () => {
                     <BookOpen size={20} className="sm:w-6 sm:h-6 text-accent-foreground" />
                   </div>
                   <h3 className="font-display text-lg sm:text-xl font-bold text-accent-foreground">
-                    Join the Mastermind
+                    Build Your Courage
                   </h3>
-                  <div className="text-2xl font-bold text-primary mb-2">$497</div>
                   <p className="text-accent-foreground/80 text-xs sm:text-sm leading-relaxed">
-                    Transform your confidence & communication skills with our comprehensive 8-week program.
+                    Join our sisterhood of courageous Persian ladybosses and unlock your full potential.
                   </p>
                   <Button 
                     className="w-full bg-primary hover:bg-primary-dark text-sm sm:text-base"
                     asChild
                   >
-                    <Link to="/landing">
-                      Join Mastermind Program
+                    <Link to="/#community">
+                      Join LadyBoss Academy
                     </Link>
                   </Button>
                 </div>
@@ -143,14 +138,14 @@ const Video = () => {
                 <div className="space-y-3 sm:space-y-4">
                   <h3 className="font-semibold text-sm sm:text-base">Share This Video</h3>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    Help other immigrant women discover these powerful strategies
+                    Help other women discover these powerful strategies
                   </p>
                   <Button 
                     variant="outline" 
                     className="w-full text-sm sm:text-base"
                     onClick={() => {
                       navigator.share?.({
-                        title: 'Assertiveness & Confidence Mastermind - LadyBoss Academy',
+                        title: 'Courageous Character Course - LadyBoss Academy',
                         url: window.location.href
                       }) || navigator.clipboard.writeText(window.location.href);
                     }}
