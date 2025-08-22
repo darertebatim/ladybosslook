@@ -61,13 +61,13 @@ const CTA = () => {
               <div className="text-center md:text-left space-y-6">
                 <div className="space-y-2">
                   <div className="text-4xl font-bold font-display text-secondary">
-                    $197
+                    $297
                   </div>
                   <div className="text-white/70 line-through text-lg">
                     Regular Price: $497
                   </div>
                   <div className="text-secondary font-semibold">
-                    Limited Time: 60% OFF
+                    Limited Time: 40% OFF
                   </div>
                 </div>
 
