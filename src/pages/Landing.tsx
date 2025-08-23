@@ -75,12 +75,12 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center py-4 md:py-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-2 md:py-4">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-4 md:gap-8 items-start max-w-6xl mx-auto">
           {/* Left Column - Content */}
           <div className="space-y-3 md:space-y-4 order-2 lg:order-1">
-            <div className="space-y-2 md:space-y-3">
+            <div className="space-y-1 md:space-y-2">
               <div className="inline-flex items-center bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
                 <Star className="w-4 h-4 mr-2" />
                 Exclusive Free Training
