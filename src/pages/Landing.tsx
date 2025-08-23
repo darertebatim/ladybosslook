@@ -12,7 +12,7 @@ const Landing = () => {
   const [name, setName] = useState('');
   const [city, setCity] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  const [submitted, setSubmitted] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,15 +29,25 @@ const Landing = () => {
 
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // TODO: Replace with your Mailchimp API endpoint or form action
+      // For now, simulate successful submission
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setSubmitted(true);
       toast({
         title: "Success!",
-        description: "Welcome! Redirecting you to your exclusive training...",
+        description: "Please check your email for the training video link!",
       });
-      navigate('/video');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const benefits = [
@@ -115,68 +125,86 @@ const Landing = () => {
               </CardHeader>
               
               <CardContent className="space-y-4">
-                <form onSubmit={handleSubmit} className="space-y-3">
-                  <div className="space-y-1">
-                    <Label htmlFor="name">Your First Name</Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Enter your first name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="h-10"
-                      required
-                    />
+                {submitted ? (
+                  <div className="text-center space-y-4 py-8">
+                    <CheckCircle className="w-16 h-16 text-primary mx-auto" />
+                    <h3 className="text-xl font-semibold">Check Your Email!</h3>
+                    <p className="text-muted-foreground">
+                      We've sent you the exclusive training video link. 
+                      Check your inbox (and spam folder) for immediate access.
+                    </p>
+                    <div className="bg-primary/10 p-4 rounded-lg">
+                      <p className="text-sm font-medium text-primary">
+                        Can't find the email? Check your promotions or spam folder.
+                      </p>
+                    </div>
                   </div>
-                  
-                  <div className="space-y-1">
-                    <Label htmlFor="city">Your City, State</Label>
-                    <Input
-                      id="city"
-                      type="text"
-                      placeholder="e.g., Los Angeles, CA"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      className="h-10"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <Label htmlFor="email">Your Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email address"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="h-10"
-                      required
-                    />
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full h-11 text-base font-semibold"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Getting Access..." : "Watch Free Training Now →"}
-                  </Button>
-                </form>
+                ) : (
+                  <>
+                    <form onSubmit={handleSubmit} className="space-y-3">
+                      <div className="space-y-1">
+                        <Label htmlFor="name">Your First Name</Label>
+                        <Input
+                          id="name"
+                          type="text"
+                          placeholder="Enter your first name"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="h-10"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <Label htmlFor="city">Your City, State</Label>
+                        <Input
+                          id="city"
+                          type="text"
+                          placeholder="e.g., Los Angeles, CA"
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
+                          className="h-10"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <Label htmlFor="email">Your Email Address</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="Enter your email address"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="h-10"
+                          required
+                        />
+                      </div>
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full h-11 text-base font-semibold"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Getting Access..." : "Watch Free Training Now →"}
+                      </Button>
+                    </form>
 
-                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                  <Shield className="w-3 h-3" />
-                  <span>100% Free • No Spam • Unsubscribe Anytime</span>
-                </div>
+                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                      <Shield className="w-3 h-3" />
+                      <span>100% Free • No Spam • Unsubscribe Anytime</span>
+                    </div>
 
-                <div className="text-center pt-2">
-                  <p className="text-sm text-muted-foreground italic">
-                    "This training changed everything for me."
-                  </p>
-                  <p className="text-xs font-medium text-primary">
-                    - Shirin K., Marketing Director
-                  </p>
-                </div>
+                    <div className="text-center pt-2">
+                      <p className="text-sm text-muted-foreground italic">
+                        "This training changed everything for me."
+                      </p>
+                      <p className="text-xs font-medium text-primary">
+                        - Shirin K., Marketing Director
+                      </p>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>
