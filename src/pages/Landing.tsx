@@ -30,19 +30,34 @@ const Landing = () => {
     setIsLoading(true);
     
     try {
-      // TODO: Replace with your Mailchimp API endpoint or form action
-      // For now, simulate successful submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const response = await fetch('https://mnukhzjcvbwpvktxqlej.supabase.co/functions/v1/mailchimp-subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          name,
+          city,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to subscribe');
+      }
+
       setSubmitted(true);
       toast({
         title: "Success!",
         description: "Please check your email for the training video link!",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Subscription error:', error);
       toast({
         title: "Error",
-        description: "Something went wrong. Please try again.",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
