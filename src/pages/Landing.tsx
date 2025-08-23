@@ -81,7 +81,7 @@ const Landing = () => {
         <div className="text-center mb-4 lg:hidden">
           <div className="inline-flex items-center bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-2">
             <Star className="w-4 h-4 mr-2" />
-            Exclusive Free Training
+            Exclusive Free Training By LADYBOSS
           </div>
           
           <h1 className="text-xl font-bold leading-tight mb-2">
@@ -101,7 +101,7 @@ const Landing = () => {
             <div className="space-y-2 md:space-y-3 hidden lg:block">
               <div className="inline-flex items-center bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
                 <Star className="w-4 h-4 mr-2" />
-                Exclusive Free Training
+                Exclusive Free Training By LADYBOSS
               </div>
               
               <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight">
