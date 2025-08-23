@@ -75,30 +75,30 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center">
-      <div className="container mx-auto px-4 py-4">
-        <div className="grid lg:grid-cols-2 gap-8 items-center max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center py-4 md:py-8">
+      <div className="container mx-auto px-4">
+        <div className="grid lg:grid-cols-2 gap-4 md:gap-8 items-start max-w-6xl mx-auto">
           {/* Left Column - Content */}
-          <div className="space-y-4">
-            <div className="space-y-3">
+          <div className="space-y-3 md:space-y-4 order-2 lg:order-1">
+            <div className="space-y-2 md:space-y-3">
               <div className="inline-flex items-center bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
                 <Star className="w-4 h-4 mr-2" />
                 Exclusive Free Training
               </div>
               
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
+              <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight">
                 Unlock Your
                 <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"> Courageous Character</span>
               </h1>
               
-              <p className="text-base md:text-lg text-muted-foreground">
+              <p className="text-sm md:text-base lg:text-lg text-muted-foreground">
                 A 30-minute masterclass for Persian women ready to build confidence and success in their new homeland.
               </p>
             </div>
 
             {/* Benefits */}
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">You'll discover:</h3>
+            <div className="space-y-1 md:space-y-2">
+              <h3 className="text-base md:text-lg font-semibold">You'll discover:</h3>
               <ul className="space-y-1">
                 {benefits.map((benefit, index) => (
                   <li key={index} className="flex items-start gap-2">
@@ -110,7 +110,7 @@ const Landing = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-3 py-3">
+            <div className="grid grid-cols-3 gap-2 md:gap-3 py-2 md:py-3">
               <div className="text-center">
                 <Users className="w-5 h-5 text-primary mx-auto mb-1" />
                 <div className="text-lg font-bold">2,500+</div>
@@ -130,7 +130,7 @@ const Landing = () => {
           </div>
 
           {/* Right Column - Form */}
-          <div>
+          <div className="order-1 lg:order-2">
             <Card className="border-2 border-primary/20 shadow-xl">
               <CardHeader className="text-center pb-3">
                 <CardTitle className="text-xl md:text-2xl">
@@ -141,7 +141,7 @@ const Landing = () => {
                 </CardDescription>
               </CardHeader>
               
-              <CardContent className="space-y-4">
+                <CardContent className="space-y-3 md:space-y-4">
                 {submitted ? (
                   <div className="text-center space-y-4 py-8">
                     <CheckCircle className="w-16 h-16 text-primary mx-auto" />
