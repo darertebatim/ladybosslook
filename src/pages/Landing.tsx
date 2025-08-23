@@ -10,6 +10,7 @@ import { CheckCircle, Star, Users, Clock, Shield } from 'lucide-react';
 const Landing = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [city, setCity] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -18,7 +19,7 @@ const Landing = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !name || !city) {
+    if (!email || !name || !city || !phone) {
       toast({
         title: "Required Fields",
         description: "Please fill in all fields.",
@@ -39,6 +40,7 @@ const Landing = () => {
           email,
           name,
           city,
+          phone,
         }),
       });
 
@@ -178,6 +180,19 @@ const Landing = () => {
                           placeholder="e.g., Los Angeles, CA"
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
+                          className="h-10"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <Label htmlFor="phone">Your Phone Number</Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="Enter your phone number"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
                           className="h-10"
                           required
                         />

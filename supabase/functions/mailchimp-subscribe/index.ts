@@ -9,6 +9,7 @@ interface SubscribeRequest {
   email: string;
   name: string;
   city: string;
+  phone: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -18,7 +19,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, name, city }: SubscribeRequest = await req.json();
+    const { email, name, city, phone }: SubscribeRequest = await req.json();
 
     const mailchimpApiKey = Deno.env.get("MAILCHIMP_API_KEY");
     const listId = Deno.env.get("MAILCHIMP_LIST_ID");
@@ -39,7 +40,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     const url = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members`;
 
-    console.log("Subscribing to Mailchimp:", { email, name, city });
+    console.log("Subscribing to Mailchimp:", { email, name, city, phone });
 
     const response = await fetch(url, {
       method: "POST",
@@ -53,6 +54,7 @@ const handler = async (req: Request): Promise<Response> => {
         merge_fields: {
           FNAME: name,
           CITY: city,
+          PHONE: phone,
         },
       }),
     });
