@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,12 +14,126 @@ const Landing = () => {
   const [city, setCity] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [formStarted, setFormStarted] = useState(false);
+  const [benefitsViewed, setBenefitsViewed] = useState(false);
+  const [statsViewed, setStatsViewed] = useState(false);
   const { toast } = useToast();
+  const pageStartTime = useRef(Date.now());
+  const benefitsRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
+
+  // Meta Pixel tracking helper
+  const trackPixelEvent = (eventName: string, customData: any = {}) => {
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', eventName, customData);
+    }
+  };
+
+  const trackCustomPixelEvent = (eventName: string, customData: any = {}) => {
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('trackCustom', eventName, customData);
+    }
+  };
+
+  // Track page engagement time
+  const getEngagementTime = () => {
+    return Math.round((Date.now() - pageStartTime.current) / 1000);
+  };
+
+  // Track form interaction start
+  const handleFormStart = () => {
+    if (!formStarted) {
+      setFormStarted(true);
+      trackPixelEvent('InitiateCheckout', {
+        content_name: 'Courageous Character Training',
+        content_category: 'Free Training',
+        num_items: 1,
+        engagement_time: getEngagementTime()
+      });
+      trackCustomPixelEvent('FormInteractionStart', {
+        page: 'landing',
+        timestamp: Date.now()
+      });
+    }
+  };
+
+  // Scroll tracking for content engagement
+  useEffect(() => {
+    const handleScroll = () => {
+      // Track benefits section view
+      if (benefitsRef.current && !benefitsViewed) {
+        const rect = benefitsRef.current.getBoundingClientRect();
+        if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+          setBenefitsViewed(true);
+          trackPixelEvent('ViewContent', {
+            content_name: 'Training Benefits',
+            content_type: 'benefits_section',
+            engagement_time: getEngagementTime()
+          });
+        }
+      }
+
+      // Track stats section view
+      if (statsRef.current && !statsViewed) {
+        const rect = statsRef.current.getBoundingClientRect();
+        if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+          setStatsViewed(true);
+          trackPixelEvent('ViewContent', {
+            content_name: 'Training Statistics',
+            content_type: 'stats_section',
+            engagement_time: getEngagementTime()
+          });
+          trackPixelEvent('AddToCart', {
+            content_name: 'Free Training Interest',
+            content_type: 'training',
+            value: 0,
+            currency: 'USD'
+          });
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [benefitsViewed, statsViewed]);
+
+  // Track page exit intent
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      trackCustomPixelEvent('PageExit', {
+        engagement_time: getEngagementTime(),
+        form_started: formStarted,
+        benefits_viewed: benefitsViewed,
+        stats_viewed: statsViewed
+      });
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [formStarted, benefitsViewed, statsViewed]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Track form submission attempt
+    trackCustomPixelEvent('FormSubmissionAttempt', {
+      engagement_time: getEngagementTime(),
+      fields_filled: {
+        name: !!name,
+        email: !!email,
+        phone: !!phone,
+        city: !!city
+      }
+    });
+    
     if (!email || !name || !city || !phone) {
+      // Track validation error
+      trackCustomPixelEvent('FormValidationError', {
+        error_type: 'missing_fields',
+        page: 'landing',
+        engagement_time: getEngagementTime()
+      });
+      
       toast({
         title: "Required Fields",
         description: "Please fill in all fields.",
@@ -52,15 +166,34 @@ const Landing = () => {
 
       setSubmitted(true);
       
-      // Track Facebook Pixel Lead conversion
-      if (typeof window !== 'undefined' && (window as any).fbq) {
-        (window as any).fbq('track', 'Lead', {
-          content_name: 'Courageous Character Training',
-          content_category: 'Free Training',
-          value: 0,
-          currency: 'USD'
-        });
-      }
+      // Enhanced Lead tracking with engagement data
+      trackPixelEvent('Lead', {
+        content_name: 'Courageous Character Training',
+        content_category: 'Free Training',
+        value: 0,
+        currency: 'USD',
+        engagement_time: getEngagementTime(),
+        user_data: {
+          email_hash: btoa(email).substring(0, 8), // Simple hash for privacy
+          city: city
+        }
+      });
+
+      // Track successful form completion
+      trackCustomPixelEvent('FormCompletionSuccess', {
+        engagement_time: getEngagementTime(),
+        page: 'landing',
+        user_journey: {
+          benefits_viewed: benefitsViewed,
+          stats_viewed: statsViewed,
+          form_started: formStarted
+        }
+      });
+
+      // Track success message view
+      trackCustomPixelEvent('SuccessMessageViewed', {
+        training_type: 'courageous_character'
+      });
       
       toast({
         title: "Success!",
@@ -68,6 +201,14 @@ const Landing = () => {
       });
     } catch (error: any) {
       console.error('Subscription error:', error);
+      
+      // Track submission error
+      trackCustomPixelEvent('FormSubmissionError', {
+        error_message: error.message,
+        engagement_time: getEngagementTime(),
+        page: 'landing'
+      });
+      
       toast({
         title: "Error",
         description: error.message || "Something went wrong. Please try again.",
@@ -126,7 +267,7 @@ const Landing = () => {
             </div>
 
             {/* Benefits */}
-            <div className="space-y-1 md:space-y-2">
+            <div ref={benefitsRef} className="space-y-1 md:space-y-2">
               <h3 className="text-base md:text-lg font-semibold">You'll discover:</h3>
               <ul className="space-y-1">
                 {benefits.map((benefit, index) => (
@@ -139,7 +280,7 @@ const Landing = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-2 md:gap-3 py-2 md:py-3">
+            <div ref={statsRef} className="grid grid-cols-3 gap-2 md:gap-3 py-2 md:py-3">
               <div className="text-center">
                 <Users className="w-5 h-5 text-primary mx-auto mb-1" />
                 <div className="text-lg font-bold">2,500+</div>
@@ -196,6 +337,7 @@ const Landing = () => {
                           placeholder="Enter your first name"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
+                          onFocus={handleFormStart}
                           className="h-10"
                           required
                         />
