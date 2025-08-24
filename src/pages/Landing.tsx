@@ -51,6 +51,17 @@ const Landing = () => {
       }
 
       setSubmitted(true);
+      
+      // Track Facebook Pixel Lead conversion
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'Lead', {
+          content_name: 'Courageous Character Training',
+          content_category: 'Free Training',
+          value: 0,
+          currency: 'USD'
+        });
+      }
+      
       toast({
         title: "Success!",
         description: "Please check your email for the training video link!",
