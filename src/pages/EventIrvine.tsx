@@ -114,32 +114,14 @@ const EventIrvine = () => {
               </div>
             </div>
 
-            {/* Registration Form */}
+            {/* Buy Button */}
             <Card className="border-2 border-primary/20 bg-primary/5">
               <CardContent className="p-4 space-y-3">
                 <h3 className="text-center text-gray-900 dark:text-white font-semibold text-base md:text-lg">
                   همین الان بلیطت رو رزرو کن!
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <Input
-                    type="email"
-                    placeholder="ایمیل شما"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="text-right text-sm"
-                    dir="rtl"
-                  />
-                  <Input
-                    type="tel"
-                    placeholder="شماره تلفن"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="text-right text-sm"
-                    dir="rtl"
-                  />
-                </div>
                 <Button 
-                  onClick={handlePurchase}
+                  onClick={() => window.open('https://book.stripe.com/cNi14mgIhgBQ1kH45j9Ve00', '_blank')}
                   className="w-full text-base md:text-lg py-4 md:py-6 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
                   size="lg"
                 >
