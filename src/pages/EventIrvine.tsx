@@ -25,7 +25,16 @@ const EventIrvine = () => {
           <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-2 leading-tight">
             بیزنس کلاب لیدی‌باس – ارواین
           </h1>
-          <div className="w-16 md:w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full"></div>
+          <div className="w-16 md:w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full mb-3"></div>
+          
+          {/* Event Image */}
+          <div className="rounded-lg overflow-hidden shadow-lg mb-4">
+            <img 
+              src="/lovable-uploads/cc26e040-a2f3-48d8-83ae-02a973799ac3.png" 
+              alt="Ladyboss Business Club - Women networking and business event" 
+              className="w-full h-48 md:h-64 object-cover"
+            />
+          </div>
         </div>
 
         {/* Main Event Card */}
