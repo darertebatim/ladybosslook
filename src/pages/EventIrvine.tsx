@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Calendar, Clock, DollarSign, Users, TrendingUp, Briefcase, PiggyBank } from "lucide-react";
+import { Calendar, Clock, DollarSign, Users, TrendingUp, Briefcase, PiggyBank, UserCheck } from "lucide-react";
 
 const EventIrvine = () => {
   const [email, setEmail] = useState("");
@@ -48,6 +48,18 @@ const EventIrvine = () => {
             </div>
           </CardHeader>
           <CardContent className="space-y-4 md:space-y-6 px-4 md:px-6">
+            {/* Target Audience */}
+            <div className="text-center p-3 md:p-4 rounded-lg bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/20">
+              <UserCheck className="w-8 h-8 md:w-10 md:h-10 text-accent mx-auto mb-2" />
+              <h3 className="text-sm md:text-lg font-semibold text-foreground mb-2">
+                مناسب برای:
+              </h3>
+              <div className="flex flex-wrap justify-center gap-2 text-xs md:text-sm text-muted-foreground">
+                <span className="bg-accent/10 px-2 py-1 rounded-full">👩‍💼 خانم‌های کارمند</span>
+                <span className="bg-primary/10 px-2 py-1 rounded-full">👩‍💻 صاحب بیزینس</span>
+                <span className="bg-secondary/10 px-2 py-1 rounded-full">👩‍🎓 دانشجویان</span>
+              </div>
+            </div>
             {/* Learning Topics */}
             <div>
               <h3 className="text-lg md:text-xl font-semibold text-foreground mb-3 md:mb-4 text-center">
