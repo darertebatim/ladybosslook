@@ -100,9 +100,7 @@ const Landing = () => {
       errors.email = 'Please enter a valid email address';
     }
     
-    if (!phone.trim()) {
-      errors.phone = 'Phone number is required';
-    } else if (!/^\+?[\d\s\-\(\)]{10,}$/.test(phone)) {
+    if (phone.trim() && !/^\+?[\d\s\-\(\)]{10,}$/.test(phone)) {
       errors.phone = 'Please enter a valid phone number';
     }
     
@@ -562,7 +560,7 @@ const Landing = () => {
                       </div>
                       
                       <div className="space-y-1">
-                        <Label htmlFor="phone">Your Phone Number</Label>
+                        <Label htmlFor="phone">Your Phone Number (Optional)</Label>
                         <Input
                           id="phone"
                           type="tel"
@@ -570,8 +568,7 @@ const Landing = () => {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           className={`h-10 ${validationErrors.phone ? 'border-destructive' : ''}`}
-                          required
-                          disabled={isLoading}
+                           disabled={isLoading}
                         />
                         {validationErrors.phone && (
                           <p className="text-sm text-destructive">{validationErrors.phone}</p>
