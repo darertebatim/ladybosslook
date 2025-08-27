@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Link } from 'react-router-dom';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAdmin, user, signOut } = useAuth();
 
   const navigationItems = [
     { label: 'Home', href: '#home' },
@@ -41,8 +44,30 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
+          {/* CTA Button and Auth Links */}
+          <div className="hidden md:flex items-center space-x-4">
+            {isAdmin && (
+              <Link to="/admin">
+                <Button variant="outline" size="sm">
+                  Admin Dashboard
+                </Button>
+              </Link>
+            )}
+            {user ? (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => signOut()}
+              >
+                Sign Out
+              </Button>
+            ) : (
+              <Link to="/auth">
+                <Button variant="ghost" size="sm">
+                  Sign In
+                </Button>
+              </Link>
+            )}
             <Button variant="default" className="bg-primary hover:bg-primary-dark">
               Join Community
             </Button>
@@ -73,6 +98,32 @@ const Navigation = () => {
                 {item.label}
               </a>
             ))}
+              {isAdmin && (
+                <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="outline" size="sm" className="w-full">
+                    Admin Dashboard
+                  </Button>
+                </Link>
+              )}
+              {user ? (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    signOut();
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full"
+                >
+                  Sign Out
+                </Button>
+              ) : (
+                <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="ghost" size="sm" className="w-full">
+                    Sign In
+                  </Button>
+                </Link>
+              )}
               <Button variant="default" className="bg-primary hover:bg-primary-dark w-full mt-4">
                 Join Community
               </Button>

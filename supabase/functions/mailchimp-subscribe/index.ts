@@ -121,7 +121,7 @@ const handler = async (req: Request): Promise<Response> => {
           console.error("Error storing form submission:", formError);
         } else {
           formSubmissionId = formData?.id;
-          console.log(`Form submission stored with ID: ${formSubmissionId}`);
+        console.log(`Form submission stored with ID: ${formSubmissionId}`);
         }
       } catch (backupError) {
         console.error("Backup storage failed:", backupError);
@@ -148,7 +148,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     const url = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members`;
 
-    console.log("Subscribing to Mailchimp:", { email, name, city, phone, submissionId: formSubmissionId });
+    console.log("Subscribing to Mailchimp (admin access required to view details)");
 
     // Use retry mechanism for Mailchimp API call
     const { response, data } = await retryWithBackoff(async () => {
@@ -193,7 +193,7 @@ const handler = async (req: Request): Promise<Response> => {
       
       // Handle already subscribed case gracefully
       if (data.title === "Member Exists") {
-        console.log("User already subscribed:", email);
+        console.log("User already subscribed - email protected");
         
         // Update backup record as successful for existing members
         if (supabase && formSubmissionId) {
@@ -238,7 +238,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log("Successfully subscribed:", data);
+    console.log("Successfully subscribed - member created");
 
     // Update backup record as successful
     if (supabase && formSubmissionId) {
