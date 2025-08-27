@@ -14,7 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      form_submissions: {
+        Row: {
+          city: string
+          email: string
+          id: string
+          ip_address: unknown | null
+          mailchimp_error: string | null
+          mailchimp_success: boolean | null
+          name: string
+          phone: string
+          source: string | null
+          submitted_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          city: string
+          email: string
+          id?: string
+          ip_address?: unknown | null
+          mailchimp_error?: string | null
+          mailchimp_success?: boolean | null
+          name: string
+          phone: string
+          source?: string | null
+          submitted_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          city?: string
+          email?: string
+          id?: string
+          ip_address?: unknown | null
+          mailchimp_error?: string | null
+          mailchimp_success?: boolean | null
+          name?: string
+          phone?: string
+          source?: string | null
+          submitted_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

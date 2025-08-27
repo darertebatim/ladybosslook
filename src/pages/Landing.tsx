@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, Star, Users, Clock, Shield } from 'lucide-react';
+import { CheckCircle, Star, Users, Clock, Shield, AlertCircle, Wifi, WifiOff } from 'lucide-react';
 
 const Landing = () => {
   const [email, setEmail] = useState('');
@@ -17,23 +17,125 @@ const Landing = () => {
   const [formStarted, setFormStarted] = useState(false);
   const [benefitsViewed, setBenefitsViewed] = useState(false);
   const [statsViewed, setStatsViewed] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [submitAttempts, setSubmitAttempts] = useState(0);
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  
   const { toast } = useToast();
   const pageStartTime = useRef(Date.now());
   const benefitsRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
+  const submitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pixelEventQueue = useRef<Array<{ type: 'track' | 'trackCustom', event: string, data: any }>>([]);
+  const isSubmittingRef = useRef(false);
 
-  // Meta Pixel tracking helper
-  const trackPixelEvent = (eventName: string, customData: any = {}) => {
-    if (typeof window !== 'undefined' && (window as any).fbq) {
-      (window as any).fbq('track', eventName, customData);
-    }
-  };
+  const SUBMIT_THROTTLE_MS = 3000; // 3 seconds between attempts
+  const MAX_SUBMIT_ATTEMPTS = 3;
 
-  const trackCustomPixelEvent = (eventName: string, customData: any = {}) => {
-    if (typeof window !== 'undefined' && (window as any).fbq) {
-      (window as any).fbq('trackCustom', eventName, customData);
+  // Online/offline detection
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Batched Meta Pixel tracking to prevent rate limiting
+  const flushPixelEvents = useCallback(() => {
+    if (pixelEventQueue.current.length === 0) return;
+    
+    const events = [...pixelEventQueue.current];
+    pixelEventQueue.current = [];
+    
+    events.forEach(({ type, event, data }) => {
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        if (type === 'track') {
+          (window as any).fbq('track', event, data);
+        } else {
+          (window as any).fbq('trackCustom', event, data);
+        }
+      }
+    });
+  }, []);
+
+  // Queue pixel events for batching
+  const queuePixelEvent = useCallback((type: 'track' | 'trackCustom', eventName: string, customData: any = {}) => {
+    pixelEventQueue.current.push({ type, event: eventName, data: customData });
+    
+    // Flush events after a short delay
+    clearTimeout(submitTimeoutRef.current || undefined);
+    submitTimeoutRef.current = setTimeout(flushPixelEvents, 100);
+  }, [flushPixelEvents]);
+
+  // Meta Pixel tracking helper (now uses queue)
+  const trackPixelEvent = useCallback((eventName: string, customData: any = {}) => {
+    queuePixelEvent('track', eventName, customData);
+  }, [queuePixelEvent]);
+
+  const trackCustomPixelEvent = useCallback((eventName: string, customData: any = {}) => {
+    queuePixelEvent('trackCustom', eventName, customData);
+  }, [queuePixelEvent]);
+
+  // Enhanced form validation
+  const validateForm = useCallback(() => {
+    const errors: Record<string, string> = {};
+    
+    if (!name.trim()) {
+      errors.name = 'Name is required';
+    } else if (name.trim().length < 2) {
+      errors.name = 'Name must be at least 2 characters';
     }
-  };
+    
+    if (!email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+    
+    if (!phone.trim()) {
+      errors.phone = 'Phone number is required';
+    } else if (!/^\+?[\d\s\-\(\)]{10,}$/.test(phone)) {
+      errors.phone = 'Please enter a valid phone number';
+    }
+    
+    if (!city.trim()) {
+      errors.city = 'City is required';
+    } else if (city.trim().length < 2) {
+      errors.city = 'City must be at least 2 characters';
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [name, email, phone, city]);
+
+  // Retry mechanism with exponential backoff
+  const retryWithBackoff = useCallback(async (
+    operation: () => Promise<any>,
+    maxRetries: number = 3,
+    baseDelay: number = 1000
+  ): Promise<any> => {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        if (attempt === maxRetries) {
+          throw error;
+        }
+        
+        const delay = baseDelay * Math.pow(2, attempt - 1) + Math.random() * 1000;
+        console.log(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
+        
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }, []);
 
   // Track page engagement time
   const getEngagementTime = () => {
@@ -41,7 +143,7 @@ const Landing = () => {
   };
 
   // Track form interaction start
-  const handleFormStart = () => {
+  const handleFormStart = useCallback(() => {
     if (!formStarted) {
       setFormStarted(true);
       trackPixelEvent('InitiateCheckout', {
@@ -55,7 +157,7 @@ const Landing = () => {
         timestamp: Date.now()
       });
     }
-  };
+  }, [formStarted, trackPixelEvent, trackCustomPixelEvent]);
 
   // Scroll tracking for content engagement
   useEffect(() => {
@@ -115,9 +217,36 @@ const Landing = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Prevent double submission
+    if (isSubmittingRef.current) {
+      return;
+    }
+    
+    // Check throttling
+    const now = Date.now();
+    if (now - lastSubmitTime < SUBMIT_THROTTLE_MS) {
+      toast({
+        title: "Please wait",
+        description: `Please wait ${Math.ceil((SUBMIT_THROTTLE_MS - (now - lastSubmitTime)) / 1000)} seconds before submitting again.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Check max attempts
+    if (submitAttempts >= MAX_SUBMIT_ATTEMPTS) {
+      toast({
+        title: "Too many attempts",
+        description: "Please refresh the page and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Track form submission attempt
     trackCustomPixelEvent('FormSubmissionAttempt', {
       engagement_time: getEngagementTime(),
+      attempt_number: submitAttempts + 1,
       fields_filled: {
         name: !!name,
         email: !!email,
@@ -126,44 +255,65 @@ const Landing = () => {
       }
     });
     
-    if (!email || !name || !city || !phone) {
-      // Track validation error
+    // Validate form
+    if (!validateForm()) {
       trackCustomPixelEvent('FormValidationError', {
-        error_type: 'missing_fields',
+        error_type: 'validation_failed',
+        errors: Object.keys(validationErrors),
         page: 'landing',
         engagement_time: getEngagementTime()
       });
       
       toast({
-        title: "Required Fields",
-        description: "Please fill in all fields.",
+        title: "Please fix the errors",
+        description: "Check the highlighted fields and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check online status
+    if (!isOnline) {
+      toast({
+        title: "No internet connection",
+        description: "Please check your connection and try again.",
         variant: "destructive",
       });
       return;
     }
 
     setIsLoading(true);
+    setLastSubmitTime(now);
+    setSubmitAttempts(prev => prev + 1);
+    isSubmittingRef.current = true;
     
     try {
-      const response = await fetch('https://mnukhzjcvbwpvktxqlej.supabase.co/functions/v1/mailchimp-subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          name,
-          city,
-          phone,
-        }),
-      });
+      const submissionData = {
+        email: email.trim(),
+        name: name.trim(),
+        city: city.trim(),
+        phone: phone.trim(),
+      };
 
-      const data = await response.json();
+      const response = await retryWithBackoff(async () => {
+        const response = await fetch('https://mnukhzjcvbwpvktxqlej.supabase.co/functions/v1/mailchimp-subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(submissionData),
+        });
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to subscribe');
-      }
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to subscribe');
+        }
+        
+        return { response, data };
+      }, 3, 2000);
 
+      const { data } = response;
       setSubmitted(true);
       
       // Enhanced Lead tracking with engagement data
@@ -173,8 +323,10 @@ const Landing = () => {
         value: 0,
         currency: 'USD',
         engagement_time: getEngagementTime(),
+        processing_time: data.processingTime || 0,
+        backup_saved: data.backup_saved || false,
         user_data: {
-          email_hash: btoa(email).substring(0, 8), // Simple hash for privacy
+          email_hash: btoa(email).substring(0, 8),
           city: city
         }
       });
@@ -183,6 +335,8 @@ const Landing = () => {
       trackCustomPixelEvent('FormCompletionSuccess', {
         engagement_time: getEngagementTime(),
         page: 'landing',
+        attempt_number: submitAttempts,
+        processing_time: data.processingTime || 0,
         user_journey: {
           benefits_viewed: benefitsViewed,
           stats_viewed: statsViewed,
@@ -199,23 +353,40 @@ const Landing = () => {
         title: "Success!",
         description: "Please check your email for the training video link!",
       });
+      
+      // Clear form data for security
+      setEmail('');
+      setName('');
+      setPhone('');
+      setCity('');
+      
     } catch (error: any) {
-      console.error('Subscription error:', error);
+      console.error('Submission error:', error);
       
       // Track submission error
       trackCustomPixelEvent('FormSubmissionError', {
         error_message: error.message,
         engagement_time: getEngagementTime(),
+        attempt_number: submitAttempts,
         page: 'landing'
       });
       
+      let errorMessage = "Something went wrong. Please try again.";
+      
+      if (error.message.includes('Too many requests')) {
+        errorMessage = "Too many requests. Please wait a minute and try again.";
+      } else if (error.message.includes('network') || error.message.includes('fetch')) {
+        errorMessage = "Network error. Please check your connection and try again.";
+      }
+      
       toast({
         title: "Error",
-        description: error.message || "Something went wrong. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
+      isSubmittingRef.current = false;
     }
   };
 
@@ -312,7 +483,22 @@ const Landing = () => {
                 </CardDescription>
               </CardHeader>
               
-                <CardContent className="space-y-3 md:space-y-4">
+              <CardContent className="space-y-3 md:space-y-4">
+                {/* Connection Status Indicator */}
+                {!isOnline && (
+                  <div className="flex items-center gap-2 p-3 bg-destructive/10 text-destructive rounded-lg text-sm">
+                    <WifiOff className="w-4 h-4" />
+                    <span>No internet connection. Please check your connection.</span>
+                  </div>
+                )}
+                
+                {submitAttempts > 0 && submitAttempts < MAX_SUBMIT_ATTEMPTS && !submitted && (
+                  <div className="flex items-center gap-2 p-3 bg-primary/10 text-primary rounded-lg text-sm">
+                    <AlertCircle className="w-4 h-4" />
+                    <span>Attempt {submitAttempts} of {MAX_SUBMIT_ATTEMPTS}. If issues persist, try refreshing the page.</span>
+                  </div>
+                )}
+                
                 {submitted ? (
                   <div className="text-center space-y-4 py-8">
                     <CheckCircle className="w-16 h-16 text-primary mx-auto" />
@@ -339,9 +525,13 @@ const Landing = () => {
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           onFocus={handleFormStart}
-                          className="h-10"
+                          className={`h-10 ${validationErrors.name ? 'border-destructive' : ''}`}
                           required
+                          disabled={isLoading}
                         />
+                        {validationErrors.name && (
+                          <p className="text-sm text-destructive">{validationErrors.name}</p>
+                        )}
                       </div>
                       
                       <div className="space-y-1">
@@ -352,9 +542,13 @@ const Landing = () => {
                           placeholder="e.g., Los Angeles, CA"
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
-                          className="h-10"
+                          className={`h-10 ${validationErrors.city ? 'border-destructive' : ''}`}
                           required
+                          disabled={isLoading}
                         />
+                        {validationErrors.city && (
+                          <p className="text-sm text-destructive">{validationErrors.city}</p>
+                        )}
                       </div>
                       
                       <div className="space-y-1">
@@ -365,9 +559,13 @@ const Landing = () => {
                           placeholder="Enter your phone number"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          className="h-10"
+                          className={`h-10 ${validationErrors.phone ? 'border-destructive' : ''}`}
                           required
+                          disabled={isLoading}
                         />
+                        {validationErrors.phone && (
+                          <p className="text-sm text-destructive">{validationErrors.phone}</p>
+                        )}
                       </div>
                       
                       <div className="space-y-1">
@@ -378,17 +576,35 @@ const Landing = () => {
                           placeholder="Enter your email address"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="h-10"
+                          className={`h-10 ${validationErrors.email ? 'border-destructive' : ''}`}
                           required
+                          disabled={isLoading}
                         />
+                        {validationErrors.email && (
+                          <p className="text-sm text-destructive">{validationErrors.email}</p>
+                        )}
                       </div>
                       
                       <Button 
                         type="submit" 
                         className="w-full h-11 text-base font-semibold"
-                        disabled={isLoading}
+                        disabled={isLoading || !isOnline || submitAttempts >= MAX_SUBMIT_ATTEMPTS}
                       >
-                        {isLoading ? "Getting Access..." : "Watch Free Training Now →"}
+                        {isLoading ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span>Submitting... ({submitAttempts}/{MAX_SUBMIT_ATTEMPTS})</span>
+                          </div>
+                        ) : !isOnline ? (
+                          <div className="flex items-center gap-2">
+                            <WifiOff className="w-4 h-4" />
+                            <span>No Connection</span>
+                          </div>
+                        ) : submitAttempts >= MAX_SUBMIT_ATTEMPTS ? (
+                          <span>Too Many Attempts - Refresh Page</span>
+                        ) : (
+                          "Watch Free Training Now →"
+                        )}
                       </Button>
                     </form>
 

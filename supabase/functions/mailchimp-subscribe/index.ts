@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,14 +13,121 @@ interface SubscribeRequest {
   phone: string;
 }
 
+// Rate limiting using in-memory store (simple implementation)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const RATE_LIMIT_MAX = 10; // 10 requests per minute per IP
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const userLimit = rateLimitStore.get(ip);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitStore.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+}
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function retryWithBackoff<T>(
+  operation: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      if (attempt === maxRetries) {
+        throw error;
+      }
+      
+      const delay = baseDelay * Math.pow(2, attempt - 1) + Math.random() * 1000;
+      console.log(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
+      await sleep(delay);
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
 const handler = async (req: Request): Promise<Response> => {
+  const startTime = Date.now();
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Get client IP for rate limiting
+  const clientIP = req.headers.get("x-forwarded-for") || 
+                   req.headers.get("x-real-ip") || 
+                   "unknown";
+
+  // Check rate limit
+  if (!checkRateLimit(clientIP)) {
+    console.log(`Rate limit exceeded for IP: ${clientIP}`);
+    return new Response(
+      JSON.stringify({ 
+        error: "Too many requests. Please try again later.",
+        retryAfter: 60
+      }),
+      {
+        status: 429,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
+  }
+
+  let supabase: any = null;
+  let formSubmissionId: string | null = null;
+
   try {
     const { email, name, city, phone }: SubscribeRequest = await req.json();
+
+    // Initialize Supabase client for backup storage
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    if (supabaseUrl && supabaseServiceKey) {
+      supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      // Store form submission as backup immediately
+      try {
+        const { data: formData, error: formError } = await supabase
+          .from('form_submissions')
+          .insert({
+            email,
+            name,
+            city,
+            phone,
+            user_agent: req.headers.get("user-agent"),
+            ip_address: clientIP !== "unknown" ? clientIP : null,
+            mailchimp_success: false
+          })
+          .select('id')
+          .single();
+
+        if (formError) {
+          console.error("Error storing form submission:", formError);
+        } else {
+          formSubmissionId = formData?.id;
+          console.log(`Form submission stored with ID: ${formSubmissionId}`);
+        }
+      } catch (backupError) {
+        console.error("Backup storage failed:", backupError);
+        // Continue with Mailchimp even if backup fails
+      }
+    }
 
     const mailchimpApiKey = Deno.env.get("MAILCHIMP_API_KEY");
     const listId = Deno.env.get("MAILCHIMP_LIST_ID");
@@ -40,38 +148,74 @@ const handler = async (req: Request): Promise<Response> => {
     
     const url = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members`;
 
-    console.log("Subscribing to Mailchimp:", { email, name, city, phone });
+    console.log("Subscribing to Mailchimp:", { email, name, city, phone, submissionId: formSubmissionId });
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${mailchimpApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email_address: email,
-        status: "subscribed",
-        merge_fields: {
-          FNAME: name,
-          CITY: city,
-          PHONE: phone,
+    // Use retry mechanism for Mailchimp API call
+    const { response, data } = await retryWithBackoff(async () => {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${mailchimpApiKey}`,
+          "Content-Type": "application/json",
         },
-      }),
-    });
+        body: JSON.stringify({
+          email_address: email,
+          status: "subscribed",
+          merge_fields: {
+            FNAME: name,
+            CITY: city,
+            PHONE: phone,
+          },
+        }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
+      return { response, data };
+    }, 3, 1000);
 
     if (!response.ok) {
       console.error("Mailchimp API error:", data);
       
+      // Update backup record with error
+      if (supabase && formSubmissionId) {
+        try {
+          await supabase
+            .from('form_submissions')
+            .update({ 
+              mailchimp_error: JSON.stringify(data),
+              mailchimp_success: false 
+            })
+            .eq('id', formSubmissionId);
+        } catch (updateError) {
+          console.error("Error updating form submission:", updateError);
+        }
+      }
+      
       // Handle already subscribed case gracefully
       if (data.title === "Member Exists") {
         console.log("User already subscribed:", email);
+        
+        // Update backup record as successful for existing members
+        if (supabase && formSubmissionId) {
+          try {
+            await supabase
+              .from('form_submissions')
+              .update({ 
+                mailchimp_success: true,
+                mailchimp_error: "Member already exists"
+              })
+              .eq('id', formSubmissionId);
+          } catch (updateError) {
+            console.error("Error updating form submission:", updateError);
+          }
+        }
+        
         return new Response(
           JSON.stringify({ 
             success: true, 
             message: "Already subscribed",
-            member_id: data.detail?.split("'")[1] || null
+            member_id: data.detail?.split("'")[1] || null,
+            processingTime: Date.now() - startTime
           }),
           {
             status: 200,
@@ -80,8 +224,13 @@ const handler = async (req: Request): Promise<Response> => {
         );
       }
 
+      // For other errors, return failure but data is still saved in backup
       return new Response(
-        JSON.stringify({ error: data.detail || "Failed to subscribe" }),
+        JSON.stringify({ 
+          error: data.detail || "Failed to subscribe",
+          backup_saved: formSubmissionId ? true : false,
+          processingTime: Date.now() - startTime
+        }),
         {
           status: response.status,
           headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -91,11 +240,27 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Successfully subscribed:", data);
 
+    // Update backup record as successful
+    if (supabase && formSubmissionId) {
+      try {
+        await supabase
+          .from('form_submissions')
+          .update({ 
+            mailchimp_success: true,
+            mailchimp_error: null
+          })
+          .eq('id', formSubmissionId);
+      } catch (updateError) {
+        console.error("Error updating form submission:", updateError);
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
         message: "Successfully subscribed",
-        member_id: data.id
+        member_id: data.id,
+        processingTime: Date.now() - startTime
       }),
       {
         status: 200,
@@ -105,8 +270,28 @@ const handler = async (req: Request): Promise<Response> => {
 
   } catch (error: any) {
     console.error("Error in mailchimp-subscribe function:", error);
+    
+    // Update backup record with error if we have one
+    if (supabase && formSubmissionId) {
+      try {
+        await supabase
+          .from('form_submissions')
+          .update({ 
+            mailchimp_error: error.message,
+            mailchimp_success: false
+          })
+          .eq('id', formSubmissionId);
+      } catch (updateError) {
+        console.error("Error updating form submission with error:", updateError);
+      }
+    }
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        backup_saved: formSubmissionId ? true : false,
+        processingTime: Date.now() - startTime
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
