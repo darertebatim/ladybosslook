@@ -4,7 +4,7 @@
 
 /* LadyBoss Empowerment Design System - Elegant, Powerful, Inspiring */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&family=Vazirmatn:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -70,6 +70,7 @@
     /* Typography Scale */
     --font-display: 'Playfair Display', serif;
     --font-body: 'Inter', sans-serif;
+    --font-farsi: 'Vazirmatn', sans-serif;
 
     /* Animation */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -162,6 +163,51 @@
 
   .font-body {
     font-family: var(--font-body);
+  }
+
+  .font-farsi {
+    font-family: var(--font-farsi);
+  }
+
+  /* RTL Support */
+  .rtl {
+    direction: rtl;
+    text-align: right;
+  }
+
+  .ltr {
+    direction: ltr;
+    text-align: left;
+  }
+
+  /* Farsi Numbers */
+  .farsi-nums {
+    font-feature-settings: "ss01" on;
+  }
+
+  /* Sticky CTA */
+  .sticky-cta {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes slideUp {
+    from { transform: translate(-50%, 100%); }
+    to { transform: translate(-50%, 0); }
+  }
+
+  /* Pulse animation for urgency */
+  .pulse-glow {
+    animation: pulseGlow 2s infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.3); }
+    50% { box-shadow: 0 0 40px hsl(var(--primary) / 0.6); }
   }
 
   /* Gradient Text */

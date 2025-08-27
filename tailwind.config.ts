@@ -20,6 +20,7 @@ export default {
 		extend: {
 			fontFamily: {
 				'persian': ['Vazirmatn', 'Inter', 'sans-serif'],
+				'farsi': ['Vazirmatn', 'sans-serif'],
 				'display': ['Playfair Display', 'serif'],
 				'body': ['Inter', 'sans-serif'],
 			},
