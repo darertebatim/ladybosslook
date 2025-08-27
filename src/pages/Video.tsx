@@ -83,15 +83,16 @@ const Video = () => {
         </div>
 
         {/* WhatsApp Gift Section */}
-        <div className="max-w-3xl mx-auto mt-6 sm:mt-8 px-4 sm:px-6 text-center">
-          <p className="text-sm sm:text-base text-foreground mb-3 sm:mb-4 font-bold bg-primary/10 p-3 rounded-lg">
+        <div className="max-w-4xl mx-auto mt-6 sm:mt-8 px-4 sm:px-6 text-center">
+          <p className="text-xs sm:text-sm text-foreground mb-3 sm:mb-4 font-bold bg-primary/10 p-3 rounded-lg whitespace-nowrap overflow-hidden">
             برای گرفتن هدیه، اسم رمز را به واتسپ پایین بفرستید
           </p>
           <Button 
             className="bg-green-600 hover:bg-green-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
             onClick={() => {
               const message = encodeURIComponent('jorat');
-              window.open(`https://wa.me/19495723730?text=${message}`, '_blank');
+              const url = `https://wa.me/19495723730?text=${message}`;
+              window.open(url, '_blank', 'noopener,noreferrer');
             }}
           >
             <MessageCircle size={18} className="sm:w-5 sm:h-5 mr-2" />
