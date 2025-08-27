@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, Play, Share2, BookOpen, ChevronDown, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Play, Share2, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Video = () => {
@@ -51,21 +51,14 @@ const Video = () => {
           </p>
         </div>
 
-        {/* Arrow pointing to video */}
-        <div className="flex justify-center mb-4">
-          <div className="animate-bounce">
-            <ChevronDown size={32} className="text-primary" />
-          </div>
-        </div>
-
         {/* Video Container */}
-        <div className="max-w-5xl mx-auto px-2 sm:px-0" id="video-focus">
+        <div className="max-w-5xl mx-auto px-2 sm:px-0">
           <Card className="overflow-hidden bg-gradient-card border-border shadow-medium">
             <div className="aspect-video relative">
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/0wT0D8dJin8?rel=0&modestbranding=1"
+                src="https://www.youtube.com/embed/FYn1vYW1tP8?rel=0&modestbranding=1"
                 title="Courageous Character Course - LadyBoss Academy"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -75,23 +68,6 @@ const Video = () => {
               ></iframe>
             </div>
           </Card>
-        </div>
-
-        {/* WhatsApp Section */}
-        <div className="max-w-5xl mx-auto mt-6 px-2 sm:px-0">
-          <div className="text-center">
-            <p className="text-lg font-medium text-foreground mb-4" dir="rtl">
-              برای گرفتن هدیه، اسم رمز را به واتسپ پایین بفرستید
-            </p>
-            <Button 
-              onClick={() => window.open('https://wa.me/19495723730?text=orat', '_blank')}
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
-              size="lg"
-            >
-              <MessageCircle size={20} className="mr-2" />
-              Send "orat" to WhatsApp
-            </Button>
-          </div>
         </div>
 
         {/* Video Info & Actions */}
