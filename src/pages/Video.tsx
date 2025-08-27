@@ -46,7 +46,7 @@ const Video = () => {
           </h1>
           
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-            Transform your challenges into strengths and become a confident ladyboss leader.
+            Learn your rights and set healthy boundaries as the first step to courageous leadership.
           </p>
         </div>
 
