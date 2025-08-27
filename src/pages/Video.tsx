@@ -30,9 +30,9 @@ const Video = () => {
         </div>
       </div>
 
-      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
         {/* Page Header */}
-        <div className="text-center mb-8 sm:mb-12">
+        <div className="text-center mb-4 sm:mb-6">
           <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-primary/10 rounded-full mb-4 sm:mb-6">
             <Play size={14} className="sm:w-4 sm:h-4 mr-2 text-primary" />
             <span className="text-xs sm:text-sm font-medium text-primary">
@@ -51,7 +51,7 @@ const Video = () => {
         </div>
 
         {/* Multiple Bouncing Arrows */}
-        <div className="flex justify-center items-center space-x-2 mb-4 sm:mb-6">
+        <div className="flex justify-center items-center space-x-2 mb-2 sm:mb-3">
           <div className="animate-bounce" style={{ animationDelay: '0s' }}>
             <ChevronDown size={28} className="text-primary" />
           </div>
