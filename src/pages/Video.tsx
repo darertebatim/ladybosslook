@@ -2,8 +2,115 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowLeft, Play, Share2, BookOpen, ChevronDown, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+
+// Declare Facebook Pixel function
+declare global {
+  interface Window {
+    fbq?: (command: string, event: string, parameters?: Record<string, any>) => void;
+  }
+}
 
 const Video = () => {
+  // Meta Pixel tracking
+  useEffect(() => {
+    // Track PageView
+    if (typeof window !== 'undefined' && window.fbq) {
+      window.fbq('track', 'PageView');
+      
+      // Track ViewContent with video-specific parameters
+      window.fbq('track', 'ViewContent', {
+        content_type: 'video',
+        content_name: 'Courageous Character Course',
+        content_category: 'Training Video',
+        value: 0,
+        currency: 'USD'
+      });
+      
+      // Custom event for video page visit
+      window.fbq('trackCustom', 'VideoPageVisit', {
+        video_title: 'Build Your Courageous Character',
+        course_step: 'Step 1: Rights & Boundaries',
+        user_type: 'video_viewer'
+      });
+    }
+
+    // Track scroll depth for engagement
+    let maxScroll = 0;
+    const trackScrollDepth = () => {
+      const scrollPercent = Math.round(
+        (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+      );
+      
+      if (scrollPercent > maxScroll) {
+        maxScroll = scrollPercent;
+        
+        // Track engagement milestones
+        if (scrollPercent >= 25 && maxScroll < 25) {
+          window.fbq && window.fbq('trackCustom', 'VideoEngagement', {
+            engagement_level: '25_percent_scroll',
+            content_name: 'Courageous Character Course'
+          });
+        } else if (scrollPercent >= 50 && maxScroll < 50) {
+          window.fbq && window.fbq('trackCustom', 'VideoEngagement', {
+            engagement_level: '50_percent_scroll',
+            content_name: 'Courageous Character Course'
+          });
+        } else if (scrollPercent >= 75 && maxScroll < 75) {
+          window.fbq && window.fbq('trackCustom', 'VideoEngagement', {
+            engagement_level: '75_percent_scroll',
+            content_name: 'Courageous Character Course'
+          });
+        }
+      }
+    };
+
+    window.addEventListener('scroll', trackScrollDepth);
+    return () => window.removeEventListener('scroll', trackScrollDepth);
+  }, []);
+
+  const handleWhatsAppClick = () => {
+    // Track WhatsApp button click as Lead event
+    if (typeof window !== 'undefined' && window.fbq) {
+      window.fbq('track', 'Lead', {
+        content_name: 'WhatsApp Gift Contact',
+        content_category: 'Video CTA',
+        value: 1,
+        currency: 'USD'
+      });
+      
+      // Custom event for WhatsApp interaction
+      window.fbq('trackCustom', 'WhatsAppButtonClick', {
+        source: 'video_page',
+        gift_code: 'jorat',
+        user_intent: 'high_interest'
+      });
+    }
+
+    const message = encodeURIComponent('jorat');
+    const url = `https://wa.me/19495723730?text=${message}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleJoinAcademyClick = () => {
+    // Track course interest
+    if (typeof window !== 'undefined' && window.fbq) {
+      window.fbq('track', 'InitiateCheckout', {
+        content_name: 'LadyBoss Academy Membership',
+        content_category: 'Course Enrollment',
+        value: 0,
+        currency: 'USD'
+      });
+      
+      // Custom event for course interest
+      window.fbq('trackCustom', 'CourseInterest', {
+        source: 'video_page',
+        course_name: 'LadyBoss Academy',
+        user_intent: 'conversion_ready'
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation Header */}
@@ -89,11 +196,7 @@ const Video = () => {
           </p>
           <Button 
             className="bg-green-600 hover:bg-green-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
-            onClick={() => {
-              const message = encodeURIComponent('jorat');
-              const url = `https://wa.me/19495723730?text=${message}`;
-              window.open(url, '_blank', 'noopener,noreferrer');
-            }}
+            onClick={handleWhatsAppClick}
           >
             <MessageCircle size={18} className="sm:w-5 sm:h-5 mr-2" />
             Send to WhatsApp
@@ -155,6 +258,7 @@ const Video = () => {
                   <Button 
                     className="w-full bg-primary hover:bg-primary-dark text-sm sm:text-base font-bold"
                     asChild
+                    onClick={handleJoinAcademyClick}
                   >
                     <Link to="/#community">
                       Join LadyBoss Academy
