@@ -486,7 +486,7 @@ const Landing = () => {
             <Card className="border-2 border-primary/20 shadow-xl">
               <CardHeader className="text-center pb-3">
                 <CardTitle className="text-xl md:text-2xl">
-                  Get Instant Access
+                  Get Instant Email Access
                 </CardTitle>
                 <CardDescription>
                   🎁 آموزش 20 دقیقه‌ای رایگان 🎁
