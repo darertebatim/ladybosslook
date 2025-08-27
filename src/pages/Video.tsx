@@ -36,7 +36,7 @@ const Video = () => {
           <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-primary/10 rounded-full mb-4 sm:mb-6">
             <Play size={14} className="sm:w-4 sm:h-4 mr-2 text-primary" />
             <span className="text-xs sm:text-sm font-medium text-primary">
-              Featured Content
+              Step 1: Rights & Boundaries
             </span>
           </div>
           
