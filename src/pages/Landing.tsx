@@ -401,7 +401,7 @@ const Landing = () => {
   return (
     <>
       <SEOHead
-        title="Unlock Your Courageous Character - Free Training for Persian Women"
+        title="Exclusive Free Training By LADYBOSS"
         description="20-minute exclusive training by LADYBOSS. Build unshakeable confidence and overcome cultural barriers. Join 2,500+ empowered Persian women."
         image={`${window.location.origin}/lovable-uploads/cc26e040-a2f3-48d8-83ae-02a973799ac3.png`}
         url={`${window.location.origin}/landing`}
