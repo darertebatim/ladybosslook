@@ -241,8 +241,9 @@ const Landing = () => {
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"> Courageous Character</span>
           </h1>
           
-          <p className="text-sm text-muted-foreground">
-            A 30-minute masterclass for Persian women ready to build confidence and success in their new homeland.
+          <p className="text-sm text-muted-foreground leading-tight">
+            A 20-minute masterclass for Persian women<br className="sm:hidden" />
+            ready to build confidence and success in their new homeland.
           </p>
         </div>
 
@@ -262,7 +263,7 @@ const Landing = () => {
               </h1>
               
               <p className="text-sm md:text-base lg:text-lg text-muted-foreground">
-                A 30-minute masterclass for Persian women ready to build confidence and success in their new homeland.
+                A 20-minute masterclass for Persian women ready to build confidence and success in their new homeland.
               </p>
             </div>
 
@@ -293,7 +294,7 @@ const Landing = () => {
               </div>
               <div className="text-center">
                 <Clock className="w-5 h-5 text-primary mx-auto mb-1" />
-                <div className="text-lg font-bold">30 Min</div>
+                <div className="text-lg font-bold">20 Min</div>
                 <div className="text-xs text-muted-foreground">Training</div>
               </div>
             </div>
