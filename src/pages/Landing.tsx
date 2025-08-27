@@ -241,9 +241,9 @@ const Landing = () => {
             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"> Courageous Character</span>
           </h1>
           
-          <p className="text-sm text-muted-foreground leading-tight">
-            A 20-minute masterclass for Persian women<br className="sm:hidden" />
-            ready to build confidence and success in their new homeland.
+          <p className="text-sm text-muted-foreground/70 leading-tight">
+            20-minute training for Persian women<br className="sm:hidden" />
+            to build confidence and success.
           </p>
         </div>
 
@@ -262,8 +262,8 @@ const Landing = () => {
                 <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"> Courageous Character</span>
               </h1>
               
-              <p className="text-sm md:text-base lg:text-lg text-muted-foreground">
-                A 20-minute masterclass for Persian women ready to build confidence and success in their new homeland.
+              <p className="text-sm md:text-base lg:text-lg text-muted-foreground/70">
+                20-minute training for Persian women to build confidence and success.
               </p>
             </div>
 
