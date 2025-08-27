@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, Star, Users, Clock, Shield, AlertCircle, Wifi, WifiOff } from 'lucide-react';
+import { SEOHead } from '@/components/SEOHead';
 
 const Landing = () => {
   const [email, setEmail] = useState('');
@@ -398,7 +399,16 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center py-2 md:py-8">
+    <>
+      <SEOHead
+        title="Unlock Your Courageous Character - Free Training for Persian Women"
+        description="20-minute exclusive training by LADYBOSS. Build unshakeable confidence and overcome cultural barriers. Join 2,500+ empowered Persian women."
+        image={`${window.location.origin}/lovable-uploads/cc26e040-a2f3-48d8-83ae-02a973799ac3.png`}
+        url={`${window.location.origin}/landing`}
+        type="website"
+        locale="fa_IR"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center py-2 md:py-8">
       <div className="container mx-auto px-4">
         {/* Title Section - Above everything on mobile */}
         <div className="text-center mb-4 lg:hidden">
@@ -629,6 +639,7 @@ const Landing = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
