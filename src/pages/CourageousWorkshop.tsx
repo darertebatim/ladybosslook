@@ -213,11 +213,12 @@ const CourageousWorkshop = () => {
               <Calendar className="w-4 h-4 ml-2" />
               کارگاه زنده آنلاین
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent leading-tight">
-              کاراکتر پرجرات: مرزبندی، ابراز وجود و قدرت ارتباطی برای ایرانیان مهاجر
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent leading-tight">
+              کارگاه آنلاین
+              <span className="block text-4xl sm:text-5xl lg:text-7xl mt-2 text-primary">شخصیت شجاع</span>
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground mb-6 max-w-4xl mx-auto leading-relaxed">
-              ورکشاپی زن-محور و مهاجر-فهم برای این‌که محترمانه حرفت را بزنی، بدون عذاب وجدان «نه» بگویی و حقّت را بگیری—به فارسی (با مثال‌های انگلیسی)
+              اعتماد به نفستان را متحول کنید، مرزهای سالم تعیین کنید و شجاعت لازم برای دنبال کردن بزرگ‌ترین رویاهایتان را در این کارگاه زنده ۳ ساعته بسازید
             </p>
 
             {/* Pricing Section */}
@@ -241,7 +242,7 @@ const CourageousWorkshop = () => {
                 onClick={() => handleRegisterClick('hero')}
               >
                 <Zap className="w-6 h-6 ml-2" />
-                ثبت‌نام • ۳ جلسهٔ زنده × ۲ ساعت • +۶ ساعت دورهٔ ضبط‌شده • زوم + جزوه
+                همین حالا ثبت‌نام کنید - $۹۷
               </Button>
               <Button 
                 variant="outline" 
@@ -274,39 +275,34 @@ const CourageousWorkshop = () => {
           {/* Problem Section */}
           <section className="mb-12">
             <div className="bg-gradient-to-br from-red-50 to-orange-50 border border-red-100 rounded-2xl p-8">
-              <h2 className="text-3xl font-bold text-center mb-8 text-red-800">مشکلی که همه‌ی مهاجران ایرانی با آن روبرو هستند</h2>
-              <div className="text-center mb-6">
-                <p className="text-lg text-red-700 max-w-3xl mx-auto">
-                  مهاجرت نباید صدای تو را خاموش کند؛ اما خیلی‌ها در محیط جدید خجالتی می‌شوند، تعارف می‌کنند و از نُرم‌های آمریکا مطمئن نیستند
-                </p>
-              </div>
+              <h2 className="text-3xl font-bold text-center mb-8 text-red-800">آیا این احساسات برایتان آشنا است؟</h2>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>اتلاف زمان و انرژی در محیط کار و مدرسه</span>
+                    <span>نمی‌توانم «نه» بگویم و همیشه خودم را فدا می‌کنم</span>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>نمی‌دانم چطور درخواست‌هایم را مطرح کنم</span>
+                    <span>از قضاوت دیگران می‌ترسم و اعتماد به نفس ندارم</span>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>از نُرم‌های آمریکایی مطمئن نیستم</span>
+                    <span>رویاهایم را کنار گذاشته‌ام چون نمی‌دانم چطور شروع کنم</span>
                   </div>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>اتلاف لذت و آرامش در روابط خانوادگی</span>
+                    <span>همیشه در موقعیت‌های دشوار تسلیم می‌شوم</span>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>نمی‌توانم حقوقم را پیگیری کنم</span>
+                    <span>احساس می‌کنم صدایم شنیده نمی‌شود</span>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>هزینه‌های غیرضروری بخاطر نتوانستن مذاکره کردن</span>
+                    <span>نمی‌توانم برای خودم دفاع کنم</span>
                   </div>
                 </div>
               </div>
@@ -316,9 +312,9 @@ const CourageousWorkshop = () => {
           {/* Solution Section */}
           <section className="mb-12">
             <div className="bg-gradient-to-br from-green-50 to-blue-50 border border-green-100 rounded-2xl p-8">
-              <h2 className="text-3xl font-bold text-center mb-6 text-green-800">راه‌حل: کاراکتر پرجرات در ۳ جلسه زنده</h2>
+              <h2 className="text-3xl font-bold text-center mb-6 text-green-800">راه‌حل: متحول شدن در ۳ ساعت!</h2>
               <p className="text-lg text-center mb-8 max-w-3xl mx-auto text-green-700">
-                در ۳ کلاس زنده (به‌علاوهٔ دورهٔ ۶ ساعتهٔ ضبط‌شده) سبک ارتباطی قاطع و درعین‌حال محترمانه می‌سازی. با اسکریپت‌های مرزبندی، نُرم‌های آمریکا و قانون سه‌تایی اظهارنظر یاد می‌گیری درخواست‌ها، تعارض‌ها، انتقادها و مذاکره‌ها را بدون خراب‌کردن رابطه مدیریت کنی
+                در کارگاه «شخصیت شجاع» یاد می‌گیرید چطور از یک زن تردیدآمیز به یک لیدر مطمئن و شجاع تبدیل شوید
               </p>
               <div className="text-center">
                 <Button 
@@ -343,24 +339,24 @@ const CourageousWorkshop = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">قالب:</span>
-                  <span className="font-medium">۳ روز، هر روز ۲ ساعت</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">دوره آفلاین:</span>
-                  <span className="font-medium">۶ ساعت ضبط‌شده</span>
+                  <span className="text-muted-foreground">مدت زمان:</span>
+                  <span className="font-medium">۳ ساعت زنده</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">شیوه برگزاری:</span>
-                  <span className="font-medium">زوم (ضبط در دسترس)</span>
+                  <span className="font-medium">آنلاین از طریق زوم</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">مخاطب:</span>
-                  <span className="font-medium">خانم‌های ایرانی مهاجر</span>
+                  <span className="text-muted-foreground">حداکثر شرکت‌کنندگان:</span>
+                  <span className="font-medium">۲۵ خانم</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">گروه همراهی:</span>
-                  <span className="font-medium">واتس‌اپ/تلگرام</span>
+                  <span className="text-muted-foreground">دسترسی به ضبط:</span>
+                  <span className="font-medium">۷ روز</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">مواد جانبی:</span>
+                  <span className="font-medium">شامل می‌شود</span>
                 </div>
               </CardContent>
             </Card>
@@ -375,31 +371,27 @@ const CourageousWorkshop = () => {
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>ورک‌بوک دو زبانه (PDF)</span>
+                  <span>کارگاه ۳ ساعته زنده و تعاملی</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>پکیج اسکریپت‌های مرزبندی (۴۰+ اسکریپت)</span>
+                  <span>تمرین‌ها و ابزارهای شجاعت‌سازی</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>شیت محاسبهٔ لطمۀ مالی</span>
+                  <span>چارچوب حدودگذاری سالم</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>فایل «۱۰ جواب آماده برای نه گفتن»</span>
+                  <span>پرسش و پاسخ با جوآنا</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>چک‌لیست‌های بازخورد و مذاکره</span>
+                  <span>کتاب کار دیجیتال و قالب‌ها</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>دسترسی دائمی به ضبط‌ها</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>حلقهٔ خصوصی واتس‌اپ/تلگرام</span>
+                  <span>دسترسی به انجمن خصوصی</span>
                 </div>
               </CardContent>
             </Card>
@@ -407,61 +399,53 @@ const CourageousWorkshop = () => {
 
           {/* What You'll Learn */}
           <section className="mb-12">
-          <h2 className="text-3xl font-bold text-center mb-8">خروجی‌ها - آنچه یاد خواهید گرفت</h2>
+            <h2 className="text-3xl font-bold text-center mb-8">چه چیزهایی یاد خواهید گرفت؟</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <Award className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">ریشه‌های کم‌جراتی را بشناسید</h3>
-                  <p className="text-muted-foreground">ریشه‌های کم‌جراتی را بشناسی و به جسارت تبدیل کنی</p>
+                  <h3 className="text-lg font-semibold mb-2">اعتماد به نفس تزلزل‌ناپذیر</h3>
+                  <p className="text-muted-foreground">بر تردید غلبه کنید و اعتماد به نفس لازم برای دنبال کردن بزرگ‌ترین اهدافتان را توسعه دهید.</p>
                 </CardContent>
               </Card>
               
               <Card className="bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20 hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <Shield className="w-12 h-12 text-secondary mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">مرزبندی روشن</h3>
-                  <p className="text-muted-foreground">مرزبندی روشن با خانواده، همکار، صاحب‌خانه، مدرسه، و …</p>
+                  <h3 className="text-lg font-semibold mb-2">مرزگذاری سالم</h3>
+                  <p className="text-muted-foreground">یاد بگیرید بدون احساس گناه «نه» بگویید و از انرژی و زمانتان محافظت کنید.</p>
                 </CardContent>
               </Card>
               
               <Card className="bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20 hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <Zap className="w-12 h-12 text-accent mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">قانون سه‌تایی اظهارنظر</h3>
-                  <p className="text-muted-foreground">به‌کارگیری قانون سه‌تایی اظهارنظر (واقعیت۱ + واقعیت۲ + پیش‌نهاد)</p>
+                  <h3 className="text-lg font-semibold mb-2">شجاعت در عمل</h3>
+                  <p className="text-muted-foreground">ترس را به سوخت تبدیل کنید و اقدام جسورانه به سمت رویاهایتان بردارید.</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <Target className="w-12 h-12 text-green-600 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">«نه» و «بله» بگویید</h3>
-                  <p className="text-muted-foreground">«نه» گفتن بدون عذاب وجدان؛ «بله» گفتن مشروط</p>
+                  <h3 className="text-lg font-semibold mb-2">هدف‌گذاری قدرتمند</h3>
+                  <p className="text-muted-foreground">اهداف واضح و قابل دستیابی تعیین کنید و راه‌های عملی برای رسیدن به آنها بیاموزید.</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <Heart className="w-12 h-12 text-purple-600 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">پیگیری حق و حقوق</h3>
-                  <p className="text-muted-foreground">پیگیری حق و حقوق (ریفاند، دستمزد، ضرب‌الاجل‌ها) به سبک آمریکایی</p>
+                  <h3 className="text-lg font-semibold mb-2">مراقبت از خود</h3>
+                  <p className="text-muted-foreground">اولویت‌بندی نیازهای خود بدون احساس خودخواهی و ایجاد تعادل سالم در زندگی.</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <TrendingUp className="w-12 h-12 text-orange-600 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">ساختن «اقتدارِ مهربان»</h3>
-                  <p className="text-muted-foreground">کنارگذاشتن «همه‌پسندبودن» و ساختن «اقتدارِ مهربان»</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <Star className="w-12 h-12 text-blue-600 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">دریافت انتقاد</h3>
-                  <p className="text-muted-foreground">دریافت انتقاد بدون کوچک‌شدن یا پرخاش</p>
+                  <h3 className="text-lg font-semibold mb-2">رشد مداوم</h3>
+                  <p className="text-muted-foreground">ایجاد عادت‌های مثبت و ذهنیت رشد برای پیشرفت مداوم در تمام زمینه‌های زندگی.</p>
                 </CardContent>
               </Card>
             </div>
@@ -470,37 +454,37 @@ const CourageousWorkshop = () => {
           {/* Instructor Section */}
           <section className="mb-12">
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8">
-              <h2 className="text-3xl font-bold text-center mb-8">مربی شما: راضیه میرزایی</h2>
+              <h2 className="text-3xl font-bold text-center mb-8">مربی شما: جوآنا سولیوان</h2>
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
                   <img 
                     src="/assets/hero-businesswoman.jpg" 
-                    alt="راضیه میرزایی" 
+                    alt="جوآنا سولیوان" 
                     className="w-full max-w-md mx-auto rounded-lg shadow-lg"
                   />
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-blue-800">نویسندهٔ «کاراکتر پرجرات» و بنیان‌گذار آکادمی لیدی‌باس</h3>
+                  <h3 className="text-xl font-semibold text-blue-800">متخصص توسعه رهبری زنان</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
+                      <Star className="w-5 h-5 text-yellow-500" />
+                      <span>بیش از ۱۰ سال تجربه در کوچینگ زنان</span>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <Users className="w-5 h-5 text-blue-500" />
-                      <span>۱۵هزار+ هنرجو در کارگاه‌های حضوری/آنلاین</span>
+                      <span>بیش از ۵۰۰۰ زن را متحول کرده</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Award className="w-5 h-5 text-purple-500" />
-                      <span>متخصص ارتباط قاطع برای زنان ایرانی</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Star className="w-5 h-5 text-yellow-500" />
-                      <span>تمرکز بر زنان؛ همراهی برای همه</span>
+                      <span>نویسنده کتاب پرفروش "قدرت درونی"</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Globe className="w-5 h-5 text-green-500" />
-                      <span>متخصص فرهنگ ایرانی-آمریکایی</span>
+                      <span>سخنران بین‌المللی</span>
                     </div>
                   </div>
                   <p className="text-muted-foreground">
-                    راضیه با تجربه‌ی مهاجرت و درک عمیق از چالش‌های فرهنگی، روش‌هایی عملی و کاربردی برای رشد اعتماد به نفس و مهارت‌های ارتباطی زنان ایرانی ارائه می‌دهد.
+                    جوآنا با ترکیب روش‌های علمی و تجربیات عملی، راه‌هایی منحصر به فرد برای رشد اعتماد به نفس و شجاعت زنان ارائه می‌دهد.
                   </p>
                 </div>
               </div>
@@ -621,32 +605,20 @@ const CourageousWorkshop = () => {
             <div className="space-y-4 max-w-3xl mx-auto">
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">ضبط‌ها؟</h3>
-                  <p className="text-muted-foreground">بله، دسترسی دائمی. تمام جلسات ضبط می‌شود و در دسترس شما قرار می‌گیرد.</p>
+                  <h3 className="font-semibold mb-2">آیا این کارگاه برای مبتدی‌ها مناسب است؟</h3>
+                  <p className="text-muted-foreground">بله، این کارگاه برای تمام سطوح طراحی شده و نیازی به تجربه قبلی ندارید.</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">فقط برای خانم‌هاست؟</h3>
-                  <p className="text-muted-foreground">زن-محور است؛ حضور متحدان آزاد. تمرکز اصلی روی نیازهای زنان ایرانی مهاجر است.</p>
+                  <h3 className="font-semibold mb-2">اگر نتوانم در زمان مقرر شرکت کنم چه؟</h3>
+                  <p className="text-muted-foreground">شما ۷ روز دسترسی به ضبط کامل کارگاه خواهید داشت.</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">زبان من ضعیف است؟</h3>
-                  <p className="text-muted-foreground">آموزش فارسی با مثال‌های انگلیسی؛ اسکریپت‌ها دو زبانه. نگران نباشید!</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">خجالتی‌ام و ترسیده‌ام</h3>
-                  <p className="text-muted-foreground">اتاق‌های کوچک و تمرین‌های مرحله‌به‌مرحله داریم. محیط امن و حمایتی خواهید داشت.</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">گارانتی؟</h3>
-                  <p className="text-muted-foreground">گارانتی ۷روزهٔ رضایت از شروع دورهٔ زنده. اگر راضی نباشید، پول شما برگردانده می‌شود.</p>
+                  <h3 className="font-semibold mb-2">آیا ضمانت بازگشت وجه دارید؟</h3>
+                  <p className="text-muted-foreground">بله، ۳۰ روز ضمانت کامل بازگشت وجه داریم. اگر راضی نباشید، پول شما برگردانده می‌شود.</p>
                 </CardContent>
               </Card>
             </div>
@@ -676,7 +648,7 @@ const CourageousWorkshop = () => {
                 onClick={() => handleRegisterClick('final_cta')}
               >
                 <Zap className="w-6 h-6 ml-2" />
-                همین حالا ثبت‌نام کن → ظرفیت محدودِ جلسات زنده
+                همین الان ثبت‌نام کنید - $۹۷
               </Button>
               <Button 
                 variant="outline" 
