@@ -489,7 +489,7 @@ const Landing = () => {
                   Get Instant Access
                 </CardTitle>
                 <CardDescription>
-                  Join thousands of empowered Persian women
+                  🎁 آموزش 20 دقیقه‌ای رایگان 🎁
                 </CardDescription>
               </CardHeader>
               
