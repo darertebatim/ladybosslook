@@ -100,34 +100,33 @@ const Video = () => {
             <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               <div>
                 <h2 className="font-display text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
-                  About This 30-Minute Course
+                  About This 20-Minute Course
                 </h2>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  This transformative course is specially crafted for Persian women who have courageously 
-                  immigrated and are ready to step into their power. Learn how to overcome cultural barriers, 
-                  build unshakeable confidence, and develop the courageous character needed to thrive as 
-                  a successful ladyboss in your new environment.
+                  The foundational step to building courageous character as a Persian immigrant woman. 
+                  This powerful session focuses on understanding your fundamental rights and establishing 
+                  healthy boundaries in your relationships, communications, and professional life in your new homeland.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-3 text-sm sm:text-base">What You'll Master in 30 Minutes:</h3>
+                <h3 className="font-semibold mb-3 text-sm sm:text-base">What You'll Learn in 20 Minutes:</h3>
                 <ul className="space-y-2 sm:space-y-3 text-muted-foreground text-sm sm:text-base">
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    <span>How to transform immigrant challenges into your greatest strengths as a leader</span>
+                    <span>Recognize your fundamental rights as an immigrant woman in personal and professional settings</span>
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    <span>The Persian resilience framework for building unshakeable confidence</span>
+                    <span>Master the art of saying "no" respectfully while maintaining your dignity and relationships</span>
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    <span>Navigating cultural bridges while staying true to your authentic self</span>
+                    <span>Establish clear boundaries in your workplace communications and career advancement</span>
                   </li>
                   <li className="flex items-start">
                     <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                    <span>Courageous communication techniques for commanding respect in any room</span>
+                    <span>Communicate assertively while honoring your Persian heritage and cultural values</span>
                   </li>
                 </ul>
               </div>
