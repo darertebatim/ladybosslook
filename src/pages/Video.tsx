@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, Play, Share2, BookOpen } from 'lucide-react';
+import { ArrowLeft, Play, Share2, BookOpen, ChevronDown, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Video = () => {
@@ -45,10 +45,16 @@ const Video = () => {
             <span className="gradient-text">Courageous Character</span>
           </h1>
           
-          <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto px-4">
-            A powerful 30-minute course designed specifically for Persian immigrant women ready to 
-            embrace their inner strength and become confident ladyboss leaders in their new homeland.
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
+            Transform your challenges into strengths and become a confident ladyboss leader.
           </p>
+        </div>
+
+        {/* Bouncing Arrow */}
+        <div className="flex justify-center mb-4 sm:mb-6">
+          <div className="animate-bounce">
+            <ChevronDown size={32} className="text-primary" />
+          </div>
         </div>
 
         {/* Video Container */}
@@ -58,7 +64,7 @@ const Video = () => {
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/FYn1vYW1tP8?rel=0&modestbranding=1"
+                src="https://www.youtube.com/embed/0wT0D8dJin8?rel=0&modestbranding=1"
                 title="Courageous Character Course - LadyBoss Academy"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -68,6 +74,23 @@ const Video = () => {
               ></iframe>
             </div>
           </Card>
+        </div>
+
+        {/* WhatsApp Gift Section */}
+        <div className="max-w-3xl mx-auto mt-6 sm:mt-8 px-4 sm:px-6 text-center">
+          <p className="text-sm sm:text-base text-foreground mb-3 sm:mb-4 font-medium">
+            برای گرفتن هدیه، اسم رمز را به واتسپ پایین بفرستید
+          </p>
+          <Button 
+            className="bg-green-600 hover:bg-green-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+            onClick={() => {
+              const message = encodeURIComponent('jorat');
+              window.open(`https://wa.me/19495723730?text=${message}`, '_blank');
+            }}
+          >
+            <MessageCircle size={18} className="sm:w-5 sm:h-5 mr-2" />
+            Send to WhatsApp
+          </Button>
         </div>
 
         {/* Video Info & Actions */}
