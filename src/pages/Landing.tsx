@@ -350,7 +350,7 @@ const Landing = () => {
       
       toast({
         title: "Success!",
-        description: "Please check your email for the training video link!",
+        description: "Redirecting to your training video...",
       });
       
       // Clear form data for security
@@ -358,6 +358,11 @@ const Landing = () => {
       setName('');
       setPhone('');
       setCity('');
+      
+      // Redirect to video page after successful submission
+      setTimeout(() => {
+        window.location.href = '/video';
+      }, 1500);
       
     } catch (error: any) {
       console.error('Submission error:', error);
