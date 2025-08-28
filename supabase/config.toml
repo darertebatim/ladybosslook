@@ -2,9 +2,3 @@ project_id = "mnukhzjcvbwpvktxqlej"
 
 [functions.mailchimp-subscribe]
 verify_jwt = false
-
-[functions.send-email]
-verify_jwt = false
-
-[functions.send-intro-email]
-verify_jwt = false

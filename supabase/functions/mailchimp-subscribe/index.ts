@@ -68,11 +68,10 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Get client IP for rate limiting - take first IP from comma-separated list
-  const forwardedFor = req.headers.get("x-forwarded-for");
-  const clientIP = forwardedFor 
-    ? forwardedFor.split(',')[0].trim() 
-    : req.headers.get("x-real-ip") || "unknown";
+  // Get client IP for rate limiting
+  const clientIP = req.headers.get("x-forwarded-for") || 
+                   req.headers.get("x-real-ip") || 
+                   "unknown";
 
   // Check rate limit
   if (!checkRateLimit(clientIP)) {
@@ -112,7 +111,7 @@ const handler = async (req: Request): Promise<Response> => {
             city,
             phone,
             user_agent: req.headers.get("user-agent"),
-            ip_address: (clientIP !== "unknown" && clientIP !== "") ? clientIP : null,
+            ip_address: clientIP !== "unknown" ? clientIP : null,
             mailchimp_success: false
           })
           .select('id')
@@ -210,24 +209,6 @@ const handler = async (req: Request): Promise<Response> => {
             console.error("Error updating form submission:", updateError);
           }
         }
-
-        // Send introduction email to existing subscribers too
-        try {
-          console.log(`Sending introduction email to existing subscriber: ${email}`);
-          if (supabase) {
-            const { error: emailError } = await supabase.functions.invoke('send-intro-email', {
-              body: { email }
-            });
-
-            if (emailError) {
-              console.error("Failed to send introduction email to existing subscriber:", emailError);
-            } else {
-              console.log("Introduction email sent to existing subscriber");
-            }
-          }
-        } catch (emailError) {
-          console.error("Error sending introduction email to existing subscriber:", emailError);
-        }
         
         return new Response(
           JSON.stringify({ 
@@ -272,26 +253,6 @@ const handler = async (req: Request): Promise<Response> => {
       } catch (updateError) {
         console.error("Error updating form submission:", updateError);
       }
-    }
-
-    // Send introduction email after successful subscription
-    try {
-      console.log(`Sending introduction email to: ${email}`);
-      if (supabase) {
-        const { error: emailError } = await supabase.functions.invoke('send-intro-email', {
-          body: { email }
-        });
-
-        if (emailError) {
-          console.error("Failed to send introduction email:", emailError);
-          // Don't fail the whole process if email fails
-        } else {
-          console.log("Introduction email sent successfully");
-        }
-      }
-    } catch (emailError) {
-      console.error("Error sending introduction email:", emailError);
-      // Continue with success response even if email fails
     }
 
     return new Response(
