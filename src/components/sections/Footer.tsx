@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const footerLinks = {
@@ -101,12 +102,21 @@ const Footer = () => {
                 <ul className="space-y-3">
                   {links.map((link, index) => (
                     <li key={index}>
-                      <a
-                        href="#"
-                        className="text-muted-foreground hover:text-primary transition-smooth text-sm"
-                      >
-                        {link}
-                      </a>
+                      {link === 'Privacy Policy' ? (
+                        <Link
+                          to="/privacy"
+                          className="text-muted-foreground hover:text-primary transition-smooth text-sm"
+                        >
+                          {link}
+                        </Link>
+                      ) : (
+                        <a
+                          href="#"
+                          className="text-muted-foreground hover:text-primary transition-smooth text-sm"
+                        >
+                          {link}
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -148,9 +158,9 @@ const Footer = () => {
             </div>
             
             <div className="flex space-x-6 text-sm">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-smooth">
+              <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-smooth">
                 Privacy Policy
-              </a>
+              </Link>
               <a href="#" className="text-muted-foreground hover:text-primary transition-smooth">
                 Terms of Service
               </a>
