@@ -164,6 +164,8 @@ const handler = async (req: Request): Promise<Response> => {
           status: "subscribed",
           merge_fields: {
             FNAME: name,
+            CITY: city,
+            PHONE: phone,
           },
         }),
       });
