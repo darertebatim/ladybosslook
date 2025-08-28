@@ -213,6 +213,22 @@ const CourageousWorkshop = () => {
               <Calendar className="w-4 h-4 ml-2" />
               کارگاه زنده آنلاین
             </div>
+            
+            {/* Workshop Poster Space */}
+            <div className="mb-8 max-w-2xl mx-auto">
+              <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-8 border-2 border-dashed border-primary/30">
+                <div className="flex items-center justify-center h-64 text-muted-foreground">
+                  <div className="text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-primary/20 rounded-full flex items-center justify-center">
+                      <Play className="w-8 h-8 text-primary" />
+                    </div>
+                    <p className="text-lg font-medium">فضای تصویر یا پوستر کارگاه</p>
+                    <p className="text-sm">Workshop poster placeholder</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent leading-tight">
               <span className="block text-4xl sm:text-5xl lg:text-7xl mt-2 text-primary">کاراکتر پرجرات</span>
             </h1>
@@ -275,8 +291,8 @@ const CourageousWorkshop = () => {
           <section className="mb-12">
             <div className="bg-gradient-to-br from-red-50 to-orange-50 border border-red-100 rounded-2xl p-8">
               <h2 className="text-3xl font-bold text-center mb-8 text-red-800">آیا این احساسات برایتان آشنا است؟</h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-4">
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 space-y-4">
                   <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                     <span>نمی‌توانم «نه» بگویم و همیشه خودم را فدا می‌کنم</span>
@@ -289,8 +305,6 @@ const CourageousWorkshop = () => {
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                     <span>رویاهایم را کنار گذاشته‌ام چون نمی‌دانم چطور شروع کنم</span>
                   </div>
-                </div>
-                <div className="space-y-4">
                   <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                     <span>همیشه در موقعیت‌های دشوار تسلیم می‌شوم</span>
@@ -304,6 +318,18 @@ const CourageousWorkshop = () => {
                     <span>نمی‌توانم برای خودم دفاع کنم</span>
                   </div>
                 </div>
+                <div className="flex items-center justify-center">
+                  <div className="bg-white/30 rounded-xl p-4 text-center">
+                    <img 
+                      src="/assets/hero-businesswoman.jpg" 
+                      alt="زن موفق و با اعتماد به نفس" 
+                      className="w-full h-48 object-cover rounded-lg mb-4"
+                    />
+                    <p className="text-sm text-red-700 font-medium">
+                      شما هم می‌توانید متحول شوید
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -311,18 +337,27 @@ const CourageousWorkshop = () => {
           {/* Solution Section */}
           <section className="mb-12">
             <div className="bg-gradient-to-br from-green-50 to-blue-50 border border-green-100 rounded-2xl p-8">
-              <h2 className="text-3xl font-bold text-center mb-6 text-green-800">راه‌حل: متحول شدن در ۳ ساعت!</h2>
-              <p className="text-lg text-center mb-8 max-w-3xl mx-auto text-green-700">
-                در کارگاه «شخصیت شجاع» یاد می‌گیرید چطور از یک زن تردیدآمیز به یک لیدر مطمئن و شجاع تبدیل شوید
-              </p>
-              <div className="text-center">
-                <Button 
-                  size="lg" 
-                  className="bg-green-600 hover:bg-green-700 text-white px-10 py-6 text-xl font-bold"
-                  onClick={() => handleRegisterClick('solution')}
-                >
-                  می‌خواهم متحول شوم!
-                </Button>
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h2 className="text-3xl font-bold mb-6 text-green-800">راه‌حل: متحول شدن در ۳ هفته!</h2>
+                  <p className="text-lg mb-8 text-green-700">
+                    در کارگاه «کاراکتر پرجرات» یاد می‌گیرید چطور از یک زن تردیدآمیز به یک لیدر مطمئن و شجاع تبدیل شوید
+                  </p>
+                  <Button 
+                    size="lg" 
+                    className="bg-green-600 hover:bg-green-700 text-white px-10 py-6 text-xl font-bold"
+                    onClick={() => handleRegisterClick('solution')}
+                  >
+                    می‌خواهم متحول شوم!
+                  </Button>
+                </div>
+                <div className="flex justify-center">
+                  <img 
+                    src="/assets/business-coaching-program.jpg" 
+                    alt="کارگاه تغییر زندگی" 
+                    className="w-full max-w-sm rounded-xl shadow-lg"
+                  />
+                </div>
               </div>
             </div>
           </section>
@@ -398,7 +433,14 @@ const CourageousWorkshop = () => {
 
           {/* What You'll Learn */}
           <section className="mb-12">
-            <h2 className="text-3xl font-bold text-center mb-8">چه چیزهایی یاد خواهید گرفت؟</h2>
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold mb-4">چه چیزهایی یاد خواهید گرفت؟</h2>
+              <img 
+                src="/assets/money-literacy-program.jpg" 
+                alt="یادگیری مهارت های زندگی" 
+                className="w-full max-w-md mx-auto rounded-lg shadow-md mb-6"
+              />
+            </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
