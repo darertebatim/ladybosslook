@@ -68,10 +68,11 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Get client IP for rate limiting
-  const clientIP = req.headers.get("x-forwarded-for") || 
-                   req.headers.get("x-real-ip") || 
-                   "unknown";
+  // Get client IP for rate limiting - extract only the first IP
+  const forwardedFor = req.headers.get("x-forwarded-for");
+  const clientIP = forwardedFor 
+    ? forwardedFor.split(',')[0].trim()
+    : req.headers.get("x-real-ip") || "unknown";
 
   // Check rate limit
   if (!checkRateLimit(clientIP)) {
@@ -163,8 +164,6 @@ const handler = async (req: Request): Promise<Response> => {
           status: "subscribed",
           merge_fields: {
             FNAME: name,
-            CITY: city,
-            PHONE: phone,
           },
         }),
       });
