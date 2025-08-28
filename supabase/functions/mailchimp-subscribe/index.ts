@@ -68,10 +68,11 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Get client IP for rate limiting
-  const clientIP = req.headers.get("x-forwarded-for") || 
-                   req.headers.get("x-real-ip") || 
-                   "unknown";
+  // Get client IP for rate limiting - take first IP from comma-separated list
+  const forwardedFor = req.headers.get("x-forwarded-for");
+  const clientIP = forwardedFor 
+    ? forwardedFor.split(',')[0].trim() 
+    : req.headers.get("x-real-ip") || "unknown";
 
   // Check rate limit
   if (!checkRateLimit(clientIP)) {
@@ -111,7 +112,7 @@ const handler = async (req: Request): Promise<Response> => {
             city,
             phone,
             user_agent: req.headers.get("user-agent"),
-            ip_address: clientIP !== "unknown" ? clientIP : null,
+            ip_address: (clientIP !== "unknown" && clientIP !== "") ? clientIP : null,
             mailchimp_success: false
           })
           .select('id')
