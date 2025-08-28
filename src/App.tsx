@@ -15,6 +15,7 @@ import BusinessIdeas from "./pages/BusinessIdeas";
 import EventIrvine from "./pages/EventIrvine";
 import CourageousWorkshop from "./pages/CourageousWorkshop";
 import Privacy from "./pages/Privacy";
+import SMSTerms from "./pages/SMSTerms";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/event-irvine" element={<EventIrvine />} />
             <Route path="/courageous-workshop" element={<CourageousWorkshop />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/sms-terms" element={<SMSTerms />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
