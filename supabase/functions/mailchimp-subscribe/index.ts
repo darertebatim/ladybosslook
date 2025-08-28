@@ -209,6 +209,24 @@ const handler = async (req: Request): Promise<Response> => {
             console.error("Error updating form submission:", updateError);
           }
         }
+
+        // Send introduction email to existing subscribers too
+        try {
+          console.log(`Sending introduction email to existing subscriber: ${email}`);
+          if (supabase) {
+            const { error: emailError } = await supabase.functions.invoke('send-intro-email', {
+              body: { email }
+            });
+
+            if (emailError) {
+              console.error("Failed to send introduction email to existing subscriber:", emailError);
+            } else {
+              console.log("Introduction email sent to existing subscriber");
+            }
+          }
+        } catch (emailError) {
+          console.error("Error sending introduction email to existing subscriber:", emailError);
+        }
         
         return new Response(
           JSON.stringify({ 
@@ -253,6 +271,26 @@ const handler = async (req: Request): Promise<Response> => {
       } catch (updateError) {
         console.error("Error updating form submission:", updateError);
       }
+    }
+
+    // Send introduction email after successful subscription
+    try {
+      console.log(`Sending introduction email to: ${email}`);
+      if (supabase) {
+        const { error: emailError } = await supabase.functions.invoke('send-intro-email', {
+          body: { email }
+        });
+
+        if (emailError) {
+          console.error("Failed to send introduction email:", emailError);
+          // Don't fail the whole process if email fails
+        } else {
+          console.log("Introduction email sent successfully");
+        }
+      }
+    } catch (emailError) {
+      console.error("Error sending introduction email:", emailError);
+      // Continue with success response even if email fails
     }
 
     return new Response(
