@@ -214,11 +214,10 @@ const CourageousWorkshop = () => {
               کارگاه زنده آنلاین
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent leading-tight">
-              کارگاه آنلاین
-              <span className="block text-4xl sm:text-5xl lg:text-7xl mt-2 text-primary">شخصیت شجاع</span>
+              <span className="block text-4xl sm:text-5xl lg:text-7xl mt-2 text-primary">کاراکتر پرجرات</span>
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground mb-6 max-w-4xl mx-auto leading-relaxed">
-              اعتماد به نفستان را متحول کنید، مرزهای سالم تعیین کنید و شجاعت لازم برای دنبال کردن بزرگ‌ترین رویاهایتان را در این کارگاه زنده ۳ ساعته بسازید
+              ورکشاپ ۳ هفته‌ای (۳ جلسه دو ساعته) برای یادگیری مرزبندی، ابراز وجود و قدرت ارتباطی
             </p>
 
             {/* Pricing Section */}
@@ -230,7 +229,7 @@ const CourageousWorkshop = () => {
                   <span className="text-5xl font-bold text-primary farsi-nums">$۹۷</span>
                 </div>
                 <div className="bg-green-100 text-green-800 rounded-full px-4 py-1 text-sm font-semibold">
-                  ۸۰% تخفیف - تنها امروز!
+                  ۶۰% تخفیف - فقط ۱۰۰ نفر!
                 </div>
               </div>
             </div>
@@ -340,7 +339,7 @@ const CourageousWorkshop = () => {
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">مدت زمان:</span>
-                  <span className="font-medium">۳ ساعت زنده</span>
+                  <span className="font-medium">۳ هفته (۳ جلسه دو ساعته)</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">شیوه برگزاری:</span>
@@ -371,7 +370,7 @@ const CourageousWorkshop = () => {
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>کارگاه ۳ ساعته زنده و تعاملی</span>
+                  <span>ورکشاپ ۳ هفته‌ای زنده و تعاملی</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
@@ -383,7 +382,7 @@ const CourageousWorkshop = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>پرسش و پاسخ با جوآنا</span>
+                  <span>پرسش و پاسخ با راضیه میرزایی</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
@@ -454,37 +453,37 @@ const CourageousWorkshop = () => {
           {/* Instructor Section */}
           <section className="mb-12">
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8">
-              <h2 className="text-3xl font-bold text-center mb-8">مربی شما: جوآنا سولیوان</h2>
+              <h2 className="text-3xl font-bold text-center mb-8">مربی شما: راضیه میرزایی</h2>
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
                   <img 
                     src="/assets/hero-businesswoman.jpg" 
-                    alt="جوآنا سولیوان" 
+                    alt="راضیه میرزایی" 
                     className="w-full max-w-md mx-auto rounded-lg shadow-lg"
                   />
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-blue-800">متخصص توسعه رهبری زنان</h3>
+                  <h3 className="text-xl font-semibold text-blue-800">مدرس اعتمادبنفس و مربی کسب و کارهای خانمانه</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
+                      <Award className="w-5 h-5 text-purple-500" />
+                      <span>نویسنده کتاب پرفروش "کاراکتر پرجرات" به زبان فارسی و انگلیسی</span>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <Star className="w-5 h-5 text-yellow-500" />
-                      <span>بیش از ۱۰ سال تجربه در کوچینگ زنان</span>
+                      <span>متخصص توسعه شخصیت و اعتماد به نفس</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Users className="w-5 h-5 text-blue-500" />
-                      <span>بیش از ۵۰۰۰ زن را متحول کرده</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Award className="w-5 h-5 text-purple-500" />
-                      <span>نویسنده کتاب پرفروش "قدرت درونی"</span>
+                      <span>مربی کسب و کارهای خانمانه</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Globe className="w-5 h-5 text-green-500" />
-                      <span>سخنران بین‌المللی</span>
+                      <span>بنیان‌گذار آکادمی لیدی‌باس</span>
                     </div>
                   </div>
                   <p className="text-muted-foreground">
-                    جوآنا با ترکیب روش‌های علمی و تجربیات عملی، راه‌هایی منحصر به فرد برای رشد اعتماد به نفس و شجاعت زنان ارائه می‌دهد.
+                    راضیه با تسلط بر زبان فارسی و انگلیسی، تجربیات منحصر به فردی را برای توسعه اعتماد به نفس و قدرت درونی زنان ایرانی ارائه می‌دهد.
                   </p>
                 </div>
               </div>
@@ -563,7 +562,7 @@ const CourageousWorkshop = () => {
               <h2 className="text-3xl font-bold text-center mb-8 text-purple-800">ارزش کل پکیج: $۱۲۹۷</h2>
               <div className="space-y-4 max-w-2xl mx-auto">
                 <div className="flex justify-between items-center p-4 bg-white/50 rounded-lg">
-                  <span>کارگاه ۳ ساعته زنده</span>
+                  <span>ورکشاپ ۳ هفته‌ای (۳ جلسه دو ساعته)</span>
                   <span className="font-semibold text-purple-600 farsi-nums">$۴۹۷</span>
                 </div>
                 <div className="flex justify-between items-center p-4 bg-white/50 rounded-lg">
