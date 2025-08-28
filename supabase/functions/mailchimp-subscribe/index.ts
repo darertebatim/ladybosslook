@@ -167,6 +167,13 @@ const handler = async (req: Request): Promise<Response> => {
             CITY: city,
             PHONE: phone,
           },
+          marketing_permissions: [
+            {
+              marketing_permission_id: "sms",
+              enabled: true
+            }
+          ],
+          phone_number: phone,
         }),
       });
 
