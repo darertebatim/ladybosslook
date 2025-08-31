@@ -225,172 +225,172 @@ const CourageousWorkshop = () => {
             </div>
             
             {/* Mobile-First Hero Title */}
-            <div className="mb-8">
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold mb-4 text-luxury-white leading-tight font-display">
-                شخصیت
-                <span className="block bg-gradient-luxury-text bg-clip-text text-transparent text-5xl sm:text-6xl lg:text-8xl mt-2">
-                  شجاع
+            <div className="mb-8 px-2">
+              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-4 text-luxury-white leading-tight font-display">
+                کاراکتر
+                <span className="block bg-gradient-luxury-text bg-clip-text text-transparent text-4xl sm:text-5xl lg:text-7xl mt-2">
+                  پرجرات
                 </span>
               </h1>
-              <div className="w-32 h-1 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-6"></div>
+              <div className="w-24 h-1 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-6"></div>
             </div>
 
             {/* Mobile Optimized Description */}
-            <p className="text-lg sm:text-xl text-luxury-silver mb-8 max-w-3xl mx-auto leading-relaxed px-4">
-              تحول ۳ هفته‌ای برای زنانی که می‌خواهند با اعتماد به نفس کامل زندگی کنند
+            <p className="text-base sm:text-lg lg:text-xl text-luxury-silver mb-8 max-w-2xl mx-auto leading-relaxed px-6">
+              تحول ۳ هفته‌ای برای زنانی که می‌خواهند با اعتماد به نفس کامل و قدرت داخلی زندگی کنند
             </p>
 
-            {/* Pricing Section - Luxury Mobile Design */}
-            <div className="relative bg-gradient-to-br from-luxury-white/5 to-luxury-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8 max-w-md mx-auto border border-luxury-white/20 shadow-luxury">
-              <div className="absolute top-4 right-4">
-                <Crown className="w-6 h-6 text-luxury-silver" />
+            {/* Pricing Section - Mobile Optimized */}
+            <div className="relative bg-gradient-to-br from-luxury-white/5 to-luxury-white/10 backdrop-blur-sm rounded-xl p-6 mb-8 mx-4 border border-luxury-white/20 shadow-luxury">
+              <div className="absolute top-3 right-3">
+                <Crown className="w-5 h-5 text-luxury-silver" />
               </div>
               <div className="text-center">
-                <p className="text-sm text-luxury-silver mb-2 font-medium">سرمایه‌گذاری در خودتان</p>
-                <div className="flex items-center justify-center gap-4 mb-6">
-                  <span className="text-2xl font-bold text-luxury-silver/60 line-through farsi-nums">$۴۹۷</span>
-                  <span className="text-5xl font-bold text-luxury-white farsi-nums">$۹۷</span>
+                <p className="text-xs text-luxury-silver mb-3 font-medium">سرمایه‌گذاری در خودتان</p>
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <span className="text-xl font-bold text-luxury-silver/60 line-through farsi-nums">$۴۹۷</span>
+                  <span className="text-4xl font-bold text-luxury-white farsi-nums">$۹۷</span>
                 </div>
-                <div className="bg-luxury-white text-luxury-black rounded-full px-6 py-2 text-sm font-bold inline-block">
-                  ۸۰% تخفیف ویژه - فقط ۲۵ نفر
+                <div className="bg-luxury-white text-luxury-black rounded-full px-4 py-2 text-xs font-bold inline-block">
+                  ۸۰% تخفیف ویژه - فقط ۱۰۰ نفر
                 </div>
               </div>
             </div>
             
             {/* Mobile-First CTA Buttons */}
-            <div className="flex flex-col gap-4 justify-center items-center mb-12">
+            <div className="flex flex-col gap-3 justify-center items-center mb-12 px-4">
               <Button 
                 size="lg" 
-                className="w-full max-w-sm bg-luxury-white hover:bg-luxury-silver text-luxury-black px-8 py-6 text-xl font-bold shadow-luxury hover:shadow-luxury-glow transition-all duration-300 rounded-xl"
+                className="w-full max-w-xs bg-luxury-white hover:bg-luxury-silver text-luxury-black px-6 py-5 text-lg font-bold shadow-luxury hover:shadow-luxury-glow transition-all duration-300 rounded-xl"
                 onClick={() => handleRegisterClick('hero')}
               >
-                <Zap className="w-6 h-6 ml-2" />
-                <span className="farsi-nums">تحول خود را آغاز کنید - $۹۷</span>
+                <Zap className="w-5 h-5 ml-2" />
+                <span className="farsi-nums text-sm sm:text-base">شروع تحول - $۹۷</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="lg" 
                 onClick={handleWhatsAppClick}
-                className="w-full max-w-sm border-luxury-white/30 text-luxury-white hover:bg-luxury-white/10 px-8 py-4 text-lg font-semibold rounded-xl"
+                className="w-full max-w-xs border-luxury-white/30 text-luxury-white hover:bg-luxury-white/10 px-6 py-4 text-base font-semibold rounded-xl"
               >
-                <MessageCircle className="w-5 h-5 ml-2" />
-                سوال دارید؟ پاسخ فوری
+                <MessageCircle className="w-4 h-4 ml-2" />
+                سوال دارید؟
               </Button>
             </div>
 
             {/* Trust Indicators - Mobile Optimized */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center max-w-2xl mx-auto">
-              <div className="flex flex-col items-center gap-2 p-4 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
-                <Shield className="w-6 h-6 text-luxury-white" />
-                <span className="text-luxury-silver text-sm font-medium">ضمانت ۳۰ روزه</span>
+            <div className="grid grid-cols-3 gap-2 text-center max-w-sm mx-auto px-4">
+              <div className="flex flex-col items-center gap-1 p-3 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
+                <Shield className="w-5 h-5 text-luxury-white" />
+                <span className="text-luxury-silver text-xs font-medium">ضمانت ۳۰ روزه</span>
               </div>
-              <div className="flex flex-col items-center gap-2 p-4 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
-                <Users className="w-6 h-6 text-luxury-white" />
-                <span className="text-luxury-silver text-sm font-medium">محدود به ۲۵ نفر</span>
+              <div className="flex flex-col items-center gap-1 p-3 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
+                <Users className="w-5 h-5 text-luxury-white" />
+                <span className="text-luxury-silver text-xs font-medium">محدود ۱۰۰ نفر</span>
               </div>
-              <div className="flex flex-col items-center gap-2 p-4 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
-                <Star className="w-6 h-6 text-luxury-white" />
-                <span className="text-luxury-silver text-sm font-medium">۴.۹/۵ امتیاز</span>
+              <div className="flex flex-col items-center gap-1 p-3 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
+                <Star className="w-5 h-5 text-luxury-white" />
+                <span className="text-luxury-silver text-xs font-medium">۴.۹/۵ امتیاز</span>
               </div>
             </div>
           </section>
 
-          {/* Problem Section - Luxury Mobile Design */}
-          <section className="mb-16">
-            <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-2xl p-6 sm:p-8 border border-luxury-white/10 shadow-luxury">
-              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-luxury-white font-display">
+          {/* Problem Section - Mobile Optimized */}
+          <section className="mb-12 px-4">
+            <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-5 border border-luxury-white/10 shadow-luxury">
+              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-display leading-tight">
                 آیا شما هم این احساسات را داشته‌اید؟
               </h2>
-              <div className="space-y-4 max-w-2xl mx-auto">
+              <div className="space-y-3 max-w-lg mx-auto">
                 {[
-                  'نمی‌توانم «نه» بگویم و خودم را فدا می‌کنم',
-                  'از قضاوت دیگران می‌ترسم و اعتماد به نفس ندارم',
+                  'نمی‌توانم «نه» بگویم',
+                  'از قضاوت دیگران می‌ترسم',
                   'رویاهایم را کنار گذاشته‌ام',
                   'در موقعیت‌های دشوار تسلیم می‌شوم',
-                  'احساس می‌کنم صدایم شنیده نمی‌شود',
-                  'نمی‌توانم برای خودم دفاع کنم'
+                  'صدایم شنیده نمی‌شود',
+                  'نمی‌توانم دفاع کنم'
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-3 p-4 bg-luxury-black/30 rounded-lg border border-luxury-white/5 backdrop-blur-sm">
-                    <div className="w-2 h-2 bg-luxury-white rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-luxury-silver leading-relaxed">{item}</span>
+                  <div key={index} className="flex items-start gap-3 p-3 bg-luxury-black/30 rounded-lg border border-luxury-white/5 backdrop-blur-sm">
+                    <div className="w-1.5 h-1.5 bg-luxury-white rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-luxury-silver text-sm leading-relaxed">{item}</span>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          {/* Solution Section - Luxury Design */}
-          <section className="mb-16">
-            <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-luxury-white/20 shadow-luxury">
-              <div className="text-center max-w-4xl mx-auto">
-                <Crown className="w-12 h-12 text-luxury-white mx-auto mb-6" />
-                <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-luxury-white font-display">
+          {/* Solution Section - Mobile Optimized */}
+          <section className="mb-12 px-4">
+            <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-xl p-6 border border-luxury-white/20 shadow-luxury">
+              <div className="text-center max-w-lg mx-auto">
+                <Crown className="w-10 h-10 text-luxury-white mx-auto mb-4" />
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-luxury-white font-display leading-tight">
                   تحول شما در ۳ هفته
                 </h2>
-                <p className="text-lg sm:text-xl mb-8 text-luxury-silver leading-relaxed">
-                  از زنی تردیدآمیز به رهبری مطمئن و شجاع تبدیل شوید
+                <p className="text-base text-luxury-silver mb-6 leading-relaxed">
+                  از زنی تردیدآمیز به رهبری مطمئن تبدیل شوید
                 </p>
                 <Button 
                   size="lg" 
-                  className="bg-luxury-white hover:bg-luxury-silver text-luxury-black px-10 py-6 text-xl font-bold rounded-xl shadow-luxury"
+                  className="w-full max-w-xs bg-luxury-white hover:bg-luxury-silver text-luxury-black px-8 py-5 text-lg font-bold rounded-xl shadow-luxury"
                   onClick={() => handleRegisterClick('solution')}
                 >
-                  <Target className="w-6 h-6 ml-2" />
+                  <Target className="w-5 h-5 ml-2" />
                   می‌خواهم متحول شوم!
                 </Button>
               </div>
             </div>
           </section>
 
-          {/* Workshop Details - Mobile Cards */}
-          <section className="grid gap-6 mb-16">
-            <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-luxury-white">
-                  <Clock className="w-6 h-6 text-luxury-silver" />
+          {/* Workshop Details - Mobile Optimized */}
+          <section className="grid gap-4 mb-12 px-4">
+            <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
+                  <Clock className="w-5 h-5 text-luxury-silver" />
                   جزئیات کارگاه
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 text-luxury-silver">
+              <CardContent className="space-y-3 text-luxury-silver">
                 <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
-                  <span>مدت زمان:</span>
-                  <span className="font-bold text-luxury-white">۳ هفته (۳ جلسه)</span>
+                  <span className="text-sm">مدت:</span>
+                  <span className="font-bold text-luxury-white text-sm">۳ هفته</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
-                  <span>شیوه برگزاری:</span>
-                  <span className="font-bold text-luxury-white">آنلاین زوم</span>
+                  <span className="text-sm">پلتفرم:</span>
+                  <span className="font-bold text-luxury-white text-sm">Google Meets</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
-                  <span>حداکثر شرکت‌کننده:</span>
-                  <span className="font-bold text-luxury-white">۲۵ خانم</span>
+                  <span className="text-sm">ظرفیت:</span>
+                  <span className="font-bold text-luxury-white text-sm">۱۰۰ خانم</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
-                  <span>دسترسی ضبط:</span>
-                  <span className="font-bold text-luxury-white">۷ روز</span>
+                  <span className="text-sm">ضبط:</span>
+                  <span className="font-bold text-luxury-white text-sm">۷ روز دسترسی</span>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-luxury-white">
-                  <Award className="w-6 h-6 text-luxury-silver" />
-                  چه چیزی یاد می‌گیرید
+            <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
+                  <Award className="w-5 h-5 text-luxury-silver" />
+                  یادگیری‌های کارگاه
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-3">
+                <div className="grid gap-2">
                   {[
-                    'مرزبندی قدرتمند و موثر',
-                    'افزایش اعتماد به نفس پایدار',
-                    'ابراز وجود بدون احساس گناه',
-                    'مدیریت تعارضات با قدرت',
-                    'تکنیک‌های ارتباط مؤثر',
-                    'رهایی از نیاز به تأیید دیگران'
+                    'مرزبندی قدرتمند',
+                    'اعتماد به نفس پایدار',
+                    'ابراز وجود بدون گناه',
+                    'مدیریت تعارضات',
+                    'ارتباط مؤثر',
+                    'استقلال از تأیید دیگران'
                   ].map((item, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-luxury-white/5 rounded-lg">
-                      <CheckCircle className="w-5 h-5 text-luxury-white flex-shrink-0" />
-                      <span className="text-luxury-silver">{item}</span>
+                    <div key={index} className="flex items-center gap-3 p-2.5 bg-luxury-white/5 rounded-lg">
+                      <CheckCircle className="w-4 h-4 text-luxury-white flex-shrink-0" />
+                      <span className="text-luxury-silver text-sm">{item}</span>
                     </div>
                   ))}
                 </div>
@@ -398,23 +398,23 @@ const CourageousWorkshop = () => {
             </Card>
           </section>
 
-          {/* Contact Section */}
-          <section className="text-center bg-gradient-luxury rounded-2xl p-8 shadow-luxury">
-            <div className="max-w-2xl mx-auto">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-luxury-white font-display">
+          {/* Contact Section - Mobile Optimized */}
+          <section className="text-center bg-gradient-luxury rounded-xl p-6 shadow-luxury mx-4">
+            <div className="max-w-sm mx-auto">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-luxury-white font-display leading-tight">
                 آماده برای تحول هستید؟
               </h2>
-              <p className="text-luxury-silver mb-8 text-lg leading-relaxed">
-                امروز اولین قدم را برای تبدیل شدن به بهترین نسخه خودتان بردارید
+              <p className="text-luxury-silver mb-6 text-sm leading-relaxed">
+                امروز اولین قدم را بردارید
               </p>
               
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="flex flex-col gap-3">
                 <Button 
                   size="lg" 
-                  className="w-full bg-luxury-white hover:bg-luxury-silver text-luxury-black px-8 py-6 text-xl font-bold rounded-xl shadow-luxury"
+                  className="w-full bg-luxury-white hover:bg-luxury-silver text-luxury-black px-6 py-5 text-lg font-bold rounded-xl shadow-luxury"
                   onClick={() => handleRegisterClick('final')}
                 >
-                  <Sparkles className="w-6 h-6 ml-2" />
+                  <Sparkles className="w-5 h-5 ml-2" />
                   <span className="farsi-nums">ثبت‌نام فوری - $۹۷</span>
                 </Button>
                 
@@ -422,9 +422,9 @@ const CourageousWorkshop = () => {
                   variant="outline"
                   size="lg" 
                   onClick={handleWhatsAppClick}
-                  className="w-full border-luxury-white/30 text-luxury-white hover:bg-luxury-white/10 px-8 py-6 text-lg font-semibold rounded-xl"
+                  className="w-full border-luxury-white/30 text-luxury-white hover:bg-luxury-white/10 px-6 py-4 text-base font-semibold rounded-xl"
                 >
-                  <Phone className="w-5 h-5 ml-2" />
+                  <Phone className="w-4 h-4 ml-2" />
                   مشاوره رایگان
                 </Button>
               </div>
@@ -437,11 +437,11 @@ const CourageousWorkshop = () => {
           <div className="sticky-cta sm:hidden">
             <Button 
               size="lg" 
-              className="bg-luxury-white hover:bg-luxury-silver text-luxury-black px-8 py-4 text-lg font-bold rounded-xl shadow-luxury w-80 max-w-[90vw]"
+              className="bg-luxury-white hover:bg-luxury-silver text-luxury-black px-6 py-4 text-base font-bold rounded-xl shadow-luxury w-72 max-w-[85vw]"
               onClick={() => handleRegisterClick('sticky')}
             >
-              <Crown className="w-5 h-5 ml-2" />
-              <span className="farsi-nums">شروع تحول - $۹۷</span>
+              <Crown className="w-4 h-4 ml-2" />
+              <span className="farsi-nums text-sm">شروع تحول - $۹۷</span>
             </Button>
           </div>
         )}
