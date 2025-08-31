@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, Star, Users, Clock, Shield, AlertCircle, Wifi, WifiOff, ChevronDown } from 'lucide-react';
-import { SEOHead } from '@/components/SEOHead';
+
 
 const Landing = () => {
   const [email, setEmail] = useState('');
@@ -403,14 +403,6 @@ const Landing = () => {
 
   return (
     <>
-      <SEOHead
-        title="Exclusive Free Training By LADYBOSS"
-        description="20-minute exclusive training by LADYBOSS. Build unshakeable confidence and overcome cultural barriers. Join 2,500+ empowered Persian women."
-        image={`${window.location.origin}/lovable-uploads/cc26e040-a2f3-48d8-83ae-02a973799ac3.png`}
-        url={`${window.location.origin}/landing`}
-        type="website"
-        locale="fa_IR"
-      />
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center py-2 md:py-8">
       <div className="container mx-auto px-4">
         {/* Hero Image Section */}
