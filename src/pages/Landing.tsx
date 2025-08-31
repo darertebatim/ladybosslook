@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, Star, Users, Clock, Shield, AlertCircle, Wifi, WifiOff } from 'lucide-react';
+import { CheckCircle, Star, Users, Clock, Shield, AlertCircle, Wifi, WifiOff, ChevronDown } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 
 const Landing = () => {
@@ -413,6 +413,23 @@ const Landing = () => {
       />
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center py-2 md:py-8">
       <div className="container mx-auto px-4">
+        {/* Hero Image Section */}
+        <div className="text-center mb-6 md:mb-8">
+          <div className="flex flex-col items-center space-y-4">
+            <img 
+              src="/lovable-uploads/dc841674-07ae-49e3-8de6-23c9bb303342.png" 
+              alt="LADYBOSS Training" 
+              className="w-64 h-auto md:w-80 lg:w-96 rounded-lg shadow-lg"
+            />
+            <div className="animate-bounce">
+              <ChevronDown className="w-8 h-8 text-primary" />
+            </div>
+            <p className="text-sm text-muted-foreground font-medium">
+              Fill out the form below to access your free training
+            </p>
+          </div>
+        </div>
+        
         {/* Title Section - Above everything on mobile */}
         <div className="text-center mb-4 lg:hidden">
           <div className="inline-flex items-center bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-2">
