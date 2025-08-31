@@ -201,10 +201,10 @@ const CourageousWorkshop = () => {
           <div className="relative bg-gradient-to-r from-luxury-charcoal via-luxury-accent to-luxury-charcoal border border-luxury-silver/30 rounded-xl p-6 mb-8 text-center shadow-luxury-glow">
             <div className="absolute inset-0 bg-luxury-black/50 rounded-xl"></div>
             <div className="relative">
-              <div className="flex items-center justify-center gap-3 text-luxury-white font-bold text-lg mb-4">
-                <Timer className="w-6 h-6 text-luxury-silver" />
-                <span>پیشنهاد محدود زمان برای زنان قدرتمند</span>
-                <Sparkles className="w-6 h-6 text-luxury-silver" />
+              <div className="flex items-center justify-center gap-2 text-luxury-white font-bold text-sm sm:text-lg mb-4">
+                <Timer className="w-5 h-5 sm:w-6 sm:h-6 text-luxury-silver" />
+                <span className="text-center leading-tight">پیشنهاد محدود زمان برای زنان قدرتمند</span>
+                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-luxury-silver" />
               </div>
               <div className="flex items-center justify-center gap-4 text-3xl font-bold text-luxury-white farsi-nums">
                 <div className="bg-luxury-white text-luxury-black rounded-lg px-4 py-2 shadow-lg">{timeLeft.hours.toString().padStart(2, '0')}</div>
@@ -225,14 +225,11 @@ const CourageousWorkshop = () => {
             </div>
             
             {/* Mobile-First Hero Title */}
-            <div className="mb-8 px-2">
+            <div className="mb-6 px-2">
               <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-4 text-luxury-white leading-tight font-display">
-                کاراکتر
-                <span className="block bg-gradient-luxury-text bg-clip-text text-transparent text-4xl sm:text-5xl lg:text-7xl mt-2">
-                  پرجرات
-                </span>
+                <span className="bg-gradient-luxury-text bg-clip-text text-transparent">کاراکتر پرجرات</span>
               </h1>
-              <div className="w-24 h-1 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-6"></div>
+              <div className="w-24 h-1 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-4"></div>
             </div>
 
             {/* Mobile Optimized Description */}
@@ -298,7 +295,7 @@ const CourageousWorkshop = () => {
           {/* Problem Section - Mobile Optimized */}
           <section className="mb-12 px-4">
             <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-5 border border-luxury-white/10 shadow-luxury">
-              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-display leading-tight">
+              <h2 className="text-lg sm:text-xl font-bold text-center mb-4 text-luxury-white font-display leading-tight">
                 آیا شما هم این احساسات را داشته‌اید؟
               </h2>
               <div className="space-y-3 max-w-lg mx-auto">
@@ -324,10 +321,10 @@ const CourageousWorkshop = () => {
             <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-xl p-6 border border-luxury-white/20 shadow-luxury">
               <div className="text-center max-w-lg mx-auto">
                 <Crown className="w-10 h-10 text-luxury-white mx-auto mb-4" />
-                <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-luxury-white font-display leading-tight">
+                <h2 className="text-xl sm:text-2xl font-bold mb-3 text-luxury-white font-display leading-tight">
                   تحول شما در ۳ هفته
                 </h2>
-                <p className="text-base text-luxury-silver mb-6 leading-relaxed">
+                <p className="text-sm text-luxury-silver mb-5 leading-relaxed">
                   از زنی تردیدآمیز به رهبری مطمئن تبدیل شوید
                 </p>
                 <Button 
