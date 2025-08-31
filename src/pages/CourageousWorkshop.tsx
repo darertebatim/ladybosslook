@@ -206,14 +206,14 @@ const CourageousWorkshop = () => {
                 <span className="text-center leading-tight">پیشنهاد محدود زمان برای زنان قدرتمند</span>
                 <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-luxury-silver" />
               </div>
-              <div className="flex items-center justify-center gap-4 text-3xl font-bold text-luxury-white farsi-nums">
-                <div className="bg-luxury-white text-luxury-black rounded-lg px-4 py-2 shadow-lg">{timeLeft.hours.toString().padStart(2, '0')}</div>
-                <span className="text-luxury-silver">:</span>
-                <div className="bg-luxury-white text-luxury-black rounded-lg px-4 py-2 shadow-lg">{timeLeft.minutes.toString().padStart(2, '0')}</div>
-                <span className="text-luxury-silver">:</span>
-                <div className="bg-luxury-white text-luxury-black rounded-lg px-4 py-2 shadow-lg">{timeLeft.seconds.toString().padStart(2, '0')}</div>
+              <div className="flex items-center justify-center gap-2 text-xl font-bold text-luxury-white farsi-nums">
+                <div className="bg-luxury-white text-luxury-black rounded px-2 py-1 text-sm shadow-lg">{timeLeft.hours.toString().padStart(2, '0')}</div>
+                <span className="text-luxury-silver text-sm">:</span>
+                <div className="bg-luxury-white text-luxury-black rounded px-2 py-1 text-sm shadow-lg">{timeLeft.minutes.toString().padStart(2, '0')}</div>
+                <span className="text-luxury-silver text-sm">:</span>
+                <div className="bg-luxury-white text-luxury-black rounded px-2 py-1 text-sm shadow-lg">{timeLeft.seconds.toString().padStart(2, '0')}</div>
               </div>
-              <p className="text-sm text-luxury-silver mt-3 font-medium">ساعت : دقیقه : ثانیه</p>
+              <p className="text-xs text-luxury-silver mt-2 font-medium">ساعت : دقیقه : ثانیه</p>
             </div>
           </div>
 
@@ -268,7 +268,7 @@ const CourageousWorkshop = () => {
                 variant="outline" 
                 size="lg" 
                 onClick={handleWhatsAppClick}
-                className="w-full max-w-xs border-luxury-white/30 text-luxury-white hover:bg-luxury-white/10 px-6 py-4 text-base font-semibold rounded-xl"
+                className="w-full max-w-xs border-luxury-white/50 bg-luxury-black/50 text-luxury-white hover:bg-luxury-white/10 hover:text-luxury-white hover:border-luxury-white px-6 py-4 text-base font-semibold rounded-xl backdrop-blur-sm"
               >
                 <MessageCircle className="w-4 h-4 ml-2" />
                 سوال دارید؟
@@ -419,7 +419,7 @@ const CourageousWorkshop = () => {
                   variant="outline"
                   size="lg" 
                   onClick={handleWhatsAppClick}
-                  className="w-full border-luxury-white/30 text-luxury-white hover:bg-luxury-white/10 px-6 py-4 text-base font-semibold rounded-xl"
+                  className="w-full border-luxury-white/50 bg-luxury-black/50 text-luxury-white hover:bg-luxury-white/10 hover:text-luxury-white hover:border-luxury-white px-6 py-4 text-base font-semibold rounded-xl backdrop-blur-sm"
                 >
                   <Phone className="w-4 h-4 ml-2" />
                   مشاوره رایگان
