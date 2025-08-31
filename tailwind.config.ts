@@ -68,6 +68,13 @@ export default {
 					elevated: 'hsl(var(--card-elevated))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				luxury: {
+					black: 'hsl(var(--luxury-black))',
+					charcoal: 'hsl(var(--luxury-charcoal))',
+					silver: 'hsl(var(--luxury-silver))',
+					white: 'hsl(var(--luxury-white))',
+					accent: 'hsl(var(--luxury-accent))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -112,13 +119,18 @@ export default {
 				'gradient-hero': 'var(--gradient-hero)',
 				'gradient-card': 'var(--gradient-card)',
 				'gradient-accent': 'var(--gradient-accent)',
-				'gradient-text': 'var(--gradient-text)'
+				'gradient-text': 'var(--gradient-text)',
+				'gradient-luxury': 'var(--gradient-luxury)',
+				'gradient-luxury-reverse': 'var(--gradient-luxury-reverse)',
+				'gradient-luxury-text': 'var(--gradient-luxury-text)'
 			},
 			boxShadow: {
 				'soft': 'var(--shadow-soft)',
 				'medium': 'var(--shadow-medium)', 
 				'bold': 'var(--shadow-bold)',
-				'glow': 'var(--shadow-glow)'
+				'glow': 'var(--shadow-glow)',
+				'luxury': 'var(--shadow-luxury)',
+				'luxury-glow': 'var(--shadow-luxury-glow)'
 			}
 		}
 	},

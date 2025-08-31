@@ -60,6 +60,22 @@
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(320 20% 98%));
     --gradient-accent: linear-gradient(120deg, hsl(330 50% 85%), hsl(285 40% 90%));
     --gradient-text: linear-gradient(135deg, hsl(280 60% 50%), hsl(45 90% 60%));
+    
+    /* Luxury Black & White Theme */
+    --luxury-black: 0 0% 8%;
+    --luxury-charcoal: 0 0% 15%;
+    --luxury-silver: 0 0% 85%;
+    --luxury-white: 0 0% 98%;
+    --luxury-accent: 0 0% 25%;
+    
+    /* Luxury Gradients */
+    --gradient-luxury: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 15%), hsl(0 0% 25%));
+    --gradient-luxury-reverse: linear-gradient(135deg, hsl(0 0% 98%), hsl(0 0% 92%), hsl(0 0% 88%));
+    --gradient-luxury-text: linear-gradient(135deg, hsl(0 0% 98%), hsl(0 0% 85%));
+    
+    /* Luxury Shadows */
+    --shadow-luxury: 0 25px 50px -12px hsl(0 0% 0% / 0.4);
+    --shadow-luxury-glow: 0 0 50px hsl(0 0% 100% / 0.1);
 
     /* Shadows - Elegant Depth */
     --shadow-soft: 0 2px 20px -2px hsl(280 60% 50% / 0.1);

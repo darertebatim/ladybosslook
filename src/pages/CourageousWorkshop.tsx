@@ -20,7 +20,10 @@ import {
   Zap,
   Phone,
   Mail,
-  Globe
+  Globe,
+  Crown,
+  Diamond,
+  Sparkles
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -173,14 +176,17 @@ const CourageousWorkshop = () => {
         description="در کارگاه زنده آنلاین ما شرکت کنید تا شجاعت بسازید، مرزهای سالم تعیین کنید و اعتماد به نفس تزلزل‌ناپذیر توسعه دهید. تفکرتان را در عرض ۳ ساعت متحول کنید."
         image="/assets/hero-businesswoman.jpg"
       />
-      <div className="min-h-screen bg-background font-farsi rtl">
+      <div className="min-h-screen bg-luxury-black font-farsi rtl">
         {/* Navigation Header */}
-        <header className="border-b border-border/40 bg-background/80 backdrop-blur-md sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-3 sm:py-4">
+        <header className="border-b border-luxury-accent/20 bg-luxury-black/95 backdrop-blur-md sticky top-0 z-50 shadow-luxury">
+          <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <h1 className="text-lg sm:text-xl font-bold text-primary">آکادمی لیدی‌باس</h1>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground">
+              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-luxury-text bg-clip-text text-transparent">
+                <Crown className="w-6 h-6 inline-block ml-2 text-luxury-white" />
+                آکادمی لیدی‌باس
+              </h1>
+              <Button variant="ghost" size="sm" asChild className="text-luxury-silver hover:text-luxury-white hover:bg-luxury-charcoal">
+                <Link to="/" className="flex items-center gap-2">
                   <span className="hidden sm:inline">بازگشت به خانه</span>
                   <span className="sm:hidden">بازگشت</span>
                   <ArrowLeft size={16} className="rotate-180" />
@@ -191,549 +197,251 @@ const CourageousWorkshop = () => {
         </header>
 
         <main className="container mx-auto px-4 py-8">
-          {/* Urgency Banner */}
-          <div className="bg-gradient-to-r from-red-500/10 via-orange-500/10 to-red-500/10 border border-red-200 rounded-lg p-4 mb-6 text-center">
-            <div className="flex items-center justify-center gap-2 text-red-600 font-semibold">
-              <Timer className="w-5 h-5" />
-              <span>پیشنهاد محدود زمان!</span>
+          {/* Urgency Banner - Luxury Style */}
+          <div className="relative bg-gradient-to-r from-luxury-charcoal via-luxury-accent to-luxury-charcoal border border-luxury-silver/30 rounded-xl p-6 mb-8 text-center shadow-luxury-glow">
+            <div className="absolute inset-0 bg-luxury-black/50 rounded-xl"></div>
+            <div className="relative">
+              <div className="flex items-center justify-center gap-3 text-luxury-white font-bold text-lg mb-4">
+                <Timer className="w-6 h-6 text-luxury-silver" />
+                <span>پیشنهاد محدود زمان برای زنان قدرتمند</span>
+                <Sparkles className="w-6 h-6 text-luxury-silver" />
+              </div>
+              <div className="flex items-center justify-center gap-4 text-3xl font-bold text-luxury-white farsi-nums">
+                <div className="bg-luxury-white text-luxury-black rounded-lg px-4 py-2 shadow-lg">{timeLeft.hours.toString().padStart(2, '0')}</div>
+                <span className="text-luxury-silver">:</span>
+                <div className="bg-luxury-white text-luxury-black rounded-lg px-4 py-2 shadow-lg">{timeLeft.minutes.toString().padStart(2, '0')}</div>
+                <span className="text-luxury-silver">:</span>
+                <div className="bg-luxury-white text-luxury-black rounded-lg px-4 py-2 shadow-lg">{timeLeft.seconds.toString().padStart(2, '0')}</div>
+              </div>
+              <p className="text-sm text-luxury-silver mt-3 font-medium">ساعت : دقیقه : ثانیه</p>
             </div>
-            <div className="flex items-center justify-center gap-4 mt-2 text-2xl font-bold text-red-700 farsi-nums">
-              <div className="bg-red-100 rounded px-2 py-1">{timeLeft.hours.toString().padStart(2, '0')}</div>
-              <span>:</span>
-              <div className="bg-red-100 rounded px-2 py-1">{timeLeft.minutes.toString().padStart(2, '0')}</div>
-              <span>:</span>
-              <div className="bg-red-100 rounded px-2 py-1">{timeLeft.seconds.toString().padStart(2, '0')}</div>
-            </div>
-            <p className="text-sm text-red-600 mt-1">ساعت : دقیقه : ثانیه</p>
           </div>
 
-          {/* Hero Section */}
-          <section className="text-center mb-12">
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-              <Calendar className="w-4 h-4 ml-2" />
-              کارگاه زنده آنلاین
+          {/* Hero Section - Mobile First Luxury Design */}
+          <section className="text-center mb-16">
+            <div className="inline-flex items-center px-6 py-3 rounded-full bg-luxury-white/10 text-luxury-white text-sm font-bold mb-6 border border-luxury-white/20 backdrop-blur-sm">
+              <Diamond className="w-5 h-5 ml-2" />
+              کارگاه زنده آنلاین - تجربه‌ای لوکس
             </div>
             
-            {/* Workshop Poster Space */}
-            <div className="mb-8 max-w-2xl mx-auto">
-              <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-8 border-2 border-dashed border-primary/30">
-                <div className="flex items-center justify-center h-64 text-muted-foreground">
-                  <div className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-primary/20 rounded-full flex items-center justify-center">
-                      <Play className="w-8 h-8 text-primary" />
-                    </div>
-                    <p className="text-lg font-medium">فضای تصویر یا پوستر کارگاه</p>
-                    <p className="text-sm">Workshop poster placeholder</p>
-                  </div>
-                </div>
-              </div>
+            {/* Mobile-First Hero Title */}
+            <div className="mb-8">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold mb-4 text-luxury-white leading-tight font-display">
+                شخصیت
+                <span className="block bg-gradient-luxury-text bg-clip-text text-transparent text-5xl sm:text-6xl lg:text-8xl mt-2">
+                  شجاع
+                </span>
+              </h1>
+              <div className="w-32 h-1 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-6"></div>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent leading-tight">
-              <span className="block text-4xl sm:text-5xl lg:text-7xl mt-2 text-primary">کاراکتر پرجرات</span>
-            </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground mb-6 max-w-4xl mx-auto leading-relaxed">
-              ورکشاپ ۳ هفته‌ای (۳ جلسه دو ساعته) برای یادگیری مرزبندی، ابراز وجود و قدرت ارتباطی
+            {/* Mobile Optimized Description */}
+            <p className="text-lg sm:text-xl text-luxury-silver mb-8 max-w-3xl mx-auto leading-relaxed px-4">
+              تحول ۳ هفته‌ای برای زنانی که می‌خواهند با اعتماد به نفس کامل زندگی کنند
             </p>
 
-            {/* Pricing Section */}
-            <div className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl p-6 mb-8 max-w-md mx-auto border-2 border-primary/20">
+            {/* Pricing Section - Luxury Mobile Design */}
+            <div className="relative bg-gradient-to-br from-luxury-white/5 to-luxury-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8 max-w-md mx-auto border border-luxury-white/20 shadow-luxury">
+              <div className="absolute top-4 right-4">
+                <Crown className="w-6 h-6 text-luxury-silver" />
+              </div>
               <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-2">قیمت عادی</p>
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <span className="text-3xl font-bold text-red-500 line-through farsi-nums">$۴۹۷</span>
-                  <span className="text-5xl font-bold text-primary farsi-nums">$۹۷</span>
+                <p className="text-sm text-luxury-silver mb-2 font-medium">سرمایه‌گذاری در خودتان</p>
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <span className="text-2xl font-bold text-luxury-silver/60 line-through farsi-nums">$۴۹۷</span>
+                  <span className="text-5xl font-bold text-luxury-white farsi-nums">$۹۷</span>
                 </div>
-                <div className="bg-green-100 text-green-800 rounded-full px-4 py-1 text-sm font-semibold">
-                  ۶۰% تخفیف - فقط ۱۰۰ نفر!
+                <div className="bg-luxury-white text-luxury-black rounded-full px-6 py-2 text-sm font-bold inline-block">
+                  ۸۰% تخفیف ویژه - فقط ۲۵ نفر
                 </div>
               </div>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+            {/* Mobile-First CTA Buttons */}
+            <div className="flex flex-col gap-4 justify-center items-center mb-12">
               <Button 
                 size="lg" 
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 pulse-glow"
+                className="w-full max-w-sm bg-luxury-white hover:bg-luxury-silver text-luxury-black px-8 py-6 text-xl font-bold shadow-luxury hover:shadow-luxury-glow transition-all duration-300 rounded-xl"
                 onClick={() => handleRegisterClick('hero')}
               >
                 <Zap className="w-6 h-6 ml-2" />
-                همین حالا ثبت‌نام کنید - $۹۷
+                <span className="farsi-nums">تحول خود را آغاز کنید - $۹۷</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="lg" 
                 onClick={handleWhatsAppClick}
-                className="px-8 py-6 text-lg font-semibold"
+                className="w-full max-w-sm border-luxury-white/30 text-luxury-white hover:bg-luxury-white/10 px-8 py-4 text-lg font-semibold rounded-xl"
               >
                 <MessageCircle className="w-5 h-5 ml-2" />
-                سوال دارید؟
+                سوال دارید؟ پاسخ فوری
               </Button>
             </div>
 
-            {/* Trust Indicators */}
-            <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Shield className="w-4 h-4 text-green-600" />
-                <span>ضمانت ۳۰ روزه</span>
+            {/* Trust Indicators - Mobile Optimized */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center max-w-2xl mx-auto">
+              <div className="flex flex-col items-center gap-2 p-4 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
+                <Shield className="w-6 h-6 text-luxury-white" />
+                <span className="text-luxury-silver text-sm font-medium">ضمانت ۳۰ روزه</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Users className="w-4 h-4 text-blue-600" />
-                <span>ظرفیت محدود ۲۵ نفر</span>
+              <div className="flex flex-col items-center gap-2 p-4 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
+                <Users className="w-6 h-6 text-luxury-white" />
+                <span className="text-luxury-silver text-sm font-medium">محدود به ۲۵ نفر</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Star className="w-4 h-4 text-yellow-600" />
-                <span>۴.۹/۵ امتیاز</span>
-              </div>
-            </div>
-          </section>
-
-          {/* Problem Section */}
-          <section className="mb-12">
-            <div className="bg-gradient-to-br from-red-50 to-orange-50 border border-red-100 rounded-2xl p-8">
-              <h2 className="text-3xl font-bold text-center mb-8 text-red-800">آیا این احساسات برایتان آشنا است؟</h2>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 space-y-4">
-                  <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>نمی‌توانم «نه» بگویم و همیشه خودم را فدا می‌کنم</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>از قضاوت دیگران می‌ترسم و اعتماد به نفس ندارم</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>رویاهایم را کنار گذاشته‌ام چون نمی‌دانم چطور شروع کنم</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>همیشه در موقعیت‌های دشوار تسلیم می‌شوم</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>احساس می‌کنم صدایم شنیده نمی‌شود</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-4 bg-white/50 rounded-lg">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span>نمی‌توانم برای خودم دفاع کنم</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-center">
-                  <div className="bg-white/30 rounded-xl p-4 text-center">
-                    <img 
-                      src="/assets/hero-businesswoman.jpg" 
-                      alt="زن موفق و با اعتماد به نفس" 
-                      className="w-full h-48 object-cover rounded-lg mb-4"
-                    />
-                    <p className="text-sm text-red-700 font-medium">
-                      شما هم می‌توانید متحول شوید
-                    </p>
-                  </div>
-                </div>
+              <div className="flex flex-col items-center gap-2 p-4 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
+                <Star className="w-6 h-6 text-luxury-white" />
+                <span className="text-luxury-silver text-sm font-medium">۴.۹/۵ امتیاز</span>
               </div>
             </div>
           </section>
 
-          {/* Solution Section */}
-          <section className="mb-12">
-            <div className="bg-gradient-to-br from-green-50 to-blue-50 border border-green-100 rounded-2xl p-8">
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div>
-                  <h2 className="text-3xl font-bold mb-6 text-green-800">راه‌حل: متحول شدن در ۳ هفته!</h2>
-                  <p className="text-lg mb-8 text-green-700">
-                    در کارگاه «کاراکتر پرجرات» یاد می‌گیرید چطور از یک زن تردیدآمیز به یک لیدر مطمئن و شجاع تبدیل شوید
-                  </p>
-                  <Button 
-                    size="lg" 
-                    className="bg-green-600 hover:bg-green-700 text-white px-10 py-6 text-xl font-bold"
-                    onClick={() => handleRegisterClick('solution')}
-                  >
-                    می‌خواهم متحول شوم!
-                  </Button>
-                </div>
-                <div className="flex justify-center">
-                  <img 
-                    src="/assets/business-coaching-program.jpg" 
-                    alt="کارگاه تغییر زندگی" 
-                    className="w-full max-w-sm rounded-xl shadow-lg"
-                  />
-                </div>
+          {/* Problem Section - Luxury Mobile Design */}
+          <section className="mb-16">
+            <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-2xl p-6 sm:p-8 border border-luxury-white/10 shadow-luxury">
+              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-luxury-white font-display">
+                آیا شما هم این احساسات را داشته‌اید؟
+              </h2>
+              <div className="space-y-4 max-w-2xl mx-auto">
+                {[
+                  'نمی‌توانم «نه» بگویم و خودم را فدا می‌کنم',
+                  'از قضاوت دیگران می‌ترسم و اعتماد به نفس ندارم',
+                  'رویاهایم را کنار گذاشته‌ام',
+                  'در موقعیت‌های دشوار تسلیم می‌شوم',
+                  'احساس می‌کنم صدایم شنیده نمی‌شود',
+                  'نمی‌توانم برای خودم دفاع کنم'
+                ].map((item, index) => (
+                  <div key={index} className="flex items-start gap-3 p-4 bg-luxury-black/30 rounded-lg border border-luxury-white/5 backdrop-blur-sm">
+                    <div className="w-2 h-2 bg-luxury-white rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-luxury-silver leading-relaxed">{item}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </section>
 
-          {/* Workshop Details */}
-          <section className="grid md:grid-cols-2 gap-8 mb-12">
-            <Card className="bg-card/50 border-border/50">
+          {/* Solution Section - Luxury Design */}
+          <section className="mb-16">
+            <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-luxury-white/20 shadow-luxury">
+              <div className="text-center max-w-4xl mx-auto">
+                <Crown className="w-12 h-12 text-luxury-white mx-auto mb-6" />
+                <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-luxury-white font-display">
+                  تحول شما در ۳ هفته
+                </h2>
+                <p className="text-lg sm:text-xl mb-8 text-luxury-silver leading-relaxed">
+                  از زنی تردیدآمیز به رهبری مطمئن و شجاع تبدیل شوید
+                </p>
+                <Button 
+                  size="lg" 
+                  className="bg-luxury-white hover:bg-luxury-silver text-luxury-black px-10 py-6 text-xl font-bold rounded-xl shadow-luxury"
+                  onClick={() => handleRegisterClick('solution')}
+                >
+                  <Target className="w-6 h-6 ml-2" />
+                  می‌خواهم متحول شوم!
+                </Button>
+              </div>
+            </div>
+          </section>
+
+          {/* Workshop Details - Mobile Cards */}
+          <section className="grid gap-6 mb-16">
+            <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-primary" />
+                <CardTitle className="flex items-center gap-3 text-luxury-white">
+                  <Clock className="w-6 h-6 text-luxury-silver" />
                   جزئیات کارگاه
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">مدت زمان:</span>
-                  <span className="font-medium">۳ هفته (۳ جلسه دو ساعته)</span>
+              <CardContent className="space-y-4 text-luxury-silver">
+                <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
+                  <span>مدت زمان:</span>
+                  <span className="font-bold text-luxury-white">۳ هفته (۳ جلسه)</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">شیوه برگزاری:</span>
-                  <span className="font-medium">آنلاین از طریق زوم</span>
+                <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
+                  <span>شیوه برگزاری:</span>
+                  <span className="font-bold text-luxury-white">آنلاین زوم</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">حداکثر شرکت‌کنندگان:</span>
-                  <span className="font-medium">۲۵ خانم</span>
+                <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
+                  <span>حداکثر شرکت‌کننده:</span>
+                  <span className="font-bold text-luxury-white">۲۵ خانم</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">دسترسی به ضبط:</span>
-                  <span className="font-medium">۷ روز</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">مواد جانبی:</span>
-                  <span className="font-medium">شامل می‌شود</span>
+                <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
+                  <span>دسترسی ضبط:</span>
+                  <span className="font-bold text-luxury-white">۷ روز</span>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 border-border/50">
+            <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Gift className="w-5 h-5 text-primary" />
-                  چه چیزی دریافت می‌کنید؟
+                <CardTitle className="flex items-center gap-3 text-luxury-white">
+                  <Award className="w-6 h-6 text-luxury-silver" />
+                  چه چیزی یاد می‌گیرید
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>ورکشاپ ۳ هفته‌ای زنده و تعاملی</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>تمرین‌ها و ابزارهای شجاعت‌سازی</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>چارچوب حدودگذاری سالم</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>پرسش و پاسخ با راضیه میرزایی</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>کتاب کار دیجیتال و قالب‌ها</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span>دسترسی به انجمن خصوصی</span>
+              <CardContent>
+                <div className="grid gap-3">
+                  {[
+                    'مرزبندی قدرتمند و موثر',
+                    'افزایش اعتماد به نفس پایدار',
+                    'ابراز وجود بدون احساس گناه',
+                    'مدیریت تعارضات با قدرت',
+                    'تکنیک‌های ارتباط مؤثر',
+                    'رهایی از نیاز به تأیید دیگران'
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 bg-luxury-white/5 rounded-lg">
+                      <CheckCircle className="w-5 h-5 text-luxury-white flex-shrink-0" />
+                      <span className="text-luxury-silver">{item}</span>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </section>
 
-          {/* What You'll Learn */}
-          <section className="mb-12">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-4">چه چیزهایی یاد خواهید گرفت؟</h2>
-              <img 
-                src="/assets/money-literacy-program.jpg" 
-                alt="یادگیری مهارت های زندگی" 
-                className="w-full max-w-md mx-auto rounded-lg shadow-md mb-6"
-              />
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <Award className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">اعتماد به نفس تزلزل‌ناپذیر</h3>
-                  <p className="text-muted-foreground">بر تردید غلبه کنید و اعتماد به نفس لازم برای دنبال کردن بزرگ‌ترین اهدافتان را توسعه دهید.</p>
-                </CardContent>
-              </Card>
+          {/* Contact Section */}
+          <section className="text-center bg-gradient-luxury rounded-2xl p-8 shadow-luxury">
+            <div className="max-w-2xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-luxury-white font-display">
+                آماده برای تحول هستید؟
+              </h2>
+              <p className="text-luxury-silver mb-8 text-lg leading-relaxed">
+                امروز اولین قدم را برای تبدیل شدن به بهترین نسخه خودتان بردارید
+              </p>
               
-              <Card className="bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20 hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <Shield className="w-12 h-12 text-secondary mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">مرزگذاری سالم</h3>
-                  <p className="text-muted-foreground">یاد بگیرید بدون احساس گناه «نه» بگویید و از انرژی و زمانتان محافظت کنید.</p>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20 hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <Zap className="w-12 h-12 text-accent mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">شجاعت در عمل</h3>
-                  <p className="text-muted-foreground">ترس را به سوخت تبدیل کنید و اقدام جسورانه به سمت رویاهایتان بردارید.</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <Target className="w-12 h-12 text-green-600 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">هدف‌گذاری قدرتمند</h3>
-                  <p className="text-muted-foreground">اهداف واضح و قابل دستیابی تعیین کنید و راه‌های عملی برای رسیدن به آنها بیاموزید.</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <Heart className="w-12 h-12 text-purple-600 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">مراقبت از خود</h3>
-                  <p className="text-muted-foreground">اولویت‌بندی نیازهای خود بدون احساس خودخواهی و ایجاد تعادل سالم در زندگی.</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <TrendingUp className="w-12 h-12 text-orange-600 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">رشد مداوم</h3>
-                  <p className="text-muted-foreground">ایجاد عادت‌های مثبت و ذهنیت رشد برای پیشرفت مداوم در تمام زمینه‌های زندگی.</p>
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-
-          {/* Instructor Section */}
-          <section className="mb-12">
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8">
-              <h2 className="text-3xl font-bold text-center mb-8">مربی شما: راضیه میرزایی</h2>
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div>
-                  <img 
-                    src="/assets/hero-businesswoman.jpg" 
-                    alt="راضیه میرزایی" 
-                    className="w-full max-w-md mx-auto rounded-lg shadow-lg"
-                  />
-                </div>
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-blue-800">مدرس اعتمادبنفس و مربی کسب و کارهای خانمانه</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Award className="w-5 h-5 text-purple-500" />
-                      <span>نویسنده کتاب پرفروش "کاراکتر پرجرات" به زبان فارسی و انگلیسی</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Star className="w-5 h-5 text-yellow-500" />
-                      <span>متخصص توسعه شخصیت و اعتماد به نفس</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-5 h-5 text-blue-500" />
-                      <span>مربی کسب و کارهای خانمانه</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-5 h-5 text-green-500" />
-                      <span>بنیان‌گذار آکادمی لیدی‌باس</span>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground">
-                    راضیه با تسلط بر زبان فارسی و انگلیسی، تجربیات منحصر به فردی را برای توسعه اعتماد به نفس و قدرت درونی زنان ایرانی ارائه می‌دهد.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Testimonials */}
-          <section className="mb-12">
-            <h2 className="text-3xl font-bold text-center mb-8">نظرات شرکت‌کنندگان قبلی</h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              <Card className="bg-white border-l-4 border-l-primary">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-4">
-                    "این کارگاه زندگی من را کاملاً تغییر داد. حالا می‌توانم با اعتماد به نفس کامل برای خودم صحبت کنم."
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <img src="/assets/testimonial-1.jpg" alt="مریم احمدی" className="w-10 h-10 rounded-full" />
-                    <div>
-                      <p className="font-semibold">مریم احمدی</p>
-                      <p className="text-sm text-muted-foreground">کارآفرین</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white border-l-4 border-l-secondary">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-4">
-                    "یاد گرفتم چطور بدون احساس گناه 'نه' بگویم. این مهارت زندگی‌ام را متحول کرد."
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <img src="/assets/testimonial-2.jpg" alt="سارا کریمی" className="w-10 h-10 rounded-full" />
-                    <div>
-                      <p className="font-semibold">سارا کریمی</p>
-                      <p className="text-sm text-muted-foreground">مدیر فروش</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white border-l-4 border-l-accent">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-4">
-                    "از یک زن ترسو به یک لیدر مطمئن تبدیل شدم. همه می‌گویند تغییر کرده‌ام!"
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <img src="/assets/testimonial-3.jpg" alt="نازنین موسوی" className="w-10 h-10 rounded-full" />
-                    <div>
-                      <p className="font-semibold">نازنین موسوی</p>
-                      <p className="text-sm text-muted-foreground">معلم</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-
-          {/* Value Stack */}
-          <section className="mb-12">
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border border-purple-200">
-              <h2 className="text-3xl font-bold text-center mb-8 text-purple-800">ارزش کل پکیج: $۱۲۹۷</h2>
-              <div className="space-y-4 max-w-2xl mx-auto">
-                <div className="flex justify-between items-center p-4 bg-white/50 rounded-lg">
-                  <span>ورکشاپ ۳ هفته‌ای (۳ جلسه دو ساعته)</span>
-                  <span className="font-semibold text-purple-600 farsi-nums">$۴۹۷</span>
-                </div>
-                <div className="flex justify-between items-center p-4 bg-white/50 rounded-lg">
-                  <span>کتاب کار دیجیتال اختصاصی</span>
-                  <span className="font-semibold text-purple-600 farsi-nums">$۱۹۷</span>
-                </div>
-                <div className="flex justify-between items-center p-4 bg-white/50 rounded-lg">
-                  <span>۷ روز دسترسی به ضبط</span>
-                  <span className="font-semibold text-purple-600 farsi-nums">$۲۹۷</span>
-                </div>
-                <div className="flex justify-between items-center p-4 bg-white/50 rounded-lg">
-                  <span>دسترسی به انجمن خصوصی</span>
-                  <span className="font-semibold text-purple-600 farsi-nums">$۱۹۷</span>
-                </div>
-                <div className="flex justify-between items-center p-4 bg-white/50 rounded-lg">
-                  <span>پشتیبانی ایمیلی ۳۰ روزه</span>
-                  <span className="font-semibold text-purple-600 farsi-nums">$۱۰۹</span>
-                </div>
-                <div className="border-t-2 border-purple-300 pt-4">
-                  <div className="flex justify-between items-center text-xl font-bold">
-                    <span>مجموع ارزش:</span>
-                    <span className="text-purple-800 farsi-nums">$۱۲۹۷</span>
-                  </div>
-                  <div className="flex justify-between items-center text-2xl font-bold text-green-600 mt-2">
-                    <span>قیمت امروز:</span>
-                    <span className="farsi-nums">$۹۷</span>
-                  </div>
-                  <p className="text-center text-green-600 font-semibold mt-2">
-                    ۹۲% صرفه‌جویی - تنها امروز!
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* FAQ Section */}
-          <section className="mb-12">
-            <h2 className="text-3xl font-bold text-center mb-8">سوالات متداول</h2>
-            <div className="space-y-4 max-w-3xl mx-auto">
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">آیا این کارگاه برای مبتدی‌ها مناسب است؟</h3>
-                  <p className="text-muted-foreground">بله، این کارگاه برای تمام سطوح طراحی شده و نیازی به تجربه قبلی ندارید.</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">اگر نتوانم در زمان مقرر شرکت کنم چه؟</h3>
-                  <p className="text-muted-foreground">شما ۷ روز دسترسی به ضبط کامل کارگاه خواهید داشت.</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">آیا ضمانت بازگشت وجه دارید؟</h3>
-                  <p className="text-muted-foreground">بله، ۳۰ روز ضمانت کامل بازگشت وجه داریم. اگر راضی نباشید، پول شما برگردانده می‌شود.</p>
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-
-          {/* Final CTA Section */}
-          <section className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 rounded-2xl p-8 text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">آماده هستید شجاعت خود را بسازید؟</h2>
-            <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-              به ۲۵ زن جاه‌طلب در این کارگاه تحول‌آفرین بپیوندید. جاهای محدود موجود است.
-            </p>
-            
-            {/* Scarcity Indicators */}
-            <div className="flex justify-center items-center gap-8 mb-6 text-sm">
-              <div className="bg-red-100 text-red-800 px-3 py-1 rounded-full">
-                🔥 تنها ۷ جا باقی مانده
-              </div>
-              <div className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full">
-                ⏰ پیشنهاد تا ۲۴ ساعت
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-              <Button 
-                size="lg" 
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-12 py-6 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300"
-                onClick={() => handleRegisterClick('final_cta')}
-              >
-                <Zap className="w-6 h-6 ml-2" />
-                همین الان ثبت‌نام کنید - $۹۷
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                onClick={handleWhatsAppClick}
-                className="px-8 py-6 text-lg font-semibold"
-              >
-                <MessageCircle className="w-5 h-5 ml-2" />
-                سوال دارید؟
-              </Button>
-            </div>
-
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>💰 ضمانت ۳۰ روزه بازگشت وجه</p>
-              <p>🎁 مواد جانبی شامل می‌شود</p>
-              <p>📧 دسترسی فوری پس از پرداخت</p>
-            </div>
-          </section>
-
-          {/* Contact Info */}
-          <section className="text-center">
-            <h3 className="text-xl font-semibold mb-4">برای سوالات بیشتر:</h3>
-            <div className="flex justify-center items-center gap-6 text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                <span dir="ltr">+1 (949) 572-3730</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                <span>info@ladybossacademy.com</span>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Button 
+                  size="lg" 
+                  className="w-full bg-luxury-white hover:bg-luxury-silver text-luxury-black px-8 py-6 text-xl font-bold rounded-xl shadow-luxury"
+                  onClick={() => handleRegisterClick('final')}
+                >
+                  <Sparkles className="w-6 h-6 ml-2" />
+                  <span className="farsi-nums">ثبت‌نام فوری - $۹۷</span>
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  size="lg" 
+                  onClick={handleWhatsAppClick}
+                  className="w-full border-luxury-white/30 text-luxury-white hover:bg-luxury-white/10 px-8 py-6 text-lg font-semibold rounded-xl"
+                >
+                  <Phone className="w-5 h-5 ml-2" />
+                  مشاوره رایگان
+                </Button>
               </div>
             </div>
           </section>
         </main>
 
-        {/* Sticky CTA Button */}
+        {/* Sticky Mobile CTA */}
         {showStickyBtn && (
-          <div className="sticky-cta">
+          <div className="sticky-cta sm:hidden">
             <Button 
               size="lg" 
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-bold shadow-2xl"
+              className="bg-luxury-white hover:bg-luxury-silver text-luxury-black px-8 py-4 text-lg font-bold rounded-xl shadow-luxury w-80 max-w-[90vw]"
               onClick={() => handleRegisterClick('sticky')}
             >
-              ثبت‌نام $۹۷
+              <Crown className="w-5 h-5 ml-2" />
+              <span className="farsi-nums">شروع تحول - $۹۷</span>
             </Button>
           </div>
         )}
