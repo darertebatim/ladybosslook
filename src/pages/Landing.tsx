@@ -421,12 +421,6 @@ const Landing = () => {
               alt="LADYBOSS Training" 
               className="w-64 h-auto md:w-80 lg:w-96 rounded-lg shadow-lg"
             />
-            <div className="animate-bounce">
-              <ChevronDown className="w-8 h-8 text-primary" />
-            </div>
-            <p className="text-sm text-muted-foreground font-medium">
-              Fill out the form below to access your free training
-            </p>
           </div>
         </div>
         
@@ -503,6 +497,19 @@ const Landing = () => {
 
           {/* Right Column - Form */}
           <div className="order-1 lg:order-2">
+            {/* Arrow indicators above form */}
+            <div className="flex justify-center items-center mb-4 space-x-2">
+              <div className="animate-bounce">
+                <ChevronDown className="w-8 h-8 text-red-500" />
+              </div>
+              <div className="animate-bounce" style={{ animationDelay: '0.1s' }}>
+                <ChevronDown className="w-8 h-8 text-red-500" />
+              </div>
+              <div className="animate-bounce" style={{ animationDelay: '0.2s' }}>
+                <ChevronDown className="w-8 h-8 text-red-500" />
+              </div>
+            </div>
+            
             <Card className="border-2 border-primary/20 shadow-xl">
               <CardHeader className="text-center pb-3">
                 <CardTitle className="text-xl md:text-2xl">
