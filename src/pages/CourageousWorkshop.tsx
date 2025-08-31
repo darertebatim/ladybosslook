@@ -197,23 +197,23 @@ const CourageousWorkshop = () => {
         </header>
 
         <main className="container mx-auto px-4 py-8">
-          {/* Urgency Banner - Luxury Style */}
-          <div className="relative bg-gradient-to-r from-luxury-charcoal via-luxury-accent to-luxury-charcoal border border-luxury-silver/30 rounded-xl p-6 mb-8 text-center shadow-luxury-glow">
-            <div className="absolute inset-0 bg-luxury-black/50 rounded-xl"></div>
+          {/* Urgency Banner - Compact Timer */}
+          <div className="relative bg-gradient-to-r from-luxury-charcoal via-luxury-accent to-luxury-charcoal border border-luxury-silver/30 rounded-lg p-3 mb-6 text-center shadow-luxury-glow">
+            <div className="absolute inset-0 bg-luxury-black/50 rounded-lg"></div>
             <div className="relative">
-              <div className="flex items-center justify-center gap-2 text-luxury-white font-bold text-sm sm:text-lg mb-4">
-                <Timer className="w-5 h-5 sm:w-6 sm:h-6 text-luxury-silver" />
-                <span className="text-center leading-tight">پیشنهاد محدود زمان برای زنان قدرتمند</span>
-                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-luxury-silver" />
+              <div className="flex items-center justify-center gap-1 text-luxury-white font-bold text-xs mb-2">
+                <Timer className="w-4 h-4 text-luxury-silver" />
+                <span>پیشنهاد محدود زمان برای زنان قدرتمند</span>
+                <Sparkles className="w-4 h-4 text-luxury-silver" />
               </div>
-              <div className="flex items-center justify-center gap-2 text-xl font-bold text-luxury-white farsi-nums">
-                <div className="bg-luxury-white text-luxury-black rounded px-2 py-1 text-sm shadow-lg">{timeLeft.hours.toString().padStart(2, '0')}</div>
-                <span className="text-luxury-silver text-sm">:</span>
-                <div className="bg-luxury-white text-luxury-black rounded px-2 py-1 text-sm shadow-lg">{timeLeft.minutes.toString().padStart(2, '0')}</div>
-                <span className="text-luxury-silver text-sm">:</span>
-                <div className="bg-luxury-white text-luxury-black rounded px-2 py-1 text-sm shadow-lg">{timeLeft.seconds.toString().padStart(2, '0')}</div>
+              <div className="flex items-center justify-center gap-1 farsi-nums">
+                <div className="bg-luxury-white text-luxury-black rounded-md px-3 py-2 text-2xl font-bold shadow-lg min-w-[50px]">{timeLeft.hours.toString().padStart(2, '0')}</div>
+                <span className="text-luxury-silver text-lg font-bold">:</span>
+                <div className="bg-luxury-white text-luxury-black rounded-md px-3 py-2 text-2xl font-bold shadow-lg min-w-[50px]">{timeLeft.minutes.toString().padStart(2, '0')}</div>
+                <span className="text-luxury-silver text-lg font-bold">:</span>
+                <div className="bg-luxury-white text-luxury-black rounded-md px-3 py-2 text-2xl font-bold shadow-lg min-w-[50px]">{timeLeft.seconds.toString().padStart(2, '0')}</div>
               </div>
-              <p className="text-xs text-luxury-silver mt-2 font-medium">ساعت : دقیقه : ثانیه</p>
+              <p className="text-xs text-luxury-silver mt-1 font-medium">ساعت : دقیقه : ثانیه</p>
             </div>
           </div>
 
