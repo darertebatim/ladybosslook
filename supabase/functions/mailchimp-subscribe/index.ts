@@ -11,6 +11,12 @@ interface SubscribeRequest {
   name: string;
   city: string;
   phone: string;
+  source?: string;
+  workshop_name?: string;
+  purchase_amount?: number;
+  purchase_date?: string;
+  payment_status?: string;
+  tags?: string[];
 }
 
 // Rate limiting using in-memory store (simple implementation)
@@ -93,7 +99,18 @@ const handler = async (req: Request): Promise<Response> => {
   let formSubmissionId: string | null = null;
 
   try {
-    const { email, name, city, phone }: SubscribeRequest = await req.json();
+    const { 
+      email, 
+      name, 
+      city, 
+      phone, 
+      source, 
+      workshop_name, 
+      purchase_amount, 
+      purchase_date, 
+      payment_status, 
+      tags 
+    }: SubscribeRequest = await req.json();
 
     // Initialize Supabase client for backup storage
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
@@ -111,6 +128,7 @@ const handler = async (req: Request): Promise<Response> => {
             name,
             city,
             phone,
+            source: source || 'landing_page',
             user_agent: req.headers.get("user-agent"),
             ip_address: clientIP !== "unknown" ? clientIP : null,
             mailchimp_success: false
@@ -166,6 +184,11 @@ const handler = async (req: Request): Promise<Response> => {
             FNAME: name,
             CITY: city,
             PHONE: phone,
+            ...(workshop_name && { WORKSHOP: workshop_name }),
+            ...(purchase_amount && { AMOUNT: purchase_amount }),
+            ...(purchase_date && { PURCHDATE: new Date(purchase_date).toISOString().split('T')[0] }),
+            ...(payment_status && { PAYSTATUS: payment_status }),
+            ...(source && { SOURCE: source }),
           },
           marketing_permissions: [
             {
@@ -174,6 +197,7 @@ const handler = async (req: Request): Promise<Response> => {
             }
           ],
           phone_number: phone,
+          ...(tags && tags.length > 0 && { tags: tags }),
         }),
       });
 

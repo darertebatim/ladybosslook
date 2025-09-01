@@ -87,13 +87,23 @@ serve(async (req) => {
       logStep("Payment successful, adding to Mailchimp");
       
       try {
-         // Call the existing mailchimp-subscribe function
+         // Call the existing mailchimp-subscribe function with workshop-specific data
          const mailchimpResponse = await supabaseService.functions.invoke('mailchimp-subscribe', {
            body: {
              email: updatedOrder.email,
              name: updatedOrder.name,
              phone: updatedOrder.phone,
-             source: `payment_${updatedOrder.product_name.toLowerCase().replace(/\s+/g, '_')}`
+             city: "Not provided", // Default for payment customers
+             source: `payment_${updatedOrder.product_name.toLowerCase().replace(/\s+/g, '_')}`,
+             workshop_name: updatedOrder.product_name,
+             purchase_amount: updatedOrder.amount,
+             purchase_date: new Date().toISOString(),
+             payment_status: "paid",
+             tags: [
+               `workshop_${updatedOrder.product_name.toLowerCase().replace(/\s+/g, '_')}`,
+               "paid_customer",
+               "workshop_attendee"
+             ]
            }
          });
 
