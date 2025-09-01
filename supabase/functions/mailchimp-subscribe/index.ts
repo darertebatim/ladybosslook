@@ -165,21 +165,29 @@ const handler = async (req: Request): Promise<Response> => {
     // Extract datacenter from API key (e.g., us1, us2, etc.)
     const datacenter = mailchimpApiKey.split("-")[1];
     
-    const url = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members`;
+    // Create MD5 hash of email for subscriber ID (required by Mailchimp API)
+    const crypto = await import("https://deno.land/std@0.190.0/crypto/mod.ts");
+    const encoder = new TextEncoder();
+    const emailHash = Array.from(
+      new Uint8Array(await crypto.crypto.subtle.digest("MD5", encoder.encode(email.toLowerCase())))
+    ).map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    const memberUrl = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members/${emailHash}`;
+    const tagsUrl = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members/${emailHash}/tags`;
 
-    console.log("Subscribing to Mailchimp (admin access required to view details)");
+    console.log("Subscribing/Updating Mailchimp member (admin access required to view details)");
 
-    // Use retry mechanism for Mailchimp API call
+    // Use retry mechanism for Mailchimp API call - Use PUT to create or update
     const { response, data } = await retryWithBackoff(async () => {
-      const response = await fetch(url, {
-        method: "POST",
+      const response = await fetch(memberUrl, {
+        method: "PUT",
         headers: {
           "Authorization": `Bearer ${mailchimpApiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email_address: email,
-          status: "subscribed",
+          status_if_new: "subscribed",
           merge_fields: {
             FNAME: name,
             CITY: city,
@@ -198,13 +206,38 @@ const handler = async (req: Request): Promise<Response> => {
             }
           ],
           phone_number: phone,
-          ...(tags && tags.length > 0 && { tags: tags }),
         }),
       });
 
       const data = await response.json();
       return { response, data };
     }, 3, 1000);
+
+    // If member was created/updated successfully, add tags
+    if (response.ok && tags && tags.length > 0) {
+      console.log("Adding tags to member:", tags);
+      try {
+        const tagsResponse = await fetch(tagsUrl, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${mailchimpApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            tags: tags.map(tag => ({ name: tag, status: "active" }))
+          }),
+        });
+        
+        const tagsData = await tagsResponse.json();
+        if (!tagsResponse.ok) {
+          console.error("Error adding tags:", tagsData);
+        } else {
+          console.log("Tags added successfully");
+        }
+      } catch (tagError) {
+        console.error("Error adding tags:", tagError);
+      }
+    }
 
     if (!response.ok) {
       console.error("Mailchimp API error:", data);
@@ -224,9 +257,9 @@ const handler = async (req: Request): Promise<Response> => {
         }
       }
       
-      // Handle already subscribed case gracefully
+      // Handle already subscribed case gracefully - but this shouldn't happen with PUT method
       if (data.title === "Member Exists") {
-        console.log("User already subscribed - email protected");
+        console.log("Member updated successfully");
         
         // Update backup record as successful for existing members
         if (supabase && formSubmissionId) {
@@ -235,7 +268,7 @@ const handler = async (req: Request): Promise<Response> => {
               .from('form_submissions')
               .update({ 
                 mailchimp_success: true,
-                mailchimp_error: "Member already exists"
+                mailchimp_error: "Member updated"
               })
               .eq('id', formSubmissionId);
           } catch (updateError) {
@@ -246,8 +279,8 @@ const handler = async (req: Request): Promise<Response> => {
         return new Response(
           JSON.stringify({ 
             success: true, 
-            message: "Already subscribed",
-            member_id: data.detail?.split("'")[1] || null,
+            message: "Member updated successfully",
+            member_id: data.id || emailHash,
             processingTime: Date.now() - startTime
           }),
           {
@@ -271,7 +304,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log("Successfully subscribed - member created");
+    console.log("Member created/updated successfully");
 
     // Update backup record as successful
     if (supabase && formSubmissionId) {
@@ -291,8 +324,8 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Successfully subscribed",
-        member_id: data.id,
+        message: "Successfully created/updated member",
+        member_id: data.id || emailHash,
         processingTime: Date.now() - startTime
       }),
       {
