@@ -98,15 +98,22 @@ serve(async (req) => {
         logStep('Order record created', { orderId: newOrder.id });
       }
 
-      // If payment successful, optionally subscribe to Mailchimp
+      // If payment successful, subscribe to Mailchimp with workshop details
       if (orderDetails) {
-        logStep('Attempting Mailchimp subscription');
+        logStep('Attempting Mailchimp subscription with workshop details');
         try {
           const mailchimpResponse = await supabase.functions.invoke('mailchimp-subscribe', {
             body: {
               email: orderDetails.email,
               name: orderDetails.name,
-              phone: orderDetails.phone
+              city: "Online", // Default city for online workshop
+              phone: orderDetails.phone || "",
+              source: "workshop_purchase",
+              workshop_name: "Courageous Character Workshop",
+              purchase_amount: orderDetails.amount,
+              purchase_date: new Date().toISOString(),
+              payment_status: "paid",
+              tags: ["workshop_courageous_character"]
             }
           });
           logStep('Mailchimp subscription result', mailchimpResponse);
