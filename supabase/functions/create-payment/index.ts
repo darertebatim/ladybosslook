@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -45,8 +44,6 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, {
       apiVersion: "2023-10-16",
     });
-
-    // We don't need Supabase for pre-payment data capture anymore
 
     // Parse request data with enhanced validation
     const requestBody = await req.json();
@@ -167,6 +164,7 @@ serve(async (req) => {
 
     logStep("Stripe checkout session created", { sessionId: session.id });
 
+    // Return session URL directly - no pre-payment database records needed
     return new Response(JSON.stringify({ 
       url: session.url,
       sessionId: session.id
