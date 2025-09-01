@@ -156,45 +156,45 @@ export default function PaymentSuccess() {
       
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-4 sm:py-12 px-4">
         <div className="max-w-2xl mx-auto">
-          {/* Success Header - Mobile Optimized */}
-          <div className="text-center mb-4 sm:mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-20 sm:h-20 bg-green-100 rounded-full mb-3 sm:mb-6">
-              <CheckCircle className="w-6 h-6 sm:w-10 sm:h-10 text-green-600" />
+          {/* Success Header - Ultra Compact */}
+          <div className="text-center mb-2 sm:mb-4">
+            <div className="inline-flex items-center justify-center w-10 h-10 sm:w-16 sm:h-16 bg-green-100 rounded-full mb-2 sm:mb-4">
+              <CheckCircle className="w-5 h-5 sm:w-8 sm:h-8 text-green-600" />
             </div>
-            <h1 className="text-2xl sm:text-4xl font-bold text-primary mb-2 sm:mb-4">
+            <h1 className="text-xl sm:text-3xl font-bold text-primary mb-1 sm:mb-2">
               Payment Successful!
             </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground">
+            <p className="text-sm sm:text-lg text-muted-foreground">
               Welcome to your transformation journey!
             </p>
           </div>
 
-          {/* Order Details - Mobile Optimized */}
+          {/* Order Details - Ultra Compact */}
           {orderDetails && (
-            <Card className="mb-4 sm:mb-8">
-              <CardHeader className="pb-3 sm:pb-6">
-                <CardTitle className="text-lg sm:text-xl">Order Confirmation</CardTitle>
-                <CardDescription className="text-sm">
+            <Card className="mb-2 sm:mb-4">
+              <CardHeader className="pb-1 sm:pb-3">
+                <CardTitle className="text-base sm:text-lg">Order Confirmation</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
                   {new Date(orderDetails.created_at).toLocaleDateString()}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-2 sm:space-y-4">
-                <div className="flex justify-between items-center py-1 sm:py-2 border-b">
-                  <span className="font-medium text-sm sm:text-base">Program:</span>
+              <CardContent className="space-y-1 sm:space-y-2">
+                <div className="flex justify-between items-center py-0.5 sm:py-1 border-b">
+                  <span className="font-medium text-xs sm:text-sm">Program:</span>
                   <div className="text-right">
-                    <div className="text-sm sm:text-base">{getWorkshopDisplayName(orderDetails.product_name).english}</div>
-                    <div className="text-xs sm:text-sm text-muted-foreground">{getWorkshopDisplayName(orderDetails.product_name).farsi}</div>
+                    <div className="text-xs sm:text-sm">{getWorkshopDisplayName(orderDetails.product_name).english}</div>
+                    <div className="text-xs text-muted-foreground">{getWorkshopDisplayName(orderDetails.product_name).farsi}</div>
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-1 sm:py-2 border-b">
-                  <span className="font-medium text-sm sm:text-base">Amount:</span>
-                  <span className="text-base sm:text-lg font-semibold text-primary">
+                <div className="flex justify-between items-center py-0.5 sm:py-1 border-b">
+                  <span className="font-medium text-xs sm:text-sm">Amount:</span>
+                  <span className="text-sm sm:text-base font-semibold text-primary">
                     {formatPrice(orderDetails.amount)}
                   </span>
                 </div>
-                <div className="flex justify-between items-center py-1 sm:py-2">
-                  <span className="font-medium text-sm sm:text-base">Status:</span>
-                  <span className="text-green-600 font-semibold capitalize text-sm sm:text-base">
+                <div className="flex justify-between items-center py-0.5 sm:py-1">
+                  <span className="font-medium text-xs sm:text-sm">Status:</span>
+                  <span className="text-green-600 font-semibold capitalize text-xs sm:text-sm">
                     {orderDetails.status}
                   </span>
                 </div>
@@ -239,45 +239,34 @@ export default function PaymentSuccess() {
                   </div>
                   
                   {/* Large Arrow Pointing Down - Mobile Optimized */}
-                  <div className="flex justify-center py-2 sm:py-4">
+                  <div className="flex justify-center py-1 sm:py-2">
                     <div className="animate-bounce">
-                      <ArrowRight className="h-8 w-8 sm:h-12 sm:w-12 text-primary font-bold transform rotate-90" />
+                      <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-primary font-bold transform rotate-90" />
                     </div>
+                  </div>
+                  
+                  {/* WhatsApp Button - Directly Under Arrow */}
+                  <div className="pt-1 sm:pt-2">
+                    <a 
+                      href={createWhatsAppMessage()}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-block w-full sm:w-auto"
+                    >
+                      <Button 
+                        size="lg" 
+                        className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white text-sm sm:text-lg py-3 sm:py-4 px-4 sm:px-6 animate-pulse"
+                      >
+                        <MessageCircle className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                        Message Us on WhatsApp
+                      </Button>
+                    </a>
+                    <p className="text-xs text-green-700 mt-1 sm:mt-2">
+                      Your message is ready to send with all your details!
+                    </p>
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Connect with Us - WhatsApp Priority - Mobile Optimized */}
-          <Card className="mb-4 sm:mb-8 border-green-200 bg-green-50/50">
-            <CardHeader className="text-center pb-2 sm:pb-6">
-              <CardTitle className="text-green-800 text-lg sm:text-xl">🎉 Connect with Us Now!</CardTitle>
-              <CardDescription className="text-green-700 text-sm">
-                Get instant support and your workshop materials
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <a 
-                href={createWhatsAppMessage()}
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-block w-full sm:w-auto"
-              >
-                <Button 
-                  size="lg" 
-                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white mb-3 sm:mb-4 text-base sm:text-lg py-4 sm:py-6 px-6 sm:px-8"
-                >
-                  <MessageCircle className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
-                  Message Us on WhatsApp
-                </Button>
-              </a>
-              <p className="text-xs sm:text-sm text-green-700 mb-1 sm:mb-2">
-                Your message is ready to send with all your details!
-              </p>
-              <p className="text-xs text-muted-foreground">
-                We'll respond within minutes with your workshop access and next steps
-              </p>
             </CardContent>
           </Card>
 
