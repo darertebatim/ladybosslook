@@ -206,48 +206,48 @@ export default function PaymentSuccess() {
             </Card>
           )}
 
-          {/* Next Steps */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <ArrowRight className="mr-2 h-5 w-5" />
+          {/* Next Steps - WhatsApp Focus */}
+          <Card className="mb-8 border-primary bg-primary/5">
+            <CardHeader className="text-center">
+              <CardTitle className="flex items-center justify-center text-2xl">
+                <ArrowRight className="mr-3 h-8 w-8 text-primary font-bold" />
                 What's Next?
+                <ArrowRight className="ml-3 h-8 w-8 text-primary font-bold" />
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-semibold text-primary">1</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Check Your Email</h3>
-                  <p className="text-muted-foreground">
-                    You'll receive a confirmation email with access instructions and program materials within the next few minutes.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-semibold text-primary">2</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Join Our Community</h3>
-                  <p className="text-muted-foreground">
-                    Connect with other participants and get ongoing support throughout your transformation journey.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-semibold text-primary">3</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Start Your Journey</h3>
-                  <p className="text-muted-foreground">
-                    Begin with Module 1 and take your first step towards building unshakeable confidence.
-                  </p>
+            <CardContent className="text-center space-y-6">
+              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-6 rounded-lg border-2 border-primary/20">
+                <div className="space-y-4">
+                  {/* English Text */}
+                  <div className="text-lg font-semibold text-primary">
+                    <div className="flex items-center justify-center mb-2">
+                      <ArrowRight className="mr-2 h-6 w-6 font-bold" />
+                      <span className="font-bold">Click the button below and message our support on WhatsApp</span>
+                      <ArrowRight className="ml-2 h-6 w-6 font-bold" />
+                    </div>
+                    <p className="text-muted-foreground">
+                      Get your workshop access information and instructions immediately
+                    </p>
+                  </div>
+                  
+                  {/* Farsi Text */}
+                  <div className="text-lg font-semibold text-primary" dir="rtl">
+                    <div className="flex items-center justify-center mb-2">
+                      <ArrowRight className="ml-2 h-6 w-6 font-bold" />
+                      <span className="font-bold">همین حالا روی دکمه پایین بزنید و به واتسپ پشتیبان پیام بزنید</span>
+                      <ArrowRight className="mr-2 h-6 w-6 font-bold" />
+                    </div>
+                    <p className="text-muted-foreground">
+                      اطلاعات ورود به ورکشاپ و نحوه دسترسی را دریافت کنید
+                    </p>
+                  </div>
+                  
+                  {/* Large Arrow Pointing Down */}
+                  <div className="flex justify-center py-4">
+                    <div className="animate-bounce">
+                      <ArrowRight className="h-12 w-12 text-primary font-bold transform rotate-90" />
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
