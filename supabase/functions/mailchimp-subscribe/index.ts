@@ -184,6 +184,7 @@ const handler = async (req: Request): Promise<Response> => {
             FNAME: name,
             CITY: city,
             PHONE: phone,
+            ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
             ...(purchase_date && { PURCHDATE: new Date(purchase_date).toISOString().split('T')[0] }),

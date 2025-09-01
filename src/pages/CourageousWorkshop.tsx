@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { TestMailchimp } from '@/components/TestMailchimp';
 
 
 // Declare Facebook Pixel function
@@ -457,6 +458,8 @@ const CourageousWorkshop = () => {
           </div>
         )}
       </div>
+      
+      <TestMailchimp />
     </>
   );
 };
