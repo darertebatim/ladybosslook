@@ -336,9 +336,12 @@ const CourageousWorkshop = () => {
                   size="lg" 
                   className="w-full max-w-xs bg-luxury-white hover:bg-luxury-silver text-luxury-black px-8 py-5 text-lg font-bold rounded-xl shadow-luxury"
                   onClick={() => handleRegisterClick('solution')}
+                  asChild
                 >
-                  <Target className="w-5 h-5 ml-2" />
-                  می‌خواهم متحول شوم!
+                  <Link to="/checkout?program=courageous-character">
+                    <Target className="w-5 h-5 ml-2" />
+                    می‌خواهم متحول شوم!
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -415,9 +418,12 @@ const CourageousWorkshop = () => {
                   size="lg" 
                   className="w-full bg-luxury-white hover:bg-luxury-silver text-luxury-black px-6 py-5 text-lg font-bold rounded-xl shadow-luxury"
                   onClick={() => handleRegisterClick('final')}
+                  asChild
                 >
-                  <Sparkles className="w-5 h-5 ml-2" />
-                  <span className="farsi-nums">ثبت‌نام فوری - $۹۷</span>
+                  <Link to="/checkout?program=courageous-character">
+                    <Sparkles className="w-5 h-5 ml-2" />
+                    <span className="farsi-nums">ثبت‌نام فوری - $۹۷</span>
+                  </Link>
                 </Button>
                 
                 <Button 
@@ -441,9 +447,12 @@ const CourageousWorkshop = () => {
               size="lg" 
               className="bg-luxury-white hover:bg-luxury-silver text-luxury-black px-6 py-4 text-base font-bold rounded-xl shadow-luxury w-72 max-w-[85vw]"
               onClick={() => handleRegisterClick('sticky')}
+              asChild
             >
-              <Crown className="w-4 h-4 ml-2" />
-              <span className="farsi-nums text-sm">شروع تحول - $۹۷</span>
+              <Link to="/checkout?program=courageous-character">
+                <Crown className="w-4 h-4 ml-2" />
+                <span className="farsi-nums text-sm">شروع تحول - $۹۷</span>
+              </Link>
             </Button>
           </div>
         )}
