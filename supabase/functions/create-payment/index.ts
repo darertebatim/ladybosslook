@@ -46,12 +46,7 @@ serve(async (req) => {
       apiVersion: "2023-10-16",
     });
 
-    // Initialize Supabase with service role key for database operations
-    const supabaseService = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
+    // We don't need Supabase for pre-payment data capture anymore
 
     // Parse request data with enhanced validation
     const requestBody = await req.json();

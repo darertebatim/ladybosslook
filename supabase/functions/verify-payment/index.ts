@@ -61,8 +61,10 @@ serve(async (req) => {
     
     logStep("Session ID validated", { sessionId });
 
-    // Retrieve the checkout session from Stripe
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    // Retrieve the checkout session from Stripe with line items
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['line_items', 'customer']
+    });
     logStep("Stripe session retrieved", { 
       status: session.payment_status,
       amount: session.amount_total 
