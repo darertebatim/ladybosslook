@@ -163,14 +163,14 @@ const Checkout = () => {
                   <div className="space-y-3">
                      <form onSubmit={handleSubmit} className="space-y-3">
                        <div>
-                         <div className="flex justify-between items-center mb-1">
-                           <Label htmlFor="name" className="text-xs font-medium text-luxury-silver">
-                             Full Name *
-                           </Label>
-                           <Label htmlFor="name" className="text-xs font-medium text-luxury-silver">
-                             نام کامل *
-                           </Label>
-                         </div>
+                          <div className="flex justify-between items-center mb-1">
+                            <Label htmlFor="name" className="text-xs font-medium text-luxury-silver text-left">
+                              Full Name *
+                            </Label>
+                            <Label htmlFor="name" className="text-xs font-medium text-luxury-silver text-right">
+                              نام کامل *
+                            </Label>
+                          </div>
                          <Input
                            id="name"
                            name="name"
@@ -184,14 +184,14 @@ const Checkout = () => {
                        </div>
                        
                        <div>
-                         <div className="flex justify-between items-center mb-1">
-                           <Label htmlFor="email" className="text-xs font-medium text-luxury-silver">
-                             Email Address *
-                           </Label>
-                           <Label htmlFor="email" className="text-xs font-medium text-luxury-silver">
-                             آدرس ایمیل *
-                           </Label>
-                         </div>
+                          <div className="flex justify-between items-center mb-1">
+                            <Label htmlFor="email" className="text-xs font-medium text-luxury-silver text-left">
+                              Email Address *
+                            </Label>
+                            <Label htmlFor="email" className="text-xs font-medium text-luxury-silver text-right">
+                              آدرس ایمیل *
+                            </Label>
+                          </div>
                          <Input
                            id="email"
                            name="email"
@@ -205,14 +205,14 @@ const Checkout = () => {
                        </div>
                        
                        <div>
-                         <div className="flex justify-between items-center mb-1">
-                           <Label htmlFor="phone" className="text-xs font-medium text-luxury-silver">
-                             Phone Number (Optional)
-                           </Label>
-                           <Label htmlFor="phone" className="text-xs font-medium text-luxury-silver">
-                             شماره تلفن (اختیاری)
-                           </Label>
-                         </div>
+                          <div className="flex justify-between items-center mb-1">
+                            <Label htmlFor="phone" className="text-xs font-medium text-luxury-silver text-left">
+                              Phone Number (Optional)
+                            </Label>
+                            <Label htmlFor="phone" className="text-xs font-medium text-luxury-silver text-right">
+                              شماره تلفن (اختیاری)
+                            </Label>
+                          </div>
                          <Input
                            id="phone"
                            name="phone"
