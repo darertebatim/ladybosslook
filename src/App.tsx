@@ -15,6 +15,7 @@ import BusinessIdeas from "./pages/BusinessIdeas";
 import EventIrvine from "./pages/EventIrvine";
 import CourageousWorkshop from "./pages/CourageousWorkshop";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import Checkout from "./pages/Checkout";
 import Privacy from "./pages/Privacy";
 import SMSTerms from "./pages/SMSTerms";
 import NotFound from "./pages/NotFound";
@@ -45,7 +46,8 @@ const App = () => (
             <Route path="/business-ideas" element={<BusinessIdeas />} />
             <Route path="/event-irvine" element={<EventIrvine />} />
             <Route path="/courageous-workshop" element={<CourageousWorkshop />} />
-            <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/checkout" element={<Checkout />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/sms-terms" element={<SMSTerms />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
