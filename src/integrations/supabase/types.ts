@@ -172,10 +172,6 @@ export type Database = {
         Args: { p_action: string; p_details?: Json; p_user_id?: string }
         Returns: undefined
       }
-      update_order_status_secure: {
-        Args: { p_status: string; p_stripe_session_id: string }
-        Returns: string
-      }
     }
     Enums: {
       app_role: "admin" | "user"

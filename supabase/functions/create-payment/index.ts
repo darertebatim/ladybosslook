@@ -167,33 +167,9 @@ serve(async (req) => {
 
     logStep("Stripe checkout session created", { sessionId: session.id });
 
-    // Create order record in database (using sanitized inputs)
-    const { data: orderData, error: orderError } = await supabaseService
-      .from("orders")
-      .insert({
-        email: sanitizedEmail,
-        name: sanitizedName,
-        phone: sanitizedPhone,
-        stripe_session_id: session.id,
-        amount: selectedProgram.amount,
-        currency: "usd",
-        status: "pending",
-        product_name: selectedProgram.name,
-      })
-      .select()
-      .single();
-
-    if (orderError) {
-      logStep("Database error", orderError);
-      throw new Error(`Database error: ${orderError.message}`);
-    }
-
-    logStep("Order created in database", { orderId: orderData.id });
-
     return new Response(JSON.stringify({ 
       url: session.url,
-      sessionId: session.id,
-      orderId: orderData.id
+      sessionId: session.id
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
