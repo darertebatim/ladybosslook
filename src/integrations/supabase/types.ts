@@ -138,6 +138,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      update_order_status_secure: {
+        Args: { p_status: string; p_stripe_session_id: string }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "user"

@@ -51,25 +51,35 @@ serve(async (req) => {
       amount: session.amount_total 
     });
 
-    // Update order status in database
+    // Update order status using secure function
+    const newStatus = session.payment_status === "paid" ? "paid" : "failed";
     const { data: orderData, error: orderError } = await supabaseService
-      .from("orders")
-      .update({
-        status: session.payment_status === "paid" ? "paid" : "failed",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("stripe_session_id", sessionId)
-      .select()
-      .single();
+      .rpc('update_order_status_secure', {
+        p_stripe_session_id: sessionId,
+        p_status: newStatus
+      });
 
     if (orderError) {
       logStep("Database error", orderError);
       throw new Error(`Database error: ${orderError.message}`);
     }
 
+    // Get the updated order details
+    const { data: updatedOrder, error: fetchError } = await supabaseService
+      .from("orders")
+      .select()
+      .eq("stripe_session_id", sessionId)
+      .single();
+
+    if (fetchError) {
+      logStep("Database fetch error", fetchError);
+      throw new Error(`Database fetch error: ${fetchError.message}`);
+    }
+
     logStep("Order status updated", { 
-      orderId: orderData.id, 
-      status: orderData.status 
+      orderId: orderData, 
+      status: newStatus,
+      orderDetails: updatedOrder
     });
 
     // If payment is successful, send email to Mailchimp
@@ -77,15 +87,15 @@ serve(async (req) => {
       logStep("Payment successful, adding to Mailchimp");
       
       try {
-        // Call the existing mailchimp-subscribe function
-        const mailchimpResponse = await supabaseService.functions.invoke('mailchimp-subscribe', {
-          body: {
-            email: orderData.email,
-            name: orderData.name,
-            phone: orderData.phone,
-            source: `payment_${orderData.product_name.toLowerCase().replace(/\s+/g, '_')}`
-          }
-        });
+         // Call the existing mailchimp-subscribe function
+         const mailchimpResponse = await supabaseService.functions.invoke('mailchimp-subscribe', {
+           body: {
+             email: updatedOrder.email,
+             name: updatedOrder.name,
+             phone: updatedOrder.phone,
+             source: `payment_${updatedOrder.product_name.toLowerCase().replace(/\s+/g, '_')}`
+           }
+         });
 
         if (mailchimpResponse.error) {
           logStep("Mailchimp error", mailchimpResponse.error);
@@ -101,7 +111,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       success: true,
       paymentStatus: session.payment_status,
-      order: orderData,
+      order: updatedOrder,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
