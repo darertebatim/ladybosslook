@@ -10,6 +10,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
+  logSecurityEvent: (action: string, details?: any) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -98,14 +99,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return { error };
   };
 
+  const logSecurityEvent = async (action: string, details?: any): Promise<void> => {
+    try {
+      // Only log if we have a user context or for authentication events
+      if (user || ['sign_in_attempt', 'sign_up_attempt', 'sign_in_failed', 'sign_up_failed'].includes(action)) {
+        await supabase.rpc('log_security_event', {
+          p_action: action,
+          p_details: details ? JSON.stringify(details) : null,
+          p_user_id: user?.id || null
+        });
+      }
+    } catch (error) {
+      // Silently fail to avoid breaking the main flow
+      console.warn('Failed to log security event:', error);
+    }
+  };
+
   const value = {
     user,
     session,
     loading,
     isAdmin,
-    signIn,
-    signUp,
-    signOut,
+      signIn,
+      signUp,
+      signOut,
+      logSecurityEvent,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
