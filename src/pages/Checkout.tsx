@@ -163,14 +163,19 @@ const Checkout = () => {
                   <div className="space-y-3">
                      <form onSubmit={handleSubmit} className="space-y-3">
                        <div>
-                         <Label htmlFor="name" className="text-xs font-medium text-luxury-silver mb-1 block">
-                           نام کامل *
-                         </Label>
+                         <div className="flex justify-between items-center mb-1">
+                           <Label htmlFor="name" className="text-xs font-medium text-luxury-silver">
+                             Full Name *
+                           </Label>
+                           <Label htmlFor="name" className="text-xs font-medium text-luxury-silver">
+                             نام کامل *
+                           </Label>
+                         </div>
                          <Input
                            id="name"
                            name="name"
                            type="text"
-                           placeholder="نام کامل خود را وارد کنید"
+                           placeholder="Enter your full name | نام کامل خود را وارد کنید"
                            className="h-10 bg-luxury-black/30 border-luxury-white/20 text-luxury-white placeholder-luxury-silver/60"
                            value={formData.name}
                            onChange={handleInputChange}
@@ -179,14 +184,19 @@ const Checkout = () => {
                        </div>
                        
                        <div>
-                         <Label htmlFor="email" className="text-xs font-medium text-luxury-silver mb-1 block">
-                           آدرس ایمیل *
-                         </Label>
+                         <div className="flex justify-between items-center mb-1">
+                           <Label htmlFor="email" className="text-xs font-medium text-luxury-silver">
+                             Email Address *
+                           </Label>
+                           <Label htmlFor="email" className="text-xs font-medium text-luxury-silver">
+                             آدرس ایمیل *
+                           </Label>
+                         </div>
                          <Input
                            id="email"
                            name="email"
                            type="email"
-                           placeholder="ایمیل خود را وارد کنید"
+                           placeholder="Enter your email | ایمیل خود را وارد کنید"
                            className="h-10 bg-luxury-black/30 border-luxury-white/20 text-luxury-white placeholder-luxury-silver/60"
                            value={formData.email}
                            onChange={handleInputChange}
@@ -195,14 +205,19 @@ const Checkout = () => {
                        </div>
                        
                        <div>
-                         <Label htmlFor="phone" className="text-xs font-medium text-luxury-silver mb-1 block">
-                           شماره تلفن (اختیاری)
-                         </Label>
+                         <div className="flex justify-between items-center mb-1">
+                           <Label htmlFor="phone" className="text-xs font-medium text-luxury-silver">
+                             Phone Number (Optional)
+                           </Label>
+                           <Label htmlFor="phone" className="text-xs font-medium text-luxury-silver">
+                             شماره تلفن (اختیاری)
+                           </Label>
+                         </div>
                          <Input
                            id="phone"
                            name="phone"
                            type="tel"
-                           placeholder="شماره تلفن"
+                           placeholder="Phone number | شماره تلفن"
                            className="h-10 bg-luxury-black/30 border-luxury-white/20 text-luxury-white placeholder-luxury-silver/60"
                            value={formData.phone}
                            onChange={handleInputChange}
@@ -217,12 +232,12 @@ const Checkout = () => {
                          {isLoading ? (
                            <>
                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                             در حال پردازش...
+                             Processing... | در حال پردازش...
                            </>
                          ) : (
                            <>
                              <Crown className="mr-2 h-4 w-4" />
-                             پرداخت امن - ${(details.price / 100).toFixed(0)}
+                             Secure Payment - ${(details.price / 100).toFixed(0)} | پرداخت امن
                            </>
                          )}
                        </Button>
