@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { PaymentForm } from '@/components/PaymentForm';
 
 // Declare Facebook Pixel function
 declare global {
@@ -254,16 +255,14 @@ const CourageousWorkshop = () => {
               </div>
             </div>
             
-            {/* Mobile-First CTA Buttons */}
-            <div className="flex flex-col gap-3 justify-center items-center mb-12 px-4">
-              <Button 
-                size="lg" 
-                className="w-full max-w-xs bg-luxury-white hover:bg-luxury-silver text-luxury-black px-6 py-5 text-lg font-bold shadow-luxury hover:shadow-luxury-glow transition-all duration-300 rounded-xl"
-                onClick={() => handleRegisterClick('hero')}
-              >
-                <Zap className="w-5 h-5 ml-2" />
-                <span className="farsi-nums text-sm sm:text-base">شروع تحول - $۹۷</span>
-              </Button>
+            {/* Payment Form */}
+            <div className="flex flex-col gap-6 justify-center items-center mb-12 px-4">
+              <PaymentForm
+                program="courageous-character"
+                programName="Courageous Character Workshop"
+                price={29700}
+                description="Transform your mindset and build unshakeable confidence"
+              />
               <Button 
                 variant="outline" 
                 size="lg" 
