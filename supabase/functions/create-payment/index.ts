@@ -7,6 +7,22 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Input validation helpers
+const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) && email.length <= 254;
+};
+
+const validatePhone = (phone: string): boolean => {
+  // Basic international phone validation
+  const phoneRegex = /^\+?[\d\s\-\(\)]{10,20}$/;
+  return phoneRegex.test(phone);
+};
+
+const sanitizeString = (input: string): string => {
+  return input.trim().replace(/[<>'"]/g, '').substring(0, 255);
+};
+
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-PAYMENT] ${step}${detailsStr}`);
@@ -37,15 +53,47 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Parse request data
-    const { name, email, phone, program } = await req.json();
-    logStep("Request data parsed", { name, email, phone, program });
-
-    if (!name || !email || !program) {
-      throw new Error("Missing required fields: name, email, or program");
+    // Parse request data with enhanced validation
+    const requestBody = await req.json();
+    
+    // Enhanced input validation
+    const { name, email, phone, program } = requestBody;
+    
+    if (!name || typeof name !== 'string' || name.length > 100 || name.length < 2) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid name provided' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+    
+    if (!email || !validateEmail(email)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid email address' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    if (!phone || !validatePhone(phone)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid phone number format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    if (!program || typeof program !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Program selection required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Sanitize inputs
+    const sanitizedName = sanitizeString(name);
+    const sanitizedEmail = email.toLowerCase().trim();
+    const sanitizedPhone = sanitizeString(phone);
+    logStep("Request data parsed and validated", { name: sanitizedName, email: sanitizedEmail, phone: sanitizedPhone, program });
 
-    // Define program pricing
+    // Define program pricing (whitelist approach)
     const programPricing = {
       "courageous-character": {
         name: "Courageous Character Workshop",
@@ -66,14 +114,17 @@ serve(async (req) => {
 
     const selectedProgram = programPricing[program as keyof typeof programPricing];
     if (!selectedProgram) {
-      throw new Error("Invalid program selected");
+      return new Response(
+        JSON.stringify({ error: 'Invalid program selected' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     logStep("Program selected", selectedProgram);
 
-    // Check if customer exists
+    // Check if customer exists (with sanitized email)
     const customers = await stripe.customers.list({ 
-      email: email, 
+      email: sanitizedEmail, 
       limit: 1 
     });
     
@@ -83,9 +134,9 @@ serve(async (req) => {
       logStep("Existing customer found", { customerId });
     } else {
       const customer = await stripe.customers.create({
-        email: email,
-        name: name,
-        phone: phone,
+        email: sanitizedEmail,
+        name: sanitizedName,
+        phone: sanitizedPhone,
       });
       customerId = customer.id;
       logStep("New customer created", { customerId });
@@ -113,21 +164,21 @@ serve(async (req) => {
       payment_intent_data: {
         metadata: {
           program: program,
-          customer_name: name,
-          customer_email: email,
+          customer_name: sanitizedName,
+          customer_email: sanitizedEmail,
         },
       },
     });
 
     logStep("Stripe checkout session created", { sessionId: session.id });
 
-    // Create order record in database
+    // Create order record in database (using sanitized inputs)
     const { data: orderData, error: orderError } = await supabaseService
       .from("orders")
       .insert({
-        email: email,
-        name: name,
-        phone: phone,
+        email: sanitizedEmail,
+        name: sanitizedName,
+        phone: sanitizedPhone,
         stripe_session_id: session.id,
         amount: selectedProgram.amount,
         currency: "usd",

@@ -3,8 +3,13 @@ import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+// Input validation helpers
+const validateSessionId = (sessionId: string): boolean => {
+  return sessionId && typeof sessionId === 'string' && sessionId.length > 10 && sessionId.startsWith('cs_');
 };
 
 const logStep = (step: string, details?: any) => {
@@ -36,13 +41,25 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Parse request data
-    const { sessionId } = await req.json();
-    logStep("Request data parsed", { sessionId });
-
-    if (!sessionId) {
-      throw new Error("Missing session ID");
+    // Parse and validate request body
+    const requestBody = await req.json();
+    const { sessionId } = requestBody;
+    
+    // Enhanced input validation
+    if (!validateSessionId(sessionId)) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Invalid or missing session ID' 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
     }
+    
+    logStep("Session ID validated", { sessionId });
 
     // Retrieve the checkout session from Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId);
