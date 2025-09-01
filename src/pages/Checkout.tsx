@@ -1,12 +1,23 @@
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { SEOHead } from '@/components/SEOHead';
-import { PaymentForm } from '@/components/PaymentForm';
-import { ArrowLeft, Shield, Crown, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Shield, Crown, CheckCircle, Loader2 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Checkout = () => {
   const [searchParams] = useSearchParams();
   const program = searchParams.get('program') || 'courageous-character';
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+  });
   
   const programDetails = {
     'courageous-character': {
@@ -25,6 +36,64 @@ const Checkout = () => {
   };
 
   const details = programDetails[program as keyof typeof programDetails] || programDetails['courageous-character'];
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.email) {
+      toast({
+        title: "اطلاعات ناکامل",
+        description: "لطفاً تمام فیلدهای مورد نیاز را پر کنید.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          program: program,
+        }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+        
+        toast({
+          title: "انتقال به صفحه پرداخت",
+          description: "لطفاً پرداخت خود را در تب جدید باز شده تکمیل کنید.",
+        });
+      } else {
+        throw new Error('لینک پرداخت دریافت نشد');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: "خطا در پرداخت",
+        description: "مشکلی در پردازش پرداخت شما به وجود آمد. لطفاً دوباره تلاش کنید.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -53,54 +122,151 @@ const Checkout = () => {
           </div>
         </header>
 
-        <main className="container mx-auto px-4 py-4 sm:py-8">
-          <div className="max-w-6xl mx-auto">
-            {/* Mobile-First Layout */}
-            <div className="space-y-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
+        <main className="container mx-auto px-4 py-3 sm:py-6">
+          <div className="max-w-4xl mx-auto">
+            {/* Mobile: Order Summary First (Above Fold) */}
+            <div className="block lg:hidden mb-4">
+              <div className="bg-gradient-to-br from-luxury-charcoal/50 to-luxury-accent/30 backdrop-blur-sm rounded-lg p-3 border border-luxury-white/20 shadow-luxury">
+                <div className="text-center mb-3">
+                  <h2 className="text-lg font-bold text-luxury-white mb-1">{details.displayName}</h2>
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    <span className="text-base text-luxury-silver/60 line-through farsi-nums">${(details.originalPrice / 100).toFixed(0)}</span>
+                    <span className="text-2xl font-bold text-luxury-white farsi-nums">${(details.price / 100).toFixed(0)}</span>
+                  </div>
+                  <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold inline-block">
+                    ${((details.originalPrice - details.price) / 100).toFixed(0)} تخفیف
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {details.features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-1 text-luxury-silver">
+                      <CheckCircle className="w-3 h-3 text-green-400 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop: Side by Side Layout */}
+            <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
               
-              {/* Payment Form - Mobile First */}
+              {/* Compact Payment Form */}
               <div className="order-1">
-                <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-luxury-white/20 shadow-luxury">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-luxury-white mb-4 sm:mb-6 text-center">
-                    <Shield className="w-5 h-5 sm:w-6 sm:h-6 inline-block ml-2" />
+                <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-lg p-4 border border-luxury-white/20 shadow-luxury">
+                  <h1 className="text-lg sm:text-xl font-bold text-luxury-white mb-3 text-center">
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 inline-block ml-2" />
                     پرداخت امن
                   </h1>
                   
-                  <PaymentForm
-                    program={program}
-                    programName={details.name}
-                    price={details.price}
-                    description={details.description}
-                  />
+                  {/* Compact Form */}
+                  <div className="space-y-3">
+                     <form onSubmit={handleSubmit} className="space-y-3">
+                       <div>
+                         <Label htmlFor="name" className="text-xs font-medium text-luxury-silver mb-1 block">
+                           نام کامل *
+                         </Label>
+                         <Input
+                           id="name"
+                           name="name"
+                           type="text"
+                           placeholder="نام کامل خود را وارد کنید"
+                           className="h-10 bg-luxury-black/30 border-luxury-white/20 text-luxury-white placeholder-luxury-silver/60"
+                           value={formData.name}
+                           onChange={handleInputChange}
+                           required
+                         />
+                       </div>
+                       
+                       <div>
+                         <Label htmlFor="email" className="text-xs font-medium text-luxury-silver mb-1 block">
+                           آدرس ایمیل *
+                         </Label>
+                         <Input
+                           id="email"
+                           name="email"
+                           type="email"
+                           placeholder="ایمیل خود را وارد کنید"
+                           className="h-10 bg-luxury-black/30 border-luxury-white/20 text-luxury-white placeholder-luxury-silver/60"
+                           value={formData.email}
+                           onChange={handleInputChange}
+                           required
+                         />
+                       </div>
+                       
+                       <div>
+                         <Label htmlFor="phone" className="text-xs font-medium text-luxury-silver mb-1 block">
+                           شماره تلفن (اختیاری)
+                         </Label>
+                         <Input
+                           id="phone"
+                           name="phone"
+                           type="tel"
+                           placeholder="شماره تلفن"
+                           className="h-10 bg-luxury-black/30 border-luxury-white/20 text-luxury-white placeholder-luxury-silver/60"
+                           value={formData.phone}
+                           onChange={handleInputChange}
+                         />
+                       </div>
+
+                       <Button
+                         type="submit"
+                         disabled={isLoading}
+                         className="w-full h-11 text-base font-bold bg-luxury-white hover:bg-luxury-silver text-luxury-black mt-4"
+                       >
+                         {isLoading ? (
+                           <>
+                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                             در حال پردازش...
+                           </>
+                         ) : (
+                           <>
+                             <Crown className="mr-2 h-4 w-4" />
+                             پرداخت امن - ${(details.price / 100).toFixed(0)}
+                           </>
+                         )}
+                       </Button>
+                     </form>
+
+                    {/* Trust Indicators - Compact */}
+                    <div className="grid grid-cols-2 gap-2 pt-3 border-t border-luxury-white/20">
+                      <div className="flex items-center gap-1 text-xs text-luxury-silver">
+                        <Shield className="w-3 h-3 text-green-400" />
+                        <span>پرداخت امن</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-luxury-silver">
+                        <CheckCircle className="w-3 h-3 text-green-400" />
+                        <span>ضمانت ۳۰ روزه</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Order Summary - Mobile Optimized */}
-              <div className="order-2">
-                <div className="bg-gradient-to-br from-luxury-charcoal/50 to-luxury-accent/30 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-luxury-white/20 shadow-luxury">
-                  <h2 className="text-lg sm:text-xl font-bold text-luxury-white mb-4 sm:mb-6 flex items-center gap-2">
+              {/* Desktop Order Summary */}
+              <div className="order-2 hidden lg:block">
+                <div className="bg-gradient-to-br from-luxury-charcoal/50 to-luxury-accent/30 backdrop-blur-sm rounded-lg p-4 border border-luxury-white/20 shadow-luxury">
+                  <h2 className="text-lg font-bold text-luxury-white mb-4 flex items-center gap-2">
                     <CheckCircle className="w-5 h-5" />
                     خلاصه سفارش
                   </h2>
                   
-                  {/* Product Details */}
-                  <div className="space-y-4 mb-6">
-                    <div className="p-3 sm:p-4 bg-luxury-black/30 rounded-lg border border-luxury-white/10">
-                      <h3 className="font-bold text-luxury-white text-base sm:text-lg mb-2">{details.displayName}</h3>
-                      <p className="text-luxury-silver text-xs sm:text-sm mb-3">{details.description}</p>
+                  <div className="space-y-4 mb-4">
+                    <div className="p-3 bg-luxury-black/30 rounded-lg border border-luxury-white/10">
+                      <h3 className="font-bold text-luxury-white text-base mb-2">{details.displayName}</h3>
+                      <p className="text-luxury-silver text-sm mb-3">{details.description}</p>
                       
                       <div className="space-y-2">
                         {details.features.map((feature, index) => (
-                          <div key={index} className="flex items-center gap-2 text-xs sm:text-sm text-luxury-silver">
-                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                          <div key={index} className="flex items-center gap-2 text-sm text-luxury-silver">
+                            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
                             <span>{feature}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                     
-                    {/* Pricing Breakdown - Mobile Optimized */}
-                    <div className="border-t border-luxury-white/20 pt-4 space-y-3">
+                    <div className="border-t border-luxury-white/20 pt-3 space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-luxury-silver text-sm">قیمت اصلی:</span>
                         <span className="text-luxury-silver line-through farsi-nums text-sm">${(details.originalPrice / 100).toFixed(0)}</span>
@@ -109,32 +275,26 @@ const Checkout = () => {
                         <span className="text-luxury-silver text-sm">تخفیف ویژه:</span>
                         <span className="text-green-400 farsi-nums text-sm">-${((details.originalPrice - details.price) / 100).toFixed(0)}</span>
                       </div>
-                      <div className="border-t border-luxury-white/10 pt-3">
+                      <div className="border-t border-luxury-white/10 pt-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-luxury-white font-bold text-base sm:text-lg">مجموع:</span>
-                          <span className="text-luxury-white font-bold text-xl sm:text-2xl farsi-nums">${(details.price / 100).toFixed(0)}</span>
-                        </div>
-                        <div className="text-center mt-2">
-                          <span className="inline-block bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                            ${((details.originalPrice - details.price) / 100).toFixed(0)} تخفیف
-                          </span>
+                          <span className="text-luxury-white font-bold text-base">مجموع:</span>
+                          <span className="text-luxury-white font-bold text-xl farsi-nums">${(details.price / 100).toFixed(0)}</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Trust Indicators - Mobile Optimized */}
-                  <div className="space-y-2 sm:space-y-3 pt-4 border-t border-luxury-white/20">
-                    <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-luxury-silver">
-                      <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                  <div className="space-y-2 pt-3 border-t border-luxury-white/20">
+                    <div className="flex items-center gap-2 text-xs text-luxury-silver">
+                      <Shield className="w-3 h-3 text-green-400 flex-shrink-0" />
                       <span>پرداخت ۱۰۰% امن با Stripe</span>
                     </div>
-                    <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-luxury-silver">
-                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                    <div className="flex items-center gap-2 text-xs text-luxury-silver">
+                      <CheckCircle className="w-3 h-3 text-green-400 flex-shrink-0" />
                       <span>ضمانت ۳۰ روزه بازگشت وجه</span>
                     </div>
-                    <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-luxury-silver">
-                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                    <div className="flex items-center gap-2 text-xs text-luxury-silver">
+                      <CheckCircle className="w-3 h-3 text-green-400 flex-shrink-0" />
                       <span>دسترسی فوری پس از پرداخت</span>
                     </div>
                   </div>
