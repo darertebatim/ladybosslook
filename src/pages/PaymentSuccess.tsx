@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, ArrowRight, Download, Calendar } from 'lucide-react';
+import { CheckCircle, ArrowRight, Download, Calendar, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
@@ -59,6 +59,35 @@ export default function PaymentSuccess() {
       style: 'currency',
       currency: 'USD',
     });
+  };
+
+  const getWorkshopDisplayName = (productName: string) => {
+    if (productName.toLowerCase().includes('courageous')) {
+      return {
+        english: 'Courageous Character Workshop',
+        farsi: 'کاراکتر پرجرات'
+      };
+    }
+    return {
+      english: productName,
+      farsi: productName
+    };
+  };
+
+  const createWhatsAppMessage = () => {
+    if (!orderDetails) return '';
+    
+    const workshop = getWorkshopDisplayName(orderDetails.product_name);
+    const message = encodeURIComponent(
+      `Hello! I just completed my payment for the ${workshop.english} (${workshop.farsi}) workshop.\n\n` +
+      `My details:\n` +
+      `Name: ${orderDetails.name}\n` +
+      `Email: ${orderDetails.email}\n` +
+      `Phone: ${orderDetails.phone || 'Not provided'}\n` +
+      `Amount Paid: ${formatPrice(orderDetails.amount)}\n\n` +
+      `Please send me the workshop details and next steps. Thank you!`
+    );
+    return `https://wa.me/19495723730?text=${message}`;
   };
 
   if (isLoading) {
@@ -126,7 +155,10 @@ export default function PaymentSuccess() {
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b">
                   <span className="font-medium">Program:</span>
-                  <span>{orderDetails.product_name}</span>
+                  <div className="text-right">
+                    <div>{getWorkshopDisplayName(orderDetails.product_name).english}</div>
+                    <div className="text-sm text-muted-foreground">{getWorkshopDisplayName(orderDetails.product_name).farsi}</div>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b">
                   <span className="font-medium">Amount Paid:</span>
@@ -195,9 +227,41 @@ export default function PaymentSuccess() {
             </CardContent>
           </Card>
 
-          {/* Action Buttons */}
+          {/* Connect with Us - WhatsApp Priority */}
+          <Card className="mb-8 border-green-200 bg-green-50/50">
+            <CardHeader className="text-center">
+              <CardTitle className="text-green-800">🎉 Connect with Us Now!</CardTitle>
+              <CardDescription className="text-green-700">
+                Get instant support and your workshop materials
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <a 
+                href={createWhatsAppMessage()}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-block w-full sm:w-auto"
+              >
+                <Button 
+                  size="lg" 
+                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white mb-4 text-lg py-6 px-8"
+                >
+                  <MessageCircle className="mr-3 h-6 w-6" />
+                  Message Us on WhatsApp
+                </Button>
+              </a>
+              <p className="text-sm text-green-700 mb-2">
+                Your message is ready to send with all your details!
+              </p>
+              <p className="text-xs text-muted-foreground">
+                We'll respond within minutes with your workshop access and next steps
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Additional Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-primary hover:bg-primary-dark">
+            <Button variant="outline" size="lg">
               <Download className="mr-2 h-5 w-5" />
               Access Course Materials
             </Button>
@@ -209,16 +273,16 @@ export default function PaymentSuccess() {
 
           {/* Support Info */}
           <div className="text-center mt-8 p-6 bg-muted/50 rounded-lg">
-            <h3 className="font-semibold mb-2">Need Help?</h3>
+            <h3 className="font-semibold mb-2">Alternative Support</h3>
             <p className="text-muted-foreground mb-4">
-              If you have any questions or need support, we're here to help.
+              You can also reach us through email if needed.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 
-                href="mailto:support@courageouscharacter.com" 
+                href="mailto:support@ladybosslook.com" 
                 className="text-primary hover:underline"
               >
-                support@courageouscharacter.com
+                support@ladybosslook.com
               </a>
               <a 
                 href="https://wa.me/19495723730" 
