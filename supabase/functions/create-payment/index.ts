@@ -49,7 +49,7 @@ serve(async (req) => {
     const programPricing = {
       "courageous-character": {
         name: "Courageous Character Workshop",
-        amount: 29700, // $297 in cents
+        amount: 9700, // $97 in cents
         description: "Transform your mindset and build unshakeable confidence"
       },
       "business-coaching": {

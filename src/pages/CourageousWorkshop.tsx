@@ -265,7 +265,7 @@ const CourageousWorkshop = () => {
               >
                 <Link to="/checkout?program=courageous-character">
                   <Target className="w-5 h-5 ml-2" />
-                  خرید کارگاه - $297
+                  خرید کارگاه - $97
                 </Link>
               </Button>
               

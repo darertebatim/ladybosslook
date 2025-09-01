@@ -12,7 +12,8 @@ const Checkout = () => {
     'courageous-character': {
       name: 'Courageous Character Workshop',
       displayName: 'کارگاه آنلاین شخصیت شجاع',
-      price: 29700,
+      price: 9700, // $97
+      originalPrice: 49700, // $497
       description: 'Transform your mindset and build unshakeable confidence',
       features: [
         'کارگاه زنده ۳ هفته‌ای',
@@ -52,70 +53,16 @@ const Checkout = () => {
           </div>
         </header>
 
-        <main className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-8">
-              {/* Order Summary */}
-              <div className="order-2 lg:order-1">
-                <div className="bg-gradient-to-br from-luxury-charcoal/50 to-luxury-accent/30 backdrop-blur-sm rounded-xl p-6 border border-luxury-white/20 shadow-luxury">
-                  <h2 className="text-xl font-bold text-luxury-white mb-6 flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5" />
-                    خلاصه سفارش
-                  </h2>
-                  
-                  <div className="space-y-4 mb-6">
-                    <div className="p-4 bg-luxury-black/30 rounded-lg border border-luxury-white/10">
-                      <h3 className="font-bold text-luxury-white text-lg mb-2">{details.displayName}</h3>
-                      <p className="text-luxury-silver text-sm mb-3">{details.description}</p>
-                      
-                      <div className="space-y-2">
-                        {details.features.map((feature, index) => (
-                          <div key={index} className="flex items-center gap-2 text-sm text-luxury-silver">
-                            <CheckCircle className="w-4 h-4 text-green-400" />
-                            {feature}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="border-t border-luxury-white/20 pt-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-luxury-silver">قیمت اصلی:</span>
-                        <span className="text-luxury-silver line-through farsi-nums">$497</span>
-                      </div>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-luxury-silver">تخفیف ویژه:</span>
-                        <span className="text-green-400 farsi-nums">-$200</span>
-                      </div>
-                      <div className="flex justify-between items-center text-xl font-bold">
-                        <span className="text-luxury-white">مجموع:</span>
-                        <span className="text-luxury-white farsi-nums">${(details.price / 100).toFixed(0)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Trust Indicators */}
-                  <div className="space-y-3 pt-4 border-t border-luxury-white/20">
-                    <div className="flex items-center gap-3 text-sm text-luxury-silver">
-                      <Shield className="w-4 h-4 text-green-400" />
-                      پرداخت ۱۰۰% امن با Stripe
-                    </div>
-                    <div className="flex items-center gap-3 text-sm text-luxury-silver">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                      ضمانت ۳۰ روزه بازگشت وجه
-                    </div>
-                    <div className="flex items-center gap-3 text-sm text-luxury-silver">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                      دسترسی فوری پس از پرداخت
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment Form */}
-              <div className="order-1 lg:order-2">
-                <div className="sticky top-24">
-                  <h1 className="text-2xl sm:text-3xl font-bold text-luxury-white mb-6 text-center">
+        <main className="container mx-auto px-4 py-4 sm:py-8">
+          <div className="max-w-6xl mx-auto">
+            {/* Mobile-First Layout */}
+            <div className="space-y-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
+              
+              {/* Payment Form - Mobile First */}
+              <div className="order-1">
+                <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-luxury-white/20 shadow-luxury">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-luxury-white mb-4 sm:mb-6 text-center">
+                    <Shield className="w-5 h-5 sm:w-6 sm:h-6 inline-block ml-2" />
                     پرداخت امن
                   </h1>
                   
@@ -125,6 +72,72 @@ const Checkout = () => {
                     price={details.price}
                     description={details.description}
                   />
+                </div>
+              </div>
+
+              {/* Order Summary - Mobile Optimized */}
+              <div className="order-2">
+                <div className="bg-gradient-to-br from-luxury-charcoal/50 to-luxury-accent/30 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-luxury-white/20 shadow-luxury">
+                  <h2 className="text-lg sm:text-xl font-bold text-luxury-white mb-4 sm:mb-6 flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5" />
+                    خلاصه سفارش
+                  </h2>
+                  
+                  {/* Product Details */}
+                  <div className="space-y-4 mb-6">
+                    <div className="p-3 sm:p-4 bg-luxury-black/30 rounded-lg border border-luxury-white/10">
+                      <h3 className="font-bold text-luxury-white text-base sm:text-lg mb-2">{details.displayName}</h3>
+                      <p className="text-luxury-silver text-xs sm:text-sm mb-3">{details.description}</p>
+                      
+                      <div className="space-y-2">
+                        {details.features.map((feature, index) => (
+                          <div key={index} className="flex items-center gap-2 text-xs sm:text-sm text-luxury-silver">
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Pricing Breakdown - Mobile Optimized */}
+                    <div className="border-t border-luxury-white/20 pt-4 space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-luxury-silver text-sm">قیمت اصلی:</span>
+                        <span className="text-luxury-silver line-through farsi-nums text-sm">${(details.originalPrice / 100).toFixed(0)}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-luxury-silver text-sm">تخفیف ویژه:</span>
+                        <span className="text-green-400 farsi-nums text-sm">-${((details.originalPrice - details.price) / 100).toFixed(0)}</span>
+                      </div>
+                      <div className="border-t border-luxury-white/10 pt-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-luxury-white font-bold text-base sm:text-lg">مجموع:</span>
+                          <span className="text-luxury-white font-bold text-xl sm:text-2xl farsi-nums">${(details.price / 100).toFixed(0)}</span>
+                        </div>
+                        <div className="text-center mt-2">
+                          <span className="inline-block bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                            ${((details.originalPrice - details.price) / 100).toFixed(0)} تخفیف
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Trust Indicators - Mobile Optimized */}
+                  <div className="space-y-2 sm:space-y-3 pt-4 border-t border-luxury-white/20">
+                    <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-luxury-silver">
+                      <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                      <span>پرداخت ۱۰۰% امن با Stripe</span>
+                    </div>
+                    <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-luxury-silver">
+                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                      <span>ضمانت ۳۰ روزه بازگشت وجه</span>
+                    </div>
+                    <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-luxury-silver">
+                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+                      <span>دسترسی فوری پس از پرداخت</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
