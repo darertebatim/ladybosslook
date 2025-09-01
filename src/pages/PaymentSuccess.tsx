@@ -216,10 +216,16 @@ export default function PaymentSuccess() {
                 <div className="space-y-2 sm:space-y-4">
                   {/* English Text */}
                   <div className="text-sm sm:text-lg font-semibold text-primary">
-                    <div className="flex items-center justify-center mb-1 sm:mb-2">
-                      <ArrowRight className="mr-1 sm:mr-2 h-4 w-4 sm:h-6 sm:w-6 font-bold" />
+                    {/* Mobile: 2 lines without arrows */}
+                    <div className="sm:hidden mb-1">
+                      <div className="font-bold text-center">Click the button below</div>
+                      <div className="font-bold text-center">and message our support on WhatsApp</div>
+                    </div>
+                    {/* Desktop: 1 line with arrows */}
+                    <div className="hidden sm:flex items-center justify-center mb-2">
+                      <ArrowRight className="mr-2 h-6 w-6 font-bold" />
                       <span className="font-bold text-center">Click the button below and message our support on WhatsApp</span>
-                      <ArrowRight className="ml-1 sm:ml-2 h-4 w-4 sm:h-6 sm:w-6 font-bold" />
+                      <ArrowRight className="ml-2 h-6 w-6 font-bold" />
                     </div>
                     <p className="text-muted-foreground text-xs sm:text-base">
                       Get your workshop access information and instructions immediately
