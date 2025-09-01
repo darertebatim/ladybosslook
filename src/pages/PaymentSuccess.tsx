@@ -154,51 +154,47 @@ export default function PaymentSuccess() {
         description="Thank you for your purchase! Your payment has been confirmed and you now have access to the Courageous Character Workshop."
       />
       
-      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-12 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-4 sm:py-12 px-4">
         <div className="max-w-2xl mx-auto">
-          {/* Success Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
-              <CheckCircle className="w-10 h-10 text-green-600" />
+          {/* Success Header - Mobile Optimized */}
+          <div className="text-center mb-4 sm:mb-8">
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-20 sm:h-20 bg-green-100 rounded-full mb-3 sm:mb-6">
+              <CheckCircle className="w-6 h-6 sm:w-10 sm:h-10 text-green-600" />
             </div>
-            <h1 className="text-4xl font-bold text-primary mb-4">
+            <h1 className="text-2xl sm:text-4xl font-bold text-primary mb-2 sm:mb-4">
               Payment Successful!
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-lg sm:text-xl text-muted-foreground">
               Welcome to your transformation journey!
             </p>
           </div>
 
-          {/* Order Details */}
+          {/* Order Details - Mobile Optimized */}
           {orderDetails && (
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Order Confirmation</CardTitle>
-                <CardDescription>
-                  Order placed on {new Date(orderDetails.created_at).toLocaleDateString()}
+            <Card className="mb-4 sm:mb-8">
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-lg sm:text-xl">Order Confirmation</CardTitle>
+                <CardDescription className="text-sm">
+                  {new Date(orderDetails.created_at).toLocaleDateString()}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b">
-                  <span className="font-medium">Program:</span>
+              <CardContent className="space-y-2 sm:space-y-4">
+                <div className="flex justify-between items-center py-1 sm:py-2 border-b">
+                  <span className="font-medium text-sm sm:text-base">Program:</span>
                   <div className="text-right">
-                    <div>{getWorkshopDisplayName(orderDetails.product_name).english}</div>
-                    <div className="text-sm text-muted-foreground">{getWorkshopDisplayName(orderDetails.product_name).farsi}</div>
+                    <div className="text-sm sm:text-base">{getWorkshopDisplayName(orderDetails.product_name).english}</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">{getWorkshopDisplayName(orderDetails.product_name).farsi}</div>
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b">
-                  <span className="font-medium">Amount Paid:</span>
-                  <span className="text-lg font-semibold text-primary">
+                <div className="flex justify-between items-center py-1 sm:py-2 border-b">
+                  <span className="font-medium text-sm sm:text-base">Amount:</span>
+                  <span className="text-base sm:text-lg font-semibold text-primary">
                     {formatPrice(orderDetails.amount)}
                   </span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b">
-                  <span className="font-medium">Email:</span>
-                  <span>{orderDetails.email}</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="font-medium">Status:</span>
-                  <span className="text-green-600 font-semibold capitalize">
+                <div className="flex justify-between items-center py-1 sm:py-2">
+                  <span className="font-medium text-sm sm:text-base">Status:</span>
+                  <span className="text-green-600 font-semibold capitalize text-sm sm:text-base">
                     {orderDetails.status}
                   </span>
                 </div>
@@ -206,46 +202,46 @@ export default function PaymentSuccess() {
             </Card>
           )}
 
-          {/* Next Steps - WhatsApp Focus */}
-          <Card className="mb-8 border-primary bg-primary/5">
-            <CardHeader className="text-center">
-              <CardTitle className="flex items-center justify-center text-2xl">
-                <ArrowRight className="mr-3 h-8 w-8 text-primary font-bold" />
+          {/* Next Steps - WhatsApp Focus - Mobile Optimized */}
+          <Card className="mb-3 sm:mb-8 border-primary bg-primary/5">
+            <CardHeader className="text-center pb-2 sm:pb-6">
+              <CardTitle className="flex items-center justify-center text-lg sm:text-2xl">
+                <ArrowRight className="mr-2 sm:mr-3 h-5 w-5 sm:h-8 sm:w-8 text-primary font-bold" />
                 What's Next?
-                <ArrowRight className="ml-3 h-8 w-8 text-primary font-bold" />
+                <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 sm:h-8 sm:w-8 text-primary font-bold" />
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-center space-y-6">
-              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-6 rounded-lg border-2 border-primary/20">
-                <div className="space-y-4">
+            <CardContent className="text-center space-y-3 sm:space-y-6">
+              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-3 sm:p-6 rounded-lg border-2 border-primary/20">
+                <div className="space-y-2 sm:space-y-4">
                   {/* English Text */}
-                  <div className="text-lg font-semibold text-primary">
-                    <div className="flex items-center justify-center mb-2">
-                      <ArrowRight className="mr-2 h-6 w-6 font-bold" />
-                      <span className="font-bold">Click the button below and message our support on WhatsApp</span>
-                      <ArrowRight className="ml-2 h-6 w-6 font-bold" />
+                  <div className="text-sm sm:text-lg font-semibold text-primary">
+                    <div className="flex items-center justify-center mb-1 sm:mb-2">
+                      <ArrowRight className="mr-1 sm:mr-2 h-4 w-4 sm:h-6 sm:w-6 font-bold" />
+                      <span className="font-bold text-center">Click the button below and message our support on WhatsApp</span>
+                      <ArrowRight className="ml-1 sm:ml-2 h-4 w-4 sm:h-6 sm:w-6 font-bold" />
                     </div>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground text-xs sm:text-base">
                       Get your workshop access information and instructions immediately
                     </p>
                   </div>
                   
                   {/* Farsi Text */}
-                  <div className="text-lg font-semibold text-primary" dir="rtl">
-                    <div className="flex items-center justify-center mb-2">
-                      <ArrowRight className="ml-2 h-6 w-6 font-bold" />
-                      <span className="font-bold">همین حالا روی دکمه پایین بزنید و به واتسپ پشتیبان پیام بزنید</span>
-                      <ArrowRight className="mr-2 h-6 w-6 font-bold" />
+                  <div className="text-sm sm:text-lg font-semibold text-primary" dir="rtl">
+                    <div className="flex items-center justify-center mb-1 sm:mb-2">
+                      <ArrowRight className="ml-1 sm:ml-2 h-4 w-4 sm:h-6 sm:w-6 font-bold" />
+                      <span className="font-bold text-center">همین حالا روی دکمه پایین بزنید و به واتسپ پشتیبان پیام بزنید</span>
+                      <ArrowRight className="mr-1 sm:mr-2 h-4 w-4 sm:h-6 sm:w-6 font-bold" />
                     </div>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground text-xs sm:text-base">
                       اطلاعات ورود به ورکشاپ و نحوه دسترسی را دریافت کنید
                     </p>
                   </div>
                   
-                  {/* Large Arrow Pointing Down */}
-                  <div className="flex justify-center py-4">
+                  {/* Large Arrow Pointing Down - Mobile Optimized */}
+                  <div className="flex justify-center py-2 sm:py-4">
                     <div className="animate-bounce">
-                      <ArrowRight className="h-12 w-12 text-primary font-bold transform rotate-90" />
+                      <ArrowRight className="h-8 w-8 sm:h-12 sm:w-12 text-primary font-bold transform rotate-90" />
                     </div>
                   </div>
                 </div>
@@ -253,11 +249,11 @@ export default function PaymentSuccess() {
             </CardContent>
           </Card>
 
-          {/* Connect with Us - WhatsApp Priority */}
-          <Card className="mb-8 border-green-200 bg-green-50/50">
-            <CardHeader className="text-center">
-              <CardTitle className="text-green-800">🎉 Connect with Us Now!</CardTitle>
-              <CardDescription className="text-green-700">
+          {/* Connect with Us - WhatsApp Priority - Mobile Optimized */}
+          <Card className="mb-4 sm:mb-8 border-green-200 bg-green-50/50">
+            <CardHeader className="text-center pb-2 sm:pb-6">
+              <CardTitle className="text-green-800 text-lg sm:text-xl">🎉 Connect with Us Now!</CardTitle>
+              <CardDescription className="text-green-700 text-sm">
                 Get instant support and your workshop materials
               </CardDescription>
             </CardHeader>
@@ -270,13 +266,13 @@ export default function PaymentSuccess() {
               >
                 <Button 
                   size="lg" 
-                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white mb-4 text-lg py-6 px-8"
+                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white mb-3 sm:mb-4 text-base sm:text-lg py-4 sm:py-6 px-6 sm:px-8"
                 >
-                  <MessageCircle className="mr-3 h-6 w-6" />
+                  <MessageCircle className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
                   Message Us on WhatsApp
                 </Button>
               </a>
-              <p className="text-sm text-green-700 mb-2">
+              <p className="text-xs sm:text-sm text-green-700 mb-1 sm:mb-2">
                 Your message is ready to send with all your details!
               </p>
               <p className="text-xs text-muted-foreground">
@@ -285,8 +281,8 @@ export default function PaymentSuccess() {
             </CardContent>
           </Card>
 
-          {/* Additional Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {/* Additional Action Buttons - Mobile Hidden/Compact */}
+          <div className="hidden sm:flex flex-col sm:flex-row gap-4 justify-center mb-6">
             <Button variant="outline" size="lg">
               <Download className="mr-2 h-5 w-5" />
               Access Course Materials
@@ -297,16 +293,16 @@ export default function PaymentSuccess() {
             </Button>
           </div>
 
-          {/* Support Info */}
-          <div className="text-center mt-8 p-6 bg-muted/50 rounded-lg">
-            <h3 className="font-semibold mb-2">Alternative Support</h3>
-            <p className="text-muted-foreground mb-4">
+          {/* Support Info - Mobile Compact */}
+          <div className="text-center mt-4 sm:mt-8 p-3 sm:p-6 bg-muted/50 rounded-lg">
+            <h3 className="font-semibold mb-1 sm:mb-2 text-sm sm:text-base">Alternative Support</h3>
+            <p className="text-muted-foreground mb-2 sm:mb-4 text-xs sm:text-sm">
               You can also reach us through email if needed.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center">
               <a 
                 href="mailto:support@ladybosslook.com" 
-                className="text-primary hover:underline"
+                className="text-primary hover:underline text-sm"
               >
                 support@ladybosslook.com
               </a>
@@ -314,7 +310,7 @@ export default function PaymentSuccess() {
                 href="https://wa.me/19495723730" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
+                className="text-primary hover:underline text-sm"
               >
                 WhatsApp: +1 (949) 572-3730
               </a>
