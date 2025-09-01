@@ -162,15 +162,10 @@ const Checkout = () => {
                   {/* Compact Form */}
                   <div className="space-y-3">
                      <form onSubmit={handleSubmit} className="space-y-3">
-                       <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <Label htmlFor="name" className="text-xs font-medium text-luxury-silver text-left">
-                              Full Name *
-                            </Label>
-                            <Label htmlFor="name" className="text-xs font-medium text-luxury-silver text-right">
-                              نام کامل *
-                            </Label>
-                          </div>
+                        <div>
+                          <Label htmlFor="name" className="text-sm font-medium text-luxury-silver mb-1">
+                            Full Name *
+                          </Label>
                          <Input
                            id="name"
                            name="name"
@@ -183,15 +178,10 @@ const Checkout = () => {
                          />
                        </div>
                        
-                       <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <Label htmlFor="email" className="text-xs font-medium text-luxury-silver text-left">
-                              Email Address *
-                            </Label>
-                            <Label htmlFor="email" className="text-xs font-medium text-luxury-silver text-right">
-                              آدرس ایمیل *
-                            </Label>
-                          </div>
+                        <div>
+                          <Label htmlFor="email" className="text-sm font-medium text-luxury-silver mb-1">
+                            Email Address *
+                          </Label>
                          <Input
                            id="email"
                            name="email"
@@ -204,15 +194,10 @@ const Checkout = () => {
                          />
                        </div>
                        
-                       <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <Label htmlFor="phone" className="text-xs font-medium text-luxury-silver text-left">
-                              Phone Number (Optional)
-                            </Label>
-                            <Label htmlFor="phone" className="text-xs font-medium text-luxury-silver text-right">
-                              شماره تلفن (اختیاری)
-                            </Label>
-                          </div>
+                        <div>
+                          <Label htmlFor="phone" className="text-sm font-medium text-luxury-silver mb-1">
+                            Phone Number (Optional)
+                          </Label>
                          <Input
                            id="phone"
                            name="phone"
