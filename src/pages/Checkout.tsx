@@ -22,15 +22,15 @@ const Checkout = () => {
   const programDetails = {
     'courageous-character': {
       name: 'Courageous Character Workshop',
-      displayName: 'کارگاه آنلاین شخصیت شجاع',
+      displayName: 'Courageous Character Workshop',
       price: 9700, // $97
       originalPrice: 49700, // $497
       description: 'Transform your mindset and build unshakeable confidence',
       features: [
-        'کارگاه زنده ۳ هفته‌ای',
-        'ضبط جلسات به مدت ۷ روز',
-        'جامعه پشتیبان',
-        'گواهینامه تکمیل'
+        '3-week live workshop',
+        '7-day session recordings',
+        'Supportive community',
+        'Completion certificate'
       ]
     }
   };
@@ -50,8 +50,8 @@ const Checkout = () => {
     
     if (!formData.name || !formData.email) {
       toast({
-        title: "اطلاعات ناکامل",
-        description: "لطفاً تمام فیلدهای مورد نیاز را پر کنید.",
+        title: "Incomplete Information",
+        description: "Please fill in all required fields.",
         variant: "destructive",
       });
       return;
@@ -77,17 +77,17 @@ const Checkout = () => {
         window.open(data.url, '_blank');
         
         toast({
-          title: "انتقال به صفحه پرداخت",
-          description: "لطفاً پرداخت خود را در تب جدید باز شده تکمیل کنید.",
+          title: "Redirecting to Payment",
+          description: "Please complete your payment in the new tab that opened.",
         });
       } else {
-        throw new Error('لینک پرداخت دریافت نشد');
+        throw new Error('Payment link not received');
       }
     } catch (error) {
       console.error('Payment error:', error);
       toast({
-        title: "خطا در پرداخت",
-        description: "مشکلی در پردازش پرداخت شما به وجود آمد. لطفاً دوباره تلاش کنید.",
+        title: "Payment Error",
+        description: "There was a problem processing your payment. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -98,24 +98,24 @@ const Checkout = () => {
   return (
     <>
       <SEOHead 
-        title="پرداخت امن - کارگاه آنلاین شخصیت شجاع"
-        description="پرداخت امن برای کارگاه آنلاین شخصیت شجاع. با ضمانت ۳۰ روزه و پشتیبانی کامل."
+        title="Secure Payment - Courageous Character Workshop"
+        description="Secure payment for the Courageous Character Workshop. 30-day guarantee and full support."
       />
       
-      <div className="min-h-screen bg-luxury-black font-farsi rtl">
+      <div className="min-h-screen bg-luxury-black ltr">
         {/* Navigation Header */}
         <header className="border-b border-luxury-accent/20 bg-luxury-black/95 backdrop-blur-md sticky top-0 z-50 shadow-luxury">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <h1 className="text-xl sm:text-2xl font-bold bg-gradient-luxury-text bg-clip-text text-transparent">
-                <Crown className="w-6 h-6 inline-block ml-2 text-luxury-white" />
-                آکادمی لیدی‌باس
+                <Crown className="w-6 h-6 inline-block mr-2 text-luxury-white" />
+                LadyBoss Academy
               </h1>
               <Button variant="ghost" size="sm" asChild className="text-luxury-silver hover:text-luxury-white hover:bg-luxury-charcoal">
                 <Link to="/courageous-workshop" className="flex items-center gap-2">
-                  <span className="hidden sm:inline">بازگشت به کارگاه</span>
-                  <span className="sm:hidden">بازگشت</span>
-                  <ArrowLeft size={16} className="rotate-180" />
+                  <ArrowLeft size={16} />
+                  <span className="hidden sm:inline">Back to Workshop</span>
+                  <span className="sm:hidden">Back</span>
                 </Link>
               </Button>
             </div>
@@ -130,11 +130,11 @@ const Checkout = () => {
                 <div className="text-center mb-3">
                   <h2 className="text-lg font-bold text-luxury-white mb-1">{details.displayName}</h2>
                   <div className="flex items-center justify-center gap-3 mb-2">
-                    <span className="text-base text-luxury-silver/60 line-through farsi-nums">${(details.originalPrice / 100).toFixed(0)}</span>
-                    <span className="text-2xl font-bold text-luxury-white farsi-nums">${(details.price / 100).toFixed(0)}</span>
+                    <span className="text-base text-luxury-silver/60 line-through">${(details.originalPrice / 100).toFixed(0)}</span>
+                    <span className="text-2xl font-bold text-luxury-white">${(details.price / 100).toFixed(0)}</span>
                   </div>
                   <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold inline-block">
-                    ${((details.originalPrice - details.price) / 100).toFixed(0)} تخفیف
+                    ${((details.originalPrice - details.price) / 100).toFixed(0)} discount
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
@@ -155,8 +155,8 @@ const Checkout = () => {
               <div className="order-1">
                 <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-lg p-4 border border-luxury-white/20 shadow-luxury">
                   <h1 className="text-lg sm:text-xl font-bold text-luxury-white mb-3 text-center">
-                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 inline-block ml-2" />
-                    پرداخت امن
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 inline-block mr-2" />
+                    Secure Payment
                   </h1>
                   
                   {/* Compact Form */}
@@ -170,7 +170,7 @@ const Checkout = () => {
                            id="name"
                            name="name"
                            type="text"
-                           placeholder="Enter your full name | نام کامل خود را وارد کنید"
+                           placeholder="Enter your full name"
                            className="h-10 bg-luxury-black/30 border-luxury-white/20 text-luxury-white placeholder-luxury-silver/60"
                            value={formData.name}
                            onChange={handleInputChange}
@@ -186,7 +186,7 @@ const Checkout = () => {
                            id="email"
                            name="email"
                            type="email"
-                           placeholder="Enter your email | ایمیل خود را وارد کنید"
+                           placeholder="Enter your email"
                            className="h-10 bg-luxury-black/30 border-luxury-white/20 text-luxury-white placeholder-luxury-silver/60"
                            value={formData.email}
                            onChange={handleInputChange}
@@ -202,7 +202,7 @@ const Checkout = () => {
                            id="phone"
                            name="phone"
                            type="tel"
-                           placeholder="Phone number | شماره تلفن"
+                           placeholder="Phone number"
                            className="h-10 bg-luxury-black/30 border-luxury-white/20 text-luxury-white placeholder-luxury-silver/60"
                            value={formData.phone}
                            onChange={handleInputChange}
@@ -214,17 +214,17 @@ const Checkout = () => {
                          disabled={isLoading}
                          className="w-full h-11 text-base font-bold bg-luxury-white hover:bg-luxury-silver text-luxury-black mt-4"
                        >
-                         {isLoading ? (
-                           <>
-                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                             Processing... | در حال پردازش...
-                           </>
-                         ) : (
-                           <>
-                             <Crown className="mr-2 h-4 w-4" />
-                             Secure Payment - ${(details.price / 100).toFixed(0)} | پرداخت امن
-                           </>
-                         )}
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <Crown className="mr-2 h-4 w-4" />
+                              Secure Payment - ${(details.price / 100).toFixed(0)}
+                            </>
+                          )}
                        </Button>
                      </form>
 
@@ -232,11 +232,11 @@ const Checkout = () => {
                     <div className="grid grid-cols-2 gap-2 pt-3 border-t border-luxury-white/20">
                       <div className="flex items-center gap-1 text-xs text-luxury-silver">
                         <Shield className="w-3 h-3 text-green-400" />
-                        <span>پرداخت امن</span>
+                        <span>Secure Payment</span>
                       </div>
                       <div className="flex items-center gap-1 text-xs text-luxury-silver">
                         <CheckCircle className="w-3 h-3 text-green-400" />
-                        <span>ضمانت ۳۰ روزه</span>
+                        <span>30-day Guarantee</span>
                       </div>
                     </div>
                   </div>
@@ -248,7 +248,7 @@ const Checkout = () => {
                 <div className="bg-gradient-to-br from-luxury-charcoal/50 to-luxury-accent/30 backdrop-blur-sm rounded-lg p-4 border border-luxury-white/20 shadow-luxury">
                   <h2 className="text-lg font-bold text-luxury-white mb-4 flex items-center gap-2">
                     <CheckCircle className="w-5 h-5" />
-                    خلاصه سفارش
+                    Order Summary
                   </h2>
                   
                   <div className="space-y-4 mb-4">
@@ -268,17 +268,17 @@ const Checkout = () => {
                     
                     <div className="border-t border-luxury-white/20 pt-3 space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-luxury-silver text-sm">قیمت اصلی:</span>
-                        <span className="text-luxury-silver line-through farsi-nums text-sm">${(details.originalPrice / 100).toFixed(0)}</span>
+                        <span className="text-luxury-silver text-sm">Original Price:</span>
+                        <span className="text-luxury-silver line-through text-sm">${(details.originalPrice / 100).toFixed(0)}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-luxury-silver text-sm">تخفیف ویژه:</span>
-                        <span className="text-green-400 farsi-nums text-sm">-${((details.originalPrice - details.price) / 100).toFixed(0)}</span>
+                        <span className="text-luxury-silver text-sm">Special Discount:</span>
+                        <span className="text-green-400 text-sm">-${((details.originalPrice - details.price) / 100).toFixed(0)}</span>
                       </div>
                       <div className="border-t border-luxury-white/10 pt-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-luxury-white font-bold text-base">مجموع:</span>
-                          <span className="text-luxury-white font-bold text-xl farsi-nums">${(details.price / 100).toFixed(0)}</span>
+                          <span className="text-luxury-white font-bold text-base">Total:</span>
+                          <span className="text-luxury-white font-bold text-xl">${(details.price / 100).toFixed(0)}</span>
                         </div>
                       </div>
                     </div>
@@ -287,15 +287,15 @@ const Checkout = () => {
                   <div className="space-y-2 pt-3 border-t border-luxury-white/20">
                     <div className="flex items-center gap-2 text-xs text-luxury-silver">
                       <Shield className="w-3 h-3 text-green-400 flex-shrink-0" />
-                      <span>پرداخت ۱۰۰% امن با Stripe</span>
+                      <span>100% Secure Payment with Stripe</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-luxury-silver">
                       <CheckCircle className="w-3 h-3 text-green-400 flex-shrink-0" />
-                      <span>ضمانت ۳۰ روزه بازگشت وجه</span>
+                      <span>30-day Money Back Guarantee</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-luxury-silver">
                       <CheckCircle className="w-3 h-3 text-green-400 flex-shrink-0" />
-                      <span>دسترسی فوری پس از پرداخت</span>
+                      <span>Instant Access After Payment</span>
                     </div>
                   </div>
                 </div>
