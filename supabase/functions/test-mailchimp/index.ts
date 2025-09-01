@@ -24,8 +24,8 @@ serve(async (req) => {
 
     // Test subscription with workshop details
     const testData = {
-      email: "darertebatim@gmail.com",
-      name: "Test Workshop Participant",
+      email: "alilotfihami@gmail.com",
+      name: "Ali Lotfi Test Workshop",
       city: "Online",
       phone: "+1234567890",
       source: "workshop_test",

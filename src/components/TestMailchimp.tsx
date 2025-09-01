@@ -25,7 +25,7 @@ export function TestMailchimp() {
         console.log("Test function result:", data);
         toast({
           title: "Test Sent!",
-          description: "Mailchimp test subscription sent to darertebatim@gmail.com with workshop tag",
+          description: "Mailchimp test subscription sent to alilotfihami@gmail.com with workshop tag",
         });
       }
     } catch (err) {
