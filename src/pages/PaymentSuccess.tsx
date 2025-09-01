@@ -17,6 +17,30 @@ export default function PaymentSuccess() {
 
   useEffect(() => {
     const verifyPayment = async () => {
+      // Check for test mode
+      const isTestMode = searchParams.get('test') === 'true';
+      
+      if (isTestMode) {
+        // Show test data
+        setPaymentVerified(true);
+        setOrderDetails({
+          id: 'test-order-123',
+          product_name: 'Courageous Character Workshop',
+          amount: 4999, // $49.99 in cents
+          email: 'test@example.com',
+          name: 'Sarah Johnson',
+          phone: '+1 (555) 123-4567',
+          status: 'paid',
+          created_at: new Date().toISOString()
+        });
+        setIsLoading(false);
+        toast({
+          title: "Test Mode - Payment Confirmed!",
+          description: "This is a test view of the payment success page.",
+        });
+        return;
+      }
+
       if (!sessionId) {
         setIsLoading(false);
         return;
@@ -52,7 +76,7 @@ export default function PaymentSuccess() {
     };
 
     verifyPayment();
-  }, [sessionId, toast]);
+  }, [sessionId, searchParams, toast]);
 
   const formatPrice = (cents: number) => {
     return (cents / 100).toLocaleString('en-US', {
@@ -101,7 +125,9 @@ export default function PaymentSuccess() {
     );
   }
 
-  if (!sessionId || !paymentVerified) {
+  const isTestMode = searchParams.get('test') === 'true';
+  
+  if ((!sessionId || !paymentVerified) && !isTestMode) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center">
         <Card className="w-full max-w-md mx-auto">
