@@ -74,6 +74,7 @@ const CTA = () => {
                 <Button 
                   size="lg"
                   className="w-full bg-secondary hover:bg-secondary-dark text-secondary-foreground font-semibold shadow-bold hover:shadow-glow transition-all duration-300 group"
+                  onClick={() => window.location.href = '/courageous-workshop'}
                 >
                   Join Courageous Character Course
                   <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />

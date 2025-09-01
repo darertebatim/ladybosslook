@@ -49,6 +49,7 @@ const Hero = () => {
               <Button 
                 size="lg" 
                 className="bg-primary hover:bg-primary-dark shadow-medium hover:shadow-glow transition-all duration-300 group"
+                onClick={() => window.location.href = '/courageous-workshop'}
               >
                 Start Your Journey
                 <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
@@ -57,6 +58,7 @@ const Hero = () => {
                 variant="outline" 
                 size="lg"
                 className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                onClick={() => window.location.href = '/courageous-workshop'}
               >
                 Explore Programs
               </Button>

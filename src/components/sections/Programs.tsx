@@ -160,6 +160,7 @@ const Programs = () => {
                   
                   <Button 
                     className="w-full bg-primary hover:bg-primary-dark group-hover:shadow-glow transition-all duration-300"
+                    onClick={() => window.location.href = '/courageous-workshop'}
                   >
                     Enroll Now
                     <ArrowRight size={16} className="ml-2" />
@@ -184,6 +185,7 @@ const Programs = () => {
               variant="secondary"
               size="lg"
               className="bg-white text-primary hover:bg-white/90"
+              onClick={() => window.open('https://wa.me/19495723730', '_blank')}
             >
               Book Free Consultation
             </Button>
