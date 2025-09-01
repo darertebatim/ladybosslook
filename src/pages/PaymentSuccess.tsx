@@ -207,8 +207,8 @@ export default function PaymentSuccess() {
             <CardHeader className="text-center pb-2 sm:pb-6">
               <CardTitle className="flex items-center justify-center text-lg sm:text-2xl">
                 <ArrowRight className="mr-2 sm:mr-3 h-5 w-5 sm:h-8 sm:w-8 text-primary font-bold" />
-                What's Next?
-                <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 sm:h-8 sm:w-8 text-primary font-bold" />
+                What's Next? ❗️❗️
+                <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 sm:h-8 sm:w-8 text-red-600 font-bold transform rotate-90" />
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-3 sm:space-y-6">
@@ -217,9 +217,9 @@ export default function PaymentSuccess() {
                   {/* English Text */}
                   <div className="text-sm sm:text-lg font-semibold text-primary">
                     {/* Mobile: 2 lines without arrows */}
-                    <div className="sm:hidden mb-1">
-                      <div className="font-bold text-center">Click the button below</div>
-                      <div className="font-bold text-center">and message our support on WhatsApp</div>
+                    <div className="sm:hidden mb-1 leading-tight">
+                      <div className="font-bold text-center text-sm">Click the button below</div>
+                      <div className="font-bold text-center text-sm">and message our support on WhatsApp</div>
                     </div>
                     {/* Desktop: 1 line with arrows */}
                     <div className="hidden sm:flex items-center justify-center mb-2">
@@ -244,10 +244,12 @@ export default function PaymentSuccess() {
                     </p>
                   </div>
                   
-                  {/* Large Arrow Pointing Down - Mobile Optimized */}
+                  {/* Multiple Red Bold Arrows Pointing Down */}
                   <div className="flex justify-center py-1 sm:py-2">
-                    <div className="animate-bounce">
-                      <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-primary font-bold transform rotate-90" />
+                    <div className="animate-bounce flex flex-col items-center space-y-1">
+                      <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 font-bold transform rotate-90" />
+                      <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 font-bold transform rotate-90" />
+                      <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 font-bold transform rotate-90" />
                     </div>
                   </div>
                   
