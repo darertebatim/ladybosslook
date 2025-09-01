@@ -14,7 +14,7 @@ const Checkout = () => {
       price: 9700, // $97
       originalPrice: 49700, // $497
       description: 'Transform your mindset and build unshakeable confidence',
-      stripePaymentLink: 'https://buy.stripe.com/test_bIY00E5w18o64Ra000', // Replace with your actual Stripe payment link
+      stripePaymentLink: 'https://buy.stripe.com/8x25kC8bL4T87J559n9Ve02',
       features: [
         '3-week live workshop',
         '7-day session recordings',
