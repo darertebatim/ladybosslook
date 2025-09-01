@@ -240,13 +240,13 @@ export default function PaymentSuccess() {
                       <ArrowRight className="mr-1 sm:mr-2 h-4 w-4 sm:h-6 sm:w-6 font-bold" />
                     </div>
                     <p className="text-muted-foreground text-xs sm:text-base">
-                      اطلاعات ورود به ورکشاپ و نحوه دسترسی را دریافت کنید
+                      از واتسپ اطلاعات ورود به ورکشاپ را دریافت کنید
                     </p>
                   </div>
                   
-                  {/* Multiple Red Bold Arrows Pointing Down */}
+                  {/* Multiple Red Bold Arrows Pointing Down - Side by Side */}
                   <div className="flex justify-center py-1 sm:py-2">
-                    <div className="animate-bounce flex flex-col items-center space-y-1">
+                    <div className="animate-bounce flex items-center space-x-2">
                       <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 font-bold transform rotate-90" />
                       <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 font-bold transform rotate-90" />
                       <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 font-bold transform rotate-90" />
