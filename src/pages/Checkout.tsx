@@ -102,7 +102,7 @@ const Checkout = () => {
                   
                   <div className="text-center mb-6">
                     <p className="text-luxury-silver mb-4 leading-relaxed">
-                      Join the Courageous Character Workshop<br />
+                      <span className="whitespace-nowrap">Join the Courageous Character Workshop</span><br />
                       and Behave like a confident Ladyboss
                     </p>
                     
