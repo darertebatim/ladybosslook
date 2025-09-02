@@ -102,7 +102,8 @@ const Checkout = () => {
                   
                   <div className="text-center mb-6">
                     <p className="text-luxury-silver mb-4 leading-relaxed">
-                      Join the {details.displayName} and start building<br className="hidden sm:inline" /> unshakeable confidence today.
+                      Join the Courageous Character Workshop<br />
+                      and Behave like a confident Ladyboss
                     </p>
                     
                     <div className="flex items-center justify-center gap-3 mb-2">
