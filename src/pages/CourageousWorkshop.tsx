@@ -389,6 +389,10 @@ const CourageousWorkshop = () => {
               <CardContent className="space-y-3">
                 <div className="grid gap-2">
                   {[
+                    { title: "دوستیابی و ساختن ارتباطات", subtitle: "Making friends and building relationships" },
+                    { title: "حفظ خونسردی در لحظات پراضطراب", subtitle: "Maintaining composure in stressful moments" },
+                    { title: "نشتی‌گیری احساسی و ارتباطی", subtitle: "Emotional and relational leak prevention" },
+                    { title: "اعتمادبه‌نفس کلامی دو‌زبانه", subtitle: "Bilingual verbal self-confidence" },
                     { title: "نه گفتن", subtitle: "Say No" },
                     { title: "بله گفتنِ هوشمند", subtitle: "Wise Yes" },
                     { title: "بیان اَسِرتیو", subtitle: "Assertive Expression" },
