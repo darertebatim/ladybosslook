@@ -399,11 +399,7 @@ const CourageousWorkshop = () => {
                     { title: "جلوگیری از بی‌انصافی و حق‌خوری", subtitle: "" },
                     { title: "مدیریت تعارض‌ها", subtitle: "Conflict Management" },
                     { title: "مرزبندی حریم", subtitle: "Boundaries" },
-                    { title: "مذاکرهٔ روزمره", subtitle: "Everyday Negotiation" },
-                    { title: "نُرم‌های ارتباطی غربی", subtitle: "Western Communication Norms" },
-                    { title: "حفظ آرامش و خونسردی", subtitle: "Calm Under Pressure" },
-                    { title: "جلوگیری از نشتی احساسی و ارتباطی", subtitle: "" },
-                    { title: "ساختن اعتمادبه‌نفس دو‌زبانه", subtitle: "" }
+                    { title: "مذاکرهٔ روزمره", subtitle: "Everyday Negotiation" }
                   ].map((item, index) => (
                     <div key={index} className="flex items-start gap-3 p-3 bg-luxury-black/30 rounded-lg border border-luxury-white/5 hover:bg-luxury-black/50 transition-colors">
                       <div className="flex items-center justify-center w-6 h-6 bg-luxury-white/10 rounded-full text-xs font-bold text-luxury-white flex-shrink-0 mt-0.5">
