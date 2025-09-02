@@ -377,6 +377,50 @@ const CourageousWorkshop = () => {
               </CardContent>
             </Card>
 
+            {/* Workshop Curriculum Section */}
+            <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
+                  <TrendingUp className="w-5 h-5 text-luxury-silver" />
+                  سرفصل‌های کارگاه کاراکتر پرجرات
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid gap-2">
+                  {[
+                    { title: "نه گفتن", subtitle: "Say No" },
+                    { title: "بله گفتنِ هوشمند", subtitle: "Wise Yes" },
+                    { title: "بیان اَسِرتیو", subtitle: "Assertive Expression" },
+                    { title: "ارائه کردن", subtitle: "Presenting" },
+                    { title: "اظهار نظر کردن", subtitle: "Voicing Opinions" },
+                    { title: "بله گرفتن", subtitle: "Getting a Yes" },
+                    { title: "حق گرفتن", subtitle: "Claiming Rights" },
+                    { title: "پاسخ به انتقاد", subtitle: "Handling Feedback" },
+                    { title: "جلوگیری از بی‌انصافی و حق‌خوری", subtitle: "" },
+                    { title: "مدیریت تعارض‌ها", subtitle: "Conflict Management" },
+                    { title: "مرزبندی حریم", subtitle: "Boundaries" },
+                    { title: "مذاکرهٔ روزمره", subtitle: "Everyday Negotiation" },
+                    { title: "نُرم‌های ارتباطی غربی", subtitle: "Western Communication Norms" },
+                    { title: "حفظ آرامش و خونسردی", subtitle: "Calm Under Pressure" },
+                    { title: "جلوگیری از نشتی احساسی و ارتباطی", subtitle: "" },
+                    { title: "ساختن اعتمادبه‌نفس دو‌زبانه", subtitle: "" }
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-luxury-black/30 rounded-lg border border-luxury-white/5 hover:bg-luxury-black/50 transition-colors">
+                      <div className="flex items-center justify-center w-6 h-6 bg-luxury-white/10 rounded-full text-xs font-bold text-luxury-white flex-shrink-0 mt-0.5">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-luxury-white text-sm font-medium leading-tight mb-1">{item.title}</div>
+                        {item.subtitle && (
+                          <div className="text-luxury-silver/70 text-xs">{item.subtitle}</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
