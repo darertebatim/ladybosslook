@@ -235,9 +235,9 @@ const CourageousWorkshop = () => {
             </div>
 
             {/* Mobile Optimized Description */}
-            <p className="text-base sm:text-lg lg:text-xl text-luxury-silver mb-8 max-w-2xl mx-auto leading-relaxed px-6">
-              <span className="block">Join the Courageous Character Workshop</span>
-              <span className="block">and Behave like a confident Ladyboss</span>
+            <p className="text-sm sm:text-base lg:text-xl text-luxury-silver mb-8 max-w-2xl mx-auto leading-relaxed px-6 text-center">
+              <span className="block whitespace-nowrap">Join the Courageous Character Workshop</span>
+              <span className="block whitespace-nowrap">and Behave like a confident Ladyboss</span>
             </p>
 
             {/* Pricing Section - Mobile Optimized */}
