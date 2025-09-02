@@ -236,8 +236,7 @@ const CourageousWorkshop = () => {
 
             {/* Mobile Optimized Description */}
             <p className="text-base sm:text-lg lg:text-xl text-luxury-silver mb-8 max-w-2xl mx-auto leading-relaxed px-6">
-              Join the Courageous Character Workshop<br />
-              and Behave like a confident Ladyboss
+              Join the Courageous Character Workshop and Behave like a confident Ladyboss
             </p>
 
             {/* Pricing Section - Mobile Optimized */}
