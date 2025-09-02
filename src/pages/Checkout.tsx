@@ -95,14 +95,14 @@ const Checkout = () => {
               {/* Buy Now Section */}
               <div className="order-1">
                 <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-lg p-6 border border-luxury-white/20 shadow-luxury">
-                  <h1 className="text-xl sm:text-2xl font-bold text-luxury-white mb-4 text-center">
+                  <h1 className="text-lg sm:text-xl font-bold text-luxury-white mb-4 text-center whitespace-nowrap">
                     <Crown className="w-5 h-5 sm:w-6 sm:h-6 inline-block mr-2" />
                     Ready to Transform Your Life?
                   </h1>
                   
                   <div className="text-center mb-6">
-                    <p className="text-luxury-silver mb-4">
-                      Join the {details.displayName} and start building unshakeable confidence today.
+                    <p className="text-luxury-silver mb-4 leading-relaxed">
+                      Join the {details.displayName} and start building<br className="hidden sm:inline" /> unshakeable confidence today.
                     </p>
                     
                     <div className="flex items-center justify-center gap-3 mb-2">
@@ -116,7 +116,7 @@ const Checkout = () => {
 
                   <Button
                     onClick={handleBuyNow}
-                    className="w-full h-14 text-lg font-bold bg-luxury-white hover:bg-luxury-silver text-luxury-black mb-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="w-full h-14 text-lg font-black bg-luxury-white hover:bg-luxury-silver text-luxury-black mb-4 shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-luxury-white"
                   >
                     <Crown className="mr-2 h-5 w-5" />
                     Buy Now - Secure Payment
