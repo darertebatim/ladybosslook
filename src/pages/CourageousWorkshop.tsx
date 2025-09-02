@@ -422,7 +422,7 @@ const CourageousWorkshop = () => {
                     { title: "بله گرفتن", subtitle: "Getting a Yes" },
                     { title: "حق گرفتن", subtitle: "Claiming Rights" },
                     { title: "پاسخ به انتقاد", subtitle: "Handling Feedback" },
-                    { title: "جلوگیری از بی‌انصافی", subtitle: "" },
+                    { title: "جلوگیری از بی‌انصافی", subtitle: "Preventing Injustice" },
                     { title: "مدیریت تعارض‌ها", subtitle: "Conflict Management" },
                     { title: "مرزبندی حریم", subtitle: "Boundaries" },
                     { title: "مذاکرهٔ روزمره", subtitle: "Everyday Negotiation" }
