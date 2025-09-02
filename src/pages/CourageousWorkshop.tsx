@@ -236,7 +236,8 @@ const CourageousWorkshop = () => {
 
             {/* Mobile Optimized Description */}
             <p className="text-base sm:text-lg lg:text-xl text-luxury-silver mb-8 max-w-2xl mx-auto leading-relaxed px-6">
-              تحول ۳ هفته‌ای برای زنانی که می‌خواهند با اعتماد به نفس کامل و قدرت داخلی زندگی کنند
+              Join the Courageous Character Workshop<br />
+              and Behave like a confident Ladyboss
             </p>
 
             {/* Pricing Section - Mobile Optimized */}
