@@ -19,7 +19,6 @@ import Checkout from "./pages/Checkout";
 import Privacy from "./pages/Privacy";
 import SMSTerms from "./pages/SMSTerms";
 import Giveaway from "./pages/Giveaway";
-import PDFRedirect from "./pages/PDFRedirect";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,7 +52,6 @@ const App = () => (
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/sms-terms" element={<SMSTerms />} />
             <Route path="/giveaway" element={<Giveaway />} />
-            <Route path="/guide" element={<PDFRedirect />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
