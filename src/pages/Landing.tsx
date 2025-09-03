@@ -12,7 +12,6 @@ import { SEOHead } from '@/components/SEOHead';
 const Landing = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
   const [city, setCity] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -101,9 +100,6 @@ const Landing = () => {
       errors.email = 'Please enter a valid email address';
     }
     
-    if (phone.trim() && !/^\+?[\d\s\-\(\)]{10,}$/.test(phone)) {
-      errors.phone = 'Please enter a valid phone number';
-    }
     
     if (!city.trim()) {
       errors.city = 'City is required';
@@ -113,7 +109,7 @@ const Landing = () => {
     
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
-  }, [name, email, phone, city]);
+  }, [name, email, city]);
 
   // Retry mechanism with exponential backoff
   const retryWithBackoff = useCallback(async (
@@ -247,12 +243,11 @@ const Landing = () => {
     trackCustomPixelEvent('FormSubmissionAttempt', {
       engagement_time: getEngagementTime(),
       attempt_number: submitAttempts + 1,
-      fields_filled: {
-        name: !!name,
-        email: !!email,
-        phone: !!phone,
-        city: !!city
-      }
+        fields_filled: {
+          name: !!name,
+          email: !!email,
+          city: !!city
+        }
     });
     
     // Validate form
@@ -292,7 +287,6 @@ const Landing = () => {
         email: email.trim(),
         name: name.trim(),
         city: city.trim(),
-        phone: phone.trim(),
       };
 
       const response = await retryWithBackoff(async () => {
@@ -357,7 +351,6 @@ const Landing = () => {
       // Clear form data for security
       setEmail('');
       setName('');
-      setPhone('');
       setCity('');
       
       // Redirect to video page after successful submission
@@ -580,22 +573,6 @@ const Landing = () => {
                         />
                         {validationErrors.city && (
                           <p className="text-sm text-destructive">{validationErrors.city}</p>
-                        )}
-                      </div>
-                      
-                      <div className="space-y-1">
-                        <Label htmlFor="phone">Your Phone Number (Optional)</Label>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          placeholder="Enter your phone number"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          className={`h-10 ${validationErrors.phone ? 'border-destructive' : ''}`}
-                           disabled={isLoading}
-                        />
-                        {validationErrors.phone && (
-                          <p className="text-sm text-destructive">{validationErrors.phone}</p>
                         )}
                       </div>
                       
