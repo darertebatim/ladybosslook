@@ -18,6 +18,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import Checkout from "./pages/Checkout";
 import Privacy from "./pages/Privacy";
 import SMSTerms from "./pages/SMSTerms";
+import Giveaway from "./pages/Giveaway";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
           <Route path="/checkout" element={<Checkout />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/sms-terms" element={<SMSTerms />} />
+            <Route path="/giveaway" element={<Giveaway />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
