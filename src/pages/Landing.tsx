@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, Star, Users, Clock, Shield, AlertCircle, Wifi, WifiOff, ChevronDown } from 'lucide-react';
+import { SEOHead } from '@/components/SEOHead';
 
 
 const Landing = () => {
@@ -403,8 +404,10 @@ const Landing = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center py-2 md:py-8">
-      <div className="container mx-auto px-4">
+      <SEOHead />
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center py-2 md:py-8" dir="rtl"
+           style={{ fontFamily: 'Vazirmatn, sans-serif' }}>
+        <div className="container mx-auto px-4">
         {/* Hero Image Section */}
         <div className="text-center mb-6 md:mb-8">
           <div className="flex flex-col items-center space-y-4">
@@ -655,8 +658,8 @@ const Landing = () => {
             </Card>
           </div>
         </div>
+        </div>
       </div>
-    </div>
     </>
   );
 };

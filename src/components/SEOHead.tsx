@@ -10,9 +10,9 @@ interface SEOHeadProps {
 }
 
 export const SEOHead = ({
-  title = "Lovable",
-  description = "Create amazing web applications",
-  image = "/placeholder.svg",
+  title = "LadyBoss Academy",
+  description = "",
+  image = "",
   url = typeof window !== 'undefined' ? window.location.href : '',
   type = "website",
   locale = "en_US"

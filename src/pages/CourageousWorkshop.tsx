@@ -173,11 +173,7 @@ const CourageousWorkshop = () => {
 
   return (
     <>
-      <SEOHead 
-        title="کارگاه آنلاین شخصیت شجاع - اعتماد به نفس و حدودگذاری"
-        description="در کارگاه زنده آنلاین ما شرکت کنید تا شجاعت بسازید، مرزهای سالم تعیین کنید و اعتماد به نفس تزلزل‌ناپذیر توسعه دهید. تفکرتان را در عرض ۳ ساعت متحول کنید."
-        image="/assets/hero-businesswoman.jpg"
-      />
+      <SEOHead />
       <div className="min-h-screen bg-luxury-black font-farsi rtl">
         {/* Navigation Header */}
         <header className="border-b border-luxury-accent/20 bg-luxury-black/95 backdrop-blur-md sticky top-0 z-50 shadow-luxury">

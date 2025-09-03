@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp } from 'lucide-react';
+import { SEOHead } from '@/components/SEOHead';
 
 interface FormSubmission {
   id: string;
@@ -112,7 +113,9 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <>
+      <SEOHead />
+      <div className="min-h-screen bg-background p-4">
       <div className="container mx-auto max-w-6xl">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -257,6 +260,7 @@ const Admin = () => {
         </Card>
       </div>
     </div>
+    </>
   );
 };
 

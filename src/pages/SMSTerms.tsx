@@ -3,11 +3,7 @@ import { SEOHead } from "@/components/SEOHead";
 const SMSTerms = () => {
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
-        title="SMS Terms & Conditions - Ali Lotfi"
-        description="Read the terms and conditions for SMS messaging services from Ali Lotfi. Learn about message frequency, cancellation, and privacy policies."
-        url={typeof window !== 'undefined' ? `${window.location.origin}/sms-terms` : ''}
-      />
+      <SEOHead />
       
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <header className="mb-12">

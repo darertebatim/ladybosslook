@@ -12,10 +12,7 @@ const Giveaway = () => {
 
   return (
     <>
-      <SEOHead
-        title="Free Gift - Rights & Boundaries Guide | Lady Boss Business"
-        description="Download your exclusive free guide on Rights & Boundaries for business women who watched our training video."
-      />
+      <SEOHead />
       
       <div className="min-h-screen bg-gradient-to-br from-luxury-black via-luxury-charcoal to-luxury-accent text-luxury-white">
         <div className="container mx-auto px-4 py-16">

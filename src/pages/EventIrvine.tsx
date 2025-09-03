@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Calendar, Clock, MapPin, Users, TrendingUp, Briefcase, PiggyBank, DollarSign } from "lucide-react";
+import { SEOHead } from '@/components/SEOHead';
 
 const EventIrvine = () => {
   const [email, setEmail] = useState("");
@@ -14,7 +15,9 @@ const EventIrvine = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 font-persian">
+    <>
+      <SEOHead />
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 font-persian">
       <div className="container mx-auto px-3 py-3 md:px-4 md:py-4 max-w-4xl">
         
         {/* Header */}
@@ -145,6 +148,7 @@ const EventIrvine = () => {
 
       </div>
     </div>
+    </>
   );
 };
 

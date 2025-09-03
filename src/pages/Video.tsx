@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { ArrowLeft, Play, Share2, BookOpen, ChevronDown, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
+import { SEOHead } from '@/components/SEOHead';
 
 // Declare Facebook Pixel function
 declare global {
@@ -112,7 +113,9 @@ const Video = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEOHead />
+      <div className="min-h-screen bg-background">
       {/* Navigation Header */}
       <div className="border-b border-border bg-background/95 backdrop-blur-md">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
@@ -271,6 +274,7 @@ const Video = () => {
         </div>
       </main>
     </div>
+    </>
   );
 };
 

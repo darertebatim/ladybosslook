@@ -149,10 +149,7 @@ export default function PaymentSuccess() {
 
   return (
     <>
-      <SEOHead
-        title="Payment Successful - Courageous Character Workshop"
-        description="Thank you for your purchase! Your payment has been confirmed and you now have access to the Courageous Character Workshop."
-      />
+      <SEOHead />
       
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-4 sm:py-12 px-4">
         <div className="max-w-2xl mx-auto">

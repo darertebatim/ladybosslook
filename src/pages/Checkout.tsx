@@ -38,10 +38,7 @@ const Checkout = () => {
 
   return (
     <>
-      <SEOHead 
-        title="Secure Payment - Courageous Character Workshop"
-        description="Secure payment for the Courageous Character Workshop. 30-day guarantee and full support."
-      />
+      <SEOHead />
       
       <div className="min-h-screen bg-luxury-black ltr">
         {/* Navigation Header */}
