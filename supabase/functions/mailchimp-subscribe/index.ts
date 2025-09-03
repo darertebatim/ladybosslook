@@ -191,7 +191,8 @@ const handler = async (req: Request): Promise<Response> => {
           merge_fields: {
             FNAME: name,
             CITY: city,
-            PHONE: phone,
+            PHONE: phone, // Regular phone number field
+            SMSPHONE: phone, // SMS phone number field
             ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
@@ -205,7 +206,6 @@ const handler = async (req: Request): Promise<Response> => {
               enabled: true
             }
           ],
-          phone_number: phone,
         }),
       });
 
