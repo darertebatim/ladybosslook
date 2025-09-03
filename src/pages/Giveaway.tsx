@@ -17,17 +17,17 @@ const Giveaway = () => {
         description="Download your exclusive free guide on Rights & Boundaries for business women who watched our training video."
       />
       
-      <div className="min-h-screen bg-gradient-to-br from-luxury-dark via-luxury-navy to-luxury-deep text-luxury-white">
+      <div className="min-h-screen bg-gradient-to-br from-luxury-black via-luxury-charcoal to-luxury-accent text-luxury-white">
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-2xl mx-auto text-center space-y-8">
             {/* Header */}
             <div className="space-y-4">
               <div className="flex items-center justify-center gap-3 mb-6">
-                <Gift className="w-12 h-12 text-luxury-gold" />
+                <Gift className="w-12 h-12 text-secondary" />
                 <Users className="w-8 h-8 text-luxury-silver" />
               </div>
               
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-luxury-gold to-luxury-silver bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-secondary to-luxury-silver bg-clip-text text-transparent">
                 Your Free Gift
               </h1>
               
@@ -37,9 +37,9 @@ const Giveaway = () => {
             </div>
 
             {/* Gift Card */}
-            <Card className="bg-luxury-navy/40 border-luxury-gold/20 backdrop-blur-sm">
+            <Card className="bg-luxury-charcoal/60 border-secondary/20 backdrop-blur-sm">
               <CardHeader className="pb-4">
-                <CardTitle className="flex items-center justify-center gap-3 text-luxury-gold text-2xl">
+                <CardTitle className="flex items-center justify-center gap-3 text-secondary text-2xl">
                   <Download className="w-6 h-6" />
                   Rights & Boundaries Guide
                 </CardTitle>
@@ -53,7 +53,7 @@ const Giveaway = () => {
                 <div className="space-y-4">
                   <Button
                     onClick={handleDownload}
-                    className="w-full bg-gradient-to-r from-luxury-gold to-luxury-gold/80 hover:from-luxury-gold/90 hover:to-luxury-gold text-luxury-dark font-semibold py-6 text-lg transition-all duration-300 transform hover:scale-105"
+                    className="w-full bg-gradient-to-r from-secondary to-secondary-light hover:from-secondary-light hover:to-secondary text-luxury-black font-semibold py-6 text-lg transition-all duration-300 transform hover:scale-105"
                   >
                     <Download className="w-5 h-5 mr-2" />
                     Download Your Free Guide
@@ -67,7 +67,7 @@ const Giveaway = () => {
             </Card>
 
             {/* Additional Message */}
-            <div className="bg-luxury-deep/30 border border-luxury-silver/20 rounded-xl p-6">
+            <div className="bg-luxury-accent/30 border border-luxury-silver/20 rounded-xl p-6">
               <p className="text-luxury-silver text-center">
                 💡 <strong>Pro Tip:</strong> Save this guide to your device and refer back to it whenever you need to reinforce your professional boundaries.
               </p>
