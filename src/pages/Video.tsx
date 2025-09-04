@@ -15,25 +15,27 @@ declare global {
 const Video = () => {
   // Meta Pixel tracking
   useEffect(() => {
-    // Track PageView
+    // Track PageView for both pixels
     if (typeof window !== 'undefined' && window.fbq) {
       window.fbq('track', 'PageView');
       
-      // Track ViewContent with video-specific parameters
-      window.fbq('track', 'ViewContent', {
+      // Track ViewContent with video-specific parameters for both pixels
+      const viewContentData = {
         content_type: 'video',
         content_name: 'Courageous Character Course',
         content_category: 'Training Video',
         value: 0,
         currency: 'USD'
-      });
+      };
+      window.fbq('track', 'ViewContent', viewContentData);
       
-      // Custom event for video page visit
-      window.fbq('trackCustom', 'VideoPageVisit', {
+      // Custom event for video page visit for both pixels
+      const videoPageData = {
         video_title: 'Build Your Courageous Character',
         course_step: 'Step 1: Rights & Boundaries',
         user_type: 'video_viewer'
-      });
+      };
+      window.fbq('trackCustom', 'VideoPageVisit', videoPageData);
     }
 
     // Track scroll depth for engagement
@@ -46,22 +48,25 @@ const Video = () => {
       if (scrollPercent > maxScroll) {
         maxScroll = scrollPercent;
         
-        // Track engagement milestones
+        // Track engagement milestones for both pixels
         if (scrollPercent >= 25 && maxScroll < 25) {
-          window.fbq && window.fbq('trackCustom', 'VideoEngagement', {
+          const engagementData = {
             engagement_level: '25_percent_scroll',
             content_name: 'Courageous Character Course'
-          });
+          };
+          window.fbq && window.fbq('trackCustom', 'VideoEngagement', engagementData);
         } else if (scrollPercent >= 50 && maxScroll < 50) {
-          window.fbq && window.fbq('trackCustom', 'VideoEngagement', {
+          const engagementData = {
             engagement_level: '50_percent_scroll',
             content_name: 'Courageous Character Course'
-          });
+          };
+          window.fbq && window.fbq('trackCustom', 'VideoEngagement', engagementData);
         } else if (scrollPercent >= 75 && maxScroll < 75) {
-          window.fbq && window.fbq('trackCustom', 'VideoEngagement', {
+          const engagementData = {
             engagement_level: '75_percent_scroll',
             content_name: 'Courageous Character Course'
-          });
+          };
+          window.fbq && window.fbq('trackCustom', 'VideoEngagement', engagementData);
         }
       }
     };
@@ -71,21 +76,23 @@ const Video = () => {
   }, []);
 
   const handleWhatsAppClick = () => {
-    // Track WhatsApp button click as Lead event
+    // Track WhatsApp button click as Lead event for both pixels
     if (typeof window !== 'undefined' && window.fbq) {
-      window.fbq('track', 'Lead', {
+      const leadData = {
         content_name: 'WhatsApp Gift Contact',
         content_category: 'Video CTA',
         value: 1,
         currency: 'USD'
-      });
+      };
+      window.fbq('track', 'Lead', leadData);
       
-      // Custom event for WhatsApp interaction
-      window.fbq('trackCustom', 'WhatsAppButtonClick', {
+      // Custom event for WhatsApp interaction for both pixels
+      const whatsappData = {
         source: 'video_page',
         gift_code: 'jorat',
         user_intent: 'high_interest'
-      });
+      };
+      window.fbq('trackCustom', 'WhatsAppButtonClick', whatsappData);
     }
 
     const message = encodeURIComponent('jorat');
@@ -94,21 +101,23 @@ const Video = () => {
   };
 
   const handleJoinAcademyClick = () => {
-    // Track course interest
+    // Track course interest for both pixels
     if (typeof window !== 'undefined' && window.fbq) {
-      window.fbq('track', 'InitiateCheckout', {
+      const checkoutData = {
         content_name: 'LadyBoss Academy Membership',
         content_category: 'Course Enrollment',
         value: 0,
         currency: 'USD'
-      });
+      };
+      window.fbq('track', 'InitiateCheckout', checkoutData);
       
-      // Custom event for course interest
-      window.fbq('trackCustom', 'CourseInterest', {
+      // Custom event for course interest for both pixels
+      const courseData = {
         source: 'video_page',
         course_name: 'LadyBoss Academy',
         user_intent: 'conversion_ready'
-      });
+      };
+      window.fbq('trackCustom', 'CourseInterest', courseData);
     }
   };
 
