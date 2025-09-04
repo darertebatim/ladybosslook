@@ -71,28 +71,26 @@ const CourageousWorkshop = () => {
 
   // Meta Pixel tracking
   useEffect(() => {
-    // Track PageView for both pixels
+    // Track PageView
     if (typeof window !== 'undefined' && window.fbq) {
       window.fbq('track', 'PageView');
       
-      // Track ViewContent with workshop-specific parameters for both pixels
-      const viewContentData = {
+      // Track ViewContent with workshop-specific parameters
+      window.fbq('track', 'ViewContent', {
         content_type: 'workshop',
         content_name: 'کارگاه آنلاین شخصیت شجاع',
         content_category: 'Live Training',
         value: 97,
         currency: 'USD'
-      };
-      window.fbq('track', 'ViewContent', viewContentData);
+      });
       
-      // Custom event for workshop page visit for both pixels
-      const workshopPageData = {
+      // Custom event for workshop page visit
+      window.fbq('trackCustom', 'WorkshopPageVisit', {
         workshop_title: 'کارگاه آنلاین شخصیت شجاع',
         workshop_type: 'live_online',
         user_type: 'workshop_prospect',
         language: 'farsi'
-      };
-      window.fbq('trackCustom', 'WorkshopPageVisit', workshopPageData);
+      });
     }
 
     // Track scroll depth for engagement
@@ -105,25 +103,22 @@ const CourageousWorkshop = () => {
       if (scrollPercent > maxScroll) {
         maxScroll = scrollPercent;
         
-        // Track engagement milestones for both pixels
+        // Track engagement milestones
         if (scrollPercent >= 25 && maxScroll < 25) {
-          const engagementData = {
+          window.fbq && window.fbq('trackCustom', 'WorkshopEngagement', {
             engagement_level: '25_percent_scroll',
             content_name: 'کارگاه شخصیت شجاع'
-          };
-          window.fbq && window.fbq('trackCustom', 'WorkshopEngagement', engagementData);
+          });
         } else if (scrollPercent >= 50 && maxScroll < 50) {
-          const engagementData = {
+          window.fbq && window.fbq('trackCustom', 'WorkshopEngagement', {
             engagement_level: '50_percent_scroll',
             content_name: 'کارگاه شخصیت شجاع'
-          };
-          window.fbq && window.fbq('trackCustom', 'WorkshopEngagement', engagementData);
+          });
         } else if (scrollPercent >= 75 && maxScroll < 75) {
-          const engagementData = {
+          window.fbq && window.fbq('trackCustom', 'WorkshopEngagement', {
             engagement_level: '75_percent_scroll',
             content_name: 'کارگاه شخصیت شجاع'
-          };
-          window.fbq && window.fbq('trackCustom', 'WorkshopEngagement', engagementData);
+          });
         }
       }
     };
@@ -133,46 +128,42 @@ const CourageousWorkshop = () => {
   }, []);
 
   const handleRegisterClick = (source: string = 'main_cta') => {
-    // Track workshop registration interest for both pixels
+    // Track workshop registration interest
     if (typeof window !== 'undefined' && window.fbq) {
-      const checkoutData = {
+      window.fbq('track', 'InitiateCheckout', {
         content_name: 'کارگاه آنلاین شخصیت شجاع',
         content_category: 'Workshop Registration',
         value: 97,
         currency: 'USD'
-      };
-      window.fbq('track', 'InitiateCheckout', checkoutData);
+      });
       
-      // Custom event for workshop registration for both pixels
-      const registrationData = {
+      // Custom event for workshop registration
+      window.fbq('trackCustom', 'WorkshopRegistration', {
         source: source,
         workshop_name: 'شخصیت شجاع',
         user_intent: 'high_conversion',
         language: 'farsi'
-      };
-      window.fbq('trackCustom', 'WorkshopRegistration', registrationData);
+      });
     }
   };
 
   const handleWhatsAppClick = () => {
-    // Track WhatsApp contact for both pixels
+    // Track WhatsApp contact
     if (typeof window !== 'undefined' && window.fbq) {
-      const contactData = {
+      window.fbq('track', 'Contact', {
         content_name: 'Workshop Inquiry',
         content_category: 'WhatsApp Contact',
         value: 1,
         currency: 'USD'
-      };
-      window.fbq('track', 'Contact', contactData);
+      });
       
-      // Custom event for WhatsApp interaction for both pixels
-      const inquiryData = {
+      // Custom event for WhatsApp interaction
+      window.fbq('trackCustom', 'WorkshopInquiry', {
         source: 'workshop_page',
         contact_method: 'whatsapp',
         user_intent: 'needs_info',
         language: 'farsi'
-      };
-      window.fbq('trackCustom', 'WorkshopInquiry', inquiryData);
+      });
     }
 
     const message = encodeURIComponent('سلام! من به کارگاه آنلاین شخصیت شجاع علاقه‌مند هستم. ممکن است اطلاعات بیشتری بدهید؟');
