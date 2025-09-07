@@ -191,8 +191,7 @@ const handler = async (req: Request): Promise<Response> => {
           merge_fields: {
             FNAME: name,
             CITY: city,
-            PHONE: phone, // Regular phone number field
-            SMSPHONE: phone, // SMS phone number field
+            SMSPHONE: phone, // SMS phone number field for marketing
             ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
@@ -200,12 +199,6 @@ const handler = async (req: Request): Promise<Response> => {
             ...(payment_status && { PAYSTATUS: payment_status }),
             ...(source && { SOURCE: source }),
           },
-          marketing_permissions: [
-            {
-              marketing_permission_id: "sms",
-              enabled: true
-            }
-          ],
         }),
       });
 
@@ -228,11 +221,17 @@ const handler = async (req: Request): Promise<Response> => {
           }),
         });
         
-        const tagsData = await tagsResponse.json();
         if (!tagsResponse.ok) {
-          console.error("Error adding tags:", tagsData);
+          const tagsError = await tagsResponse.text();
+          console.error("Error adding tags:", tagsError);
         } else {
-          console.log("Tags added successfully");
+          // Only try to parse JSON if response is OK
+          try {
+            const tagsData = await tagsResponse.json();
+            console.log("Tags added successfully:", tagsData);
+          } catch (jsonError) {
+            console.log("Tags added successfully (no response body)");
+          }
         }
       } catch (tagError) {
         console.error("Error adding tags:", tagError);
