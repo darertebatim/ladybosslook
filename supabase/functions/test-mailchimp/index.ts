@@ -24,16 +24,17 @@ serve(async (req) => {
 
     // Test subscription with workshop details
     const testData = {
-      email: "alilotfihami@gmail.com",
-      name: "Ali Lotfi Test Workshop",
-      city: "Online",
-      phone: "+1234567890",
+      email: "ceyt06@gmail.com",
+      name: "Ceyda Test User",
+      city: "Istanbul",
+      phone: "+19491234567",
       source: "workshop_test",
       workshop_name: "Courageous Character Workshop",
       purchase_amount: 4700, // $47 in cents
       purchase_date: new Date().toISOString(),
       payment_status: "paid",
-      tags: ["workshop_courageous_character"]
+      tags: ["workshop_courageous_character"],
+      session_id: "cs_test_" + Math.random().toString(36).substring(2, 15)
     };
 
     console.log('Sending test subscription with data:', testData);
