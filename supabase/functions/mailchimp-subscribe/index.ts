@@ -175,6 +175,14 @@ const handler = async (req: Request): Promise<Response> => {
     const memberUrl = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members/${emailHash}`;
     const tagsUrl = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members/${emailHash}/tags`;
 
+    console.log("MAILCHIMP DEBUG - Configuration:", {
+      datacenter: datacenter,
+      listId: listId,
+      memberUrl: memberUrl,
+      email: email,
+      emailHash: emailHash
+    });
+
     console.log("Sending to Mailchimp with phone formats:", {
       email: email,
       phone_original: phone,
@@ -213,6 +221,15 @@ const handler = async (req: Request): Promise<Response> => {
       });
 
       const data = await response.json();
+      
+      console.log("MAILCHIMP API RESPONSE:", {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries()),
+        data: data
+      });
+      
       return { response, data };
     }, 3, 1000);
 
