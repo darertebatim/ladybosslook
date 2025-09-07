@@ -191,9 +191,7 @@ const handler = async (req: Request): Promise<Response> => {
           merge_fields: {
             FNAME: name,
             CITY: city,
-            PHONE: phone, // Regular phone field
-            SMSPHONE: phone, // SMS phone field name
-            MERGE8: phone, // SMS phone field merge tag
+            PHONE: phone, // Standard phone field - this should work for SMS if configured properly in Mailchimp
             ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),

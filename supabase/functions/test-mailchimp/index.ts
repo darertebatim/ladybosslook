@@ -22,18 +22,25 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Generate random test data for each test
-    const randomId = Math.random().toString(36).substring(2, 15);
-    const randomPhone = `949${Math.floor(Math.random() * 9000000) + 1000000}`;
+    // Generate completely fresh random test data for each test
+    const timestamp = Date.now();
+    const randomSeed = Math.random().toString(36).substring(2, 15);
+    const uniqueId = `${timestamp}_${randomSeed}`;
+    
+    // Generate realistic phone number variations
+    const areaCode = Math.floor(Math.random() * 900) + 100; // 100-999
+    const exchange = Math.floor(Math.random() * 900) + 100; // 100-999  
+    const number = Math.floor(Math.random() * 9000) + 1000; // 1000-9999
+    const randomPhone = `${areaCode}${exchange}${number}`;
     
     const testData = {
-      email: `test${randomId}@testdomain.com`,
-      name: `Test User ${randomId}`,
-      city: "Online",
+      email: `sarah.martinez.test.${uniqueId}@gmail.com`,
+      name: `Sarah Martinez Test ${uniqueId}`,
+      city: "Irvine",
       phone: randomPhone,
       source: "workshop_test",
       workshop_name: "Courageous Character Workshop",
-      purchase_amount: 4700, // $47 in cents
+      purchase_amount: 9700, // $97 in cents (correct price)
       purchase_date: new Date().toISOString(),
       payment_status: "paid",
       tags: ["workshop_courageous_character"]
