@@ -47,7 +47,7 @@ export function TestMailchimp() {
         disabled={loading}
         className="bg-purple-600 hover:bg-purple-700"
       >
-        {loading ? "Testing..." : "Test Mailchimp"}
+        {loading ? "Testing..." : "Test Mailchimp (Check Console)"}
       </Button>
     </div>
   );

@@ -153,8 +153,14 @@ const handler = async (req: Request): Promise<Response> => {
     const mailchimpApiKey = Deno.env.get("MAILCHIMP_API_KEY");
     const listId = Deno.env.get("MAILCHIMP_LIST_ID");
 
+    console.log("Mailchimp API Key exists:", !!mailchimpApiKey);
+    console.log("Mailchimp List ID exists:", !!listId);
+    console.log("Processing subscription for:", email);
+
     if (!mailchimpApiKey || !listId) {
       console.error("Missing Mailchimp API key or List ID");
+      console.error("API Key present:", !!mailchimpApiKey);
+      console.error("List ID present:", !!listId);
       return new Response(
         JSON.stringify({ error: "Mailchimp configuration missing" }),
         {
@@ -166,6 +172,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Extract datacenter from API key (e.g., us1, us2, etc.)
     const datacenter = mailchimpApiKey.split("-")[1];
+    console.log("Extracted datacenter:", datacenter);
     
     // Create MD5 hash of email for subscriber ID (required by Mailchimp API)
     const crypto = await import("https://deno.land/std@0.190.0/crypto/mod.ts");
@@ -177,7 +184,9 @@ const handler = async (req: Request): Promise<Response> => {
     const memberUrl = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members/${emailHash}`;
     const tagsUrl = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members/${emailHash}/tags`;
 
-    console.log("Subscribing/Updating Mailchimp member (admin access required to view details)");
+    console.log("Member URL:", memberUrl);
+    console.log("Email hash:", emailHash);
+    console.log("Subscribing/Updating Mailchimp member for:", email);
 
     // Use retry mechanism for Mailchimp API call - Use PUT to create or update
     const { response, data } = await retryWithBackoff(async () => {
@@ -214,6 +223,8 @@ const handler = async (req: Request): Promise<Response> => {
       });
 
       const data = await response.json();
+      console.log("Mailchimp API Response status:", response.status);
+      console.log("Mailchimp API Response data:", JSON.stringify(data));
       return { response, data };
     }, 3, 1000);
 
@@ -340,6 +351,9 @@ const handler = async (req: Request): Promise<Response> => {
 
   } catch (error: any) {
     console.error("Error in mailchimp-subscribe function:", error);
+    console.error("Error stack:", error.stack);
+    console.error("Error name:", error.name);
+    console.error("Error message:", error.message);
     
     // Update backup record with error if we have one
     if (supabase && formSubmissionId) {
@@ -359,6 +373,7 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         error: error.message,
+        errorName: error.name,
         backup_saved: formSubmissionId ? true : false,
         processingTime: Date.now() - startTime
       }),
