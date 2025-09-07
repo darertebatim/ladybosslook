@@ -175,7 +175,12 @@ const handler = async (req: Request): Promise<Response> => {
     const memberUrl = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members/${emailHash}`;
     const tagsUrl = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members/${emailHash}/tags`;
 
-    console.log("Subscribing/Updating Mailchimp member (admin access required to view details)");
+    console.log("Sending to Mailchimp with phone formats:", {
+      email: email,
+      phone_original: phone,
+      phone_formatted: `+1${phone.replace(/\D/g, '')}`,
+      merge_fields_used: ['PHONE', 'SMSPHONE', 'MERGE8', 'CELLPHONE', 'MOBILE']
+    });
 
     // Use retry mechanism for Mailchimp API call - Use PUT to create or update
     const { response, data } = await retryWithBackoff(async () => {
@@ -193,6 +198,9 @@ const handler = async (req: Request): Promise<Response> => {
             CITY: city,
             PHONE: `+1${phone.replace(/\D/g, '')}`, // Regular phone field
             SMSPHONE: `+1${phone.replace(/\D/g, '')}`, // SMS phone field
+            MERGE8: `+1${phone.replace(/\D/g, '')}`, // Common SMS merge tag
+            CELLPHONE: `+1${phone.replace(/\D/g, '')}`, // Alternative SMS field
+            MOBILE: `+1${phone.replace(/\D/g, '')}`, // Another alternative
             ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
