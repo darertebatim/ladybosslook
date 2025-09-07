@@ -191,7 +191,8 @@ const handler = async (req: Request): Promise<Response> => {
           merge_fields: {
             FNAME: name,
             CITY: city,
-            PHONE: `+1${phone.replace(/\D/g, '')}`, // Format for SMS with +1 prefix
+            PHONE: `+1${phone.replace(/\D/g, '')}`, // Regular phone field
+            SMSPHONE: `+1${phone.replace(/\D/g, '')}`, // SMS phone field
             ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
