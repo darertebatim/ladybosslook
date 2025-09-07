@@ -22,22 +22,16 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Generate completely fresh random test data for each test
+    // Use real email and phone for proper Mailchimp testing
+    // Fake emails get cleaned by Mailchimp and SMS needs real numbers
     const timestamp = Date.now();
-    const randomSeed = Math.random().toString(36).substring(2, 15);
-    const uniqueId = `${timestamp}_${randomSeed}`;
-    
-    // Generate realistic phone number variations
-    const areaCode = Math.floor(Math.random() * 900) + 100; // 100-999
-    const exchange = Math.floor(Math.random() * 900) + 100; // 100-999  
-    const number = Math.floor(Math.random() * 9000) + 1000; // 1000-9999
-    const randomPhone = `${areaCode}${exchange}${number}`;
+    const uniqueId = `test_${timestamp}`;
     
     const testData = {
-      email: `sarah.martinez.test.${uniqueId}@gmail.com`,
-      name: `Sarah Martinez Test ${uniqueId}`,
+      email: "ladybosslookshop@gmail.com", // Real email that won't be filtered
+      name: `Lady Boss Look Shop ${uniqueId}`,
       city: "Irvine",
-      phone: randomPhone,
+      phone: "9495723730", // Real phone for SMS testing
       source: "workshop_test",
       workshop_name: "Courageous Character Workshop",
       purchase_amount: 9700, // $97 in cents (correct price)

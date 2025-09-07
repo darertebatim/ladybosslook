@@ -25,7 +25,7 @@ export function TestMailchimp() {
         console.log("Test function result:", data);
         toast({
           title: "Test Sent!",
-          description: `Fresh test sent with +1 phone format and automation tags for thank you email/SMS (check console)`,
+          description: `Real email/phone test sent to Mailchimp for SMS verification (check your Mailchimp dashboard)`,
         });
       }
     } catch (err) {
