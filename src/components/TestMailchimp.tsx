@@ -60,10 +60,31 @@ export function TestMailchimp() {
       } else {
         console.log("Check function result:", data);
         if (data.exists) {
+          const thankUrl = data.member.merge_fields?.THANKURL;
           toast({
             title: "Member Found!",
-            description: `Status: ${data.member.status}, THANKURL: ${data.member.merge_fields?.THANKURL || 'Not set'}`,
+            description: `Status: ${data.member.status}, THANKURL: ${thankUrl || 'Not set'}`,
           });
+          
+          // Test the thank you URL
+          if (thankUrl) {
+            console.log("Testing THANKURL:", thankUrl);
+            try {
+              const urlTest = await fetch(thankUrl, { method: 'HEAD' });
+              console.log("THANKURL test result:", urlTest.status);
+              toast({
+                title: "THANKURL Test",
+                description: `URL returns status: ${urlTest.status}`,
+              });
+            } catch (urlError) {
+              console.error("THANKURL test failed:", urlError);
+              toast({
+                title: "THANKURL Test Failed",
+                description: "URL is not accessible",
+                variant: "destructive"
+              });
+            }
+          }
         } else {
           toast({
             title: "Member Not Found",

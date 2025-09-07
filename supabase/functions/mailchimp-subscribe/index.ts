@@ -203,7 +203,7 @@ const handler = async (req: Request): Promise<Response> => {
             FNAME: name,
             CITY: city,
             PHONE: phone, // Regular phone number field
-            SMSPHONE: phone, // SMS phone number field
+            SMSPHONE: phone, // SMS phone number field (same as regular phone)
             ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
@@ -214,6 +214,10 @@ const handler = async (req: Request): Promise<Response> => {
             ...(session_id && { THANKURL: `https://hi.ladybosslook.com/payment-success?session_id=${session_id}` }),
           },
           marketing_permissions: [
+            {
+              marketing_permission_id: "email",
+              enabled: true
+            },
             {
               marketing_permission_id: "sms",
               enabled: true
