@@ -187,6 +187,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Member URL:", memberUrl);
     console.log("Email hash:", emailHash);
     console.log("Subscribing/Updating Mailchimp member for:", email);
+    console.log("Phone number being sent:", phone);
 
     // Use retry mechanism for Mailchimp API call - Use PUT to create or update
     const { response, data } = await retryWithBackoff(async () => {
@@ -203,7 +204,8 @@ const handler = async (req: Request): Promise<Response> => {
             FNAME: name,
             CITY: city,
             PHONE: phone, // Regular phone number field
-            SMSPHONE: phone, // SMS phone number field (same as regular phone)
+            SMS_PHONE: phone, // Try SMS_PHONE instead of SMSPHONE
+            SMSPHONE: phone, // Keep original as backup
             ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
@@ -229,6 +231,12 @@ const handler = async (req: Request): Promise<Response> => {
       const data = await response.json();
       console.log("Mailchimp API Response status:", response.status);
       console.log("Mailchimp API Response data:", JSON.stringify(data));
+      // Log merge fields to debug SMS phone field
+      if (data.merge_fields) {
+        console.log("Merge fields in response:", data.merge_fields);
+        console.log("PHONE field:", data.merge_fields.PHONE);
+        console.log("SMSPHONE field:", data.merge_fields.SMSPHONE);
+      }
       return { response, data };
     }, 3, 1000);
 
