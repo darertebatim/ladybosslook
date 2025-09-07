@@ -175,20 +175,7 @@ const handler = async (req: Request): Promise<Response> => {
     const memberUrl = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members/${emailHash}`;
     const tagsUrl = `https://${datacenter}.api.mailchimp.com/3.0/lists/${listId}/members/${emailHash}/tags`;
 
-    console.log("MAILCHIMP DEBUG - Configuration:", {
-      datacenter: datacenter,
-      listId: listId,
-      memberUrl: memberUrl,
-      email: email,
-      emailHash: emailHash
-    });
-
-    console.log("Sending to Mailchimp with phone formats:", {
-      email: email,
-      phone_original: phone,
-      phone_formatted: `+1${phone.replace(/\D/g, '')}`,
-      merge_fields_used: ['PHONE', 'SMSPHONE', 'MERGE8', 'CELLPHONE', 'MOBILE']
-    });
+    console.log("Subscribing/Updating Mailchimp member (admin access required to view details)");
 
     // Use retry mechanism for Mailchimp API call - Use PUT to create or update
     const { response, data } = await retryWithBackoff(async () => {
@@ -204,11 +191,8 @@ const handler = async (req: Request): Promise<Response> => {
           merge_fields: {
             FNAME: name,
             CITY: city,
-            PHONE: `+1${phone.replace(/\D/g, '')}`, // Regular phone field
-            SMSPHONE: `+1${phone.replace(/\D/g, '')}`, // SMS phone field
-            MERGE8: `+1${phone.replace(/\D/g, '')}`, // Common SMS merge tag
-            CELLPHONE: `+1${phone.replace(/\D/g, '')}`, // Alternative SMS field
-            MOBILE: `+1${phone.replace(/\D/g, '')}`, // Another alternative
+            PHONE: phone, // Regular phone number field
+            SMSPHONE: phone, // SMS phone number field
             ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
@@ -216,35 +200,22 @@ const handler = async (req: Request): Promise<Response> => {
             ...(payment_status && { PAYSTATUS: payment_status }),
             ...(source && { SOURCE: source }),
           },
-          tags: [], // Clear any existing tags first
+          marketing_permissions: [
+            {
+              marketing_permission_id: "sms",
+              enabled: true
+            }
+          ],
         }),
       });
 
       const data = await response.json();
-      
-      console.log("MAILCHIMP API RESPONSE:", {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        headers: Object.fromEntries(response.headers.entries()),
-        data: data
-      });
-      
       return { response, data };
     }, 3, 1000);
 
-    // If member was created/updated successfully, add tags for automation triggers
+    // If member was created/updated successfully, add tags
     if (response.ok && tags && tags.length > 0) {
-      console.log("Adding automation tags:", tags);
-      
-      // Add workshop-specific tags and automation triggers
-      const automationTags = [
-        ...tags,
-        "workshop_purchased", // General workshop purchase trigger
-        "send_thank_you", // Trigger for thank you email/SMS automation
-        `workshop_${workshop_name?.toLowerCase().replace(/\s+/g, '_')}` || "workshop_general"
-      ];
-      
+      console.log("Adding tags to member:", tags);
       try {
         const tagsResponse = await fetch(tagsUrl, {
           method: "POST",
@@ -253,21 +224,15 @@ const handler = async (req: Request): Promise<Response> => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            tags: automationTags.map(tag => ({ name: tag, status: "active" }))
+            tags: tags.map(tag => ({ name: tag, status: "active" }))
           }),
         });
         
+        const tagsData = await tagsResponse.json();
         if (!tagsResponse.ok) {
-          const tagsError = await tagsResponse.text();
-          console.error("Error adding tags:", tagsError);
+          console.error("Error adding tags:", tagsData);
         } else {
-          // Only try to parse JSON if response is OK
-          try {
-            const tagsData = await tagsResponse.json();
-            console.log("Tags added successfully:", tagsData);
-          } catch (jsonError) {
-            console.log("Tags added successfully (no response body)");
-          }
+          console.log("Tags added successfully");
         }
       } catch (tagError) {
         console.error("Error adding tags:", tagError);

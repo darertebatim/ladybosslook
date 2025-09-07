@@ -22,25 +22,21 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Use real email and phone for proper Mailchimp testing
-    // Fake emails get cleaned by Mailchimp and SMS needs real numbers
-    const timestamp = Date.now();
-    const uniqueId = `test_${timestamp}`;
-    
+    // Test subscription with workshop details
     const testData = {
-      email: "ladybosslookshop@gmail.com", // Real email that won't be filtered
-      name: `Lady Boss Look Shop ${uniqueId}`,
-      city: "Irvine",
-      phone: "9495723730", // Real phone for SMS testing
+      email: "alilotfihami@gmail.com",
+      name: "Ali Lotfi Test Workshop",
+      city: "Online",
+      phone: "+1234567890",
       source: "workshop_test",
       workshop_name: "Courageous Character Workshop",
-      purchase_amount: 9700, // $97 in cents (correct price)
+      purchase_amount: 4700, // $47 in cents
       purchase_date: new Date().toISOString(),
       payment_status: "paid",
-      tags: ["workshop_courageous_character", "test_customer"]
+      tags: ["workshop_courageous_character"]
     };
 
-    console.log('Sending test subscription with random data:', testData);
+    console.log('Sending test subscription with data:', testData);
 
     const mailchimpResponse = await supabase.functions.invoke('mailchimp-subscribe', {
       body: testData
