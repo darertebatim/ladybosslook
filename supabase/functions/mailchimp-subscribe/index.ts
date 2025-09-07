@@ -191,7 +191,7 @@ const handler = async (req: Request): Promise<Response> => {
           merge_fields: {
             FNAME: name,
             CITY: city,
-            PHONE: phone, // Standard phone field - this should work for SMS if configured properly in Mailchimp
+            PHONE: `+1${phone.replace(/\D/g, '')}`, // Format for SMS with +1 prefix
             ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
@@ -199,6 +199,7 @@ const handler = async (req: Request): Promise<Response> => {
             ...(payment_status && { PAYSTATUS: payment_status }),
             ...(source && { SOURCE: source }),
           },
+          tags: [], // Clear any existing tags first
         }),
       });
 
@@ -206,9 +207,18 @@ const handler = async (req: Request): Promise<Response> => {
       return { response, data };
     }, 3, 1000);
 
-    // If member was created/updated successfully, add tags
+    // If member was created/updated successfully, add tags for automation triggers
     if (response.ok && tags && tags.length > 0) {
-      console.log("Adding tags to member:", tags);
+      console.log("Adding automation tags:", tags);
+      
+      // Add workshop-specific tags and automation triggers
+      const automationTags = [
+        ...tags,
+        "workshop_purchased", // General workshop purchase trigger
+        "send_thank_you", // Trigger for thank you email/SMS automation
+        `workshop_${workshop_name?.toLowerCase().replace(/\s+/g, '_')}` || "workshop_general"
+      ];
+      
       try {
         const tagsResponse = await fetch(tagsUrl, {
           method: "POST",
@@ -217,7 +227,7 @@ const handler = async (req: Request): Promise<Response> => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            tags: tags.map(tag => ({ name: tag, status: "active" }))
+            tags: automationTags.map(tag => ({ name: tag, status: "active" }))
           }),
         });
         

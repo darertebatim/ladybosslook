@@ -43,7 +43,7 @@ serve(async (req) => {
       purchase_amount: 9700, // $97 in cents (correct price)
       purchase_date: new Date().toISOString(),
       payment_status: "paid",
-      tags: ["workshop_courageous_character"]
+      tags: ["workshop_courageous_character", "test_customer"]
     };
 
     console.log('Sending test subscription with random data:', testData);
