@@ -22,12 +22,15 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Test subscription with workshop details
+    // Generate random test data for each test
+    const randomId = Math.random().toString(36).substring(2, 15);
+    const randomPhone = `949${Math.floor(Math.random() * 9000000) + 1000000}`;
+    
     const testData = {
-      email: "alitesttesttest@gmail.com",
-      name: "Ali Test SMS Phone Workshop",
+      email: `test${randomId}@testdomain.com`,
+      name: `Test User ${randomId}`,
       city: "Online",
-      phone: "9495723730",
+      phone: randomPhone,
       source: "workshop_test",
       workshop_name: "Courageous Character Workshop",
       purchase_amount: 4700, // $47 in cents
@@ -36,7 +39,7 @@ serve(async (req) => {
       tags: ["workshop_courageous_character"]
     };
 
-    console.log('Sending test subscription with data:', testData);
+    console.log('Sending test subscription with random data:', testData);
 
     const mailchimpResponse = await supabase.functions.invoke('mailchimp-subscribe', {
       body: testData
