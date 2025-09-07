@@ -189,7 +189,8 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Subscribing/Updating Mailchimp member for:", email);
     console.log("Phone number being sent:", phone);
 
-    // Use retry mechanism for Mailchimp API call - Use PUT to create or update
+    // STEP 1: Create/update member with basic info (no SMS fields initially)
+    console.log("STEP 1: Creating/updating member with basic info");
     const { response, data } = await retryWithBackoff(async () => {
       const response = await fetch(memberUrl, {
         method: "PUT",
@@ -203,9 +204,7 @@ const handler = async (req: Request): Promise<Response> => {
           merge_fields: {
             FNAME: name,
             CITY: city,
-            PHONE: phone, // Regular phone number field
-            SMS_PHONE: phone, // Try SMS_PHONE instead of SMSPHONE
-            SMSPHONE: phone, // Keep original as backup
+            PHONE: phone, // Only regular phone field first
             ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
@@ -219,26 +218,58 @@ const handler = async (req: Request): Promise<Response> => {
             {
               marketing_permission_id: "email",
               enabled: true
-            },
-            {
-              marketing_permission_id: "sms",
-              enabled: true
             }
           ],
         }),
       });
 
       const data = await response.json();
-      console.log("Mailchimp API Response status:", response.status);
-      console.log("Mailchimp API Response data:", JSON.stringify(data));
-      // Log merge fields to debug SMS phone field
-      if (data.merge_fields) {
-        console.log("Merge fields in response:", data.merge_fields);
-        console.log("PHONE field:", data.merge_fields.PHONE);
-        console.log("SMSPHONE field:", data.merge_fields.SMSPHONE);
-      }
+      console.log("STEP 1 - Mailchimp API Response status:", response.status);
+      console.log("STEP 1 - Mailchimp API Response data:", JSON.stringify(data));
       return { response, data };
     }, 3, 1000);
+
+    // STEP 2: Update member with SMS phone field and SMS marketing consent
+    if (response.ok && phone) {
+      console.log("STEP 2: Updating member with SMS phone field");
+      try {
+        const smsResponse = await fetch(memberUrl, {
+          method: "PATCH",
+          headers: {
+            "Authorization": `Bearer ${mailchimpApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            merge_fields: {
+              SMSPHONE: phone, // Now add SMS phone field
+            },
+            marketing_permissions: [
+              {
+                marketing_permission_id: "email",
+                enabled: true
+              },
+              {
+                marketing_permission_id: "sms",
+                enabled: true
+              }
+            ],
+          }),
+        });
+
+        const smsData = await smsResponse.json();
+        console.log("STEP 2 - SMS update Response status:", smsResponse.status);
+        console.log("STEP 2 - SMS update Response data:", JSON.stringify(smsData));
+        
+        // Log final merge fields to debug SMS phone field
+        if (smsData.merge_fields) {
+          console.log("Final merge fields:", smsData.merge_fields);
+          console.log("Final PHONE field:", smsData.merge_fields.PHONE);
+          console.log("Final SMSPHONE field:", smsData.merge_fields.SMSPHONE);
+        }
+      } catch (smsError) {
+        console.error("STEP 2 failed - SMS phone update error:", smsError);
+      }
+    }
 
     // If member was created/updated successfully, add tags
     if (response.ok && tags && tags.length > 0) {
