@@ -113,7 +113,8 @@ serve(async (req) => {
               purchase_amount: orderDetails.amount,
               purchase_date: new Date().toISOString(),
               payment_status: "paid",
-              tags: ["workshop_courageous_character"]
+              tags: ["workshop_courageous_character"],
+              session_id: sanitizedSessionId
             }
           });
           logStep('Mailchimp subscription result', mailchimpResponse);

@@ -17,6 +17,7 @@ interface SubscribeRequest {
   purchase_date?: string;
   payment_status?: string;
   tags?: string[];
+  session_id?: string;
 }
 
 // Rate limiting using in-memory store (simple implementation)
@@ -109,7 +110,8 @@ const handler = async (req: Request): Promise<Response> => {
       purchase_amount, 
       purchase_date, 
       payment_status, 
-      tags 
+      tags,
+      session_id 
     }: SubscribeRequest = await req.json();
 
     // Initialize Supabase client for backup storage
@@ -199,6 +201,8 @@ const handler = async (req: Request): Promise<Response> => {
             ...(purchase_date && { PURCHDATE: new Date(purchase_date).toISOString().split('T')[0] }),
             ...(payment_status && { PAYSTATUS: payment_status }),
             ...(source && { SOURCE: source }),
+            ...(session_id && { SESSIONID: session_id }),
+            ...(session_id && { THANKURL: `https://hi.ladybosslook.com/payment-success?session_id=${session_id}` }),
           },
           marketing_permissions: [
             {
