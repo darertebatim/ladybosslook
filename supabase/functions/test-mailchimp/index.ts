@@ -24,10 +24,10 @@ serve(async (req) => {
 
     // Test subscription with workshop details
     const testData = {
-      email: "alilotfihami@gmail.com",
-      name: "Ali Lotfi Test Workshop",
+      email: "ladybosslookshop@gmail.com",
+      name: "Lady Boss Look Shop Test Workshop",
       city: "Online",
-      phone: "+1234567890",
+      phone: "9495723730",
       source: "workshop_test",
       workshop_name: "Courageous Character Workshop",
       purchase_amount: 4700, // $47 in cents
