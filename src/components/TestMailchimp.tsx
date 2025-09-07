@@ -26,7 +26,7 @@ export function TestMailchimp() {
         console.log("Test function result:", data);
         toast({
           title: "Test Sent!",
-          description: "Mailchimp test subscription sent to john.testuser@gmail.com",
+          description: "Mailchimp test subscription sent to sarah.workshop@gmail.com",
         });
       }
     } catch (err) {
@@ -47,7 +47,7 @@ export function TestMailchimp() {
       console.log("Checking Mailchimp member...");
       
       const { data, error } = await supabase.functions.invoke('check-mailchimp-member', {
-        body: { email: "john.testuser@gmail.com" }
+        body: { email: "sarah.workshop@gmail.com" }
       });
       
       if (error) {
@@ -61,9 +61,11 @@ export function TestMailchimp() {
         console.log("Check function result:", data);
         if (data.exists) {
           const thankUrl = data.member.merge_fields?.THANKURL;
+          const phone = data.member.merge_fields?.PHONE;
+          const smsPhone = data.member.merge_fields?.SMSPHONE;
           toast({
             title: "Member Found!",
-            description: `Status: ${data.member.status}, THANKURL: ${thankUrl || 'Not set'}`,
+            description: `Status: ${data.member.status}, PHONE: ${phone || 'Not set'}, SMSPHONE: ${smsPhone || 'Not set'}`,
           });
           
           // Test the thank you URL
