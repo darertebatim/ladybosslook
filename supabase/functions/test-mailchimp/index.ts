@@ -24,10 +24,10 @@ serve(async (req) => {
 
     // Test subscription with workshop details
     const testData = {
-      email: "test.workshop@example.com",
-      name: "Workshop Test User",
-      city: "New York",
-      phone: "+15551234567",
+      email: "john.testuser@gmail.com",
+      name: "John Test User",
+      city: "San Francisco",
+      phone: "+14155551234",
       source: "workshop_test",
       workshop_name: "Courageous Character Workshop",
       purchase_amount: 4700, // $47 in cents

@@ -26,7 +26,7 @@ export function TestMailchimp() {
         console.log("Test function result:", data);
         toast({
           title: "Test Sent!",
-          description: "Mailchimp test subscription sent to test.workshop@example.com",
+          description: "Mailchimp test subscription sent to john.testuser@gmail.com",
         });
       }
     } catch (err) {
@@ -47,7 +47,7 @@ export function TestMailchimp() {
       console.log("Checking Mailchimp member...");
       
       const { data, error } = await supabase.functions.invoke('check-mailchimp-member', {
-        body: { email: "test.workshop@example.com" }
+        body: { email: "john.testuser@gmail.com" }
       });
       
       if (error) {
