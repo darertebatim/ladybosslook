@@ -10,7 +10,8 @@ interface SubscribeRequest {
   email: string;
   name: string;
   city: string;
-  phone: string;
+  phone?: string; // Legacy field for backward compatibility
+  smsPhone?: string; // New field for SMS phone numbers
   source?: string;
   workshop_name?: string;
   purchase_amount?: number;
@@ -105,6 +106,7 @@ const handler = async (req: Request): Promise<Response> => {
       name, 
       city, 
       phone, 
+      smsPhone,
       source, 
       workshop_name, 
       purchase_amount, 
@@ -113,6 +115,9 @@ const handler = async (req: Request): Promise<Response> => {
       tags,
       session_id 
     }: SubscribeRequest = await req.json();
+
+    // Use smsPhone if provided, otherwise fall back to phone for backward compatibility
+    const phoneNumber = smsPhone || phone;
 
     // Initialize Supabase client for backup storage
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
@@ -129,7 +134,7 @@ const handler = async (req: Request): Promise<Response> => {
             email,
             name,
             city,
-            phone,
+            phone: phoneNumber,
             source: source || 'landing_page',
             user_agent: req.headers.get("user-agent"),
             ip_address: clientIP !== "unknown" ? clientIP : null,
@@ -187,7 +192,9 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Member URL:", memberUrl);
     console.log("Email hash:", emailHash);
     console.log("Subscribing/Updating Mailchimp member for:", email);
-    console.log("Phone number being sent:", phone);
+    console.log("Phone number being sent:", phoneNumber);
+    console.log("SMS Phone specifically:", smsPhone);
+    console.log("Legacy phone field:", phone);
 
     // STEP 1: Create/update member with basic info (no SMS fields initially)
     console.log("STEP 1: Creating/updating member with basic info");
@@ -204,7 +211,6 @@ const handler = async (req: Request): Promise<Response> => {
           merge_fields: {
             FNAME: name,
             CITY: city,
-            PHONE: phone, // Only regular phone field first
             ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
@@ -230,7 +236,7 @@ const handler = async (req: Request): Promise<Response> => {
     }, 3, 1000);
 
     // STEP 2: Update member with SMS phone field and SMS marketing consent
-    if (response.ok && phone) {
+    if (response.ok && phoneNumber) {
       console.log("STEP 2: Updating member with SMS phone field");
       try {
         const smsResponse = await fetch(memberUrl, {
@@ -241,7 +247,7 @@ const handler = async (req: Request): Promise<Response> => {
           },
           body: JSON.stringify({
             merge_fields: {
-              SMSPHONE: phone, // Now add SMS phone field
+              SMSPHONE: phoneNumber, // Add phone number to SMS field only
             },
             marketing_permissions: [
               {

@@ -68,7 +68,7 @@ const LadybossCoaching = () => {
         email: email.trim(),
         name: name.trim(),
         city: city.trim(),
-        phone: phone.trim(),
+        smsPhone: phone.trim(),
         source: 'ladyboss_coaching_page',
         tags: ['ladyboss_coaching_program']
       };
