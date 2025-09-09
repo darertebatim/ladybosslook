@@ -46,6 +46,31 @@ async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function formatPhoneForSMS(phone: string): string {
+  if (!phone) return phone;
+  
+  // Remove all non-digit characters
+  const cleanPhone = phone.replace(/\D/g, '');
+  
+  // If it already starts with country code (11 digits starting with 1), just add +
+  if (cleanPhone.length === 11 && cleanPhone.startsWith('1')) {
+    return `+${cleanPhone}`;
+  }
+  
+  // If it's a 10-digit US number, add +1
+  if (cleanPhone.length === 10) {
+    return `+1${cleanPhone}`;
+  }
+  
+  // If it's already formatted with + or other country codes, return as is
+  if (phone.startsWith('+')) {
+    return phone;
+  }
+  
+  // Default to US format if we can't determine
+  return `+1${cleanPhone}`;
+}
+
 async function retryWithBackoff<T>(
   operation: () => Promise<T>,
   maxRetries: number = 3,
@@ -232,6 +257,9 @@ const handler = async (req: Request): Promise<Response> => {
     // STEP 2: Update member with SMS phone field and SMS marketing consent
     if (response.ok && phone) {
       console.log("STEP 2: Updating member with SMS phone field");
+      const formattedSmsPhone = formatPhoneForSMS(phone);
+      console.log(`Formatting phone for SMS: ${phone} → ${formattedSmsPhone}`);
+      
       try {
         const smsResponse = await fetch(memberUrl, {
           method: "PATCH",
@@ -241,7 +269,7 @@ const handler = async (req: Request): Promise<Response> => {
           },
           body: JSON.stringify({
             merge_fields: {
-              SMSPHONE: phone, // Now add SMS phone field
+              SMSPHONE: formattedSmsPhone, // Format phone for SMS field
             },
             marketing_permissions: [
               {
