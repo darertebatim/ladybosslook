@@ -10,8 +10,7 @@ interface SubscribeRequest {
   email: string;
   name: string;
   city: string;
-  phone?: string;
-  smsPhone?: string;
+  phone: string;
   source?: string;
   workshop_name?: string;
   purchase_amount?: number;
@@ -106,7 +105,6 @@ const handler = async (req: Request): Promise<Response> => {
       name, 
       city, 
       phone, 
-      smsPhone,
       source, 
       workshop_name, 
       purchase_amount, 
@@ -131,7 +129,7 @@ const handler = async (req: Request): Promise<Response> => {
             email,
             name,
             city,
-            phone: phone || smsPhone,
+            phone,
             source: source || 'landing_page',
             user_agent: req.headers.get("user-agent"),
             ip_address: clientIP !== "unknown" ? clientIP : null,
@@ -190,7 +188,6 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Email hash:", emailHash);
     console.log("Subscribing/Updating Mailchimp member for:", email);
     console.log("Phone number being sent:", phone);
-    console.log("SMS Phone number being sent:", smsPhone);
 
     // STEP 1: Create/update member with basic info (no SMS fields initially)
     console.log("STEP 1: Creating/updating member with basic info");
@@ -207,8 +204,7 @@ const handler = async (req: Request): Promise<Response> => {
           merge_fields: {
             FNAME: name,
             CITY: city,
-            ...(phone && { PHONE: phone }),
-            ...(smsPhone && { SMSPHONE: smsPhone }),
+            PHONE: phone, // Only regular phone field first
             ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
@@ -233,9 +229,9 @@ const handler = async (req: Request): Promise<Response> => {
       return { response, data };
     }, 3, 1000);
 
-    // STEP 2: Update member with SMS marketing consent if smsPhone provided
-    if (response.ok && smsPhone) {
-      console.log("STEP 2: Updating member with SMS marketing consent");
+    // STEP 2: Update member with SMS phone field and SMS marketing consent
+    if (response.ok && phone) {
+      console.log("STEP 2: Updating member with SMS phone field");
       try {
         const smsResponse = await fetch(memberUrl, {
           method: "PATCH",
@@ -244,6 +240,9 @@ const handler = async (req: Request): Promise<Response> => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            merge_fields: {
+              SMSPHONE: phone, // Now add SMS phone field
+            },
             marketing_permissions: [
               {
                 marketing_permission_id: "email",
@@ -258,8 +257,8 @@ const handler = async (req: Request): Promise<Response> => {
         });
 
         const smsData = await smsResponse.json();
-        console.log("STEP 2 - SMS consent Response status:", smsResponse.status);
-        console.log("STEP 2 - SMS consent Response data:", JSON.stringify(smsData));
+        console.log("STEP 2 - SMS update Response status:", smsResponse.status);
+        console.log("STEP 2 - SMS update Response data:", JSON.stringify(smsData));
         
         // Log final merge fields to debug SMS phone field
         if (smsData.merge_fields) {
@@ -268,7 +267,7 @@ const handler = async (req: Request): Promise<Response> => {
           console.log("Final SMSPHONE field:", smsData.merge_fields.SMSPHONE);
         }
       } catch (smsError) {
-        console.error("STEP 2 failed - SMS consent update error:", smsError);
+        console.error("STEP 2 failed - SMS phone update error:", smsError);
       }
     }
 
