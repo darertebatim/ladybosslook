@@ -67,11 +67,18 @@
     --luxury-silver: 0 0% 85%;
     --luxury-white: 0 0% 98%;
     --luxury-accent: 0 0% 25%;
+    --luxury-gold: 45 96% 58%;
+    --luxury-gold-dark: 38 92% 50%;
+    --luxury-gold-light: 48 100% 88%;
+    --pure-black: 0 0% 0%;
+    --pure-white: 0 0% 100%;
     
     /* Luxury Gradients */
     --gradient-luxury: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 15%), hsl(0 0% 25%));
     --gradient-luxury-reverse: linear-gradient(135deg, hsl(0 0% 98%), hsl(0 0% 92%), hsl(0 0% 88%));
     --gradient-luxury-text: linear-gradient(135deg, hsl(0 0% 98%), hsl(0 0% 85%));
+    --gradient-gold: linear-gradient(135deg, hsl(45 96% 58%), hsl(38 92% 50%));
+    --gradient-bw-gold: linear-gradient(135deg, hsl(0 0% 8%), hsl(45 96% 58%), hsl(0 0% 98%));
     
     /* Luxury Shadows */
     --shadow-luxury: 0 25px 50px -12px hsl(0 0% 0% / 0.4);
