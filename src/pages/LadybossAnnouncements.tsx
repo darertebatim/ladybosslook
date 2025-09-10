@@ -78,7 +78,7 @@ export default function LadybossAnnouncements() {
                 </span>
               </div>
               <p className="text-sm md:text-base text-[hsl(var(--luxury-silver))] font-farsi" dir="rtl">
-                هر هفته به این صفحه سر بزنید تا از آخرین اخبار و اعلانات باخبر شوید
+                لطفا هر هفته به این صفحه سر بزنید چون آخرین خبرها، تمرین‌ها و جزوه‌های کلاس به این صفحه اضافه میشن
               </p>
             </CardContent>
           </Card>
