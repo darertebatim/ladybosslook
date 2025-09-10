@@ -249,7 +249,7 @@ const LadybossCoaching = () => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => window.open('/ladyboss-announcements', '_blank')}
+                  onClick={() => window.open('/coaching/announcements', '_blank')}
                   className="gap-2"
                 >
                   <Bell className="w-4 h-4" />
