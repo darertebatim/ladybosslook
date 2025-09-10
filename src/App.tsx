@@ -20,6 +20,7 @@ import Privacy from "./pages/Privacy";
 import SMSTerms from "./pages/SMSTerms";
 import Giveaway from "./pages/Giveaway";
 import LadybossCoaching from "./pages/LadybossCoaching";
+import LadybossAnnouncements from "./pages/LadybossAnnouncements";
 import NotFound from "./pages/NotFound";
 import Redirect from "./components/Redirect";
 
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/sms-terms" element={<SMSTerms />} />
             <Route path="/giveaway" element={<Giveaway />} />
             <Route path="/ladyboss-coaching" element={<LadybossCoaching />} />
+            <Route path="/ladyboss-announcements" element={<LadybossAnnouncements />} />
             <Route path="/firststepbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/RightsnboundariesLadybossgift.pdf" />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

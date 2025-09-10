@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, Crown, Users, Calendar, Star, Sparkles } from 'lucide-react';
+import { CheckCircle, Crown, Users, Calendar, Star, Sparkles, Bell } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 
 const LadybossCoaching = () => {
@@ -232,6 +232,29 @@ const LadybossCoaching = () => {
                   <div className="text-2xl font-bold">12 Week</div>
                   <div className="text-sm text-muted-foreground">Program</div>
                 </div>
+              </div>
+
+              {/* Announcements Link */}
+              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 border border-primary/20">
+                <div className="flex items-center gap-3 mb-2">
+                  <Bell className="w-5 h-5 text-primary" />
+                  <h4 className="font-semibold">Stay Updated</h4>
+                </div>
+                <p className="text-muted-foreground text-sm mb-3">
+                  Check our announcements page weekly for program updates, success stories, and community news.
+                </p>
+                <div className="text-sm text-muted-foreground mb-2" dir="rtl">
+                  <span className="font-semibold">هر هفته به این صفحه سر بزنید</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.open('/ladyboss-announcements', '_blank')}
+                  className="gap-2"
+                >
+                  <Bell className="w-4 h-4" />
+                  View Announcements
+                </Button>
               </div>
             </div>
 
