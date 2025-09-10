@@ -1,7 +1,7 @@
 import { SEOHead } from "@/components/SEOHead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Bell, ArrowLeft, Phone, Mail, Video, ExternalLink, MessageCircle } from "lucide-react";
+import { Calendar, Bell, ArrowLeft, Phone, Mail, Video, ExternalLink, MessageCircle, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const announcements = [
@@ -25,6 +25,16 @@ const announcements = [
     content: "برای دسترسی به ویدیوی جلسه ها روی کلاس خودتان وارد شوید",
     europeLink: "https://drive.google.com/drive/folders/1lMNr1ztakLS8wuZzZ8MNSHPG8CMYIH1M?usp=sharing",
     americaLink: "https://drive.google.com/drive/folders/1kuWTyXIvJl6jbwBkUgv8D3smlxBd0LkW?usp=drive_link",
+    isUrgent: false,
+    isToday: false
+  },
+  {
+    id: 3,
+    title: "آموزشهای صوتی زن قوی",
+    date: "۸ سپتامبر ۲۰۲۵",
+    category: "آموزش",
+    content: "آموزشهای صوتی ارزشمند برای تقویت مهارت‌های شما در دسترس است",
+    audioLink: "https://drive.google.com/drive/folders/1xq0LH0I40qS16NCEzNm0xJS7C38OcUBX?usp=sharing",
     isUrgent: false,
     isToday: false
   }
@@ -168,7 +178,7 @@ export default function LadybossAnnouncements() {
                     </div>
                   )}
                   
-                  {(announcement.europeLink || announcement.americaLink) && (
+                  {(announcement.europeLink || announcement.americaLink || announcement.audioLink) && (
                     <div className="space-y-3 mb-4">
                       {announcement.europeLink && (
                         <div className="flex items-center gap-2 justify-end bg-purple-500/10 p-3 rounded-lg border border-purple-500/20">
@@ -197,6 +207,21 @@ export default function LadybossAnnouncements() {
                           </Button>
                           <ExternalLink className="h-4 w-4 text-orange-400" />
                           <span className="text-[hsl(var(--pure-white))] font-farsi">جلسات امریکا:</span>
+                        </div>
+                      )}
+                      
+                      {announcement.audioLink && (
+                        <div className="flex items-center gap-2 justify-end bg-cyan-500/10 p-3 rounded-lg border border-cyan-500/20">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(announcement.audioLink, '_blank')}
+                            className="text-cyan-400 hover:text-cyan-300 p-0 h-auto font-farsi"
+                          >
+                            دسترسی به آموزشها
+                          </Button>
+                          <Headphones className="h-4 w-4 text-cyan-400" />
+                          <span className="text-[hsl(var(--pure-white))] font-farsi">آموزشهای صوتی:</span>
                         </div>
                       )}
                     </div>
