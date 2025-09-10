@@ -1,14 +1,14 @@
 import { SEOHead } from "@/components/SEOHead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Bell, ArrowLeft, Phone, Mail, Video } from "lucide-react";
+import { Calendar, Bell, ArrowLeft, Phone, Mail, Video, ExternalLink, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const announcements = [
   {
     id: 1,
     title: "پشتیبانی واتساپ موقتاً در دسترس نیست",
-    date: "۱۰ ژانویه ۲۰۲۴",
+    date: "۱۰ سپتامبر ۲۰۲۵",
     category: "مهم",
     content: "خط پشتیبانی واتساپ ما در حال حاضر در دسترس نیست. لطفاً برای تماس مجدد به این واتساپ پیام دهید:",
     phone: "(626) 502-8538",
@@ -19,28 +19,12 @@ const announcements = [
   },
   {
     id: 2,
-    title: "کارگاه جدید: استراتژی‌های تجاری پیشرفته",
-    date: "۵ ژانویه ۲۰۲۴",
-    category: "کارگاه",
-    content: "به ما در کارگاه فشرده استراتژی‌های تجاری پیشرفته بپیوندید که سفر کارآفرینی شما را متحول خواهد کرد.",
-    isUrgent: false,
-    isToday: false
-  },
-  {
-    id: 3,
-    title: "داستان‌های موفقیت این ماه",
-    date: "۱ ژانویه ۲۰۲۴",
-    category: "موفقیت",
-    content: "داستان‌های الهام‌بخش اعضای جامعه ما را بخوانید که این ماه به اهداف تجاری خود رسیدند.",
-    isUrgent: false,
-    isToday: false
-  },
-  {
-    id: 4,
-    title: "رویداد شبکه‌سازی ماهانه",
-    date: "۲۸ دسامبر ۲۰۲۳",
-    category: "رویداد",
-    content: "با کارآفرینان همکار در رویداد ماهانه شبکه‌سازی ما ارتباط برقرار کنید. روابط معنادار بسازید و کسب‌وکارتان را توسعه دهید.",
+    title: "ویدیوی ضبط شده جلسات کوچینگ زن قوی با استاد راضیه لیدی باس",
+    date: "۹ سپتامبر ۲۰۲۵",
+    category: "ویدیو",
+    content: "برای دسترسی به ویدیوی جلسه ها روی کلاس خودتان وارد شوید",
+    europeLink: "https://drive.google.com/drive/folders/1lMNr1ztakLS8wuZzZ8MNSHPG8CMYIH1M?usp=sharing",
+    americaLink: "https://drive.google.com/drive/folders/1kuWTyXIvJl6jbwBkUgv8D3smlxBd0LkW?usp=drive_link",
     isUrgent: false,
     isToday: false
   }
@@ -140,10 +124,15 @@ export default function LadybossAnnouncements() {
                   {announcement.phone && (
                     <div className="space-y-3 mb-4">
                       <div className="flex items-center gap-2 justify-end bg-[hsl(var(--luxury-gold))]/10 p-3 rounded-lg border border-[hsl(var(--luxury-gold))]/20">
-                        <span className="text-[hsl(var(--luxury-gold))] font-mono font-bold" dir="ltr">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => window.open(`https://wa.me/${announcement.phone.replace(/[^0-9]/g, '')}`, '_blank')}
+                          className="text-[hsl(var(--luxury-gold))] hover:text-[hsl(var(--pure-white))] p-0 h-auto font-mono"
+                        >
                           {announcement.phone}
-                        </span>
-                        <Phone className="h-4 w-4 text-[hsl(var(--luxury-gold))]" />
+                        </Button>
+                        <MessageCircle className="h-4 w-4 text-[hsl(var(--luxury-gold))]" />
                         <span className="text-[hsl(var(--pure-white))] font-farsi">واتساپ جدید:</span>
                       </div>
                       
@@ -153,7 +142,7 @@ export default function LadybossAnnouncements() {
                             variant="ghost"
                             size="sm"
                             onClick={() => window.open(announcement.meetLink, '_blank')}
-                            className="text-blue-400 hover:text-blue-300 p-0 h-auto font-mono"
+                            className="text-blue-400 hover:text-blue-300 p-0 h-auto font-farsi"
                           >
                             پیوند جلسه امروز
                           </Button>
@@ -164,11 +153,50 @@ export default function LadybossAnnouncements() {
                       
                       {announcement.supportEmail && (
                         <div className="flex items-center gap-2 justify-end bg-green-500/10 p-3 rounded-lg border border-green-500/20">
-                          <span className="text-green-400 font-mono" dir="ltr">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(`mailto:${announcement.supportEmail}`, '_blank')}
+                            className="text-green-400 hover:text-green-300 p-0 h-auto font-mono"
+                          >
                             {announcement.supportEmail}
-                          </span>
+                          </Button>
                           <Mail className="h-4 w-4 text-green-400" />
                           <span className="text-[hsl(var(--pure-white))] font-farsi">ایمیل پشتیبانی:</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {(announcement.europeLink || announcement.americaLink) && (
+                    <div className="space-y-3 mb-4">
+                      {announcement.europeLink && (
+                        <div className="flex items-center gap-2 justify-end bg-purple-500/10 p-3 rounded-lg border border-purple-500/20">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(announcement.europeLink, '_blank')}
+                            className="text-purple-400 hover:text-purple-300 p-0 h-auto font-farsi"
+                          >
+                            دسترسی به ویدیوها
+                          </Button>
+                          <ExternalLink className="h-4 w-4 text-purple-400" />
+                          <span className="text-[hsl(var(--pure-white))] font-farsi">جلسات اروپا:</span>
+                        </div>
+                      )}
+                      
+                      {announcement.americaLink && (
+                        <div className="flex items-center gap-2 justify-end bg-orange-500/10 p-3 rounded-lg border border-orange-500/20">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(announcement.americaLink, '_blank')}
+                            className="text-orange-400 hover:text-orange-300 p-0 h-auto font-farsi"
+                          >
+                            دسترسی به ویدیوها
+                          </Button>
+                          <ExternalLink className="h-4 w-4 text-orange-400" />
+                          <span className="text-[hsl(var(--pure-white))] font-farsi">جلسات امریکا:</span>
                         </div>
                       )}
                     </div>
