@@ -56,7 +56,7 @@ const App = () => (
             <Route path="/sms-terms" element={<SMSTerms />} />
             <Route path="/giveaway" element={<Giveaway />} />
             <Route path="/ladyboss-coaching" element={<LadybossCoaching />} />
-            <Route path="/coaching/announcements" element={<LadybossAnnouncements />} />
+            <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
             <Route path="/firststepbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/RightsnboundariesLadybossgift.pdf" />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
