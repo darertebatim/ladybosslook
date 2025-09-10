@@ -133,46 +133,60 @@ export default function LadybossAnnouncements() {
                   
                   {announcement.phone && (
                     <div className="space-y-3 mb-4">
-                      <div className="flex items-center gap-2 justify-end bg-[hsl(var(--luxury-gold))]/10 p-3 rounded-lg border border-[hsl(var(--luxury-gold))]/20">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => window.open(`https://wa.me/${announcement.phone.replace(/[^0-9]/g, '')}`, '_blank')}
-                          className="text-[hsl(var(--luxury-gold))] hover:text-[hsl(var(--pure-white))] p-0 h-auto font-mono"
-                        >
-                          {announcement.phone}
-                        </Button>
-                        <MessageCircle className="h-4 w-4 text-[hsl(var(--luxury-gold))]" />
-                        <span className="text-[hsl(var(--pure-white))] font-farsi">واتساپ جدید:</span>
+                      <div className="bg-[hsl(var(--luxury-gold))]/10 p-4 rounded-lg border border-[hsl(var(--luxury-gold))]/20">
+                        <div className="flex items-center gap-3 justify-end mb-2">
+                          <MessageCircle className="h-5 w-5 text-[hsl(var(--luxury-gold))]" />
+                          <span className="text-[hsl(var(--pure-white))] font-farsi font-semibold">واتساپ جدید:</span>
+                        </div>
+                        <div className="flex justify-end">
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => window.open(`https://wa.me/${announcement.phone.replace(/[^0-9]/g, '')}`, '_blank')}
+                            className="bg-[hsl(var(--luxury-gold))] hover:bg-[hsl(var(--luxury-gold-dark))] text-[hsl(var(--pure-black))] font-bold text-lg px-4 py-2"
+                            dir="ltr"
+                          >
+                            {announcement.phone}
+                          </Button>
+                        </div>
                       </div>
                       
                       {announcement.meetLink && (
-                        <div className="flex items-center gap-2 justify-end bg-blue-500/10 p-3 rounded-lg border border-blue-500/20">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => window.open(announcement.meetLink, '_blank')}
-                            className="text-blue-400 hover:text-blue-300 p-0 h-auto font-farsi"
-                          >
-                            پیوند جلسه امروز
-                          </Button>
-                          <Video className="h-4 w-4 text-blue-400" />
-                          <span className="text-[hsl(var(--pure-white))] font-farsi">گوگل میت:</span>
+                        <div className="bg-blue-500/10 p-4 rounded-lg border border-blue-500/20">
+                          <div className="flex items-center gap-3 justify-end mb-2">
+                            <Video className="h-5 w-5 text-blue-400" />
+                            <span className="text-[hsl(var(--pure-white))] font-farsi font-semibold">گوگل میت:</span>
+                          </div>
+                          <div className="flex justify-end">
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => window.open(announcement.meetLink, '_blank')}
+                              className="bg-blue-500 hover:bg-blue-600 text-white font-farsi font-semibold px-4 py-2"
+                            >
+                              پیوند جلسه امروز
+                            </Button>
+                          </div>
                         </div>
                       )}
                       
                       {announcement.supportEmail && (
-                        <div className="flex items-center gap-2 justify-end bg-green-500/10 p-3 rounded-lg border border-green-500/20">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => window.open(`mailto:${announcement.supportEmail}`, '_blank')}
-                            className="text-green-400 hover:text-green-300 p-0 h-auto font-mono"
-                          >
-                            {announcement.supportEmail}
-                          </Button>
-                          <Mail className="h-4 w-4 text-green-400" />
-                          <span className="text-[hsl(var(--pure-white))] font-farsi">ایمیل پشتیبانی:</span>
+                        <div className="bg-green-500/10 p-4 rounded-lg border border-green-500/20">
+                          <div className="flex items-center gap-3 justify-end mb-2">
+                            <Mail className="h-5 w-5 text-green-400" />
+                            <span className="text-[hsl(var(--pure-white))] font-farsi font-semibold">ایمیل پشتیبانی:</span>
+                          </div>
+                          <div className="flex justify-end">
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => window.open(`mailto:${announcement.supportEmail}`, '_blank')}
+                              className="bg-green-500 hover:bg-green-600 text-white font-mono font-semibold px-4 py-2"
+                              dir="ltr"
+                            >
+                              {announcement.supportEmail}
+                            </Button>
+                          </div>
                         </div>
                       )}
                     </div>
