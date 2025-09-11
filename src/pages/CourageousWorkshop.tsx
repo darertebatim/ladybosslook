@@ -337,8 +337,16 @@ const CourageousWorkshop = () => {
                   asChild
                 >
                   <Link to="/checkout?program=courageous-character">
-                    <Target className="w-5 h-5 ml-2" />
-                    میخواهم پرجرات بشم!
+                    <div className="flex flex-col items-center">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Target className="w-5 h-5" />
+                        <span>میخواهم پرجرات بشم!</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="line-through text-luxury-black/60 farsi-nums">$۴۹۷</span>
+                        <span className="farsi-nums">$۹۷ فقط برای ۱۰۰ نفر اول</span>
+                      </div>
+                    </div>
                   </Link>
                 </Button>
               </div>
