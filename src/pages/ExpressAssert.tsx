@@ -88,10 +88,10 @@ const ExpressAssert = () => {
       return;
     }
 
-    if (!password || password.toLowerCase() !== 'jorat') {
+    if (!password || password.toLowerCase() !== 'fnp') {
       toast({
         title: "Wrong Password", 
-        description: "Please enter the correct video password: jorat",
+        description: "Please enter the correct video password: fnp",
         variant: "destructive",
       });
       return;
@@ -121,7 +121,7 @@ const ExpressAssert = () => {
         // Custom event for email subscription
         window.fbq('trackCustom', 'EmailBonusSubscription', {
           source: 'expressassert_page',
-          bonus_type: 'secondvideo',
+          bonus_type: 'fnpbonus',
           user_intent: 'high_interest'
         });
       }
@@ -133,7 +133,7 @@ const ExpressAssert = () => {
           city: '',
           phone: '',
           source: 'expressassert_page',
-          tags: ['secondvideo']
+          tags: ['fnpbonus']
         }
       });
 
@@ -277,7 +277,7 @@ const ExpressAssert = () => {
               <div className="flex flex-col gap-3 max-w-md mx-auto">
                 <Input
                   type="text"
-                  placeholder="Enter Video's Pass word 'jorat'"
+                  placeholder="Enter Video's Pass word 'fnp'"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isSubmitting}
