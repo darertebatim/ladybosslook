@@ -160,7 +160,7 @@ const Programs = () => {
                   
                   <Button 
                     className="w-full bg-primary hover:bg-primary-dark group-hover:shadow-glow transition-all duration-300"
-                    onClick={() => window.location.href = '/courageous-workshop'}
+                    onClick={() => window.location.href = '/ccw'}
                   >
                     Enroll Now
                     <ArrowRight size={16} className="ml-2" />

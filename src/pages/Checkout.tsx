@@ -50,7 +50,7 @@ const Checkout = () => {
                 LadyBoss Academy
               </h1>
               <Button variant="ghost" size="sm" asChild className="text-luxury-silver hover:text-luxury-white hover:bg-luxury-charcoal">
-                <Link to="/courageous-workshop" className="flex items-center gap-2">
+                <Link to="/ccw" className="flex items-center gap-2">
                   <ArrowLeft size={16} />
                   <span className="hidden sm:inline">Back to Workshop</span>
                   <span className="sm:hidden">Back</span>

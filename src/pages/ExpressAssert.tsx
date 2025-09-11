@@ -359,7 +359,7 @@ const ExpressAssert = () => {
                     asChild
                     onClick={handleJoinAcademyClick}
                   >
-                    <Link to="/courageous-workshop">
+                    <Link to="/ccw">
                       Join Courageous Character Workshop
                     </Link>
                   </Button>

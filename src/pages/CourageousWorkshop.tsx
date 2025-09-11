@@ -345,6 +345,78 @@ const CourageousWorkshop = () => {
             </div>
           </section>
 
+          {/* Pricing & Bonuses Section - Mobile Optimized */}
+          <section className="mb-12 px-4">
+            <div className="bg-gradient-to-br from-luxury-white/15 to-luxury-white/5 backdrop-blur-sm rounded-xl p-6 border border-luxury-white/30 shadow-luxury">
+              <div className="text-center mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold mb-3 text-luxury-white font-display leading-tight">
+                  بونس ویژه ایرانیان خارج از کشور
+                </h2>
+                <div className="w-16 h-1 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-4"></div>
+              </div>
+              
+              {/* Original Price Display */}
+              <div className="text-center mb-6">
+                <p className="text-luxury-silver text-sm mb-2">قیمت اصلی بلیط کارگاه:</p>
+                <div className="text-3xl font-bold text-luxury-white farsi-nums mb-4">$۴۹۷</div>
+              </div>
+
+              {/* Bonuses List */}
+              <div className="space-y-4 mb-6">
+                <div className="bg-luxury-black/30 rounded-lg p-4 border border-luxury-white/10">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-luxury-white/20 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-luxury-white font-bold text-sm">۱</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-luxury-white font-bold text-sm mb-2">ورک‌بوک ۱۲ دیالوگ جرأت‌مندانه با دیالوگهای ۲ زبانه</h3>
+                      <div className="text-luxury-silver text-lg font-bold farsi-nums">ارزش: $۲۰۰</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-luxury-black/30 rounded-lg p-4 border border-luxury-white/10">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-luxury-white/20 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-luxury-white font-bold text-sm">۲</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-luxury-white font-bold text-sm mb-2">کتاب صوتی کاراکتر پرجرأت با صدای راضیه لیدی‌باس</h3>
+                      <div className="text-luxury-silver text-lg font-bold farsi-nums">ارزش: $۵۰</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-luxury-black/30 rounded-lg p-4 border border-luxury-white/10">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-luxury-white/20 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-luxury-white font-bold text-sm">۳</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-luxury-white font-bold text-sm mb-2">وبینار ذهن آگاهی و حفظ خونسردی (برای رفع اضطراب)</h3>
+                      <div className="text-luxury-silver text-lg font-bold farsi-nums">ارزش: $۵۰</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Total Value vs Special Price */}
+              <div className="bg-gradient-to-r from-luxury-white/10 to-luxury-white/5 rounded-lg p-4 border border-luxury-white/20 text-center">
+                <div className="mb-3">
+                  <p className="text-luxury-silver text-sm mb-1">مجموع ارزش:</p>
+                  <div className="text-2xl font-bold text-luxury-silver line-through farsi-nums">$۷۹۷</div>
+                </div>
+                <div className="bg-gradient-to-r from-luxury-white/20 to-luxury-white/10 rounded-lg p-3 border border-luxury-white/30">
+                  <p className="text-luxury-white text-sm font-bold mb-2">قیمت ویژه برای ۱۰۰ نفر اول:</p>
+                  <div className="text-4xl font-bold text-luxury-white farsi-nums mb-2">$۹۷</div>
+                  <div className="bg-luxury-white text-luxury-black rounded-full px-4 py-2 text-xs font-bold inline-block">
+                    صرفه‌جویی ۸۷٪ - فقط امروز!
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Workshop Details - Mobile Optimized */}
           <section className="grid gap-4 mb-12 px-4">
             <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl">
