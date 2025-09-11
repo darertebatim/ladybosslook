@@ -111,7 +111,7 @@ export default function PaymentSuccess() {
       `Amount Paid: ${formatPrice(orderDetails.amount)}\n\n` +
       `Please send me the workshop details and next steps. Thank you!`
     );
-    return `https://wa.me/19495723730?text=${message}`;
+    return `https://wa.me/16265028538?text=${message}`;
   };
 
   if (isLoading) {
@@ -301,12 +301,12 @@ export default function PaymentSuccess() {
                 support@ladybosslook.com
               </a>
               <a 
-                href="https://wa.me/19495723730" 
+                href="https://wa.me/16265028538" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-primary hover:underline text-sm"
               >
-                WhatsApp: +1 (949) 572-3730
+                WhatsApp: +1 (626) 502-8538
               </a>
             </div>
           </div>
