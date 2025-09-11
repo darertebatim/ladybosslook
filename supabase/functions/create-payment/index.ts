@@ -110,7 +110,7 @@ serve(async (req) => {
       },
       customer_creation: 'always',
       success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/courageous-workshop?payment=cancelled`,
+      cancel_url: `${req.headers.get("origin")}/ccw?payment=cancelled`,
       payment_intent_data: {
         metadata: {
           program: program,

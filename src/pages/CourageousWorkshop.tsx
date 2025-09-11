@@ -25,10 +25,11 @@ import {
   Diamond,
   Sparkles
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { TestMailchimp } from '@/components/TestMailchimp';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 
 // Declare Facebook Pixel function
@@ -42,6 +43,7 @@ const CourageousWorkshop = () => {
   const [timeLeft, setTimeLeft] = useState({ hours: 47, minutes: 23, seconds: 45 });
   const [showStickyBtn, setShowStickyBtn] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [searchParams] = useSearchParams();
 
   // Countdown timer
   useEffect(() => {
@@ -60,6 +62,18 @@ const CourageousWorkshop = () => {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Handle payment cancellation
+  useEffect(() => {
+    const paymentStatus = searchParams.get('payment');
+    if (paymentStatus === 'cancelled') {
+      toast({
+        title: "Payment Cancelled",
+        description: "Your payment was cancelled. You can try again when you're ready.",
+        variant: "destructive",
+      });
+    }
+  }, [searchParams]);
 
   // Sticky button visibility
   useEffect(() => {
