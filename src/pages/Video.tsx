@@ -259,8 +259,8 @@ const Video = () => {
                 </h3>
               </div>
               
-              <p className="text-sm text-foreground/80 max-w-md mx-auto">
-                Enter your email below to receive exclusive bonus materials that complement this video lesson.
+              <p className="text-sm text-foreground/80 max-w-md mx-auto" dir="rtl">
+                ایمیل خودتون رو وارد کنید تا مطالب ویژه و هدیه‌های مکمل این درس رو دریافت کنید
               </p>
               
               <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
