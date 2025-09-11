@@ -314,11 +314,25 @@ const handler = async (req: Request): Promise<Response> => {
           }),
         });
         
-        const tagsData = await tagsResponse.json();
-        if (!tagsResponse.ok) {
-          console.error("Error adding tags:", tagsData);
+        console.log("Tags response status:", tagsResponse.status);
+        
+        // Handle response - Mailchimp tags API sometimes returns empty body on success
+        if (tagsResponse.status === 204) {
+          console.log("Tags added successfully (no content response)");
+        } else if (tagsResponse.ok) {
+          try {
+            const tagsData = await tagsResponse.json();
+            console.log("Tags added successfully with data:", tagsData);
+          } catch (parseError) {
+            console.log("Tags added successfully (empty response body)");
+          }
         } else {
-          console.log("Tags added successfully");
+          try {
+            const tagsData = await tagsResponse.json();
+            console.error("Error adding tags:", tagsData);
+          } catch (parseError) {
+            console.error("Error adding tags - status:", tagsResponse.status, "Unable to parse response");
+          }
         }
       } catch (tagError) {
         console.error("Error adding tags:", tagError);
