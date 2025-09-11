@@ -336,7 +336,11 @@ const CourageousWorkshop = () => {
                   onClick={() => handleRegisterClick('solution')}
                   asChild
                 >
-                  <Link to="/checkout?program=courageous-character">
+                  <a 
+                    href="https://buy.stripe.com/8wM9D04FQ8hAb4sbIO?success_url=https://boldadventurous.lovable.app/payment-success&cancel_url=https://boldadventurous.lovable.app/ccw"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <div className="flex flex-col items-center">
                       <div className="flex items-center gap-2 mb-1">
                         <Target className="w-5 h-5" />
@@ -347,7 +351,7 @@ const CourageousWorkshop = () => {
                         <span className="farsi-nums">$۹۷ فقط برای ۱۰۰ نفر اول</span>
                       </div>
                     </div>
-                  </Link>
+                  </a>
                 </Button>
               </div>
             </div>
