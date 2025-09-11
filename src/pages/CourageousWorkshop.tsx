@@ -370,7 +370,10 @@ const CourageousWorkshop = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-luxury-white font-bold text-sm mb-2">ورک‌بوک ۱۲ دیالوگ جرأت‌مندانه با دیالوگهای ۲ زبانه</h3>
-                      <div className="text-luxury-silver text-lg font-bold farsi-nums">ارزش: $۲۰۰</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-luxury-silver text-lg font-bold line-through farsi-nums">$۲۰۰</span>
+                        <span className="bg-luxury-white text-luxury-black px-2 py-1 rounded-full text-xs font-bold">رایگان</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -382,7 +385,10 @@ const CourageousWorkshop = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-luxury-white font-bold text-sm mb-2">کتاب صوتی کاراکتر پرجرأت با صدای راضیه لیدی‌باس</h3>
-                      <div className="text-luxury-silver text-lg font-bold farsi-nums">ارزش: $۵۰</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-luxury-silver text-lg font-bold line-through farsi-nums">$۵۰</span>
+                        <span className="bg-luxury-white text-luxury-black px-2 py-1 rounded-full text-xs font-bold">رایگان</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -394,7 +400,10 @@ const CourageousWorkshop = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-luxury-white font-bold text-sm mb-2">وبینار ذهن آگاهی و حفظ خونسردی (برای رفع اضطراب)</h3>
-                      <div className="text-luxury-silver text-lg font-bold farsi-nums">ارزش: $۵۰</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-luxury-silver text-lg font-bold line-through farsi-nums">$۵۰</span>
+                        <span className="bg-luxury-white text-luxury-black px-2 py-1 rounded-full text-xs font-bold">رایگان</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -404,13 +413,13 @@ const CourageousWorkshop = () => {
               <div className="bg-gradient-to-r from-luxury-white/10 to-luxury-white/5 rounded-lg p-4 border border-luxury-white/20 text-center">
                 <div className="mb-3">
                   <p className="text-luxury-silver text-sm mb-1">مجموع ارزش:</p>
-                  <div className="text-2xl font-bold text-luxury-silver line-through farsi-nums">$۷۹۷</div>
+                  <div className="text-2xl font-bold text-luxury-silver line-through farsi-nums">$۵۰۰</div>
                 </div>
                 <div className="bg-gradient-to-r from-luxury-white/20 to-luxury-white/10 rounded-lg p-3 border border-luxury-white/30">
                   <p className="text-luxury-white text-sm font-bold mb-2">قیمت ویژه برای ۱۰۰ نفر اول:</p>
                   <div className="text-4xl font-bold text-luxury-white farsi-nums mb-2">$۹۷</div>
                   <div className="bg-luxury-white text-luxury-black rounded-full px-4 py-2 text-xs font-bold inline-block">
-                    صرفه‌جویی ۸۷٪ - فقط امروز!
+                    صرفه‌جویی ۸۰٪ - فقط امروز!
                   </div>
                 </div>
               </div>
@@ -446,12 +455,12 @@ const CourageousWorkshop = () => {
               </CardContent>
             </Card>
 
-            {/* Updates Section - Persian */}
+            {/* Program Updates Section */}
             <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl mb-4">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
                   <Sparkles className="w-5 h-5 text-luxury-silver" />
-                  آپدیت‌های کاراکتر پرجرأت 2026
+                  برنامه‌های آپدیت شده کاراکتر پرجرأت ۲۰۲۶
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -476,8 +485,7 @@ const CourageousWorkshop = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
                   <TrendingUp className="w-5 h-5 text-luxury-silver" />
-                  <span className="block">۱۲ تکنیک ویژه</span>
-                  <span className="block">کاراکتر پرجرات</span>
+                  ۱۲ تکنیک کاراکتر پرجرأت
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
