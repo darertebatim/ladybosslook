@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Video from "./pages/Video";
+import ExpressAssert from "./pages/ExpressAssert";
 import Landing from "./pages/Landing";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
@@ -46,8 +47,9 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            <Route path="/video" element={<Video />} />
-            <Route path="/business-ideas" element={<BusinessIdeas />} />
+          <Route path="/video" element={<Video />} />
+          <Route path="/expressassert" element={<ExpressAssert />} />
+          <Route path="/business-ideas" element={<BusinessIdeas />} />
             <Route path="/event-irvine" element={<EventIrvine />} />
             <Route path="/courageous-workshop" element={<CourageousWorkshop />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
