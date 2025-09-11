@@ -45,32 +45,9 @@ serve(async (req) => {
       apiVersion: "2023-10-16",
     });
 
-    // Parse request data with enhanced validation
+    // Parse request data - only need program type
     const requestBody = await req.json();
-    
-    // Enhanced input validation
-    const { name, email, phone, program } = requestBody;
-    
-    if (!name || typeof name !== 'string' || name.length > 100 || name.length < 2) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid name provided' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-    
-    if (!email || !validateEmail(email)) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid email address' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-    
-    if (!phone || !validatePhone(phone)) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid phone number format' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    const { program } = requestBody;
     
     if (!program || typeof program !== 'string') {
       return new Response(
@@ -79,11 +56,7 @@ serve(async (req) => {
       );
     }
     
-    // Sanitize inputs
-    const sanitizedName = sanitizeString(name);
-    const sanitizedEmail = email.toLowerCase().trim();
-    const sanitizedPhone = sanitizeString(phone);
-    logStep("Request data parsed and validated", { name: sanitizedName, email: sanitizedEmail, phone: sanitizedPhone, program });
+    logStep("Request data parsed", { program });
 
     // Define program pricing (whitelist approach)
     const programPricing = {
@@ -114,29 +87,8 @@ serve(async (req) => {
 
     logStep("Program selected", selectedProgram);
 
-    // Check if customer exists (with sanitized email)
-    const customers = await stripe.customers.list({ 
-      email: sanitizedEmail, 
-      limit: 1 
-    });
-    
-    let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-      logStep("Existing customer found", { customerId });
-    } else {
-      const customer = await stripe.customers.create({
-        email: sanitizedEmail,
-        name: sanitizedName,
-        phone: sanitizedPhone,
-      });
-      customerId = customer.id;
-      logStep("New customer created", { customerId });
-    }
-
-    // Create checkout session
+    // Create checkout session - let Stripe collect all customer data
     const session = await stripe.checkout.sessions.create({
-      customer: customerId,
       line_items: [
         {
           price_data: {
@@ -151,13 +103,17 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
+      payment_method_types: ['card'], // Restrict to card payments only
+      billing_address_collection: 'required',
+      phone_number_collection: {
+        enabled: true
+      },
+      customer_creation: 'always',
       success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/courageous-workshop?payment=cancelled`,
       payment_intent_data: {
         metadata: {
           program: program,
-          customer_name: sanitizedName,
-          customer_email: sanitizedEmail,
         },
       },
     });

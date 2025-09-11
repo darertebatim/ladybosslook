@@ -183,9 +183,6 @@ const CourageousWorkshop = () => {
       // Call the create-payment edge function
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
-          name: 'Workshop Participant',
-          email: 'customer@example.com', // This would normally come from a form
-          phone: '+1234567890', // This would normally come from a form
           program: 'courageous-character'
         }
       });
