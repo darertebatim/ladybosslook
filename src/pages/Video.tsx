@@ -1,9 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, Play, Share2, BookOpen, ChevronDown, MessageCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ArrowLeft, Play, Share2, BookOpen, ChevronDown, Mail, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { SEOHead } from '@/components/SEOHead';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 // Declare Facebook Pixel function
 declare global {
@@ -13,6 +16,10 @@ declare global {
 }
 
 const Video = () => {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
   // Meta Pixel tracking
   useEffect(() => {
     // Track PageView
@@ -70,27 +77,76 @@ const Video = () => {
     return () => window.removeEventListener('scroll', trackScrollDepth);
   }, []);
 
-  const handleWhatsAppClick = () => {
-    // Track WhatsApp button click as Lead event
-    if (typeof window !== 'undefined' && window.fbq) {
-      window.fbq('track', 'Lead', {
-        content_name: 'WhatsApp Gift Contact',
-        content_category: 'Video CTA',
-        value: 1,
-        currency: 'USD'
+  const handleEmailSubmit = async () => {
+    if (!email) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email to receive the bonus.",
+        variant: "destructive",
       });
-      
-      // Custom event for WhatsApp interaction
-      window.fbq('trackCustom', 'WhatsAppButtonClick', {
-        source: 'video_page',
-        gift_code: 'jorat',
-        user_intent: 'high_interest'
-      });
+      return;
     }
 
-    const message = encodeURIComponent('jorat');
-    const url = `https://wa.me/19495723730?text=${message}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Track email submission as Lead event
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'Lead', {
+          content_name: 'First Step Bonus Email',
+          content_category: 'Video CTA',
+          value: 1,
+          currency: 'USD'
+        });
+        
+        // Custom event for email subscription
+        window.fbq('trackCustom', 'EmailBonusSubscription', {
+          source: 'video_page',
+          bonus_type: 'firststepbonus',
+          user_intent: 'high_interest'
+        });
+      }
+
+      const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
+        body: {
+          email,
+          name: '',
+          city: '',
+          phone: '',
+          source: 'video_page',
+          tags: ['firststepbonus']
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Bonus Sent! 🎁",
+        description: "Check your email for your first step bonus materials!",
+      });
+
+      setEmail('');
+    } catch (error: any) {
+      console.error('Error subscribing to bonus:', error);
+      toast({
+        title: "Something went wrong",
+        description: "Please try again or contact support.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleJoinAcademyClick = () => {
@@ -192,18 +248,41 @@ const Video = () => {
           </Card>
         </div>
 
-        {/* WhatsApp Gift Section */}
-        <div className="max-w-4xl mx-auto mt-6 sm:mt-8 px-4 sm:px-6 text-center">
-          <p className="text-xs sm:text-sm text-foreground mb-3 sm:mb-4 font-bold bg-primary/10 p-3 rounded-lg whitespace-nowrap overflow-hidden">
-            برای گرفتن هدیه، اسم رمز را به واتسپ پایین بفرستید
-          </p>
-          <Button 
-            className="bg-green-600 hover:bg-green-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
-            onClick={handleWhatsAppClick}
-          >
-            <MessageCircle size={18} className="sm:w-5 sm:h-5 mr-2" />
-            Send to WhatsApp
-          </Button>
+        {/* Email Bonus Section */}
+        <div className="max-w-4xl mx-auto mt-6 sm:mt-8 px-4 sm:px-6">
+          <Card className="p-4 sm:p-6 bg-gradient-accent border-2 border-primary/20">
+            <div className="text-center space-y-4">
+              <div className="flex items-center justify-center space-x-2">
+                <Gift size={24} className="text-primary" />
+                <h3 className="font-display text-lg sm:text-xl font-bold text-foreground">
+                  Get Your First Step Bonus
+                </h3>
+              </div>
+              
+              <p className="text-sm text-foreground/80 max-w-md mx-auto">
+                Enter your email below to receive exclusive bonus materials that complement this video lesson.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                <Input
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1"
+                  disabled={isSubmitting}
+                />
+                <Button 
+                  onClick={handleEmailSubmit}
+                  disabled={isSubmitting}
+                  className="bg-primary hover:bg-primary/90 text-white px-6 py-3 text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 sm:w-auto"
+                >
+                  <Mail size={16} className="mr-2" />
+                  {isSubmitting ? 'Sending...' : 'Get Bonus'}
+                </Button>
+              </div>
+            </div>
+          </Card>
         </div>
 
         {/* Video Info & Actions */}
