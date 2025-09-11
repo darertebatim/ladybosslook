@@ -261,10 +261,14 @@ const CourageousWorkshop = () => {
                 onClick={() => handleRegisterClick('main_cta')}
                 asChild
               >
-                <Link to="/checkout?program=courageous-character">
+                <a 
+                  href="https://buy.stripe.com/8wM9D04FQ8hAb4sbIO?success_url=https://boldadventurous.lovable.app/payment-success&cancel_url=https://boldadventurous.lovable.app/ccw"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Target className="w-5 h-5 ml-2" />
                   خرید کارگاه - $97
-                </Link>
+                </a>
               </Button>
               
               <Button 
@@ -576,10 +580,14 @@ const CourageousWorkshop = () => {
                   onClick={() => handleRegisterClick('final')}
                   asChild
                 >
-                  <Link to="/checkout?program=courageous-character">
+                  <a 
+                    href="https://buy.stripe.com/8wM9D04FQ8hAb4sbIO?success_url=https://boldadventurous.lovable.app/payment-success&cancel_url=https://boldadventurous.lovable.app/ccw"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Sparkles className="w-5 h-5 ml-2" />
                     <span className="farsi-nums">ثبت‌نام فوری - $۹۷</span>
-                  </Link>
+                  </a>
                 </Button>
                 
                 <Button 
@@ -605,10 +613,14 @@ const CourageousWorkshop = () => {
               onClick={() => handleRegisterClick('sticky')}
               asChild
             >
-              <Link to="/checkout?program=courageous-character">
+              <a 
+                href="https://buy.stripe.com/8wM9D04FQ8hAb4sbIO?success_url=https://boldadventurous.lovable.app/payment-success&cancel_url=https://boldadventurous.lovable.app/ccw"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Crown className="w-4 h-4 ml-2" />
                 <span className="farsi-nums text-sm">ثبت نام فوری - $۹۷</span>
-              </Link>
+              </a>
             </Button>
           </div>
         )}
