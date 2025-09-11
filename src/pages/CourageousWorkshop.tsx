@@ -166,8 +166,8 @@ const CourageousWorkshop = () => {
       });
     }
 
-    const message = encodeURIComponent('سلام! من به کارگاه آنلاین شخصیت شجاع علاقه‌مند هستم. ممکن است اطلاعات بیشتری بدهید؟');
-    const url = `https://wa.me/19495723730?text=${message}`;
+    const message = encodeURIComponent('سلام! من به کارگاه آنلاین کاراکتر پرجرات علاقه‌مند هستم. ممکن است اطلاعات بیشتری بدهید؟');
+    const url = `https://wa.me/16265028538?text=${message}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
@@ -338,7 +338,7 @@ const CourageousWorkshop = () => {
                 >
                   <Link to="/checkout?program=courageous-character">
                     <Target className="w-5 h-5 ml-2" />
-                    می‌خواهم متحول شوم!
+                    میخواهم پرجرات بشم!
                   </Link>
                 </Button>
               </div>
@@ -595,7 +595,7 @@ const CourageousWorkshop = () => {
             >
               <Link to="/checkout?program=courageous-character">
                 <Crown className="w-4 h-4 ml-2" />
-                <span className="farsi-nums text-sm">شروع تحول - $۹۷</span>
+                <span className="farsi-nums text-sm">ثبت نام فوری - $۹۷</span>
               </Link>
             </Button>
           </div>
