@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { TestMailchimp } from '@/components/TestMailchimp';
+
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -653,8 +653,6 @@ const CourageousWorkshop = () => {
           </div>
         )}
       </div>
-      
-      <TestMailchimp />
     </>
   );
 };
