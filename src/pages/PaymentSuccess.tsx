@@ -57,7 +57,7 @@ export default function PaymentSuccess() {
 
         if (data?.success && data?.paymentStatus === 'paid') {
           setPaymentVerified(true);
-          setOrderDetails(data.order);
+          setOrderDetails(data.orderDetails);
           toast({
             title: "Payment Confirmed!",
             description: "Your payment has been successfully processed.",

@@ -128,8 +128,8 @@ serve(async (req) => {
 
     const response = {
       success: session.payment_status === 'paid',
-      payment_status: session.payment_status,
-      order_details: orderDetails
+      paymentStatus: session.payment_status,
+      orderDetails: orderDetails
     };
 
     logStep('Returning response', response);
