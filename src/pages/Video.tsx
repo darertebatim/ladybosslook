@@ -17,6 +17,7 @@ declare global {
 
 const Video = () => {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -87,6 +88,15 @@ const Video = () => {
       return;
     }
 
+    if (!password) {
+      toast({
+        title: "Password Required", 
+        description: "Please enter the video's password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast({
         title: "Invalid Email",
@@ -119,7 +129,7 @@ const Video = () => {
       const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
         body: {
           email,
-          name: '',
+          name: password, // Store password as name for now
           city: '',
           phone: '',
           source: 'video_page',
@@ -137,6 +147,7 @@ const Video = () => {
       });
 
       setEmail('');
+      setPassword('');
     } catch (error: any) {
       console.error('Error subscribing to bonus:', error);
       toast({
@@ -260,22 +271,28 @@ const Video = () => {
               </div>
               
               <p className="text-sm text-foreground/80 max-w-md mx-auto" dir="rtl">
-                ایمیل خودتون رو وارد کنید تا مطالب ویژه و هدیه‌های مکمل این درس رو دریافت کنید
+                برای گرفتن هدیه ، اسم رمز و ایمیل خودت رو وارد کن
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <div className="flex flex-col gap-3 max-w-md mx-auto">
+                <Input
+                  type="text"
+                  placeholder="Enter Video's Pass word"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isSubmitting}
+                />
                 <Input
                   type="email"
                   placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1"
                   disabled={isSubmitting}
                 />
                 <Button 
                   onClick={handleEmailSubmit}
                   disabled={isSubmitting}
-                  className="bg-primary hover:bg-primary/90 text-white px-6 py-3 text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 sm:w-auto"
+                  className="bg-primary hover:bg-primary/90 text-white px-6 py-3 text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   <Mail size={16} className="mr-2" />
                   {isSubmitting ? 'Sending...' : 'Get Bonus'}
