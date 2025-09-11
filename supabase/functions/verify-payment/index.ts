@@ -72,7 +72,8 @@ serve(async (req) => {
       logStep('Payment successful, creating order record');
       
       // Extract customer details from the session
-      const customer = session.customer ? await stripe.customers.retrieve(session.customer as string) : null;
+      // Note: customer is already expanded in the session retrieve call above
+      const customer = session.customer;
       
       // Create order record only after successful payment
       const { data: newOrder, error: orderError } = await supabase
