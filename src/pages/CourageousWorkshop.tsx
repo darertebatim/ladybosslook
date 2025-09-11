@@ -28,6 +28,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { TestMailchimp } from '@/components/TestMailchimp';
+import { supabase } from '@/integrations/supabase/client';
 
 
 // Declare Facebook Pixel function
@@ -40,6 +41,7 @@ declare global {
 const CourageousWorkshop = () => {
   const [timeLeft, setTimeLeft] = useState({ hours: 47, minutes: 23, seconds: 45 });
   const [showStickyBtn, setShowStickyBtn] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   // Countdown timer
   useEffect(() => {
@@ -171,6 +173,43 @@ const CourageousWorkshop = () => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
+  const handleDirectPayment = async (source: string = 'main_cta') => {
+    if (isProcessingPayment) return;
+    
+    setIsProcessingPayment(true);
+    handleRegisterClick(source);
+    
+    try {
+      // Call the create-payment edge function
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: {
+          name: 'Workshop Participant',
+          email: 'customer@example.com', // This would normally come from a form
+          phone: '+1234567890', // This would normally come from a form
+          program: 'courageous-character'
+        }
+      });
+
+      if (error) {
+        console.error('Payment creation error:', error);
+        alert('خطا در ایجاد پرداخت. لطفاً دوباره تلاش کنید.');
+        return;
+      }
+
+      if (data?.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
+      } else {
+        alert('خطا در ایجاد پرداخت. لطفاً دوباره تلاش کنید.');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('خطا در ایجاد پرداخت. لطفاً دوباره تلاش کنید.');
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
   return (
     <>
       <SEOHead />
@@ -258,13 +297,11 @@ const CourageousWorkshop = () => {
               <Button 
                 size="lg" 
                 className="w-full max-w-xs bg-luxury-white hover:bg-luxury-silver text-luxury-black px-8 py-5 text-lg font-bold rounded-xl shadow-luxury"
-                onClick={() => handleRegisterClick('main_cta')}
-                asChild
+                onClick={() => handleDirectPayment('main_cta')}
+                disabled={isProcessingPayment}
               >
-                <Link to="/checkout?program=courageous-character">
-                  <Target className="w-5 h-5 ml-2" />
-                  خرید کارگاه - $97
-                </Link>
+                <Target className="w-5 h-5 ml-2" />
+                {isProcessingPayment ? 'در حال پردازش...' : 'خرید کارگاه - $97'}
               </Button>
               
               <Button 
@@ -333,21 +370,21 @@ const CourageousWorkshop = () => {
                 <Button 
                   size="lg" 
                   className="w-full max-w-xs bg-luxury-white hover:bg-luxury-silver text-luxury-black px-8 py-5 text-lg font-bold rounded-xl shadow-luxury"
-                  onClick={() => handleRegisterClick('solution')}
-                  asChild
+                  onClick={() => handleDirectPayment('solution')}
+                  disabled={isProcessingPayment}
                 >
-                  <Link to="/checkout?program=courageous-character">
-                    <div className="flex flex-col items-center">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Target className="w-5 h-5" />
-                        <span>میخواهم پرجرات بشم!</span>
-                      </div>
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Target className="w-5 h-5" />
+                      <span>{isProcessingPayment ? 'در حال پردازش...' : 'میخواهم پرجرات بشم!'}</span>
+                    </div>
+                    {!isProcessingPayment && (
                       <div className="flex items-center gap-2 text-sm">
                         <span className="line-through text-luxury-black/60 farsi-nums">$۴۹۷</span>
                         <span className="farsi-nums">$۹۷ فقط برای ۱۰۰ نفر اول</span>
                       </div>
-                    </div>
-                  </Link>
+                    )}
+                  </div>
                 </Button>
               </div>
             </div>
@@ -569,13 +606,11 @@ const CourageousWorkshop = () => {
                 <Button 
                   size="lg" 
                   className="w-full bg-luxury-white hover:bg-luxury-silver text-luxury-black px-6 py-5 text-lg font-bold rounded-xl shadow-luxury"
-                  onClick={() => handleRegisterClick('final')}
-                  asChild
+                  onClick={() => handleDirectPayment('final')}
+                  disabled={isProcessingPayment}
                 >
-                  <Link to="/checkout?program=courageous-character">
-                    <Sparkles className="w-5 h-5 ml-2" />
-                    <span className="farsi-nums">ثبت‌نام فوری - $۹۷</span>
-                  </Link>
+                  <Sparkles className="w-5 h-5 ml-2" />
+                  <span className="farsi-nums">{isProcessingPayment ? 'در حال پردازش...' : 'ثبت‌نام فوری - $۹۷'}</span>
                 </Button>
                 
                 <Button 
@@ -598,13 +633,11 @@ const CourageousWorkshop = () => {
             <Button 
               size="lg" 
               className="bg-luxury-white hover:bg-luxury-silver text-luxury-black px-6 py-4 text-base font-bold rounded-xl shadow-luxury w-72 max-w-[85vw]"
-              onClick={() => handleRegisterClick('sticky')}
-              asChild
+              onClick={() => handleDirectPayment('sticky')}
+              disabled={isProcessingPayment}
             >
-              <Link to="/checkout?program=courageous-character">
-                <Crown className="w-4 h-4 ml-2" />
-                <span className="farsi-nums text-sm">ثبت نام فوری - $۹۷</span>
-              </Link>
+              <Crown className="w-4 h-4 ml-2" />
+              <span className="farsi-nums text-sm">{isProcessingPayment ? 'پردازش...' : 'ثبت نام فوری - $۹۷'}</span>
             </Button>
           </div>
         )}
