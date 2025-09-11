@@ -88,10 +88,10 @@ const Video = () => {
       return;
     }
 
-    if (!password) {
+    if (!password || password.toLowerCase() !== 'jorat') {
       toast({
-        title: "Password Required", 
-        description: "Please enter the video's password.",
+        title: "Wrong Password", 
+        description: "Please enter the correct video password: jorat",
         variant: "destructive",
       });
       return;
@@ -129,7 +129,7 @@ const Video = () => {
       const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
         body: {
           email,
-          name: password, // Store password as name for now
+          name: '',
           city: '',
           phone: '',
           source: 'video_page',
@@ -277,7 +277,7 @@ const Video = () => {
               <div className="flex flex-col gap-3 max-w-md mx-auto">
                 <Input
                   type="text"
-                  placeholder="Enter Video's Pass word"
+                  placeholder="Enter Video's Pass word 'jorat'"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isSubmitting}
