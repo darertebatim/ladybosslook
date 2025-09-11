@@ -428,59 +428,7 @@ const CourageousWorkshop = () => {
 
           {/* Workshop Details - Mobile Optimized */}
           <section className="grid gap-4 mb-12 px-4">
-            <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
-                  <Clock className="w-5 h-5 text-luxury-silver" />
-                  جزئیات کارگاه
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-luxury-silver">
-                <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
-                  <span className="text-sm">مدت:</span>
-                  <span className="font-bold text-luxury-white text-sm">۳ هفته</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
-                  <span className="text-sm">پلتفرم:</span>
-                  <span className="font-bold text-luxury-white text-sm">Google Meets</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
-                  <span className="text-sm">ظرفیت:</span>
-                  <span className="font-bold text-luxury-white text-sm">۱۰۰ خانم</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
-                  <span className="text-sm">ضبط:</span>
-                  <span className="font-bold text-luxury-white text-sm">۷ روز دسترسی</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Program Updates Section */}
-            <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl mb-4">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
-                  <Sparkles className="w-5 h-5 text-luxury-silver" />
-                  برنامه‌های آپدیت شده کاراکتر پرجرأت ۲۰۲۶
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid gap-2">
-                  {[
-                    'دوستیابی و ساختن ارتباطات',
-                    'حفظ خونسردی در لحظات پراضطراب',
-                    'نشتی‌گیری احساسی و ارتباطی',
-                    'اعتمادبه‌نفس کلامی دو‌زبانه'
-                  ].map((item, index) => (
-                    <div key={index} className="flex items-start gap-3 p-3 bg-luxury-black/30 rounded-lg border border-luxury-white/5 hover:bg-luxury-black/50 transition-colors">
-                      <Crown className="w-5 h-5 text-luxury-white mt-0.5 flex-shrink-0" />
-                      <span className="text-luxury-silver text-sm leading-relaxed">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Workshop Curriculum Section */}
+            {/* Workshop Curriculum Section - Moved Up */}
             <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
@@ -516,6 +464,58 @@ const CourageousWorkshop = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Program Updates Section */}
+            <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl mb-4">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
+                  <Sparkles className="w-5 h-5 text-luxury-silver" />
+                  برنامه‌های آپدیت شده کاراکتر پرجرأت ۲۰۲۶
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid gap-2">
+                  {[
+                    'دوستیابی و ساختن ارتباطات',
+                    'حفظ خونسردی در لحظات پراضطراب',
+                    'نشتی‌گیری احساسی و ارتباطی',
+                    'اعتمادبه‌نفس کلامی دو‌زبانه'
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-luxury-black/30 rounded-lg border border-luxury-white/5 hover:bg-luxury-black/50 transition-colors">
+                      <Crown className="w-5 h-5 text-luxury-white mt-0.5 flex-shrink-0" />
+                      <span className="text-luxury-silver text-sm leading-relaxed">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
+                  <Clock className="w-5 h-5 text-luxury-silver" />
+                  جزئیات کارگاه
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-luxury-silver">
+                <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
+                  <span className="text-sm">مدت:</span>
+                  <span className="font-bold text-luxury-white text-sm">۳ هفته</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
+                  <span className="text-sm">پلتفرم:</span>
+                  <span className="font-bold text-luxury-white text-sm">Google Meets</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
+                  <span className="text-sm">ظرفیت:</span>
+                  <span className="font-bold text-luxury-white text-sm">۱۰۰ خانم</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
+                  <span className="text-sm">ضبط:</span>
+                  <span className="font-bold text-luxury-white text-sm">۷ روز دسترسی</span>
                 </div>
               </CardContent>
             </Card>
