@@ -261,14 +261,10 @@ const CourageousWorkshop = () => {
                 onClick={() => handleRegisterClick('main_cta')}
                 asChild
               >
-                <a 
-                  href="https://buy.stripe.com/8wM9D04FQ8hAb4sbIO?success_url=https://boldadventurous.lovable.app/payment-success&cancel_url=https://boldadventurous.lovable.app/ccw"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <Link to="/checkout?program=courageous-character">
                   <Target className="w-5 h-5 ml-2" />
                   خرید کارگاه - $97
-                </a>
+                </Link>
               </Button>
               
               <Button 
@@ -340,11 +336,7 @@ const CourageousWorkshop = () => {
                   onClick={() => handleRegisterClick('solution')}
                   asChild
                 >
-                  <a 
-                    href="https://buy.stripe.com/8wM9D04FQ8hAb4sbIO?success_url=https://boldadventurous.lovable.app/payment-success&cancel_url=https://boldadventurous.lovable.app/ccw"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Link to="/checkout?program=courageous-character">
                     <div className="flex flex-col items-center">
                       <div className="flex items-center gap-2 mb-1">
                         <Target className="w-5 h-5" />
@@ -355,7 +347,7 @@ const CourageousWorkshop = () => {
                         <span className="farsi-nums">$۹۷ فقط برای ۱۰۰ نفر اول</span>
                       </div>
                     </div>
-                  </a>
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -580,14 +572,10 @@ const CourageousWorkshop = () => {
                   onClick={() => handleRegisterClick('final')}
                   asChild
                 >
-                  <a 
-                    href="https://buy.stripe.com/8wM9D04FQ8hAb4sbIO?success_url=https://boldadventurous.lovable.app/payment-success&cancel_url=https://boldadventurous.lovable.app/ccw"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Link to="/checkout?program=courageous-character">
                     <Sparkles className="w-5 h-5 ml-2" />
                     <span className="farsi-nums">ثبت‌نام فوری - $۹۷</span>
-                  </a>
+                  </Link>
                 </Button>
                 
                 <Button 
@@ -613,14 +601,10 @@ const CourageousWorkshop = () => {
               onClick={() => handleRegisterClick('sticky')}
               asChild
             >
-              <a 
-                href="https://buy.stripe.com/8wM9D04FQ8hAb4sbIO?success_url=https://boldadventurous.lovable.app/payment-success&cancel_url=https://boldadventurous.lovable.app/ccw"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <Link to="/checkout?program=courageous-character">
                 <Crown className="w-4 h-4 ml-2" />
                 <span className="farsi-nums text-sm">ثبت نام فوری - $۹۷</span>
-              </a>
+              </Link>
             </Button>
           </div>
         )}
