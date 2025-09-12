@@ -12,6 +12,7 @@ import CountdownTimer from "@/components/CountdownTimer";
 const FreeLive = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
+  const [city, setCity] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const { toast } = useToast();
@@ -19,10 +20,10 @@ const FreeLive = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !name) {
+    if (!email || !name || !city) {
       toast({
         title: "خطا",
-        description: "لطفا ایمیل و نام خود را وارد کنید",
+        description: "لطفا تمام فیلدها را کامل کنید",
         variant: "destructive",
       });
       return;
@@ -35,10 +36,10 @@ const FreeLive = () => {
         body: {
           email,
           name,
-          city: 'Online',
+          city,
           phone: '',
           source: 'freelive',
-          tags: ['ccwlive']
+          tags: ['freelive']
         }
       });
 
@@ -52,6 +53,7 @@ const FreeLive = () => {
       // Reset form and close modal
       setEmail('');
       setName('');
+      setCity('');
       setShowModal(false);
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -307,10 +309,10 @@ const FreeLive = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="نام خود را وارد کنید"
+                placeholder="Your Name"
                 required
-                className="text-right h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white font-farsi"
-                dir="rtl"
+                className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
+                dir="ltr"
               />
             </div>
 
@@ -323,7 +325,23 @@ const FreeLive = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="ایمیل خود را وارد کنید"
+                placeholder="your.email@example.com"
+                required
+                className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
+                dir="ltr"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="modal-city" className="text-right block text-luxury-black font-farsi font-medium">
+                شهر محل سکونت
+              </Label>
+              <Input
+                id="modal-city"
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="Your City"
                 required
                 className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
                 dir="ltr"
