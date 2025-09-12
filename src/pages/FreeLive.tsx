@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +13,7 @@ const FreeLive = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,9 +49,10 @@ const FreeLive = () => {
         description: "لینک وبینار به ایمیل شما ارسال شد",
       });
 
-      // Reset form
+      // Reset form and close modal
       setEmail('');
       setName('');
+      setShowModal(false);
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({
@@ -130,67 +133,28 @@ const FreeLive = () => {
                 </div>
               </div>
 
-              {/* Right Side - Registration Form */}
-              <div className="lg:sticky lg:top-8" id="register">
-                <Card className="shadow-luxury border-2 border-secondary/20 bg-luxury-white/95 backdrop-blur-sm">
-                  <CardContent className="p-8">
-                    <div className="text-center mb-6">
-                      <h3 className="text-2xl font-bold text-luxury-black mb-2 font-farsi">
-                        همین الان ثبت نام کنید
-                      </h3>
-                      <p className="text-luxury-accent font-farsi">
-                        ایمیل و نام خود را وارد کنید تا لینک وبینار را دریافت کنید
-                      </p>
-                    </div>
+              {/* Right Side - CTA Button */}
+              <div className="lg:sticky lg:top-8 text-center">
+                <Button
+                  onClick={() => setShowModal(true)}
+                  className="w-full max-w-md h-16 text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-2xl"
+                >
+                  🚀 کلیک کنید و جای خود را رزرو کنید
+                </Button>
+                
+                <div className="mt-6 bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-4">
+                  <p className="text-secondary font-bold text-lg mb-2 font-farsi">
+                    ⚡ تنها ۱۰۰ نفر ظرفیت داریم!
+                  </p>
+                  <p className="text-luxury-silver/90 text-sm font-farsi">
+                    برای کیفیت بالا، تعداد شرکت‌کنندگان محدود است
+                  </p>
+                </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="name" className="text-right block text-luxury-black font-farsi font-medium">
-                          نام شما
-                        </Label>
-                        <Input
-                          id="name"
-                          type="text"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          placeholder="نام خود را وارد کنید"
-                          required
-                          className="text-right h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white font-farsi"
-                          dir="rtl"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="email" className="text-right block text-luxury-black font-farsi font-medium">
-                          ایمیل شما
-                        </Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="ایمیل خود را وارد کنید"
-                          required
-                          className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
-                          dir="ltr"
-                        />
-                      </div>
-
-                      <Button
-                        type="submit"
-                        className="w-full h-14 text-lg font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow"
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? 'در حال ارسال...' : '🚀 دریافت لینک وبینار رایگان'}
-                      </Button>
-                    </form>
-
-                    <div className="mt-6 text-center text-sm text-luxury-accent font-farsi">
-                      <p>🔒 اطلاعات شما کاملاً محفوظ است</p>
-                      <p className="mt-1">💌 فقط محتوای ارزشمند دریافت خواهید کرد</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="mt-4 text-center text-sm text-luxury-silver/80 font-farsi">
+                  <p>🔒 اطلاعات شما کاملاً محفوظ است</p>
+                  <p className="mt-1">💌 فقط محتوای ارزشمند دریافت خواهید کرد</p>
+                </div>
               </div>
             </div>
           </div>
@@ -311,14 +275,76 @@ const FreeLive = () => {
             <p className="text-xl text-luxury-black/80 mb-8 font-farsi">
               فقط چند کلیک تا دسترسی به وبینار رایگان که زندگی شما را تغییر خواهد داد
             </p>
-            <a href="#register" className="inline-block">
-              <Button className="bg-luxury-black hover:bg-luxury-charcoal text-secondary font-bold text-xl px-12 py-4 h-auto rounded-2xl shadow-luxury transition-all duration-300 transform hover:scale-105 font-farsi">
-                ⬆️ همین الان ثبت نام کنید
-              </Button>
-            </a>
+            <Button 
+              onClick={() => setShowModal(true)}
+              className="bg-luxury-black hover:bg-luxury-charcoal text-secondary font-bold text-xl px-12 py-4 h-auto rounded-2xl shadow-luxury transition-all duration-300 transform hover:scale-105 font-farsi"
+            >
+              ⬆️ همین الان ثبت نام کنید
+            </Button>
           </div>
         </div>
       </div>
+
+      {/* Registration Modal */}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="sm:max-w-md bg-luxury-white border-2 border-secondary/20 shadow-luxury">
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-2xl font-bold text-luxury-black mb-2 font-farsi">
+              🎉 رزرو جای شما در وبینار رایگان
+            </DialogTitle>
+            <p className="text-luxury-accent font-farsi">
+              فقط ایمیل و نام خود را وارد کنید
+            </p>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-6 mt-6">
+            <div className="space-y-2">
+              <Label htmlFor="modal-name" className="text-right block text-luxury-black font-farsi font-medium">
+                نام شما
+              </Label>
+              <Input
+                id="modal-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="نام خود را وارد کنید"
+                required
+                className="text-right h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white font-farsi"
+                dir="rtl"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="modal-email" className="text-right block text-luxury-black font-farsi font-medium">
+                ایمیل شما
+              </Label>
+              <Input
+                id="modal-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ایمیل خود را وارد کنید"
+                required
+                className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
+                dir="ltr"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full h-14 text-lg font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'در حال ارسال...' : '✅ کامل! لینک وبینار را ارسال کن'}
+            </Button>
+          </form>
+
+          <div className="mt-4 text-center text-sm text-luxury-accent font-farsi">
+            <p>🔒 اطلاعات شما کاملاً محفوظ است</p>
+            <p className="mt-1">💌 فقط محتوای ارزشمند دریافت خواهید کرد</p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
