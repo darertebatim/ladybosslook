@@ -64,7 +64,7 @@ const ThankFreeLive = () => {
               <div className="text-center">
                 <Button
                   onClick={() => whatsappLink && window.open(whatsappLink, '_blank')}
-                  className="w-full md:w-auto bg-secondary hover:bg-secondary-dark text-luxury-black font-bold text-base md:text-xl px-6 md:px-12 py-3 md:py-4 h-auto rounded-xl md:rounded-2xl shadow-luxury transition-all duration-300 transform hover:scale-105 font-farsi mb-3 md:mb-4"
+                  className="w-full md:w-auto bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold text-base md:text-xl px-6 md:px-12 py-3 md:py-4 h-auto rounded-xl md:rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 font-farsi mb-3 md:mb-4"
                   disabled={!whatsappLink}
                 >
                   🚀 به گروه واتساپ بپیوندید و هدیه رایگان را دریافت کنید
