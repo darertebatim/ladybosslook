@@ -75,7 +75,7 @@ const FreeLive = () => {
       {/* Event Banner */}
       <div className="bg-secondary text-luxury-black py-3 text-center">
         <p className="font-bold text-sm md:text-base">
-          🎯 وبینار رایگان | زمان محدود 
+          🎯 وبینار رایگان | ۲۱ سپتامبر
         </p>
       </div>
 
@@ -88,9 +88,8 @@ const FreeLive = () => {
         <div className="container mx-auto px-4 py-12 relative z-10">
           {/* Logo Area */}
           <div className="text-center mb-8">
-            <div className="inline-block text-2xl md:text-3xl font-display font-bold text-luxury-white mb-4">
-              LB
-              <span className="text-secondary ml-2">ACADEMY</span>
+            <div className="text-lg md:text-xl text-luxury-silver/90 font-farsi">
+              مخصوص خانم‌های مهاجرت کرده به خارج
             </div>
           </div>
 
@@ -101,26 +100,13 @@ const FreeLive = () => {
               {/* Left Side - Hero Text */}
               <div className="text-center lg:text-right space-y-8">
                 <div>
-                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-luxury-white leading-tight mb-6">
-                    <span className="text-secondary">نقشه راه جرات</span>
-                    <br />
-                    <span className="text-luxury-white">برای</span>
-                    <br />
-                    <span className="text-secondary">زنان مهاجر</span>
+                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-luxury-white leading-tight mb-8">
+                    <span className="text-secondary block">نقشه راه جرات</span>
+                    <span className="text-luxury-white block">برای زنان مهاجر</span>
                   </h1>
-                  <p className="text-xl md:text-2xl text-luxury-silver/90 mb-8 font-farsi">
-                    مخصوص خانم‌های مهاجرت کرده به خارج
-                  </p>
                 </div>
 
-                <div className="bg-secondary/20 backdrop-blur-sm border border-secondary/30 rounded-2xl p-6 mb-8">
-                  <h3 className="text-lg md:text-xl font-bold text-secondary mb-4 font-farsi">
-                    ⏰ زمان باقی مانده تا شروع وبینار رایگان
-                  </h3>
-                  <CountdownTimer className="justify-center lg:justify-end" />
-                </div>
-
-                <div className="bg-luxury-white/5 backdrop-blur-sm border border-secondary/20 rounded-xl p-6">
+                <div className="bg-luxury-white/5 backdrop-blur-sm border border-secondary/20 rounded-xl p-6 mb-8">
                   <p className="text-luxury-white font-bold text-lg mb-2 font-farsi">
                     🎁 هدیه ویژه شرکت‌کنندگان
                   </p>
@@ -131,18 +117,25 @@ const FreeLive = () => {
                     (ارزش ۹۷ دلار - رایگان!)
                   </p>
                 </div>
+
+                <div className="bg-secondary/20 backdrop-blur-sm border border-secondary/30 rounded-2xl p-6">
+                  <h3 className="text-lg md:text-xl font-bold text-secondary mb-4 font-farsi">
+                    ⏰ زمان باقی مانده تا شروع وبینار رایگان
+                  </h3>
+                  <CountdownTimer className="justify-center lg:justify-end" />
+                </div>
               </div>
 
               {/* Right Side - CTA Button */}
-              <div className="lg:sticky lg:top-8 text-center">
+              <div className="lg:sticky lg:top-8 text-center space-y-6">
                 <Button
                   onClick={() => setShowModal(true)}
-                  className="w-full max-w-md h-16 text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-2xl"
+                  className="w-full max-w-md h-16 text-lg md:text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-2xl"
                 >
                   🚀 کلیک کنید و جای خود را رزرو کنید
                 </Button>
                 
-                <div className="mt-6 bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-4">
+                <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-4">
                   <p className="text-secondary font-bold text-lg mb-2 font-farsi">
                     ⚡ تنها ۱۰۰ نفر ظرفیت داریم!
                   </p>
@@ -151,7 +144,7 @@ const FreeLive = () => {
                   </p>
                 </div>
 
-                <div className="mt-4 text-center text-sm text-luxury-silver/80 font-farsi">
+                <div className="text-center text-sm text-luxury-silver/80 font-farsi">
                   <p>🔒 اطلاعات شما کاملاً محفوظ است</p>
                   <p className="mt-1">💌 فقط محتوای ارزشمند دریافت خواهید کرد</p>
                 </div>
