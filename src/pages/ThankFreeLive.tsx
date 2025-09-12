@@ -4,8 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SEOHead } from "@/components/SEOHead";
 
 const ThankFreeLive = () => {
-  const [whatsappLink, setWhatsappLink] = useState('');
-  const [videoLink, setVideoLink] = useState('');
+  const [whatsappLink, setWhatsappLink] = useState('https://chat.whatsapp.com/CRH4Ke6wZlN1KC0tYwFcfk?mode=ems_copy_t');
+  const [videoLink, setVideoLink] = useState('https://www.youtube.com/embed/OI8Fivvpl1c');
 
   return (
     <>
