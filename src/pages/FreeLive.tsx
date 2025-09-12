@@ -104,6 +104,16 @@ const FreeLive = () => {
                     <span className="text-secondary block">نقشه راه جرات</span>
                     <span className="text-luxury-white block">برای زنان مهاجر</span>
                   </h1>
+                  
+                  {/* Signup Button - Mobile centered, Desktop right-aligned */}
+                  <div className="flex justify-center lg:justify-end mb-8">
+                    <Button
+                      onClick={() => setShowModal(true)}
+                      className="w-full max-w-sm h-16 text-lg md:text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-2xl"
+                    >
+                      🚀 کلیک کنید و جای خود را رزرو کنید
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="bg-luxury-white/5 backdrop-blur-sm border border-secondary/20 rounded-xl p-6 mb-8">
@@ -126,20 +136,13 @@ const FreeLive = () => {
                 </div>
               </div>
 
-              {/* Right Side - CTA Button */}
+              {/* Right Side - Additional Info */}
               <div className="lg:sticky lg:top-8 text-center space-y-6">
-                <Button
-                  onClick={() => setShowModal(true)}
-                  className="w-full max-w-md h-16 text-lg md:text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-2xl"
-                >
-                  🚀 کلیک کنید و جای خود را رزرو کنید
-                </Button>
-                
-                <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-4">
-                  <p className="text-secondary font-bold text-lg mb-2 font-farsi">
+                <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-6">
+                  <p className="text-secondary font-bold text-xl mb-2 font-farsi">
                     ⚡ تنها ۱۰۰ نفر ظرفیت داریم!
                   </p>
-                  <p className="text-luxury-silver/90 text-sm font-farsi">
+                  <p className="text-luxury-silver/90 font-farsi">
                     برای کیفیت بالا، تعداد شرکت‌کنندگان محدود است
                   </p>
                 </div>
