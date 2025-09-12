@@ -301,8 +301,8 @@ const FreeLive = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-6">
             <div className="space-y-2">
-              <Label htmlFor="modal-name" className="text-right block text-luxury-black font-farsi font-medium">
-                نام شما
+              <Label htmlFor="modal-name" className="text-left block text-luxury-black font-medium">
+                Your Name
               </Label>
               <Input
                 id="modal-name"
@@ -317,8 +317,8 @@ const FreeLive = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="modal-email" className="text-right block text-luxury-black font-farsi font-medium">
-                ایمیل شما
+              <Label htmlFor="modal-email" className="text-left block text-luxury-black font-medium">
+                Your Email
               </Label>
               <Input
                 id="modal-email"
@@ -333,8 +333,8 @@ const FreeLive = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="modal-city" className="text-right block text-luxury-black font-farsi font-medium">
-                شهر محل سکونت
+              <Label htmlFor="modal-city" className="text-left block text-luxury-black font-medium">
+                Your City
               </Label>
               <Input
                 id="modal-city"
