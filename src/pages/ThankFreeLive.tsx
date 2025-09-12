@@ -64,10 +64,12 @@ const ThankFreeLive = () => {
               <div className="text-center">
                 <Button
                   onClick={() => whatsappLink && window.open(whatsappLink, '_blank')}
-                  className="w-full md:w-auto bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold text-base md:text-xl px-6 md:px-12 py-3 md:py-4 h-auto rounded-xl md:rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105 font-farsi mb-3 md:mb-4"
+                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold text-sm md:text-lg px-4 md:px-8 py-4 md:py-5 h-auto rounded-lg md:rounded-xl shadow-lg transition-all duration-300 font-farsi mb-3 md:mb-4 whitespace-normal leading-tight"
                   disabled={!whatsappLink}
                 >
-                  🚀 به گروه واتساپ بپیوندید و هدیه رایگان را دریافت کنید
+                  <span className="text-center">
+                    🚀 به گروه واتساپ بپیوندید و هدیه رایگان را دریافت کنید
+                  </span>
                 </Button>
                 <p className="text-luxury-silver/80 text-xs md:text-sm font-farsi px-2">
                   ظرفیت محدود - همین الان بپیوندید تا کتاب راهنمای عملی را رایگان دریافت کنید (ارزش ۹۷ دلار)
