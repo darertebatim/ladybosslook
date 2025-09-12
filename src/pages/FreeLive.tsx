@@ -286,8 +286,14 @@ const FreeLive = () => {
             <DialogTitle className="text-2xl font-bold text-luxury-black mb-2 font-farsi">
               🎉 رزرو جای شما در وبینار رایگان
             </DialogTitle>
+            <p className="text-luxury-accent font-farsi mb-2">
+              مخصوص ایرانیان مهاجر به خارج
+            </p>
             <p className="text-luxury-accent font-farsi">
               فقط ایمیل و نام خود را وارد کنید
+            </p>
+            <p className="text-red-600 font-farsi text-sm font-medium">
+              لطفا از داخل ایران ثبت نام نکنید
             </p>
           </DialogHeader>
 
