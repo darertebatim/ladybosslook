@@ -73,8 +73,8 @@ const FreeLive = () => {
       />
       
       {/* Event Banner */}
-      <div className="bg-secondary text-luxury-black py-3 text-center">
-        <p className="font-bold text-sm md:text-base">
+      <div className="bg-secondary text-luxury-black py-4 text-center">
+        <p className="font-bold text-lg md:text-xl">
           🎯 وبینار رایگان | ۲۱ سپتامبر
         </p>
       </div>
@@ -100,10 +100,17 @@ const FreeLive = () => {
               {/* Left Side - Hero Text */}
               <div className="text-center lg:text-right space-y-8">
                 <div>
-                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-luxury-white leading-tight mb-8">
-                    <span className="text-secondary block">نقشه راه جرات</span>
-                    <span className="text-luxury-white block">برای زنان مهاجر</span>
+                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-luxury-white leading-tight mb-6">
+                    <span className="text-secondary block text-5xl md:text-7xl lg:text-8xl">نقشه راه جرات</span>
+                    <span className="text-luxury-white block text-3xl md:text-5xl lg:text-6xl">برای زنان مهاجر</span>
                   </h1>
+                  
+                  {/* Location Restriction */}
+                  <div className="text-center mb-4">
+                    <p className="text-luxury-silver/90 font-medium text-lg md:text-xl font-farsi">
+                      فقط ساکن امریکا | کانادا | اروپا | استرالیا | دبی
+                    </p>
+                  </div>
                   
                   {/* Signup Button - Mobile centered, Desktop right-aligned */}
                   <div className="flex justify-center lg:justify-end mb-8">
@@ -127,24 +134,15 @@ const FreeLive = () => {
                     (ارزش ۹۷ دلار - رایگان!)
                   </p>
                 </div>
-
-                <div className="bg-secondary/20 backdrop-blur-sm border border-secondary/30 rounded-2xl p-6">
-                  <h3 className="text-lg md:text-xl font-bold text-secondary mb-4 font-farsi">
-                    ⏰ زمان باقی مانده تا شروع وبینار رایگان
-                  </h3>
-                  <CountdownTimer className="justify-center lg:justify-end" />
-                </div>
               </div>
 
               {/* Right Side - Additional Info */}
               <div className="lg:sticky lg:top-8 text-center space-y-6">
                 <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-6">
                   <p className="text-secondary font-bold text-xl mb-2 font-farsi">
-                    ⚡ تنها ۱۰۰ نفر ظرفیت داریم!
+                    ⚡ تنها ۱۰۰۰ نفر ظرفیت داریم!
                   </p>
-                  <p className="text-luxury-silver/90 font-farsi">
-                    برای کیفیت بالا، تعداد شرکت‌کنندگان محدود است
-                  </p>
+                  <p className="text-luxury-silver/90 font-farsi">برای کیفیت بالا، تعداد شرکت‌کنندگان محدود است</p>
                 </div>
 
                 <div className="text-center text-sm text-luxury-silver/80 font-farsi">
