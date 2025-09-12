@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
+import CountdownTimer from "@/components/CountdownTimer";
 
 const FreeLive = () => {
   const [email, setEmail] = useState('');
@@ -68,86 +69,83 @@ const FreeLive = () => {
         description="وبینار رایگان نقشه راه جرات مخصوص خانم‌های مهاجرت کرده به خارج. ایمیل و نام خود را وارد کنید تا لینک وبینار را دریافت کنید."
       />
       
-      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10">
-        {/* Header */}
-        <div className="container mx-auto px-4 py-8">
+      {/* Event Banner */}
+      <div className="bg-secondary text-luxury-black py-3 text-center">
+        <p className="font-bold text-sm md:text-base">
+          🎯 وبینار رایگان | زمان محدود 
+        </p>
+      </div>
+
+      {/* Hero Section */}
+      <div className="min-h-screen bg-gradient-luxury relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-luxury-black via-luxury-charcoal to-luxury-accent opacity-90"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
+        
+        <div className="container mx-auto px-4 py-12 relative z-10">
+          {/* Logo Area */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-4 leading-tight">
-              وبینار رایگان
-            </h1>
-            <h2 className="text-2xl lg:text-4xl font-semibold text-primary mb-6">
-              نقشه راه جرات
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              مخصوص خانم‌های مهاجرت کرده به خارج
-            </p>
+            <div className="inline-block text-2xl md:text-3xl font-display font-bold text-luxury-white mb-4">
+              LB
+              <span className="text-secondary ml-2">ACADEMY</span>
+            </div>
           </div>
 
-          {/* Main Content */}
-          <div className="max-w-4xl mx-auto">
+          {/* Main Hero Content */}
+          <div className="max-w-6xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left Side - Benefits */}
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold text-foreground mb-6">
-                  در این وبینار یاد می‌گیرید:
-                </h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-primary-foreground text-sm">✓</span>
-                    </div>
-                    <p className="text-foreground">چگونه اعتماد به نفس خود را در محیط جدید بازیابید</p>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-primary-foreground text-sm">✓</span>
-                    </div>
-                    <p className="text-foreground">راهکارهای عملی برای غلبه بر ترس و نگرانی</p>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-primary-foreground text-sm">✓</span>
-                    </div>
-                    <p className="text-foreground">چگونه از چالش‌های مهاجرت به فرصت تبدیل کنید</p>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-primary-foreground text-sm">✓</span>
-                    </div>
-                    <p className="text-foreground">استراتژی‌های موثر برای شروع زندگی جدید با قدرت</p>
-                  </div>
+              
+              {/* Left Side - Hero Text */}
+              <div className="text-center lg:text-right space-y-8">
+                <div>
+                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-luxury-white leading-tight mb-6">
+                    <span className="text-secondary">نقشه راه جرات</span>
+                    <br />
+                    <span className="text-luxury-white">برای</span>
+                    <br />
+                    <span className="text-secondary">زنان مهاجر</span>
+                  </h1>
+                  <p className="text-xl md:text-2xl text-luxury-silver/90 mb-8 font-farsi">
+                    مخصوص خانم‌های مهاجرت کرده به خارج
+                  </p>
                 </div>
 
-                <div className="mt-8 p-6 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg border">
-                  <p className="text-lg font-semibold text-foreground mb-2">
+                <div className="bg-secondary/20 backdrop-blur-sm border border-secondary/30 rounded-2xl p-6 mb-8">
+                  <h3 className="text-lg md:text-xl font-bold text-secondary mb-4 font-farsi">
+                    ⏰ زمان باقی مانده تا شروع وبینار رایگان
+                  </h3>
+                  <CountdownTimer className="justify-center lg:justify-end" />
+                </div>
+
+                <div className="bg-luxury-white/5 backdrop-blur-sm border border-secondary/20 rounded-xl p-6">
+                  <p className="text-luxury-white font-bold text-lg mb-2 font-farsi">
                     🎁 هدیه ویژه شرکت‌کنندگان
                   </p>
-                  <p className="text-muted-foreground">
+                  <p className="text-secondary font-medium font-farsi">
                     کتاب الکترونیکی "راهنمای عملی جرات برای زنان مهاجر"
+                  </p>
+                  <p className="text-luxury-silver/80 text-sm mt-2 font-farsi">
+                    (ارزش ۹۷ دلار - رایگان!)
                   </p>
                 </div>
               </div>
 
               {/* Right Side - Registration Form */}
-              <div className="lg:sticky lg:top-8">
-                <Card className="shadow-2xl border-2 border-primary/20">
+              <div className="lg:sticky lg:top-8" id="register">
+                <Card className="shadow-luxury border-2 border-secondary/20 bg-luxury-white/95 backdrop-blur-sm">
                   <CardContent className="p-8">
                     <div className="text-center mb-6">
-                      <h3 className="text-2xl font-bold text-foreground mb-2">
+                      <h3 className="text-2xl font-bold text-luxury-black mb-2 font-farsi">
                         همین الان ثبت نام کنید
                       </h3>
-                      <p className="text-muted-foreground">
+                      <p className="text-luxury-accent font-farsi">
                         ایمیل و نام خود را وارد کنید تا لینک وبینار را دریافت کنید
                       </p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                       <div className="space-y-2">
-                        <Label htmlFor="name" className="text-right block">
+                        <Label htmlFor="name" className="text-right block text-luxury-black font-farsi font-medium">
                           نام شما
                         </Label>
                         <Input
@@ -157,13 +155,13 @@ const FreeLive = () => {
                           onChange={(e) => setName(e.target.value)}
                           placeholder="نام خود را وارد کنید"
                           required
-                          className="text-right"
+                          className="text-right h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white font-farsi"
                           dir="rtl"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="email" className="text-right block">
+                        <Label htmlFor="email" className="text-right block text-luxury-black font-farsi font-medium">
                           ایمیل شما
                         </Label>
                         <Input
@@ -173,21 +171,21 @@ const FreeLive = () => {
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="ایمیل خود را وارد کنید"
                           required
-                          className="text-left"
+                          className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
                           dir="ltr"
                         />
                       </div>
 
                       <Button
                         type="submit"
-                        className="w-full h-12 text-lg font-semibold"
+                        className="w-full h-14 text-lg font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow"
                         disabled={isSubmitting}
                       >
-                        {isSubmitting ? 'در حال ارسال...' : 'دریافت لینک وبینار رایگان'}
+                        {isSubmitting ? 'در حال ارسال...' : '🚀 دریافت لینک وبینار رایگان'}
                       </Button>
                     </form>
 
-                    <div className="mt-6 text-center text-sm text-muted-foreground">
+                    <div className="mt-6 text-center text-sm text-luxury-accent font-farsi">
                       <p>🔒 اطلاعات شما کاملاً محفوظ است</p>
                       <p className="mt-1">💌 فقط محتوای ارزشمند دریافت خواهید کرد</p>
                     </div>
@@ -196,46 +194,128 @@ const FreeLive = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Additional Information */}
-          <div className="mt-16 text-center">
-            <div className="max-w-3xl mx-auto">
-              <h3 className="text-2xl font-bold text-foreground mb-6">
-                چرا این وبینار را از دست ندهید؟
-              </h3>
+      {/* Benefits Section */}
+      <div className="bg-luxury-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h3 className="text-3xl md:text-4xl font-display font-bold text-luxury-black mb-12 font-farsi">
+              در این وبینار یاد می‌گیرید:
+            </h3>
+            
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-gradient-to-br from-secondary/10 to-primary/10 p-8 rounded-2xl border border-secondary/20">
+                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl">💪</span>
+                </div>
+                <h4 className="text-xl font-bold text-luxury-black mb-4 font-farsi">
+                  اعتماد به نفس قدرتمند
+                </h4>
+                <p className="text-luxury-accent font-farsi">
+                  چگونه اعتماد به نفس خود را در محیط جدید بازیابید و قدرتمند شوید
+                </p>
+              </div>
               
-              <div className="grid md:grid-cols-3 gap-8 mt-8">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl">🎯</span>
-                  </div>
-                  <h4 className="font-semibold text-foreground mb-2">تخصصی و هدفمند</h4>
-                  <p className="text-muted-foreground text-sm">
-                    مخصوص چالش‌های واقعی زنان مهاجر طراحی شده
-                  </p>
+              <div className="bg-gradient-to-br from-primary/10 to-secondary/10 p-8 rounded-2xl border border-primary/20">
+                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl">🎯</span>
                 </div>
-                
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl">💡</span>
-                  </div>
-                  <h4 className="font-semibold text-foreground mb-2">راهکارهای عملی</h4>
-                  <p className="text-muted-foreground text-sm">
-                    استراتژی‌هایی که می‌توانید همین امروز شروع کنید
-                  </p>
+                <h4 className="text-xl font-bold text-luxury-black mb-4 font-farsi">
+                  غلبه بر ترس و نگرانی
+                </h4>
+                <p className="text-luxury-accent font-farsi">
+                  راهکارهای عملی و مؤثر برای مدیریت ترس‌ها و نگرانی‌های شما
+                </p>
+              </div>
+              
+              <div className="bg-gradient-to-br from-secondary/10 to-primary/10 p-8 rounded-2xl border border-secondary/20">
+                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl">🚀</span>
                 </div>
-                
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl">🚀</span>
-                  </div>
-                  <h4 className="font-semibold text-foreground mb-2">تحول سریع</h4>
-                  <p className="text-muted-foreground text-sm">
-                    نتایج قابل مشاهده در کمترین زمان ممکن
-                  </p>
+                <h4 className="text-xl font-bold text-luxury-black mb-4 font-farsi">
+                  تبدیل چالش به فرصت
+                </h4>
+                <p className="text-luxury-accent font-farsi">
+                  چگونه از چالش‌های مهاجرت به فرصت‌های طلایی تبدیل کنید
+                </p>
+              </div>
+              
+              <div className="bg-gradient-to-br from-primary/10 to-secondary/10 p-8 rounded-2xl border border-primary/20">
+                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-2xl">⭐</span>
                 </div>
+                <h4 className="text-xl font-bold text-luxury-black mb-4 font-farsi">
+                  استراتژی زندگی قدرتمند
+                </h4>
+                <p className="text-luxury-accent font-farsi">
+                  نقشه راه عملی برای شروع زندگی جدید با اعتماد و قدرت
+                </p>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Why Choose Section */}
+      <div className="bg-gradient-luxury py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h3 className="text-3xl md:text-4xl font-display font-bold text-luxury-white mb-12 font-farsi">
+              چرا این وبینار را از دست ندهید؟
+            </h3>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-2xl p-8">
+                <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-3xl">🎯</span>
+                </div>
+                <h4 className="text-xl font-bold text-secondary mb-4 font-farsi">تخصصی و هدفمند</h4>
+                <p className="text-luxury-silver/90 font-farsi">
+                  مخصوص چالش‌های واقعی زنان مهاجر طراحی شده
+                </p>
+              </div>
+              
+              <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-2xl p-8">
+                <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-3xl">💡</span>
+                </div>
+                <h4 className="text-xl font-bold text-secondary mb-4 font-farsi">راهکارهای عملی</h4>
+                <p className="text-luxury-silver/90 font-farsi">
+                  استراتژی‌هایی که می‌توانید همین امروز شروع کنید
+                </p>
+              </div>
+              
+              <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-2xl p-8">
+                <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-3xl">🚀</span>
+                </div>
+                <h4 className="text-xl font-bold text-secondary mb-4 font-farsi">تحول سریع</h4>
+                <p className="text-luxury-silver/90 font-farsi">
+                  نتایج قابل مشاهده در کمترین زمان ممکن
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Final CTA Section */}
+      <div className="bg-secondary py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <h3 className="text-3xl md:text-4xl font-display font-bold text-luxury-black mb-8 font-farsi">
+              آماده برای تحول زندگی‌تان هستید؟
+            </h3>
+            <p className="text-xl text-luxury-black/80 mb-8 font-farsi">
+              فقط چند کلیک تا دسترسی به وبینار رایگان که زندگی شما را تغییر خواهد داد
+            </p>
+            <a href="#register" className="inline-block">
+              <Button className="bg-luxury-black hover:bg-luxury-charcoal text-secondary font-bold text-xl px-12 py-4 h-auto rounded-2xl shadow-luxury transition-all duration-300 transform hover:scale-105 font-farsi">
+                ⬆️ همین الان ثبت نام کنید
+              </Button>
+            </a>
           </div>
         </div>
       </div>
