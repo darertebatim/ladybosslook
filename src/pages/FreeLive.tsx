@@ -161,7 +161,7 @@ const FreeLive = () => {
                   <p className="text-secondary font-bold text-xl mb-2 font-farsi">
                     ⚡ تنها ۱۰۰۰ نفر ظرفیت داریم!
                   </p>
-                  <p className="text-luxury-silver/90 font-farsi">برای کیفیت بالا، تعداد شرکت‌کنندگان محدود است</p>
+                  <p className="text-luxury-silver/90 font-farsi">تعداد شرکت‌کنندگان محدود است</p>
                 </div>
 
                 <div className="text-center text-sm text-luxury-silver/80 font-farsi">
