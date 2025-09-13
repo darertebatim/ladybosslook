@@ -47,11 +47,7 @@ const FreeLive = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "موفقیت!",
-        description: "لینک وبینار به ایمیل شما ارسال شد",
-      });
-
+      // Success - directly redirect without showing toast
       // Reset form and close modal
       setEmail('');
       setName('');
