@@ -123,6 +123,12 @@ const FreeLive = () => {
                     <p className="text-luxury-silver/90 font-medium text-lg md:text-xl font-farsi">
                       فقط ساکن امریکا | کانادا | اروپا | استرالیا | دبی
                     </p>
+                    {/* Arrows pointing down */}
+                    <div className="flex justify-center gap-2 mt-3">
+                      <div className="text-secondary text-2xl animate-bounce" style={{ animationDelay: '0ms' }}>⬇️</div>
+                      <div className="text-secondary text-2xl animate-bounce" style={{ animationDelay: '200ms' }}>⬇️</div>
+                      <div className="text-secondary text-2xl animate-bounce" style={{ animationDelay: '400ms' }}>⬇️</div>
+                    </div>
                   </div>
                   
                   {/* Signup Button - Mobile centered, Desktop right-aligned */}
