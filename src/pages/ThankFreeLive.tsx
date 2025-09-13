@@ -117,7 +117,7 @@ const ThankFreeLive = () => {
                     تاریخ را علامت‌گذاری کنید
                   </h3>
                   <p className="text-sm md:text-base text-luxury-silver/90 font-farsi mb-2">
-                    ۲۱ سپتامبر - ساعت ۹:۳۰ صبح (وقت لس آنجلس)
+                    یکشنبه ۲۱ سپتامبر ساعت ۹:۳۰ بوقت کالیفرنیا
                   </p>
                   <p className="text-xs md:text-sm text-secondary font-medium mb-3">
                     Sunday, September 21st at 9:30 AM
