@@ -304,9 +304,6 @@ const FreeLive = () => {
             <p className="text-green-600 font-farsi mb-2 font-bold text-xl">
               مخصوص ایرانیان مهاجر به خارج
             </p>
-            <p className="text-luxury-accent font-farsi">
-              فقط ایمیل و نام خود را وارد کنید
-            </p>
             <p className="text-red-600 font-farsi text-sm font-medium">
               لطفا از داخل ایران ثبت نام نکنید
             </p>
