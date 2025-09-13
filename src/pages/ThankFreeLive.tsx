@@ -11,6 +11,7 @@ const ThankFreeLive = () => {
       {/* Success Banner */}
       <div className="bg-secondary text-luxury-black py-3 md:py-4 text-center px-4">
         <p className="font-bold text-base md:text-lg lg:text-xl font-farsi">🎉 ثبت نام ۸۰٪ تکمیل شد</p>
+        <p className="font-bold text-base md:text-lg lg:text-xl font-farsi">فقط یک قدم تا دریافت هدیه!</p>
       </div>
 
       {/* Main Content */}
