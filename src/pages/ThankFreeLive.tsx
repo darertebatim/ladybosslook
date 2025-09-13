@@ -45,6 +45,11 @@ const ThankFreeLive = () => {
                   </div>}
               </div>
               
+              {/* Arrow Down */}
+              <div className="text-center py-4">
+                <div className="text-4xl animate-bounce">⬇️</div>
+              </div>
+              
               {/* WhatsApp Button */}
               <div className="text-center">
                 <Button onClick={() => whatsappLink && window.open(whatsappLink, '_blank')} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold text-sm md:text-lg px-4 md:px-8 py-4 md:py-5 h-auto rounded-lg md:rounded-xl shadow-lg transition-all duration-300 font-farsi mb-3 md:mb-4 whitespace-normal leading-tight" disabled={!whatsappLink}>
@@ -54,6 +59,11 @@ const ThankFreeLive = () => {
                 <p className="text-luxury-silver/80 text-xs md:text-sm font-farsi px-2">
                   ظرفیت محدود - همین الان بپیوندید تا کتاب راهنمای عملی را رایگان دریافت کنید (ارزش ۹۷ دلار)
                 </p>
+                
+                {/* Arrow Up */}
+                <div className="text-center pt-4">
+                  <div className="text-4xl animate-bounce">⬆️</div>
+                </div>
               </div>
             </div>
           </div>
