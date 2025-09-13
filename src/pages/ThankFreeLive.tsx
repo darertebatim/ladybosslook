@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SEOHead } from "@/components/SEOHead";
+import { Calendar, Download } from "lucide-react";
+import { generateGoogleCalendarUrl, downloadICSFile, webinarEvent } from "@/utils/calendar";
 const ThankFreeLive = () => {
   const [whatsappLink, setWhatsappLink] = useState('https://chat.whatsapp.com/CRH4Ke6wZlN1KC0tYwFcfk?mode=ems_copy_t');
   const [videoLink, setVideoLink] = useState('https://www.youtube.com/embed/OI8Fivvpl1c');
@@ -114,9 +116,27 @@ const ThankFreeLive = () => {
                   <h3 className="text-lg md:text-xl font-bold text-secondary mb-2 md:mb-4 font-farsi">
                     تاریخ را علامت‌گذاری کنید
                   </h3>
-                  <p className="text-sm md:text-base text-luxury-silver/90 font-farsi">
-                    تاریخ و زمان وبینار را ذخیره کنید تا از دست ندهید
+                  <p className="text-sm md:text-base text-luxury-silver/90 font-farsi mb-4">
+                    ۲۱ سپتامبر - ساعت ۹:۳۰ صبح (وقت لس آنجلس)
                   </p>
+                  
+                  {/* Calendar Buttons */}
+                  <div className="space-y-2">
+                    <Button 
+                      onClick={() => window.open(generateGoogleCalendarUrl(webinarEvent), '_blank')}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm py-2 px-3 h-auto font-farsi"
+                    >
+                      <Calendar className="w-4 h-4 mr-2" />
+                      افزودن به Google Calendar
+                    </Button>
+                    <Button 
+                      onClick={() => downloadICSFile(webinarEvent, 'webinar-event.ics')}
+                      className="w-full bg-gray-600 hover:bg-gray-700 text-white text-xs md:text-sm py-2 px-3 h-auto font-farsi"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      دانلود برای Apple Calendar
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
