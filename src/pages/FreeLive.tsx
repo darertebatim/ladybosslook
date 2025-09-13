@@ -84,6 +84,9 @@ const FreeLive = () => {
         <p className="font-bold text-lg md:text-xl">
           🎯 وبینار رایگان | ۲۱ سپتامبر
         </p>
+        <p className="text-sm md:text-base mt-1">
+          ساعت ۹:۳۰ صبح به وقت کالیفرنیا
+        </p>
       </div>
 
       {/* Hero Section */}
@@ -97,6 +100,9 @@ const FreeLive = () => {
           <div className="text-center mb-8">
             <div className="text-lg md:text-xl text-luxury-silver/90 font-farsi">
               مخصوص خانم‌های مهاجرت کرده به خارج
+            </div>
+            <div className="text-base md:text-lg text-luxury-silver/80 mt-2">
+              Free Live Training for Persian Women
             </div>
           </div>
 
@@ -135,7 +141,7 @@ const FreeLive = () => {
                     🎁 هدیه ویژه شرکت‌کنندگان
                   </p>
                   <p className="text-secondary font-medium font-farsi">
-                    کتاب الکترونیکی "راهنمای عملی جرات برای زنان مهاجر"
+                    پادکست آموزشی "قدرت در زبان دوم"
                   </p>
                   <p className="text-luxury-silver/80 text-sm mt-2 font-farsi">
                     (ارزش ۹۷ دلار - رایگان!)
@@ -368,6 +374,16 @@ const FreeLive = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Sticky Bottom Button */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-gradient-to-r from-secondary to-secondary-dark shadow-2xl border-t border-luxury-white/20">
+        <Button
+          onClick={() => setShowModal(true)}
+          className="w-full h-16 text-lg md:text-xl font-bold bg-luxury-black hover:bg-luxury-charcoal text-secondary font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-xl animate-pulse"
+        >
+          🚀 رزرو جای شما در وبینار رایگان
+        </Button>
+      </div>
     </>
   );
 };
