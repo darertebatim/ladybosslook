@@ -23,7 +23,9 @@ const ThankFreeLive = () => {
         <div className="container mx-auto px-4 py-6 md:py-12 relative z-10">
           {/* Header */}
           <div className="text-center mb-8 md:mb-12">
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-display font-bold text-secondary mb-4 md:mb-6 font-farsi leading-tight">این ویدیو را ببینید
+            <h1 className="md:text-7xl lg:text-8xl font-display font-bold text-secondary mb-4 md:mb-6 font-farsi leading-tight text-3xl">این ویدیو را ببینید
+
+
 تا ۱۰۰٪ آماده وبینار شوید</h1>
             <p className="text-lg md:text-xl text-luxury-white mb-6 md:mb-8 font-farsi px-2">
               تقریباً رسیدید! مراحل زیر را دنبال کنید تا ثبت نام خود را کامل کنید و هدیه رایگان را دریافت کنید!
@@ -46,7 +48,7 @@ const ThankFreeLive = () => {
               {/* WhatsApp Button */}
               <div className="text-center">
                 <Button onClick={() => whatsappLink && window.open(whatsappLink, '_blank')} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold text-sm md:text-lg px-4 md:px-8 py-4 md:py-5 h-auto rounded-lg md:rounded-xl shadow-lg transition-all duration-300 font-farsi mb-3 md:mb-4 whitespace-normal leading-tight" disabled={!whatsappLink}>
-                  <span className="text-center">🚀 به گروه واتساپ بپیوندید و
+                  <span className="text-center text-xl">🚀 به گروه واتساپ بپیوندید و
 هدیه رایگان را دریافت کنید</span>
                 </Button>
                 <p className="text-luxury-silver/80 text-xs md:text-sm font-farsi px-2">
