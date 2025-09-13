@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SEOHead } from "@/components/SEOHead";
@@ -7,6 +7,11 @@ import { generateGoogleCalendarUrl, downloadICSFile, webinarEvent } from "@/util
 const ThankFreeLive = () => {
   const [whatsappLink, setWhatsappLink] = useState('https://chat.whatsapp.com/CRH4Ke6wZlN1KC0tYwFcfk?mode=ems_copy_t');
   const [videoLink, setVideoLink] = useState('https://www.youtube.com/embed/OI8Fivvpl1c');
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return <>
       <SEOHead title="تشکر از ثبت نام - وبینار رایگان نقشه راه جرات" description="ثبت نام شما با موفقیت انجام شد. مراحل بعدی را دنبال کنید تا آماده وبینار شوید." />
       
