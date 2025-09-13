@@ -75,14 +75,43 @@ const FreeLive = () => {
         description="وبینار رایگان نقشه راه جرات مخصوص خانم‌های مهاجرت کرده به خارج. ایمیل و نام خود را وارد کنید تا لینک وبینار را دریافت کنید."
       />
       
-      {/* Event Banner */}
-      <div className="bg-secondary text-luxury-black py-4 text-center">
-        <p className="font-bold text-lg md:text-xl">
-          🎯 وبینار رایگان | ۲۱ سپتامبر
-        </p>
-        <p className="text-sm md:text-base mt-1">
-          ساعت ۹:۳۰ صبح به وقت کالیفرنیا
-        </p>
+      {/* Capsule Event Header */}
+      <div className="bg-gradient-to-br from-luxury-black via-luxury-charcoal to-luxury-accent py-8 relative overflow-hidden">
+        {/* Background glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary/20 via-primary/20 to-secondary/20 opacity-50"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="flex justify-center">
+            <div className="bg-gradient-to-r from-secondary to-secondary/90 backdrop-blur-sm border-2 border-secondary/30 rounded-full px-8 py-6 md:px-12 md:py-8 shadow-glow animate-pulse-glow max-w-4xl w-full">
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-3 mb-3">
+                  <span className="text-3xl md:text-4xl animate-bounce">🎯</span>
+                  <h2 className="font-bold text-2xl md:text-4xl lg:text-5xl text-luxury-black font-farsi">
+                    وبینار رایگان
+                  </h2>
+                  <span className="text-3xl md:text-4xl animate-bounce" style={{ animationDelay: '0.5s' }}>🚀</span>
+                </div>
+                
+                <div className="bg-luxury-black/20 rounded-2xl px-6 py-3 mb-4 border border-luxury-black/30">
+                  <p className="text-xl md:text-2xl lg:text-3xl font-bold text-luxury-black font-farsi">
+                    ۲۱ سپتامبر ۲۰۲۴
+                  </p>
+                  <p className="text-base md:text-lg lg:text-xl text-luxury-black/80 font-farsi mt-1">
+                    ساعت ۹:۳۰ صبح به وقت کالیفرنیا
+                  </p>
+                </div>
+                
+                <div className="flex items-center justify-center gap-2">
+                  <span className="w-3 h-3 bg-luxury-black rounded-full animate-pulse"></span>
+                  <p className="text-luxury-black/90 font-medium text-lg md:text-xl font-farsi">
+                    ظرفیت محدود - فقط ۱۰۰۰ نفر
+                  </p>
+                  <span className="w-3 h-3 bg-luxury-black rounded-full animate-pulse" style={{ animationDelay: '1s' }}></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Hero Section */}
