@@ -9,31 +9,32 @@ import { useToast } from "@/components/ui/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import CountdownTimer from "@/components/CountdownTimer";
+
 const FreeLive = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [city, setCity] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const navigate = useNavigate();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!email || !name || !city) {
       toast({
         title: "خطا",
         description: "لطفا تمام فیلدها را کامل کنید",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
+
     setIsSubmitting(true);
+
     try {
-      const {
-        error
-      } = await supabase.functions.invoke('mailchimp-subscribe', {
+      const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
         body: {
           email,
           name,
@@ -43,18 +44,16 @@ const FreeLive = () => {
           tags: ['freelive']
         }
       });
-      if (error) throw error;
-      toast({
-        title: "موفقیت!",
-        description: "لینک وبینار به ایمیل شما ارسال شد"
-      });
 
+      if (error) throw error;
+
+      // Success - directly redirect without showing toast
       // Reset form and close modal
       setEmail('');
       setName('');
       setCity('');
       setShowModal(false);
-
+      
       // Redirect to thank you page
       navigate('/thankfreelive');
     } catch (error) {
@@ -62,19 +61,27 @@ const FreeLive = () => {
       toast({
         title: "خطا",
         description: "مشکلی پیش آمد، لطفا دوباره تلاش کنید",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-  return <>
-      <SEOHead title="وبینار رایگان نقشه راه جرات - LadyBoss Academy" description="وبینار رایگان نقشه راه جرات مخصوص خانم‌های مهاجرت کرده به خارج. ایمیل و نام خود را وارد کنید تا لینک وبینار را دریافت کنید." />
+
+  return (
+    <>
+      <SEOHead
+        title="وبینار رایگان نقشه راه جرات - LadyBoss Academy"
+        description="وبینار رایگان نقشه راه جرات مخصوص خانم‌های مهاجرت کرده به خارج. ایمیل و نام خود را وارد کنید تا لینک وبینار را دریافت کنید."
+      />
       
       {/* Event Banner */}
       <div className="bg-secondary text-luxury-black py-4 text-center">
         <p className="font-bold text-lg md:text-xl">
           🎯 وبینار رایگان | ۲۱ سپتامبر
+        </p>
+        <p className="text-sm md:text-base mt-1">
+          ساعت ۹:۳۰ صبح به وقت کالیفرنیا
         </p>
       </div>
 
@@ -89,6 +96,9 @@ const FreeLive = () => {
           <div className="text-center mb-8">
             <div className="text-lg md:text-xl text-luxury-silver/90 font-farsi">
               مخصوص خانم‌های مهاجرت کرده به خارج
+            </div>
+            <div className="text-base md:text-lg text-luxury-silver/80 mt-2">
+              Free Live Training for Persian Women
             </div>
           </div>
 
@@ -109,11 +119,20 @@ const FreeLive = () => {
                     <p className="text-luxury-silver/90 font-medium text-lg md:text-xl font-farsi">
                       فقط ساکن امریکا | کانادا | اروپا | استرالیا | دبی
                     </p>
+                    {/* Arrows pointing down */}
+                    <div className="flex justify-center gap-2 mt-3">
+                      <div className="text-secondary text-2xl animate-bounce" style={{ animationDelay: '0ms' }}>⬇️</div>
+                      <div className="text-secondary text-2xl animate-bounce" style={{ animationDelay: '200ms' }}>⬇️</div>
+                      <div className="text-secondary text-2xl animate-bounce" style={{ animationDelay: '400ms' }}>⬇️</div>
+                    </div>
                   </div>
                   
                   {/* Signup Button - Mobile centered, Desktop right-aligned */}
                   <div className="flex justify-center lg:justify-end mb-8">
-                    <Button onClick={() => setShowModal(true)} className="w-full max-w-sm h-16 text-lg md:text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-2xl">
+                    <Button
+                      onClick={() => setShowModal(true)}
+                      className="w-full max-w-sm h-16 text-lg md:text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-2xl"
+                    >
                       🚀 کلیک کنید و جای خود را رزرو کنید
                     </Button>
                   </div>
@@ -124,7 +143,7 @@ const FreeLive = () => {
                     🎁 هدیه ویژه شرکت‌کنندگان
                   </p>
                   <p className="text-secondary font-medium font-farsi">
-                    کتاب الکترونیکی "راهنمای عملی جرات برای زنان مهاجر"
+                    پادکست آموزشی "قدرت در زبان دوم"
                   </p>
                   <p className="text-luxury-silver/80 text-sm mt-2 font-farsi">
                     (ارزش ۹۷ دلار - رایگان!)
@@ -138,7 +157,7 @@ const FreeLive = () => {
                   <p className="text-secondary font-bold text-xl mb-2 font-farsi">
                     ⚡ تنها ۱۰۰۰ نفر ظرفیت داریم!
                   </p>
-                  <p className="text-luxury-silver/90 font-farsi">برای کیفیت بالا، تعداد شرکت‌کنندگان محدود است</p>
+                  <p className="text-luxury-silver/90 font-farsi">تعداد شرکت‌کنندگان محدود است</p>
                 </div>
 
                 <div className="text-center text-sm text-luxury-silver/80 font-farsi">
@@ -265,7 +284,10 @@ const FreeLive = () => {
             <p className="text-xl text-luxury-black/80 mb-8 font-farsi">
               فقط چند کلیک تا دسترسی به وبینار رایگان که زندگی شما را تغییر خواهد داد
             </p>
-            <Button onClick={() => setShowModal(true)} className="bg-luxury-black hover:bg-luxury-charcoal text-secondary font-bold text-xl px-12 py-4 h-auto rounded-2xl shadow-luxury transition-all duration-300 transform hover:scale-105 font-farsi">
+            <Button 
+              onClick={() => setShowModal(true)}
+              className="bg-luxury-black hover:bg-luxury-charcoal text-secondary font-bold text-xl px-12 py-4 h-auto rounded-2xl shadow-luxury transition-all duration-300 transform hover:scale-105 font-farsi"
+            >
               ⬆️ همین الان ثبت نام کنید
             </Button>
           </div>
@@ -279,40 +301,68 @@ const FreeLive = () => {
             <DialogTitle className="text-2xl font-bold text-luxury-black mb-2 font-farsi">
               🎉 رزرو جای شما در وبینار رایگان
             </DialogTitle>
-            <p className="text-green-600 font-farsi mb-2 font-bold">
+            <p className="text-green-600 font-farsi mb-2 font-bold text-xl">
               مخصوص ایرانیان مهاجر به خارج
-            </p>
-            <p className="text-luxury-accent font-farsi">
-              فقط ایمیل و نام خود را وارد کنید
             </p>
             <p className="text-red-600 font-farsi text-sm font-medium">
               لطفا از داخل ایران ثبت نام نکنید
             </p>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6 mt-6 text-lg">
+          <form onSubmit={handleSubmit} className="space-y-6 mt-6">
             <div className="space-y-2">
               <Label htmlFor="modal-name" className="text-left block text-luxury-black font-medium">
                 Your Name
               </Label>
-              <Input id="modal-name" type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Your Name" required className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white" dir="ltr" />
+              <Input
+                id="modal-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your Name"
+                required
+                className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
+                dir="ltr"
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="modal-email" className="text-left block text-luxury-black font-medium">
                 Your Email
               </Label>
-              <Input id="modal-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your.email@example.com" required className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white" dir="ltr" />
+              <Input
+                id="modal-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your.email@example.com"
+                required
+                className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
+                dir="ltr"
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="modal-city" className="text-left block text-luxury-black font-medium">
                 Your City
               </Label>
-              <Input id="modal-city" type="text" value={city} onChange={e => setCity(e.target.value)} placeholder="Your City" required className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white" dir="ltr" />
+              <Input
+                id="modal-city"
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="Your City"
+                required
+                className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
+                dir="ltr"
+              />
             </div>
 
-            <Button type="submit" className="w-full h-14 text-lg font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full h-14 text-lg font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? 'در حال ارسال...' : '✅ کامل! لینک وبینار را ارسال کن'}
             </Button>
           </form>
@@ -323,6 +373,18 @@ const FreeLive = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </>;
+
+      {/* Sticky Bottom Button */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-gradient-to-r from-secondary to-secondary-dark shadow-2xl border-t border-luxury-white/20">
+        <Button
+          onClick={() => setShowModal(true)}
+          className="w-full h-16 text-lg md:text-xl font-bold bg-luxury-black hover:bg-luxury-charcoal text-secondary font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-xl animate-pulse"
+        >
+          🚀 رزرو جای شما در وبینار رایگان
+        </Button>
+      </div>
+    </>
+  );
 };
+
 export default FreeLive;
