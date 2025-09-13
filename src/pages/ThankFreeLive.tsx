@@ -116,9 +116,27 @@ const ThankFreeLive = () => {
                   <h3 className="text-lg md:text-xl font-bold text-secondary mb-2 md:mb-4 font-farsi">
                     تاریخ را علامت‌گذاری کنید
                   </h3>
-                  <p className="text-sm md:text-base text-luxury-silver/90 font-farsi mb-4">
+                  <p className="text-sm md:text-base text-luxury-silver/90 font-farsi mb-2">
                     ۲۱ سپتامبر - ساعت ۹:۳۰ صبح (وقت لس آنجلس)
                   </p>
+                  <p className="text-xs md:text-sm text-secondary font-medium mb-3">
+                    Sunday, September 21st at 9:30 AM
+                  </p>
+                  
+                  {/* Time Zones */}
+                  <div className="text-xs text-luxury-silver/80 mb-4 space-y-1">
+                    <div className="grid grid-cols-2 gap-2">
+                      <p>Los Angeles: 9:30 AM</p>
+                      <p>Toronto: 12:30 PM</p>
+                      <p>New York: 12:30 PM</p>
+                      <p>Chicago: 11:30 AM</p>
+                      <p>Texas: 11:30 AM</p>
+                      <p>London: 5:30 PM</p>
+                      <p>France: 6:30 PM</p>
+                      <p>Germany: 6:30 PM</p>
+                      <p className="col-span-2 text-center">Dubai: 8:30 PM</p>
+                    </div>
+                  </div>
                   
                   {/* Calendar Buttons */}
                   <div className="space-y-2">
