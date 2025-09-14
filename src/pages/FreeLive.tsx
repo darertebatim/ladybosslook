@@ -143,7 +143,7 @@ const FreeLive = () => {
                     🎁 هدیه ویژه شرکت‌کنندگان
                   </p>
                   <p className="text-secondary font-medium font-farsi">
-                    پادکست آموزشی "قدرت در زبان دوم"
+                    کتابچه راهنمای عملی "قدرت در زبان دوم"
                   </p>
                   <p className="text-luxury-silver/80 text-sm mt-2 font-farsi">
                     (ارزش ۹۷ دلار - رایگان!)
