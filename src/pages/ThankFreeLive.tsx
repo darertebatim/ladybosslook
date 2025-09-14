@@ -177,15 +177,15 @@ const ThankFreeLive = () => {
           {/* Support Section */}
           <div className="max-w-2xl mx-auto mt-8 md:mt-16 text-center">
             <div className="bg-luxury-white/5 backdrop-blur-sm border border-secondary/20 rounded-xl p-4 md:p-8">
-              <h3 className="text-lg md:text-2xl font-bold text-secondary mb-2 md:mb-4 font-farsi">پشتیبانی:</h3>
-              <p className="text-luxury-white font-farsi text-base md:text-lg">
-                📱 واتساپ: +1 (626) 502‑8538
+              <h3 className="text-lg md:text-2xl font-bold text-secondary mb-2 md:mb-4">Support:</h3>
+              <p className="text-luxury-white text-base md:text-lg">
+                📱 WhatsApp: +1 (626) 502‑8538
               </p>
-              <p className="text-luxury-white font-farsi text-base md:text-lg mt-2">
-                📧 ایمیل: support@ladybosslook.com
+              <p className="text-luxury-white text-base md:text-lg mt-2">
+                📧 Email: support@ladybosslook.com
               </p>
-              <p className="text-luxury-silver/80 text-xs md:text-sm font-farsi mt-1 md:mt-2">
-                برای هرگونه سوال یا مشکل با ما تماس بگیرید
+              <p className="text-luxury-silver/80 text-xs md:text-sm mt-1 md:mt-2">
+                Contact us for any questions or issues
               </p>
             </div>
           </div>

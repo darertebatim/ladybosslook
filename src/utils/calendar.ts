@@ -72,8 +72,8 @@ export const downloadICSFile = (event: EventDetails, filename: string = 'event.i
 // Webinar event details - September 28, 2025, 9:30 AM Los Angeles time
 export const webinarEvent: EventDetails = {
   title: 'Free Live "رونمایی از کاراکتر پرجرات"',
-  description: 'وبینار رایگان رونمایی از کاراکتر پرجرات - به ما ملحق شوید برای این رویداد ویژه!\n\nلینک پخش: https://youtube.com/live/Q30Oubk2w0Q?feature=share',
+  description: 'وبینار رایگان رونمایی از کاراکتر پرجرات - به ما ملحق شوید برای این رویداد ویژه!\n\nلینک پخش: https://youtube.com/live/ofrgyfGl5ic?feature=share',
   startDate: new Date('2025-09-28T09:30:00-07:00'), // Los Angeles time (PDT)
   endDate: new Date('2025-09-28T10:15:00-07:00'), // 45 minutes duration
-  location: 'https://youtube.com/live/Q30Oubk2w0Q?feature=share'
+  location: 'https://youtube.com/live/ofrgyfGl5ic?feature=share'
 };
