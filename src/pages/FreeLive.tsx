@@ -78,7 +78,7 @@ const FreeLive = () => {
       {/* Event Banner */}
       <div className="bg-secondary text-luxury-black py-4 text-center">
         <p className="font-bold text-lg md:text-xl">
-          🎯 وبینار رایگان | ۲۱ سپتامبر
+          🎯 وبینار رایگان | ۲۸ سپتامبر
         </p>
         <p className="text-sm md:text-base mt-1">
           ساعت ۹:۳۰ صبح به وقت کالیفرنیا

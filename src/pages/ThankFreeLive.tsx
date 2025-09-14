@@ -34,8 +34,8 @@ const ThankFreeLive = () => {
 
 
 تا ۱۰۰٪ آماده وبینار شوید</h1>
-            <p className="text-lg md:text-xl text-luxury-white mb-6 md:mb-8 font-farsi px-2">
-              تقریباً رسیدید! مراحل زیر را دنبال کنید تا ثبت نام خود را کامل کنید و هدیه رایگان را دریافت کنید!
+            <p className="text-lg md:text-xl text-luxury-white mb-6 md:mb-8 font-farsi px-2 font-bold">
+              همین الان ویدیوی پایین را ببینید تا لایو را از دست ندهید !
             </p>
           </div>
 
@@ -122,10 +122,10 @@ const ThankFreeLive = () => {
                     تاریخ را علامت‌گذاری کنید
                   </h3>
                   <p className="text-sm md:text-base text-luxury-silver/90 font-farsi mb-2">
-                    یکشنبه ۲۱ سپتامبر ساعت ۹:۳۰ بوقت کالیفرنیا
+                    یکشنبه ۲۸ سپتامبر ساعت ۹:۳۰ بوقت کالیفرنیا
                   </p>
                   <p className="text-xs md:text-sm text-secondary font-medium mb-3">
-                    Sunday, September 21st at 9:30 AM
+                    Sunday, September 28th at 9:30 AM
                   </p>
                   
                   {/* Time Zones */}
@@ -170,7 +170,10 @@ const ThankFreeLive = () => {
             <div className="bg-luxury-white/5 backdrop-blur-sm border border-secondary/20 rounded-xl p-4 md:p-8">
               <h3 className="text-lg md:text-2xl font-bold text-secondary mb-2 md:mb-4 font-farsi">پشتیبانی:</h3>
               <p className="text-luxury-white font-farsi text-base md:text-lg">
-                📱 واتساپ: +1-000-000-0000
+                📱 واتساپ: +1 (626) 502‑8538
+              </p>
+              <p className="text-luxury-white font-farsi text-base md:text-lg mt-2">
+                📧 ایمیل: support@ladybosslook.com
               </p>
               <p className="text-luxury-silver/80 text-xs md:text-sm font-farsi mt-1 md:mt-2">
                 برای هرگونه سوال یا مشکل با ما تماس بگیرید
