@@ -75,10 +75,19 @@ const ThankFreeLive = () => {
             </div>
           </div>
 
+          {/* Prize Announcement */}
+          <div className="max-w-4xl mx-auto mb-8 md:mb-12 text-center">
+            <div className="bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 backdrop-blur-sm border border-yellow-400/30 rounded-xl p-4 md:p-6">
+              <p className="text-xl md:text-2xl font-bold text-yellow-400 font-farsi">
+                🎁جایزه ۶۰۰ دلاری برای ۳ نفر از بین شرکت‌کنندان لایو قرعه کشی می‌شود🎁
+              </p>
+            </div>
+          </div>
+
           {/* Next Steps */}
           <div className="max-w-4xl mx-auto">
             <h2 className="text-xl md:text-3xl lg:text-4xl font-display font-bold text-secondary text-center mb-6 md:mb-12 font-farsi">
-              مراحل بعدی:
+              سه مرحله گرفتن هدیه
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
