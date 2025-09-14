@@ -52,9 +52,18 @@ const ThankFreeLive = () => {
                   </div>}
               </div>
               
+              {/* Prize Announcement */}
+              <div className="text-center mb-6">
+                <div className="bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 backdrop-blur-sm border border-yellow-400/30 rounded-xl p-4">
+                  <p className="text-lg md:text-xl font-bold text-yellow-400 font-farsi">
+                    🎁جایزه ۶۰۰ دلاری برای ۳ نفر از بین شرکت‌کنندان لایو قرعه کشی می‌شود🎁
+                  </p>
+                </div>
+              </div>
+              
               {/* Arrow Down */}
               <div className="text-center py-4">
-                <div className="text-4xl animate-bounce">⬇️</div>
+                <div className="text-4xl animate-pulse">👇</div>
               </div>
               
               {/* WhatsApp Button */}
@@ -69,18 +78,9 @@ const ThankFreeLive = () => {
                 
                 {/* Arrow Up */}
                 <div className="text-center pt-4">
-                  <div className="text-4xl animate-bounce">⬆️</div>
+                  <div className="text-4xl animate-pulse">☝️</div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Prize Announcement */}
-          <div className="max-w-4xl mx-auto mb-8 md:mb-12 text-center">
-            <div className="bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 backdrop-blur-sm border border-yellow-400/30 rounded-xl p-4 md:p-6">
-              <p className="text-xl md:text-2xl font-bold text-yellow-400 font-farsi">
-                🎁جایزه ۶۰۰ دلاری برای ۳ نفر از بین شرکت‌کنندان لایو قرعه کشی می‌شود🎁
-              </p>
             </div>
           </div>
 
