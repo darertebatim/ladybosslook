@@ -170,62 +170,23 @@ const FreeLive = () => {
         </div>
       </div>
 
-      {/* Benefits Section */}
-      <div className="bg-luxury-white py-16">
+      {/* Benefits of Being an Assertive Woman */}
+      <div className="bg-luxury-white/95 py-8">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h3 className="text-3xl md:text-4xl font-display font-bold text-luxury-black mb-12 font-farsi">
-              در این وبینار یاد می‌گیرید:
-            </h3>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-gradient-to-br from-secondary/10 to-primary/10 p-8 rounded-2xl border border-secondary/20">
-                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl">💪</span>
-                </div>
-                <h4 className="text-xl font-bold text-luxury-black mb-4 font-farsi">
-                  اعتماد به نفس قدرتمند
-                </h4>
-                <p className="text-luxury-accent font-farsi">
-                  چگونه اعتماد به نفس خود را در محیط جدید بازیابید و قدرتمند شوید
-                </p>
-              </div>
-              
-              <div className="bg-gradient-to-br from-primary/10 to-secondary/10 p-8 rounded-2xl border border-primary/20">
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl">🎯</span>
-                </div>
-                <h4 className="text-xl font-bold text-luxury-black mb-4 font-farsi">
-                  غلبه بر ترس و نگرانی
-                </h4>
-                <p className="text-luxury-accent font-farsi">
-                  راهکارهای عملی و مؤثر برای مدیریت ترس‌ها و نگرانی‌های شما
-                </p>
-              </div>
-              
-              <div className="bg-gradient-to-br from-secondary/10 to-primary/10 p-8 rounded-2xl border border-secondary/20">
-                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl">🚀</span>
-                </div>
-                <h4 className="text-xl font-bold text-luxury-black mb-4 font-farsi">
-                  تبدیل چالش به فرصت
-                </h4>
-                <p className="text-luxury-accent font-farsi">
-                  چگونه از چالش‌های مهاجرت به فرصت‌های طلایی تبدیل کنید
-                </p>
-              </div>
-              
-              <div className="bg-gradient-to-br from-primary/10 to-secondary/10 p-8 rounded-2xl border border-primary/20">
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl">⭐</span>
-                </div>
-                <h4 className="text-xl font-bold text-luxury-black mb-4 font-farsi">
-                  استراتژی زندگی قدرتمند
-                </h4>
-                <p className="text-luxury-accent font-farsi">
-                  نقشه راه عملی برای شروع زندگی جدید با اعتماد و قدرت
-                </p>
-              </div>
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs md:text-sm text-luxury-accent/80 font-farsi">
+              <span>• مرزبندی قدرتمند</span>
+              <span>• اعتماد به نفس پایدار</span>
+              <span>• ابراز وجود بدون گناه</span>
+              <span>• مدیریت تعارضات</span>
+              <span>• ارتباط مؤثر</span>
+              <span>• استقلال از تأیید دیگران</span>
+              <span>• نه گفتن با اعتماد</span>
+              <span>• بیان اَسِرتیو</span>
+              <span>• حق گرفتن</span>
+              <span>• پاسخ به انتقاد</span>
+              <span>• جلوگیری از بی‌انصافی</span>
+              <span>• مذاکرهٔ روزمره</span>
             </div>
           </div>
         </div>
@@ -374,11 +335,11 @@ const FreeLive = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Sticky Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-gradient-to-r from-secondary to-secondary-dark shadow-2xl border-t border-luxury-white/20">
+      {/* Sticky Bottom Button - Optimized for Performance */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-secondary/95 backdrop-blur-sm border-t border-luxury-white/10">
         <Button
           onClick={() => setShowModal(true)}
-          className="w-full h-16 text-lg md:text-xl font-bold bg-luxury-black hover:bg-luxury-charcoal text-secondary font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-xl animate-pulse"
+          className="w-full h-14 text-base md:text-lg font-bold bg-luxury-black hover:bg-luxury-charcoal text-secondary font-farsi transition-colors duration-200 rounded-lg"
         >
           🚀 رزرو جای شما در وبینار رایگان
         </Button>
