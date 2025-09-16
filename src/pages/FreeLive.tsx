@@ -71,8 +71,8 @@ const FreeLive = () => {
   return (
     <>
       <SEOHead
-        title="وبینار رایگان نقشه راه جرات - LadyBoss Academy"
-        description="وبینار رایگان نقشه راه جرات مخصوص خانم‌های مهاجرت کرده به خارج. ایمیل و نام خود را وارد کنید تا لینک وبینار را دریافت کنید."
+        title="Free Live: Courage Roadmap for Persian Women"
+        description="Free webinar for Persian immigrant women. Register now!"
       />
       
       {/* Event Banner */}

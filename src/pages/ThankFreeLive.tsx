@@ -13,7 +13,7 @@ const ThankFreeLive = () => {
     window.scrollTo(0, 0);
   }, []);
   return <>
-      <SEOHead title="تشکر از ثبت نام - وبینار رایگان نقشه راه جرات" description="ثبت نام شما با موفقیت انجام شد. مراحل بعدی را دنبال کنید تا آماده وبینار شوید." />
+      <SEOHead title="Thank You - Registration Complete" description="Registration successful! Follow next steps to prepare for webinar." />
       
       {/* Success Banner */}
       <div className="bg-secondary text-luxury-black py-3 md:py-4 text-center px-4">
