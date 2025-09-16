@@ -143,12 +143,15 @@ const ThankFreeLive = () => {
                       <p>Los Angeles: 9:30 AM</p>
                       <p>Toronto: 12:30 PM</p>
                       <p>New York: 12:30 PM</p>
+                      <p>Miami: 12:30 PM</p>
                       <p>Chicago: 11:30 AM</p>
                       <p>Texas: 11:30 AM</p>
                       <p>London: 5:30 PM</p>
                       <p>France: 6:30 PM</p>
                       <p>Germany: 6:30 PM</p>
-                      <p className="col-span-2 text-center">Dubai: 8:30 PM</p>
+                      <p>Istanbul: 7:30 PM</p>
+                      <p>Dubai: 8:30 PM</p>
+                      <p>Sydney: 2:30 AM+1</p>
                     </div>
                   </div>
                   
