@@ -155,19 +155,6 @@ const ThankFreeLive = () => {
                     </div>
                   </div>
                   
-                  {/* Short Calendar Link */}
-                  <div className="mb-3">
-                    <p className="text-xs text-luxury-silver/90 mb-1 font-farsi">Quick Calendar Link:</p>
-                    <a 
-                      href={generateGoogleCalendarUrl(webinarEvent)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 text-xs break-all underline"
-                    >
-                      📅 cal.gg/webinar-sep28
-                    </a>
-                  </div>
-                  
                   {/* Calendar Buttons */}
                   <div className="space-y-2">
                     <Button 
