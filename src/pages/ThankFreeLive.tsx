@@ -42,7 +42,7 @@ const ThankFreeLive = () => {
           {/* Video Section */}
           <div className="max-w-4xl mx-auto mb-4 md:mb-12">
             <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl md:rounded-2xl p-4 md:p-8">
-              <div className="aspect-video bg-luxury-charcoal rounded-lg md:rounded-xl mb-4 md:mb-6 flex items-center justify-center">
+              <div className="aspect-video bg-luxury-charcoal rounded-lg md:rounded-xl mb-2 md:mb-4 flex items-center justify-center">
                 {videoLink ? <iframe src={videoLink} className="w-full h-full rounded-lg md:rounded-xl" allowFullScreen title="وبینار آمادگی" /> : <div className="text-center">
                     <div className="w-16 h-16 md:w-20 md:h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
                       <span className="text-2xl md:text-3xl">▶️</span>
@@ -53,8 +53,8 @@ const ThankFreeLive = () => {
               </div>
               
               {/* Prize Announcement */}
-              <div className="text-center mb-6">
-                <div className="bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 backdrop-blur-sm border border-yellow-400/30 rounded-xl p-4">
+              <div className="text-center mb-3">
+                <div className="bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 backdrop-blur-sm border border-yellow-400/30 rounded-xl p-2 md:p-3">
                   <p className="text-lg md:text-xl font-bold text-yellow-400 font-farsi">
                     🎁جایزه ۶۰۰ دلاری برای ۳ نفر از بین شرکت‌کنندان لایو قرعه کشی می‌شود🎁
                   </p>
@@ -62,7 +62,7 @@ const ThankFreeLive = () => {
               </div>
               
               {/* Arrow Down */}
-              <div className="text-center py-4">
+              <div className="text-center py-2">
                 <div className="text-4xl animate-pulse">👇</div>
               </div>
               
