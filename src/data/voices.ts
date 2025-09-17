@@ -18,7 +18,7 @@ export const voices: Voice[] = [
     titleFarsi: "جلسه شجاعت‌سازی",
     description: "A powerful session on building inner courage and confidence",
     descriptionFarsi: "جلسه‌ای قدرتمند در مورد ساختن شجاعت و اعتماد به نفس درونی",
-    googleDriveId: "1xq0LH0I40qS16NCEzNm0xJS7C38OcUBX", // Placeholder - needs actual file ID
+    googleDriveId: "xq0LH0I40qS16NCEzNm0xJS7C38OcUBX",
     duration: "15:30",
     category: "mindset"
   },
