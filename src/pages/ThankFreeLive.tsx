@@ -6,7 +6,7 @@ import { Calendar, Download } from "lucide-react";
 import { generateGoogleCalendarUrl, downloadICSFile, webinarEvent } from "@/utils/calendar";
 const ThankFreeLive = () => {
   const [whatsappLink, setWhatsappLink] = useState('https://chat.whatsapp.com/CRH4Ke6wZlN1KC0tYwFcfk?mode=ems_copy_t');
-  const [videoLink, setVideoLink] = useState('https://www.youtube.com/embed/OI8Fivvpl1c');
+  const [videoLink, setVideoLink] = useState('https://www.youtube.com/embed/ct9plBl6B0c');
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -27,9 +27,9 @@ const ThankFreeLive = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-luxury-black via-luxury-charcoal to-luxury-accent opacity-90"></div>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
         
-        <div className="container mx-auto px-4 py-6 md:py-12 relative z-10">
+        <div className="container mx-auto px-4 py-3 md:py-12 relative z-10">
           {/* Header */}
-          <div className="text-center mb-8 md:mb-12">
+          <div className="text-center mb-4 md:mb-12">
             <h1 className="md:text-7xl lg:text-8xl font-display font-bold text-secondary mb-4 md:mb-6 font-farsi leading-tight text-3xl">این ویدیو را ببینید
 
 
@@ -40,7 +40,7 @@ const ThankFreeLive = () => {
           </div>
 
           {/* Video Section */}
-          <div className="max-w-4xl mx-auto mb-8 md:mb-12">
+          <div className="max-w-4xl mx-auto mb-4 md:mb-12">
             <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl md:rounded-2xl p-4 md:p-8">
               <div className="aspect-video bg-luxury-charcoal rounded-lg md:rounded-xl mb-4 md:mb-6 flex items-center justify-center">
                 {videoLink ? <iframe src={videoLink} className="w-full h-full rounded-lg md:rounded-xl" allowFullScreen title="وبینار آمادگی" /> : <div className="text-center">
