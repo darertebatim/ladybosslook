@@ -14,33 +14,13 @@ export interface Voice {
 export const voices: Voice[] = [
   {
     id: "voice-1",
-    title: "Courage Building Session",
-    titleFarsi: "جلسه شجاعت‌سازی",
-    description: "A powerful session on building inner courage and confidence",
-    descriptionFarsi: "جلسه‌ای قدرتمند در مورد ساختن شجاعت و اعتماد به نفس درونی",
-    googleDriveId: "xq0LH0I40qS16NCEzNm0xJS7C38OcUBX",
-    duration: "15:30",
-    category: "mindset"
-  },
-  {
-    id: "voice-2", 
-    title: "Leadership Guidance",
-    titleFarsi: "راهنمایی رهبری",
-    description: "Essential leadership principles for empowered women",
-    descriptionFarsi: "اصول ضروری رهبری برای زنان قدرتمند",
-    googleDriveId: "1xq0LH0I40qS16NCEzNm0xJS7C38OcUBX", // Placeholder - needs actual file ID
-    duration: "22:45",
-    category: "leadership"
-  },
-  {
-    id: "voice-3",
-    title: "Boundary Setting",
-    titleFarsi: "تعیین مرزها",
-    description: "How to set healthy boundaries in personal and professional life",
-    descriptionFarsi: "چگونه در زندگی شخصی و حرفه‌ای مرزهای سالم تعیین کنیم",
-    googleDriveId: "1xq0LH0I40qS16NCEzNm0xJS7C38OcUBX", // Placeholder - needs actual file ID
-    duration: "18:20",
-    category: "boundaries"
+    title: "Empowered Ladyboss Coaching",
+    titleFarsi: "کوچینگ لیدی باس قدرتمند",
+    description: "A powerful coaching session for empowered women leaders",
+    descriptionFarsi: "جلسه کوچینگ قدرتمند برای زنان رهبر قدرتمند",
+    googleDriveId: "101BvMtA5ZhpNx8i2DKGe4SyAs06EGD5T",
+    duration: "Loading...",
+    category: "coaching"
   }
 ];
 
