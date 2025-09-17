@@ -52,22 +52,8 @@ const ThankFreeLive = () => {
                   </div>}
               </div>
               
-              {/* Prize Announcement */}
-              <div className="text-center mb-6">
-                <div className="bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 backdrop-blur-sm border border-yellow-400/30 rounded-xl p-4">
-                  <p className="text-lg md:text-xl font-bold text-yellow-400 font-farsi">
-                    🎁جایزه ۶۰۰ دلاری برای ۳ نفر از بین شرکت‌کنندان لایو قرعه کشی می‌شود🎁
-                  </p>
-                </div>
-              </div>
-              
-              {/* Arrow Down */}
-              <div className="text-center py-4">
-                <div className="text-4xl animate-pulse">👇</div>
-              </div>
-              
               {/* WhatsApp Button */}
-              <div className="text-center">
+              <div className="text-center mb-4">
                 <Button onClick={() => whatsappLink && window.open(whatsappLink, '_blank')} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold text-sm md:text-lg px-4 md:px-8 py-4 md:py-5 h-auto rounded-lg md:rounded-xl shadow-lg transition-all duration-300 font-farsi mb-3 md:mb-4 whitespace-normal leading-tight" disabled={!whatsappLink}>
                   <span className="text-center text-xl">🚀 به گروه واتساپ بپیوندید و
 هدیه رایگان را دریافت کنید</span>
@@ -75,11 +61,25 @@ const ThankFreeLive = () => {
                 <p className="text-luxury-silver/80 text-xs md:text-sm font-farsi px-2">
                   ظرفیت محدود - همین الان بپیوندید تا کتاب راهنمای عملی را رایگان دریافت کنید (ارزش ۹۷ دلار)
                 </p>
-                
-                {/* Arrow Up */}
-                <div className="text-center pt-4">
-                  <div className="text-4xl animate-pulse">☝️</div>
+              </div>
+              
+              {/* Prize Announcement */}
+              <div className="text-center mb-4">
+                <div className="bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 backdrop-blur-sm border border-yellow-400/30 rounded-lg p-2 md:p-3">
+                  <p className="text-base md:text-lg font-bold text-yellow-400 font-farsi">
+                    🎁جایزه ۶۰۰ دلاری برای ۳ نفر از بین شرکت‌کنندان لایو قرعه کشی می‌شود🎁
+                  </p>
                 </div>
+              </div>
+              
+              {/* Arrow Down */}
+              <div className="text-center py-2">
+                <div className="text-4xl animate-pulse">👇</div>
+              </div>
+              
+              {/* Arrow Up */}
+              <div className="text-center">
+                <div className="text-4xl animate-pulse">☝️</div>
               </div>
             </div>
           </div>
