@@ -17,6 +17,7 @@ export const VoicePlayer: React.FC<VoicePlayerProps> = ({
   isActive = false, 
   onPlay 
 }) => {
+  // Always call the hook first - never conditionally
   const { audioRef, state, actions } = useAudioPlayer();
 
   // Load audio when component becomes active
@@ -50,7 +51,7 @@ export const VoicePlayer: React.FC<VoicePlayerProps> = ({
     }`}>
       <CardContent className="p-6">
         {/* Hidden audio element */}
-        <audio ref={audioRef} preload="metadata" />
+        <audio ref={audioRef} preload="metadata" crossOrigin="anonymous" />
         
         {/* Voice Info */}
         <div className="mb-4">
@@ -76,16 +77,14 @@ export const VoicePlayer: React.FC<VoicePlayerProps> = ({
 
         {/* Player Controls */}
         <div className="space-y-3">
-          {/* Progress Bar */}
-          {isActive && (
-            <div className="space-y-2">
-              <Progress value={progress} className="h-2" />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{actions.formatTime(state.currentTime)}</span>
-                <span>{actions.formatTime(state.duration)}</span>
-              </div>
+          {/* Progress Bar - Always render to maintain hook order */}
+          <div className={`space-y-2 ${isActive ? 'block' : 'hidden'}`}>
+            <Progress value={progress} className="h-2" />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>{actions.formatTime(state.currentTime)}</span>
+              <span>{actions.formatTime(state.duration)}</span>
             </div>
-          )}
+          </div>
 
           {/* Control Buttons */}
           <div className="flex items-center justify-between">
@@ -109,23 +108,21 @@ export const VoicePlayer: React.FC<VoicePlayerProps> = ({
                 </span>
               </Button>
 
-              {/* Volume Control - only show when active */}
-              {isActive && (
-                <div className="flex items-center gap-2">
-                  <Volume2 className="h-4 w-4 text-muted-foreground" />
-                  <Progress 
-                    value={state.volume * 100} 
-                    className="w-16 h-2 cursor-pointer"
-                    onClick={(e) => {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const x = e.clientX - rect.left;
-                      const width = rect.width;
-                      const newVolume = Math.max(0, Math.min(1, x / width));
-                      actions.setVolume(newVolume);
-                    }}
-                  />
-                </div>
-              )}
+              {/* Volume Control - Always render to maintain hook order */}
+              <div className={`flex items-center gap-2 ${isActive ? 'block' : 'hidden'}`}>
+                <Volume2 className="h-4 w-4 text-muted-foreground" />
+                <Progress 
+                  value={state.volume * 100} 
+                  className="w-16 h-2 cursor-pointer"
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const width = rect.width;
+                    const newVolume = Math.max(0, Math.min(1, x / width));
+                    actions.setVolume(newVolume);
+                  }}
+                />
+              </div>
             </div>
 
             {/* Download Button */}
@@ -140,12 +137,10 @@ export const VoicePlayer: React.FC<VoicePlayerProps> = ({
             </Button>
           </div>
 
-          {/* Error Message */}
-          {state.error && (
-            <div className="text-sm text-destructive bg-destructive/10 p-2 rounded">
-              {state.error}
-            </div>
-          )}
+          {/* Error Message - Always render to maintain hook order */}
+          <div className={`text-sm text-destructive bg-destructive/10 p-2 rounded ${state.error ? 'block' : 'hidden'}`}>
+            {state.error || 'No error'}
+          </div>
         </div>
       </CardContent>
     </Card>

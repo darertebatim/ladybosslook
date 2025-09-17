@@ -10,6 +10,7 @@ export interface Voice {
 }
 
 // Voice recordings metadata from Google Drive folder
+// Note: Replace these with actual file IDs from your folder once available
 export const voices: Voice[] = [
   {
     id: "voice-1",
@@ -17,7 +18,7 @@ export const voices: Voice[] = [
     titleFarsi: "جلسه شجاعت‌سازی",
     description: "A powerful session on building inner courage and confidence",
     descriptionFarsi: "جلسه‌ای قدرتمند در مورد ساختن شجاعت و اعتماد به نفس درونی",
-    googleDriveId: "1_EXAMPLE_FILE_ID_1", // Replace with actual file IDs
+    googleDriveId: "1xq0LH0I40qS16NCEzNm0xJS7C38OcUBX", // Placeholder - needs actual file ID
     duration: "15:30",
     category: "mindset"
   },
@@ -27,7 +28,7 @@ export const voices: Voice[] = [
     titleFarsi: "راهنمایی رهبری",
     description: "Essential leadership principles for empowered women",
     descriptionFarsi: "اصول ضروری رهبری برای زنان قدرتمند",
-    googleDriveId: "2_EXAMPLE_FILE_ID_2", // Replace with actual file IDs
+    googleDriveId: "1xq0LH0I40qS16NCEzNm0xJS7C38OcUBX", // Placeholder - needs actual file ID
     duration: "22:45",
     category: "leadership"
   },
@@ -37,14 +38,16 @@ export const voices: Voice[] = [
     titleFarsi: "تعیین مرزها",
     description: "How to set healthy boundaries in personal and professional life",
     descriptionFarsi: "چگونه در زندگی شخصی و حرفه‌ای مرزهای سالم تعیین کنیم",
-    googleDriveId: "3_EXAMPLE_FILE_ID_3", // Replace with actual file IDs
+    googleDriveId: "1xq0LH0I40qS16NCEzNm0xJS7C38OcUBX", // Placeholder - needs actual file ID
     duration: "18:20",
     category: "boundaries"
   }
 ];
 
-// Generate Google Drive streaming URL
+// Generate Google Drive streaming URL for individual files
+// This format works for publicly shared files
 export const getGoogleDriveAudioUrl = (fileId: string): string => {
+  // Use the direct download format for shared files
   return `https://drive.google.com/uc?export=download&id=${fileId}`;
 };
 
