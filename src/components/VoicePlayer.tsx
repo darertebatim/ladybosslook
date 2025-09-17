@@ -25,7 +25,7 @@ export const VoicePlayer: React.FC<VoicePlayerProps> = ({
       const audioUrl = getGoogleDriveAudioUrl(voice.googleDriveId);
       actions.load(audioUrl);
     }
-  }, [isActive, voice.googleDriveId, actions, audioRef]);
+  }, [isActive, voice.googleDriveId, actions]);
 
   const handlePlayClick = () => {
     onPlay?.();

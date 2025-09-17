@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 
 export interface AudioPlayerState {
   isPlaying: boolean;
@@ -133,17 +133,19 @@ export const useAudioPlayer = () => {
     };
   }, [updateState]);
 
+  const actions = useMemo(() => ({
+    play,
+    pause,
+    togglePlay,
+    seek,
+    setVolume,
+    load,
+    formatTime
+  }), [play, pause, togglePlay, seek, setVolume, load, formatTime]);
+
   return {
     audioRef,
     state,
-    actions: {
-      play,
-      pause,
-      togglePlay,
-      seek,
-      setVolume,
-      load,
-      formatTime
-    }
+    actions
   };
 };
