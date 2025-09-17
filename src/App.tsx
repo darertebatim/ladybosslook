@@ -27,6 +27,7 @@ import Redirect from "./components/Redirect";
 import CalendarRedirect from "./components/CalendarRedirect";
 import FreeLive from "./pages/FreeLive";
 import ThankFreeLive from "./pages/ThankFreeLive";
+import Voices from "./pages/Voices";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,7 @@ const App = () => (
             <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
             <Route path="/freelive" element={<FreeLive />} />
             <Route path="/thankfreelive" element={<ThankFreeLive />} />
+            <Route path="/voices" element={<Voices />} />
             <Route path="/calendar" element={<CalendarRedirect />} />
             <Route path="/firststepbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/RightsnboundariesLadybossgift.pdf" />} />
             <Route path="/fnpbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/fnpbonus.pdf" />} />
