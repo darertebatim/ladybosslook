@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import CountdownTimer from "@/components/CountdownTimer";
+import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 
 const FreeLive = () => {
   const [email, setEmail] = useState('');
@@ -344,6 +345,12 @@ const FreeLive = () => {
           🚀 رزرو جای شما در وبینار رایگان
         </Button>
       </div>
+
+      {/* Performance Monitor - Enable during high traffic testing */}
+      <PerformanceMonitor 
+        enabled={window.location.search.includes('monitor=true')} 
+        monitoringInterval={15000} 
+      />
     </>
   );
 };

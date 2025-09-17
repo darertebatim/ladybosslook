@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.test-mailchimp]
 verify_jwt = false
+
+[functions.check-mailchimp-member]
+verify_jwt = false
+
+[functions.health-check]
+verify_jwt = false

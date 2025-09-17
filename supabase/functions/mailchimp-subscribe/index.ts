@@ -20,26 +20,73 @@ interface SubscribeRequest {
   session_id?: string;
 }
 
-// Rate limiting using in-memory store (simple implementation)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+// Enhanced rate limiting with burst capacity for high traffic scenarios
+const rateLimitStore = new Map<string, { count: number; resetTime: number; burstCount: number; burstResetTime: number }>();
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
-const RATE_LIMIT_MAX = 10; // 10 requests per minute per IP
+const RATE_LIMIT_MAX = 50; // 50 requests per minute per IP (increased for high traffic)
+const BURST_LIMIT_WINDOW = 10000; // 10 seconds for burst detection
+const BURST_LIMIT_MAX = 15; // 15 requests per 10 seconds burst limit
+
+// Performance monitoring
+const performanceMetrics = new Map<string, number>();
+let totalRequests = 0;
+let successfulRequests = 0;
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const userLimit = rateLimitStore.get(ip);
   
   if (!userLimit || now > userLimit.resetTime) {
-    rateLimitStore.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    rateLimitStore.set(ip, { 
+      count: 1, 
+      resetTime: now + RATE_LIMIT_WINDOW,
+      burstCount: 1,
+      burstResetTime: now + BURST_LIMIT_WINDOW
+    });
     return true;
   }
   
+  // Check burst limit (short-term)
+  if (now > userLimit.burstResetTime) {
+    userLimit.burstCount = 1;
+    userLimit.burstResetTime = now + BURST_LIMIT_WINDOW;
+  } else {
+    userLimit.burstCount++;
+    if (userLimit.burstCount > BURST_LIMIT_MAX) {
+      console.log(`Burst limit exceeded for IP: ${ip} (${userLimit.burstCount}/${BURST_LIMIT_MAX})`);
+      return false;
+    }
+  }
+  
+  // Check regular rate limit
   if (userLimit.count >= RATE_LIMIT_MAX) {
+    console.log(`Rate limit exceeded for IP: ${ip} (${userLimit.count}/${RATE_LIMIT_MAX})`);
     return false;
   }
   
   userLimit.count++;
   return true;
+}
+
+// Cleanup old rate limit entries to prevent memory leaks
+function cleanupRateLimitStore(): void {
+  const now = Date.now();
+  for (const [ip, limit] of rateLimitStore.entries()) {
+    if (now > limit.resetTime && now > limit.burstResetTime) {
+      rateLimitStore.delete(ip);
+    }
+  }
+}
+
+// Log performance metrics
+function logPerformanceMetrics(): void {
+  totalRequests++;
+  console.log(`Performance metrics - Total: ${totalRequests}, Success rate: ${(successfulRequests/totalRequests*100).toFixed(2)}%`);
+  
+  if (totalRequests % 100 === 0) {
+    console.log(`Rate limit store size: ${rateLimitStore.size} entries`);
+    cleanupRateLimitStore();
+  }
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -94,6 +141,7 @@ async function retryWithBackoff<T>(
 
 const handler = async (req: Request): Promise<Response> => {
   const startTime = Date.now();
+  logPerformanceMetrics();
   
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -106,17 +154,22 @@ const handler = async (req: Request): Promise<Response> => {
     ? forwardedFor.split(',')[0].trim()
     : req.headers.get("x-real-ip") || "unknown";
 
-  // Check rate limit
+  // Check rate limit with enhanced burst protection
   if (!checkRateLimit(clientIP)) {
     console.log(`Rate limit exceeded for IP: ${clientIP}`);
     return new Response(
       JSON.stringify({ 
         error: "Too many requests. Please try again later.",
-        retryAfter: 60
+        retryAfter: 60,
+        processingTime: Date.now() - startTime
       }),
       {
         status: 429,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
+        headers: { 
+          "Content-Type": "application/json", 
+          "Retry-After": "60",
+          ...corsHeaders 
+        },
       }
     );
   }
@@ -360,6 +413,7 @@ const handler = async (req: Request): Promise<Response> => {
       // Handle already subscribed case gracefully - but this shouldn't happen with PUT method
       if (data.title === "Member Exists") {
         console.log("Member updated successfully");
+        successfulRequests++;
         
         // Update backup record as successful for existing members
         if (supabase && formSubmissionId) {
@@ -376,12 +430,15 @@ const handler = async (req: Request): Promise<Response> => {
           }
         }
         
+        const processingTime = Date.now() - startTime;
+        console.log(`Member update processed in ${processingTime}ms`);
+        
         return new Response(
           JSON.stringify({ 
             success: true, 
             message: "Member updated successfully",
             member_id: data.id || emailHash,
-            processingTime: Date.now() - startTime
+            processingTime
           }),
           {
             status: 200,
@@ -405,6 +462,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log("Member created/updated successfully");
+    successfulRequests++;
 
     // Update backup record as successful
     if (supabase && formSubmissionId) {
@@ -421,12 +479,15 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
+    const processingTime = Date.now() - startTime;
+    console.log(`Request processed successfully in ${processingTime}ms`);
+
     return new Response(
       JSON.stringify({ 
         success: true, 
         message: "Successfully created/updated member",
         member_id: data.id || emailHash,
-        processingTime: Date.now() - startTime
+        processingTime
       }),
       {
         status: 200,
