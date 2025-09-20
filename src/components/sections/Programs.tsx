@@ -27,21 +27,39 @@ const Programs = () => {
     },
     {
       title: 'Business Growth Accelerator',
-      description: 'Transform your business idea into a profitable empire with our comprehensive coaching program and proven growth frameworks.',
+      description: 'Transform your existing business into a profitable empire with our comprehensive coaching program and proven growth frameworks designed for scaling businesses.',
       image: businessCoachingImage,
       duration: '12 weeks',
       participants: '3,200+',
       rating: 5.0,
       features: [
-        'Business Strategy Development',
+        'Advanced Business Strategy',
+        'Revenue Optimization',
         'Marketing & Sales Mastery',
-        'Operations Optimization',
         'Leadership Development',
         'Weekly Group Coaching Calls'
       ],
-      price: '$997',
+      price: '$1,200',
       popular: true,
-      link: '/ccw'
+      link: '/business-growth-accelerator'
+    },
+    {
+      title: 'Business Startup Accelerator',
+      description: 'Launch your business from idea to profit in 90 days. Complete startup program with step-by-step guidance, legal setup, and launch strategy.',
+      image: networkingImage,
+      duration: '90 days',
+      participants: '1,800+',
+      rating: 4.9,
+      features: [
+        'Business Idea Validation',
+        'Complete Legal Setup',
+        'Brand & Website Creation',
+        'Launch Strategy & Marketing',
+        '90-Day Success Roadmap'
+      ],
+      price: '$1,200',
+      popular: false,
+      link: '/business-startup-accelerator'
     },
     {
       title: 'Courageous Character Course',

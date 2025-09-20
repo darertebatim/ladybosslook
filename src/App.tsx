@@ -11,6 +11,8 @@ import Admin from "./pages/Admin";
 import AssertLanding from "./pages/AssertLanding";
 import Auth from "./pages/Auth";
 import BusinessIdeas from "./pages/BusinessIdeas";
+import BusinessGrowthAccelerator from "./pages/BusinessGrowthAccelerator";
+import BusinessStartupAccelerator from "./pages/BusinessStartupAccelerator";
 import CapacityDashboard from "./pages/CapacityDashboard";
 import Checkout from "./pages/Checkout";
 import CourageousWorkshop from "./pages/CourageousWorkshop";
@@ -59,6 +61,8 @@ const App = () => (
           <Route path="/video" element={<Video />} />
           <Route path="/expressassert" element={<ExpressAssert />} />
           <Route path="/business-ideas" element={<BusinessIdeas />} />
+            <Route path="/business-growth-accelerator" element={<BusinessGrowthAccelerator />} />
+            <Route path="/business-startup-accelerator" element={<BusinessStartupAccelerator />} />
             <Route path="/event-irvine" element={<EventIrvine />} />
             <Route path="/ccw" element={<CourageousWorkshop />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
