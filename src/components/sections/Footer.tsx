@@ -63,15 +63,15 @@ const Footer = () => {
               <div className="space-y-3">
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Mail size={16} className="mr-2" />
-                  hello@ladybossacademy.com
+                  support@ladybosslook.com
                 </div>
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Phone size={16} className="mr-2" />
-                  +1 (555) 123-4567
+                  +1 (626) 502-8538
                 </div>
                 <div className="flex items-center text-sm text-muted-foreground">
                   <MapPin size={16} className="mr-2" />
-                  New York, NY • Los Angeles, CA
+                  2403 Elements way, Irvine, CA
                 </div>
               </div>
 
