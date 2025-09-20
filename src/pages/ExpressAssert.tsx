@@ -18,6 +18,7 @@ declare global {
 const ExpressAssert = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [city, setCity] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -88,6 +89,15 @@ const ExpressAssert = () => {
       return;
     }
 
+    if (!city) {
+      toast({
+        title: "City Required",
+        description: "Please enter your city to receive the bonus.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!password || password.toLowerCase() !== 'fnp') {
       toast({
         title: "Wrong Password", 
@@ -126,30 +136,24 @@ const ExpressAssert = () => {
         });
       }
 
-      const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
-        body: {
-          email,
-          name: '',
-          city: '',
-          phone: '',
-          source: 'expressassert_page',
-          tags: ['fnpbonus']
-        }
-      });
-
-      if (error) {
-        throw error;
-      }
+      // Create WhatsApp message
+      const whatsappNumber = '16265028538'; // +1 (626) 502-8538
+      const message = `Hello! I want to get the bonus from the Express Assert video.%0A%0AEmail: ${email}%0ACity: ${city}`;
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+      
+      // Open WhatsApp
+      window.open(whatsappUrl, '_blank');
 
       toast({
-        title: "Bonus Sent! 🎁",
-        description: "Check your email for your second step bonus materials!",
+        title: "Redirecting to WhatsApp! 📱",
+        description: "Please send the message to get your bonus materials.",
       });
 
       setEmail('');
       setPassword('');
+      setCity('');
     } catch (error: any) {
-      console.error('Error subscribing to bonus:', error);
+      console.error('Error creating WhatsApp message:', error);
       toast({
         title: "Something went wrong",
         description: "Please try again or contact support.",
@@ -259,6 +263,19 @@ const ExpressAssert = () => {
           </Card>
         </div>
 
+        {/* Multiple Bouncing Arrows Below Video */}
+        <div className="flex justify-center items-center space-x-2 mt-2 sm:mt-3 mb-4 sm:mb-6">
+          <div className="animate-bounce" style={{ animationDelay: '0s' }}>
+            <ChevronDown size={28} className="text-primary" />
+          </div>
+          <div className="animate-bounce" style={{ animationDelay: '0.2s' }}>
+            <ChevronDown size={32} className="text-primary" />
+          </div>
+          <div className="animate-bounce" style={{ animationDelay: '0.4s' }}>
+            <ChevronDown size={28} className="text-primary" />
+          </div>
+        </div>
+
         {/* Email Bonus Section */}
         <div className="max-w-4xl mx-auto mt-6 sm:mt-8 px-4 sm:px-6">
           <Card className="p-4 sm:p-6 bg-gradient-accent border-2 border-primary/20">
@@ -274,7 +291,7 @@ const ExpressAssert = () => {
                 برای گرفتن هدیه ، اسم رمز و ایمیل خودت رو وارد کن
               </p>
               
-              <div className="flex flex-col gap-3 max-w-md mx-auto">
+               <div className="flex flex-col gap-3 max-w-md mx-auto">
                 <Input
                   type="text"
                   placeholder="Enter Video's Pass word 'fnp'"
@@ -287,6 +304,13 @@ const ExpressAssert = () => {
                   placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitting}
+                />
+                <Input
+                  type="text"
+                  placeholder="Enter your city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
                   disabled={isSubmitting}
                 />
                 <Button 
