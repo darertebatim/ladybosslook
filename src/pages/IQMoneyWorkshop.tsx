@@ -155,41 +155,41 @@ export default function IQMoneyWorkshop() {
     },
     {
       module: "Module 3",
-      title: "Debt Elimination & Credit Optimization", 
+      title: "Debt Elimination & Financial Confidence Building", 
       lessons: 9,
       duration: "2.8 hours",
       icon: <TrendingDown className="h-6 w-6" />,
       topics: [
-        "Debt Avalanche vs Snowball Method",
-        "Credit Score Improvement Strategies",
-        "Negotiating with Creditors",
-        "Consolidation vs Refinancing",
-        "Credit Card Optimization",
-        "Student Loan Management",
-        "Mortgage Strategies",
-        "Building Credit from Scratch",
-        "Credit Monitoring & Protection"
+        "Debt Psychology & Mindset Shift",
+        "Strategic Debt Elimination Methods",
+        "Building Financial Confidence While Paying Off Debt",
+        "Credit Building Without Overwhelming Paperwork",
+        "Simple Credit Optimization Strategies",
+        "Debt Consolidation Made Easy",
+        "Emergency Fund Building",
+        "Financial Confidence Exercises",
+        "Overcoming Money Shame and Guilt"
       ]
     },
     {
       module: "Module 4",
-      title: "Investment Fundamentals & Wealth Building",
+      title: "Investment Psychology & Wealth Building Mindset",
       lessons: 12,
       duration: "4.1 hours", 
       icon: <TrendingUp className="h-6 w-6" />,
       topics: [
-        "Investment Basics & Risk Assessment",
-        "Stock Market Fundamentals",
-        "ETFs vs Mutual Funds",
-        "Dollar-Cost Averaging Strategy",
-        "Retirement Account Optimization (401k, IRA)",
+        "Investment Psychology Fundamentals",
+        "Overcoming Fear of Investing",
+        "Understanding Your Risk Personality",
+        "Simple Investment Strategies for Beginners",
+        "Building Investment Confidence",
+        "Dollar-Cost Averaging Made Simple",
+        "Retirement Planning Without Complexity",
         "Real Estate Investment Basics",
-        "Diversification Strategies",
-        "Tax-Efficient Investing",
-        "Robo-Advisors vs DIY Investing",
-        "Creating Investment Goals",
-        "Rebalancing Your Portfolio",
-        "Long-term Wealth Building Plan"
+        "Diversification for Peace of Mind",
+        "Investment Goal Setting",
+        "Market Psychology & Emotions",
+        "Long-term Wealth Building Mindset"
       ]
     },
     {
@@ -288,7 +288,7 @@ export default function IQMoneyWorkshop() {
   return (
     <>
       <SEOHead 
-        title="IQMoney Mastery Course: Complete Financial Education for Ambitious Women"
+        title="IQMoney Online Course: Money Literacy for Ladyboss - Complete Financial Education"
         description="Master your money with our comprehensive online course. 52 lessons covering budgeting, investing, debt elimination, and wealth building. Lifetime access, expert instruction, and proven strategies for financial independence."
         image={moneyLiteracyHero}
       />
@@ -303,7 +303,8 @@ export default function IQMoneyWorkshop() {
                 🎓 PREMIUM ONLINE COURSE
               </Badge>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-8 bg-gradient-to-r from-slate-900 via-blue-900 to-purple-900 bg-clip-text text-transparent leading-tight">
-                IQMoney Mastery Course
+                IQMoney Online Course:<br />
+                Money Literacy for Ladyboss
               </h1>
               <p className="text-xl md:text-2xl font-medium text-slate-700 mb-8 max-w-4xl mx-auto leading-relaxed">
                 The Complete Financial Education System for Ambitious Women Who Demand Excellence
@@ -356,6 +357,100 @@ export default function IQMoneyWorkshop() {
                 <Shield className="inline h-4 w-4 mr-1" />
                 Secure payment • 30-day money-back guarantee
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Why Immigrant Women Need This */}
+        <section className="py-20 bg-gradient-to-br from-purple-50 to-pink-50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
+                  Why Immigrant Women Need Financial Independence More Than Ever
+                </h2>
+                <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
+                  As an immigrant woman, you face unique financial challenges that others may not understand. 
+                  This course addresses the specific needs and barriers that immigrant women encounter on their path to financial freedom.
+                </p>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+                <div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-6">The Immigrant Woman's Financial Reality</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-start space-x-3">
+                      <CheckCircle className="h-5 w-5 text-purple-600 mt-1 flex-shrink-0" />
+                      <p className="text-slate-700">
+                        <strong>Limited Family Safety Net:</strong> Unlike others who may have generational wealth or family support, you're building from ground zero
+                      </p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <CheckCircle className="h-5 w-5 text-purple-600 mt-1 flex-shrink-0" />
+                      <p className="text-slate-700">
+                        <strong>Supporting Multiple Households:</strong> You may be sending money home while building your own future, requiring advanced financial planning
+                      </p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <CheckCircle className="h-5 w-5 text-purple-600 mt-1 flex-shrink-0" />
+                      <p className="text-slate-700">
+                        <strong>Credit and Banking Barriers:</strong> Building credit history and navigating financial systems that weren't designed with immigrants in mind
+                      </p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <CheckCircle className="h-5 w-5 text-purple-600 mt-1 flex-shrink-0" />
+                      <p className="text-slate-700">
+                        <strong>Cultural Financial Differences:</strong> Learning new financial systems, investment strategies, and wealth-building approaches
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-6">Why This Course Is Your Solution</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-start space-x-3">
+                      <Star className="h-5 w-5 text-gold-500 mt-1 flex-shrink-0" />
+                      <p className="text-slate-700">
+                        <strong>Culturally Aware Strategies:</strong> Razie understands the immigrant experience and provides strategies that work for our unique situation
+                      </p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Star className="h-5 w-5 text-gold-500 mt-1 flex-shrink-0" />
+                      <p className="text-slate-700">
+                        <strong>No Prerequisites Required:</strong> Start wherever you are - no existing credit, savings, or investment knowledge needed
+                      </p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Star className="h-5 w-5 text-gold-500 mt-1 flex-shrink-0" />
+                      <p className="text-slate-700">
+                        <strong>Multiple Income Stream Focus:</strong> Learn to build diverse income sources for security and growth
+                      </p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Star className="h-5 w-5 text-gold-500 mt-1 flex-shrink-0" />
+                      <p className="text-slate-700">
+                        <strong>Community of Like-Minded Women:</strong> Connect with other immigrant women on the same journey to financial independence
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-8 rounded-3xl text-white text-center">
+                <h3 className="text-2xl font-bold mb-4">Your Financial Independence Is Not Just a Dream - It's Your Right</h3>
+                <p className="text-lg opacity-90 mb-6 max-w-3xl mx-auto">
+                  You didn't come this far to only come this far. It's time to build the financial security and wealth that will not only 
+                  transform your life but create a legacy for generations to come.
+                </p>
+                <Button 
+                  onClick={handleEnrollClick}
+                  disabled={isProcessingPayment}
+                  className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 text-lg font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105"
+                >
+                  {isProcessingPayment ? "Processing..." : "Start Your Financial Independence Journey"}
+                </Button>
+              </div>
             </div>
           </div>
         </section>
