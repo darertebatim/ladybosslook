@@ -185,7 +185,7 @@ const Programs = () => {
               variant="secondary"
               size="lg"
               className="bg-white text-primary hover:bg-white/90"
-              onClick={() => window.open('https://wa.me/19495723730', '_blank')}
+              onClick={() => window.open('https://wa.me/16265028538', '_blank')}
             >
               Book Free Consultation
             </Button>
