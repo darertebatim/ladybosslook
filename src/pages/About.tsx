@@ -3,9 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, Users, TrendingUp, Award, Instagram, Quote } from 'lucide-react';
-import aboutHero1 from "@/assets/about-hero-1.jpg";
-import aboutHero2 from "@/assets/about-hero-2.jpg";
-import aboutHero3 from "@/assets/about-hero-3.jpg";
+import razie1 from "@/assets/razie-1.jpg";
+import razie2 from "@/assets/razie-2.jpg";
+import razie3 from "@/assets/razie-3.jpg";
+import razie4 from "@/assets/razie-4.jpg";
+import razie5 from "@/assets/razie-5.jpg";
+import razie6 from "@/assets/razie-6.jpg";
 import testimonialAvatar from "@/assets/testimonial-avatar.jpg";
 
 export default function About() {
@@ -74,7 +77,7 @@ export default function About() {
       <SEOHead 
         title="About Us - LadyBoss Academy | Empowering Women to Success"
         description="Learn about LadyBoss Academy's journey from a small consulting agency to empowering 264,000+ women worldwide. Discover our mission to help women achieve financial independence and business success."
-        image={aboutHero1}
+        image={razie1}
       />
       
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50/30">
@@ -96,27 +99,70 @@ export default function About() {
             </div>
 
             {/* Hero Images Grid */}
-            <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
-              <div className="aspect-[4/3] overflow-hidden rounded-2xl shadow-xl">
+            <div className="grid md:grid-cols-6 gap-4 max-w-7xl mx-auto mb-16">
+              <div className="md:col-span-2 aspect-[3/4] overflow-hidden rounded-2xl shadow-xl">
                 <img 
-                  src={aboutHero1} 
-                  alt="LadyBoss Academy founder"
+                  src={razie1} 
+                  alt="Razie - LadyBoss Academy Founder"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="aspect-[3/4] overflow-hidden rounded-2xl shadow-xl">
+              <div className="md:col-span-2 aspect-[3/4] overflow-hidden rounded-2xl shadow-xl">
                 <img 
-                  src={aboutHero2} 
-                  alt="LadyBoss community member"
+                  src={razie2} 
+                  alt="Razie - Empowering Women Entrepreneurs"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="aspect-[3/4] overflow-hidden rounded-2xl shadow-xl">
+              <div className="md:col-span-2 aspect-[3/4] overflow-hidden rounded-2xl shadow-xl">
                 <img 
-                  src={aboutHero3} 
-                  alt="Successful LadyBoss entrepreneur"
+                  src={razie3} 
+                  alt="Razie - LadyBoss Academy Leader"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
+              </div>
+              <div className="md:col-span-3 aspect-[4/3] overflow-hidden rounded-2xl shadow-xl">
+                <img 
+                  src={razie4} 
+                  alt="Razie - Business Coach and Mentor"
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="md:col-span-3 aspect-[4/3] overflow-hidden rounded-2xl shadow-xl">
+                <img 
+                  src={razie5} 
+                  alt="Razie - Women's Empowerment Leader"
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+            </div>
+
+            {/* Additional Founder Spotlight */}
+            <div className="max-w-4xl mx-auto mb-16">
+              <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-8 lg:p-12">
+                <div className="grid lg:grid-cols-2 gap-8 items-center">
+                  <div>
+                    <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 mb-4">
+                      Meet Razie - Your Success Mentor
+                    </h3>
+                    <p className="text-lg text-slate-700 leading-relaxed mb-6">
+                      From a small consulting agency to empowering over 264,000 women worldwide, 
+                      Razie's journey is a testament to the power of determination, vision, and 
+                      the LadyBoss mindset.
+                    </p>
+                    <p className="text-md text-slate-600 leading-relaxed">
+                      "Every woman has the potential to be a LadyBoss. My mission is to unlock 
+                      that potential and guide you toward financial independence and success."
+                    </p>
+                  </div>
+                  <div className="aspect-[3/4] overflow-hidden rounded-2xl shadow-xl">
+                    <img 
+                      src={razie6} 
+                      alt="Razie - Inspiring Success Stories"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
