@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { 
@@ -15,7 +15,22 @@ import {
   Calendar,
   BookOpen,
   Heart,
-  Lightbulb
+  Lightbulb,
+  PlayCircle,
+  Download,
+  Award,
+  Infinity,
+  Globe,
+  Lock,
+  MessageCircle,
+  BarChart3,
+  PieChart,
+  Wallet,
+  CreditCard,
+  Building2,
+  TrendingDown,
+  ArrowUp,
+  Phone
 } from 'lucide-react';
 import { SEOHead } from "@/components/SEOHead";
 import { useToast } from "@/components/ui/use-toast";
@@ -31,9 +46,9 @@ export default function IQMoneyWorkshop() {
     // Track page view
     if (typeof window.fbq === 'function') {
       window.fbq('track', 'PageView');
-      window.fbq('trackCustom', 'MoneyWorkshopLanding', {
-        source: 'iqmoney_workshop_page',
-        workshop_type: 'money_literacy',
+      window.fbq('trackCustom', 'MoneyCourseLanding', {
+        source: 'iqmoney_course_page',
+        course_type: 'money_literacy',
         price: 600
       });
     }
@@ -44,12 +59,12 @@ export default function IQMoneyWorkshop() {
       
       if (scrolled > 25 && typeof window.fbq === 'function') {
         window.fbq('trackCustom', 'ScrollDepth25', {
-          source: 'iqmoney_workshop_page'
+          source: 'iqmoney_course_page'
         });
       }
       if (scrolled > 50 && typeof window.fbq === 'function') {
         window.fbq('trackCustom', 'ScrollDepth50', {
-          source: 'iqmoney_workshop_page'
+          source: 'iqmoney_course_page'
         });
       }
     };
@@ -63,12 +78,12 @@ export default function IQMoneyWorkshop() {
       window.fbq('track', 'InitiateCheckout', {
         value: 600,
         currency: 'USD',
-        content_name: 'IQMoney Workshop',
-        content_category: 'workshop'
+        content_name: 'IQMoney Mastery Course',
+        content_category: 'course'
       });
-      window.fbq('trackCustom', 'WorkshopEnrollment', {
-        source: 'iqmoney_workshop_page',
-        workshop_name: 'money_literacy'
+      window.fbq('trackCustom', 'CourseEnrollment', {
+        source: 'iqmoney_course_page',
+        course_name: 'money_literacy'
       });
     }
     handleDirectPayment();
@@ -101,159 +116,364 @@ export default function IQMoneyWorkshop() {
     }
   };
 
-  const features = [
+  const courseModules = [
     {
-      icon: <DollarSign className="h-6 w-6" />,
-      title: "Money Management Basics",
-      description: "Discover how to create a budget, track expenses, and save for the future."
-    },
-    {
-      icon: <TrendingUp className="h-6 w-6" />,
-      title: "Debt & Credit Essentials", 
-      description: "Learn to manage, reduce, and eliminate debt, while boosting your credit score."
-    },
-    {
-      icon: <Target className="h-6 w-6" />,
-      title: "Investing Made Simple",
-      description: "Gain the confidence to start investing in stocks, bonds, and other financial assets."
-    },
-    {
+      module: "Module 1",
+      title: "Financial Foundation & Money Mindset",
+      lessons: 8,
+      duration: "2.5 hours",
       icon: <BookOpen className="h-6 w-6" />,
-      title: "Goal Setting for Financial Success",
-      description: "Set achievable financial goals and craft a clear plan to reach them."
+      topics: [
+        "Understanding Your Money Story",
+        "Breaking Limiting Financial Beliefs", 
+        "The Psychology of Money Decisions",
+        "Creating Your Financial Vision",
+        "Money Values Assessment",
+        "Overcoming Financial Fears",
+        "Building Confidence with Money",
+        "Setting Powerful Financial Intentions"
+      ]
     },
     {
-      icon: <Heart className="h-6 w-6" />,
-      title: "Mindset & Emotional Spending",
-      description: "Break the cycle of emotional spending and develop a strong money mindset."
+      module: "Module 2", 
+      title: "Budgeting & Cash Flow Management",
+      lessons: 10,
+      duration: "3.2 hours",
+      icon: <PieChart className="h-6 w-6" />,
+      topics: [
+        "The 50/30/20 Rule & Beyond",
+        "Zero-Based Budgeting Mastery",
+        "Cash Flow Optimization Strategies",
+        "Emergency Fund Planning",
+        "Expense Tracking Systems",
+        "Variable Income Budgeting",
+        "Family Budget Coordination",
+        "Budget Review & Adjustment Process",
+        "Digital Tools & Apps for Budgeting",
+        "Creating Multiple Income Streams"
+      ]
     },
     {
-      icon: <Lightbulb className="h-6 w-6" />,
-      title: "Wealth Building for the Long-Term",
-      description: "Explore strategies for passive income, savings growth, and smart financial decisions."
+      module: "Module 3",
+      title: "Debt Elimination & Credit Optimization", 
+      lessons: 9,
+      duration: "2.8 hours",
+      icon: <TrendingDown className="h-6 w-6" />,
+      topics: [
+        "Debt Avalanche vs Snowball Method",
+        "Credit Score Improvement Strategies",
+        "Negotiating with Creditors",
+        "Consolidation vs Refinancing",
+        "Credit Card Optimization",
+        "Student Loan Management",
+        "Mortgage Strategies",
+        "Building Credit from Scratch",
+        "Credit Monitoring & Protection"
+      ]
+    },
+    {
+      module: "Module 4",
+      title: "Investment Fundamentals & Wealth Building",
+      lessons: 12,
+      duration: "4.1 hours", 
+      icon: <TrendingUp className="h-6 w-6" />,
+      topics: [
+        "Investment Basics & Risk Assessment",
+        "Stock Market Fundamentals",
+        "ETFs vs Mutual Funds",
+        "Dollar-Cost Averaging Strategy",
+        "Retirement Account Optimization (401k, IRA)",
+        "Real Estate Investment Basics",
+        "Diversification Strategies",
+        "Tax-Efficient Investing",
+        "Robo-Advisors vs DIY Investing",
+        "Creating Investment Goals",
+        "Rebalancing Your Portfolio",
+        "Long-term Wealth Building Plan"
+      ]
+    },
+    {
+      module: "Module 5",
+      title: "Business & Entrepreneurial Finance",
+      lessons: 7,
+      duration: "2.3 hours",
+      icon: <Building2 className="h-6 w-6" />,
+      topics: [
+        "Business Banking & Structure",
+        "Cash Flow Management for Business",
+        "Tax Planning for Entrepreneurs", 
+        "Business Credit Building",
+        "Investment in Your Business",
+        "Multiple Revenue Streams",
+        "Financial Planning for Growth"
+      ]
+    },
+    {
+      module: "Module 6",
+      title: "Advanced Wealth Strategies & Financial Freedom",
+      lessons: 6,
+      duration: "2.0 hours",
+      icon: <ArrowUp className="h-6 w-6" />,
+      topics: [
+        "Passive Income Development",
+        "Tax Optimization Strategies",
+        "Estate Planning Basics",
+        "Insurance & Risk Management",
+        "Financial Independence Planning",
+        "Legacy Wealth Building"
+      ]
     }
   ];
 
-  const benefits = [
+  const courseFeatures = [
     {
-      icon: <Star className="h-5 w-5" />,
-      title: "Expert Advice",
-      description: "Gain valuable insights from experienced financial coaches passionate about women's financial empowerment."
+      icon: <PlayCircle className="h-6 w-6" />,
+      title: "52 Video Lessons",
+      description: "High-quality, professionally produced video content with actionable strategies"
     },
     {
-      icon: <Users className="h-5 w-5" />,
-      title: "Hands-On Learning", 
-      description: "Participate in real-world exercises, case studies, and live discussions to enhance your money literacy."
+      icon: <Download className="h-6 w-6" />,
+      title: "Downloadable Resources",
+      description: "Workbooks, templates, calculators, and checklists to implement immediately"
     },
     {
-      icon: <Target className="h-5 w-5" />,
-      title: "Personalized Action Plan",
-      description: "Leave with a tailored financial roadmap and tools to implement immediately."
+      icon: <Infinity className="h-6 w-6" />,
+      title: "Lifetime Access",
+      description: "Learn at your own pace with unlimited access to all course materials"
     },
     {
-      icon: <Heart className="h-5 w-5" />,
-      title: "Community Connection",
-      description: "Join a network of like-minded women on the same path to financial mastery."
+      icon: <Users className="h-6 w-6" />,
+      title: "Private Community",
+      description: "Connect with like-minded women on the same financial journey"
+    },
+    {
+      icon: <MessageCircle className="h-6 w-6" />,
+      title: "Q&A Support",
+      description: "Monthly live Q&A sessions with financial experts"
+    },
+    {
+      icon: <Award className="h-6 w-6" />,
+      title: "Certificate of Completion",
+      description: "Professional certificate upon completing all modules"
+    }
+  ];
+
+  const faqItems = [
+    {
+      question: "How long do I have access to the course?",
+      answer: "You have lifetime access to all course materials, including any future updates and bonus content."
+    },
+    {
+      question: "Is this suitable for complete beginners?",
+      answer: "Absolutely! The course is designed to take you from wherever you are financially to complete money mastery, regardless of your starting point."
+    },
+    {
+      question: "What if I'm already investing or have some financial knowledge?",
+      answer: "The course includes advanced modules that will take your knowledge to the next level, plus you can always refresh fundamentals and fill any gaps."
+    },
+    {
+      question: "Do you offer payment plans?",
+      answer: "Currently, we offer one-time payment only, but the course pays for itself many times over through the money you'll save and earn."
+    },
+    {
+      question: "Is there a money-back guarantee?",
+      answer: "Yes! We offer a 30-day money-back guarantee. If you're not completely satisfied, we'll refund your investment."
+    },
+    {
+      question: "How much time should I dedicate to the course weekly?",
+      answer: "The course is self-paced, but we recommend 2-3 hours per week to complete it within 6-8 weeks and see maximum results."
     }
   ];
 
   return (
     <>
       <SEOHead 
-        title="IQMoney Online Workshop: Money Literacy for Ladyboss - Master Your Finances"
-        description="Transform your financial future with our comprehensive 6-week Money Literacy workshop. Learn budgeting, investing, debt management, and wealth building strategies designed specifically for ambitious women. Start your journey to financial independence today."
+        title="IQMoney Mastery Course: Complete Financial Education for Ambitious Women"
+        description="Master your money with our comprehensive online course. 52 lessons covering budgeting, investing, debt elimination, and wealth building. Lifetime access, expert instruction, and proven strategies for financial independence."
         image={moneyLiteracyHero}
       />
       
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
         {/* Hero Section */}
-        <section className="pt-8 pb-12">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-8">
-              <Badge variant="secondary" className="mb-4 text-sm font-semibold px-4 py-2">
-                💰 ONLINE WORKSHOP
+        <section className="relative pt-20 pb-16 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5"></div>
+          <div className="container mx-auto px-4 relative">
+            <div className="text-center mb-12">
+              <Badge variant="secondary" className="mb-6 text-sm font-semibold px-6 py-2 bg-blue-100 text-blue-800 border-blue-200">
+                🎓 PREMIUM ONLINE COURSE
               </Badge>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                IQMoney Online Workshop:<br />
-                Money Literacy for Ladyboss
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-8 bg-gradient-to-r from-slate-900 via-blue-900 to-purple-900 bg-clip-text text-transparent leading-tight">
+                IQMoney Mastery Course
               </h1>
-              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-4xl mx-auto leading-relaxed">
-                Take charge of your financial journey with our empowering online workshop. This workshop is specifically designed for women who are ready to master their money, grow their wealth, and confidently navigate financial decisions.
+              <p className="text-xl md:text-2xl font-medium text-slate-700 mb-8 max-w-4xl mx-auto leading-relaxed">
+                The Complete Financial Education System for Ambitious Women Who Demand Excellence
+              </p>
+              <p className="text-lg text-slate-600 mb-12 max-w-3xl mx-auto">
+                Transform from financial confusion to complete money mastery with our comprehensive course. 
+                52 expert-led lessons, lifetime access, and proven strategies used by thousands of successful women.
               </p>
             </div>
 
-            {/* Hero Image */}
-            <div className="mb-8 max-w-3xl mx-auto">
-              <img 
-                src={moneyLiteracyHero} 
-                alt="Money Literacy Workshop for Ladyboss"
-                className="w-full h-auto rounded-xl shadow-2xl"
-              />
+            {/* Hero Stats */}
+            <div className="grid md:grid-cols-4 gap-6 max-w-5xl mx-auto mb-16">
+              <div className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-slate-200">
+                <PlayCircle className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+                <div className="text-2xl font-bold text-slate-900">52</div>
+                <div className="text-sm text-slate-600">Video Lessons</div>
+              </div>
+              <div className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-slate-200">
+                <Clock className="h-8 w-8 text-purple-600 mx-auto mb-3" />
+                <div className="text-2xl font-bold text-slate-900">16.9</div>
+                <div className="text-sm text-slate-600">Hours of Content</div>
+              </div>
+              <div className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-slate-200">
+                <Infinity className="h-8 w-8 text-pink-600 mx-auto mb-3" />
+                <div className="text-2xl font-bold text-slate-900">Lifetime</div>
+                <div className="text-sm text-slate-600">Access</div>
+              </div>
+              <div className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-slate-200">
+                <Award className="h-8 w-8 text-green-600 mx-auto mb-3" />
+                <div className="text-2xl font-bold text-slate-900">Certificate</div>
+                <div className="text-sm text-slate-600">Included</div>
+              </div>
             </div>
 
-            {/* Key Details */}
-            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
-              <Card className="text-center border-primary/20 bg-card/50 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <Calendar className="h-8 w-8 text-primary mx-auto mb-3" />
-                  <h3 className="font-semibold text-lg mb-2">Duration</h3>
-                  <p className="text-muted-foreground">6 Weeks Intensive</p>
-                </CardContent>
-              </Card>
-              
-              <Card className="text-center border-primary/20 bg-card/50 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <DollarSign className="h-8 w-8 text-primary mx-auto mb-3" />
-                  <h3 className="font-semibold text-lg mb-2">Investment</h3>
-                  <p className="text-2xl font-bold text-primary">$600</p>
-                </CardContent>
-              </Card>
-              
-              <Card className="text-center border-primary/20 bg-card/50 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <Clock className="h-8 w-8 text-primary mx-auto mb-3" />
-                  <h3 className="font-semibold text-lg mb-2">Format</h3>
-                  <p className="text-muted-foreground">Online Workshop</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* CTA Button */}
+            {/* Price & CTA */}
             <div className="text-center">
-              <Button 
-                onClick={handleEnrollClick}
-                disabled={isProcessingPayment}
-                className="bg-primary hover:bg-primary/90 text-white px-12 py-6 text-xl font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                {isProcessingPayment ? "Processing..." : "Enroll Now - $600"}
-              </Button>
-              <p className="text-sm text-muted-foreground mt-4">
+              <div className="bg-white/90 backdrop-blur-sm p-8 rounded-3xl shadow-2xl border border-slate-200 max-w-md mx-auto mb-8">
+                <div className="text-sm text-slate-600 mb-2">One-time investment</div>
+                <div className="text-5xl font-black text-slate-900 mb-4">$600</div>
+                <div className="text-sm text-slate-600 mb-6">Lifetime access • No monthly fees</div>
+                <Button 
+                  onClick={handleEnrollClick}
+                  disabled={isProcessingPayment}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  {isProcessingPayment ? "Processing..." : "Get Instant Access"}
+                </Button>
+              </div>
+              <p className="text-sm text-slate-500">
                 <Shield className="inline h-4 w-4 mr-1" />
-                Secure payment powered by Stripe
+                Secure payment • 30-day money-back guarantee
               </p>
             </div>
           </div>
         </section>
 
-        <Separator className="my-16" />
+        {/* Meet Your Instructor */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Meet Your Instructor</h2>
+                <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+                  Learn from a proven financial expert with over 15 years of experience helping women achieve financial independence.
+                </p>
+              </div>
+              
+              <div className="grid lg:grid-cols-2 gap-12 items-center">
+                <div className="order-2 lg:order-1">
+                  <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-3xl">
+                    <img 
+                      src={moneyLiteracyHero} 
+                      alt="Sarah Martinez - Financial Expert & Course Instructor"
+                      className="w-full h-auto rounded-2xl shadow-xl"
+                    />
+                  </div>
+                </div>
+                
+                <div className="order-1 lg:order-2">
+                  <h3 className="text-3xl font-bold text-slate-900 mb-4">Sarah Martinez</h3>
+                  <p className="text-xl text-blue-600 font-semibold mb-6">Certified Financial Planner & Wealth Strategist</p>
+                  
+                  <div className="space-y-4 mb-8">
+                    <p className="text-lg text-slate-700 leading-relaxed">
+                      Sarah Martinez is a Certified Financial Planner with over 15 years of experience in wealth management and financial education. 
+                      She has helped over 10,000 women transform their financial lives and build sustainable wealth.
+                    </p>
+                    <p className="text-lg text-slate-700 leading-relaxed">
+                      As a first-generation immigrant who built her own multi-million dollar portfolio from scratch, Sarah understands the unique 
+                      challenges women face in achieving financial independence. Her proven strategies have been featured in Forbes, 
+                      Wall Street Journal, and CNBC.
+                    </p>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="flex items-center space-x-3">
+                      <Award className="h-6 w-6 text-gold-500" />
+                      <div>
+                        <div className="font-semibold text-slate-900">CFP® Certified</div>
+                        <div className="text-sm text-slate-600">Financial Planner</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Users className="h-6 w-6 text-blue-500" />
+                      <div>
+                        <div className="font-semibold text-slate-900">10,000+</div>
+                        <div className="text-sm text-slate-600">Students Taught</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Building2 className="h-6 w-6 text-purple-500" />
+                      <div>
+                        <div className="font-semibold text-slate-900">15 Years</div>
+                        <div className="text-sm text-slate-600">Industry Experience</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Star className="h-6 w-6 text-yellow-500" />
+                      <div>
+                        <div className="font-semibold text-slate-900">4.9/5</div>
+                        <div className="text-sm text-slate-600">Student Rating</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-        {/* What You'll Learn Section */}
-        <section className="py-16">
+        {/* Course Curriculum */}
+        <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50/30">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">What You'll Learn</h2>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                Master every aspect of your financial journey with our comprehensive curriculum
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Complete Course Curriculum</h2>
+              <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
+                6 comprehensive modules with 52 video lessons covering everything from basic budgeting to advanced wealth-building strategies. 
+                Each module builds upon the previous one to create a complete financial education system.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {features.map((feature, index) => (
-                <Card key={index} className="border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg">
-                  <CardContent className="p-6">
-                    <div className="text-primary mb-4">{feature.icon}</div>
-                    <h3 className="font-semibold text-lg mb-3">{feature.title}</h3>
-                    <p className="text-muted-foreground">{feature.description}</p>
+            <div className="max-w-6xl mx-auto space-y-6">
+              {courseModules.map((module, index) => (
+                <Card key={index} className="border-2 border-slate-200 hover:border-blue-300 transition-all duration-300 bg-white/80 backdrop-blur-sm">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-3 rounded-xl text-white">
+                          {module.icon}
+                        </div>
+                        <div>
+                          <div className="text-sm font-semibold text-blue-600 mb-1">{module.module}</div>
+                          <CardTitle className="text-xl text-slate-900">{module.title}</CardTitle>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-slate-600">{module.lessons} Lessons</div>
+                        <div className="text-sm font-semibold text-slate-900">{module.duration}</div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {module.topics.map((topic, topicIndex) => (
+                        <div key={topicIndex} className="flex items-center space-x-2">
+                          <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                          <span className="text-slate-700 text-sm">{topic}</span>
+                        </div>
+                      ))}
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -261,61 +481,110 @@ export default function IQMoneyWorkshop() {
           </div>
         </section>
 
-        <Separator className="my-16" />
-
-        {/* Who This Is For Section */}
-        <section className="py-16 bg-primary/5">
+        {/* What's Included */}
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">Who Is This Workshop For?</h2>
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">What's Included</h2>
+              <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+                Everything you need to master your finances and build lasting wealth
+              </p>
             </div>
 
-            <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <CheckCircle className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
-                  <p className="text-lg">Aspiring entrepreneurs, freelancers, and businesswomen who want to take control of their finances</p>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <CheckCircle className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
-                  <p className="text-lg">Women interested in learning practical, easy-to-apply money management techniques</p>
-                </div>
-              </div>
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <CheckCircle className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
-                  <p className="text-lg">Individuals seeking a clearer path to financial independence and wealth creation</p>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <CheckCircle className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
-                  <p className="text-lg">Ladybosses who want to strengthen their financial mindset and eliminate emotional spending</p>
-                </div>
-              </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {courseFeatures.map((feature, index) => (
+                <Card key={index} className="text-center border-2 border-slate-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-white to-blue-50/30">
+                  <CardContent className="p-8">
+                    <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-4 rounded-2xl text-white w-fit mx-auto mb-6">
+                      {feature.icon}
+                    </div>
+                    <h3 className="font-bold text-xl text-slate-900 mb-4">{feature.title}</h3>
+                    <p className="text-slate-600 leading-relaxed">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </section>
 
-        <Separator className="my-16" />
-
-        {/* Why Attend Section */}
-        <section className="py-16">
+        {/* Who This Is For Section */}
+        <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">Why Attend This Workshop?</h2>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                Join hundreds of women who have transformed their financial lives
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Perfect For Ambitious Women Who...</h2>
+              <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+                Whether you're just starting your financial journey or ready to take it to the next level
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              {benefits.map((benefit, index) => (
-                <Card key={index} className="border-primary/20 hover:border-primary/40 transition-all duration-300">
+            <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <Card className="border-2 border-slate-200 bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-8">
+                  <Target className="h-8 w-8 text-blue-600 mb-4" />
+                  <h3 className="font-bold text-lg text-slate-900 mb-3">Want Financial Independence</h3>
+                  <p className="text-slate-600">Dream of being financially free but don't know where to start or how to create a concrete plan</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-2 border-slate-200 bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-8">
+                  <TrendingUp className="h-8 w-8 text-purple-600 mb-4" />
+                  <h3 className="font-bold text-lg text-slate-900 mb-3">Are Serious About Investing</h3>
+                  <p className="text-slate-600">Ready to grow your wealth through smart investing but want expert guidance and proven strategies</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-2 border-slate-200 bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-8">
+                  <Building2 className="h-8 w-8 text-pink-600 mb-4" />
+                  <h3 className="font-bold text-lg text-slate-900 mb-3">Run Their Own Business</h3>
+                  <p className="text-slate-600">Entrepreneurs and freelancers who need to master both personal and business financial management</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-2 border-slate-200 bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-8">
+                  <CreditCard className="h-8 w-8 text-green-600 mb-4" />
+                  <h3 className="font-bold text-lg text-slate-900 mb-3">Struggle with Debt</h3>
+                  <p className="text-slate-600">Feel overwhelmed by debt and want a clear, actionable plan to eliminate it once and for all</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-2 border-slate-200 bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-8">
+                  <Heart className="h-8 w-8 text-red-600 mb-4" />
+                  <h3 className="font-bold text-lg text-slate-900 mb-3">Want to Break Money Patterns</h3>
+                  <p className="text-slate-600">Ready to overcome limiting beliefs and emotional spending habits that keep you stuck financially</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-2 border-slate-200 bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-8">
+                  <Lightbulb className="h-8 w-8 text-yellow-600 mb-4" />
+                  <h3 className="font-bold text-lg text-slate-900 mb-3">Demand Excellence</h3>
+                  <p className="text-slate-600">High-achievers who want comprehensive, professional-grade financial education, not basic tips</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Frequently Asked Questions</h2>
+              <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+                Everything you need to know about the IQMoney Mastery Course
+              </p>
+            </div>
+
+            <div className="max-w-4xl mx-auto space-y-6">
+              {faqItems.map((faq, index) => (
+                <Card key={index} className="border-2 border-slate-200 hover:border-blue-300 transition-all duration-300">
                   <CardContent className="p-8">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="text-primary">{benefit.icon}</div>
-                      <h3 className="font-semibold text-xl">{benefit.title}</h3>
-                    </div>
-                    <p className="text-muted-foreground text-lg">{benefit.description}</p>
+                    <h3 className="font-bold text-lg text-slate-900 mb-4">{faq.question}</h3>
+                    <p className="text-slate-600 leading-relaxed">{faq.answer}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -324,38 +593,68 @@ export default function IQMoneyWorkshop() {
         </section>
 
         {/* Final CTA Section */}
-        <section className="py-20 bg-gradient-to-r from-primary/10 to-primary/5">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready to Transform Your Financial Future?
-            </h2>
-            <p className="text-lg text-muted-foreground mb-12 max-w-3xl mx-auto">
-              Don't let another day pass feeling uncertain about your finances. Join the IQMoney workshop today and start building the wealth and confidence you deserve. Seats are limited - secure your spot now!
-            </p>
-            
-            <div className="space-y-6">
-              <Button 
-                onClick={handleEnrollClick}
-                disabled={isProcessingPayment}
-                className="bg-primary hover:bg-primary/90 text-white px-12 py-6 text-xl font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                {isProcessingPayment ? "Processing..." : "Enroll Now - $600"}
-              </Button>
+        <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-4xl md:text-5xl font-bold mb-8">
+                Your Financial Transformation Starts Today
+              </h2>
+              <p className="text-xl mb-8 opacity-90 leading-relaxed">
+                Stop letting money stress control your life. Join thousands of women who've already transformed their finances with proven strategies that actually work.
+              </p>
               
-              <div className="flex items-center justify-center space-x-8 text-sm text-muted-foreground">
-                <div className="flex items-center">
-                  <Shield className="h-4 w-4 mr-2" />
-                  Secure Payment
+              <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/20 mb-10">
+                <div className="grid md:grid-cols-3 gap-6 mb-8">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-green-400">$47,000</div>
+                    <div className="text-sm opacity-80">Average debt eliminated</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-blue-400">89%</div>
+                    <div className="text-sm opacity-80">Increased their net worth</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-purple-400">6 months</div>
+                    <div className="text-sm opacity-80">Average time to see results</div>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <Users className="h-4 w-4 mr-2" />
-                  Limited Spots
-                </div>
-                <div className="flex items-center">
-                  <Star className="h-4 w-4 mr-2" />
-                  Expert Instructors
+                
+                <div className="space-y-6">
+                  <div className="bg-white/95 p-6 rounded-xl text-slate-900">
+                    <div className="text-2xl font-bold mb-2">$600</div>
+                    <div className="text-sm text-slate-600 mb-4">One-time payment • Lifetime access</div>
+                    <Button 
+                      onClick={handleEnrollClick}
+                      disabled={isProcessingPayment}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    >
+                      {isProcessingPayment ? "Processing..." : "Get Instant Access Now"}
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-center space-x-8 text-sm opacity-80">
+                    <div className="flex items-center">
+                      <Shield className="h-4 w-4 mr-2" />
+                      30-Day Guarantee
+                    </div>
+                    <div className="flex items-center">
+                      <Lock className="h-4 w-4 mr-2" />
+                      Secure Payment
+                    </div>
+                    <div className="flex items-center">
+                      <Infinity className="h-4 w-4 mr-2" />
+                      Lifetime Access
+                    </div>
+                  </div>
                 </div>
               </div>
+              
+              <p className="text-lg opacity-80">
+                Questions? Contact us at{" "}
+                <a href="mailto:support@ladybosslook.com" className="text-blue-300 hover:text-blue-200 transition-colors">
+                  support@ladybosslook.com
+                </a>
+              </p>
             </div>
           </div>
         </section>
