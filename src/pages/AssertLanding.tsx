@@ -142,47 +142,24 @@ const AssertLanding = () => {
         description="Get exclusive access to our powerful assertive expression video training. Learn to communicate with confidence as an immigrant woman."
       />
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
-        {/* Navigation Header */}
-        <div className="border-b border-border bg-background/95 backdrop-blur-md">
-          <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-            <div className="flex items-center justify-between">
-              <Link 
-                to="/" 
-                className="flex items-center space-x-2 text-muted-foreground hover:text-primary transition-smooth"
-              >
-                <span className="text-sm sm:text-base">← Home</span>
-              </Link>
-              
-              <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-hero rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xs sm:text-sm">LB</span>
-                </div>
-                <span className="font-display text-base sm:text-lg font-bold gradient-text hidden xs:block">
-                  LadyBoss Academy
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="max-w-4xl mx-auto">
             {/* Hero Section - Mobile Optimized */}
-            <div className="text-center mb-6 sm:mb-8">
-              <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-primary/10 rounded-full mb-4 sm:mb-6">
+            <div className="text-center mb-4 sm:mb-6">
+              <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-primary/10 rounded-full mb-3 sm:mb-4">
                 <Gift size={14} className="sm:w-4 sm:h-4 mr-2 text-primary" />
                 <span className="text-xs sm:text-sm font-medium text-primary">
                   Exclusive Video Training
                 </span>
               </div>
               
-              <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 px-2 leading-tight">
+              <h1 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 px-2 leading-tight">
                 <span className="gradient-text">Assertive Expression Training</span>
                 <br />
-                <span className="text-base sm:text-lg md:text-xl font-normal">for Immigrant Women</span>
+                <span className="text-sm sm:text-base md:text-lg font-normal">for Immigrant Women</span>
               </h1>
               
-              <div className="mb-6 sm:mb-8 max-w-md mx-auto">
+              <div className="mb-4 sm:mb-6 max-w-xs sm:max-w-sm mx-auto">
                 <img 
                   src={assertiveTrainingHero} 
                   alt="Professional woman in assertive expression training" 
@@ -191,7 +168,7 @@ const AssertLanding = () => {
               </div>
 
               {/* Value Props - Compact for mobile */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6 max-w-2xl mx-auto px-2">
                 <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 bg-muted/50 rounded-lg">
                   <CheckCircle size={14} className="sm:w-4 sm:h-4 text-primary flex-shrink-0" />
                   <span className="text-xs sm:text-sm font-medium text-center sm:text-left">Instant Access</span>
@@ -207,15 +184,15 @@ const AssertLanding = () => {
               </div>
 
               {/* Animated arrows pointing to CTA */}
-              <div className="flex justify-center items-center mb-4 space-x-2">
+              <div className="flex justify-center items-center mb-3 space-x-2">
                 <div className="animate-bounce">
-                  <ChevronDown className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                  <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                 </div>
                 <div className="animate-bounce" style={{ animationDelay: '0.2s' }}>
-                  <ChevronDown className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
+                  <ChevronDown className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                 </div>
                 <div className="animate-bounce" style={{ animationDelay: '0.4s' }}>
-                  <ChevronDown className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                  <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                 </div>
               </div>
 
@@ -231,7 +208,7 @@ const AssertLanding = () => {
             </div>
 
             {/* Benefits Section - Compact */}
-            <div className="bg-muted/30 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
+            <div className="bg-muted/30 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
               <h3 className="font-display text-lg sm:text-xl font-bold mb-4 text-center">
                 What You'll Learn:
               </h3>
