@@ -42,7 +42,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/landing" element={<Landing />} />
-            <Route path="/assert-access" element={<AssertLanding />} />
+            <Route path="/asac" element={<AssertLanding />} />
             <Route path="/auth" element={<Auth />} />
             <Route 
               path="/admin" 

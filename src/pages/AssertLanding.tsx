@@ -1,8 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowRight, Play, Gift, Star, CheckCircle, Mail, MessageCircle, Send } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ArrowRight, Play, Gift, Star, CheckCircle, Mail, MessageCircle, Send, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { SEOHead } from '@/components/SEOHead';
@@ -18,9 +20,11 @@ declare global {
 
 const AssertLanding = () => {
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [city, setCity] = useState('');
   const [preference, setPreference] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   // Meta Pixel tracking
   useEffect(() => {
@@ -46,7 +50,7 @@ const AssertLanding = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !city || !preference) {
+    if (!email || !name || !city || !preference) {
       toast({
         title: "All fields required",
         description: "Please fill in all fields to access the video.",
@@ -77,7 +81,7 @@ const AssertLanding = () => {
         });
         
         window.fbq('trackCustom', 'VideoAccessRequest', {
-          source: 'assert_landing_page',
+          source: 'asac_landing_page',
           communication_preference: preference,
           user_intent: 'video_access'
         });
@@ -87,12 +91,12 @@ const AssertLanding = () => {
       const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
         body: {
           email,
-          name: '',
+          name: name,
           city: city,
           phone: '',
-          source: 'assert_landing_page',
+          source: 'asac_landing_page',
           communication_preference: preference,
-          tags: ['express_assert_access']
+          tags: ['asac']
         }
       });
 
@@ -105,6 +109,13 @@ const AssertLanding = () => {
         title: "Access Granted! 🎉",
         description: "Redirecting you to the Express Assert video...",
       });
+
+      // Reset form and close modal
+      setEmail('');
+      setName('');
+      setCity('');
+      setPreference('');
+      setShowModal(false);
 
       // Redirect to ExpressAssert after 1 second
       setTimeout(() => {
@@ -153,155 +164,232 @@ const AssertLanding = () => {
           </div>
         </div>
 
-        <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="max-w-4xl mx-auto">
-            {/* Hero Section */}
-            <div className="text-center mb-8 sm:mb-12">
-              <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full mb-6">
-                <Gift size={16} className="mr-2 text-primary" />
-                <span className="text-sm font-medium text-primary">
+            {/* Hero Section - Mobile Optimized */}
+            <div className="text-center mb-6 sm:mb-8">
+              <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-primary/10 rounded-full mb-4 sm:mb-6">
+                <Gift size={14} className="sm:w-4 sm:h-4 mr-2 text-primary" />
+                <span className="text-xs sm:text-sm font-medium text-primary">
                   Exclusive Video Training
                 </span>
               </div>
               
-              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 px-2 leading-tight">
+              <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 px-2 leading-tight">
                 Unlock Your{' '}
                 <span className="gradient-text">Assertive Voice</span>
               </h1>
               
-              <p className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto mb-8 leading-relaxed">
-                Get exclusive access to our powerful assertive expression training designed specifically for immigrant women ready to transform their communication style.
+              <p className="text-sm sm:text-base md:text-lg text-foreground/80 max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed px-2">
+                Get exclusive access to our powerful assertive expression training designed specifically for immigrant women.
               </p>
 
-              {/* Value Props */}
-              <div className="grid sm:grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
-                <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-                  <CheckCircle size={16} className="text-primary flex-shrink-0" />
-                  <span className="text-sm font-medium">Instant Access</span>
+              {/* Value Props - Compact for mobile */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
+                <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 bg-muted/50 rounded-lg">
+                  <CheckCircle size={14} className="sm:w-4 sm:h-4 text-primary flex-shrink-0" />
+                  <span className="text-xs sm:text-sm font-medium text-center sm:text-left">Instant Access</span>
                 </div>
-                <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-                  <Play size={16} className="text-primary flex-shrink-0" />
-                  <span className="text-sm font-medium">Video Training</span>
+                <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 bg-muted/50 rounded-lg">
+                  <Play size={14} className="sm:w-4 sm:h-4 text-primary flex-shrink-0" />
+                  <span className="text-xs sm:text-sm font-medium text-center sm:text-left">Video Training</span>
                 </div>
-                <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-                  <Star size={16} className="text-primary flex-shrink-0" />
-                  <span className="text-sm font-medium">Exclusive Content</span>
+                <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 bg-muted/50 rounded-lg">
+                  <Star size={14} className="sm:w-4 sm:h-4 text-primary flex-shrink-0" />
+                  <span className="text-xs sm:text-sm font-medium text-center sm:text-left">Exclusive</span>
+                </div>
+              </div>
+
+              {/* Animated arrows pointing to CTA */}
+              <div className="flex justify-center items-center mb-4 space-x-2">
+                <div className="animate-bounce">
+                  <ChevronDown className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                </div>
+                <div className="animate-bounce" style={{ animationDelay: '0.2s' }}>
+                  <ChevronDown className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
+                </div>
+                <div className="animate-bounce" style={{ animationDelay: '0.4s' }}>
+                  <ChevronDown className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                </div>
+              </div>
+
+              {/* Main CTA Button */}
+              <Button 
+                onClick={() => setShowModal(true)}
+                className="w-full max-w-sm bg-primary hover:bg-primary/90 text-white px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                size="lg"
+              >
+                <ArrowRight size={18} className="sm:w-5 sm:h-5 mr-2" />
+                Get Instant Access
+              </Button>
+            </div>
+
+            {/* Benefits Section - Compact */}
+            <div className="bg-muted/30 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
+              <h3 className="font-display text-lg sm:text-xl font-bold mb-4 text-center">
+                What You'll Learn:
+              </h3>
+              <div className="grid sm:grid-cols-2 gap-3 text-sm">
+                <div className="flex items-start gap-2">
+                  <CheckCircle size={16} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>Express yourself with confidence</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle size={16} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>Navigate cultural differences</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle size={16} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>Build assertive communication</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle size={16} className="text-primary mt-0.5 flex-shrink-0" />
+                  <span>Overcome self-doubt</span>
                 </div>
               </div>
             </div>
 
-            {/* Main Form Card */}
-            <Card className="max-w-lg mx-auto p-6 sm:p-8 bg-gradient-card border-2 border-primary/20 shadow-luxury">
-              <div className="text-center mb-6">
-                <h2 className="font-display text-2xl sm:text-3xl font-bold mb-2">
-                  Get Instant Access
-                </h2>
-                <p className="text-muted-foreground">
-                  Just 3 quick details to unlock your training
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium mb-2">
-                    Email Address *
-                  </label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isSubmitting}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="city" className="block text-sm font-medium mb-2">
-                    Your City *
-                  </label>
-                  <Input
-                    id="city"
-                    type="text"
-                    placeholder="Enter your city"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    disabled={isSubmitting}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="preference" className="block text-sm font-medium mb-2">
-                    How would you like us to contact you? *
-                  </label>
-                  <Select value={preference} onValueChange={setPreference} disabled={isSubmitting} required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Choose your preference" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="email">
-                        <div className="flex items-center gap-2">
-                          <Mail size={16} />
-                          Email
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="whatsapp">
-                        <div className="flex items-center gap-2">
-                          <MessageCircle size={16} />
-                          WhatsApp
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="telegram">
-                        <div className="flex items-center gap-2">
-                          <Send size={16} />
-                          Telegram
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button 
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                  size="lg"
-                >
-                  {isSubmitting ? (
-                    'Processing...'
-                  ) : (
-                    <>
-                      <ArrowRight size={20} className="mr-2" />
-                      Unlock Video Training
-                    </>
-                  )}
-                </Button>
-              </form>
-
-              <p className="text-xs text-muted-foreground text-center mt-4">
-                By submitting, you agree to receive valuable content and updates. 
-                You can unsubscribe anytime.
-              </p>
-            </Card>
-
-            {/* Social Proof */}
-            <div className="text-center mt-8 sm:mt-12">
-              <p className="text-sm text-muted-foreground mb-4">
+            {/* Social Proof - Compact */}
+            <div className="text-center">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-2">
                 Trusted by immigrant women worldwide
               </p>
               <div className="flex items-center justify-center gap-1 mb-2">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={16} className="text-yellow-400 fill-current" />
+                  <Star key={i} size={14} className="text-yellow-400 fill-current" />
                 ))}
               </div>
-              <p className="text-sm font-medium">
-                "This training changed how I communicate at work and in my community"
+              <p className="text-xs sm:text-sm font-medium">
+                "This training changed how I communicate at work"
               </p>
             </div>
           </div>
         </main>
+
+        {/* Registration Modal */}
+        <Dialog open={showModal} onOpenChange={setShowModal}>
+          <DialogContent className="sm:max-w-md bg-background border-2 border-primary/20 shadow-luxury">
+            <DialogHeader className="text-center">
+              <DialogTitle className="text-xl sm:text-2xl font-bold mb-2">
+                🎉 Get Your Access
+              </DialogTitle>
+              <p className="text-sm text-muted-foreground">
+                Just a few details to unlock your training
+              </p>
+            </DialogHeader>
+
+            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="modal-name" className="text-left block font-medium">
+                  Your Name *
+                </Label>
+                <Input
+                  id="modal-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your name"
+                  required
+                  className="h-12 border-2 focus:border-primary"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="modal-email" className="text-left block font-medium">
+                  Email Address *
+                </Label>
+                <Input
+                  id="modal-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your.email@example.com"
+                  required
+                  className="h-12 border-2 focus:border-primary"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="modal-city" className="text-left block font-medium">
+                  Your City *
+                </Label>
+                <Input
+                  id="modal-city"
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Enter your city"
+                  required
+                  className="h-12 border-2 focus:border-primary"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="modal-preference" className="text-left block font-medium">
+                  Preferred Contact Method *
+                </Label>
+                <Select value={preference} onValueChange={setPreference} disabled={isSubmitting} required>
+                  <SelectTrigger className="h-12 border-2 focus:border-primary">
+                    <SelectValue placeholder="How should we contact you?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="email">
+                      <div className="flex items-center gap-2">
+                        <Mail size={16} />
+                        Email
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="whatsapp">
+                      <div className="flex items-center gap-2">
+                        <MessageCircle size={16} />
+                        WhatsApp
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="telegram">
+                      <div className="flex items-center gap-2">
+                        <Send size={16} />
+                        Telegram
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90 text-white transition-all duration-300 transform hover:scale-105"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  'Processing...'
+                ) : (
+                  <>
+                    <ArrowRight size={18} className="mr-2" />
+                    Unlock Video Now
+                  </>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-4 text-center text-xs text-muted-foreground">
+              <p>🔒 Your information is completely secure</p>
+              <p className="mt-1">💌 You'll only receive valuable content</p>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Sticky Bottom CTA - Mobile */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-primary/95 backdrop-blur-sm border-t border-primary/10 sm:hidden">
+          <Button
+            onClick={() => setShowModal(true)}
+            className="w-full h-12 text-base font-bold bg-background hover:bg-muted text-primary transition-colors duration-200 rounded-lg"
+          >
+            🚀 Get Instant Access
+          </Button>
+        </div>
       </div>
     </>
   );
