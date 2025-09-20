@@ -1,33 +1,55 @@
 import { Card } from '@/components/ui/card';
 import { Star, Quote } from 'lucide-react';
-import testimonial1 from '@/assets/testimonial-1.jpg';
-import testimonial2 from '@/assets/testimonial-2.jpg';
-import testimonial3 from '@/assets/testimonial-3.jpg';
+import testimonialAvatar from '@/assets/testimonial-avatar.jpg';
 
 const Testimonials = () => {
   const testimonials = [
     {
-      name: 'Sarah Martinez',
-      title: 'CEO, TechFlow Solutions',
-      image: testimonial1,
-      quote: 'The Business Growth Accelerator completely transformed my approach to entrepreneurship. I went from struggling freelancer to running a 7-figure agency in just 18 months. The support and strategies are unmatched.',
-      revenue: '+420% Revenue Growth',
+      name: 'Dr. Tina Ghaboulian',
+      title: 'Dentist and Owner of a Dental Clinic',
+      image: testimonialAvatar,
+      quote: 'I joined the Academy in Spring 2024 and participated in the financial literacy course. In the past 15-20 years, I\'ve attended various courses, but none addressed financial literacy in the practical way that Mrs. Mirzaei teaches. The mindset shift I achieved has had a positive impact on various aspects of my life.',
+      revenue: 'Business Growth',
       rating: 5
     },
     {
-      name: 'Jessica Chen',
-      title: 'Founder, Bloom Wellness Co.',
-      image: testimonial2,
-      quote: 'LadyBoss Academy gave me the confidence and financial literacy I needed to scale my wellness business. The networking opportunities alone have been worth the investment - I\'ve formed partnerships that changed my life.',
-      revenue: '+280% Client Base',
+      name: 'Maliheh Shafiei',
+      title: 'Founder of a Kids\' Products Online Shop',
+      image: testimonialAvatar,
+      quote: 'When you enter this Academy, you truly feel like you\'ve joined a new family that supports you. The weekly online programs are genuinely beyond what you offer as services, and your sense of responsibility in helping us achieve our goals is invaluable.',
+      revenue: 'Family Support',
       rating: 5
     },
     {
-      name: 'Maria Rodriguez',
-      title: 'Investment Strategist & Author',
-      image: testimonial3,
-      quote: 'The Money Literacy program opened my eyes to investment strategies I never knew existed. I\'ve built multiple passive income streams and achieved financial independence faster than I ever imagined possible.',
-      revenue: '$500K+ Portfolio',
+      name: 'Niloufar',
+      title: 'Accounting and Taxation Instructor',
+      image: testimonialAvatar,
+      quote: 'Since I started your lessons, I\'ve been able to deliver my services more professionally, help more clients, and even achieve the income level I always dreamed of. These changes weren\'t just in my business; they positively influenced my personality and life too.',
+      revenue: 'Dream Income Achieved',
+      rating: 5
+    },
+    {
+      name: 'Nadia Ghaemi',
+      title: 'Specialist in Bulk Imports',
+      image: testimonialAvatar,
+      quote: 'Your valuable guidance enabled me to advance in my business and pursue the path to success with more motivation. You helped me recognize my strengths better and approach challenges with greater confidence.',
+      revenue: 'Business Advancement',
+      rating: 5
+    },
+    {
+      name: 'Leila',
+      title: 'Hair Color Specialist, Setting Up a Beauty Salon',
+      image: testimonialAvatar,
+      quote: 'Both of them are remarkable instructors with keen attention to detail. These two great individuals are guides for every season of life, helping in all aspects of life, especially the financial side.',
+      revenue: 'Life Transformation',
+      rating: 5
+    },
+    {
+      name: 'Laleh',
+      title: 'Massage Therapist, Setting Up a Massage and Spa Salon',
+      image: testimonialAvatar,
+      quote: 'This course was truly helpful. Your guidance on reflecting on our attitudes toward money, learning how to build up our business step by step, and where to invest wisely was incredibly valuable. It has greatly boosted my motivation and confidence.',
+      revenue: 'Confidence Boost',
       rating: 5
     }
   ];
@@ -54,8 +76,8 @@ const Testimonials = () => {
         </div>
 
         {/* Testimonials Grid */}
-        <div className="grid lg:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
+        <div className="grid lg:grid-cols-3 xl:grid-cols-3 gap-8 max-h-[800px] overflow-hidden">
+          {testimonials.slice(0, 6).map((testimonial, index) => (
             <Card 
               key={index}
               className="group p-8 bg-gradient-card border-border hover:shadow-medium transition-all duration-300 hover:-translate-y-2 relative"
