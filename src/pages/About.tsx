@@ -43,32 +43,32 @@ export default function About() {
     {
       name: "Dr. Tina Ghaboulian",
       role: "Dentist and Owner of a Dental Clinic",
-      content: "I am so happy to have met you on this journey. What fascinates me is that when you enter this Academy, you truly feel like you've joined a new family that supports you. The weekly online programs are genuinely beyond what you offer as services, and your sense of responsibility in not letting us go and helping us achieve our goals is invaluable to me."
+      content: "I joined the Academy in Spring 2024 and participated in the financial literacy course. Interestingly, in the past 15-20 years, I've attended various courses and classes in Canada, mostly related to business management, but none of them addressed financial literacy in the practical way that Mrs. Mirzaei teaches. After that, I attended the IQBusiness classes, and although I still have a long way to go, I can clearly see the impact of changing my mindset and learning practical strategies on my business. Another valuable takeaway from these classes was the change in my perspective on the business world. I used to think that focusing on the business aspect of my work might diminish its quality. But now, I am confident that I can expand my work and still remain a good dentist without compromising the quality of treatments I offer. The mindset shift I achieved, thanks to Mr. Lotfi's teachings, has had a positive impact on various aspects of my life."
     },
     {
       name: "Maliheh Shafiei", 
       role: "Founder of a Kids' Products Online Shop",
-      content: "I want to thank you for all your efforts and hard work in educating and helping me grow. You helped me recognize my strengths better and approach professional and personal challenges with greater confidence through your wisdom and attention to detail."
+      content: "I am so happy to have met you on this journey. What fascinates me is that when you enter this Academy, you truly feel like you've joined a new family that supports you. The weekly online programs are genuinely beyond what you offer as services, and your sense of responsibility in not letting us go and helping us achieve our goals is invaluable to me. I deeply appreciate it and hope this continues."
     },
     {
       name: "Nadia Ghaemi",
       role: "Specialist in Bulk Imports", 
-      content: "Your valuable guidance enabled me to advance in my business and pursue the path to success with more motivation. Since I started your lessons, I've been able to deliver my services more professionally, help more clients, and even achieve the income level I always dreamed of."
+      content: "I am Nadia, and I've been familiar with Ladyboss since 2020. I want to thank you for all your efforts and hard work in educating and helping me grow. You helped me recognize my strengths better and approach professional and personal challenges with greater confidence through your wisdom and attention to detail. Your valuable guidance enabled me to advance in my business and pursue the path to success with more motivation."
     },
     {
       name: "Niloufar",
       role: "Accounting and Taxation Instructor",
-      content: "Your teachings are more than just knowledge; their impact is clearly evident in my personality and business. Now, I can manage challenges with more confidence and pursue my goals with greater resolve. These changes weren't just in my business; they positively influenced my personality and life too."
+      content: "I wanted to thank you for all your valuable teachings and guidance and let you know about the profound impact these teachings have had on my life and business. My business is in the field of accounting and tax services. Before meeting you and Mrs. Mirzaei, I always wished for an active and stable business, but I often lost my way halfway and felt the path I had chosen was too complicated and challenging. But you were like a light in the darkness for me. Your education and support gave me hope and motivation to continue with greater determination and clarity. One of the aspects that distinguishes your courses from others I've taken is how you teach with the simplest and most fundamental words, so much so that they never leave my mind. Your teachings are more than just knowledge; their impact is clearly evident in my personality and business. Since I started your lessons, I've been able to deliver my services more professionally, help more clients, and even achieve the income level I always dreamed of. These changes weren't just in my business; they positively influenced my personality and life too. Now, I can manage challenges with more confidence and pursue my goals with greater resolve."
     },
     {
       name: "Leila", 
       role: "Hair Color Specialist, Setting Up a Beauty Salon",
-      content: "Both of them are remarkable and valuable instructors with keen attention to detail. Whenever they talk about or analyze a topic, I realize it's something I've experienced before. These two great individuals are guides for every season of life, helping in all aspects of life, especially the financial side."
+      content: "I'm Leila, and I've known Mrs. Mirzaei through Instagram for several years, having participated in her school and classes, as well as those of her husband, Mr. Lotfi. Both of them are remarkable and valuable instructors with keen attention to detail. Whenever they talk about or analyze a topic, I realize it's something I've experienced before. These seemingly small issues have always been obstacles to achieving my goals. These two great individuals are guides for every season of life, helping in all aspects of life, especially the financial side."
     },
     {
       name: "Laleh",
       role: "Massage Therapist, Setting Up a Massage and Spa Salon",
-      content: "This course was truly helpful. Your guidance on reflecting on our attitudes toward money, learning how to build up our business step by step, and where to invest wisely was incredibly valuable. I really appreciate how you emphasized the importance of mindset alongside actions."
+      content: "I just wanted to take a moment to thank you both for your amazing courses! You truly transformed my perspective. I have often struggled with training courses that emphasize a money-making mindset, as they tended to feel like mere fancy speeches. However, this course was truly helpful. Your guidance on reflecting on our attitudes toward money, learning how to build up our business step by step, and where to invest wisely was incredibly valuable. I really appreciate how you emphasized the importance of mindset alongside actions; it has greatly boosted my motivation and confidence."
     }
   ];
 
