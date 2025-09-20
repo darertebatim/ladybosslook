@@ -23,7 +23,7 @@ const Programs = () => {
       ],
       price: '$600',
       popular: false,
-      link: '/iqmoney-workshop'
+      link: '/iqmoney'
     },
     {
       title: 'Business Growth Accelerator',

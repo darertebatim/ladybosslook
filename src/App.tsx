@@ -67,7 +67,7 @@ const App = () => (
             <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
             <Route path="/freelive" element={<FreeLive />} />
             <Route path="/thankfreelive" element={<ThankFreeLive />} />
-            <Route path="/iqmoney-workshop" element={<IQMoneyWorkshop />} />
+            <Route path="/iqmoney" element={<IQMoneyWorkshop />} />
             <Route path="/calendar" element={<CalendarRedirect />} />
             <Route path="/firststepbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/RightsnboundariesLadybossgift.pdf" />} />
             <Route path="/fnpbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/fnpbonus.pdf" />} />

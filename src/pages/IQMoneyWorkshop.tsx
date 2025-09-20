@@ -119,93 +119,93 @@ export default function IQMoneyWorkshop() {
   const courseModules = [
     {
       module: "Module 1",
-      title: "Financial Foundation & Money Mindset",
+      title: "U.S. Financial System & Money Mindset for Immigrants",
       lessons: 8,
       duration: "2.5 hours",
       icon: <BookOpen className="h-6 w-6" />,
       topics: [
-        "Understanding Your Money Story",
+        "How the U.S. Financial System Works",
+        "Banking, Credit & Debt Management Explained",
+        "Understanding Your Money Story as an Immigrant",
         "Breaking Limiting Financial Beliefs", 
-        "The Psychology of Money Decisions",
-        "Creating Your Financial Vision",
-        "Money Values Assessment",
-        "Overcoming Financial Fears",
-        "Building Confidence with Money",
-        "Setting Powerful Financial Intentions"
+        "The Psychology of Money Decisions in a New Country",
+        "Creating Your Financial Vision in America",
+        "Overcoming Financial Fears & Cultural Barriers",
+        "Building Confidence with U.S. Money Systems"
       ]
     },
     {
       module: "Module 2", 
-      title: "Budgeting & Cash Flow Management",
+      title: "Budgeting & Saving Strategies to Stop Paycheck-to-Paycheck Living",
       lessons: 10,
       duration: "3.2 hours",
       icon: <PieChart className="h-6 w-6" />,
       topics: [
-        "The 50/30/20 Rule & Beyond",
-        "Zero-Based Budgeting Mastery",
-        "Cash Flow Optimization Strategies",
-        "Emergency Fund Planning",
-        "Expense Tracking Systems",
-        "Variable Income Budgeting",
-        "Family Budget Coordination",
+        "Budgeting Strategies for Immigrant Families",
+        "How to Grow Your Savings Effectively",
+        "Breaking the Paycheck-to-Paycheck Cycle",
+        "Emergency Fund Planning for Security",
+        "Managing Money While Supporting Family Abroad",
+        "Variable Income Budgeting for Immigrants",
+        "Smart Expense Tracking Systems",
         "Budget Review & Adjustment Process",
-        "Digital Tools & Apps for Budgeting",
+        "Digital Tools & Apps for Money Management",
         "Creating Multiple Income Streams"
       ]
     },
     {
       module: "Module 3",
-      title: "Debt Elimination & Financial Confidence Building", 
+      title: "Credit Building & Avoiding Common Financial Pitfalls", 
       lessons: 9,
       duration: "2.8 hours",
       icon: <TrendingDown className="h-6 w-6" />,
       topics: [
-        "Debt Psychology & Mindset Shift",
+        "Build & Repair Your Credit Score as an Immigrant",
+        "Qualify for Better Financial Opportunities",
+        "Spot Financial Traps & Scams Targeting Immigrants",
         "Strategic Debt Elimination Methods",
         "Building Financial Confidence While Paying Off Debt",
         "Credit Building Without Overwhelming Paperwork",
         "Simple Credit Optimization Strategies",
-        "Debt Consolidation Made Easy",
-        "Emergency Fund Building",
-        "Financial Confidence Exercises",
-        "Overcoming Money Shame and Guilt"
+        "Emergency Fund Building for Stability",
+        "Overcoming Money Shame and Cultural Barriers"
       ]
     },
     {
       module: "Module 4",
-      title: "Investment Psychology & Wealth Building Mindset",
+      title: "Smart Investing for Beginners - Grow Wealth with Little Money",
       lessons: 12,
       duration: "4.1 hours", 
       icon: <TrendingUp className="h-6 w-6" />,
       topics: [
-        "Investment Psychology Fundamentals",
-        "Overcoming Fear of Investing",
+        "Investment Psychology for New Americans",
+        "How to Grow Your Wealth Through Investments",
+        "Start Investing Even with Little Money",
         "Understanding Your Risk Personality",
         "Simple Investment Strategies for Beginners",
-        "Building Investment Confidence",
+        "Building Investment Confidence Step by Step",
         "Dollar-Cost Averaging Made Simple",
-        "Retirement Planning Without Complexity",
-        "Real Estate Investment Basics",
+        "Retirement Planning in the U.S. System",
+        "Real Estate Investment Basics for Immigrants",
         "Diversification for Peace of Mind",
-        "Investment Goal Setting",
         "Market Psychology & Emotions",
-        "Long-term Wealth Building Mindset"
+        "Long-term Wealth Building in America"
       ]
     },
     {
       module: "Module 5",
-      title: "Investing Psychology & Business Building",
+      title: "Business & Side Hustle Finances for Immigrant Entrepreneurs",
       lessons: 7,
       duration: "2.3 hours",
       icon: <Building2 className="h-6 w-6" />,
       topics: [
-        "Investment Psychology & Mindset",
-        "Understanding Market Emotions",
-        "Business Building Fundamentals", 
-        "Scaling Your Business Income",
-        "Investment Strategies for Entrepreneurs",
-        "Building Multiple Revenue Streams",
-        "Long-term Wealth Psychology"
+        "Manage Money Effectively as Entrepreneur or Freelancer",
+        "Business Banking & Structure in the U.S.",
+        "Investment Psychology for Business Owners",
+        "Understanding Market Emotions as Immigrant Business Owner", 
+        "Building Multiple Revenue Streams for Security",
+        "Scaling Your Business Income in America",
+        "Long-term Wealth Psychology for Entrepreneurs"
       ]
     },
     {
@@ -307,11 +307,11 @@ export default function IQMoneyWorkshop() {
                 Money Literacy for Ladyboss
               </h1>
               <p className="text-xl md:text-2xl font-medium text-slate-700 mb-8 max-w-4xl mx-auto leading-relaxed">
-                The Complete Financial Education System for Ambitious Women Who Demand Excellence
+                The Complete Financial Education System for Ambitious Immigrant Women Who Demand Excellence
               </p>
               <p className="text-lg text-slate-600 mb-12 max-w-3xl mx-auto">
-                Transform from financial confusion to complete money mastery with our comprehensive course. 
-                52 expert-led lessons, lifetime access, and proven strategies used by thousands of successful women.
+                Learn how to manage, grow & protect your money in the U.S. financial system. 52 expert-led lessons, 
+                lifetime access, and proven strategies designed specifically for immigrant women seeking financial independence.
               </p>
             </div>
 
@@ -586,17 +586,48 @@ export default function IQMoneyWorkshop() {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {courseFeatures.map((feature, index) => (
-                <Card key={index} className="text-center border-2 border-slate-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-white to-blue-50/30">
-                  <CardContent className="p-8">
-                    <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-4 rounded-2xl text-white w-fit mx-auto mb-6">
-                      {feature.icon}
-                    </div>
-                    <h3 className="font-bold text-xl text-slate-900 mb-4">{feature.title}</h3>
-                    <p className="text-slate-600 leading-relaxed">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
+            {courseFeatures.map((feature, index) => (
+              <Card key={index} className="text-center border-2 border-slate-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-white to-blue-50/30">
+                <CardContent className="p-8">
+                  <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-4 rounded-2xl text-white w-fit mx-auto mb-6">
+                    {feature.icon}
+                  </div>
+                  <h3 className="font-bold text-xl text-slate-900 mb-4">{feature.title}</h3>
+                  <p className="text-slate-600 leading-relaxed">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+            
+            {/* Additional Features for Immigrants */}
+            <Card className="text-center border-2 border-slate-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-white to-green-50/30">
+              <CardContent className="p-8">
+                <div className="bg-gradient-to-br from-green-500 to-blue-600 p-4 rounded-2xl text-white w-fit mx-auto mb-6">
+                  <Globe className="h-6 w-6" />
+                </div>
+                <h3 className="font-bold text-xl text-slate-900 mb-4">No Financial Background Needed</h3>
+                <p className="text-slate-600 leading-relaxed">Step-by-step lessons designed specifically for immigrants new to the U.S. financial system</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center border-2 border-slate-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-white to-purple-50/30">
+              <CardContent className="p-8">
+                <div className="bg-gradient-to-br from-purple-500 to-pink-600 p-4 rounded-2xl text-white w-fit mx-auto mb-6">
+                  <BarChart3 className="h-6 w-6" />
+                </div>
+                <h3 className="font-bold text-xl text-slate-900 mb-4">Budget Templates & Investment Guides</h3>
+                <p className="text-slate-600 leading-relaxed">Practical tools including budget templates, investment guides, and financial checklists</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center border-2 border-slate-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-white to-yellow-50/30">
+              <CardContent className="p-8">
+                <div className="bg-gradient-to-br from-yellow-500 to-orange-600 p-4 rounded-2xl text-white w-fit mx-auto mb-6">
+                  <Lightbulb className="h-6 w-6" />
+                </div>
+                <h3 className="font-bold text-xl text-slate-900 mb-4">Expert Insights & Success Stories</h3>
+                <p className="text-slate-600 leading-relaxed">Learn from financial professionals and real success stories from immigrant women</p>
+              </CardContent>
+            </Card>
             </div>
           </div>
         </section>
