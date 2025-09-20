@@ -302,13 +302,13 @@ export default function IQMoneyWorkshop() {
               <Badge variant="secondary" className="mb-4 text-xs sm:text-sm font-semibold px-4 py-2 bg-blue-100 text-blue-800 border-blue-200">
                 🎓 PREMIUM ONLINE COURSE
               </Badge>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-slate-900 via-blue-900 to-purple-900 bg-clip-text text-transparent leading-tight px-2 max-w-6xl mx-auto">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-slate-900 via-blue-900 to-purple-900 bg-clip-text text-transparent leading-tight px-1 sm:px-2">
                 IQMoney Online Course: Money Literacy for Ladyboss
               </h1>
-              <p className="text-lg sm:text-xl md:text-2xl font-medium text-slate-700 mb-6 max-w-6xl mx-auto leading-relaxed px-4">
+              <p className="text-lg sm:text-xl md:text-2xl font-medium text-slate-700 mb-6 leading-relaxed px-2 sm:px-4">
                 The Complete Financial Education System for Ambitious Immigrant Women Who Demand Excellence
               </p>
-              <p className="text-base sm:text-lg text-slate-600 mb-8 max-w-5xl mx-auto px-4 leading-relaxed">
+              <p className="text-base sm:text-lg text-slate-600 mb-8 px-2 sm:px-4 leading-relaxed max-w-4xl mx-auto">
                 Learn how to manage, grow & protect your money in the U.S. financial system. 52 expert-led lessons, 
                 lifetime access, and proven strategies designed specifically for immigrant women seeking financial independence.
               </p>
