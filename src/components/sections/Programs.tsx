@@ -22,7 +22,8 @@ const Programs = () => {
         '1-on-1 Financial Coaching'
       ],
       price: '$497',
-      popular: false
+      popular: false,
+      link: '/iqmoney-workshop'
     },
     {
       title: 'Business Growth Accelerator',
@@ -39,7 +40,8 @@ const Programs = () => {
         'Weekly Group Coaching Calls'
       ],
       price: '$997',
-      popular: true
+      popular: true,
+      link: '/ccw'
     },
     {
       title: 'Courageous Character Course',
@@ -56,7 +58,8 @@ const Programs = () => {
         'Lead with Confidence'
       ],
       price: '$497',
-      popular: false
+      popular: false,
+      link: '/ccw'
     }
   ];
 
@@ -160,7 +163,7 @@ const Programs = () => {
                   
                   <Button 
                     className="w-full bg-primary hover:bg-primary-dark group-hover:shadow-glow transition-all duration-300"
-                    onClick={() => window.location.href = '/ccw'}
+                    onClick={() => window.location.href = program.link}
                   >
                     Enroll Now
                     <ArrowRight size={16} className="ml-2" />
