@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Video from "./pages/Video";
 import ExpressAssert from "./pages/ExpressAssert";
 import Landing from "./pages/Landing";
+import AssertLanding from "./pages/AssertLanding";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
 import BusinessIdeas from "./pages/BusinessIdeas";
@@ -41,6 +42,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/landing" element={<Landing />} />
+            <Route path="/assert-access" element={<AssertLanding />} />
             <Route path="/auth" element={<Auth />} />
             <Route 
               path="/admin" 
