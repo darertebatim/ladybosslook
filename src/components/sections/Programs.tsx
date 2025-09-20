@@ -9,19 +9,19 @@ const Programs = () => {
   const programs = [
     {
       title: 'Money Literacy for LadyBoss',
-      description: 'Master financial intelligence, investment strategies, and wealth-building techniques designed specifically for ambitious women entrepreneurs.',
+      description: 'Complete financial education system with 52 video lessons covering budgeting, investing, debt elimination, and wealth building. Designed specifically for ambitious women seeking financial independence.',
       image: moneyLiteracyImage,
-      duration: '8 weeks',
-      participants: '2,500+',
+      duration: 'Self-paced',
+      participants: '60,000+',
       rating: 4.9,
       features: [
-        'Personal Financial Assessment',
-        'Investment Strategy Development',
-        'Tax Optimization Techniques',
-        'Wealth Building Roadmap',
-        '1-on-1 Financial Coaching'
+        '52 Expert-Led Video Lessons',
+        'Financial Confidence Building',
+        'Investment Psychology Mastery',
+        'Business Building Strategies',
+        'Lifetime Access & Community'
       ],
-      price: '$497',
+      price: '$600',
       popular: false,
       link: '/iqmoney-workshop'
     },
