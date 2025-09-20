@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { SEOHead } from '@/components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import assertiveTrainingHero from '@/assets/assertive-training-hero.png';
 
 // Declare Facebook Pixel function
 declare global {
@@ -176,13 +177,18 @@ const AssertLanding = () => {
               </div>
               
               <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 px-2 leading-tight">
-                Unlock Your{' '}
-                <span className="gradient-text">Assertive Voice</span>
+                <span className="gradient-text">Assertive Expression Training</span>
+                <br />
+                <span className="text-base sm:text-lg md:text-xl font-normal">for Immigrant Women</span>
               </h1>
               
-              <p className="text-sm sm:text-base md:text-lg text-foreground/80 max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed px-2">
-                Get exclusive access to our powerful assertive expression training designed specifically for immigrant women.
-              </p>
+              <div className="mb-6 sm:mb-8 max-w-md mx-auto">
+                <img 
+                  src={assertiveTrainingHero} 
+                  alt="Professional woman in assertive expression training" 
+                  className="w-full h-auto rounded-xl shadow-lg"
+                />
+              </div>
 
               {/* Value Props - Compact for mobile */}
               <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
