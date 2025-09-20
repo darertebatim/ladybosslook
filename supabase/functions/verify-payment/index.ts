@@ -103,11 +103,16 @@ serve(async (req) => {
       if (orderDetails) {
         logStep('Attempting Mailchimp subscription with workshop details');
         try {
+          // Extract city from billing address if available
+          const billingCity = session.customer_details?.address?.city || 
+                             (customer as any)?.address?.city || 
+                             "";
+          
           const mailchimpResponse = await supabase.functions.invoke('mailchimp-subscribe', {
             body: {
               email: orderDetails.email,
               name: orderDetails.name,
-              city: "Online", // Default city for online workshop
+              city: billingCity, // Use actual billing city instead of "Online"
               phone: orderDetails.phone || "",
               source: "workshop_purchase",
               workshop_name: "Courageous Character Workshop",
