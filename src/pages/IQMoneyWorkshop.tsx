@@ -194,32 +194,32 @@ export default function IQMoneyWorkshop() {
     },
     {
       module: "Module 5",
-      title: "Business & Entrepreneurial Finance",
+      title: "Investing Psychology & Business Building",
       lessons: 7,
       duration: "2.3 hours",
       icon: <Building2 className="h-6 w-6" />,
       topics: [
-        "Business Banking & Structure",
-        "Cash Flow Management for Business",
-        "Tax Planning for Entrepreneurs", 
-        "Business Credit Building",
-        "Investment in Your Business",
-        "Multiple Revenue Streams",
-        "Financial Planning for Growth"
+        "Investment Psychology & Mindset",
+        "Understanding Market Emotions",
+        "Business Building Fundamentals", 
+        "Scaling Your Business Income",
+        "Investment Strategies for Entrepreneurs",
+        "Building Multiple Revenue Streams",
+        "Long-term Wealth Psychology"
       ]
     },
     {
       module: "Module 6",
-      title: "Advanced Wealth Strategies & Financial Freedom",
+      title: "Advanced Wealth Strategies & Financial Confidence",
       lessons: 6,
       duration: "2.0 hours",
       icon: <ArrowUp className="h-6 w-6" />,
       topics: [
+        "Building Unshakeable Financial Confidence",
+        "Advanced Wealth Psychology",
         "Passive Income Development",
-        "Tax Optimization Strategies",
-        "Estate Planning Basics",
-        "Insurance & Risk Management",
-        "Financial Independence Planning",
+        "Long-term Financial Planning",
+        "Risk Management Strategies",
         "Legacy Wealth Building"
       ]
     }
@@ -251,11 +251,11 @@ export default function IQMoneyWorkshop() {
       title: "Q&A Support",
       description: "Monthly live Q&A sessions with financial experts"
     },
-    {
-      icon: <Award className="h-6 w-6" />,
-      title: "Certificate of Completion",
-      description: "Professional certificate upon completing all modules"
-    }
+            {
+              icon: <Award className="h-6 w-6" />,
+              title: "Financial Confidence Builder",
+              description: "Complete program focused on building unshakeable financial confidence and empowerment"
+            }
   ];
 
   const faqItems = [
@@ -333,8 +333,8 @@ export default function IQMoneyWorkshop() {
               </div>
               <div className="text-center bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-slate-200">
                 <Award className="h-8 w-8 text-green-600 mx-auto mb-3" />
-                <div className="text-2xl font-bold text-slate-900">Certificate</div>
-                <div className="text-sm text-slate-600">Included</div>
+                <div className="text-2xl font-bold text-slate-900">Mastery</div>
+                <div className="text-sm text-slate-600">Financial Confidence</div>
               </div>
             </div>
 
@@ -364,37 +364,36 @@ export default function IQMoneyWorkshop() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Meet Your Instructor</h2>
-                <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-                  Learn from a proven financial expert with over 15 years of experience helping women achieve financial independence.
-                </p>
-              </div>
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Meet Your Instructor</h2>
+              <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+                Learn from a proven business coach and best-selling author who has empowered over 60,000 women to achieve financial success.
+              </p>
+            </div>
               
               <div className="grid lg:grid-cols-2 gap-12 items-center">
                 <div className="order-2 lg:order-1">
                   <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-3xl">
-                    <img 
-                      src={moneyLiteracyHero} 
-                      alt="Sarah Martinez - Financial Expert & Course Instructor"
-                      className="w-full h-auto rounded-2xl shadow-xl"
-                    />
+                      <img 
+                        src={moneyLiteracyHero} 
+                        alt="Razie Ladyboss - Best-selling Author & Business Coach"
+                        className="w-full h-auto rounded-2xl shadow-xl"
+                      />
                   </div>
                 </div>
                 
                 <div className="order-1 lg:order-2">
-                  <h3 className="text-3xl font-bold text-slate-900 mb-4">Sarah Martinez</h3>
-                  <p className="text-xl text-blue-600 font-semibold mb-6">Certified Financial Planner & Wealth Strategist</p>
+                  <h3 className="text-3xl font-bold text-slate-900 mb-4">Razie Ladyboss</h3>
+                  <p className="text-xl text-blue-600 font-semibold mb-6">Best-selling Author & Business Coach</p>
                   
                   <div className="space-y-4 mb-8">
                     <p className="text-lg text-slate-700 leading-relaxed">
-                      Sarah Martinez is a Certified Financial Planner with over 15 years of experience in wealth management and financial education. 
-                      She has helped over 10,000 women transform their financial lives and build sustainable wealth.
+                      Razie Ladyboss is a best-selling author and business coach with a passion for empowering women to achieve financial independence. 
+                      She has helped over 60,000 women transform their financial lives and build sustainable wealth through her proven strategies.
                     </p>
                     <p className="text-lg text-slate-700 leading-relaxed">
-                      As a first-generation immigrant who built her own multi-million dollar portfolio from scratch, Sarah understands the unique 
-                      challenges women face in achieving financial independence. Her proven strategies have been featured in Forbes, 
-                      Wall Street Journal, and CNBC.
+                      As a successful entrepreneur who built her own empire from the ground up, Razie understands exactly what it takes to create lasting financial success. 
+                      With 2.7 million Instagram followers, she's become one of the most trusted voices in women's financial empowerment and business building.
                     </p>
                   </div>
                   
@@ -402,22 +401,22 @@ export default function IQMoneyWorkshop() {
                     <div className="flex items-center space-x-3">
                       <Award className="h-6 w-6 text-gold-500" />
                       <div>
-                        <div className="font-semibold text-slate-900">CFP® Certified</div>
-                        <div className="text-sm text-slate-600">Financial Planner</div>
+                        <div className="font-semibold text-slate-900">Best-selling</div>
+                        <div className="text-sm text-slate-600">Author</div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
                       <Users className="h-6 w-6 text-blue-500" />
                       <div>
-                        <div className="font-semibold text-slate-900">10,000+</div>
+                        <div className="font-semibold text-slate-900">60,000+</div>
                         <div className="text-sm text-slate-600">Students Taught</div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
                       <Building2 className="h-6 w-6 text-purple-500" />
                       <div>
-                        <div className="font-semibold text-slate-900">15 Years</div>
-                        <div className="text-sm text-slate-600">Industry Experience</div>
+                        <div className="font-semibold text-slate-900">2.7M</div>
+                        <div className="text-sm text-slate-600">Instagram Followers</div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
