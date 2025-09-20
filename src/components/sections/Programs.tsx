@@ -4,6 +4,7 @@ import { ArrowRight, Star, Clock, Users } from 'lucide-react';
 import moneyLiteracyImage from '@/assets/money-literacy-program.jpg';
 import businessCoachingImage from '@/assets/business-coaching-program.jpg';
 import networkingImage from '@/assets/networking-program.jpg';
+import courageousCharacterImage from '@/assets/courageous-character-course.jpg';
 
 const Programs = () => {
   const programs = [
@@ -64,7 +65,7 @@ const Programs = () => {
     {
       title: 'Courageous Character Course',
       description: 'Master assertiveness & confidence as an immigrant. Build the mindset & communication skills you need to succeed in the U.S.',
-      image: networkingImage,
+      image: courageousCharacterImage,
       duration: '6 weeks',
       participants: '1,800+',
       rating: 4.9,
