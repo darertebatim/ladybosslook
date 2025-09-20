@@ -136,6 +136,23 @@ const ExpressAssert = () => {
         });
       }
 
+      // Add to Mailchimp with city information and fnpbonus tag
+      const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
+        body: {
+          email,
+          name: '',
+          city: city, // Pass the actual city value
+          phone: '',
+          source: 'expressassert_page',
+          tags: ['fnpbonus']
+        }
+      });
+
+      if (error) {
+        console.error('Mailchimp error:', error);
+        // Don't throw error, just log it - we still want to show WhatsApp
+      }
+
       // Create WhatsApp message
       const whatsappNumber = '16265028538'; // +1 (626) 502-8538
       const message = `Hello! I want to get the bonus from the Express Assert video.%0A%0AEmail: ${email}%0ACity: ${city}`;
@@ -145,15 +162,15 @@ const ExpressAssert = () => {
       window.open(whatsappUrl, '_blank');
 
       toast({
-        title: "Redirecting to WhatsApp! 📱",
-        description: "Please send the message to get your bonus materials.",
+        title: "Success! 🎉",
+        description: "Added to our system and redirecting to WhatsApp for your bonus!",
       });
 
       setEmail('');
       setPassword('');
       setCity('');
     } catch (error: any) {
-      console.error('Error creating WhatsApp message:', error);
+      console.error('Error processing request:', error);
       toast({
         title: "Something went wrong",
         description: "Please try again or contact support.",
