@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
+import UpdateMailchimpCities from '@/components/UpdateMailchimpCities';
 
 interface FormSubmission {
   id: string;
@@ -184,6 +185,11 @@ const Admin = () => {
               </p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Mailchimp City Update Tool */}
+        <div className="mb-6">
+          <UpdateMailchimpCities />
         </div>
 
         {/* Submissions Table */}
