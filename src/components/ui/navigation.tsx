@@ -10,7 +10,7 @@ const Navigation = () => {
 
   const navigationItems = [
     { label: 'Home', href: '#home' },
-    { label: 'About', href: '#about' },
+    { label: 'About', href: '/about' },
     { label: 'Programs', href: '#programs' },
     { label: 'IQMoney Course', href: '/iqmoney' },
     { label: 'Training Video', href: '/landing' },

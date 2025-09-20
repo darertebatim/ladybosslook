@@ -6,29 +6,31 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import Index from "./pages/Index";
-import Video from "./pages/Video";
-import ExpressAssert from "./pages/ExpressAssert";
-import Landing from "./pages/Landing";
-import AssertLanding from "./pages/AssertLanding";
+import About from "./pages/About";
 import Admin from "./pages/Admin";
+import AssertLanding from "./pages/AssertLanding";
 import Auth from "./pages/Auth";
 import BusinessIdeas from "./pages/BusinessIdeas";
-import EventIrvine from "./pages/EventIrvine";
-import CourageousWorkshop from "./pages/CourageousWorkshop";
-import PaymentSuccess from "./pages/PaymentSuccess";
+import CapacityDashboard from "./pages/CapacityDashboard";
 import Checkout from "./pages/Checkout";
+import CourageousWorkshop from "./pages/CourageousWorkshop";
+import EventIrvine from "./pages/EventIrvine";
+import ExpressAssert from "./pages/ExpressAssert";
+import FreeLive from "./pages/FreeLive";
+import Giveaway from "./pages/Giveaway";
+import IQMoneyWorkshop from "./pages/IQMoneyWorkshop";
+import Index from "./pages/Index";
+import LadybossAnnouncements from "./pages/LadybossAnnouncements";
+import LadybossCoaching from "./pages/LadybossCoaching";
+import Landing from "./pages/Landing";
+import NotFound from "./pages/NotFound";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import Privacy from "./pages/Privacy";
 import SMSTerms from "./pages/SMSTerms";
-import Giveaway from "./pages/Giveaway";
-import LadybossCoaching from "./pages/LadybossCoaching";
-import LadybossAnnouncements from "./pages/LadybossAnnouncements";
-import NotFound from "./pages/NotFound";
-import Redirect from "./components/Redirect";
-import CalendarRedirect from "./components/CalendarRedirect";
-import FreeLive from "./pages/FreeLive";
 import ThankFreeLive from "./pages/ThankFreeLive";
-import IQMoneyWorkshop from "./pages/IQMoneyWorkshop";
+import Video from "./pages/Video";
+import CalendarRedirect from "./components/CalendarRedirect";
+import Redirect from "./components/Redirect";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +44,7 @@ const App = () => (
           <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
             <Route path="/landing" element={<Landing />} />
             <Route path="/asac" element={<AssertLanding />} />
             <Route path="/auth" element={<Auth />} />
