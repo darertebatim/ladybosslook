@@ -23,7 +23,6 @@ const AssertLanding = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [city, setCity] = useState('');
-  const [preference, setPreference] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -51,7 +50,7 @@ const AssertLanding = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !name || !city || !preference) {
+    if (!email || !name || !city) {
       toast({
         title: "All fields required",
         description: "Please fill in all fields to access the video.",
@@ -83,7 +82,6 @@ const AssertLanding = () => {
         
         window.fbq('trackCustom', 'VideoAccessRequest', {
           source: 'asac_landing_page',
-          communication_preference: preference,
           user_intent: 'video_access'
         });
       }
@@ -96,7 +94,6 @@ const AssertLanding = () => {
           city: city,
           phone: '',
           source: 'asac_landing_page',
-          communication_preference: preference,
           tags: ['asac']
         }
       });
@@ -115,7 +112,6 @@ const AssertLanding = () => {
       setEmail('');
       setName('');
       setCity('');
-      setPreference('');
       setShowModal(false);
 
       // Redirect to ExpressAssert after 1 second
@@ -308,37 +304,6 @@ const AssertLanding = () => {
                   className="h-12 border-2 focus:border-primary"
                   disabled={isSubmitting}
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="modal-preference" className="text-left block font-medium">
-                  Preferred Contact Method *
-                </Label>
-                <Select value={preference} onValueChange={setPreference} disabled={isSubmitting} required>
-                  <SelectTrigger className="h-12 border-2 focus:border-primary">
-                    <SelectValue placeholder="How should we contact you?" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="email">
-                      <div className="flex items-center gap-2">
-                        <Mail size={16} />
-                        Email
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="whatsapp">
-                      <div className="flex items-center gap-2">
-                        <MessageCircle size={16} />
-                        WhatsApp
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="telegram">
-                      <div className="flex items-center gap-2">
-                        <Send size={16} />
-                        Telegram
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
 
               <Button
