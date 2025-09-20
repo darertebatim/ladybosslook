@@ -1,5 +1,6 @@
 import { Card } from '@/components/ui/card';
-import { Star, Quote } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Star, Quote, ArrowRight } from 'lucide-react';
 import testimonialAvatar from '@/assets/testimonial-avatar.jpg';
 
 const Testimonials = () => {
@@ -126,6 +127,21 @@ const Testimonials = () => {
               </div>
             </Card>
           ))}
+        </div>
+
+        {/* Full Stories CTA */}
+        <div className="mt-12 text-center">
+          <Button 
+            size="lg"
+            className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+            onClick={() => window.location.href = '/about'}
+          >
+            Read Full Success Stories
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+          <p className="text-sm text-muted-foreground mt-3">
+            Discover the complete transformational journeys of our community members
+          </p>
         </div>
 
         {/* Overall Stats */}
