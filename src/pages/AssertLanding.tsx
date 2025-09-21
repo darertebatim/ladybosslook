@@ -149,11 +149,11 @@ const AssertLanding = () => {
                 </span>
               </div>
               
-              <h1 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 px-2 leading-tight">
-                <span className="gradient-text">Assertive Expression Training</span>
-                <br />
-                <span className="text-sm sm:text-base md:text-lg font-normal">for Immigrant Women</span>
-              </h1>
+                <h1 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 px-2 leading-tight">
+                  <span className="gradient-text">Assertive Expression Training</span>
+                  <br />
+                  <span className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-normal">for Immigrant Women</span>
+                </h1>
               
               <div className="mb-4 sm:mb-6 max-w-xs sm:max-w-sm mx-auto">
                 <img 
@@ -335,7 +335,7 @@ const AssertLanding = () => {
             onClick={() => setShowModal(true)}
             className="w-full h-12 text-base font-bold bg-background hover:bg-muted text-primary transition-colors duration-200 rounded-lg font-persian"
           >
-            🚀 دسترسی فوری
+            🚀 دسترسی فوری به ویدیوی رایگان
           </Button>
         </div>
       </div>
