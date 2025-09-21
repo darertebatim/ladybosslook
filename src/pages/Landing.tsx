@@ -504,7 +504,7 @@ const Landing = () => {
                   Get Instant Email Access
                 </CardTitle>
                 <CardDescription className="text-lg font-bold bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent drop-shadow-sm">
-                  🎁 آموزش 20 دقیقه‌ای رایگان 🎁
+                  <span className="font-persian"># آموزش 20 دقیقه‌ای رایگان #</span>
                 </CardDescription>
               </CardHeader>
               

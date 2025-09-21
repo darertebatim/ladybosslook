@@ -95,7 +95,7 @@ const FreeLive = () => {
         <div className="container mx-auto px-4 py-12 relative z-10">
           {/* Logo Area */}
           <div className="text-center mb-8">
-            <div className="text-lg md:text-xl text-luxury-silver/90 font-farsi">
+            <div className="text-lg md:text-xl text-luxury-silver/90 font-persian">
               مخصوص خانم‌های مهاجرت کرده به خارج
             </div>
             <div className="text-base md:text-lg text-luxury-silver/80 mt-2">
@@ -110,14 +110,14 @@ const FreeLive = () => {
               {/* Left Side - Hero Text */}
               <div className="text-center lg:text-right space-y-8">
                 <div>
-                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-luxury-white leading-tight mb-6">
+                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-luxury-white leading-tight mb-6 font-persian">
                     <span className="text-secondary block text-5xl md:text-7xl lg:text-8xl">نقشه راه جرات</span>
                     <span className="text-luxury-white block text-3xl md:text-5xl lg:text-6xl">برای زنان مهاجر</span>
                   </h1>
                   
                   {/* Location Restriction */}
                   <div className="text-center mb-4">
-                    <p className="text-luxury-silver/90 font-medium text-lg md:text-xl font-farsi">
+                    <p className="text-luxury-silver/90 font-medium text-lg md:text-xl font-persian">
                       فقط ساکن امریکا | کانادا | اروپا | استرالیا | دبی
                     </p>
                     {/* Arrows pointing down */}
@@ -132,7 +132,7 @@ const FreeLive = () => {
                   <div className="flex justify-center lg:justify-end mb-8">
                     <Button
                       onClick={() => setShowModal(true)}
-                      className="w-full max-w-sm h-16 text-lg md:text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-2xl"
+                      className="w-full max-w-sm h-16 text-lg md:text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-persian transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-2xl"
                     >
                       🚀 کلیک کنید و جای خود را رزرو کنید
                     </Button>

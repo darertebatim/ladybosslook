@@ -58,10 +58,10 @@ export default function LadybossAnnouncements() {
             </h1>
           </div>
           <div className="mb-4 md:mb-6" dir="rtl">
-            <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-[hsl(var(--luxury-gold))] font-farsi mb-2">
+            <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-[hsl(var(--luxury-gold))] font-persian mb-2" dir="rtl">
               تابلوی اعلانات کوچینگ لیدی باس
             </h2>
-            <p className="text-base md:text-xl text-[hsl(var(--luxury-silver))] font-farsi">
+            <p className="text-base md:text-xl text-[hsl(var(--luxury-silver))] font-persian" dir="rtl">
               هر هفته به این صفحه سر بزنید
             </p>
           </div>
@@ -73,11 +73,11 @@ export default function LadybossAnnouncements() {
             <CardContent className="p-4 md:p-6 text-center">
               <div className="flex items-center justify-center gap-2 md:gap-3 mb-3">
                 <Calendar className="h-5 w-5 md:h-6 md:w-6 text-[hsl(var(--luxury-gold))]" />
-                <span className="text-base md:text-lg font-semibold text-[hsl(var(--pure-white))] font-farsi" dir="rtl">
+                <span className="text-base md:text-lg font-semibold text-[hsl(var(--pure-white))] font-persian" dir="rtl">
                   اطلاعیه‌های هفتگی
                 </span>
               </div>
-              <p className="text-sm md:text-base text-[hsl(var(--luxury-silver))] font-farsi" dir="rtl">
+              <p className="text-sm md:text-base text-[hsl(var(--luxury-silver))] font-persian" dir="rtl">
                 لطفا هر هفته به این صفحه سر بزنید چون آخرین خبرها، تمرین‌ها و جزوه‌های کلاس به این صفحه اضافه میشن
               </p>
             </CardContent>
@@ -100,7 +100,7 @@ export default function LadybossAnnouncements() {
                   <div className="flex-1" dir="rtl">
                     <div className="flex items-center gap-2 mb-2 justify-end">
                       {announcement.isToday && (
-                        <Badge className="bg-[hsl(var(--luxury-gold))] text-[hsl(var(--pure-black))] font-farsi">
+                        <Badge className="bg-[hsl(var(--luxury-gold))] text-[hsl(var(--pure-black))] font-persian">
                           امروز
                         </Badge>
                       )}
@@ -115,7 +115,7 @@ export default function LadybossAnnouncements() {
                         {announcement.category}
                       </Badge>
                     </div>
-                    <CardTitle className="text-lg md:text-xl lg:text-2xl mb-2 text-[hsl(var(--pure-white))] font-farsi text-right">
+                    <CardTitle className="text-lg md:text-xl lg:text-2xl mb-2 text-[hsl(var(--pure-white))] font-persian text-right">
                       {announcement.title}
                     </CardTitle>
                   </div>
@@ -127,7 +127,7 @@ export default function LadybossAnnouncements() {
               </CardHeader>
               <CardContent className="pt-0">
                 <div dir="rtl">
-                  <p className="text-[hsl(var(--luxury-silver))] font-farsi leading-relaxed text-sm md:text-base mb-4">
+                  <p className="text-[hsl(var(--luxury-silver))] font-persian leading-relaxed text-sm md:text-base mb-4">
                     {announcement.content}
                   </p>
                   
@@ -136,7 +136,7 @@ export default function LadybossAnnouncements() {
                       <div className="bg-[hsl(var(--luxury-gold))]/10 p-4 rounded-lg border border-[hsl(var(--luxury-gold))]/20">
                         <div className="flex items-center gap-3 justify-end mb-2">
                           <MessageCircle className="h-5 w-5 text-[hsl(var(--luxury-gold))]" />
-                          <span className="text-[hsl(var(--pure-white))] font-farsi font-semibold">واتساپ جدید:</span>
+                          <span className="text-[hsl(var(--pure-white))] font-persian font-semibold">واتساپ جدید:</span>
                         </div>
                         <div className="flex justify-end">
                           <Button
@@ -155,14 +155,14 @@ export default function LadybossAnnouncements() {
                         <div className="bg-blue-500/10 p-4 rounded-lg border border-blue-500/20">
                           <div className="flex items-center gap-3 justify-end mb-2">
                             <Video className="h-5 w-5 text-blue-400" />
-                            <span className="text-[hsl(var(--pure-white))] font-farsi font-semibold">گوگل میت:</span>
+                            <span className="text-[hsl(var(--pure-white))] font-persian font-semibold">گوگل میت:</span>
                           </div>
                           <div className="flex justify-end">
                             <Button
                               variant="default"
                               size="sm"
                               onClick={() => window.open(announcement.meetLink, '_blank')}
-                              className="bg-blue-500 hover:bg-blue-600 text-white font-farsi font-semibold px-4 py-2"
+                              className="bg-blue-500 hover:bg-blue-600 text-white font-persian font-semibold px-4 py-2"
                             >
                               پیوند جلسه امروز
                             </Button>
@@ -174,7 +174,7 @@ export default function LadybossAnnouncements() {
                         <div className="bg-green-500/10 p-4 rounded-lg border border-green-500/20">
                           <div className="flex items-center gap-3 justify-end mb-2">
                             <Mail className="h-5 w-5 text-green-400" />
-                            <span className="text-[hsl(var(--pure-white))] font-farsi font-semibold">ایمیل پشتیبانی:</span>
+                            <span className="text-[hsl(var(--pure-white))] font-persian font-semibold">ایمیل پشتیبانی:</span>
                           </div>
                           <div className="flex justify-end">
                             <Button

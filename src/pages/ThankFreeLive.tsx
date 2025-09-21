@@ -18,7 +18,7 @@ const ThankFreeLive = () => {
       {/* Success Banner */}
       <div className="bg-secondary text-luxury-black py-3 md:py-4 text-center px-4">
         <p className="font-bold text-base md:text-lg lg:text-xl font-farsi">🎉 ثبت نام ۸۰٪ تکمیل شد</p>
-        <p className="font-bold text-base md:text-lg lg:text-xl font-farsi">فقط یک قدم تا دریافت هدیه!</p>
+        <p className="font-bold text-base md:text-lg lg:text-xl font-persian">فقط یک قدم تا دریافت هدیه!</p>
       </div>
 
       {/* Main Content */}
@@ -69,10 +69,10 @@ const ThankFreeLive = () => {
               {/* WhatsApp Button */}
               <div className="text-center">
                 <Button onClick={() => whatsappLink && window.open(whatsappLink, '_blank')} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold text-sm md:text-lg px-4 md:px-8 py-4 md:py-5 h-auto rounded-lg md:rounded-xl shadow-lg transition-all duration-300 font-farsi mb-3 md:mb-4 whitespace-normal leading-tight" disabled={!whatsappLink}>
-                  <span className="text-center text-xl">🚀 به گروه واتساپ بپیوندید و
+                   <span className="font-persian">🚀 به گروه واتساپ بپیوندید و
 هدیه رایگان را دریافت کنید</span>
                 </Button>
-                <p className="text-luxury-silver/80 text-xs md:text-sm font-farsi px-2">
+                <p className="text-luxury-silver/80 text-xs md:text-sm font-persian px-2">
                   ظرفیت محدود - همین الان بپیوندید تا کتاب راهنمای عملی را رایگان دریافت کنید (ارزش ۹۷ دلار)
                 </p>
                 

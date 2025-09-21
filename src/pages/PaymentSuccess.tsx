@@ -237,7 +237,7 @@ export default function PaymentSuccess() {
                       <ArrowRight className="mr-1 sm:mr-2 h-4 w-4 sm:h-6 sm:w-6 font-bold" />
                     </div>
                     <p className="text-muted-foreground text-xs sm:text-base">
-                      از واتسپ اطلاعات ورود به ورکشاپ را دریافت کنید
+                      <span className="font-persian">از واتسپ اطلاعات ورود به ورکشاپ را دریافت کنید</span>
                     </p>
                   </div>
                   
