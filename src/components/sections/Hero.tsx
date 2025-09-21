@@ -51,7 +51,7 @@ const Hero = () => {
                 className="bg-primary hover:bg-primary-dark shadow-medium hover:shadow-glow transition-all duration-300 group"
                 onClick={() => window.location.href = '/ccw'}
               >
-                Start Your Journey
+                شروع سفر شما
                 <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button 
