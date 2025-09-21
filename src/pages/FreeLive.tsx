@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,56 @@ const FreeLive = () => {
   const [showModal, setShowModal] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Meta Pixel tracking - Page view and content tracking
+  useEffect(() => {
+    // Track page view
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'PageView');
+      
+      // Track content view with page-specific data
+      (window as any).fbq('track', 'ViewContent', {
+        content_type: 'webinar_landing',
+        content_name: 'Free Live Courage Roadmap',
+        content_category: 'webinar_registration',
+        value: 97, // Value of the free gift
+        currency: 'USD'
+      });
+
+      // Track custom event for landing page visit
+      (window as any).fbq('trackCustom', 'FreeLivePageVisit', {
+        page_type: 'webinar_landing',
+        event_type: 'freelive_registration',
+        target_audience: 'persian_immigrant_women',
+        webinar_date: '2024-09-28',
+        gift_value: 97
+      });
+    }
+  }, []);
+
+  // Track modal interactions
+  const handleModalOpen = () => {
+    setShowModal(true);
+    
+    // Track modal open event
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('trackCustom', 'RegistrationModalOpen', {
+        source: 'freelive_page',
+        modal_type: 'webinar_registration'
+      });
+    }
+  };
+
+  // Track form start
+  const handleFormStart = (fieldName: string) => {
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('trackCustom', 'FormStart', {
+        form_type: 'webinar_registration',
+        first_field: fieldName,
+        source: 'freelive_page'
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +97,23 @@ const FreeLive = () => {
       });
 
       if (error) throw error;
+
+      // Track successful lead generation
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'Lead', {
+          content_name: 'Free Live Webinar Registration',
+          content_category: 'webinar_registration',
+          value: 97,
+          currency: 'USD'
+        });
+
+        (window as any).fbq('trackCustom', 'WebinarRegistration', {
+          event_type: 'freelive_registration',
+          user_city: city,
+          registration_source: 'freelive_page',
+          gift_claimed: true
+        });
+      }
 
       // Success - directly redirect without showing toast
       // Reset form and close modal
@@ -130,12 +197,12 @@ const FreeLive = () => {
                   
                   {/* Signup Button - Mobile centered, Desktop right-aligned */}
                   <div className="flex justify-center lg:justify-end mb-8">
-                    <Button
-                      onClick={() => setShowModal(true)}
-                      className="w-full max-w-sm h-16 text-lg md:text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-persian transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-2xl"
-                    >
-                      🚀 کلیک کنید و جای خود را رزرو کنید
-                    </Button>
+                  <Button
+                    onClick={handleModalOpen}
+                    className="w-full max-w-sm h-16 text-lg md:text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-persian transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-2xl"
+                  >
+                    🚀 کلیک کنید و جای خود را رزرو کنید
+                  </Button>
                   </div>
                 </div>
 
@@ -247,7 +314,7 @@ const FreeLive = () => {
               فقط چند کلیک تا دسترسی به وبینار رایگان که زندگی شما را تغییر خواهد داد
             </p>
             <Button 
-              onClick={() => setShowModal(true)}
+              onClick={handleModalOpen}
               className="bg-luxury-black hover:bg-luxury-charcoal text-secondary font-bold text-xl px-12 py-4 h-auto rounded-2xl shadow-luxury transition-all duration-300 transform hover:scale-105 font-farsi"
             >
               ⬆️ همین الان ثبت نام کنید
@@ -281,6 +348,7 @@ const FreeLive = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                onFocus={() => handleFormStart('name')}
                 placeholder="Your Name"
                 required
                 className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
@@ -339,7 +407,7 @@ const FreeLive = () => {
       {/* Sticky Bottom Button - Optimized for Performance */}
       <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-secondary/95 backdrop-blur-sm border-t border-luxury-white/10">
         <Button
-          onClick={() => setShowModal(true)}
+          onClick={handleModalOpen}
           className="w-full h-14 text-base md:text-lg font-bold bg-luxury-black hover:bg-luxury-charcoal text-secondary font-farsi transition-colors duration-200 rounded-lg"
         >
           🚀 رزرو جای شما در وبینار رایگان
