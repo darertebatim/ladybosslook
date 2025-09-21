@@ -167,7 +167,7 @@ const AssertLanding = () => {
               <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6 max-w-2xl mx-auto px-2">
                 <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 bg-muted/50 rounded-lg">
                   <CheckCircle size={14} className="sm:w-4 sm:h-4 text-primary flex-shrink-0" />
-                  <span className="text-xs sm:text-sm font-medium text-center sm:text-left">Instant Access</span>
+                  <span className="text-xs sm:text-sm font-medium text-center sm:text-left">20min Free</span>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 p-2 sm:p-3 bg-muted/50 rounded-lg">
                   <Play size={14} className="sm:w-4 sm:h-4 text-primary flex-shrink-0" />
@@ -335,7 +335,7 @@ const AssertLanding = () => {
             onClick={() => setShowModal(true)}
             className="w-full h-12 text-base font-bold bg-background hover:bg-muted text-primary transition-colors duration-200 rounded-lg"
           >
-            🚀 Get Instant Access
+            🚀 دسترسی فوری
           </Button>
         </div>
       </div>
