@@ -100,7 +100,7 @@ const FreeLive = () => {
 
       // Track successful lead generation
       if (typeof window !== 'undefined' && (window as any).fbq) {
-        (window as any).fbq('track', 'Lead', {
+        (window as any).fbq('trackCustom', 'FreeLiveLead', {
           content_name: 'Free Live Webinar Registration',
           content_category: 'webinar_registration',
           value: 97,
