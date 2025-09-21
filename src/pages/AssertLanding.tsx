@@ -249,8 +249,8 @@ const AssertLanding = () => {
         <Dialog open={showModal} onOpenChange={setShowModal}>
           <DialogContent className="sm:max-w-md bg-background border-2 border-primary/20 shadow-luxury">
             <DialogHeader className="text-center">
-              <DialogTitle className="text-xl sm:text-2xl font-bold mb-2">
-                🎉 Get Your Access
+              <DialogTitle className="text-xl sm:text-2xl font-bold mb-2 font-persian">
+                🎉 دریافت آموزش رایگان
               </DialogTitle>
               <p className="text-sm text-muted-foreground">
                 Just a few details to unlock your training
@@ -333,7 +333,7 @@ const AssertLanding = () => {
         <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-primary/95 backdrop-blur-sm border-t border-primary/10 sm:hidden">
           <Button
             onClick={() => setShowModal(true)}
-            className="w-full h-12 text-base font-bold bg-background hover:bg-muted text-primary transition-colors duration-200 rounded-lg"
+            className="w-full h-12 text-base font-bold bg-background hover:bg-muted text-primary transition-colors duration-200 rounded-lg font-persian"
           >
             🚀 دسترسی فوری
           </Button>
