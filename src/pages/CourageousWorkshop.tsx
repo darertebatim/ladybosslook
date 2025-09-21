@@ -100,8 +100,8 @@ const CourageousWorkshop = () => {
         currency: 'USD'
       });
       
-      // Custom event for workshop page visit
-      window.fbq('trackCustom', 'WorkshopPageVisit', {
+      // Custom event for CCW page visit
+      window.fbq('trackCustom', 'CCWPageVisit', {
         workshop_title: 'کارگاه آنلاین شخصیت شجاع',
         workshop_type: 'live_online',
         user_type: 'workshop_prospect',
@@ -153,8 +153,8 @@ const CourageousWorkshop = () => {
         currency: 'USD'
       });
       
-      // Custom event for workshop registration
-      window.fbq('trackCustom', 'WorkshopRegistration', {
+      // Custom event for CCW registration
+      window.fbq('trackCustom', 'CCWSignUp', {
         source: source,
         workshop_name: 'شخصیت شجاع',
         user_intent: 'high_conversion',
