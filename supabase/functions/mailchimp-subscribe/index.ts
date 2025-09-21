@@ -280,10 +280,10 @@ const handler = async (req: Request): Promise<Response> => {
           email_address: email,
           status_if_new: "subscribed",
           merge_fields: {
-            FNAME: name,
-            CITY: city,
-            PHONE: phone, // Only regular phone field first
-            ADDRESS: city, // Use city as address to satisfy Mailchimp requirement
+            ...(name && name.trim() && { FNAME: name }),
+            ...(city && city.trim() && { CITY: city }),
+            ...(phone && phone.trim() && { PHONE: phone }),
+            ...(city && city.trim() && { ADDRESS: city }), // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
             ...(purchase_amount && { AMOUNT: purchase_amount }),
             ...(purchase_date && { PURCHDATE: new Date(purchase_date).toISOString().split('T')[0] }),

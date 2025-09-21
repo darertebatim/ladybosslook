@@ -129,9 +129,6 @@ const Video = () => {
       const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
         body: {
           email,
-          name: '',
-          city: '',
-          phone: '',
           source: 'video_page',
           tags: ['firststepbonus']
         }
