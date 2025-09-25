@@ -95,7 +95,7 @@ const BusinessStartupAccelerator = () => {
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button size="lg" variant="secondary" className="bg-white text-primary hover:bg-white/90">
-                    Start Your Business - $1,200
+                    Start Your Business - $4,990
                     <ArrowRight size={20} className="ml-2" />
                   </Button>
                   <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
@@ -178,7 +178,7 @@ const BusinessStartupAccelerator = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" variant="secondary" className="bg-white text-primary hover:bg-white/90">
-                Start Your Business - $1,200
+                Start Your Business - $4,990
                 <ArrowRight size={20} className="ml-2" />
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">

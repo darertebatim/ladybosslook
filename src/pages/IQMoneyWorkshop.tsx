@@ -49,7 +49,7 @@ export default function IQMoneyWorkshop() {
       window.fbq('trackCustom', 'MoneyCourseLanding', {
         source: 'iqmoney_course_page',
         course_type: 'money_literacy',
-        price: 600
+        price: 997
       });
     }
 
@@ -76,7 +76,7 @@ export default function IQMoneyWorkshop() {
   const handleEnrollClick = () => {
     if (typeof window.fbq === 'function') {
       window.fbq('track', 'InitiateCheckout', {
-        value: 600,
+        value: 997,
         currency: 'USD',
         content_name: 'IQMoney Mastery Course',
         content_category: 'course'
@@ -342,7 +342,7 @@ export default function IQMoneyWorkshop() {
             <div className="text-center px-4">
               <div className="bg-white/90 backdrop-blur-sm p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-200 max-w-sm mx-auto mb-6">
                 <div className="text-sm text-slate-600 mb-2">One-time investment</div>
-                <div className="text-4xl sm:text-5xl font-black text-slate-900 mb-4">$600</div>
+                <div className="text-4xl sm:text-5xl font-black text-slate-900 mb-4">$997</div>
                 <div className="text-sm text-slate-600 mb-6">Lifetime access • No monthly fees</div>
                 <Button 
                   onClick={handleEnrollClick}

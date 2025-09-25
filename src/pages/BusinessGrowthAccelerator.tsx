@@ -95,7 +95,7 @@ const BusinessGrowthAccelerator = () => {
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button size="lg" variant="secondary" className="bg-white text-primary hover:bg-white/90">
-                    Enroll Now - $1,200
+                    Enroll Now - $4,990
                     <ArrowRight size={20} className="ml-2" />
                   </Button>
                   <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
@@ -178,7 +178,7 @@ const BusinessGrowthAccelerator = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" variant="secondary" className="bg-white text-primary hover:bg-white/90">
-                Enroll Now - $1,200
+                Enroll Now - $4,990
                 <ArrowRight size={20} className="ml-2" />
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
