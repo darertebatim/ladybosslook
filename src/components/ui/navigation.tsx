@@ -13,7 +13,7 @@ const Navigation = () => {
     { label: 'About', href: '/about' },
     { label: 'Programs', href: '#programs' },
     { label: 'IQMoney Course', href: '/iqmoney' },
-    { label: 'Training Video', href: '/landing' },
+    { label: 'Training Video', href: '/asac' },
     { label: 'Success Stories', href: '#stories' },
     { label: 'Community', href: '#community' },
   ];
