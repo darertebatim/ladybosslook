@@ -22,7 +22,7 @@ const Programs = () => {
         'Business Building Strategies',
         'Lifetime Access & Community'
       ],
-      price: '$600',
+      price: '$997',
       popular: false,
       link: '/iqmoney'
     },
@@ -40,7 +40,7 @@ const Programs = () => {
         'Leadership Development',
         'Weekly Group Coaching Calls'
       ],
-      price: '$1,200',
+      price: '$4,990',
       popular: true,
       link: '/business-growth-accelerator'
     },
@@ -58,7 +58,7 @@ const Programs = () => {
         'Launch Strategy & Marketing',
         '90-Day Success Roadmap'
       ],
-      price: '$1,200',
+      price: '$4,990',
       popular: false,
       link: '/business-startup-accelerator'
     },
@@ -76,7 +76,9 @@ const Programs = () => {
         'Build Powerful Connections',
         'Lead with Confidence'
       ],
-      price: '$497',
+      price: '$97',
+      originalPrice: '$497',
+      limitedSpots: 'Limited to 100',
       popular: false,
       link: '/ccw'
     }
@@ -172,9 +174,27 @@ const Programs = () => {
                 {/* Price & CTA */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold gradient-text">
-                      {program.price}
-                    </span>
+                    <div className="flex flex-col">
+                      {program.originalPrice ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg text-muted-foreground line-through">
+                            {program.originalPrice}
+                          </span>
+                          <span className="text-2xl font-bold gradient-text">
+                            {program.price}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-2xl font-bold gradient-text">
+                          {program.price}
+                        </span>
+                      )}
+                      {program.limitedSpots && (
+                        <span className="text-xs text-primary font-semibold">
+                          {program.limitedSpots}
+                        </span>
+                      )}
+                    </div>
                     <span className="text-sm text-muted-foreground">
                       One-time payment
                     </span>
