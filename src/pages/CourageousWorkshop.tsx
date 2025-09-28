@@ -183,7 +183,7 @@ const CourageousWorkshop = () => {
     }
 
     const message = encodeURIComponent('سلام! من به کارگاه آنلاین کاراکتر پرجرات علاقه‌مند هستم. ممکن است اطلاعات بیشتری بدهید؟');
-    const url = `https://wa.me/16265028538?text=${message}`;
+    const url = `https://wa.me/16265028589?text=${message}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 

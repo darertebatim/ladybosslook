@@ -182,7 +182,7 @@ const ThankFreeLive = () => {
             <div className="bg-luxury-white/5 backdrop-blur-sm border border-secondary/20 rounded-xl p-4 md:p-8">
               <h3 className="text-lg md:text-2xl font-bold text-secondary mb-2 md:mb-4">Support:</h3>
               <p className="text-luxury-white text-base md:text-lg">
-                📱 WhatsApp: +1 (626) 502‑8538
+                📱 WhatsApp: +1 (626) 502‑8589
               </p>
               <p className="text-luxury-white text-base md:text-lg mt-2">
                 📧 Email: support@ladybosslook.com
