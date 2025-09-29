@@ -154,7 +154,7 @@ const ExpressAssert = () => {
       }
 
       // Create WhatsApp message
-      const whatsappNumber = '16265028589'; // +1 (626) 502-8589
+      const whatsappNumber = '16265028538'; // +1 (626) 502-8538
       const message = `Hello! I want to get the bonus from the Express Assert video.%0A%0AEmail: ${email}%0ACity: ${city}`;
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
       
