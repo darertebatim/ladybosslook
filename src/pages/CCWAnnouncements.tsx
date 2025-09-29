@@ -8,13 +8,13 @@ const announcements = [
   {
     id: 1,
     title: "Welcome to Courageous Character Workshop Community!",
-    titlePersian: "به جامعه کارگاه شخصیت شجاع خوش آمدید!",
+    titlePersian: "به جامعه ورکشاپ کارکتر پرجرات خوش آمدید!",
     date: "September 29, 2025",
     datePersian: "۲۹ سپتامبر ۲۰۲۵",
     category: "Important",
     categoryPersian: "مهم",
     content: "Thank you for joining our Courageous Character Workshop. Check this page weekly for workshop materials, exercises, and community updates.",
-    contentPersian: "از شرکت شما در کارگاه شخصیت شجاع سپاسگزاریم. هر هفته به این صفحه سر بزنید تا مطالب کارگاه، تمرینات و اخبار جامعه را دریافت کنید.",
+    contentPersian: "سلام سلام دوباره، بازم تبریک میگم بخاطر حضورتون توی ورکشاپ کاراکتر پرجرات. در حال آماده کردن زیر ساخت ها هستیم، فردا اشانتیون هاتون رو براتون میفرستیم. ورکشاپ ۳ جلسه آنلاینه، توی ۳ هفته از هفته سوم اکتبر شروع می کنیم. برای راحتی شما ۲ تا سانس داریم (یک سانس مخصوص امریکا/کانادا/اروپا) (یک سانس مخصوص اروپا/انگلیس/دبی)",
     isUrgent: true,
     isToday: true
   },
@@ -66,7 +66,7 @@ export default function CCWAnnouncements() {
           </div>
           <div className="mb-4 md:mb-6" dir="rtl">
             <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-[hsl(var(--luxury-gold))] font-persian mb-2" dir="rtl">
-              تابلوی اعلانات کارگاه شخصیت شجاع
+              تابلوی اعلانات ورکشاپ کارکتر پرجرات
             </h2>
             <p className="text-base md:text-xl text-[hsl(var(--luxury-silver))] font-persian" dir="rtl">
               هر هفته به این صفحه سر بزنید
