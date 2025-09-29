@@ -285,7 +285,7 @@ const handler = async (req: Request): Promise<Response> => {
             ...(phone && phone.trim() && { PHONE: phone }),
             ...(city && city.trim() && { ADDRESS: city }), // Use city as address to satisfy Mailchimp requirement
             ...(workshop_name && { WORKSHOP: workshop_name }),
-            ...(purchase_amount && { AMOUNT: purchase_amount }),
+            ...(purchase_amount && { AMOUNT: (purchase_amount / 100).toFixed(2) }),
             ...(purchase_date && { PURCHDATE: new Date(purchase_date).toISOString().split('T')[0] }),
             ...(payment_status && { PAYSTATUS: payment_status }),
             ...(source && { SOURCE: source }),
