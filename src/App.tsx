@@ -50,14 +50,7 @@ const App = () => (
             <Route path="/landing" element={<Landing />} />
             <Route path="/asac" element={<AssertLanding />} />
             <Route path="/auth" element={<Auth />} />
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedRoute requireAdmin={true}>
-                  <Admin />
-                </ProtectedRoute>
-              } 
-            />
+            <Route path="/admin" element={<Admin />} />
           <Route path="/video" element={<Video />} />
           <Route path="/expressassert" element={<ExpressAssert />} />
           <Route path="/business-ideas" element={<BusinessIdeas />} />
