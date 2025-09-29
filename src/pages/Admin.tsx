@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import UpdateMailchimpCities from '@/components/UpdateMailchimpCities';
+import FixMailchimpAmounts from '@/components/FixMailchimpAmounts';
 
 interface FormSubmission {
   id: string;
@@ -187,9 +188,10 @@ const Admin = () => {
           </Card>
         </div>
 
-        {/* Mailchimp City Update Tool */}
-        <div className="mb-6">
+        {/* Mailchimp Update Tools */}
+        <div className="mb-6 space-y-4">
           <UpdateMailchimpCities />
+          <FixMailchimpAmounts />
         </div>
 
         {/* Submissions Table */}

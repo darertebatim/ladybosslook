@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createHash } from "https://deno.land/std@0.190.0/crypto/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -107,7 +106,7 @@ serve(async (req) => {
         results.push({
           email: update.email,
           success: false,
-          error: error.message
+          error: (error as Error).message
         });
       }
     }

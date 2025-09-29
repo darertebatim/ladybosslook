@@ -99,7 +99,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in check-mailchimp-member function:', error);
     return new Response(JSON.stringify({ 
-      error: error.message 
+      error: (error as Error).message 
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,

@@ -85,7 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
         }
       },
       memory: {
-        used: (Deno.memoryUsage?.() || 0) / 1024 / 1024, // MB
+        used: ((Deno.memoryUsage?.() as any)?.rss || 0) / 1024 / 1024, // MB
       }
     };
 
