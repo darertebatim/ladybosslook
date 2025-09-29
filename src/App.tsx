@@ -23,6 +23,7 @@ import Giveaway from "./pages/Giveaway";
 import IQMoneyWorkshop from "./pages/IQMoneyWorkshop";
 import Index from "./pages/Index";
 import LadybossAnnouncements from "./pages/LadybossAnnouncements";
+import CCWAnnouncements from "./pages/CCWAnnouncements";
 import LadybossCoaching from "./pages/LadybossCoaching";
 import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
@@ -65,6 +66,7 @@ const App = () => (
             <Route path="/giveaway" element={<Giveaway />} />
             <Route path="/ladyboss-coaching" element={<LadybossCoaching />} />
             <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
+            <Route path="/announcements/ccw" element={<CCWAnnouncements />} />
             <Route path="/freelive" element={<FreeLive />} />
             <Route path="/thankfreelive" element={<ThankFreeLive />} />
             <Route path="/iqmoney" element={<IQMoneyWorkshop />} />
