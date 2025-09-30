@@ -1,47 +1,52 @@
 import { SEOHead } from "@/components/SEOHead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Bell, ArrowLeft, ExternalLink, BookOpen, Heart } from "lucide-react";
+import { Calendar, Bell, ArrowLeft, Phone, Mail, Video, ExternalLink, MessageCircle, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const announcements = [
   {
     id: 1,
-    title: "Welcome to Courageous Character Workshop Community!",
-    titlePersian: "به جامعه ورکشاپ کارکتر پرجرات خوش آمدید!",
-    date: "September 29, 2025",
-    datePersian: "۲۹ سپتامبر ۲۰۲۵",
-    category: "Important",
-    categoryPersian: "مهم",
-    content: "Thank you for joining our Courageous Character Workshop. Check this page weekly for workshop materials, exercises, and community updates.",
-    contentPersian: "سلام سلام دوباره، بازم تبریک میگم بخاطر حضورتون توی ورکشاپ کاراکتر پرجرات. در حال آماده کردن زیر ساخت ها هستیم، فردا اشانتیون هاتون رو براتون میفرستیم. ورکشاپ ۳ جلسه آنلاینه، توی ۳ هفته از هفته سوم اکتبر شروع می کنیم. برای راحتی شما ۲ تا سانس داریم (یک سانس مخصوص امریکا/کانادا/اروپا) (یک سانس مخصوص اروپا/انگلیس/دبی)",
+    title: "سلام سلام دوباره، بازم تبریک میگم بخاطر حضورتون توی ورکشاپ کاراکتر پرجرات",
+    date: "۲۹ سپتامبر ۲۰۲۵",
+    category: "مهم",
+    content: "سلام سلام دوباره، بازم تبریک میگم بخاطر حضورتون توی ورکشاپ کاراکتر پرجرات. در حال آماده کردن زیر ساخت ها هستیم، فردا اشانتیون هاتون رو براتون میفرستیم. ورکشاپ ۳ جلسه آنلاینه، توی ۳ هفته از هفته سوم اکتبر شروع می کنیم. برای راحتی شما ۲ تا سانس داریم (یک سانس مخصوص امریکا/کانادا/اروپا) (یک سانس مخصوص اروپا/انگلیس/دبی)",
+    phone: undefined,
+    meetLink: undefined,
+    supportEmail: undefined,
+    europeLink: undefined,
+    americaLink: undefined,
+    audioLink: undefined,
     isUrgent: true,
     isToday: true
   },
   {
     id: 2,
-    title: "Workshop Materials & Resources",
-    titlePersian: "مواد و منابع کارگاه",
-    date: "September 29, 2025",
-    datePersian: "۲۹ سپتامبر ۲۰۲۵",
-    category: "Resources",
-    categoryPersian: "منابع",
-    content: "Access your workshop materials, exercises, and bonus content. More resources will be added weekly.",
-    contentPersian: "به مواد کارگاه، تمرینات و محتوای جایزه خود دسترسی داشته باشید. هر هفته منابع بیشتری اضافه می‌شود.",
-    resourceLink: "https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/",
+    title: "ویدیوی ضبط شده جلسات ورکشاپ کارکتر پرجرات",
+    date: "۹ سپتامبر ۲۰۲۵",
+    category: "ویدیو",
+    content: "برای دسترسی به ویدیوی جلسه ها روی کلاس خودتان وارد شوید",
+    phone: undefined,
+    meetLink: undefined,
+    supportEmail: undefined,
+    europeLink: "",
+    americaLink: "",
+    audioLink: undefined,
     isUrgent: false,
     isToday: false
   },
   {
     id: 3,
-    title: "Weekly Check-in & Community Support",
-    titlePersian: "چک‌این هفتگی و پشتیبانی جامعه",
-    date: "Every Week",
-    datePersian: "هر هفته",
-    category: "Community",
-    categoryPersian: "جامعه",
-    content: "Join us for weekly check-ins, share your progress, and connect with other workshop participants. Together we grow stronger!",
-    contentPersian: "هر هفته به ما بپیوندید، پیشرفت خود را به اشتراک بگذارید و با سایر شرکت‌کنندگان کارگاه ارتباط برقرار کنید. با هم قوی‌تر می‌شویم!",
+    title: "آموزشهای صوتی ورکشاپ کارکتر پرجرات",
+    date: "۸ سپتامبر ۲۰۲۵",
+    category: "آموزش",
+    content: "آموزشهای صوتی ارزشمند برای تقویت مهارت‌های شما در دسترس است",
+    phone: undefined,
+    meetLink: undefined,
+    supportEmail: undefined,
+    europeLink: undefined,
+    americaLink: undefined,
+    audioLink: "",
     isUrgent: false,
     isToday: false
   }
@@ -51,7 +56,7 @@ export default function CCWAnnouncements() {
   return (
     <div className="min-h-screen bg-gradient-luxury">
       <SEOHead 
-        title="CCW News & Announcements | تابلوی اعلانات کارگاه شخصیت شجاع"
+        title="CCW News & Announcements | تابلوی اعلانات ورکشاپ کارکتر پرجرات"
         description="Stay updated with the latest news, announcements, and resources from Courageous Character Workshop community. Visit weekly for new updates."
       />
       
@@ -61,7 +66,7 @@ export default function CCWAnnouncements() {
           <div className="inline-flex items-center gap-2 mb-4">
             <Bell className="h-6 w-6 md:h-8 md:w-8 text-[hsl(var(--luxury-gold))]" />
             <h1 className="text-2xl md:text-4xl lg:text-5xl font-display font-bold text-[hsl(var(--pure-white))]">
-              CCW Announcements
+              News & Announcements
             </h1>
           </div>
           <div className="mb-4 md:mb-6" dir="rtl">
@@ -77,29 +82,16 @@ export default function CCWAnnouncements() {
         {/* Weekly Visit Reminder */}
         <div className="mb-6 md:mb-8">
           <Card className="bg-[hsl(var(--luxury-charcoal))] border-[hsl(var(--luxury-gold))]/20">
-            <CardContent className="p-4 md:p-6">
-              <div className="text-center mb-4">
-                <div className="flex items-center justify-center gap-2 md:gap-3 mb-3">
-                  <Calendar className="h-5 w-5 md:h-6 md:w-6 text-[hsl(var(--luxury-gold))]" />
-                  <span className="text-base md:text-lg font-semibold text-[hsl(var(--pure-white))]">
-                    Weekly Updates
-                  </span>
-                </div>
-                <p className="text-sm md:text-base text-[hsl(var(--luxury-silver))]">
-                  Please check this page weekly for the latest news, exercises, and workshop materials.
-                </p>
+            <CardContent className="p-4 md:p-6 text-center">
+              <div className="flex items-center justify-center gap-2 md:gap-3 mb-3">
+                <Calendar className="h-5 w-5 md:h-6 md:w-6 text-[hsl(var(--luxury-gold))]" />
+                <span className="text-base md:text-lg font-semibold text-[hsl(var(--pure-white))] font-persian" dir="rtl">
+                  اطلاعیه‌های هفتگی
+                </span>
               </div>
-              <div className="text-center" dir="rtl">
-                <div className="flex items-center justify-center gap-2 md:gap-3 mb-3">
-                  <span className="text-base md:text-lg font-semibold text-[hsl(var(--pure-white))] font-persian">
-                    اطلاعیه‌های هفتگی
-                  </span>
-                  <Heart className="h-5 w-5 md:h-6 md:w-6 text-[hsl(var(--luxury-gold))]" />
-                </div>
-                <p className="text-sm md:text-base text-[hsl(var(--luxury-silver))] font-persian">
-                  لطفا هر هفته به این صفحه سر بزنید چون آخرین خبرها، تمرین‌ها و جزوه‌های کارگاه به این صفحه اضافه میشن
-                </p>
-              </div>
+              <p className="text-sm md:text-base text-[hsl(var(--luxury-silver))] font-persian" dir="rtl">
+                لطفا هر هفته به این صفحه سر بزنید چون آخرین خبرها، تمرین‌ها و جزوه‌های ورکشاپ به این صفحه اضافه میشن
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -116,92 +108,165 @@ export default function CCWAnnouncements() {
               }`}
             >
               <CardHeader className="pb-3">
-                {/* English Section */}
-                <div className="mb-4">
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge 
-                          variant={announcement.isUrgent ? "default" : "secondary"}
-                          className={announcement.isUrgent 
-                            ? 'bg-[hsl(var(--luxury-gold))] text-[hsl(var(--pure-black))]' 
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                  <div className="flex-1" dir="rtl">
+                    <div className="flex items-center gap-2 mb-2 justify-end">
+                      {announcement.isToday && (
+                        <Badge className="bg-[hsl(var(--luxury-gold))] text-[hsl(var(--pure-black))] font-persian">
+                          امروز
+                        </Badge>
+                      )}
+                      <Badge 
+                        variant={announcement.isUrgent ? "default" : "secondary"}
+                        className={`font-persian ${
+                          announcement.isUrgent 
+                            ? 'bg-red-600 text-white' 
                             : 'bg-[hsl(var(--luxury-silver))]/20 text-[hsl(var(--luxury-silver))]'
-                          }
-                        >
-                          {announcement.category}
-                        </Badge>
-                        {announcement.isToday && (
-                          <Badge className="bg-green-600 text-white">
-                            New Today
-                          </Badge>
-                        )}
-                      </div>
-                      <CardTitle className="text-lg md:text-xl lg:text-2xl mb-2 text-[hsl(var(--pure-white))]">
-                        {announcement.title}
-                      </CardTitle>
+                        }`}
+                      >
+                        {announcement.category}
+                      </Badge>
                     </div>
-                    <div className="flex items-center gap-2 text-[hsl(var(--luxury-silver))]">
-                      <Calendar className="h-4 w-4" />
-                      <span className="text-sm">{announcement.date}</span>
-                    </div>
+                    <CardTitle className="text-lg md:text-xl lg:text-2xl mb-2 text-[hsl(var(--pure-white))] font-persian text-right">
+                      {announcement.title}
+                    </CardTitle>
                   </div>
-                  <p className="text-[hsl(var(--luxury-silver))] leading-relaxed text-sm md:text-base">
-                    {announcement.content}
-                  </p>
-                </div>
-
-                {/* Persian Section */}
-                <div dir="rtl" className="pt-4 border-t border-[hsl(var(--luxury-silver))]/10">
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2 justify-end">
-                        {announcement.isToday && (
-                          <Badge className="bg-green-600 text-white font-persian">
-                            امروز
-                          </Badge>
-                        )}
-                        <Badge 
-                          variant={announcement.isUrgent ? "default" : "secondary"}
-                          className={`font-persian ${
-                            announcement.isUrgent 
-                              ? 'bg-[hsl(var(--luxury-gold))] text-[hsl(var(--pure-black))]' 
-                              : 'bg-[hsl(var(--luxury-silver))]/20 text-[hsl(var(--luxury-silver))]'
-                          }`}
-                        >
-                          {announcement.categoryPersian}
-                        </Badge>
-                      </div>
-                      <CardTitle className="text-lg md:text-xl lg:text-2xl mb-2 text-[hsl(var(--pure-white))] font-persian text-right">
-                        {announcement.titlePersian}
-                      </CardTitle>
-                    </div>
-                    <div className="flex items-center gap-2 text-[hsl(var(--luxury-silver))] justify-end sm:justify-start">
-                      <span className="text-sm font-persian">{announcement.datePersian}</span>
-                      <Calendar className="h-4 w-4" />
-                    </div>
+                  <div className="flex items-center gap-2 text-[hsl(var(--luxury-silver))] justify-end sm:justify-start" dir="rtl">
+                    <span className="text-sm font-persian">{announcement.date}</span>
+                    <Calendar className="h-4 w-4" />
                   </div>
-                  <p className="text-[hsl(var(--luxury-silver))] font-persian leading-relaxed text-sm md:text-base text-right">
-                    {announcement.contentPersian}
-                  </p>
                 </div>
               </CardHeader>
-
-              {announcement.resourceLink && (
-                <CardContent className="pt-0">
-                  <div className="flex items-center gap-2 justify-center bg-purple-500/10 p-4 rounded-lg border border-purple-500/20">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => window.open(announcement.resourceLink, '_blank')}
-                      className="text-purple-400 hover:text-purple-300 font-semibold"
+              <CardContent className="pt-0">
+                <div dir="rtl">
+                  <p className="text-[hsl(var(--luxury-silver))] font-persian leading-relaxed text-sm md:text-base mb-4">
+                    {announcement.content}
+                  </p>
+                  
+                  {announcement.phone && (
+                    <div className="space-y-3 mb-4">
+                      <div className="bg-[hsl(var(--luxury-gold))]/10 p-4 rounded-lg border border-[hsl(var(--luxury-gold))]/20">
+                        <div className="flex items-center gap-3 justify-end mb-2">
+                          <MessageCircle className="h-5 w-5 text-[hsl(var(--luxury-gold))]" />
+                          <span className="text-[hsl(var(--pure-white))] font-persian font-semibold">واتساپ جدید:</span>
+                        </div>
+                        <div className="flex justify-end">
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => window.open(`https://wa.me/${announcement.phone.replace(/[^0-9]/g, '')}`, '_blank')}
+                            className="bg-[hsl(var(--luxury-gold))] hover:bg-[hsl(var(--luxury-gold-dark))] text-[hsl(var(--pure-black))] font-bold text-lg px-4 py-2"
+                            dir="ltr"
+                          >
+                            {announcement.phone}
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {announcement.meetLink && (
+                        <div className="bg-blue-500/10 p-4 rounded-lg border border-blue-500/20">
+                          <div className="flex items-center gap-3 justify-end mb-2">
+                            <Video className="h-5 w-5 text-blue-400" />
+                            <span className="text-[hsl(var(--pure-white))] font-persian font-semibold">گوگل میت:</span>
+                          </div>
+                          <div className="flex justify-end">
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => window.open(announcement.meetLink, '_blank')}
+                              className="bg-blue-500 hover:bg-blue-600 text-white font-persian font-semibold px-4 py-2"
+                            >
+                              پیوند جلسه امروز
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {announcement.supportEmail && (
+                        <div className="bg-green-500/10 p-4 rounded-lg border border-green-500/20">
+                          <div className="flex items-center gap-3 justify-end mb-2">
+                            <Mail className="h-5 w-5 text-green-400" />
+                            <span className="text-[hsl(var(--pure-white))] font-persian font-semibold">ایمیل پشتیبانی:</span>
+                          </div>
+                          <div className="flex justify-end">
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => window.open(`mailto:${announcement.supportEmail}`, '_blank')}
+                              className="bg-green-500 hover:bg-green-600 text-white font-mono font-semibold px-4 py-2"
+                              dir="ltr"
+                            >
+                              {announcement.supportEmail}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {(announcement.europeLink || announcement.americaLink || announcement.audioLink) && (
+                    <div className="space-y-3 mb-4">
+                      {announcement.europeLink && (
+                        <div className="flex items-center gap-2 justify-end bg-purple-500/10 p-3 rounded-lg border border-purple-500/20">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(announcement.europeLink, '_blank')}
+                            className="text-purple-400 hover:text-purple-300 p-0 h-auto font-persian"
+                          >
+                            دسترسی به ویدیوها
+                          </Button>
+                          <ExternalLink className="h-4 w-4 text-purple-400" />
+                          <span className="text-[hsl(var(--pure-white))] font-persian">جلسات اروپا:</span>
+                        </div>
+                      )}
+                      
+                      {announcement.americaLink && (
+                        <div className="flex items-center gap-2 justify-end bg-orange-500/10 p-3 rounded-lg border border-orange-500/20">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(announcement.americaLink, '_blank')}
+                            className="text-orange-400 hover:text-orange-300 p-0 h-auto font-persian"
+                          >
+                            دسترسی به ویدیوها
+                          </Button>
+                          <ExternalLink className="h-4 w-4 text-orange-400" />
+                          <span className="text-[hsl(var(--pure-white))] font-persian">جلسات امریکا:</span>
+                        </div>
+                      )}
+                      
+                      {announcement.audioLink && (
+                        <div className="flex items-center gap-2 justify-end bg-cyan-500/10 p-3 rounded-lg border border-cyan-500/20">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(announcement.audioLink, '_blank')}
+                            className="text-cyan-400 hover:text-cyan-300 p-0 h-auto font-persian"
+                          >
+                            دسترسی به آموزشها
+                          </Button>
+                          <Headphones className="h-4 w-4 text-cyan-400" />
+                          <span className="text-[hsl(var(--pure-white))] font-persian">آموزشهای صوتی:</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
+                {announcement.isToday && (
+                  <div className="mt-4 pt-4 border-t border-[hsl(var(--luxury-gold))]/20">
+                    <Button 
+                      variant="ghost" 
+                      className="group text-[hsl(var(--luxury-gold))] hover:text-[hsl(var(--pure-white))] font-persian" 
+                      dir="rtl"
                     >
-                      Access Resources
+                      <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+                      اطلاعات بیشتر
                     </Button>
-                    <ExternalLink className="h-4 w-4 text-purple-400" />
-                    <BookOpen className="h-5 w-5 text-purple-400" />
                   </div>
-                </CardContent>
-              )}
+                )}
+              </CardContent>
             </Card>
           ))}
         </div>
@@ -210,26 +275,19 @@ export default function CCWAnnouncements() {
         <div className="mt-8 md:mt-12 text-center">
           <Card className="bg-gradient-bw-gold border-[hsl(var(--luxury-gold))]/30">
             <CardContent className="p-6 md:p-8">
-              <h3 className="text-xl md:text-2xl font-bold mb-4 text-[hsl(var(--pure-white))]">
-                Stay Connected
+              <h3 className="text-xl md:text-2xl font-bold mb-4 text-[hsl(var(--pure-white))] font-persian" dir="rtl">
+                در ارتباط باشید
               </h3>
-              <p className="text-[hsl(var(--luxury-silver))] mb-4 text-sm md:text-base">
-                Don't miss important announcements, resources, and community events. 
+              <p className="text-[hsl(var(--luxury-silver))] mb-4 md:mb-6 max-w-2xl mx-auto font-persian text-sm md:text-base" dir="rtl">
+                اطلاعیه‌های مهم، کارگاه‌ها و رویدادهای جامعه را از دست ندهید. 
+                عضو خبرنامه ما شوید تا اعلانات مستقیماً به ایمیل شما ارسال شود.
               </p>
-              <div dir="rtl" className="mb-6">
-                <h3 className="text-xl md:text-2xl font-bold mb-4 text-[hsl(var(--pure-white))] font-persian">
-                  در ارتباط باشید
-                </h3>
-                <p className="text-[hsl(var(--luxury-silver))] font-persian text-sm md:text-base">
-                  اطلاعیه‌های مهم، منابع و رویدادهای جامعه را از دست ندهید.
-                </p>
-              </div>
               <Button 
                 size="lg" 
-                className="bg-[hsl(var(--luxury-gold))] hover:bg-[hsl(var(--luxury-gold-dark))] text-[hsl(var(--pure-black))] font-semibold"
-                onClick={() => window.location.href = '/'}
+                className="bg-[hsl(var(--luxury-gold))] hover:bg-[hsl(var(--luxury-gold-dark))] text-[hsl(var(--pure-black))] font-persian font-semibold"
+                dir="rtl"
               >
-                Return to Home / بازگشت به صفحه اصلی
+                عضویت در خبرنامه
               </Button>
             </CardContent>
           </Card>
