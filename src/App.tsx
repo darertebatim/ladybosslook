@@ -16,6 +16,7 @@ import BusinessStartupAccelerator from "./pages/BusinessStartupAccelerator";
 import CapacityDashboard from "./pages/CapacityDashboard";
 import Checkout from "./pages/Checkout";
 import CourageousWorkshop from "./pages/CourageousWorkshop";
+import CourageousCharacter from "./pages/CourageousCharacter";
 import EventIrvine from "./pages/EventIrvine";
 import ExpressAssert from "./pages/ExpressAssert";
 import FreeLive from "./pages/FreeLive";
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/business-startup-accelerator" element={<BusinessStartupAccelerator />} />
             <Route path="/event-irvine" element={<EventIrvine />} />
             <Route path="/ccw" element={<CourageousWorkshop />} />
+            <Route path="/cc" element={<CourageousCharacter />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/checkout" element={<Checkout />} />
             <Route path="/privacy" element={<Privacy />} />
