@@ -503,7 +503,7 @@ const CourageousWorkshop = () => {
                     { title: "بله گرفتن", subtitle: "Getting a Yes" },
                     { title: "حق گرفتن", subtitle: "Claiming Rights" },
                     { title: "پاسخ به انتقاد", subtitle: "Handling Feedback" },
-                    { title: "جلوگیری از بی‌انصافی", subtitle: "Preventing Injustice" },
+                    { title: "جلوگیری از حق خوری", subtitle: "Preventing Exploitation" },
                     { title: "مدیریت تعارض‌ها", subtitle: "Conflict Management" },
                     { title: "مرزبندی حریم", subtitle: "Boundaries" },
                     { title: "مذاکرهٔ روزمره", subtitle: "Everyday Negotiation" }
@@ -571,7 +571,7 @@ const CourageousWorkshop = () => {
                 </div>
                 <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
                   <span className="text-sm">ضبط:</span>
-                  <span className="font-bold text-luxury-white text-sm">۷ روز دسترسی</span>
+                  <span className="font-bold text-luxury-white text-sm">همیشگی</span>
                 </div>
               </CardContent>
             </Card>
