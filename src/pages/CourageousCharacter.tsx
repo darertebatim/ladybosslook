@@ -245,23 +245,21 @@ const CourageousWorkshop = () => {
         </header>
 
         <main className="container mx-auto px-4 py-8">
-          {/* Urgency Banner - Compact Timer */}
-          <div className="relative bg-gradient-to-r from-luxury-charcoal via-luxury-accent to-luxury-charcoal border border-luxury-silver/30 rounded-lg p-3 mb-6 text-center shadow-luxury-glow">
-            <div className="absolute inset-0 bg-luxury-black/50 rounded-lg"></div>
+          {/* Video Section */}
+          <div className="relative bg-gradient-to-r from-luxury-charcoal via-luxury-accent to-luxury-charcoal border border-luxury-silver/30 rounded-lg p-3 mb-6 shadow-luxury-glow">
             <div className="relative">
-              <div className="flex items-center justify-center gap-1 text-luxury-white font-bold text-xs mb-2">
-                <Timer className="w-4 h-4 text-luxury-silver" />
-                <span>پیشنهاد محدود زمان برای زنان قدرتمند</span>
-                <Sparkles className="w-4 h-4 text-luxury-silver" />
+              <div className="aspect-video w-full max-w-3xl mx-auto rounded-lg overflow-hidden">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/hkWfOP5OxXE"
+                  title="کاراکتر پرجرات"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                ></iframe>
               </div>
-              <div className="flex items-center justify-center gap-1 farsi-nums">
-                <div className="bg-luxury-white text-luxury-black rounded-md px-3 py-2 text-2xl font-bold shadow-lg min-w-[50px]">{timeLeft.hours.toString().padStart(2, '0')}</div>
-                <span className="text-luxury-silver text-lg font-bold">:</span>
-                <div className="bg-luxury-white text-luxury-black rounded-md px-3 py-2 text-2xl font-bold shadow-lg min-w-[50px]">{timeLeft.minutes.toString().padStart(2, '0')}</div>
-                <span className="text-luxury-silver text-lg font-bold">:</span>
-                <div className="bg-luxury-white text-luxury-black rounded-md px-3 py-2 text-2xl font-bold shadow-lg min-w-[50px]">{timeLeft.seconds.toString().padStart(2, '0')}</div>
-              </div>
-              <p className="text-xs text-luxury-silver mt-1 font-medium">ساعت : دقیقه : ثانیه</p>
             </div>
           </div>
 
@@ -269,7 +267,7 @@ const CourageousWorkshop = () => {
           <section className="text-center mb-16">
             <div className="inline-flex items-center px-6 py-3 rounded-full bg-luxury-white/10 text-luxury-white text-sm font-bold mb-6 border border-luxury-white/20 backdrop-blur-sm">
               <Diamond className="w-5 h-5 ml-2" />
-              کارگاه زنده آنلاین - تجربه‌ای لوکس
+              ورکشاپ مخصوص خانم‌های مهاجر فارسی زبان
             </div>
             
             {/* Mobile-First Hero Title */}
@@ -278,6 +276,10 @@ const CourageousWorkshop = () => {
                 <span className="bg-gradient-luxury-text bg-clip-text text-transparent">کاراکتر پرجرات</span>
               </h1>
               <div className="w-24 h-1 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-4"></div>
+              <div className="flex items-center justify-center gap-2 text-luxury-silver text-sm mb-4">
+                <Shield className="w-5 h-5" />
+                <span className="font-bold">گارانتی بازگشت وجه بدون سوال تا پایان ورکشاپ</span>
+              </div>
             </div>
 
             {/* Mobile Optimized Description */}
@@ -345,24 +347,79 @@ const CourageousWorkshop = () => {
 
           {/* Problem Section - Mobile Optimized */}
           <section className="mb-12 px-4">
-            <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-5 border border-luxury-white/10 shadow-luxury">
-              <h2 className="text-lg sm:text-xl font-bold text-center mb-4 text-luxury-white font-display leading-tight">
-                آیا شما هم این احساسات را داشته‌اید؟
+            <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-6 border border-luxury-white/10 shadow-luxury">
+              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-display leading-tight">
+                خودتان را در موقعیت‌های زیر تصور کنید:
               </h2>
-              <div className="space-y-3 max-w-lg mx-auto">
+              <div className="space-y-4 max-w-2xl mx-auto mb-6">
                 {[
-                  'نمی‌توانم «نه» بگویم',
-                  'از قضاوت دیگران می‌ترسم',
-                  'رویاهایم را کنار گذاشته‌ام',
-                  'در موقعیت‌های دشوار تسلیم می‌شوم',
-                  'صدایم شنیده نمی‌شود',
-                  'نمی‌توانم دفاع کنم'
+                  'در یک صف طولانی ایستادید و فردی مسن از شما خواهش می‌کند نوبت خود را به او بدهید.',
+                  'در جلسه مصاحبه شغلی، توانمندی‌های خود را دست کم می‌گیرید و رد صلاحیت می‌شوید.',
+                  'پولی به کسی قرض داده‌اید و با اینکه خودتان نیاز مالی دارید، خجالت می‌کشید پیگیری کنید.',
+                  'فرد مهمی را می‌بینید اما اعتماد به نفس ارتباط گرفتن با او را ندارید و دور می‌شوید.'
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-luxury-black/30 rounded-lg border border-luxury-white/5 backdrop-blur-sm">
-                    <div className="w-1.5 h-1.5 bg-luxury-white rounded-full mt-2 flex-shrink-0"></div>
+                  <div key={index} className="flex items-start gap-3 p-4 bg-luxury-black/30 rounded-lg border border-luxury-white/5 backdrop-blur-sm">
+                    <div className="w-2 h-2 bg-luxury-white rounded-full mt-2 flex-shrink-0"></div>
                     <span className="text-luxury-silver text-sm leading-relaxed">{item}</span>
                   </div>
                 ))}
+              </div>
+              
+              <div className="text-center space-y-4 bg-luxury-white/5 rounded-lg p-5 border border-luxury-white/10">
+                <p className="text-luxury-white font-bold text-lg">شما خجالتی و کمرو هستید و فرصت‌ها یکی یکی از جلوی چشمتان رد می‌شوند.</p>
+                <p className="text-luxury-silver text-base leading-relaxed">برای از بین بردن چالش‌هایی که با آن دست و پنجه نرم می‌کنید، یک راه حل قطعی و تضمینی با کمترین تلاش وجود دارد:</p>
+                <p className="text-luxury-white font-bold text-2xl bg-gradient-luxury-text bg-clip-text text-transparent">دوره کاراکتر پرجرات</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Benefits Section */}
+          <section className="mb-12 px-4">
+            <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-xl p-6 border border-luxury-white/20 shadow-luxury">
+              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-display">
+                با تقویت کاراکتر پرجرات:
+              </h2>
+              <div className="grid gap-3 max-w-2xl mx-auto">
+                {[
+                  'اعتماد به نفس شما تقویت می‌شود',
+                  'با ترس‌های همیشگی خود خداحافظی می‌کنید',
+                  'توانمندی‌های خود را بهتر بروز می‌دهید',
+                  'تصمیم‌های مهم را بدون نگرانی از قضاوت دیگران می‌گیرید',
+                  'با سطح بالایی از استرس برای همیشه خلاص می‌شوید',
+                  'مطالبات خود را به راحتی از دیگران درخواست می‌کنید'
+                ].map((item, index) => (
+                  <div key={index} className="flex items-center gap-3 p-4 bg-luxury-black/30 rounded-lg border border-luxury-white/5">
+                    <CheckCircle className="w-5 h-5 text-luxury-white flex-shrink-0" />
+                    <span className="text-luxury-silver text-sm leading-relaxed">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Target Audience Section */}
+          <section className="mb-12 px-4">
+            <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-6 border border-luxury-white/10 shadow-luxury">
+              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-display">
+                دوره کاراکتر پرجرات برای شما مناسب است اگر:
+              </h2>
+              <div className="grid gap-3 max-w-2xl mx-auto">
+                {[
+                  'موقع صحبت در جمع، تپش قلب و لرزش صدا می‌گیرید',
+                  'خجالت بارها و بارها مانع پیشرفت شما در زندگی شخصی و حرفه‌ای‌تان شده است',
+                  'می‌خواهید با تقویت خودباوری و عزت نفس، ارتباطات بین فردی را تقویت کنید',
+                  'در موقعیت‌های اجتماعی اضطراب دارید و می‌خواهید با این احساسات مقابله کنید',
+                  'به دنبال یادگیری تکنیک‌ها و راهکارهایی هستید تا در برابر چالش‌ها شجاعت نشان دهید'
+                ].map((item, index) => (
+                  <div key={index} className="flex items-start gap-3 p-4 bg-luxury-black/30 rounded-lg border border-luxury-white/5">
+                    <Target className="w-5 h-5 text-luxury-white flex-shrink-0 mt-1" />
+                    <span className="text-luxury-silver text-sm leading-relaxed">{item}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="text-center mt-6 p-5 bg-luxury-white/10 rounded-lg border border-luxury-white/20">
+                <p className="text-luxury-white font-bold text-lg">شما لایق یک زندگی پر از اعتماد به نفس هستید؛</p>
+                <p className="text-luxury-white font-bold text-lg">کاراکتر پرجرات را تجربه کنید و کمرویی را شکست دهید!</p>
               </div>
             </div>
           </section>
@@ -469,7 +526,7 @@ const CourageousWorkshop = () => {
               <div className="bg-gradient-to-r from-luxury-white/10 to-luxury-white/5 rounded-lg p-4 border border-luxury-white/20 text-center">
                 <div className="mb-3">
                   <p className="text-luxury-silver text-sm mb-1">مجموع ارزش:</p>
-                  <div className="text-2xl font-bold text-luxury-silver line-through farsi-nums">$۵۰۰</div>
+                  <div className="text-2xl font-bold text-luxury-silver line-through farsi-nums">$۷۹۸</div>
                 </div>
                 <div className="bg-gradient-to-r from-luxury-white/20 to-luxury-white/10 rounded-lg p-3 border border-luxury-white/30">
                   <p className="text-luxury-white text-sm font-bold mb-2">قیمت ویژه برای ۱۰۰ نفر اول:</p>
@@ -576,28 +633,91 @@ const CourageousWorkshop = () => {
               </CardContent>
             </Card>
 
+            {/* Advantages Section - Comprehensive */}
             <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl">
               <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
-                  <Award className="w-5 h-5 text-luxury-silver" />
-                  یادگیری‌های کارگاه
+                <CardTitle className="flex items-center gap-3 text-luxury-white text-xl">
+                  <Award className="w-6 h-6 text-luxury-silver" />
+                  مزایای شرکت در دوره کاراکتر پرجرات
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="grid gap-2">
-                  {[
-                    'مرزبندی قدرتمند',
-                    'اعتماد به نفس پایدار',
-                    'ابراز وجود بدون گناه',
-                    'مدیریت تعارضات',
-                    'ارتباط مؤثر',
-                    'استقلال از تأیید دیگران'
-                  ].map((item, index) => (
-                    <div key={index} className="flex items-center gap-3 p-2.5 bg-luxury-white/5 rounded-lg">
-                      <CheckCircle className="w-4 h-4 text-luxury-white flex-shrink-0" />
-                      <span className="text-luxury-silver text-sm">{item}</span>
+              <CardContent className="space-y-6">
+                {/* Advantage 1 */}
+                <div className="bg-luxury-white/5 rounded-lg p-5 border border-luxury-white/10">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="bg-luxury-white/20 rounded-full p-2 flex-shrink-0">
+                      <Globe className="w-5 h-5 text-luxury-white" />
                     </div>
-                  ))}
+                    <h3 className="text-luxury-white font-bold text-base">➕ دوره ای منطبق با فرهنگ کشورمان</h3>
+                  </div>
+                  <p className="text-luxury-silver text-sm leading-relaxed">
+                    شاید وقتی صحبت از آموزش درباره کاراکتر پرجرات می‌شود، به کتاب‌های ترجمه شده و مقالات خارجی می‌رسید. یا دوره‌هایی که تلاش می‌کنند با تقلید آموزش‌ از مدرس‌های اروپایی و آمریکایی، حرفی بزنند. اما باید بپذیریم که «خجالت» مفهومی بیگانه با «فرهنگ» نیست. آموزش‌های دوره کاراکتر پرجرات، منطبق با فرهنگ ایرانی طراحی شده و شما مثال‌ها و موارد آموزشی را کاملا درک می‌کنید و برایتان ملموس است.
+                  </p>
+                </div>
+
+                {/* Advantage 2 */}
+                <div className="bg-luxury-white/5 rounded-lg p-5 border border-luxury-white/10">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="bg-luxury-white/20 rounded-full p-2 flex-shrink-0">
+                      <Shield className="w-5 h-5 text-luxury-white" />
+                    </div>
+                    <h3 className="text-luxury-white font-bold text-base">➕ دوره سازش به پایان رسیده…</h3>
+                  </div>
+                  <p className="text-luxury-silver text-sm leading-relaxed">
+                    تعداد افرادی که از خجالتی بودن دیگران سواستفاده می‌کنند کم نیست؛ در محیط کار، اداره‌ها، مدرسه و دانشگاه و جامعه آن‌ها را می‌بینیم. کسانی که بی مسئولیتی خود را گردن افراد کمرو می‌اندازند تا موفقیت‌ها به نام خودشان ثبت شود. اما «سازش» اصلا راهکار مناسبی برای مقابله با این افراد نیست. وقت آن رسیده که آموزش ببینید و قوی شوید.
+                  </p>
+                </div>
+
+                {/* Advantage 3 */}
+                <div className="bg-luxury-white/5 rounded-lg p-5 border border-luxury-white/10">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="bg-luxury-white/20 rounded-full p-2 flex-shrink-0">
+                      <TrendingUp className="w-5 h-5 text-luxury-white" />
+                    </div>
+                    <h3 className="text-luxury-white font-bold text-base">➕ «کاراکتر پرجرات» یک صرفه جویی تمام عیار است!</h3>
+                  </div>
+                  <p className="text-luxury-silver text-sm leading-relaxed mb-3">
+                    تماشای دوره کاراکتر پرجرات، برای شما صرفه جویی محسوب می‌شود:
+                  </p>
+                  <div className="space-y-2 mr-4">
+                    {[
+                      'صرفه جویی در زمان: وقت خود را به زورگوها اختصاص نمی‌دهید',
+                      'در انرژی: به جای تن دادن اجباری به خواسته‌های دیگران، برای خودتان انرژی نگه می‌دارید',
+                      'در احساسات منفی: مدام خودتان را بابت خورده شدن حقتان سرزنش نمی‌کنید',
+                      'در پول: مطالبات خود را زنده می‌کنید و مجبور نیستید برخلاف میلتان به کسی پول قرض دهید'
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-luxury-white flex-shrink-0 mt-0.5" />
+                        <span className="text-luxury-silver text-sm">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Advantage 4 */}
+                <div className="bg-luxury-white/5 rounded-lg p-5 border border-luxury-white/10">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="bg-luxury-white/20 rounded-full p-2 flex-shrink-0">
+                      <Crown className="w-5 h-5 text-luxury-white" />
+                    </div>
+                    <h3 className="text-luxury-white font-bold text-base">چرا رفع خجولی و کم حرفی مهارتی ضروری در مهاجرت است؟</h3>
+                  </div>
+                  <p className="text-luxury-silver text-sm leading-relaxed mb-3">
+                    در غرب که نحوه معرفی و نمایش توانمندی بسیار مهم‌تر از تخصص است، شما برای رسیدن به جایگاه‌های اجتماعی و شغلی نیاز به اعتماد به نفس و کاراکتر پرجرات دارید. از طرفی، افراد خجالتی معمولا فرصت خوبی را برای افراد زورگو فراهم می‌کنند؛ گویا دیوارهای کوتاهی هستند که دیگران را به پایمال شدن حقوق خود تشویق می‌کنند!
+                  </p>
+                  <p className="text-luxury-silver text-sm leading-relaxed">
+                    بنابراین یک بار برای همیشه با غول بی رحم خجالت مبارزه کنید و به تماشای تغییرات مثبتی که بعد از آن در زندگی‌تان رخ می‌دهد بنشینید.
+                  </p>
+                </div>
+
+                {/* Final CTA in advantages */}
+                <div className="bg-gradient-luxury rounded-lg p-5 border border-luxury-white/20 text-center">
+                  <p className="text-luxury-white font-bold text-lg mb-2">
+                    خجالت، سد سیمانی بین شما و رویاهایتان است؛
+                  </p>
+                  <p className="text-luxury-white font-bold text-lg">
+                    با ابزار «کاراکتر پرجرات» آن را بشکنید!
+                  </p>
                 </div>
               </CardContent>
             </Card>
