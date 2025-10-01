@@ -283,11 +283,11 @@ const CourageousWorkshop = () => {
           <div className="mb-8 px-4">
             <div className="bg-gradient-to-br from-urgency/20 to-urgency-dark/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-urgency/40 shadow-urgency">
               <div className="text-center mb-4 sm:mb-6">
-                <div className="inline-flex items-center gap-2 bg-urgency text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-sm sm:text-base mb-3 sm:mb-4 shadow-cta">
+                <div className="inline-flex items-center gap-2 bg-urgency text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-xs sm:text-sm mb-3 sm:mb-4 shadow-cta">
                   <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-                  ویدیو معرفی ورکشاپ را حتماً تماشا کنید
+                  <span className="whitespace-nowrap">ویدیو معرفی ورکشاپ را حتماً تماشا کنید</span>
                 </div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3 leading-tight">
+                <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3 leading-tight whitespace-nowrap">
                   ویدیو معرفی ورکشاپ کاراکتر پرجرات
                 </h2>
                 <p className="text-white/90 text-sm sm:text-base max-w-2xl mx-auto">
@@ -332,7 +332,7 @@ const CourageousWorkshop = () => {
               </div>
               <div className="text-center pt-2">
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-6 text-white font-farsi leading-tight">
-                  ورکشاپ کاراکتر پرجرات ۲۰۲۶
+                  ورکشاپ کاراکتر پرجرات
                 </h1>
                 <p className="text-sm sm:text-base text-luxury-white mb-3 sm:mb-4 font-bold font-farsi">سرمایه‌گذاری در آینده خودتان</p>
                 <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-5">
@@ -506,7 +506,7 @@ const CourageousWorkshop = () => {
           {/* Problem Section - Mobile Optimized */}
           <section className="mb-10 sm:mb-12 px-4">
             <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-5 sm:p-6 border border-luxury-white/10 shadow-luxury">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center mb-5 sm:mb-6 text-luxury-white font-farsi leading-tight px-2">
+              <h2 className="text-base sm:text-xl md:text-2xl font-bold text-center mb-5 sm:mb-6 text-luxury-white font-farsi leading-tight px-2 whitespace-nowrap">
                 خودتان را در موقعیت‌های زیر تصور کنید:
               </h2>
               <div className="space-y-3 sm:space-y-4 max-w-2xl mx-auto mb-5 sm:mb-6">
@@ -558,7 +558,7 @@ const CourageousWorkshop = () => {
           {/* Cost of Inaction Section */}
           <section className="mb-12 px-4">
             <div className="bg-gradient-to-br from-red-900/20 to-red-800/10 rounded-xl p-6 border border-red-500/30 shadow-luxury">
-              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-farsi">
+              <h2 className="text-base sm:text-xl md:text-2xl font-bold text-center mb-6 text-luxury-white font-farsi whitespace-nowrap">
                 هزینه واقعی تغییر نکردن چیست؟
               </h2>
               <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
