@@ -278,52 +278,52 @@ const CourageousWorkshop = () => {
         </header>
 
         <main className="container mx-auto px-4 py-8">
-          {/* Real-Time Urgency Bar */}
-          <div className="bg-gradient-to-r from-red-900/30 via-red-800/30 to-red-900/30 border border-red-500/30 rounded-lg p-3 mb-6 backdrop-blur-sm">
-            <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                <span className="text-luxury-white font-bold farsi-nums">{spotsRemaining} جای خالی باقی مانده</span>
+          {/* Real-Time Urgency Bar - Enhanced */}
+          <div className="bg-gradient-urgency rounded-2xl p-4 mb-8 shadow-urgency animate-urgency-pulse border-2 border-urgency-light/50">
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm md:text-base">
+              <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">
+                <div className="w-3 h-3 bg-white rounded-full animate-pulse shadow-glow"></div>
+                <span className="text-white font-extrabold farsi-nums text-lg">{spotsRemaining} جای خالی!</span>
               </div>
-              <div className="h-4 w-px bg-luxury-white/20"></div>
+              <div className="h-6 w-px bg-white/30"></div>
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-luxury-white" />
-                <span className="text-luxury-silver farsi-nums">{viewersCount} نفر در حال مشاهده</span>
+                <Users className="w-5 h-5 text-white" />
+                <span className="text-white/90 font-medium farsi-nums">{viewersCount} نفر الان اینجا هستند</span>
               </div>
-              <div className="h-4 w-px bg-luxury-white/20"></div>
+              <div className="h-6 w-px bg-white/30"></div>
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-luxury-white" />
-                <span className="text-luxury-white font-bold">شروع کلاس: 15 فوریه 2025</span>
+                <Clock className="w-5 h-5 text-white" />
+                <span className="text-white font-bold">🔥 شروع: 15 فوریه</span>
               </div>
             </div>
           </div>
 
-          {/* Success Story Opening */}
-          <section className="mb-8 px-4">
-            <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 rounded-xl p-6 border border-luxury-white/20 backdrop-blur-sm">
-              <div className="text-center mb-4">
-                <div className="flex items-center justify-center gap-2 mb-3">
+          {/* Success Story Opening - Enhanced */}
+          <section className="mb-10 px-4 animate-fade-in-up">
+            <div className="bg-gradient-success rounded-2xl p-8 border-2 border-success/40 shadow-glow hover-lift">
+              <div className="text-center mb-6">
+                <div className="flex items-center justify-center gap-1 mb-4 animate-scale-in">
                   {[1,2,3,4,5].map((i) => (
-                    <Star key={i} className="w-5 h-5 fill-yellow-500 text-yellow-500" />
+                    <Star key={i} className="w-6 h-6 fill-yellow-400 text-yellow-400 drop-shadow-lg" />
                   ))}
                 </div>
-                <h3 className="text-xl font-bold text-luxury-white mb-2">
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
                   "از فردی خجالتی که حتی نمی‌توانستم در جمع حرف بزنم، به مدیری شدم که با اعتماد به نفس تیمی 12 نفره را رهبری می‌کنم"
                 </h3>
-                <p className="text-luxury-silver text-sm">- ساناز م.، مدیر محصول در شرکت تکنولوژی، تورنتو</p>
+                <p className="text-white/90 text-base font-medium">- ساناز م.، مدیر محصول در شرکت تکنولوژی، تورنتو</p>
               </div>
-              <div className="grid md:grid-cols-3 gap-4 mt-6">
-                <div className="text-center p-4 bg-luxury-black/30 rounded-lg">
-                  <div className="text-3xl font-bold text-luxury-white mb-1 farsi-nums">89%</div>
-                  <div className="text-sm text-luxury-silver">افزایش اعتماد به نفس</div>
+              <div className="grid md:grid-cols-3 gap-6 mt-8">
+                <div className="text-center p-6 bg-white/20 rounded-xl backdrop-blur-sm hover-glow transition-all">
+                  <div className="text-5xl font-extrabold text-white mb-2 farsi-nums">89%</div>
+                  <div className="text-base font-bold text-white">افزایش اعتماد به نفس</div>
                 </div>
-                <div className="text-center p-4 bg-luxury-black/30 rounded-lg">
-                  <div className="text-3xl font-bold text-luxury-white mb-1 farsi-nums">2,847</div>
-                  <div className="text-sm text-luxury-silver">زن ایرانی تحول یافته</div>
+                <div className="text-center p-6 bg-white/20 rounded-xl backdrop-blur-sm hover-glow transition-all">
+                  <div className="text-5xl font-extrabold text-white mb-2 farsi-nums">2,847</div>
+                  <div className="text-base font-bold text-white">زن ایرانی تحول یافته</div>
                 </div>
-                <div className="text-center p-4 bg-luxury-black/30 rounded-lg">
-                  <div className="text-3xl font-bold text-luxury-white mb-1 farsi-nums">94%</div>
-                  <div className="text-sm text-luxury-silver">رضایت دانشجویان</div>
+                <div className="text-center p-6 bg-white/20 rounded-xl backdrop-blur-sm hover-glow transition-all">
+                  <div className="text-5xl font-extrabold text-white mb-2 farsi-nums">94%</div>
+                  <div className="text-base font-bold text-white">رضایت دانشجویان</div>
                 </div>
               </div>
             </div>
@@ -372,70 +372,87 @@ const CourageousWorkshop = () => {
               <span className="block whitespace-nowrap">and Behave like a confident Ladyboss</span>
             </p>
 
-            {/* Pricing Section - Mobile Optimized */}
-            <div className="relative bg-gradient-to-br from-luxury-white/5 to-luxury-white/10 backdrop-blur-sm rounded-xl p-6 mb-8 mx-4 border border-luxury-white/20 shadow-luxury">
-              <div className="absolute top-3 right-3">
-                <Crown className="w-5 h-5 text-luxury-silver" />
+            {/* Pricing Section - Enhanced with Urgency */}
+            <div className="relative bg-gradient-to-br from-urgency/20 to-urgency-dark/20 backdrop-blur-sm rounded-2xl p-8 mb-10 mx-4 border-2 border-urgency/40 shadow-urgency animate-urgency-pulse">
+              <div className="absolute -top-4 right-6 bg-urgency text-white px-6 py-2 rounded-full font-bold text-sm shadow-cta animate-bounce">
+                🔥 پیشنهاد ویژه!
               </div>
               <div className="text-center">
-                <p className="text-xs text-luxury-silver mb-3 font-medium">سرمایه‌گذاری در خودتان</p>
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <span className="text-xl font-bold text-luxury-silver/60 line-through farsi-nums">$۴۹۷</span>
-                  <span className="text-4xl font-bold text-luxury-white farsi-nums">$۹۷</span>
+                <p className="text-sm text-luxury-white mb-4 font-bold">سرمایه‌گذاری در آینده خودتان</p>
+                <div className="flex items-center justify-center gap-4 mb-5">
+                  <span className="text-2xl font-bold text-luxury-silver/50 line-through farsi-nums">$۴۹۷</span>
+                  <span className="text-6xl font-extrabold text-white farsi-nums drop-shadow-2xl">$۹۷</span>
                 </div>
-                <div className="bg-luxury-white text-luxury-black rounded-full px-4 py-2 text-xs font-bold inline-block">
-                  ۸۰% تخفیف ویژه - فقط ۱۰۰ نفر
+                <div className="bg-white text-urgency-dark rounded-full px-6 py-3 text-base font-extrabold inline-block shadow-bold mb-3">
+                  ۸۰% تخفیف - فقط امروز!
+                </div>
+                <div className="mt-4 p-4 bg-white/10 rounded-xl backdrop-blur-sm">
+                  <p className="text-white text-sm font-medium">
+                    💰 ارزش واقعی: <span className="font-bold farsi-nums">$497</span>
+                  </p>
+                  <p className="text-urgency-light text-xs mt-1 farsi-nums">
+                    بعد از پر شدن ظرفیت، قیمت به $297 افزایش می‌یابد
+                  </p>
                 </div>
               </div>
             </div>
             
-            {/* CTA Buttons */}
-            <div className="flex flex-col gap-4 justify-center items-center mb-12 px-4">
+            {/* CTA Buttons - Enhanced with Urgency Design */}
+            <div className="flex flex-col gap-4 justify-center items-center mb-12 px-4 animate-fade-in-up">
               <Button 
                 size="lg" 
-                className="w-full max-w-xs bg-luxury-white hover:bg-luxury-silver text-luxury-black px-8 py-5 text-lg font-bold rounded-xl shadow-luxury"
+                className="cta-button w-full max-w-md text-white px-10 py-6 text-xl font-extrabold rounded-2xl shadow-cta transform hover:scale-105 transition-all duration-300"
                 onClick={() => handleDirectPayment('main_cta')}
                 disabled={isProcessingPayment}
               >
-                <Target className="w-5 h-5 ml-2" />
-                {isProcessingPayment ? 'در حال پردازش...' : 'خرید کارگاه - $97'}
+                <Zap className="w-6 h-6 ml-2" />
+                {isProcessingPayment ? 'در حال پردازش...' : 'ثبت‌نام فوری - فقط $97'}
               </Button>
+              <p className="text-urgency-light text-sm font-bold animate-urgency-pulse farsi-nums">
+                ⚡ فقط {spotsRemaining} جای خالی باقی مانده!
+              </p>
               
               <Button 
                 variant="outline" 
                 size="lg" 
                 onClick={handleWhatsAppClick}
-                className="w-full max-w-xs border-luxury-white/50 bg-luxury-black/50 text-luxury-white hover:bg-luxury-white/10 hover:text-luxury-white hover:border-luxury-white px-6 py-4 text-base font-semibold rounded-xl backdrop-blur-sm"
+                className="w-full max-w-md border-2 border-luxury-white/60 bg-luxury-black/60 text-luxury-white hover:bg-luxury-white hover:text-luxury-black px-8 py-5 text-lg font-bold rounded-2xl backdrop-blur-sm transition-all duration-300 hover-lift"
               >
-                <MessageCircle className="w-4 h-4 ml-2" />
-                سوال دارید؟
+                <MessageCircle className="w-5 h-5 ml-2" />
+                سوالی دارید? با ما صحبت کنید
               </Button>
             </div>
 
-            {/* Trust Indicators - Mobile Optimized */}
-            <div className="grid grid-cols-3 gap-2 text-center max-w-sm mx-auto px-4">
-              <div className="flex flex-col items-center gap-1 p-3 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
-                <Shield className="w-5 h-5 text-luxury-white" />
-                <span className="text-luxury-silver text-xs font-medium">گارانتی بدون سوال</span>
+            {/* Trust Indicators - Enhanced */}
+            <div className="grid grid-cols-3 gap-4 text-center max-w-2xl mx-auto px-4 animate-fade-in-up">
+              <div className="flex flex-col items-center gap-2 p-5 bg-success/10 rounded-xl border-2 border-success/30 hover-lift backdrop-blur-sm">
+                <Shield className="w-8 h-8 text-success" />
+                <span className="text-white text-sm font-bold">گارانتی 100%</span>
+                <span className="text-success text-xs">بدون سوال</span>
               </div>
-              <div className="flex flex-col items-center gap-1 p-3 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
-                <Users className="w-5 h-5 text-luxury-white" />
-                <span className="text-luxury-silver text-xs font-medium farsi-nums">{spotsRemaining} جای خالی</span>
+              <div className="flex flex-col items-center gap-2 p-5 bg-urgency/10 rounded-xl border-2 border-urgency/30 hover-lift backdrop-blur-sm animate-urgency-pulse">
+                <Users className="w-8 h-8 text-urgency" />
+                <span className="text-white text-sm font-bold farsi-nums">{spotsRemaining} جای خالی</span>
+                <span className="text-urgency-light text-xs">تقاضا بالا!</span>
               </div>
-              <div className="flex flex-col items-center gap-1 p-3 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
-                <Star className="w-5 h-5 text-luxury-white" />
-                <span className="text-luxury-silver text-xs font-medium">۴.۹/۵ امتیاز</span>
+              <div className="flex flex-col items-center gap-2 p-5 bg-warning/10 rounded-xl border-2 border-warning/30 hover-lift backdrop-blur-sm">
+                <Star className="w-8 h-8 text-warning fill-warning" />
+                <span className="text-white text-sm font-bold">۴.۹/۵ امتیاز</span>
+                <span className="text-warning-light text-xs farsi-nums">2,847 نظر</span>
               </div>
             </div>
           </section>
 
-          {/* Testimonials Section */}
-          <section className="mb-12 px-4">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-luxury-white mb-3 font-display">
+          {/* Testimonials Section - Enhanced */}
+          <section className="mb-12 px-4 animate-fade-in-up">
+            <div className="text-center mb-10">
+              <div className="inline-block bg-success/20 text-success px-6 py-2 rounded-full font-bold text-sm mb-4 border border-success/40">
+                ✨ موفقیت‌های واقعی
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 font-display">
                 داستان‌های تحول واقعی
               </h2>
-              <p className="text-luxury-silver">زنانی که با کاراکتر پرجرات زندگی‌شان را متحول کردند</p>
+              <p className="text-luxury-silver text-lg">زنانی که با کاراکتر پرجرات زندگی‌شان را متحول کردند</p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {[
@@ -476,20 +493,20 @@ const CourageousWorkshop = () => {
                   quote: "اضطراب اجتماعی داشتم و از رفتن به مهمانی‌ها می‌ترسیدم. الان با راحتی ارتباط می‌گیرم و دوستان جدید پیدا کرده‌ام."
                 }
               ].map((testimonial, index) => (
-                <Card key={index} className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm hover:border-luxury-white/40 transition-colors">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-1 mb-3">
+                <Card key={index} className="bg-luxury-charcoal/60 border-2 border-luxury-white/30 backdrop-blur-sm hover:border-success hover:shadow-glow transition-all hover-lift">
+                  <CardContent className="p-7">
+                    <div className="flex items-center gap-1 mb-4">
                       {[1,2,3,4,5].map((i) => (
-                        <Star key={i} className="w-4 h-4 fill-yellow-500 text-yellow-500" />
+                        <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400 drop-shadow-lg" />
                       ))}
                     </div>
-                    <p className="text-luxury-silver text-sm leading-relaxed mb-4 italic">
+                    <p className="text-luxury-white text-base leading-relaxed mb-5 italic font-medium">
                       "{testimonial.quote}"
                     </p>
-                    <div className="border-t border-luxury-white/10 pt-4">
-                      <div className="font-bold text-luxury-white text-sm">{testimonial.name}</div>
-                      <div className="text-luxury-silver text-xs mb-2">{testimonial.title}</div>
-                      <div className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-bold inline-block">
+                    <div className="border-t border-luxury-white/20 pt-4">
+                      <div className="font-bold text-white text-base mb-1">{testimonial.name}</div>
+                      <div className="text-luxury-silver text-sm mb-3">{testimonial.title}</div>
+                      <div className="bg-success/30 text-success border border-success/50 px-4 py-2 rounded-xl text-sm font-extrabold inline-block shadow-medium">
                         ✓ {testimonial.result}
                       </div>
                     </div>
@@ -1169,62 +1186,79 @@ const CourageousWorkshop = () => {
           </section>
         </main>
 
-        {/* Exit Intent Popup */}
+        {/* Exit Intent Popup - Enhanced */}
         {showExitIntent && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-            <div className="bg-luxury-charcoal rounded-xl p-6 max-w-md w-full border border-luxury-white/20 shadow-luxury animate-in fade-in zoom-in duration-300">
+          <div className="fixed inset-0 bg-luxury-black/95 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in-up">
+            <div className="bg-gradient-to-br from-urgency/30 to-urgency-dark/20 rounded-3xl p-10 max-w-lg w-full border-2 border-urgency shadow-cta relative animate-scale-in">
               <button 
                 onClick={() => setShowExitIntent(false)}
-                className="float-left text-luxury-silver hover:text-luxury-white"
+                className="absolute top-4 left-4 text-luxury-silver hover:text-white text-2xl font-bold w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-all"
               >
                 ✕
               </button>
-              <div className="text-center pt-8">
-                <h3 className="text-2xl font-bold text-luxury-white mb-3">صبر کنید! 🎁</h3>
-                <p className="text-luxury-silver mb-4">
-                  قبل از رفتن، این پیشنهاد ویژه را از دست ندهید
-                </p>
-                <div className="bg-gradient-to-r from-red-900/30 to-red-800/30 rounded-lg p-4 mb-4 border border-red-500/30">
-                  <p className="text-luxury-white font-bold mb-2">
-                    فقط الان: یک جلسه مشاوره رایگان 30 دقیقه‌ای هدیه!
-                  </p>
-                  <p className="text-luxury-silver text-sm">
-                    ارزش $50 - فقط برای 10 نفر اول
+              <div className="text-center">
+                <div className="mb-6">
+                  <div className="relative inline-block">
+                    <Gift className="w-20 h-20 mx-auto text-urgency mb-4 animate-bounce" />
+                    <div className="absolute -top-2 -right-2 bg-urgency text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm animate-pulse">
+                      !
+                    </div>
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-3 font-display leading-tight">
+                    صبر کنید! 🎁
+                  </h3>
+                  <p className="text-xl text-luxury-white font-bold">
+                    یک هدیه ویژه برای شما داریم
                   </p>
                 </div>
+                <div className="bg-gradient-success rounded-2xl p-6 mb-8 border-2 border-success shadow-glow">
+                  <p className="text-white font-bold text-lg mb-3">
+                    🎁 با ثبت‌نام الان دریافت کنید:
+                  </p>
+                  <p className="text-white font-extrabold text-2xl mb-2">
+                    یک جلسه مشاوره رایگان 30 دقیقه‌ای!
+                  </p>
+                  <p className="text-white/90 text-base font-medium">
+                    ارزش $50 - فقط برای 10 نفر اول
+                  </p>
+                  <div className="mt-4 flex items-center justify-center gap-2 text-white/80 text-sm">
+                    <Clock className="w-4 h-4" />
+                    <span>این پیشنهاد فقط برای 5 دقیقه معتبر است</span>
+                  </div>
+                </div>
                 <Button 
-                  className="w-full bg-luxury-white hover:bg-luxury-silver text-luxury-black px-6 py-4 text-lg font-bold rounded-xl mb-3"
+                  className="cta-button w-full text-white px-8 py-6 text-xl font-extrabold rounded-2xl mb-4 shadow-cta transform hover:scale-105"
                   onClick={() => {
                     handleDirectPayment('exit_intent');
                     setShowExitIntent(false);
                   }}
                   disabled={isProcessingPayment}
                 >
-                  <Gift className="w-5 h-5 ml-2" />
-                  <span className="farsi-nums">{isProcessingPayment ? 'پردازش...' : 'می‌خواهم هدیه را دریافت کنم'}</span>
+                  <Sparkles className="w-6 h-6 ml-2" />
+                  <span className="farsi-nums">{isProcessingPayment ? 'پردازش...' : 'بله! می‌خواهم هدیه را دریافت کنم'}</span>
                 </Button>
                 <button
                   onClick={() => setShowExitIntent(false)}
-                  className="text-luxury-silver text-sm hover:text-luxury-white"
+                  className="text-luxury-silver text-sm hover:text-white underline transition-colors"
                 >
-                  نه متشکرم، می‌خواهم این فرصت را از دست بدهم
+                  نه متشکرم، ترجیح می‌دهم این فرصت را از دست بدهم
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Sticky Mobile CTA */}
+        {/* Sticky Mobile CTA - Enhanced */}
         {showStickyBtn && (
-          <div className="sticky-cta sm:hidden">
+          <div className="sticky-cta">
             <Button 
               size="lg" 
-              className="bg-luxury-white hover:bg-luxury-silver text-luxury-black px-6 py-4 text-base font-bold rounded-xl shadow-luxury w-72 max-w-[85vw]"
+              className="cta-button text-white px-8 py-5 text-lg font-extrabold rounded-2xl shadow-cta w-80 max-w-[90vw] animate-urgency-pulse"
               onClick={() => handleDirectPayment('sticky')}
               disabled={isProcessingPayment}
             >
-              <Crown className="w-4 h-4 ml-2" />
-              <span className="farsi-nums text-sm">{isProcessingPayment ? 'پردازش...' : 'ثبت نام فوری - $۹۷'}</span>
+              <Zap className="w-5 h-5 ml-2" />
+              <span className="farsi-nums">{isProcessingPayment ? 'پردازش...' : 'ثبت‌نام $۹۷ - فقط ' + spotsRemaining + ' جا!'}</span>
             </Button>
           </div>
         )}
