@@ -258,19 +258,18 @@ const CourageousWorkshop = () => {
     <>
       <SEOHead />
       <div className="min-h-screen bg-luxury-black font-farsi rtl">
-        {/* Navigation Header */}
+        {/* Navigation Header - Mobile Optimized */}
         <header className="border-b border-luxury-accent/20 bg-luxury-black/95 backdrop-blur-md sticky top-0 z-50 shadow-luxury">
-          <div className="container mx-auto px-4 py-4">
+          <div className="container mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
-              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-luxury-text bg-clip-text text-transparent">
-                <Crown className="w-6 h-6 inline-block ml-2 text-luxury-white" />
+              <h1 className="text-base sm:text-xl md:text-2xl font-bold bg-gradient-luxury-text bg-clip-text text-transparent">
+                <Crown className="w-5 h-5 sm:w-6 sm:h-6 inline-block ml-2 text-luxury-white" />
                 آکادمی لیدی‌باس
               </h1>
-              <Button variant="ghost" size="sm" asChild className="text-luxury-silver hover:text-luxury-white hover:bg-luxury-charcoal">
+              <Button variant="ghost" size="sm" asChild className="text-luxury-silver hover:text-luxury-white hover:bg-luxury-charcoal min-h-[44px] px-3">
                 <Link to="/" className="flex items-center gap-2">
-                  <span className="hidden sm:inline">بازگشت به خانه</span>
-                  <span className="sm:hidden">بازگشت</span>
-                  <ArrowLeft size={16} className="rotate-180" />
+                  <span className="text-sm">بازگشت</span>
+                  <ArrowLeft size={18} className="rotate-180" />
                 </Link>
               </Button>
             </div>
@@ -278,22 +277,22 @@ const CourageousWorkshop = () => {
         </header>
 
         <main className="container mx-auto px-4 py-8">
-          {/* Real-Time Urgency Bar - Enhanced */}
-          <div className="bg-gradient-urgency rounded-2xl p-4 mb-8 shadow-urgency animate-urgency-pulse border-2 border-urgency-light/50">
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm md:text-base">
-              <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">
-                <div className="w-3 h-3 bg-white rounded-full animate-pulse shadow-glow"></div>
-                <span className="text-white font-extrabold farsi-nums text-lg">{spotsRemaining} جای خالی!</span>
+          {/* Real-Time Urgency Bar - Mobile Optimized */}
+          <div className="bg-gradient-urgency rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-6 sm:mb-8 shadow-urgency border-2 border-urgency-light/50">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm">
+              <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm min-h-[44px]">
+                <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse shadow-glow"></div>
+                <span className="text-white font-extrabold farsi-nums text-base sm:text-lg">{spotsRemaining} جای خالی!</span>
               </div>
-              <div className="h-6 w-px bg-white/30"></div>
+              <div className="hidden sm:block h-6 w-px bg-white/30"></div>
               <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-white" />
-                <span className="text-white/90 font-medium farsi-nums">{viewersCount} نفر الان اینجا هستند</span>
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                <span className="text-white/90 font-medium farsi-nums text-sm">{viewersCount} نفر الان اینجا</span>
               </div>
-              <div className="h-6 w-px bg-white/30"></div>
+              <div className="hidden sm:block h-6 w-px bg-white/30"></div>
               <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-white" />
-                <span className="text-white font-bold">🔥 شروع: 15 فوریه</span>
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                <span className="text-white font-bold text-sm">🔥 شروع: 15 فوریه</span>
               </div>
             </div>
           </div>
@@ -347,47 +346,47 @@ const CourageousWorkshop = () => {
             </div>
           </div>
 
-          {/* Hero Section - Mobile First Luxury Design */}
-          <section className="text-center mb-16">
-            <div className="inline-flex items-center px-6 py-3 rounded-full bg-luxury-white/10 text-luxury-white text-sm font-bold mb-6 border border-luxury-white/20 backdrop-blur-sm">
-              <Diamond className="w-5 h-5 ml-2" />
-              ورکشاپ مخصوص خانم‌های مهاجر فارسی زبان
+          {/* Hero Section - Mobile First */}
+          <section className="text-center mb-12 sm:mb-16">
+            <div className="inline-flex items-center px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-luxury-white/10 text-luxury-white text-xs sm:text-sm font-bold mb-4 sm:mb-6 border border-luxury-white/20 backdrop-blur-sm">
+              <Diamond className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
+              <span className="whitespace-nowrap">ورکشاپ مخصوص خانم‌های مهاجر</span>
             </div>
             
             {/* Mobile-First Hero Title */}
-            <div className="mb-6 px-2">
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-4 text-luxury-white leading-tight font-display">
+            <div className="mb-6 px-4">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 text-luxury-white leading-tight font-display">
                 <span className="bg-gradient-luxury-text bg-clip-text text-transparent">کاراکتر پرجرات</span>
               </h1>
-              <div className="w-24 h-1 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-4"></div>
-              <div className="flex items-center justify-center gap-2 text-luxury-silver text-sm mb-4">
-                <Shield className="w-5 h-5" />
-                <span className="font-bold">گارانتی بازگشت وجه بدون سوال تا پایان ورکشاپ</span>
+              <div className="w-20 sm:w-24 h-1 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-4"></div>
+              <div className="flex items-center justify-center gap-2 text-luxury-silver text-xs sm:text-sm mb-4">
+                <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="font-bold">گارانتی بازگشت وجه</span>
               </div>
             </div>
 
             {/* Mobile Optimized Description */}
-            <p className="text-sm sm:text-base lg:text-xl text-luxury-silver mb-8 max-w-2xl mx-auto leading-relaxed px-6 text-center">
-              <span className="block whitespace-nowrap">Join the Courageous Character Workshop</span>
-              <span className="block whitespace-nowrap">and Behave like a confident Ladyboss</span>
+            <p className="text-base sm:text-lg lg:text-xl text-luxury-silver mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4">
+              <span className="block">Join the Courageous Character Workshop</span>
+              <span className="block">and Behave like a confident Ladyboss</span>
             </p>
 
-            {/* Pricing Section - Enhanced with Urgency */}
-            <div className="relative bg-gradient-to-br from-urgency/20 to-urgency-dark/20 backdrop-blur-sm rounded-2xl p-8 mb-10 mx-4 border-2 border-urgency/40 shadow-urgency animate-urgency-pulse">
-              <div className="absolute -top-4 right-6 bg-urgency text-white px-6 py-2 rounded-full font-bold text-sm shadow-cta animate-bounce">
+            {/* Pricing Section - Mobile Optimized */}
+            <div className="relative bg-gradient-to-br from-urgency/20 to-urgency-dark/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-6 sm:p-8 mb-8 sm:mb-10 mx-2 sm:mx-4 border-2 border-urgency/40 shadow-urgency">
+              <div className="absolute -top-3 right-4 sm:right-6 bg-urgency text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-full font-bold text-xs sm:text-sm shadow-cta">
                 🔥 پیشنهاد ویژه!
               </div>
-              <div className="text-center">
-                <p className="text-sm text-luxury-white mb-4 font-bold">سرمایه‌گذاری در آینده خودتان</p>
-                <div className="flex items-center justify-center gap-4 mb-5">
-                  <span className="text-2xl font-bold text-luxury-silver/50 line-through farsi-nums">$۴۹۷</span>
-                  <span className="text-6xl font-extrabold text-white farsi-nums drop-shadow-2xl">$۹۷</span>
+              <div className="text-center pt-2">
+                <p className="text-sm sm:text-base text-luxury-white mb-3 sm:mb-4 font-bold">سرمایه‌گذاری در آینده خودتان</p>
+                <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-5">
+                  <span className="text-xl sm:text-2xl font-bold text-luxury-silver/50 line-through farsi-nums">$۴۹۷</span>
+                  <span className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white farsi-nums drop-shadow-2xl">$۹۷</span>
                 </div>
-                <div className="bg-white text-urgency-dark rounded-full px-6 py-3 text-base font-extrabold inline-block shadow-bold mb-3">
+                <div className="bg-white text-urgency-dark rounded-full px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-extrabold inline-block shadow-bold mb-3">
                   ۸۰% تخفیف - فقط امروز!
                 </div>
-                <div className="mt-4 p-4 bg-white/10 rounded-xl backdrop-blur-sm">
-                  <p className="text-white text-sm font-medium">
+                <div className="mt-4 p-3 sm:p-4 bg-white/10 rounded-xl backdrop-blur-sm">
+                  <p className="text-white text-xs sm:text-sm font-medium">
                     💰 ارزش واقعی: <span className="font-bold farsi-nums">$497</span>
                   </p>
                   <p className="text-urgency-light text-xs mt-1 farsi-nums">
@@ -397,18 +396,18 @@ const CourageousWorkshop = () => {
               </div>
             </div>
             
-            {/* CTA Buttons - Enhanced with Urgency Design */}
-            <div className="flex flex-col gap-4 justify-center items-center mb-12 px-4 animate-fade-in-up">
+            {/* CTA Buttons - Mobile Optimized */}
+            <div className="flex flex-col gap-3 sm:gap-4 justify-center items-center mb-10 sm:mb-12 px-4">
               <Button 
                 size="lg" 
-                className="cta-button w-full max-w-md text-white px-10 py-6 text-xl font-extrabold rounded-2xl shadow-cta transform hover:scale-105 transition-all duration-300"
+                className="cta-button w-full max-w-md text-white px-8 sm:px-10 py-5 sm:py-6 text-lg sm:text-xl font-extrabold rounded-xl sm:rounded-2xl shadow-cta min-h-[56px] sm:min-h-[64px] active:scale-95 transition-transform"
                 onClick={() => handleDirectPayment('main_cta')}
                 disabled={isProcessingPayment}
               >
-                <Zap className="w-6 h-6 ml-2" />
+                <Zap className="w-5 h-5 sm:w-6 sm:h-6 ml-2" />
                 {isProcessingPayment ? 'در حال پردازش...' : 'ثبت‌نام فوری - فقط $97'}
               </Button>
-              <p className="text-urgency-light text-sm font-bold animate-urgency-pulse farsi-nums">
+              <p className="text-urgency-light text-xs sm:text-sm font-bold farsi-nums">
                 ⚡ فقط {spotsRemaining} جای خالی باقی مانده!
               </p>
               
@@ -416,45 +415,45 @@ const CourageousWorkshop = () => {
                 variant="outline" 
                 size="lg" 
                 onClick={handleWhatsAppClick}
-                className="w-full max-w-md border-2 border-luxury-white/60 bg-luxury-black/60 text-luxury-white hover:bg-luxury-white hover:text-luxury-black px-8 py-5 text-lg font-bold rounded-2xl backdrop-blur-sm transition-all duration-300 hover-lift"
+                className="w-full max-w-md border-2 border-luxury-white/60 bg-luxury-black/60 text-luxury-white hover:bg-luxury-white hover:text-luxury-black px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl backdrop-blur-sm min-h-[56px] active:scale-95 transition-transform"
               >
-                <MessageCircle className="w-5 h-5 ml-2" />
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
                 سوالی دارید? با ما صحبت کنید
               </Button>
             </div>
 
-            {/* Trust Indicators - Enhanced */}
-            <div className="grid grid-cols-3 gap-4 text-center max-w-2xl mx-auto px-4 animate-fade-in-up">
-              <div className="flex flex-col items-center gap-2 p-5 bg-success/10 rounded-xl border-2 border-success/30 hover-lift backdrop-blur-sm">
-                <Shield className="w-8 h-8 text-success" />
-                <span className="text-white text-sm font-bold">گارانتی 100%</span>
-                <span className="text-success text-xs">بدون سوال</span>
+            {/* Trust Indicators - Mobile Optimized */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center max-w-2xl mx-auto px-2 sm:px-4">
+              <div className="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-5 bg-success/10 rounded-lg sm:rounded-xl border-2 border-success/30 backdrop-blur-sm">
+                <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-success" />
+                <span className="text-white text-xs sm:text-sm font-bold leading-tight">گارانتی 100%</span>
+                <span className="text-success text-[10px] sm:text-xs">بدون سوال</span>
               </div>
-              <div className="flex flex-col items-center gap-2 p-5 bg-urgency/10 rounded-xl border-2 border-urgency/30 hover-lift backdrop-blur-sm animate-urgency-pulse">
-                <Users className="w-8 h-8 text-urgency" />
-                <span className="text-white text-sm font-bold farsi-nums">{spotsRemaining} جای خالی</span>
-                <span className="text-urgency-light text-xs">تقاضا بالا!</span>
+              <div className="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-5 bg-urgency/10 rounded-lg sm:rounded-xl border-2 border-urgency/30 backdrop-blur-sm">
+                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-urgency" />
+                <span className="text-white text-xs sm:text-sm font-bold farsi-nums leading-tight">{spotsRemaining} جای خالی</span>
+                <span className="text-urgency-light text-[10px] sm:text-xs">تقاضا بالا!</span>
               </div>
-              <div className="flex flex-col items-center gap-2 p-5 bg-warning/10 rounded-xl border-2 border-warning/30 hover-lift backdrop-blur-sm">
-                <Star className="w-8 h-8 text-warning fill-warning" />
-                <span className="text-white text-sm font-bold">۴.۹/۵ امتیاز</span>
-                <span className="text-warning-light text-xs farsi-nums">2,847 نظر</span>
+              <div className="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-5 bg-warning/10 rounded-lg sm:rounded-xl border-2 border-warning/30 backdrop-blur-sm">
+                <Star className="w-6 h-6 sm:w-8 sm:h-8 text-warning fill-warning" />
+                <span className="text-white text-xs sm:text-sm font-bold leading-tight">۴.۹/۵ امتیاز</span>
+                <span className="text-warning-light text-[10px] sm:text-xs farsi-nums">2,847 نظر</span>
               </div>
             </div>
           </section>
 
-          {/* Testimonials Section - Enhanced */}
-          <section className="mb-12 px-4 animate-fade-in-up">
-            <div className="text-center mb-10">
-              <div className="inline-block bg-success/20 text-success px-6 py-2 rounded-full font-bold text-sm mb-4 border border-success/40">
+          {/* Testimonials Section - Mobile Optimized */}
+          <section className="mb-10 sm:mb-12 px-4">
+            <div className="text-center mb-8 sm:mb-10">
+              <div className="inline-block bg-success/20 text-success px-4 sm:px-6 py-1.5 sm:py-2 rounded-full font-bold text-xs sm:text-sm mb-3 sm:mb-4 border border-success/40">
                 ✨ موفقیت‌های واقعی
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 font-display">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3 sm:mb-4 font-display">
                 داستان‌های تحول واقعی
               </h2>
-              <p className="text-luxury-silver text-lg">زنانی که با کاراکتر پرجرات زندگی‌شان را متحول کردند</p>
+              <p className="text-luxury-silver text-sm sm:text-base lg:text-lg px-2">زنانی که با کاراکتر پرجرات زندگی‌شان را متحول کردند</p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
               {[
                 {
                   name: "مریم ک.",
@@ -493,20 +492,20 @@ const CourageousWorkshop = () => {
                   quote: "اضطراب اجتماعی داشتم و از رفتن به مهمانی‌ها می‌ترسیدم. الان با راحتی ارتباط می‌گیرم و دوستان جدید پیدا کرده‌ام."
                 }
               ].map((testimonial, index) => (
-                <Card key={index} className="bg-luxury-charcoal/60 border-2 border-luxury-white/30 backdrop-blur-sm hover:border-success hover:shadow-glow transition-all hover-lift">
-                  <CardContent className="p-7">
-                    <div className="flex items-center gap-1 mb-4">
+                <Card key={index} className="bg-luxury-charcoal/60 border-2 border-luxury-white/30 backdrop-blur-sm hover:border-success transition-all">
+                  <CardContent className="p-5 sm:p-7">
+                    <div className="flex items-center gap-1 mb-3 sm:mb-4">
                       {[1,2,3,4,5].map((i) => (
-                        <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400 drop-shadow-lg" />
+                        <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
                       ))}
                     </div>
-                    <p className="text-luxury-white text-base leading-relaxed mb-5 italic font-medium">
+                    <p className="text-luxury-white text-sm sm:text-base leading-relaxed mb-4 sm:mb-5 italic font-medium">
                       "{testimonial.quote}"
                     </p>
-                    <div className="border-t border-luxury-white/20 pt-4">
-                      <div className="font-bold text-white text-base mb-1">{testimonial.name}</div>
-                      <div className="text-luxury-silver text-sm mb-3">{testimonial.title}</div>
-                      <div className="bg-success/30 text-success border border-success/50 px-4 py-2 rounded-xl text-sm font-extrabold inline-block shadow-medium">
+                    <div className="border-t border-luxury-white/20 pt-3 sm:pt-4">
+                      <div className="font-bold text-white text-sm sm:text-base mb-1">{testimonial.name}</div>
+                      <div className="text-luxury-silver text-xs sm:text-sm mb-2 sm:mb-3">{testimonial.title}</div>
+                      <div className="bg-success/30 text-success border border-success/50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-extrabold inline-block">
                         ✓ {testimonial.result}
                       </div>
                     </div>
@@ -517,21 +516,21 @@ const CourageousWorkshop = () => {
           </section>
 
           {/* Problem Section - Mobile Optimized */}
-          <section className="mb-12 px-4">
-            <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-6 border border-luxury-white/10 shadow-luxury">
-              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-display leading-tight">
+          <section className="mb-10 sm:mb-12 px-4">
+            <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-5 sm:p-6 border border-luxury-white/10 shadow-luxury">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center mb-5 sm:mb-6 text-luxury-white font-display leading-tight px-2">
                 خودتان را در موقعیت‌های زیر تصور کنید:
               </h2>
-              <div className="space-y-4 max-w-2xl mx-auto mb-6">
+              <div className="space-y-3 sm:space-y-4 max-w-2xl mx-auto mb-5 sm:mb-6">
                 {[
                   'در یک صف طولانی ایستادید و فردی مسن از شما خواهش می‌کند نوبت خود را به او بدهید.',
                   'در جلسه مصاحبه شغلی، توانمندی‌های خود را دست کم می‌گیرید و رد صلاحیت می‌شوید.',
                   'پولی به کسی قرض داده‌اید و با اینکه خودتان نیاز مالی دارید، خجالت می‌کشید پیگیری کنید.',
                   'فرد مهمی را می‌بینید اما اعتماد به نفس ارتباط گرفتن با او را ندارید و دور می‌شوید.'
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-3 p-4 bg-luxury-black/30 rounded-lg border border-luxury-white/5 backdrop-blur-sm">
-                    <div className="w-2 h-2 bg-luxury-white rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-luxury-silver text-sm leading-relaxed">{item}</span>
+                  <div key={index} className="flex items-start gap-2.5 sm:gap-3 p-3 sm:p-4 bg-luxury-black/30 rounded-lg border border-luxury-white/5 backdrop-blur-sm">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-luxury-white rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-luxury-silver text-xs sm:text-sm leading-relaxed">{item}</span>
                   </div>
                 ))}
               </div>
