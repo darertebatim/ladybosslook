@@ -328,20 +328,41 @@ const CourageousWorkshop = () => {
             </div>
           </section>
 
-          {/* Video Section */}
-          <div className="relative bg-gradient-to-r from-luxury-charcoal via-luxury-accent to-luxury-charcoal border border-luxury-silver/30 rounded-lg p-3 mb-6 shadow-luxury-glow">
-            <div className="relative">
-              <div className="aspect-video w-full max-w-3xl mx-auto rounded-lg overflow-hidden">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src="https://www.youtube.com/embed/hkWfOP5OxXE"
-                  title="کاراکتر پرجرات"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
-                ></iframe>
+          {/* Video Section - Emphasized */}
+          <div className="mb-8 px-4">
+            <div className="bg-gradient-to-br from-urgency/20 to-urgency-dark/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-urgency/40 shadow-urgency">
+              <div className="text-center mb-4 sm:mb-6">
+                <div className="inline-flex items-center gap-2 bg-urgency text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-sm sm:text-base mb-3 sm:mb-4 shadow-cta">
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+                  ویدیو معرفی دوره را حتماً تماشا کنید
+                </div>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3 leading-tight">
+                  ویدیو معرفی کارگاه کاراکتر پرجرات
+                </h2>
+                <p className="text-white/90 text-sm sm:text-base max-w-2xl mx-auto">
+                  در این ویدیو با جزئیات کامل کارگاه و روش‌های تحول آفرین آشنا می‌شوید
+                </p>
+              </div>
+              <div className="relative bg-gradient-to-r from-luxury-charcoal via-luxury-accent to-luxury-charcoal border border-luxury-silver/30 rounded-lg p-2 sm:p-3 shadow-luxury-glow">
+                <div className="relative">
+                  <div className="aspect-video w-full max-w-3xl mx-auto rounded-lg overflow-hidden">
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src="https://www.youtube.com/embed/hkWfOP5OxXE"
+                      title="کاراکتر پرجرات"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full"
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 sm:mt-6 text-center">
+                <p className="text-white/90 text-xs sm:text-sm font-medium">
+                  ⏱️ مدت زمان: 15 دقیقه | 🎯 این ویدیو می‌تواند نقطه عطف زندگی شما باشد
+                </p>
               </div>
             </div>
           </div>
@@ -840,40 +861,94 @@ const CourageousWorkshop = () => {
 
           {/* Workshop Details - Mobile Optimized */}
           <section className="grid gap-4 mb-12 px-4">
-            {/* Workshop Curriculum Section - Moved Up */}
+            {/* Workshop Curriculum Section - Detailed */}
             <Card className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm shadow-luxury rounded-xl">
               <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-3 text-luxury-white text-lg">
-                  <TrendingUp className="w-5 h-5 text-luxury-silver" />
+                <CardTitle className="flex items-center gap-3 text-luxury-white text-lg sm:text-xl">
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-luxury-silver" />
                   ۱۲ تکنیک کاراکتر پرجرأت
                 </CardTitle>
+                <p className="text-luxury-silver text-xs sm:text-sm mt-2">
+                  هر تکنیک با مثال‌های واقعی و قابل اجرا در زندگی روزمره
+                </p>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid gap-2">
+              <CardContent className="space-y-3 sm:space-y-4">
+                <div className="grid gap-3 sm:gap-4">
                   {[
-                    { title: "نه گفتن", subtitle: "Say No" },
-                    { title: "بله گفتنِ هوشمند", subtitle: "Wise Yes" },
-                    { title: "بیان اَسِرتیو", subtitle: "Assertive Expression" },
-                    { title: "ارائه کردن", subtitle: "Presenting" },
-                    { title: "اظهار نظر کردن", subtitle: "Voicing Opinions" },
-                    { title: "بله گرفتن", subtitle: "Getting a Yes" },
-                    { title: "حق گرفتن", subtitle: "Claiming Rights" },
-                    { title: "پاسخ به انتقاد", subtitle: "Handling Feedback" },
-                    { title: "جلوگیری از حق خوری", subtitle: "Preventing Exploitation" },
-                    { title: "مدیریت تعارض‌ها", subtitle: "Conflict Management" },
-                    { title: "مرزبندی حریم", subtitle: "Boundaries" },
-                    { title: "مذاکرهٔ روزمره", subtitle: "Everyday Negotiation" }
+                    { 
+                      title: "نه گفتن", 
+                      subtitle: "Say No",
+                      description: "یاد بگیرید چگونه بدون احساس گناه و با اعتماد به نفس به درخواست‌های نامناسب «نه» بگویید. این تکنیک به شما کمک می‌کند مرزهای خود را حفظ کنید و از سواستفاده دیگران جلوگیری کنید."
+                    },
+                    { 
+                      title: "بله گفتنِ هوشمند", 
+                      subtitle: "Wise Yes",
+                      description: "تشخیص دهید چه زمانی باید «بله» بگویید و چگونه شرایط خود را مطرح کنید. این مهارت به شما کمک می‌کند فرصت‌های مناسب را از دست ندهید اما در عین حال حقوق خود را حفظ کنید."
+                    },
+                    { 
+                      title: "بیان اَسِرتیو", 
+                      subtitle: "Assertive Expression",
+                      description: "نظرات و احساسات خود را با قاطعیت و احترام بیان کنید. این تکنیک به شما کمک می‌کند صدایتان شنیده شود بدون اینکه تهاجمی یا منفعل باشید."
+                    },
+                    { 
+                      title: "ارائه کردن", 
+                      subtitle: "Presenting",
+                      description: "با اعتماد به نفس در جمع صحبت کنید و ایده‌های خود را به شکل حرفه‌ای ارائه دهید. این مهارت در محیط کار، جلسات خانوادگی و موقعیت‌های اجتماعی بسیار کلیدی است."
+                    },
+                    { 
+                      title: "اظهار نظر کردن", 
+                      subtitle: "Voicing Opinions",
+                      description: "یاد بگیرید دیدگاه‌های خود را در گفتگوها و بحث‌ها مطرح کنید. دیگر در جلسات سکوت نکنید و از فرصت‌های شغلی به دلیل عدم اظهار نظر محروم نشوید."
+                    },
+                    { 
+                      title: "بله گرفتن", 
+                      subtitle: "Getting a Yes",
+                      description: "تکنیک‌های مذاکره و متقاعدسازی را یاد بگیرید تا بتوانید از دیگران «بله» بگیرید. این مهارت در مذاکرات حقوق، فروش، و درخواست‌های شخصی بسیار مفید است."
+                    },
+                    { 
+                      title: "حق گرفتن", 
+                      subtitle: "Claiming Rights",
+                      description: "مطالبات و حقوق قانونی خود را پیگیری کنید. یاد بگیرید چگونه پول قرض داده شده را مطالبه کنید یا در مورد حقوق و شرایط کاری خود مذاکره کنید."
+                    },
+                    { 
+                      title: "پاسخ به انتقاد", 
+                      subtitle: "Handling Feedback",
+                      description: "به انتقادها و نظرات منفی به شکل سازنده و بدون احساس حمله شخصی پاسخ دهید. این تکنیک به شما کمک می‌کند از انتقادها برای رشد استفاده کنید نه برای شکستن."
+                    },
+                    { 
+                      title: "جلوگیری از حق خوری", 
+                      subtitle: "Preventing Exploitation",
+                      description: "رفتارهای سواستفاده‌گرانه را شناسایی کنید و از خود در برابر افراد زورگو محافظت کنید. دیگر اجازه ندهید دیگران از مهربانی شما سواستفاده کنند."
+                    },
+                    { 
+                      title: "مدیریت تعارض‌ها", 
+                      subtitle: "Conflict Management",
+                      description: "درگیری‌ها و اختلافات را به شکل سازنده و بدون ترس مدیریت کنید. این مهارت در روابط خانوادگی، دوستانه و شغلی بسیار حیاتی است."
+                    },
+                    { 
+                      title: "مرزبندی حریم", 
+                      subtitle: "Boundaries",
+                      description: "مرزهای شخصی، عاطفی و حرفه‌ای خود را مشخص و حفظ کنید. یاد بگیرید چگونه با افرادی که مرزها را نقض می‌کنند برخورد کنید."
+                    },
+                    { 
+                      title: "مذاکرهٔ روزمره", 
+                      subtitle: "Everyday Negotiation",
+                      description: "در موقعیت‌های روزمره مثل خرید، استخدام، و درخواست از همکاران مذاکره کنید. این مهارت می‌تواند هزینه‌های شما را کاهش و درآمدتان را افزایش دهد."
+                    }
                   ].map((item, index) => (
-                    <div key={index} className="flex items-start gap-3 p-3 bg-luxury-black/30 rounded-lg border border-luxury-white/5 hover:bg-luxury-black/50 transition-colors">
-                      <div className="flex items-center justify-center w-6 h-6 bg-luxury-white/10 rounded-full text-xs font-bold text-luxury-white flex-shrink-0 mt-0.5">
-                        {index + 1}
+                    <div key={index} className="bg-luxury-black/30 rounded-lg sm:rounded-xl border border-luxury-white/10 hover:border-luxury-white/20 transition-all p-4 sm:p-5">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-luxury-white/15 rounded-full text-xs sm:text-sm font-bold text-luxury-white flex-shrink-0">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-luxury-white text-base sm:text-lg font-bold leading-tight mb-1">{item.title}</div>
+                          <div className="text-luxury-silver/70 text-xs sm:text-sm mb-2">{item.subtitle}</div>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-luxury-white text-sm font-medium leading-tight mb-1">{item.title}</div>
-                        {item.subtitle && (
-                          <div className="text-luxury-silver/70 text-xs">{item.subtitle}</div>
-                        )}
-                      </div>
+                      <p className="text-luxury-silver text-xs sm:text-sm leading-relaxed mr-10">
+                        {item.description}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -1050,6 +1125,204 @@ const CourageousWorkshop = () => {
                 <div className="mt-6 p-4 bg-luxury-white/10 rounded-lg">
                   <p className="text-luxury-white font-bold">
                     چرا این ضمانت‌ها را می‌دهیم؟ چون 94% دانشجویان ما کاملاً راضی هستند!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Investment Cost Section */}
+          <section className="mb-12 px-4">
+            <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-xl p-6 sm:p-8 border border-luxury-white/20 shadow-luxury">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-luxury-white font-display">
+                  مبلغ سرمایه‌گذاری شما برای دوره شهامت
+                </h2>
+                <div className="inline-block bg-urgency/20 text-urgency px-6 py-3 rounded-full font-bold text-sm sm:text-base border border-urgency/40">
+                  یک درخواست جدی! لطفاً این مبالغ را یادداشت کنید
+                </div>
+              </div>
+
+              <div className="max-w-4xl mx-auto space-y-4 sm:space-y-5 mb-8">
+                {[
+                  {
+                    icon: "💸",
+                    text: "دوستی از شما پول خواسته و شما نتوانسته‌اید به او «نه» بگویید. ماه‌ها و سال‌ها پس از قرض دادن، پول به دست شما نرسیده. لطفا این مبلغ را یادداشت کنید."
+                  },
+                  {
+                    icon: "💼",
+                    text: "در مصاحبۀ کاری دوست داشته‌اید از حقوق و شرایط مورد درخواست خود بگویید اما نتوانسته‌اید. حالا دستمزد شما خیلی پایین‌تر از رقمی است که دوست داشتید دریافت کنید. لطفا این تفاوت مبلغ را هم یادداشت کنید."
+                  },
+                  {
+                    icon: "📈",
+                    text: "می‌خواهید به مدیر خود بگویید که حقوق شما را اضافه کند، اما هنوز نتوانسته‌اید حرف خود را بزنید. لطفا تفاوت این مبلغ‌ها را یادداشت کنید."
+                  },
+                  {
+                    icon: "🏠",
+                    text: "می‌خواهید خانه‌تان را رهن و اجاره بدهید اما خجالت می‌کشید درست و حسابی چانه بزنید. چند میلیون این وسط از جیب‌تان رفته؟ لطفا آن را یادداشت کنید."
+                  },
+                  {
+                    icon: "🚗",
+                    text: "همکارتان ماشین شما را قرض می‌خواهد، اصلا دلتان نمی‌خواهد ماشین‌تان را دست او بدهید، ولی نمی‌دانید چطور «نه» بگویید و در رودربایستی گیر می‌کنید. حساب کنید اگر قرار بود آن ماشین را کرایه کند، چه مبلغی می‌شد؟ لطفا این مبلغ را یادداشت کنید."
+                  },
+                  {
+                    icon: "🎤",
+                    text: "در دوران تحصیل، موقع کنفرانس دادن، یا پاسخ به سوالات دست و پایتان می‌لرزد. حاضر بودید چقدر بدهید تا بتوانید مثل یک سخنران حرفه‌ای و با اعتماد به نفس، جلوی جمع بایستید و با آرامش و لبخند صحبت کنید؟ لطفا این مبلغ را یادداشت کنید."
+                  },
+                  {
+                    icon: "🍽️",
+                    text: "دوستی که با او رودربایستی دارید تماس گرفته که می‌خواهد امروز به شما سر بزند، اما شما قول داده بودید که با همسرتان بیرون شام بخورید و قدم بزنید. اما خجالت می‌کشید درخواست دوستتان را رد کنید و به‌جایش برنامۀ خودتان را کنسل می‌کنید. هزینه پذیرایی از دوستتان را با هزینۀ بیرون رفتن خودتان جمع کنید و 2 برابر کنید؛ و این رقم را هم یادداشت کنید."
+                  },
+                  {
+                    icon: "🎯",
+                    text: "مدیر شرکتی هستید و هر از گاهی لازم است برای همکاران خود یا در جمع‌های کاری صحبت کنید، اما مدام از این کار فرار می‌کنید و این موضوع برایتان بسیار آزاردهنده است. این موضوع چقدر انگیزه‌های همکاران شما را کم کرده؟ چند موقعیت عالی را از شما گرفته است؟ احتمالا رقمی چند میلیونی یا حتی بیشتر را می‌توانید یادداشت کنید."
+                  },
+                  {
+                    icon: "💍",
+                    text: "در مراسم «بله‌برون»، طرفِ عروس تعداد سکه‌هایی را به‌عنوان مهریه مطرح می‌کند که بیشتر از توافق خصوصی‌تان است، اما چون بزرگ‌ترهایی از فامیلِ هر دو طرف در جمع نشسته‌اند فکر می‌کنید زشت است این نکته را بیان کنید. تفاوتِ تعداد سکه‌ها را به نرخ روز حساب کنید و این رقم را یادداشت کنید."
+                  },
+                  {
+                    icon: "🥤",
+                    text: "در فروشگاهی دستگاه اتوماتیک فروش آبمیوه گذاشته‌اند، اما خجالت می‌کشید جلو بروید و آبمیوۀ مورد علاقه‌تان را که به شما چشمک می‌زند بخرید، چون می‌ترسید اشتباه کنید و دیگران به شما بخندند. قیمت آن خوراکی را یادداشت کنید."
+                  },
+                  {
+                    icon: "🚕",
+                    text: "رانندۀ تاکسی صدای ضبط را بلند کرده و شما که سردرد هم دارید، حسابی اذیت می‌شوید؛ اما خجالت می‌کشید از او بخواهید صدای ضبط را کم یا آن را خاموش کند. سردرد، چند ساعت شما را از کار و زندگی می‌اندازد. حساب کنید در آن چند ساعت چقدر می‌توانستید کار مفید انجام بدهید، و مبلغِ معادلِ آن را یادداشت کنید."
+                  },
+                  {
+                    icon: "💯",
+                    text: "از خواروبارفروشی خرید کرده‌اید و الباقی پول شما 100 تومان است، فروشنده 100 تومان را نمی‌دهد یا به‌جایش شکلاتی می‌دهد که نمی‌خواهید و دوست ندارید؛ اما فکر می‌کنید زشت است درخواست کنید که 100 تومان را به شما بدهد. ده برابر این مبلغ را یادداشت کنید."
+                  },
+                  {
+                    icon: "🍎",
+                    text: "میوه‌فروشی محله‌تان یک کیلو انار را دو برابرِ جاهای دیگر حساب کرده، اما چون آشناست و با او چشم در چشم می‌شوید رویتان نمی‌شود این موضوع را تذکر بدهید یا فکر می‌کنید اگر انارها را پس بدهید خیلی زشت است. اضافه قیمتی را که پرداخته‌اید، یادداشت کنید."
+                  },
+                  {
+                    icon: "👔",
+                    text: "لباس‌هایتان را به اتوشویی داده‌اید و بیشتر از رقمی که فکر می‌کردید، می‌خواهد از شما پول بگیرد؛ اما رویتان نمی‌شود از او فاکتور بخواهید. اضافه رقمی را که تصور می‌کنید پرداخت کرده‌اید، یادداشت کنید."
+                  }
+                ].map((item, index) => (
+                  <div key={index} className="bg-luxury-black/30 rounded-lg p-4 sm:p-5 border border-luxury-white/10 hover:border-luxury-white/20 transition-all">
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div className="text-2xl sm:text-3xl flex-shrink-0">{item.icon}</div>
+                      <p className="text-luxury-silver text-sm sm:text-base leading-relaxed">
+                        {item.text}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-gradient-to-r from-urgency/20 to-urgency-dark/20 rounded-xl p-6 sm:p-8 border-2 border-urgency/40 mb-8">
+                <div className="text-center space-y-4">
+                  <p className="text-luxury-white text-lg sm:text-xl font-bold">
+                    ما چه نمونه‌های دیگری را سراغ دارید؟ آنها را هم بنویسید و مبلغشان را حساب کرده و یادداشت کنید.
+                  </p>
+                  <div className="bg-luxury-black/40 rounded-lg p-6 border border-urgency/30">
+                    <p className="text-white text-xl sm:text-2xl md:text-3xl font-extrabold mb-3">
+                      حالا، تمام مبلغ‌هایی را که نوشته‌اید، با هم جمع بزنید.
+                    </p>
+                    <p className="text-urgency-light text-lg sm:text-xl font-bold">
+                      چقدر شد؟
+                    </p>
+                  </div>
+                  <p className="text-luxury-white text-base sm:text-lg font-medium">
+                    فکرش را می‌کردید که به‌خاطر رفتارهایی که به دور از شهامت هستند، این‌قدر ضرر مالی کرده باشید؟
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 rounded-xl p-6 sm:p-8 border border-luxury-white/20 mb-8">
+                <p className="text-luxury-white text-base sm:text-lg leading-relaxed mb-6">
+                  مطمئنم شما حاضرید میلیون‌ها تومان پرداخت کنید تا از معضل خجالت کشیدن و کم حرفی رهایی پیدا کنید و فردی با اعتماد به نفس باشید! چون خجولی باعث می‌شود لحظه‌ای نفس راحت نکشیم.
+                </p>
+                
+                <div className="bg-luxury-black/40 rounded-lg p-5 sm:p-6 border border-luxury-white/10 mb-6">
+                  <h3 className="text-luxury-white font-bold text-lg sm:text-xl mb-4">
+                    کسی که از خجولی آسیب دیده می‌دانید که:
+                  </h3>
+                  <div className="space-y-3">
+                    {[
+                      "فرصت‌های شغلی زیادی را از دست داده",
+                      "به کسانی که پول را پس نمی‌دهند پول قرض داده",
+                      "احتمالاً از روابط عاطفی خود رضایت زیادی نخواهد داشت"
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-urgency flex-shrink-0 mt-0.5" />
+                        <span className="text-luxury-silver text-sm sm:text-base">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-gradient-urgency rounded-xl p-6 sm:p-8 border-2 border-urgency/40 text-center mb-6">
+                  <p className="text-white text-lg sm:text-xl font-bold mb-4">
+                    اما نگران نباشید، این دوره فقط با 2 میلیون و 690 هزار تومان در اختیار شماست.
+                  </p>
+                  <p className="text-white/90 text-base sm:text-lg mb-4">
+                    یعنی اگر بخواهیم حساب کنیم انگار که روزانه کمتر از 10 هزار تومان به مدت یک سال کنار گذاشته باشیم!
+                  </p>
+                  <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
+                    <p className="text-white font-bold text-xl sm:text-2xl farsi-nums">
+                      $97 = حدود 2,690,000 تومان
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 text-luxury-silver text-sm sm:text-base leading-relaxed">
+                  <p>
+                    برای این 15 ساعت آموزش، انگار که برای هر ساعت فقط و فقط کمتر از 150 هزار تومان می‌پردازید! مطمئنم که در هر ساعت این محصول نکات بسیار زیادی را فرا می‌گیرید که با انجام دادن آنها این مبلغ اصلاً به چشم نمی‌آید!
+                  </p>
+                  
+                  <div className="bg-luxury-black/30 rounded-lg p-4 sm:p-5 border border-luxury-white/10">
+                    <div className="flex items-start gap-3 mb-3">
+                      <CheckCircle className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
+                      <p className="text-luxury-white font-medium">
+                        افرادی که محصول را خریداری نمایند، فایل‌های به‌روزرسانی شده را به صورت رایگان دریافت می‌نمایند و نیازی به هزینه بیشتر نمی‌باشد.
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
+                      <p className="text-luxury-white font-medium">
+                        دسترسی به تمام فایل‌های آموزشی مادام‌العمر بوده و همیشه به آن دسترسی خواهید داشت. (چه بر روی کامپیوتر و چه بر روی موبایل)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-6 sm:p-8 border border-luxury-white/20">
+                <h3 className="text-luxury-white font-bold text-xl sm:text-2xl mb-6 text-center">
+                  یک مقایسه
+                </h3>
+                <div className="space-y-4 text-luxury-silver text-sm sm:text-base leading-relaxed mb-6">
+                  <p>
+                    در دوره‌های خجولی از شرکت‌کنندگان می‌پرسم که چند نفر برای درمان خجولی به روانشناس مراجعه کرده‌اند؟ تعداد قابل توجهی از شرکت‌کنندگان دستشان را بالا می‌برند.
+                  </p>
+                  <p>
+                    وقتی می‌پرسم که آیا نتیجه مطلوب را گرفته‌اید، اغلب می‌گویند نه! (چون اگر نتیجه مطلوب را گرفته بودند اینجا نمی‌آمدند)
+                  </p>
+                  <p className="text-luxury-white font-medium">
+                    متأسفانه بسیاری از روانشناسان، حتی اصول اولیه رفع خجولی را بلد نیستند و جالب است بدانید روانشناسان زیادی خودشان خجالتی هستند!
+                  </p>
+                </div>
+
+                <div className="bg-luxury-black/40 rounded-lg p-5 sm:p-6 border border-red-500/20 mb-6">
+                  <p className="text-luxury-white text-base sm:text-lg leading-relaxed">
+                    حالا فرض کنید اگر بخواهید برای درمان خجولی به یک روانشناس مراجعه کنید (که معلوم نیست آیا بتواند برای شما کاری بکند یا خیر؟) احتمالاً باید <span className="font-bold text-urgency-light">10 جلسه</span> مراجعه کنید که هزینه شما <span className="font-bold text-urgency-light">حداقل یک میلیون تومان</span> خواهد بود (تازه این با لحاظ کردن نرخ مصوب هست و روانشناسان حرفه‌ای، عموماً دریافتی بیشتری دارند)
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-r from-success/20 to-success/10 rounded-xl p-6 sm:p-8 border-2 border-success/40 text-center">
+                  <Crown className="w-12 h-12 sm:w-16 sm:h-16 text-success mx-auto mb-4" />
+                  <h3 className="text-luxury-white font-bold text-xl sm:text-2xl mb-4">
+                    بر روی خودت سرمایه‌گذاری کن
+                  </h3>
+                  <p className="text-luxury-white text-lg sm:text-xl mb-2">
+                    بهترین سرمایه‌گذاری نه خریدن سکه و طلا است و نه...
+                  </p>
+                  <p className="text-success font-bold text-xl sm:text-2xl">
+                    بهترین سرمایه‌گذاری، سرمایه‌گذاری روی خودتان است.
                   </p>
                 </div>
               </div>
