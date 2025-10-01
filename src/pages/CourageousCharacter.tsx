@@ -331,24 +331,10 @@ const CourageousWorkshop = () => {
                 🔥 پیشنهاد ویژه!
               </div>
               <div className="text-center pt-2">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 text-white font-farsi leading-tight">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-6 text-white font-farsi leading-tight">
                   ورکشاپ کاراکتر پرجرات ۲۰۲۶
                 </h1>
-                <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-transparent via-white to-transparent mx-auto mb-4"></div>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4">
-                  <div className="flex items-center gap-2 text-success text-sm sm:text-base">
-                    <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
-                    <span className="font-bold whitespace-nowrap">گارانتی بازگشت وجه</span>
-                  </div>
-                  <div className="hidden sm:block w-1 h-1 bg-white rounded-full"></div>
-                  <p className="text-base sm:text-lg lg:text-xl text-white font-bold">
-                    Join the Courageous Character Workshop
-                  </p>
-                </div>
-                <p className="text-sm sm:text-base lg:text-lg text-luxury-silver font-semibold mb-5">
-                  and Behave like a confident Ladyboss
-                </p>
-                <p className="text-sm sm:text-base text-luxury-white mb-3 sm:mb-4 font-bold">سرمایه‌گذاری در آینده خودتان</p>
+                <p className="text-sm sm:text-base text-luxury-white mb-3 sm:mb-4 font-bold font-farsi">سرمایه‌گذاری در آینده خودتان</p>
                 <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-5">
                   <span className="text-xl sm:text-2xl font-bold text-luxury-silver/50 line-through farsi-nums">$۴۹۷</span>
                   <span className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white farsi-nums drop-shadow-2xl">$۹۷</span>
@@ -701,7 +687,7 @@ const CourageousWorkshop = () => {
           {/* Target Audience Section */}
           <section className="mb-12 px-4">
             <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-6 border border-luxury-white/10 shadow-luxury">
-              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-display">
+              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-farsi">
                 دوره کاراکتر پرجرات برای شما مناسب است اگر:
               </h2>
               <div className="grid gap-3 max-w-2xl mx-auto">
@@ -730,7 +716,7 @@ const CourageousWorkshop = () => {
             <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-xl p-6 border border-luxury-white/20 shadow-luxury">
               <div className="text-center max-w-lg mx-auto">
                 <Crown className="w-10 h-10 text-luxury-white mx-auto mb-4" />
-                <h2 className="text-xl sm:text-2xl font-bold mb-3 text-luxury-white font-display leading-tight">
+                <h2 className="text-xl sm:text-2xl font-bold mb-3 text-luxury-white font-farsi leading-tight">
                   تحول شما در ۳ هفته
                 </h2>
                 <p className="text-sm text-luxury-silver mb-5 leading-relaxed">
@@ -763,7 +749,7 @@ const CourageousWorkshop = () => {
           <section className="mb-12 px-4">
             <div className="bg-gradient-to-br from-luxury-white/15 to-luxury-white/5 backdrop-blur-sm rounded-xl p-6 border border-luxury-white/30 shadow-luxury">
               <div className="text-center mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold mb-3 text-luxury-white font-display leading-tight">
+                <h2 className="text-xl sm:text-2xl font-bold mb-3 text-luxury-white font-farsi leading-tight">
                   بونس ویژه ایرانیان خارج از کشور
                 </h2>
                 <div className="w-16 h-1 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-4"></div>
@@ -1083,7 +1069,7 @@ const CourageousWorkshop = () => {
             <div className="bg-gradient-to-br from-green-900/20 to-green-800/10 rounded-xl p-6 border border-green-500/30 shadow-luxury">
               <div className="text-center max-w-2xl mx-auto">
                 <Shield className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-luxury-white font-display">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-luxury-white font-farsi">
                   3 ضمانت قدرتمند برای آرامش خاطر شما
                 </h2>
                 <div className="grid md:grid-cols-3 gap-4 mt-6">
@@ -1116,7 +1102,7 @@ const CourageousWorkshop = () => {
           <section className="mb-12 px-4">
             <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-xl p-6 sm:p-8 border border-luxury-white/20 shadow-luxury">
               <div className="text-center mb-8">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-luxury-white font-display">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-luxury-white font-farsi">
                   مبلغ سرمایه‌گذاری شما برای ورکشاپ کاراکتر پرجرات
                 </h2>
                 <div className="inline-block bg-urgency/20 text-urgency px-6 py-3 rounded-full font-bold text-sm sm:text-base border border-urgency/40">
@@ -1314,7 +1300,7 @@ const CourageousWorkshop = () => {
           {/* FAQ Section */}
           <section className="mb-12 px-4">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-luxury-white font-display">
+              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-luxury-white font-farsi">
                 سوالات متداول
               </h2>
               <div className="space-y-4">
@@ -1384,7 +1370,7 @@ const CourageousWorkshop = () => {
           <section className="mb-12 px-4">
             <div className="bg-gradient-luxury rounded-xl p-8 shadow-luxury border border-luxury-white/30">
               <div className="max-w-2xl mx-auto text-center">
-                <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-luxury-white font-display">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-luxury-white font-farsi">
                   زندگی کوتاه است - دیگر منتظر نمانید
                 </h2>
                 <p className="text-luxury-silver mb-6 leading-relaxed">
@@ -1432,7 +1418,7 @@ const CourageousWorkshop = () => {
           {/* Contact Section - Mobile Optimized */}
           <section className="text-center bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-6 shadow-luxury mx-4">
             <div className="max-w-sm mx-auto">
-              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-luxury-white font-display leading-tight">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-luxury-white font-farsi leading-tight">
                 هنوز سوالی دارید؟
               </h2>
               <p className="text-luxury-silver mb-6 text-sm leading-relaxed">
@@ -1482,7 +1468,7 @@ const CourageousWorkshop = () => {
                       !
                     </div>
                   </div>
-                  <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-3 font-display leading-tight">
+                  <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-3 font-farsi leading-tight">
                     صبر کنید! 🎁
                   </h3>
                   <p className="text-xl text-luxury-white font-bold">
