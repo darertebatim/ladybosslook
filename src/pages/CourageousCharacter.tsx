@@ -324,27 +324,6 @@ const CourageousWorkshop = () => {
               <Diamond className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               <span className="whitespace-nowrap">ورکشاپ مخصوص خانم‌های مهاجر</span>
             </div>
-            
-            {/* Prominent Workshop Title - More Visible */}
-            <div className="mb-8 px-4 bg-gradient-to-br from-luxury-white/15 to-luxury-white/5 backdrop-blur-md rounded-2xl p-6 sm:p-8 border-2 border-luxury-white/30 shadow-luxury mx-2 sm:mx-4">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold mb-6 text-luxury-white leading-tight font-display">
-                <span className="bg-gradient-luxury-text bg-clip-text text-transparent">کاراکتر پرجرات</span>
-              </h1>
-              <div className="w-32 sm:w-40 h-1.5 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-6"></div>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-6">
-                <div className="flex items-center gap-2 text-success text-sm sm:text-base">
-                  <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
-                  <span className="font-bold">گارانتی بازگشت وجه</span>
-                </div>
-                <div className="hidden sm:block w-1 h-1 bg-luxury-white rounded-full"></div>
-                <p className="text-xl sm:text-2xl lg:text-3xl text-luxury-white font-bold">
-                  Join the Courageous Character Workshop
-                </p>
-              </div>
-              <p className="text-lg sm:text-xl lg:text-2xl text-luxury-silver font-semibold">
-                and Behave like a confident Ladyboss
-              </p>
-            </div>
 
             {/* Pricing Section - Mobile Optimized */}
             <div className="relative bg-gradient-to-br from-urgency/20 to-urgency-dark/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-6 sm:p-8 mb-8 sm:mb-10 mx-2 sm:mx-4 border-2 border-urgency/40 shadow-urgency">
@@ -352,6 +331,23 @@ const CourageousWorkshop = () => {
                 🔥 پیشنهاد ویژه!
               </div>
               <div className="text-center pt-2">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 text-white font-farsi leading-tight">
+                  ورکشاپ کاراکتر پرجرات ۲۰۲۶
+                </h1>
+                <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-transparent via-white to-transparent mx-auto mb-4"></div>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4">
+                  <div className="flex items-center gap-2 text-success text-sm sm:text-base">
+                    <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <span className="font-bold whitespace-nowrap">گارانتی بازگشت وجه</span>
+                  </div>
+                  <div className="hidden sm:block w-1 h-1 bg-white rounded-full"></div>
+                  <p className="text-base sm:text-lg lg:text-xl text-white font-bold">
+                    Join the Courageous Character Workshop
+                  </p>
+                </div>
+                <p className="text-sm sm:text-base lg:text-lg text-luxury-silver font-semibold mb-5">
+                  and Behave like a confident Ladyboss
+                </p>
                 <p className="text-sm sm:text-base text-luxury-white mb-3 sm:mb-4 font-bold">سرمایه‌گذاری در آینده خودتان</p>
                 <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-5">
                   <span className="text-xl sm:text-2xl font-bold text-luxury-silver/50 line-through farsi-nums">$۴۹۷</span>
@@ -451,13 +447,13 @@ const CourageousWorkshop = () => {
           {/* Testimonials Section - Mobile Optimized */}
           <section className="mb-10 sm:mb-12 px-4">
             <div className="text-center mb-8 sm:mb-10">
-              <div className="inline-block bg-success/20 text-success px-4 sm:px-6 py-1.5 sm:py-2 rounded-full font-bold text-xs sm:text-sm mb-3 sm:mb-4 border border-success/40">
+              <div className="inline-block bg-success/20 text-success px-4 sm:px-6 py-1.5 sm:py-2 rounded-full font-bold text-xs sm:text-sm mb-3 sm:mb-4 border border-success/40 font-farsi">
                 ✨ موفقیت‌های واقعی
               </div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3 sm:mb-4 font-display">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3 sm:mb-4 font-farsi">
                 داستان‌های تحول واقعی
               </h2>
-              <p className="text-luxury-silver text-sm sm:text-base lg:text-lg px-2">زنانی که با کاراکتر پرجرات زندگی‌شان را متحول کردند</p>
+              <p className="text-luxury-silver text-sm sm:text-base lg:text-lg px-2 font-farsi whitespace-nowrap">زنانی که با کاراکتر پرجرات زندگی‌شان را متحول کردند</p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
               {[
@@ -524,7 +520,7 @@ const CourageousWorkshop = () => {
           {/* Problem Section - Mobile Optimized */}
           <section className="mb-10 sm:mb-12 px-4">
             <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-5 sm:p-6 border border-luxury-white/10 shadow-luxury">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center mb-5 sm:mb-6 text-luxury-white font-display leading-tight px-2">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center mb-5 sm:mb-6 text-luxury-white font-farsi leading-tight px-2">
                 خودتان را در موقعیت‌های زیر تصور کنید:
               </h2>
               <div className="space-y-3 sm:space-y-4 max-w-2xl mx-auto mb-5 sm:mb-6">
@@ -542,9 +538,9 @@ const CourageousWorkshop = () => {
               </div>
               
               <div className="text-center space-y-4 bg-luxury-white/5 rounded-lg p-5 border border-luxury-white/10">
-                <p className="text-luxury-white font-bold text-lg">شما خجالتی و کمرو هستید و فرصت‌ها یکی یکی از جلوی چشمتان رد می‌شوند.</p>
-                <p className="text-luxury-silver text-base leading-relaxed">برای از بین بردن چالش‌هایی که با آن دست و پنجه نرم می‌کنید، یک راه حل قطعی و تضمینی با کمترین تلاش وجود دارد:</p>
-                <p className="text-luxury-white font-bold text-2xl bg-gradient-luxury-text bg-clip-text text-transparent">ورکشاپ کاراکتر پرجرات</p>
+                <p className="text-luxury-white font-bold text-base sm:text-lg font-farsi leading-relaxed">شما خجالتی و کمرو هستید و فرصت‌ها یکی یکی از جلوی چشمتان رد می‌شوند.</p>
+                <p className="text-luxury-silver text-sm sm:text-base leading-relaxed font-farsi">برای از بین بردن چالش‌هایی که با آن دست و پنجه نرم می‌کنید، یک راه حل قطعی و تضمینی با کمترین تلاش وجود دارد:</p>
+                <p className="text-luxury-white font-bold text-xl sm:text-2xl bg-gradient-luxury-text bg-clip-text text-transparent font-farsi">ورکشاپ کاراکتر پرجرات</p>
               </div>
             </div>
           </section>
@@ -552,7 +548,7 @@ const CourageousWorkshop = () => {
           {/* Benefits Section */}
           <section className="mb-12 px-4">
             <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-xl p-6 border border-luxury-white/20 shadow-luxury">
-              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-display">
+              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-farsi">
                 با تقویت کاراکتر پرجرات:
               </h2>
               <div className="grid gap-3 max-w-2xl mx-auto">
@@ -566,7 +562,7 @@ const CourageousWorkshop = () => {
                 ].map((item, index) => (
                   <div key={index} className="flex items-center gap-3 p-4 bg-luxury-black/30 rounded-lg border border-luxury-white/5">
                     <CheckCircle className="w-5 h-5 text-luxury-white flex-shrink-0" />
-                    <span className="text-luxury-silver text-sm leading-relaxed">{item}</span>
+                    <span className="text-luxury-silver text-sm leading-relaxed font-farsi">{item}</span>
                   </div>
                 ))}
               </div>
@@ -576,16 +572,16 @@ const CourageousWorkshop = () => {
           {/* Cost of Inaction Section */}
           <section className="mb-12 px-4">
             <div className="bg-gradient-to-br from-red-900/20 to-red-800/10 rounded-xl p-6 border border-red-500/30 shadow-luxury">
-              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-display">
+              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-farsi">
                 هزینه واقعی تغییر نکردن چیست؟
               </h2>
               <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
                 <div className="bg-luxury-black/40 rounded-lg p-5 border border-red-500/20">
-                  <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2">
+                  <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2 font-farsi">
                     <span className="text-2xl">💸</span>
                     هزینه مالی
                   </h3>
-                  <ul className="space-y-2 text-luxury-silver text-sm">
+                  <ul className="space-y-2 text-luxury-silver text-sm font-farsi">
                     <li>• از دست دادن فرصت‌های شغلی با حقوق بالاتر</li>
                     <li>• عدم توانایی در مذاکره برای افزایش حقوق</li>
                     <li>• قبول کردن پروژه‌های کم‌درآمد چون نمی‌توانید نه بگویید</li>
@@ -593,11 +589,11 @@ const CourageousWorkshop = () => {
                   </ul>
                 </div>
                 <div className="bg-luxury-black/40 rounded-lg p-5 border border-red-500/20">
-                  <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2">
+                  <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2 font-farsi">
                     <span className="text-2xl">💔</span>
                     هزینه عاطفی
                   </h3>
-                  <ul className="space-y-2 text-luxury-silver text-sm">
+                  <ul className="space-y-2 text-luxury-silver text-sm font-farsi">
                     <li>• احساس پشیمانی از فرصت‌های از دست رفته</li>
                     <li>• استرس و اضطراب مداوم در موقعیت‌های اجتماعی</li>
                     <li>• کاهش عزت نفس و اعتماد به نفس</li>
@@ -605,11 +601,11 @@ const CourageousWorkshop = () => {
                   </ul>
                 </div>
                 <div className="bg-luxury-black/40 rounded-lg p-5 border border-red-500/20">
-                  <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2">
+                  <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2 font-farsi">
                     <span className="text-2xl">⏰</span>
                     هزینه زمانی
                   </h3>
-                  <ul className="space-y-2 text-luxury-silver text-sm">
+                  <ul className="space-y-2 text-luxury-silver text-sm font-farsi">
                     <li>• سال‌ها انتظار برای "زمان مناسب" که هرگز نمی‌رسد</li>
                     <li>• اتلاف وقت در روابط یک‌طرفه و ناسالم</li>
                     <li>• ماندن در شغل‌های نامناسب سال‌ها بیشتر از حد معمول</li>
@@ -617,11 +613,11 @@ const CourageousWorkshop = () => {
                   </ul>
                 </div>
                 <div className="bg-luxury-black/40 rounded-lg p-5 border border-red-500/20">
-                  <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2">
+                  <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2 font-farsi">
                     <span className="text-2xl">🚫</span>
                     هزینه فرصت
                   </h3>
-                  <ul className="space-y-2 text-luxury-silver text-sm">
+                  <ul className="space-y-2 text-luxury-silver text-sm font-farsi">
                     <li>• از دست دادن فرصت‌های شبکه‌سازی و ارتباطات</li>
                     <li>• عدم توانایی در راه‌اندازی کسب‌وکار دلخواه</li>
                     <li>• نتوانستن در مذاکرات مهم شرکت کنید</li>
@@ -630,10 +626,10 @@ const CourageousWorkshop = () => {
                 </div>
               </div>
               <div className="text-center mt-6 p-5 bg-gradient-to-r from-luxury-white/10 to-luxury-white/5 rounded-lg border border-luxury-white/20">
-                <p className="text-luxury-white font-bold text-lg mb-2">
+                <p className="text-luxury-white font-bold text-base sm:text-lg mb-2 font-farsi">
                   هزینه تغییر نکردن بسیار بیشتر از سرمایه‌گذاری $97 است
                 </p>
-                <p className="text-luxury-silver text-sm">
+                <p className="text-luxury-silver text-sm font-farsi">
                   یک تصمیم امروز می‌تواند مسیر 10 سال آینده شما را تغییر دهد
                 </p>
               </div>
@@ -643,7 +639,7 @@ const CourageousWorkshop = () => {
           {/* Comparison Table */}
           <section className="mb-12 px-4">
             <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 rounded-xl p-6 border border-luxury-white/20 backdrop-blur-sm">
-              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-display">
+              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-farsi">
                 چرا کاراکتر پرجرات متفاوت است؟
               </h2>
               <div className="max-w-4xl mx-auto overflow-x-auto">
