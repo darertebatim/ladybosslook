@@ -277,23 +277,17 @@ const CourageousWorkshop = () => {
         </header>
 
         <main className="container mx-auto px-4 py-8">
-          {/* Real-Time Urgency Bar - Mobile Optimized */}
-          <div className="bg-gradient-urgency rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-6 sm:mb-8 shadow-urgency border-2 border-urgency-light/50">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm">
-              <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm min-h-[44px]">
-                <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse shadow-glow"></div>
-                <span className="text-white font-extrabold farsi-nums text-base sm:text-lg">{spotsRemaining} جای خالی!</span>
-              </div>
-              <div className="hidden sm:block h-6 w-px bg-white/30"></div>
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                <span className="text-white/90 font-medium farsi-nums text-sm">{viewersCount} نفر الان اینجا</span>
-              </div>
-              <div className="hidden sm:block h-6 w-px bg-white/30"></div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                <span className="text-white font-bold text-sm">🔥 شروع: 15 فوریه</span>
-              </div>
+          {/* Real-Time Urgency Bar - Minimal */}
+          <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-md py-1 px-2 mb-4">
+            <div className="flex items-center justify-center gap-3 text-[10px] text-white">
+              <span className="flex items-center gap-1">
+                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+                <span className="farsi-nums">{spotsRemaining} جا</span>
+              </span>
+              <span className="flex items-center gap-1">
+                <Users className="w-2.5 h-2.5" />
+                <span className="farsi-nums">{viewersCount} نفر</span>
+              </span>
             </div>
           </div>
 
@@ -1159,7 +1153,7 @@ const CourageousWorkshop = () => {
                   },
                   {
                     icon: "🏠",
-                    text: "می‌خواهید خانه‌تان را رهن و اجاره بدهید اما خجالت می‌کشید درست و حسابی چانه بزنید. چند میلیون این وسط از جیب‌تان رفته؟ لطفا آن را یادداشت کنید."
+                    text: "می‌خواهید خانه‌تان را رهن و اجاره بدهید اما خجالت می‌کشید درست و حسابی چانه بزنید. چند دلار این وسط از جیب‌تان رفته؟ لطفا آن را یادداشت کنید."
                   },
                   {
                     icon: "🚗",
@@ -1175,7 +1169,7 @@ const CourageousWorkshop = () => {
                   },
                   {
                     icon: "🎯",
-                    text: "مدیر شرکتی هستید و هر از گاهی لازم است برای همکاران خود یا در جمع‌های کاری صحبت کنید، اما مدام از این کار فرار می‌کنید و این موضوع برایتان بسیار آزاردهنده است. این موضوع چقدر انگیزه‌های همکاران شما را کم کرده؟ چند موقعیت عالی را از شما گرفته است؟ احتمالا رقمی چند میلیونی یا حتی بیشتر را می‌توانید یادداشت کنید."
+                    text: "مدیر شرکتی هستید و هر از گاهی لازم است برای همکاران خود یا در جمع‌های کاری صحبت کنید، اما مدام از این کار فرار می‌کنید و این موضوع برایتان بسیار آزاردهنده است. این موضوع چقدر انگیزه‌های همکاران شما را کم کرده؟ چند موقعیت عالی را از شما گرفته است؟ احتمالا رقمی چند هزار دلاری یا حتی بیشتر را می‌توانید یادداشت کنید."
                   },
                   {
                     icon: "💍",
@@ -1234,18 +1228,19 @@ const CourageousWorkshop = () => {
 
               <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 rounded-xl p-6 sm:p-8 border border-luxury-white/20 mb-8">
                 <p className="text-luxury-white text-base sm:text-lg leading-relaxed mb-6">
-                  مطمئنم شما حاضرید میلیون‌ها تومان پرداخت کنید تا از معضل خجالت کشیدن و کم حرفی رهایی پیدا کنید و فردی با اعتماد به نفس باشید! چون خجولی باعث می‌شود لحظه‌ای نفس راحت نکشیم.
+                  مطمئنم شما حاضرید صدها یا هزاران دلار پرداخت کنید تا از معضل خجالت کشیدن و کم حرفی رهایی پیدا کنید و فردی با اعتماد به نفس باشید! به‌خصوص به‌عنوان یک ایرانی مهاجر که در جامعه جدید نیاز به قاطعیت بیشتری دارید.
                 </p>
                 
                 <div className="bg-luxury-black/40 rounded-lg p-5 sm:p-6 border border-luxury-white/10 mb-6">
                   <h3 className="text-luxury-white font-bold text-lg sm:text-xl mb-4">
-                    کسی که از خجولی آسیب دیده می‌دانید که:
+                    به‌عنوان یک ایرانی مهاجر، کسی که از خجولی آسیب دیده می‌دانید که:
                   </h3>
                   <div className="space-y-3">
                     {[
-                      "فرصت‌های شغلی زیادی را از دست داده",
+                      "فرصت‌های شغلی زیادی را در کشور جدید از دست داده",
                       "به کسانی که پول را پس نمی‌دهند پول قرض داده",
-                      "احتمالاً از روابط عاطفی خود رضایت زیادی نخواهد داشت"
+                      "احتمالاً از روابط عاطفی خود رضایت زیادی نخواهد داشت",
+                      "در محیط کاری جدید نتوانسته حقوق مناسب درخواست کند"
                     ].map((item, index) => (
                       <div key={index} className="flex items-start gap-3">
                         <CheckCircle className="w-5 h-5 text-urgency flex-shrink-0 mt-0.5" />
@@ -1257,21 +1252,21 @@ const CourageousWorkshop = () => {
 
                 <div className="bg-gradient-urgency rounded-xl p-6 sm:p-8 border-2 border-urgency/40 text-center mb-6">
                   <p className="text-white text-lg sm:text-xl font-bold mb-4">
-                    اما نگران نباشید، این دوره فقط با 2 میلیون و 690 هزار تومان در اختیار شماست.
+                    اما نگران نباشید، این دوره فقط با $97 در اختیار شماست.
                   </p>
                   <p className="text-white/90 text-base sm:text-lg mb-4">
-                    یعنی اگر بخواهیم حساب کنیم انگار که روزانه کمتر از 10 هزار تومان به مدت یک سال کنار گذاشته باشیم!
+                    یعنی اگر بخواهیم حساب کنیم انگار که روزانه کمتر از 30 سنت به مدت یک سال کنار گذاشته باشیم!
                   </p>
                   <div className="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
                     <p className="text-white font-bold text-xl sm:text-2xl farsi-nums">
-                      $97 = حدود 2,690,000 تومان
+                      $97
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-4 text-luxury-silver text-sm sm:text-base leading-relaxed">
                   <p>
-                    برای این 15 ساعت آموزش، انگار که برای هر ساعت فقط و فقط کمتر از 150 هزار تومان می‌پردازید! مطمئنم که در هر ساعت این محصول نکات بسیار زیادی را فرا می‌گیرید که با انجام دادن آنها این مبلغ اصلاً به چشم نمی‌آید!
+                    برای این 15 ساعت آموزش، انگار که برای هر ساعت فقط و فقط کمتر از $7 می‌پردازید! مطمئنم که در هر ساعت این محصول نکات بسیار زیادی را فرا می‌گیرید که با انجام دادن آنها این مبلغ اصلاً به چشم نمی‌آید!
                   </p>
                   
                   <div className="bg-luxury-black/30 rounded-lg p-4 sm:p-5 border border-luxury-white/10">
@@ -1293,7 +1288,7 @@ const CourageousWorkshop = () => {
 
               <div className="bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-6 sm:p-8 border border-luxury-white/20">
                 <h3 className="text-luxury-white font-bold text-xl sm:text-2xl mb-6 text-center">
-                  یک مقایسه
+                  یک مقایسه برای ایرانیان مهاجر
                 </h3>
                 <div className="space-y-4 text-luxury-silver text-sm sm:text-base leading-relaxed mb-6">
                   <p>
@@ -1309,7 +1304,7 @@ const CourageousWorkshop = () => {
 
                 <div className="bg-luxury-black/40 rounded-lg p-5 sm:p-6 border border-red-500/20 mb-6">
                   <p className="text-luxury-white text-base sm:text-lg leading-relaxed">
-                    حالا فرض کنید اگر بخواهید برای درمان خجولی به یک روانشناس مراجعه کنید (که معلوم نیست آیا بتواند برای شما کاری بکند یا خیر؟) احتمالاً باید <span className="font-bold text-urgency-light">10 جلسه</span> مراجعه کنید که هزینه شما <span className="font-bold text-urgency-light">حداقل یک میلیون تومان</span> خواهد بود (تازه این با لحاظ کردن نرخ مصوب هست و روانشناسان حرفه‌ای، عموماً دریافتی بیشتری دارند)
+                    حالا فرض کنید اگر بخواهید برای درمان خجولی به یک روانشناس در کانادا مراجعه کنید (که معلوم نیست آیا بتواند برای شما کاری بکند یا خیر؟) احتمالاً باید <span className="font-bold text-urgency-light">10 جلسه</span> مراجعه کنید که هزینه شما <span className="font-bold text-urgency-light">حداقل $1,000</span> خواهد بود (تازه این با لحاظ کردن نرخ متوسط است و روانشناسان حرفه‌ای، عموماً دریافتی بیشتری دارند)
                   </p>
                 </div>
 
