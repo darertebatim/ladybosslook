@@ -318,40 +318,40 @@ const CourageousWorkshop = () => {
             </div>
           </div>
 
-          {/* Hero Section - Workshop Title Prominent */}
-          <section className="text-center mb-12 sm:mb-16">
-            <div className="inline-flex items-center px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-luxury-white/10 text-luxury-white text-xs sm:text-sm font-bold mb-4 sm:mb-6 border border-luxury-white/20 backdrop-blur-sm">
+          {/* Hero Section - Simplified */}
+          <section className="text-center mb-8 sm:mb-10">
+            <div className="inline-flex items-center px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-luxury-white/10 text-luxury-white text-xs sm:text-sm font-bold border border-luxury-white/20 backdrop-blur-sm">
               <Diamond className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               <span className="whitespace-nowrap">ورکشاپ مخصوص خانم‌های مهاجر</span>
             </div>
-            
-            {/* Prominent Workshop Title - More Visible */}
-            <div className="mb-8 px-4 bg-gradient-to-br from-luxury-white/15 to-luxury-white/5 backdrop-blur-md rounded-2xl p-6 sm:p-8 border-2 border-luxury-white/30 shadow-luxury mx-2 sm:mx-4">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold mb-6 text-luxury-white leading-tight font-display">
-                <span className="bg-gradient-luxury-text bg-clip-text text-transparent">کاراکتر پرجرات</span>
-              </h1>
-              <div className="w-32 sm:w-40 h-1.5 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-6"></div>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-6">
-                <div className="flex items-center gap-2 text-success text-sm sm:text-base">
-                  <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
-                  <span className="font-bold">گارانتی بازگشت وجه</span>
-                </div>
-                <div className="hidden sm:block w-1 h-1 bg-luxury-white rounded-full"></div>
-                <p className="text-xl sm:text-2xl lg:text-3xl text-luxury-white font-bold">
-                  Join the Courageous Character Workshop
-                </p>
-              </div>
-              <p className="text-lg sm:text-xl lg:text-2xl text-luxury-silver font-semibold">
-                and Behave like a confident Ladyboss
-              </p>
-            </div>
 
-            {/* Pricing Section - Mobile Optimized */}
+            {/* Pricing Section with Title - Mobile Optimized */}
             <div className="relative bg-gradient-to-br from-urgency/20 to-urgency-dark/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-6 sm:p-8 mb-8 sm:mb-10 mx-2 sm:mx-4 border-2 border-urgency/40 shadow-urgency">
               <div className="absolute -top-3 right-4 sm:right-6 bg-urgency text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-full font-bold text-xs sm:text-sm shadow-cta">
                 🔥 پیشنهاد ویژه!
               </div>
               <div className="text-center pt-2">
+                {/* Workshop Title in Pricing Box */}
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 text-luxury-white leading-tight font-display">
+                  <span className="bg-gradient-luxury-text bg-clip-text text-transparent">کاراکتر پرجرات</span>
+                </h1>
+                <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-4"></div>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4">
+                  <div className="flex items-center gap-2 text-success text-xs sm:text-sm">
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="font-bold">گارانتی بازگشت وجه</span>
+                  </div>
+                  <div className="hidden sm:block w-1 h-1 bg-luxury-white rounded-full"></div>
+                  <p className="text-base sm:text-lg text-luxury-white font-bold">
+                    Join the Courageous Character Workshop
+                  </p>
+                </div>
+                <p className="text-sm sm:text-base text-luxury-silver mb-6 font-medium">
+                  and Behave like a confident Ladyboss
+                </p>
+                
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-luxury-white/30 to-transparent mb-4"></div>
+                
                 <p className="text-sm sm:text-base text-luxury-white mb-3 sm:mb-4 font-bold">سرمایه‌گذاری در آینده خودتان</p>
                 <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-5">
                   <span className="text-xl sm:text-2xl font-bold text-luxury-silver/50 line-through farsi-nums">$۴۹۷</span>
