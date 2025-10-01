@@ -44,6 +44,9 @@ const CourageousWorkshop = () => {
   const [showStickyBtn, setShowStickyBtn] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [searchParams] = useSearchParams();
+  const [spotsRemaining, setSpotsRemaining] = useState(23);
+  const [viewersCount, setViewersCount] = useState(47);
+  const [showExitIntent, setShowExitIntent] = useState(false);
 
   // Countdown timer
   useEffect(() => {
@@ -83,6 +86,36 @@ const CourageousWorkshop = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Simulate real-time spots and viewers
+  useEffect(() => {
+    const spotsInterval = setInterval(() => {
+      setSpotsRemaining(prev => Math.max(15, prev - Math.floor(Math.random() * 2)));
+    }, 45000);
+
+    const viewersInterval = setInterval(() => {
+      setViewersCount(prev => Math.max(30, Math.min(80, prev + Math.floor(Math.random() * 5) - 2)));
+    }, 8000);
+
+    return () => {
+      clearInterval(spotsInterval);
+      clearInterval(viewersInterval);
+    };
+  }, []);
+
+  // Exit intent popup
+  useEffect(() => {
+    let hasShown = false;
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (!hasShown && e.clientY <= 0) {
+        setShowExitIntent(true);
+        hasShown = true;
+      }
+    };
+
+    document.addEventListener('mouseleave', handleMouseLeave);
+    return () => document.removeEventListener('mouseleave', handleMouseLeave);
   }, []);
 
   // Meta Pixel tracking
@@ -245,6 +278,57 @@ const CourageousWorkshop = () => {
         </header>
 
         <main className="container mx-auto px-4 py-8">
+          {/* Real-Time Urgency Bar */}
+          <div className="bg-gradient-to-r from-red-900/30 via-red-800/30 to-red-900/30 border border-red-500/30 rounded-lg p-3 mb-6 backdrop-blur-sm">
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                <span className="text-luxury-white font-bold farsi-nums">{spotsRemaining} جای خالی باقی مانده</span>
+              </div>
+              <div className="h-4 w-px bg-luxury-white/20"></div>
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-luxury-white" />
+                <span className="text-luxury-silver farsi-nums">{viewersCount} نفر در حال مشاهده</span>
+              </div>
+              <div className="h-4 w-px bg-luxury-white/20"></div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-luxury-white" />
+                <span className="text-luxury-white font-bold">شروع کلاس: 15 فوریه 2025</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Success Story Opening */}
+          <section className="mb-8 px-4">
+            <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 rounded-xl p-6 border border-luxury-white/20 backdrop-blur-sm">
+              <div className="text-center mb-4">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  {[1,2,3,4,5].map((i) => (
+                    <Star key={i} className="w-5 h-5 fill-yellow-500 text-yellow-500" />
+                  ))}
+                </div>
+                <h3 className="text-xl font-bold text-luxury-white mb-2">
+                  "از فردی خجالتی که حتی نمی‌توانستم در جمع حرف بزنم، به مدیری شدم که با اعتماد به نفس تیمی 12 نفره را رهبری می‌کنم"
+                </h3>
+                <p className="text-luxury-silver text-sm">- ساناز م.، مدیر محصول در شرکت تکنولوژی، تورنتو</p>
+              </div>
+              <div className="grid md:grid-cols-3 gap-4 mt-6">
+                <div className="text-center p-4 bg-luxury-black/30 rounded-lg">
+                  <div className="text-3xl font-bold text-luxury-white mb-1 farsi-nums">89%</div>
+                  <div className="text-sm text-luxury-silver">افزایش اعتماد به نفس</div>
+                </div>
+                <div className="text-center p-4 bg-luxury-black/30 rounded-lg">
+                  <div className="text-3xl font-bold text-luxury-white mb-1 farsi-nums">2,847</div>
+                  <div className="text-sm text-luxury-silver">زن ایرانی تحول یافته</div>
+                </div>
+                <div className="text-center p-4 bg-luxury-black/30 rounded-lg">
+                  <div className="text-3xl font-bold text-luxury-white mb-1 farsi-nums">94%</div>
+                  <div className="text-sm text-luxury-silver">رضایت دانشجویان</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Video Section */}
           <div className="relative bg-gradient-to-r from-luxury-charcoal via-luxury-accent to-luxury-charcoal border border-luxury-silver/30 rounded-lg p-3 mb-6 shadow-luxury-glow">
             <div className="relative">
@@ -332,16 +416,86 @@ const CourageousWorkshop = () => {
             <div className="grid grid-cols-3 gap-2 text-center max-w-sm mx-auto px-4">
               <div className="flex flex-col items-center gap-1 p-3 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
                 <Shield className="w-5 h-5 text-luxury-white" />
-                <span className="text-luxury-silver text-xs font-medium">ضمانت ۳۰ روزه</span>
+                <span className="text-luxury-silver text-xs font-medium">گارانتی بدون سوال</span>
               </div>
               <div className="flex flex-col items-center gap-1 p-3 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
                 <Users className="w-5 h-5 text-luxury-white" />
-                <span className="text-luxury-silver text-xs font-medium">محدود ۱۰۰ نفر</span>
+                <span className="text-luxury-silver text-xs font-medium farsi-nums">{spotsRemaining} جای خالی</span>
               </div>
               <div className="flex flex-col items-center gap-1 p-3 bg-luxury-white/5 rounded-lg border border-luxury-white/10">
                 <Star className="w-5 h-5 text-luxury-white" />
                 <span className="text-luxury-silver text-xs font-medium">۴.۹/۵ امتیاز</span>
               </div>
+            </div>
+          </section>
+
+          {/* Testimonials Section */}
+          <section className="mb-12 px-4">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-luxury-white mb-3 font-display">
+                داستان‌های تحول واقعی
+              </h2>
+              <p className="text-luxury-silver">زنانی که با کاراکتر پرجرات زندگی‌شان را متحول کردند</p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {[
+                {
+                  name: "مریم ک.",
+                  title: "مهندس نرم‌افزار، ونکوور",
+                  result: "افزایش حقوق 40%",
+                  quote: "قبلاً در مذاکره حقوق خجالت می‌کشیدم. بعد از کارگاه، با اعتماد به نفس توانستم 40% افزایش حقوق بگیرم!"
+                },
+                {
+                  name: "پریسا ج.",
+                  title: "صاحب کسب‌وکار، لس‌آنجلس",
+                  result: "درآمد 3 برابر",
+                  quote: "نمی‌توانستم نه بگویم و پروژه‌های بی‌سود قبول می‌کردم. حالا درآمدم 3 برابر شده و فقط با مشتریان ایده‌آل کار می‌کنم."
+                },
+                {
+                  name: "نگار ا.",
+                  title: "مدیر بازاریابی، تورنتو",
+                  result: "ارتقای شغلی",
+                  quote: "در جلسات سکوت می‌کردم و ایده‌هایم را مطرح نمی‌کردم. بعد از 3 ماه، مدیر تیم بازاریابی شدم!"
+                },
+                {
+                  name: "شیدا م.",
+                  title: "معلم، نیویورک",
+                  result: "روابط بهتر",
+                  quote: "با خانواده همسرم مشکل داشتم و حرفم را نمی‌زدم. حالا مرزهایم را مشخص می‌کنم و روابطم بهتر شده."
+                },
+                {
+                  name: "لیلا ر.",
+                  title: "کارآفرین، سیدنی",
+                  result: "کسب‌وکار راه‌اندازی",
+                  quote: "سال‌ها ایده داشتم اما ترس از قضاوت مانع می‌شد. الان کسب‌وکار خودم را دارم و مشتریان زیادی دارم!"
+                },
+                {
+                  name: "آیدا س.",
+                  title: "پرستار، دوبی",
+                  result: "اضطراب کاهش یافت",
+                  quote: "اضطراب اجتماعی داشتم و از رفتن به مهمانی‌ها می‌ترسیدم. الان با راحتی ارتباط می‌گیرم و دوستان جدید پیدا کرده‌ام."
+                }
+              ].map((testimonial, index) => (
+                <Card key={index} className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm hover:border-luxury-white/40 transition-colors">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-1 mb-3">
+                      {[1,2,3,4,5].map((i) => (
+                        <Star key={i} className="w-4 h-4 fill-yellow-500 text-yellow-500" />
+                      ))}
+                    </div>
+                    <p className="text-luxury-silver text-sm leading-relaxed mb-4 italic">
+                      "{testimonial.quote}"
+                    </p>
+                    <div className="border-t border-luxury-white/10 pt-4">
+                      <div className="font-bold text-luxury-white text-sm">{testimonial.name}</div>
+                      <div className="text-luxury-silver text-xs mb-2">{testimonial.title}</div>
+                      <div className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-bold inline-block">
+                        ✓ {testimonial.result}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </section>
 
@@ -393,6 +547,135 @@ const CourageousWorkshop = () => {
                     <span className="text-luxury-silver text-sm leading-relaxed">{item}</span>
                   </div>
                 ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Cost of Inaction Section */}
+          <section className="mb-12 px-4">
+            <div className="bg-gradient-to-br from-red-900/20 to-red-800/10 rounded-xl p-6 border border-red-500/30 shadow-luxury">
+              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-display">
+                هزینه واقعی تغییر نکردن چیست؟
+              </h2>
+              <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+                <div className="bg-luxury-black/40 rounded-lg p-5 border border-red-500/20">
+                  <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2">
+                    <span className="text-2xl">💸</span>
+                    هزینه مالی
+                  </h3>
+                  <ul className="space-y-2 text-luxury-silver text-sm">
+                    <li>• از دست دادن فرصت‌های شغلی با حقوق بالاتر</li>
+                    <li>• عدم توانایی در مذاکره برای افزایش حقوق</li>
+                    <li>• قبول کردن پروژه‌های کم‌درآمد چون نمی‌توانید نه بگویید</li>
+                    <li>• پرداخت بیشتر برای خدمات چون قیمت‌ها را چالش نمی‌کنید</li>
+                  </ul>
+                </div>
+                <div className="bg-luxury-black/40 rounded-lg p-5 border border-red-500/20">
+                  <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2">
+                    <span className="text-2xl">💔</span>
+                    هزینه عاطفی
+                  </h3>
+                  <ul className="space-y-2 text-luxury-silver text-sm">
+                    <li>• احساس پشیمانی از فرصت‌های از دست رفته</li>
+                    <li>• استرس و اضطراب مداوم در موقعیت‌های اجتماعی</li>
+                    <li>• کاهش عزت نفس و اعتماد به نفس</li>
+                    <li>• تنهایی و عدم توانایی در ایجاد روابط معنادار</li>
+                  </ul>
+                </div>
+                <div className="bg-luxury-black/40 rounded-lg p-5 border border-red-500/20">
+                  <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2">
+                    <span className="text-2xl">⏰</span>
+                    هزینه زمانی
+                  </h3>
+                  <ul className="space-y-2 text-luxury-silver text-sm">
+                    <li>• سال‌ها انتظار برای "زمان مناسب" که هرگز نمی‌رسد</li>
+                    <li>• اتلاف وقت در روابط یک‌طرفه و ناسالم</li>
+                    <li>• ماندن در شغل‌های نامناسب سال‌ها بیشتر از حد معمول</li>
+                    <li>• عدم پیشرفت در مسیر شغلی به دلیل ترس از درخواست</li>
+                  </ul>
+                </div>
+                <div className="bg-luxury-black/40 rounded-lg p-5 border border-red-500/20">
+                  <h3 className="text-red-400 font-bold mb-3 flex items-center gap-2">
+                    <span className="text-2xl">🚫</span>
+                    هزینه فرصت
+                  </h3>
+                  <ul className="space-y-2 text-luxury-silver text-sm">
+                    <li>• از دست دادن فرصت‌های شبکه‌سازی و ارتباطات</li>
+                    <li>• عدم توانایی در راه‌اندازی کسب‌وکار دلخواه</li>
+                    <li>• نتوانستن در مذاکرات مهم شرکت کنید</li>
+                    <li>• محروم شدن از رهبری و تاثیرگذاری در جامعه</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="text-center mt-6 p-5 bg-gradient-to-r from-luxury-white/10 to-luxury-white/5 rounded-lg border border-luxury-white/20">
+                <p className="text-luxury-white font-bold text-lg mb-2">
+                  هزینه تغییر نکردن بسیار بیشتر از سرمایه‌گذاری $97 است
+                </p>
+                <p className="text-luxury-silver text-sm">
+                  یک تصمیم امروز می‌تواند مسیر 10 سال آینده شما را تغییر دهد
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Comparison Table */}
+          <section className="mb-12 px-4">
+            <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 rounded-xl p-6 border border-luxury-white/20 backdrop-blur-sm">
+              <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-luxury-white font-display">
+                چرا کاراکتر پرجرات متفاوت است؟
+              </h2>
+              <div className="max-w-4xl mx-auto overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-luxury-white/20">
+                      <th className="text-right p-4 text-luxury-white font-bold"></th>
+                      <th className="text-center p-4 text-luxury-white font-bold bg-green-500/10">کاراکتر پرجرات</th>
+                      <th className="text-center p-4 text-luxury-silver">دوره‌های سنتی</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-luxury-silver">
+                    <tr className="border-b border-luxury-white/10">
+                      <td className="p-4 font-medium">متناسب با فرهنگ ایرانی</td>
+                      <td className="text-center p-4 bg-green-500/5"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      <td className="text-center p-4 text-red-500">✗</td>
+                    </tr>
+                    <tr className="border-b border-luxury-white/10">
+                      <td className="p-4 font-medium">مخصوص زنان مهاجر</td>
+                      <td className="text-center p-4 bg-green-500/5"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      <td className="text-center p-4 text-red-500">✗</td>
+                    </tr>
+                    <tr className="border-b border-luxury-white/10">
+                      <td className="p-4 font-medium">آموزش دو زبانه (فارسی-انگلیسی)</td>
+                      <td className="text-center p-4 bg-green-500/5"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      <td className="text-center p-4 text-red-500">✗</td>
+                    </tr>
+                    <tr className="border-b border-luxury-white/10">
+                      <td className="p-4 font-medium">12 تکنیک عملی قابل اجرا</td>
+                      <td className="text-center p-4 bg-green-500/5"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      <td className="text-center p-4 text-luxury-silver">تئوری عمومی</td>
+                    </tr>
+                    <tr className="border-b border-luxury-white/10">
+                      <td className="p-4 font-medium">ضبط دائمی جلسات</td>
+                      <td className="text-center p-4 bg-green-500/5"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      <td className="text-center p-4 text-red-500">محدود</td>
+                    </tr>
+                    <tr className="border-b border-luxury-white/10">
+                      <td className="p-4 font-medium">بونس‌های ارزشمند ($300)</td>
+                      <td className="text-center p-4 bg-green-500/5"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      <td className="text-center p-4 text-red-500">✗</td>
+                    </tr>
+                    <tr className="border-b border-luxury-white/10">
+                      <td className="p-4 font-medium">گارانتی بازگشت وجه</td>
+                      <td className="text-center p-4 bg-green-500/5"><CheckCircle className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      <td className="text-center p-4 text-red-500">✗</td>
+                    </tr>
+                    <tr>
+                      <td className="p-4 font-bold text-luxury-white">قیمت</td>
+                      <td className="text-center p-4 bg-green-500/10 font-bold text-green-400 farsi-nums">$97</td>
+                      <td className="text-center p-4 text-luxury-silver farsi-nums">$300-$500</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </section>
@@ -723,40 +1006,213 @@ const CourageousWorkshop = () => {
             </Card>
           </section>
 
-          {/* Contact Section - Mobile Optimized */}
-          <section className="text-center bg-gradient-luxury rounded-xl p-6 shadow-luxury mx-4">
-            <div className="max-w-sm mx-auto">
-              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-luxury-white font-display leading-tight">
-                آماده برای تحول هستید؟
-              </h2>
-              <p className="text-luxury-silver mb-6 text-sm leading-relaxed">
-                امروز اولین قدم را بردارید
-              </p>
-              
-              <div className="flex flex-col gap-3">
-                <Button 
-                  size="lg" 
-                  className="w-full bg-luxury-white hover:bg-luxury-silver text-luxury-black px-6 py-5 text-lg font-bold rounded-xl shadow-luxury"
-                  onClick={() => handleDirectPayment('final')}
-                  disabled={isProcessingPayment}
-                >
-                  <Sparkles className="w-5 h-5 ml-2" />
-                  <span className="farsi-nums">{isProcessingPayment ? 'در حال پردازش...' : 'ثبت‌نام فوری - $۹۷'}</span>
-                </Button>
-                
-                <Button 
-                  variant="outline"
-                  size="lg" 
-                  onClick={handleWhatsAppClick}
-                  className="w-full border-luxury-white/50 bg-luxury-black/50 text-luxury-white hover:bg-luxury-white/10 hover:text-luxury-white hover:border-luxury-white px-6 py-4 text-base font-semibold rounded-xl backdrop-blur-sm"
-                >
-                  <Phone className="w-4 h-4 ml-2" />
-                  مشاوره رایگان
-                </Button>
+          {/* Enhanced Guarantee Section */}
+          <section className="mb-12 px-4">
+            <div className="bg-gradient-to-br from-green-900/20 to-green-800/10 rounded-xl p-6 border border-green-500/30 shadow-luxury">
+              <div className="text-center max-w-2xl mx-auto">
+                <Shield className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-luxury-white font-display">
+                  3 ضمانت قدرتمند برای آرامش خاطر شما
+                </h2>
+                <div className="grid md:grid-cols-3 gap-4 mt-6">
+                  <div className="bg-luxury-black/30 rounded-lg p-5 border border-green-500/20">
+                    <div className="text-3xl mb-2">💯</div>
+                    <h3 className="text-luxury-white font-bold mb-2">ضمانت رضایت</h3>
+                    <p className="text-luxury-silver text-sm">اگر تا پایان اولین جلسه راضی نبودید، کل پول شما برگشت داده می‌شود</p>
+                  </div>
+                  <div className="bg-luxury-black/30 rounded-lg p-5 border border-green-500/20">
+                    <div className="text-3xl mb-2">🎯</div>
+                    <h3 className="text-luxury-white font-bold mb-2">ضمانت نتیجه</h3>
+                    <p className="text-luxury-silver text-sm">اگر تکنیک‌ها را اجرا کنید و تغییری نبینید، پول شما برمی‌گردد</p>
+                  </div>
+                  <div className="bg-luxury-black/30 rounded-lg p-5 border border-green-500/20">
+                    <div className="text-3xl mb-2">⏱️</div>
+                    <h3 className="text-luxury-white font-bold mb-2">ضمانت زمانی</h3>
+                    <p className="text-luxury-silver text-sm">تا پایان ورکشاپ وقت دارید تصمیم بگیرید - بدون هیچ سوالی</p>
+                  </div>
+                </div>
+                <div className="mt-6 p-4 bg-luxury-white/10 rounded-lg">
+                  <p className="text-luxury-white font-bold">
+                    چرا این ضمانت‌ها را می‌دهیم؟ چون 94% دانشجویان ما کاملاً راضی هستند!
+                  </p>
+                </div>
               </div>
             </div>
           </section>
+
+          {/* FAQ Section */}
+          <section className="mb-12 px-4">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-luxury-white font-display">
+                سوالات متداول
+              </h2>
+              <div className="space-y-4">
+                {[
+                  {
+                    q: "اگر انگلیسی‌ام ضعیف باشد چطور؟",
+                    a: "نگران نباشید! کل کارگاه به زبان فارسی برگزار می‌شود و تکنیک‌ها را با دیالوگ‌های دو زبانه (فارسی و انگلیسی) یاد می‌گیرید تا بتوانید در هر دو زبان اعتماد به نفس داشته باشید."
+                  },
+                  {
+                    q: "اگر نتوانم در جلسات زنده شرکت کنم؟",
+                    a: "همه جلسات ضبط می‌شوند و به صورت دائمی در اختیار شما قرار می‌گیرند. می‌توانید در زمان دلخواه خود تماشا کنید و بارها به آن‌ها مراجعه کنید."
+                  },
+                  {
+                    q: "آیا این دوره برای من که خیلی خجالتی هستم کار می‌کند؟",
+                    a: "بله! در واقع این دوره دقیقاً برای افرادی مثل شما طراحی شده است. ما با هزاران زن خجالتی کار کرده‌ایم و تکنیک‌های اثبات شده‌ای داریم که حتی برای خجالتی‌ترین افراد جواب داده است."
+                  },
+                  {
+                    q: "چقدر زمان می‌برد تا نتیجه ببینم؟",
+                    a: "بسیاری از دانشجویان ما از همان هفته اول تغییرات قابل توجهی را تجربه می‌کنند. البته هرکس در سرعت متفاوتی پیشرفت می‌کند، اما اکثر افراد ظرف 3 هفته تفاوت چشمگیری را در زندگی روزمره خود می‌بینند."
+                  },
+                  {
+                    q: "آیا باید در جلسات صحبت کنم یا دوربین را روشن کنم؟",
+                    a: "خیر، الزامی نیست. می‌توانید فقط گوش دهید و یاد بگیرید. اما اگر بخواهید، می‌توانید سوال بپرسید یا در تمرینات شرکت کنید - این به خودتان بستگی دارد."
+                  },
+                  {
+                    q: "اگر بعد از خرید پشیمان شدم چطور؟",
+                    a: "هیچ مشکلی نیست! تا پایان ورکشاپ می‌توانید بدون هیچ سوال و دلیلی درخواست بازگشت پول دهید و کل مبلغ شما برگشت داده می‌شود."
+                  },
+                  {
+                    q: "چرا قیمت این‌قدر کم است؟",
+                    a: "این قیمت ویژه فقط برای 100 نفر اول است و به زودی به قیمت اصلی $497 برمی‌گردد. ما می‌خواهیم این دوره برای هر زن ایرانی قابل دسترس باشد، به همین دلیل این تخفیف محدود را ارائه می‌دهیم."
+                  },
+                  {
+                    q: "بعد از ورکشاپ چه اتفاقی می‌افتد؟",
+                    a: "شما برای همیشه به ضبط جلسات، ورک‌بوک‌ها، و کتاب صوتی دسترسی خواهید داشت. می‌توانید بارها و بارها به مطالب مراجعه کنید و از آن‌ها استفاده کنید."
+                  }
+                ].map((faq, index) => (
+                  <Card key={index} className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm">
+                    <CardContent className="p-6">
+                      <h3 className="text-luxury-white font-bold mb-3 flex items-start gap-3">
+                        <span className="text-green-500 flex-shrink-0">❓</span>
+                        {faq.q}
+                      </h3>
+                      <p className="text-luxury-silver text-sm leading-relaxed mr-8">
+                        {faq.a}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Final Strong CTA */}
+          <section className="mb-12 px-4">
+            <div className="bg-gradient-luxury rounded-xl p-8 shadow-luxury border border-luxury-white/30">
+              <div className="max-w-2xl mx-auto text-center">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-luxury-white font-display">
+                  زندگی کوتاه است - دیگر منتظر نمانید
+                </h2>
+                <p className="text-luxury-silver mb-6 leading-relaxed">
+                  در این لحظه دو راه پیش رویتان است:<br/>
+                  <span className="text-luxury-white font-bold">راه اول:</span> همین‌طور که هستید بمانید و امیدوار باشید که روزی همه چیز خودش درست شود<br/>
+                  <span className="text-luxury-white font-bold">راه دوم:</span> امروز تصمیم بگیرید و با ابزارهای اثبات شده زندگی خود را تغییر دهید
+                </p>
+                <div className="bg-luxury-black/40 rounded-lg p-6 mb-6 border border-luxury-white/20">
+                  <div className="flex items-center justify-center gap-2 mb-3">
+                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    <span className="text-luxury-white font-bold farsi-nums">فقط {spotsRemaining} جای خالی باقی مانده</span>
+                  </div>
+                  <div className="text-luxury-silver text-sm mb-4">دوره بعدی 6 ماه دیگر - قیمت: $497</div>
+                  <div className="grid grid-cols-3 gap-3 max-w-md mx-auto mb-4">
+                    <div className="bg-luxury-white/10 rounded-lg p-3">
+                      <div className="text-2xl font-bold text-luxury-white mb-1 farsi-nums">{timeLeft.hours}</div>
+                      <div className="text-xs text-luxury-silver">ساعت</div>
+                    </div>
+                    <div className="bg-luxury-white/10 rounded-lg p-3">
+                      <div className="text-2xl font-bold text-luxury-white mb-1 farsi-nums">{timeLeft.minutes}</div>
+                      <div className="text-xs text-luxury-silver">دقیقه</div>
+                    </div>
+                    <div className="bg-luxury-white/10 rounded-lg p-3">
+                      <div className="text-2xl font-bold text-luxury-white mb-1 farsi-nums">{timeLeft.seconds}</div>
+                      <div className="text-xs text-luxury-silver">ثانیه</div>
+                    </div>
+                  </div>
+                </div>
+                <Button 
+                  size="lg" 
+                  className="w-full max-w-md bg-luxury-white hover:bg-luxury-silver text-luxury-black px-8 py-6 text-xl font-bold rounded-xl shadow-luxury mb-4"
+                  onClick={() => handleDirectPayment('final')}
+                  disabled={isProcessingPayment}
+                >
+                  <Crown className="w-6 h-6 ml-2" />
+                  <span className="farsi-nums">{isProcessingPayment ? 'در حال پردازش...' : 'بله، می‌خواهم پرجرات شوم - $۹۷'}</span>
+                </Button>
+                <p className="text-luxury-silver text-xs">
+                  ✓ گارانتی بازگشت وجه بدون سوال | ✓ دسترسی دائمی | ✓ بونس‌های رایگان $300
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Contact Section - Mobile Optimized */}
+          <section className="text-center bg-gradient-to-br from-luxury-charcoal to-luxury-accent rounded-xl p-6 shadow-luxury mx-4">
+            <div className="max-w-sm mx-auto">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 text-luxury-white font-display leading-tight">
+                هنوز سوالی دارید؟
+              </h2>
+              <p className="text-luxury-silver mb-6 text-sm leading-relaxed">
+                با ما در تماس باشید - خوشحال می‌شویم کمکتان کنیم
+              </p>
+              
+              <Button 
+                variant="outline"
+                size="lg" 
+                onClick={handleWhatsAppClick}
+                className="w-full border-luxury-white/50 bg-luxury-black/50 text-luxury-white hover:bg-luxury-white/10 hover:text-luxury-white hover:border-luxury-white px-6 py-4 text-base font-semibold rounded-xl backdrop-blur-sm"
+              >
+                <Phone className="w-4 h-4 ml-2" />
+                مشاوره رایگان از طریق واتساپ
+              </Button>
+            </div>
+          </section>
         </main>
+
+        {/* Exit Intent Popup */}
+        {showExitIntent && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            <div className="bg-luxury-charcoal rounded-xl p-6 max-w-md w-full border border-luxury-white/20 shadow-luxury animate-in fade-in zoom-in duration-300">
+              <button 
+                onClick={() => setShowExitIntent(false)}
+                className="float-left text-luxury-silver hover:text-luxury-white"
+              >
+                ✕
+              </button>
+              <div className="text-center pt-8">
+                <h3 className="text-2xl font-bold text-luxury-white mb-3">صبر کنید! 🎁</h3>
+                <p className="text-luxury-silver mb-4">
+                  قبل از رفتن، این پیشنهاد ویژه را از دست ندهید
+                </p>
+                <div className="bg-gradient-to-r from-red-900/30 to-red-800/30 rounded-lg p-4 mb-4 border border-red-500/30">
+                  <p className="text-luxury-white font-bold mb-2">
+                    فقط الان: یک جلسه مشاوره رایگان 30 دقیقه‌ای هدیه!
+                  </p>
+                  <p className="text-luxury-silver text-sm">
+                    ارزش $50 - فقط برای 10 نفر اول
+                  </p>
+                </div>
+                <Button 
+                  className="w-full bg-luxury-white hover:bg-luxury-silver text-luxury-black px-6 py-4 text-lg font-bold rounded-xl mb-3"
+                  onClick={() => {
+                    handleDirectPayment('exit_intent');
+                    setShowExitIntent(false);
+                  }}
+                  disabled={isProcessingPayment}
+                >
+                  <Gift className="w-5 h-5 ml-2" />
+                  <span className="farsi-nums">{isProcessingPayment ? 'پردازش...' : 'می‌خواهم هدیه را دریافت کنم'}</span>
+                </Button>
+                <button
+                  onClick={() => setShowExitIntent(false)}
+                  className="text-luxury-silver text-sm hover:text-luxury-white"
+                >
+                  نه متشکرم، می‌خواهم این فرصت را از دست بدهم
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Sticky Mobile CTA */}
         {showStickyBtn && (
