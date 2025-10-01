@@ -277,64 +277,21 @@ const CourageousWorkshop = () => {
         </header>
 
         <main className="container mx-auto px-4 py-8">
-          {/* Real-Time Urgency Bar - Minimal */}
-          <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-md py-1 px-2 mb-4">
-            <div className="flex items-center justify-center gap-3 text-[10px] text-white">
-              <span className="flex items-center gap-1">
-                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-                <span className="farsi-nums">{spotsRemaining} جا</span>
-              </span>
-              <span className="flex items-center gap-1">
-                <Users className="w-2.5 h-2.5" />
-                <span className="farsi-nums">{viewersCount} نفر</span>
-              </span>
-            </div>
-          </div>
+          {/* Video Section moved here - will come first */}
 
-          {/* Success Story Opening - Enhanced */}
-          <section className="mb-10 px-4 animate-fade-in-up">
-            <div className="bg-gradient-success rounded-2xl p-8 border-2 border-success/40 shadow-glow hover-lift">
-              <div className="text-center mb-6">
-                <div className="flex items-center justify-center gap-1 mb-4 animate-scale-in">
-                  {[1,2,3,4,5].map((i) => (
-                    <Star key={i} className="w-6 h-6 fill-yellow-400 text-yellow-400 drop-shadow-lg" />
-                  ))}
-                </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
-                  "از فردی خجالتی که حتی نمی‌توانستم در جمع حرف بزنم، به مدیری شدم که با اعتماد به نفس تیمی 12 نفره را رهبری می‌کنم"
-                </h3>
-                <p className="text-white/90 text-base font-medium">- ساناز م.، مدیر محصول در شرکت تکنولوژی، تورنتو</p>
-              </div>
-              <div className="grid md:grid-cols-3 gap-6 mt-8">
-                <div className="text-center p-6 bg-white/20 rounded-xl backdrop-blur-sm hover-glow transition-all">
-                  <div className="text-5xl font-extrabold text-white mb-2 farsi-nums">89%</div>
-                  <div className="text-base font-bold text-white">افزایش اعتماد به نفس</div>
-                </div>
-                <div className="text-center p-6 bg-white/20 rounded-xl backdrop-blur-sm hover-glow transition-all">
-                  <div className="text-5xl font-extrabold text-white mb-2 farsi-nums">2,847</div>
-                  <div className="text-base font-bold text-white">زن ایرانی تحول یافته</div>
-                </div>
-                <div className="text-center p-6 bg-white/20 rounded-xl backdrop-blur-sm hover-glow transition-all">
-                  <div className="text-5xl font-extrabold text-white mb-2 farsi-nums">94%</div>
-                  <div className="text-base font-bold text-white">رضایت دانشجویان</div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Video Section - Emphasized */}
+          {/* Video Section - Emphasized - First Thing on Page */}
           <div className="mb-8 px-4">
             <div className="bg-gradient-to-br from-urgency/20 to-urgency-dark/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-urgency/40 shadow-urgency">
               <div className="text-center mb-4 sm:mb-6">
                 <div className="inline-flex items-center gap-2 bg-urgency text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-sm sm:text-base mb-3 sm:mb-4 shadow-cta">
                   <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-                  ویدیو معرفی دوره را حتماً تماشا کنید
+                  ویدیو معرفی ورکشاپ را حتماً تماشا کنید
                 </div>
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3 leading-tight">
-                  ویدیو معرفی کارگاه کاراکتر پرجرات
+                  ویدیو معرفی ورکشاپ کاراکتر پرجرات
                 </h2>
                 <p className="text-white/90 text-sm sm:text-base max-w-2xl mx-auto">
-                  در این ویدیو با جزئیات کامل کارگاه و روش‌های تحول آفرین آشنا می‌شوید
+                  در این ویدیو با جزئیات کامل ورکشاپ و روش‌های تحول آفرین آشنا می‌شوید
                 </p>
               </div>
               <div className="relative bg-gradient-to-r from-luxury-charcoal via-luxury-accent to-luxury-charcoal border border-luxury-silver/30 rounded-lg p-2 sm:p-3 shadow-luxury-glow">
@@ -361,30 +318,33 @@ const CourageousWorkshop = () => {
             </div>
           </div>
 
-          {/* Hero Section - Mobile First */}
+          {/* Hero Section - Workshop Title Prominent */}
           <section className="text-center mb-12 sm:mb-16">
             <div className="inline-flex items-center px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-luxury-white/10 text-luxury-white text-xs sm:text-sm font-bold mb-4 sm:mb-6 border border-luxury-white/20 backdrop-blur-sm">
               <Diamond className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               <span className="whitespace-nowrap">ورکشاپ مخصوص خانم‌های مهاجر</span>
             </div>
             
-            {/* Mobile-First Hero Title */}
-            <div className="mb-6 px-4">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 text-luxury-white leading-tight font-display">
+            {/* Prominent Workshop Title - More Visible */}
+            <div className="mb-8 px-4 bg-gradient-to-br from-luxury-white/15 to-luxury-white/5 backdrop-blur-md rounded-2xl p-6 sm:p-8 border-2 border-luxury-white/30 shadow-luxury mx-2 sm:mx-4">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold mb-6 text-luxury-white leading-tight font-display">
                 <span className="bg-gradient-luxury-text bg-clip-text text-transparent">کاراکتر پرجرات</span>
               </h1>
-              <div className="w-20 sm:w-24 h-1 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-4"></div>
-              <div className="flex items-center justify-center gap-2 text-luxury-silver text-xs sm:text-sm mb-4">
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="font-bold">گارانتی بازگشت وجه</span>
+              <div className="w-32 sm:w-40 h-1.5 bg-gradient-to-r from-transparent via-luxury-white to-transparent mx-auto mb-6"></div>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-6">
+                <div className="flex items-center gap-2 text-success text-sm sm:text-base">
+                  <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <span className="font-bold">گارانتی بازگشت وجه</span>
+                </div>
+                <div className="hidden sm:block w-1 h-1 bg-luxury-white rounded-full"></div>
+                <p className="text-xl sm:text-2xl lg:text-3xl text-luxury-white font-bold">
+                  Join the Courageous Character Workshop
+                </p>
               </div>
+              <p className="text-lg sm:text-xl lg:text-2xl text-luxury-silver font-semibold">
+                and Behave like a confident Ladyboss
+              </p>
             </div>
-
-            {/* Mobile Optimized Description */}
-            <p className="text-base sm:text-lg lg:text-xl text-luxury-silver mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4">
-              <span className="block">Join the Courageous Character Workshop</span>
-              <span className="block">and Behave like a confident Ladyboss</span>
-            </p>
 
             {/* Pricing Section - Mobile Optimized */}
             <div className="relative bg-gradient-to-br from-urgency/20 to-urgency-dark/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-6 sm:p-8 mb-8 sm:mb-10 mx-2 sm:mx-4 border-2 border-urgency/40 shadow-urgency">
@@ -453,6 +413,37 @@ const CourageousWorkshop = () => {
                 <Star className="w-6 h-6 sm:w-8 sm:h-8 text-warning fill-warning" />
                 <span className="text-white text-xs sm:text-sm font-bold leading-tight">۴.۹/۵ امتیاز</span>
                 <span className="text-warning-light text-[10px] sm:text-xs farsi-nums">2,847 نظر</span>
+              </div>
+            </div>
+          </section>
+
+          {/* Success Story Box - Moved to Middle & Compact */}
+          <section className="mb-10 px-4 animate-fade-in-up">
+            <div className="bg-gradient-success rounded-xl p-5 sm:p-6 border border-success/30 shadow-glow max-w-2xl mx-auto">
+              <div className="text-center mb-4">
+                <div className="flex items-center justify-center gap-1 mb-3">
+                  {[1,2,3,4,5].map((i) => (
+                    <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-2 leading-tight">
+                  "از فردی خجالتی که حتی نمی‌توانستم در جمع حرف بزنم، به مدیری شدم که با اعتماد به نفس تیمی 12 نفره را رهبری می‌کنم"
+                </h3>
+                <p className="text-white/90 text-xs sm:text-sm">- ساناز م.، مدیر محصول در شرکت تکنولوژی، تورنتو</p>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="text-center p-3 bg-white/20 rounded-lg">
+                  <div className="text-2xl sm:text-3xl font-bold text-white mb-1 farsi-nums">89%</div>
+                  <div className="text-[10px] sm:text-xs font-medium text-white">افزایش اعتماد به نفس</div>
+                </div>
+                <div className="text-center p-3 bg-white/20 rounded-lg">
+                  <div className="text-2xl sm:text-3xl font-bold text-white mb-1 farsi-nums">2,847</div>
+                  <div className="text-[10px] sm:text-xs font-medium text-white">زن ایرانی تحول یافته</div>
+                </div>
+                <div className="text-center p-3 bg-white/20 rounded-lg">
+                  <div className="text-2xl sm:text-3xl font-bold text-white mb-1 farsi-nums">94%</div>
+                  <div className="text-[10px] sm:text-xs font-medium text-white">رضایت دانشجویان</div>
+                </div>
               </div>
             </div>
           </section>
@@ -553,7 +544,7 @@ const CourageousWorkshop = () => {
               <div className="text-center space-y-4 bg-luxury-white/5 rounded-lg p-5 border border-luxury-white/10">
                 <p className="text-luxury-white font-bold text-lg">شما خجالتی و کمرو هستید و فرصت‌ها یکی یکی از جلوی چشمتان رد می‌شوند.</p>
                 <p className="text-luxury-silver text-base leading-relaxed">برای از بین بردن چالش‌هایی که با آن دست و پنجه نرم می‌کنید، یک راه حل قطعی و تضمینی با کمترین تلاش وجود دارد:</p>
-                <p className="text-luxury-white font-bold text-2xl bg-gradient-luxury-text bg-clip-text text-transparent">دوره کاراکتر پرجرات</p>
+                <p className="text-luxury-white font-bold text-2xl bg-gradient-luxury-text bg-clip-text text-transparent">ورکشاپ کاراکتر پرجرات</p>
               </div>
             </div>
           </section>
@@ -992,7 +983,7 @@ const CourageousWorkshop = () => {
                 </div>
                 <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
                   <span className="text-sm">ظرفیت:</span>
-                  <span className="font-bold text-luxury-white text-sm">۱۰۰ خانم</span>
+                  <span className="font-bold text-luxury-white text-sm">۱۰۰۰ خانم</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-luxury-black/30 rounded-lg">
                   <span className="text-sm">ضبط:</span>
@@ -1006,7 +997,7 @@ const CourageousWorkshop = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-3 text-luxury-white text-xl">
                   <Award className="w-6 h-6 text-luxury-silver" />
-                  مزایای شرکت در دوره کاراکتر پرجرات
+                  مزایای شرکت در ورکشاپ کاراکتر پرجرات
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1130,7 +1121,7 @@ const CourageousWorkshop = () => {
             <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-xl p-6 sm:p-8 border border-luxury-white/20 shadow-luxury">
               <div className="text-center mb-8">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-luxury-white font-display">
-                  مبلغ سرمایه‌گذاری شما برای دوره شهامت
+                  مبلغ سرمایه‌گذاری شما برای ورکشاپ کاراکتر پرجرات
                 </h2>
                 <div className="inline-block bg-urgency/20 text-urgency px-6 py-3 rounded-full font-bold text-sm sm:text-base border border-urgency/40">
                   یک درخواست جدی! لطفاً این مبالغ را یادداشت کنید
@@ -1185,7 +1176,7 @@ const CourageousWorkshop = () => {
                   },
                   {
                     icon: "💯",
-                    text: "از خواروبارفروشی خرید کرده‌اید و الباقی پول شما 100 تومان است، فروشنده 100 تومان را نمی‌دهد یا به‌جایش شکلاتی می‌دهد که نمی‌خواهید و دوست ندارید؛ اما فکر می‌کنید زشت است درخواست کنید که 100 تومان را به شما بدهد. ده برابر این مبلغ را یادداشت کنید."
+                    text: "از خواروبارفروشی خرید کرده‌اید و الباقی پول شما $1 است، فروشنده $1 را نمی‌دهد یا به‌جایش شکلاتی می‌دهد که نمی‌خواهید و دوست ندارید؛ اما فکر می‌کنید زشت است درخواست کنید که $1 را به شما بدهد. ده برابر این مبلغ را یادداشت کنید."
                   },
                   {
                     icon: "🍎",
@@ -1221,7 +1212,7 @@ const CourageousWorkshop = () => {
                     </p>
                   </div>
                   <p className="text-luxury-white text-base sm:text-lg font-medium">
-                    فکرش را می‌کردید که به‌خاطر رفتارهایی که به دور از شهامت هستند، این‌قدر ضرر مالی کرده باشید؟
+                    فکرش را می‌کردید که به‌خاطر رفتارهایی که به دور از کاراکتر پرجرات هستند، این‌قدر ضرر مالی کرده باشید؟
                   </p>
                 </div>
               </div>
@@ -1358,11 +1349,23 @@ const CourageousWorkshop = () => {
                   },
                   {
                     q: "چرا قیمت این‌قدر کم است؟",
-                    a: "این قیمت ویژه فقط برای 100 نفر اول است و به زودی به قیمت اصلی $497 برمی‌گردد. ما می‌خواهیم این دوره برای هر زن ایرانی قابل دسترس باشد، به همین دلیل این تخفیف محدود را ارائه می‌دهیم."
+                    a: "این قیمت ویژه فقط برای 1000 نفر اول است و به زودی به قیمت اصلی $497 برمی‌گردد. ما می‌خواهیم این ورکشاپ برای هر زن ایرانی قابل دسترس باشد، به همین دلیل این تخفیف محدود را ارائه می‌دهیم."
+                  },
+                  {
+                    q: "من تازه به کانادا/آمریکا آمده‌ام، آیا این ورکشاپ به من کمک می‌کند؟",
+                    a: "بله! در واقع همین الان بهترین زمان برای شروع است. خیلی از زنان مهاجر آرزو می‌کنند کاش از همان ابتدا این مهارت‌ها را یاد گرفته بودند. این ورکشاپ به شما کمک می‌کند سریع‌تر در جامعه جدید جا بیفتید و فرصت‌های شغلی بهتری پیدا کنید."
+                  },
+                  {
+                    q: "من سال‌هاست که مهاجر هستم، آیا دیر نشده؟",
+                    a: "هرگز دیر نیست! خیلی از دانشجویان ما 10-20 سال است که مهاجرند و می‌گویند کاش زودتر این دوره را می‌دیدند. شما همین حالا هم می‌توانید تغییرات شگفت‌انگیزی در زندگی شخصی و حرفه‌ای خود ایجاد کنید."
                   },
                   {
                     q: "بعد از ورکشاپ چه اتفاقی می‌افتد؟",
                     a: "شما برای همیشه به ضبط جلسات، ورک‌بوک‌ها، و کتاب صوتی دسترسی خواهید داشت. می‌توانید بارها و بارها به مطالب مراجعه کنید و از آن‌ها استفاده کنید."
+                  },
+                  {
+                    q: "چگونه می‌توانم با شما تماس بگیرم؟",
+                    a: "شما می‌توانید از طریق واتساپ یا ایمیل با ما در تماس باشید. ما معمولاً ظرف 24 ساعت به پیام‌ها پاسخ می‌دهیم و خوشحال می‌شویم به سوالات شما کمک کنیم."
                   }
                 ].map((faq, index) => (
                   <Card key={index} className="bg-luxury-charcoal/50 border-luxury-white/20 backdrop-blur-sm">
@@ -1437,18 +1440,30 @@ const CourageousWorkshop = () => {
                 هنوز سوالی دارید؟
               </h2>
               <p className="text-luxury-silver mb-6 text-sm leading-relaxed">
-                با ما در تماس باشید - خوشحال می‌شویم کمکتان کنیم
+                با ما از طریق واتساپ یا ایمیل در تماس باشید - خوشحال می‌شویم کمکتان کنیم
               </p>
               
-              <Button 
-                variant="outline"
-                size="lg" 
-                onClick={handleWhatsAppClick}
-                className="w-full border-luxury-white/50 bg-luxury-black/50 text-luxury-white hover:bg-luxury-white/10 hover:text-luxury-white hover:border-luxury-white px-6 py-4 text-base font-semibold rounded-xl backdrop-blur-sm"
-              >
-                <Phone className="w-4 h-4 ml-2" />
-                مشاوره رایگان از طریق واتساپ
-              </Button>
+              <div className="space-y-3">
+                <Button 
+                  variant="outline"
+                  size="lg" 
+                  onClick={handleWhatsAppClick}
+                  className="w-full border-luxury-white/50 bg-luxury-black/50 text-luxury-white hover:bg-luxury-white/10 hover:text-luxury-white hover:border-luxury-white px-6 py-4 text-base font-semibold rounded-xl backdrop-blur-sm"
+                >
+                  <Phone className="w-4 h-4 ml-2" />
+                  مشاوره رایگان از طریق واتساپ
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  size="lg" 
+                  onClick={() => window.location.href = 'mailto:info@ladyboss.ca'}
+                  className="w-full border-luxury-white/50 bg-luxury-black/50 text-luxury-white hover:bg-luxury-white/10 hover:text-luxury-white hover:border-luxury-white px-6 py-4 text-base font-semibold rounded-xl backdrop-blur-sm"
+                >
+                  <Mail className="w-4 h-4 ml-2" />
+                  ارسال ایمیل به ما
+                </Button>
+              </div>
             </div>
           </section>
         </main>
@@ -1483,7 +1498,7 @@ const CourageousWorkshop = () => {
                     🎁 با ثبت‌نام الان دریافت کنید:
                   </p>
                   <p className="text-white font-extrabold text-2xl mb-2">
-                    یک جلسه مشاوره رایگان 30 دقیقه‌ای!
+                    یک جلسه مشاوره رایگان 15 دقیقه‌ای!
                   </p>
                   <p className="text-white/90 text-base font-medium">
                     ارزش $50 - فقط برای 10 نفر اول
