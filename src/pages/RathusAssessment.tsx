@@ -129,7 +129,7 @@ export default function RathusAssessment() {
           {!showResults ? (
             <>
               <div className="text-center mb-8">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-l from-primary via-primary-foreground to-accent bg-clip-text text-transparent">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 text-primary">
                   تست راستوس
                 </h1>
                 <p className="text-xl text-muted-foreground mb-2">
@@ -167,7 +167,7 @@ export default function RathusAssessment() {
                         value={answers[index]?.toString()}
                         onValueChange={(value) => handleAnswerChange(index, parseInt(value))}
                       >
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <div className="flex flex-col gap-2">
                           {scoreOptions.map((option) => (
                             <div key={option.value} className="flex items-center space-x-2 space-x-reverse">
                               <RadioGroupItem
@@ -222,7 +222,30 @@ export default function RathusAssessment() {
                   </div>
 
                   <div className="p-6 rounded-lg bg-secondary/50">
-                    <h4 className="font-bold text-lg mb-3">درباره این تست:</h4>
+                    <h4 className="font-bold text-lg mb-4">طیف نمرات و تفسیر آن‌ها:</h4>
+                    <div className="space-y-3 mb-4">
+                      <div className="border-r-4 border-destructive pr-3">
+                        <p className="font-semibold text-sm">۹۰- تا ۲۰-: بسیار غیر قاطع</p>
+                        <p className="text-xs text-muted-foreground">مشکل قابل توجه در ابراز نیازها و احساسات</p>
+                      </div>
+                      <div className="border-r-4 border-orange-500 pr-3">
+                        <p className="font-semibold text-sm">۲۰- تا ۰: موقعیتی غیر قاطع</p>
+                        <p className="text-xs text-muted-foreground">قاطعیت بسته به موقعیت متفاوت است</p>
+                      </div>
+                      <div className="border-r-4 border-yellow-500 pr-3">
+                        <p className="font-semibold text-sm">۰ تا ۲۰+: تا حدی قاطع</p>
+                        <p className="text-xs text-muted-foreground">توانایی ابراز وجود اما نه به طور مداوم</p>
+                      </div>
+                      <div className="border-r-4 border-green-500 pr-3">
+                        <p className="font-semibold text-sm">۲۰+ تا ۴۰+: قاطع (محدوده سالم)</p>
+                        <p className="text-xs text-muted-foreground">مؤثر در ابراز نیازها با احترام به دیگران</p>
+                      </div>
+                      <div className="border-r-4 border-red-600 pr-3">
+                        <p className="font-semibold text-sm">۴۰+ تا ۹۰+: احتمالاً تهاجمی</p>
+                        <p className="text-xs text-muted-foreground">سبک ارتباطی بیش از حد قدرتمند یا خصمانه</p>
+                      </div>
+                    </div>
+                    <h4 className="font-bold text-lg mb-3 mt-6">درباره این تست:</h4>
                     <p className="text-sm leading-relaxed text-muted-foreground mb-3">
                       در یک نمونهٔ آماری دانشگاهی از ۷۶۴ زن و ۶۳۷ مرد در آمریکا، ۵۰٪ از زنان امتیازی کمتر از ۸ و ۵۰٪ از مردان امتیازی کمتر از ۱۱ کسب کرده‌اند.
                     </p>
