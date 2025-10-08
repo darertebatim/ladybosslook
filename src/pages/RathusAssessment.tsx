@@ -55,27 +55,57 @@ const getInterpretation = (score: number) => {
   if (score >= -90 && score <= -20) {
     return {
       title: "بسیار غیر قاطع",
-      description: "این نمره نشان می‌دهد که شما در ابراز نیازها، افکار و احساسات خود مشکل قابل توجهی دارید. ممکن است اغلب احساسات دیگران را بر احساسات خود ترجیح دهید و به هر قیمتی از تعارض اجتناب کنید."
+      description: "این نمره نشان می‌دهد که شما در ابراز نیازها، افکار و احساسات خود مشکل قابل توجهی دارید. ممکن است اغلب احساسات دیگران را بر احساسات خود ترجیح دهید و به هر قیمتی از تعارض اجتناب کنید.",
+      suggestions: [
+        "تمرین گفتن «نه» در موقعیت‌های کم‌خطر را شروع کنید",
+        "در کلاس‌های آموزش مهارت‌های ابراز وجود شرکت کنید",
+        "با یک روانشناس یا مشاور برای کار روی اعتماد به نفس مشورت کنید",
+        "نیازها و احساسات خود را روزانه بنویسید تا خودآگاهی پیدا کنید"
+      ]
     };
   } else if (score > -20 && score <= 0) {
     return {
       title: "موقعیتی غیر قاطع",
-      description: "این نمره نشان می‌دهد که قاطعیت شما بسته به موقعیت متفاوت است. ممکن است در برخی زمینه‌ها راحت باشید اما در برخی دیگر مردد یا منفعل."
+      description: "این نمره نشان می‌دهد که قاطعیت شما بسته به موقعیت متفاوت است. ممکن است در برخی زمینه‌ها راحت باشید اما در برخی دیگر مردد یا منفعل.",
+      suggestions: [
+        "موقعیت‌هایی را که در آن‌ها ابراز وجود برایتان دشوار است شناسایی کنید",
+        "قبل از موقعیت‌های چالش‌برانگیز، پاسخ‌های قاطعانه را تمرین کنید",
+        "با افراد مورد اعتماد، مهارت‌های ارتباطی خود را تمرین کنید",
+        "تکنیک‌های آرامش‌بخشی برای کنترل اضطراب اجتماعی یاد بگیرید"
+      ]
     };
   } else if (score > 0 && score <= 20) {
     return {
       title: "تا حدی قاطع",
-      description: "نمره در این محدوده به این معناست که شما می‌توانید خود را ابراز کنید، اما شاید نه به طور مداوم یا با راحتی کامل. شما بیشتر قاطع هستید تا غیر قاطع، اما هنوز جای رشد وجود دارد."
+      description: "نمره در این محدوده به این معناست که شما می‌توانید خود را ابراز کنید، اما شاید نه به طور مداوم یا با راحتی کامل. شما بیشتر قاطع هستید تا غیر قاطع، اما هنوز جای رشد وجود دارد.",
+      suggestions: [
+        "به تمرین ابراز وجود در موقعیت‌های مختلف ادامه دهید",
+        "کتاب‌ها و منابع آموزشی درباره ارتباطات قاطعانه مطالعه کنید",
+        "از تکنیک «من» برای بیان احساسات و نیازها استفاده کنید",
+        "با بازخورد مثبت، پیشرفت‌های خود را تقویت کنید"
+      ]
     };
   } else if (score > 20 && score <= 40) {
     return {
       title: "قاطع",
-      description: "این یک محدوده سالم برای قاطعیت است. شما به طور کلی در ابراز نیازهای خود و دفاع از حقوق خود مؤثر هستید و در عین حال به دیگران احترام می‌گذارید."
+      description: "این یک محدوده سالم برای قاطعیت است. شما به طور کلی در ابراز نیازهای خود و دفاع از حقوق خود مؤثر هستید و در عین حال به دیگران احترام می‌گذارید.",
+      suggestions: [
+        "مهارت‌های فعلی خود را حفظ کرده و به عنوان الگو برای دیگران عمل کنید",
+        "در موقعیت‌های پیچیده‌تر، مهارت‌های خود را توسعه دهید",
+        "به دیگران کمک کنید تا مهارت‌های ابراز وجود خود را بهبود ببخشند",
+        "همچنان مراقب باشید که تعادل بین قاطعیت و همدلی را حفظ کنید"
+      ]
     };
   } else {
     return {
       title: "احتمالاً تهاجمی",
-      description: "نمره‌های در این محدوده نشان می‌دهد که سبک ارتباطی شما ممکن است بیش از حد قدرتمند، خصمانه یا بی‌توجه به حقوق و احساسات دیگران باشد. قاطعیت واقعی درباره برابری قدرت است، نه «برنده شدن» با تحقیر دیگران."
+      description: "نمره‌های در این محدوده نشان می‌دهد که سبک ارتباطی شما ممکن است بیش از حد قدرتمند، خصمانه یا بی‌توجه به حقوق و احساسات دیگران باشد. قاطعیت واقعی درباره برابری قدرت است، نه «برنده شدن» با تحقیر دیگران.",
+      suggestions: [
+        "روی گوش دادن فعال و همدلی با دیگران تمرکز کنید",
+        "قبل از پاسخ دادن، مکث کنید و دیدگاه طرف مقابل را در نظر بگیرید",
+        "تکنیک‌های مدیریت خشم و کنترل احساسات را یاد بگیرید",
+        "با یک مشاور برای یادگیری ارتباطات متعادل و احترام‌آمیز کار کنید"
+      ]
     };
   }
 };
@@ -135,9 +165,14 @@ export default function RathusAssessment() {
                 <p className="text-xl text-muted-foreground mb-2">
                   پرسشنامه ابراز وجود
                 </p>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  به گزاره‌های زیر امتیاز دهید. پاسخ‌های شما کاملاً محرمانه است و تنها برای ارزیابی شخصی شما استفاده می‌شود.
-                </p>
+                <div className="max-w-3xl mx-auto space-y-3 mb-6">
+                  <p className="text-muted-foreground leading-relaxed">
+                    پرسشنامه ابراز وجود راستوس (Rathus Assertiveness Schedule) یکی از معتبرترین ابزارهای روانسنجی برای ارزیابی سطح قاطعیت و توانایی ابراز وجود فردی است. این تست به شما کمک می‌کند تا بفهمید چقدر می‌توانید نیازها، افکار و احساسات خود را به صورت مؤثر و محترمانه بیان کنید.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed">
+                    به گزاره‌های زیر امتیاز دهید. پاسخ‌های شما کاملاً محرمانه است و تنها برای ارزیابی شخصی شما استفاده می‌شود.
+                  </p>
+                </div>
               </div>
 
               {progress > 0 && (
@@ -176,9 +211,12 @@ export default function RathusAssessment() {
                               />
                               <Label
                                 htmlFor={`q${index}-${option.value}`}
-                                className="cursor-pointer text-sm flex-1"
+                                className="cursor-pointer text-sm flex-1 flex items-center justify-between"
                               >
-                                {option.label}
+                                <span>{option.label}</span>
+                                <span className="text-xs font-mono text-muted-foreground mr-2">
+                                  ({option.value > 0 ? '+' : ''}{option.value})
+                                </span>
                               </Label>
                             </div>
                           ))}
@@ -207,7 +245,7 @@ export default function RathusAssessment() {
               <Card className="border-primary/30">
                 <CardHeader className="text-center pb-4">
                   <CardTitle className="text-3xl mb-2">نتیجه تست شما</CardTitle>
-                  <div className="text-6xl font-bold bg-gradient-to-l from-primary via-primary-foreground to-accent bg-clip-text text-transparent my-4">
+                  <div className="text-6xl font-bold text-primary my-4">
                     {score}
                   </div>
                 </CardHeader>
@@ -219,6 +257,18 @@ export default function RathusAssessment() {
                     <p className="text-lg leading-relaxed text-foreground/90">
                       {interpretation.description}
                     </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-accent/10 border border-accent/20">
+                    <h4 className="font-bold text-lg mb-4 text-accent-foreground">پیشنهادات برای بهبود:</h4>
+                    <ul className="space-y-2">
+                      {interpretation.suggestions.map((suggestion, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm leading-relaxed">
+                          <span className="text-accent mt-1">•</span>
+                          <span>{suggestion}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
                   <div className="p-6 rounded-lg bg-secondary/50">
