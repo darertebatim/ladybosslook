@@ -134,7 +134,7 @@ export default function RathusAssessment() {
       }
     });
     
-    // Find the 5 questions with the lowest scores (most negative)
+    // Find the 5 questions with the lowest scores (most negative) - these indicate weak assertiveness
     const worst = scoredQuestions
       .sort((a, b) => a.score - b.score)
       .slice(0, 5);
