@@ -114,6 +114,7 @@ export default function RathusAssessment() {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
+  const [worstQuestions, setWorstQuestions] = useState<Array<{ index: number; score: number }>>([]);
 
   const handleAnswerChange = (questionIndex: number, value: number) => {
     setAnswers(prev => ({ ...prev, [questionIndex]: value }));
@@ -121,6 +122,7 @@ export default function RathusAssessment() {
 
   const calculateScore = () => {
     let totalScore = 0;
+    const scoredQuestions: Array<{ index: number; score: number }> = [];
     
     questions.forEach((_, index) => {
       const answer = answers[index];
@@ -128,10 +130,17 @@ export default function RathusAssessment() {
         // Reverse score for specified questions
         const finalScore = reverseQuestions.includes(index) ? -answer : answer;
         totalScore += finalScore;
+        scoredQuestions.push({ index, score: finalScore });
       }
     });
     
+    // Find the 5 questions with the lowest scores (most negative)
+    const worst = scoredQuestions
+      .sort((a, b) => a.score - b.score)
+      .slice(0, 5);
+    
     setScore(totalScore);
+    setWorstQuestions(worst);
     setShowResults(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -140,6 +149,7 @@ export default function RathusAssessment() {
     setAnswers({});
     setShowResults(false);
     setScore(0);
+    setWorstQuestions([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -259,21 +269,28 @@ export default function RathusAssessment() {
                     </p>
                   </div>
 
-                  <div className="p-6 rounded-lg bg-accent/10 border border-accent/20">
-                    <h4 className="font-bold text-lg mb-4 text-accent-foreground">پیشنهادات برای بهبود:</h4>
-                    <ul className="space-y-2">
-                      {interpretation.suggestions.map((suggestion, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm leading-relaxed">
-                          <span className="text-accent mt-1">•</span>
-                          <span>{suggestion}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {worstQuestions.length > 0 && (
+                    <div className="p-6 rounded-lg bg-destructive/5 border border-destructive/20">
+                      <h4 className="font-bold text-lg mb-4 text-destructive">نقاط ضعف شما:</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        این سوالاتی هستند که در آن‌ها کمترین امتیاز را کسب کردید و نیاز به توجه بیشتری دارند:
+                      </p>
+                      <div className="space-y-3">
+                        {worstQuestions.map(({ index, score }) => (
+                          <div key={index} className="p-3 rounded-lg bg-background border border-destructive/20">
+                            <p className="text-sm leading-relaxed mb-2">{questions[index]}</p>
+                            <span className="text-xs font-mono text-destructive">
+                              امتیاز: {score > 0 ? '+' : ''}{score}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="p-6 rounded-lg bg-secondary/50">
                     <h4 className="font-bold text-lg mb-4">طیف نمرات و تفسیر آن‌ها:</h4>
-                    <div className="space-y-3 mb-4">
+                    <div className="space-y-3">
                       <div className="border-r-4 border-destructive pr-3">
                         <p className="font-semibold text-sm">۹۰- تا ۲۰-: بسیار غیر قاطع</p>
                         <p className="text-xs text-muted-foreground">مشکل قابل توجه در ابراز نیازها و احساسات</p>
@@ -295,13 +312,6 @@ export default function RathusAssessment() {
                         <p className="text-xs text-muted-foreground">سبک ارتباطی بیش از حد قدرتمند یا خصمانه</p>
                       </div>
                     </div>
-                    <h4 className="font-bold text-lg mb-3 mt-6">درباره این تست:</h4>
-                    <p className="text-sm leading-relaxed text-muted-foreground mb-3">
-                      در یک نمونهٔ آماری دانشگاهی از ۷۶۴ زن و ۶۳۷ مرد در آمریکا، ۵۰٪ از زنان امتیازی کمتر از ۸ و ۵۰٪ از مردان امتیازی کمتر از ۱۱ کسب کرده‌اند.
-                    </p>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      البته قاطعیت و ابراز وجود، از فرهنگی به فرهنگ دیگر فرق می‌کند. اما به فرض که این هنجار را بپذیرید، خانمی که امتیازی بیشتر از ۸ کسب می‌کند و آقایی که امتیازی بیش از ۱۱ به دست می‌آورد، از نظر صراحت و قاطعیت و ابراز وجود، از نیمی از جامعهٔ هم‌جنسان خود جلوتر است.
-                    </p>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
