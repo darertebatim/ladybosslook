@@ -11,6 +11,7 @@ import Admin from "./pages/Admin";
 import AssertLanding from "./pages/AssertLanding";
 import Auth from "./pages/Auth";
 import BusinessIdeas from "./pages/BusinessIdeas";
+import RathusAssessment from "./pages/RathusAssessment";
 import BusinessGrowthAccelerator from "./pages/BusinessGrowthAccelerator";
 import BusinessStartupAccelerator from "./pages/BusinessStartupAccelerator";
 import CapacityDashboard from "./pages/CapacityDashboard";
@@ -72,6 +73,7 @@ const App = () => (
             <Route path="/freelive" element={<FreeLive />} />
             <Route path="/thankfreelive" element={<ThankFreeLive />} />
             <Route path="/iqmoney" element={<IQMoneyWorkshop />} />
+            <Route path="/rathus" element={<RathusAssessment />} />
             <Route path="/calendar" element={<CalendarRedirect />} />
             <Route path="/firststepbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/RightsnboundariesLadybossgift.pdf" />} />
             <Route path="/fnpbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/fnpbonus.pdf" />} />
