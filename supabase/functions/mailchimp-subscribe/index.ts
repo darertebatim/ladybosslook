@@ -192,6 +192,100 @@ const handler = async (req: Request): Promise<Response> => {
       session_id 
     }: SubscribeRequest = await req.json();
 
+    // Validate required fields with proper error messages
+    if (!email || typeof email !== 'string' || email.trim().length === 0) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Email is required",
+          processingTime: Date.now() - startTime
+        }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+    
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Name is required",
+          processingTime: Date.now() - startTime
+        }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+    
+    // Validate email format with length limits
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email) || email.length > 255) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid email format or email too long (max 255 characters)",
+          processingTime: Date.now() - startTime
+        }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+    
+    // Validate name format and length (1-100 characters, letters/spaces/hyphens only)
+    const nameRegex = /^[\p{L}\p{M}\s\-'\.]+$/u;
+    if (!nameRegex.test(name) || name.trim().length > 100) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid name format. Use only letters, spaces, and hyphens (max 100 characters)",
+          processingTime: Date.now() - startTime
+        }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+    
+    // Validate city if provided
+    if (city && (typeof city !== 'string' || city.trim().length > 100 || !nameRegex.test(city))) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid city format. Use only letters, spaces, and hyphens (max 100 characters)",
+          processingTime: Date.now() - startTime
+        }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+    
+    // Validate phone if provided
+    if (phone && typeof phone === 'string' && phone.trim().length > 0) {
+      const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
+      if (!phoneRegex.test(phone) || phone.length > 20) {
+        return new Response(
+          JSON.stringify({ 
+            error: "Invalid phone number format (max 20 characters)",
+            processingTime: Date.now() - startTime
+          }),
+          { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+    }
+    
+    // Validate tags array if provided
+    if (tags && (!Array.isArray(tags) || tags.length > 10 || tags.some((tag: string) => typeof tag !== 'string' || tag.length > 50))) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid tags format. Maximum 10 tags, each up to 50 characters",
+          processingTime: Date.now() - startTime
+        }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+    
+    // Validate source length if provided
+    if (source && (typeof source !== 'string' || source.length > 100)) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Source field too long (max 100 characters)",
+          processingTime: Date.now() - startTime
+        }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+    
+    console.log("Input validation passed for:", email);
+
     // Initialize Supabase client for backup storage
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");

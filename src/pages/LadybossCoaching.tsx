@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, Crown, Users, Calendar, Star, Sparkles, Bell } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
+import { subscriptionFormSchema } from '@/lib/validation';
+import { z } from 'zod';
 
 const LadybossCoaching = () => {
   const [email, setEmail] = useState('');
@@ -19,34 +21,23 @@ const LadybossCoaching = () => {
   const { toast } = useToast();
 
   const validateForm = () => {
-    const errors: Record<string, string> = {};
-    
-    if (!name.trim()) {
-      errors.name = 'Name is required';
-    } else if (name.trim().length < 2) {
-      errors.name = 'Name must be at least 2 characters';
+    try {
+      subscriptionFormSchema.parse({ name, email, phone, city });
+      setValidationErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            errors[err.path[0].toString()] = err.message;
+          }
+        });
+        setValidationErrors(errors);
+        return false;
+      }
+      return false;
     }
-    
-    if (!email.trim()) {
-      errors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = 'Please enter a valid email address';
-    }
-    
-    if (!city.trim()) {
-      errors.city = 'City is required';
-    } else if (city.trim().length < 2) {
-      errors.city = 'City must be at least 2 characters';
-    }
-
-    if (!phone.trim()) {
-      errors.phone = 'Phone number is required';
-    } else if (!/^\+?[\d\s\-\(\)]{10,}$/.test(phone.trim())) {
-      errors.phone = 'Please enter a valid phone number';
-    }
-    
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

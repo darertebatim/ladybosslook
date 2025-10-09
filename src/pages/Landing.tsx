@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, Star, Users, Clock, Shield, AlertCircle, Wifi, WifiOff, ChevronDown } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
+import { simpleSubscriptionSchema } from '@/lib/validation';
+import { z } from 'zod';
 
 
 const Landing = () => {
@@ -237,6 +239,29 @@ const Landing = () => {
         variant: "destructive",
       });
       return;
+    }
+    
+    // Validate form data with Zod
+    setValidationErrors({});
+    try {
+      simpleSubscriptionSchema.parse({ name, email });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            errors[err.path[0].toString()] = err.message;
+          }
+        });
+        setValidationErrors(errors);
+        
+        toast({
+          title: "Validation Error",
+          description: "Please check the highlighted fields.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
     
     // Track form submission attempt

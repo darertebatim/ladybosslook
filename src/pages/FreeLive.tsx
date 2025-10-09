@@ -10,6 +10,8 @@ import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import CountdownTimer from "@/components/CountdownTimer";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
+import { subscriptionFormSchema } from '@/lib/validation';
+import { z } from 'zod';
 
 const FreeLive = () => {
   const [email, setEmail] = useState('');
@@ -17,6 +19,7 @@ const FreeLive = () => {
   const [city, setCity] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -73,13 +76,27 @@ const FreeLive = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !name || !city) {
-      toast({
-        title: "خطا",
-        description: "لطفا تمام فیلدها را کامل کنید",
-        variant: "destructive",
-      });
-      return;
+    // Validate form data with Zod
+    setValidationErrors({});
+    try {
+      subscriptionFormSchema.parse({ name, email, city, phone: '' });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            errors[err.path[0].toString()] = err.message;
+          }
+        });
+        setValidationErrors(errors);
+        
+        toast({
+          title: "خطا",
+          description: "لطفا فرم را با دقت کامل کنید",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -87,9 +104,9 @@ const FreeLive = () => {
     try {
       const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
         body: {
-          email,
-          name,
-          city,
+          email: email.trim().toLowerCase(),
+          name: name.trim(),
+          city: city.trim(),
           phone: '',
           source: 'freelive',
           tags: ['freelive']

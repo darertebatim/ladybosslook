@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, CreditCard, Shield, CheckCircle } from 'lucide-react';
+import { paymentFormSchema, type PaymentFormData } from '@/lib/validation';
+import { z } from 'zod';
 
 interface PaymentFormProps {
   program: string;
@@ -25,6 +27,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
     email: '',
     phone: '',
   });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -39,13 +42,29 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
-      return;
+    // Clear previous validation errors
+    setValidationErrors({});
+    
+    // Validate form data with Zod
+    try {
+      paymentFormSchema.parse(formData);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            errors[err.path[0].toString()] = err.message;
+          }
+        });
+        setValidationErrors(errors);
+        
+        toast({
+          title: "Validation Error",
+          description: "Please check the highlighted fields and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -53,9 +72,9 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
     try {
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
+          name: formData.name.trim(),
+          email: formData.email.trim().toLowerCase(),
+          phone: formData.phone.trim(),
           program: program,
         }
       });
@@ -125,8 +144,15 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="h-12"
+              className={`h-12 ${validationErrors.name ? 'border-red-500' : ''}`}
+              aria-invalid={!!validationErrors.name}
+              aria-describedby={validationErrors.name ? 'name-error' : undefined}
             />
+            {validationErrors.name && (
+              <p id="name-error" className="text-sm text-red-600 mt-1">
+                {validationErrors.name}
+              </p>
+            )}
           </div>
           
           <div className="space-y-2">
@@ -141,8 +167,15 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
               value={formData.email}
               onChange={handleInputChange}
               required
-              className="h-12"
+              className={`h-12 ${validationErrors.email ? 'border-red-500' : ''}`}
+              aria-invalid={!!validationErrors.email}
+              aria-describedby={validationErrors.email ? 'email-error' : undefined}
             />
+            {validationErrors.email && (
+              <p id="email-error" className="text-sm text-red-600 mt-1">
+                {validationErrors.email}
+              </p>
+            )}
           </div>
           
           <div className="space-y-2">
@@ -156,8 +189,15 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
               placeholder="Enter your phone number"
               value={formData.phone}
               onChange={handleInputChange}
-              className="h-12"
+              className={`h-12 ${validationErrors.phone ? 'border-red-500' : ''}`}
+              aria-invalid={!!validationErrors.phone}
+              aria-describedby={validationErrors.phone ? 'phone-error' : undefined}
             />
+            {validationErrors.phone && (
+              <p id="phone-error" className="text-sm text-red-600 mt-1">
+                {validationErrors.phone}
+              </p>
+            )}
           </div>
 
           <div className="pt-4">

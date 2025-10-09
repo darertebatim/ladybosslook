@@ -6,20 +6,32 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Input validation helpers
+// Input validation helpers with strict length limits
 const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email) && email.length <= 254;
+  return emailRegex.test(email) && email.length >= 5 && email.length <= 255;
 };
 
 const validatePhone = (phone: string): boolean => {
-  // Basic international phone validation
-  const phoneRegex = /^\+?[\d\s\-\(\)]{10,20}$/;
-  return phoneRegex.test(phone);
+  // International phone validation: E.164 format or common formats
+  const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
+  return phoneRegex.test(phone) && phone.length >= 10 && phone.length <= 20;
 };
 
-const sanitizeString = (input: string): string => {
-  return input.trim().replace(/[<>'"]/g, '').substring(0, 255);
+const validateName = (name: string): boolean => {
+  // Letters, spaces, hyphens, apostrophes only, 1-100 characters
+  const nameRegex = /^[\p{L}\p{M}\s\-'\.]+$/u;
+  return nameRegex.test(name) && name.trim().length >= 1 && name.trim().length <= 100;
+};
+
+const sanitizeString = (input: string, maxLength: number = 255): string => {
+  // Remove potentially dangerous characters and limit length
+  return input.trim().replace(/[<>'"\\]/g, '').substring(0, maxLength);
+};
+
+const validateProgram = (program: string): boolean => {
+  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth'];
+  return validPrograms.includes(program);
 };
 
 const logStep = (step: string, details?: any) => {
@@ -45,10 +57,11 @@ serve(async (req) => {
       apiVersion: "2023-10-16",
     });
 
-    // Parse request data - only need program type
+    // Parse and validate request data
     const requestBody = await req.json();
-    const { program } = requestBody;
+    const { program, name, email, phone } = requestBody;
     
+    // Validate required program field
     if (!program || typeof program !== 'string') {
       return new Response(
         JSON.stringify({ error: 'Program selection required' }),
@@ -56,7 +69,37 @@ serve(async (req) => {
       );
     }
     
-    logStep("Request data parsed", { program });
+    // Validate program against whitelist
+    if (!validateProgram(program)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid program selected' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Validate optional fields if provided (for future use)
+    if (name && !validateName(name)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid name format. Use only letters, spaces, and hyphens.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    if (email && !validateEmail(email)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid email address format.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    if (phone && !validatePhone(phone)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid phone number format.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    logStep("Request data validated", { program });
 
     // Define program pricing (whitelist approach)
     const programPricing = {
