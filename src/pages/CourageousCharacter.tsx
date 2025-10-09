@@ -44,7 +44,7 @@ const CourageousWorkshop = () => {
   const [showStickyBtn, setShowStickyBtn] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [searchParams] = useSearchParams();
-  const [spotsRemaining, setSpotsRemaining] = useState(922);
+  const [spotsRemaining, setSpotsRemaining] = useState(97);
   const [viewersCount, setViewersCount] = useState(47);
   const [showExitIntent, setShowExitIntent] = useState(false);
 
