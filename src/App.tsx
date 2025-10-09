@@ -36,6 +36,8 @@ import ThankFreeLive from "./pages/ThankFreeLive";
 import Video from "./pages/Video";
 import CalendarRedirect from "./components/CalendarRedirect";
 import Redirect from "./components/Redirect";
+import CCPayDirect from "./pages/CCPayDirect";
+import CCThankYou from "./pages/CCThankYou";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +64,8 @@ const App = () => (
             <Route path="/event-irvine" element={<EventIrvine />} />
             <Route path="/ccw" element={<CourageousWorkshop />} />
             <Route path="/cc" element={<CourageousCharacter />} />
+            <Route path="/ccpay" element={<CCPayDirect />} />
+            <Route path="/ccthankyou" element={<CCThankYou />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/checkout" element={<Checkout />} />
             <Route path="/privacy" element={<Privacy />} />
