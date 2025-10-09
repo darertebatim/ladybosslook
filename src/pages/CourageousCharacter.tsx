@@ -300,7 +300,7 @@ const CourageousWorkshop = () => {
                     <iframe
                       width="100%"
                       height="100%"
-                      src="https://www.youtube.com/embed/hkWfOP5OxXE"
+                      src="https://www.youtube.com/embed/kJeq6T9swJs"
                       title="کاراکتر پرجرات"
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
