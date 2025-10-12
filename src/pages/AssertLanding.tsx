@@ -202,7 +202,7 @@ const AssertLanding = () => {
                 size="lg"
               >
                 <ArrowRight size={18} className="sm:w-5 sm:h-5 mr-2" />
-                Get Instant Access
+                دسترسی فوری به ویدیوی رایگان
               </Button>
             </div>
 
