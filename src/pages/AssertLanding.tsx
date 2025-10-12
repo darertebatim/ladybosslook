@@ -10,7 +10,6 @@ import { useEffect, useState } from 'react';
 import { SEOHead } from '@/components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import assertiveTrainingHero from '@/assets/assertive-training-hero.png';
 
 // Declare Facebook Pixel function
 declare global {
@@ -156,11 +155,15 @@ const AssertLanding = () => {
                 </h1>
               
               <div className="mb-4 sm:mb-6 max-w-xs sm:max-w-sm mx-auto">
-                <img 
-                  src={assertiveTrainingHero} 
-                  alt="Professional woman in assertive expression training" 
-                  className="w-full h-auto rounded-xl shadow-lg"
-                />
+                <div className="relative aspect-video w-full rounded-xl shadow-lg overflow-hidden">
+                  <iframe
+                    src="https://www.youtube.com/embed/56ScEQbWpqI"
+                    title="Assertive Expression Training"
+                    className="absolute top-0 left-0 w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
               </div>
 
               {/* Value Props - Compact for mobile */}
