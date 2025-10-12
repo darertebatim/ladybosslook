@@ -384,7 +384,7 @@ const handler = async (req: Request): Promise<Response> => {
             ...(payment_status && { PAYSTATUS: payment_status }),
             ...(source && { SOURCE: source }),
             ...(session_id && { SESSIONID: session_id }),
-            ...(session_id && { THANKURL: `https://hi.ladybosslook.com/payment-success?session_id=${session_id}` }),
+            ...(session_id && { THANKURL: `https://ladybosslook.com/payment-success?session_id=${session_id}` }),
           },
           marketing_permissions: [
             {
