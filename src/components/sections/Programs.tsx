@@ -8,6 +8,7 @@ import courageousCharacterImage from '@/assets/courageous-character-course.jpg';
 import iqmoneyImage from '@/assets/iqmoney-program.jpg';
 import empoweredLadybossImage from '@/assets/empowered-ladyboss-coaching.jpg';
 import ladybossVipImage from '@/assets/ladyboss-vip-club.jpg';
+import connectionLiteracyImage from '@/assets/connection-literacy-program.jpg';
 
 const Programs = () => {
   const programs = [
@@ -118,6 +119,24 @@ const Programs = () => {
       price: '$4,997',
       popular: false,
       link: '/business-startup-accelerator'
+    },
+    {
+      title: 'Connection Literacy for Ladyboss',
+      description: 'Master the art of building meaningful relationships and expanding your professional network. Learn proven strategies for networking, making lasting connections, and leveraging relationships to grow your influence and business.',
+      image: connectionLiteracyImage,
+      duration: '8 weeks',
+      participants: '3,500+',
+      rating: 4.9,
+      features: [
+        'Strategic Networking Techniques',
+        'Relationship Building Mastery',
+        'Social Influence & Persuasion',
+        'Professional Connection Strategies',
+        'Community Building Skills'
+      ],
+      price: '$497',
+      popular: false,
+      link: '/connection-literacy'
     },
     {
       title: 'Courageous Character Course',

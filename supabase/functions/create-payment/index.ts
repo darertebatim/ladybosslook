@@ -30,7 +30,7 @@ const sanitizeString = (input: string, maxLength: number = 255): string => {
 };
 
 const validateProgram = (program: string): boolean => {
-  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney', 'empowered-ladyboss', 'ladyboss-vip'];
+  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney', 'empowered-ladyboss', 'ladyboss-vip', 'connection-literacy'];
   return validPrograms.includes(program);
 };
 
@@ -142,6 +142,11 @@ serve(async (req) => {
         name: "Ladyboss VIP Club",
         amount: 499700, // $4997 in cents
         description: "12-month exclusive weekly group coaching for elite women entrepreneurs"
+      },
+      "connection-literacy": {
+        name: "Connection Literacy for Ladyboss",
+        amount: 49700, // $497 in cents
+        description: "Master networking and relationship building to expand your influence"
       }
     };
 
