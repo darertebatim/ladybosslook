@@ -30,7 +30,7 @@ const sanitizeString = (input: string, maxLength: number = 255): string => {
 };
 
 const validateProgram = (program: string): boolean => {
-  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney', 'empowered-ladyboss'];
+  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney', 'empowered-ladyboss', 'ladyboss-vip'];
   return validPrograms.includes(program);
 };
 
@@ -137,6 +137,11 @@ serve(async (req) => {
         name: "Business Growth Accelerator",
         amount: 499700, // $4997 in cents
         description: "3-month semi-private weekly sessions to scale your business"
+      },
+      "ladyboss-vip": {
+        name: "Ladyboss VIP Club",
+        amount: 499700, // $4997 in cents
+        description: "12-month exclusive weekly group coaching for elite women entrepreneurs"
       }
     };
 

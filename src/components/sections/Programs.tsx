@@ -7,6 +7,7 @@ import networkingImage from '@/assets/networking-program.jpg';
 import courageousCharacterImage from '@/assets/courageous-character-course.jpg';
 import iqmoneyImage from '@/assets/iqmoney-program.jpg';
 import empoweredLadybossImage from '@/assets/empowered-ladyboss-coaching.jpg';
+import ladybossVipImage from '@/assets/ladyboss-vip-club.jpg';
 
 const Programs = () => {
   const programs = [
@@ -45,6 +46,24 @@ const Programs = () => {
       price: '$997',
       popular: false,
       link: '/iqmoney'
+    },
+    {
+      title: 'Ladyboss VIP Club',
+      description: 'Join our most exclusive 12-month VIP coaching program. Weekly group sessions with premium access, advanced strategies, and an elite community of successful women entrepreneurs.',
+      image: ladybossVipImage,
+      duration: '12 months',
+      participants: '500+',
+      rating: 5.0,
+      features: [
+        'Weekly VIP Group Coaching',
+        'Exclusive Elite Community Access',
+        'Advanced Business Strategies',
+        'Priority Support & Resources',
+        'Year-Long Transformation Program'
+      ],
+      price: '$4,997',
+      popular: true,
+      link: '/ladyboss-vip'
     },
     {
       title: 'Empowered Ladyboss Group Coaching',
