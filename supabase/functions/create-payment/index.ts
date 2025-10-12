@@ -30,7 +30,7 @@ const sanitizeString = (input: string, maxLength: number = 255): string => {
 };
 
 const validateProgram = (program: string): boolean => {
-  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth'];
+  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney'];
   return validPrograms.includes(program);
 };
 
@@ -117,6 +117,11 @@ serve(async (req) => {
         name: "Money Literacy Program",
         amount: 99700, // $997 in cents
         description: "Master your finances and build wealth"
+      },
+      "iqmoney": {
+        name: "IQMoney - Income Growth Program",
+        amount: 199700, // $1997 in cents
+        description: "Master strategies to increase your income and earning potential"
       }
     };
 

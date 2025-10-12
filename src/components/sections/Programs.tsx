@@ -5,9 +5,28 @@ import moneyLiteracyImage from '@/assets/money-literacy-program.jpg';
 import businessCoachingImage from '@/assets/business-coaching-program.jpg';
 import networkingImage from '@/assets/networking-program.jpg';
 import courageousCharacterImage from '@/assets/courageous-character-course.jpg';
+import iqmoneyImage from '@/assets/iqmoney-program.jpg';
 
 const Programs = () => {
   const programs = [
+    {
+      title: 'IQMoney - Income Growth Program',
+      description: 'Advanced strategies to dramatically increase your income. Learn multiple income streams, negotiation mastery, and proven tactics to maximize your earning potential as an ambitious entrepreneur.',
+      image: iqmoneyImage,
+      duration: 'Self-paced',
+      participants: '12,000+',
+      rating: 5.0,
+      features: [
+        'Multiple Income Stream Strategies',
+        'Advanced Negotiation Mastery',
+        'Premium Pricing Psychology',
+        'High-Ticket Sales Training',
+        'Income Multiplication Framework'
+      ],
+      price: '$1,997',
+      popular: true,
+      link: '/iqmoney-income'
+    },
     {
       title: 'Money Literacy for LadyBoss',
       description: 'Complete financial education system with 52 video lessons covering budgeting, investing, debt elimination, and wealth building. Designed specifically for ambitious women seeking financial independence.',
@@ -41,7 +60,7 @@ const Programs = () => {
         'Weekly Group Coaching Calls'
       ],
       price: '$4,990',
-      popular: true,
+      popular: false,
       link: '/business-growth-accelerator'
     },
     {
