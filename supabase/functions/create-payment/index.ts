@@ -115,7 +115,7 @@ serve(async (req) => {
       },
       "money-literacy": {
         name: "Money Literacy Program",
-        amount: 79700, // $797 in cents
+        amount: 99700, // $997 in cents
         description: "Master your finances and build wealth"
       }
     };

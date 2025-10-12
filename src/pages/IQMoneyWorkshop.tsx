@@ -288,7 +288,7 @@ export default function IQMoneyWorkshop() {
   return (
     <>
       <SEOHead 
-        title="IQMoney Online Course: Money Literacy for Ladyboss - Complete Financial Education"
+        title="Money Literacy Course for Ladyboss - Complete Financial Education"
         description="Master your money with our comprehensive online course. 52 lessons covering budgeting, investing, debt elimination, and wealth building. Lifetime access, expert instruction, and proven strategies for financial independence."
         image={moneyLiteracyHero}
       />
@@ -303,7 +303,7 @@ export default function IQMoneyWorkshop() {
                 🎓 PREMIUM ONLINE COURSE
               </Badge>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-slate-900 via-blue-900 to-purple-900 bg-clip-text text-transparent leading-tight px-1 sm:px-2">
-                IQMoney Online Course: Money Literacy for Ladyboss
+                Money Literacy Course for Ladyboss
               </h1>
               <p className="text-lg sm:text-xl md:text-2xl font-medium text-slate-700 mb-6 leading-relaxed px-2 sm:px-4">
                 The Complete Financial Education System for Ambitious Immigrant Women Who Demand Excellence
