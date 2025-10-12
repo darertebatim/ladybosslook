@@ -30,7 +30,7 @@ const sanitizeString = (input: string, maxLength: number = 255): string => {
 };
 
 const validateProgram = (program: string): boolean => {
-  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney', 'empowered-ladyboss', 'ladyboss-vip', 'connection-literacy'];
+  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney', 'empowered-ladyboss', 'ladyboss-vip', 'connection-literacy', 'instagram-growth', 'private-coaching'];
   return validPrograms.includes(program);
 };
 
@@ -147,6 +147,16 @@ serve(async (req) => {
         name: "Connection Literacy for Ladyboss",
         amount: 49700, // $497 in cents
         description: "Master networking and relationship building to expand your influence"
+      },
+      "instagram-growth": {
+        name: "Instagram Fast Growth Course",
+        amount: 299700, // $2997 in cents
+        description: "3-month semi-private coaching to rapidly grow your Instagram presence"
+      },
+      "private-coaching": {
+        name: "1-Hour Private Session with Razie Ladyboss",
+        amount: 59700, // $597 in cents
+        description: "Exclusive one-on-one coaching session with Razie for personalized guidance"
       }
     };
 

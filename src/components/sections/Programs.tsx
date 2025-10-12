@@ -9,6 +9,8 @@ import iqmoneyImage from '@/assets/iqmoney-program.jpg';
 import empoweredLadybossImage from '@/assets/empowered-ladyboss-coaching.jpg';
 import ladybossVipImage from '@/assets/ladyboss-vip-club.jpg';
 import connectionLiteracyImage from '@/assets/connection-literacy-program.jpg';
+import instagramGrowthImage from '@/assets/instagram-growth-course.jpg';
+import privateCoachingImage from '@/assets/private-coaching-session.jpg';
 
 const Programs = () => {
   const programs = [
@@ -119,6 +121,42 @@ const Programs = () => {
       price: '$4,997',
       popular: false,
       link: '/business-startup-accelerator'
+    },
+    {
+      title: 'Instagram Fast Growth Course',
+      description: 'Rapidly grow your Instagram following and engagement with proven strategies. 3-month semi-private coaching program teaching content creation, algorithm mastery, monetization tactics, and building an engaged community.',
+      image: instagramGrowthImage,
+      duration: '3 months',
+      participants: '2,800+',
+      rating: 5.0,
+      features: [
+        'Content Strategy & Creation',
+        'Algorithm Mastery & Growth Hacks',
+        'Engagement & Community Building',
+        'Monetization Strategies',
+        'Semi-Private Weekly Sessions'
+      ],
+      price: '$2,997',
+      popular: true,
+      link: '/instagram-growth'
+    },
+    {
+      title: '1-Hour Private Session with Razie',
+      description: 'Get personalized guidance and breakthrough strategies in an exclusive one-on-one coaching session with Razie Ladyboss. Perfect for tackling specific challenges and accelerating your success.',
+      image: privateCoachingImage,
+      duration: '1 hour',
+      participants: '500+',
+      rating: 5.0,
+      features: [
+        'Personalized One-on-One Coaching',
+        'Breakthrough Strategy Session',
+        'Customized Action Plan',
+        'Direct Access to Razie',
+        'Follow-up Resources Included'
+      ],
+      price: '$597',
+      popular: false,
+      link: '/private-coaching'
     },
     {
       title: 'Connection Literacy for Ladyboss',
