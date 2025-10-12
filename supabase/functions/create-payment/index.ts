@@ -30,7 +30,7 @@ const sanitizeString = (input: string, maxLength: number = 255): string => {
 };
 
 const validateProgram = (program: string): boolean => {
-  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney'];
+  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney', 'empowered-ladyboss'];
   return validPrograms.includes(program);
 };
 
@@ -122,6 +122,21 @@ serve(async (req) => {
         name: "IQMoney - Income Growth Program",
         amount: 199700, // $1997 in cents
         description: "Master strategies to increase your income and earning potential"
+      },
+      "empowered-ladyboss": {
+        name: "Empowered Ladyboss Group Coaching",
+        amount: 99700, // $997 in cents
+        description: "3-month weekly group coaching sessions for ambitious women entrepreneurs"
+      },
+      "business-startup": {
+        name: "Business Startup Accelerator",
+        amount: 499700, // $4997 in cents
+        description: "3-month semi-private weekly sessions to launch your business"
+      },
+      "business-growth": {
+        name: "Business Growth Accelerator",
+        amount: 499700, // $4997 in cents
+        description: "3-month semi-private weekly sessions to scale your business"
       }
     };
 

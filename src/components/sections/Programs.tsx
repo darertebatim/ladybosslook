@@ -6,6 +6,7 @@ import businessCoachingImage from '@/assets/business-coaching-program.jpg';
 import networkingImage from '@/assets/networking-program.jpg';
 import courageousCharacterImage from '@/assets/courageous-character-course.jpg';
 import iqmoneyImage from '@/assets/iqmoney-program.jpg';
+import empoweredLadybossImage from '@/assets/empowered-ladyboss-coaching.jpg';
 
 const Programs = () => {
   const programs = [
@@ -46,10 +47,28 @@ const Programs = () => {
       link: '/iqmoney'
     },
     {
+      title: 'Empowered Ladyboss Group Coaching',
+      description: 'Join our exclusive 3-month group coaching program for ambitious women entrepreneurs. Weekly sessions focused on leadership, business growth, and building your empire with a supportive community.',
+      image: empoweredLadybossImage,
+      duration: '3 months',
+      participants: '2,500+',
+      rating: 4.9,
+      features: [
+        'Weekly Live Group Coaching',
+        'Empowered Leadership Training',
+        'Business Strategy & Growth',
+        'Supportive Community Network',
+        'Accountability & Support System'
+      ],
+      price: '$997',
+      popular: false,
+      link: '/empowered-ladyboss'
+    },
+    {
       title: 'Business Growth Accelerator',
-      description: 'Transform your existing business into a profitable empire with our comprehensive coaching program and proven growth frameworks designed for scaling businesses.',
+      description: 'Transform your existing business into a profitable empire with our comprehensive coaching program and proven growth frameworks. 3-month semi-private weekly sessions.',
       image: businessCoachingImage,
-      duration: '12 weeks',
+      duration: '3 months',
       participants: '3,200+',
       rating: 5.0,
       features: [
@@ -57,17 +76,17 @@ const Programs = () => {
         'Revenue Optimization',
         'Marketing & Sales Mastery',
         'Leadership Development',
-        'Weekly Group Coaching Calls'
+        'Semi-Private Weekly Sessions'
       ],
-      price: '$4,990',
+      price: '$4,997',
       popular: false,
       link: '/business-growth-accelerator'
     },
     {
       title: 'Business Startup Accelerator',
-      description: 'Launch your business from idea to profit in 90 days. Complete startup program with step-by-step guidance, legal setup, and launch strategy.',
+      description: 'Launch your business from idea to profit in 3 months. Complete startup program with step-by-step guidance, legal setup, and launch strategy. Semi-private weekly sessions.',
       image: networkingImage,
-      duration: '90 days',
+      duration: '3 months',
       participants: '1,800+',
       rating: 4.9,
       features: [
@@ -75,9 +94,9 @@ const Programs = () => {
         'Complete Legal Setup',
         'Brand & Website Creation',
         'Launch Strategy & Marketing',
-        '90-Day Success Roadmap'
+        'Semi-Private Weekly Sessions'
       ],
-      price: '$4,990',
+      price: '$4,997',
       popular: false,
       link: '/business-startup-accelerator'
     },
