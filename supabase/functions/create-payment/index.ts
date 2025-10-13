@@ -195,6 +195,7 @@ serve(async (req) => {
       success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/ccw?payment=cancelled`,
       payment_intent_data: {
+        setup_future_usage: 'off_session', // Save payment method for future charges
         metadata: {
           program: program,
         },
