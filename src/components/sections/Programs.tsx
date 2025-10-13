@@ -194,7 +194,7 @@ const Programs = () => {
       originalPrice: '$497',
       limitedSpots: 'Limited to 100',
       popular: false,
-      link: '/ccw'
+      link: '/cc'
     }
   ];
 
