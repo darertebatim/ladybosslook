@@ -12,22 +12,58 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Authenticate user
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    
+    const supabase = createClient(supabaseUrl ?? '', supabaseAnonKey ?? '');
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check admin role
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single();
+
+    if (roleData?.role !== 'admin') {
+      return new Response(
+        JSON.stringify({ error: 'Admin access required' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     console.log("Starting Mailchimp amount fix...");
     
     const mailchimpApiKey = Deno.env.get("MAILCHIMP_API_KEY");
     const listId = Deno.env.get("MAILCHIMP_LIST_ID");
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!mailchimpApiKey || !listId || !supabaseUrl || !supabaseServiceKey) {
       throw new Error("Missing required environment variables");
     }
 
-    // Initialize Supabase client
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Initialize Supabase client with service role for database access
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get all CCW orders with amount 9700 (in cents)
-    const { data: orders, error: ordersError } = await supabase
+    const { data: orders, error: ordersError } = await supabaseAdmin
       .from('orders')
       .select('email, name, amount, product_name')
       .eq('product_name', 'Courageous Character Workshop')
