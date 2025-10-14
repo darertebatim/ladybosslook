@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcements: {
+        Row: {
+          badge: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          message: string
+          target_course: string | null
+          title: string
+          type: string | null
+        }
+        Insert: {
+          badge?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message: string
+          target_course?: string | null
+          title: string
+          type?: string | null
+        }
+        Update: {
+          badge?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message?: string
+          target_course?: string | null
+          title?: string
+          type?: string | null
+        }
+        Relationships: []
+      }
+      course_enrollments: {
+        Row: {
+          course_name: string
+          enrolled_at: string
+          id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          course_name: string
+          enrolled_at?: string
+          id?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          course_name?: string
+          enrolled_at?: string
+          id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       form_submissions: {
         Row: {
           city: string

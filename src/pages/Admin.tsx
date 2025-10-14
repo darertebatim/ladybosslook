@@ -9,6 +9,8 @@ import { SEOHead } from '@/components/SEOHead';
 import UpdateMailchimpCities from '@/components/UpdateMailchimpCities';
 import FixMailchimpAmounts from '@/components/FixMailchimpAmounts';
 import SetupAdmin from '@/components/SetupAdmin';
+import { CourseStats } from '@/components/admin/CourseStats';
+import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
 
 interface FormSubmission {
   id: string;
@@ -187,6 +189,12 @@ const Admin = () => {
               </p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Course Management */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <CourseStats />
+          <AnnouncementCreator />
         </div>
 
         {/* Mailchimp Update Tools */}
