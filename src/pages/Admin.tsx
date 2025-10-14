@@ -8,6 +8,7 @@ import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp } from
 import { SEOHead } from '@/components/SEOHead';
 import UpdateMailchimpCities from '@/components/UpdateMailchimpCities';
 import FixMailchimpAmounts from '@/components/FixMailchimpAmounts';
+import SetupAdmin from '@/components/SetupAdmin';
 
 interface FormSubmission {
   id: string;
@@ -190,6 +191,7 @@ const Admin = () => {
 
         {/* Mailchimp Update Tools */}
         <div className="mb-6 space-y-4">
+          <SetupAdmin />
           <UpdateMailchimpCities />
           <FixMailchimpAmounts />
           
