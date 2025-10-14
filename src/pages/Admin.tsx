@@ -313,32 +313,38 @@ const Admin = () => {
                 size="sm"
                 onClick={async () => {
                   try {
-                    // Get all orders with their product names
+                    toast({
+                      title: "Syncing...",
+                      description: "Fetching orders and creating enrollments"
+                    });
+
+                    // Get all paid orders with their product names
                     const { data: orders, error } = await supabase
                       .from('orders')
                       .select('email, product_name, user_id')
                       .eq('status', 'paid');
 
-                    if (error) throw error;
+                    if (error) {
+                      console.error('Error fetching orders:', error);
+                      throw error;
+                    }
 
                     if (!orders || orders.length === 0) {
                       toast({
                         title: "No Orders Found",
-                        description: "No completed orders to sync",
+                        description: "No paid orders to sync",
                         variant: "destructive"
                       });
                       return;
                     }
 
-                    // Create enrollments for each order
-                    const enrollments = orders
-                      .filter(order => order.user_id) // Only orders with user_id
-                      .map(order => ({
-                        user_id: order.user_id,
-                        course_name: order.product_name
-                      }));
+                    console.log(`Found ${orders.length} paid orders`);
 
-                    if (enrollments.length === 0) {
+                    // Filter orders that have user_id
+                    const validOrders = orders.filter(order => order.user_id);
+                    console.log(`${validOrders.length} orders have user accounts`);
+
+                    if (validOrders.length === 0) {
                       toast({
                         title: "No Valid Orders",
                         description: "No orders with user accounts found",
@@ -347,23 +353,48 @@ const Admin = () => {
                       return;
                     }
 
-                    // Insert enrollments (on conflict do nothing)
-                    const { error: insertError } = await supabase
-                      .from('course_enrollments')
-                      .upsert(enrollments, { onConflict: 'user_id,course_name' });
+                    // Create enrollments for each order
+                    const enrollments = validOrders.map(order => ({
+                      user_id: order.user_id,
+                      course_name: order.product_name,
+                      status: 'active'
+                    }));
 
-                    if (insertError) throw insertError;
+                    console.log('Inserting enrollments:', enrollments.length);
+
+                    // Insert enrollments one by one to handle conflicts
+                    let successCount = 0;
+                    let skipCount = 0;
+                    
+                    for (const enrollment of enrollments) {
+                      const { error: insertError } = await supabase
+                        .from('course_enrollments')
+                        .insert(enrollment)
+                        .select();
+
+                      if (insertError) {
+                        if (insertError.code === '23505') { // Duplicate key error
+                          skipCount++;
+                        } else {
+                          console.error('Insert error:', insertError);
+                          throw insertError;
+                        }
+                      } else {
+                        successCount++;
+                      }
+                    }
 
                     toast({
                       title: "Success!",
-                      description: `Synced ${enrollments.length} enrollments from orders`
+                      description: `Added ${successCount} new enrollments${skipCount > 0 ? `, skipped ${skipCount} existing` : ''}`
                     });
 
                     fetchCourseStats();
                   } catch (error: any) {
+                    console.error('Sync error:', error);
                     toast({
                       title: "Error",
-                      description: error.message,
+                      description: error.message || 'Failed to sync enrollments',
                       variant: "destructive"
                     });
                   }
