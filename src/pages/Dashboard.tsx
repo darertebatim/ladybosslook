@@ -12,7 +12,9 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
-import { CourseLibrary } from '@/components/dashboard/CourseLibrary';
+import { StatsCards } from '@/components/dashboard/StatsCards';
+import { QuickActions } from '@/components/dashboard/QuickActions';
+import { Announcements } from '@/components/dashboard/Announcements';
 import { 
   User, 
   ShoppingBag, 
@@ -191,7 +193,10 @@ export default function Dashboard() {
           </div>
         </header>
 
-        <div className="container mx-auto px-4 py-6 lg:py-8">
+        <div className="container mx-auto px-4 py-6 lg:py-8 space-y-6">
+          {/* Stats Cards */}
+          <StatsCards enrolledCount={orders.length} />
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Profile Section */}
             <div className="lg:col-span-1">
@@ -333,48 +338,64 @@ export default function Dashboard() {
               </Card>
             </div>
 
-            {/* Course Library & Purchase History */}
+            {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Course Library */}
-              <CourseLibrary purchasedCourses={orders.map(o => o.product_name)} />
+              {/* Quick Actions */}
+              <QuickActions />
 
-              {/* Purchase History */}
-              {orders.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-xl">
-                      <ShoppingBag className="h-5 w-5" />
-                      Purchase History
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+              {/* Announcements */}
+              <Announcements />
+
+              {/* My Courses */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShoppingBag className="h-5 w-5" />
+                    My Courses & Workshops
+                  </CardTitle>
+                  <CardDescription>
+                    Your enrolled programs and training sessions
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {orders.length === 0 ? (
+                    <div className="text-center py-8">
+                      <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                      <p className="text-sm text-muted-foreground mb-4">
+                        You haven't enrolled in any courses yet
+                      </p>
+                      <Button onClick={() => navigate("/#programs")}>
+                        Browse Courses
+                      </Button>
+                    </div>
+                  ) : (
                     <div className="space-y-3">
                       {orders.map((order) => (
                         <div 
                           key={order.id} 
-                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 lg:p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                         >
-                          <div className="space-y-1 flex-1 min-w-0">
-                            <h4 className="font-medium text-sm lg:text-base">{order.product_name}</h4>
-                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          <div className="space-y-1 flex-1">
+                            <h4 className="font-semibold">{order.product_name}</h4>
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
                               <div className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
+                                <Calendar className="h-4 w-4" />
                                 <span>{formatDate(order.created_at)}</span>
                               </div>
-                              <Badge variant={order.status === 'paid' ? 'default' : 'secondary'} className="text-xs">
+                              <Badge variant={order.status === 'paid' ? 'default' : 'secondary'}>
                                 {order.status}
                               </Badge>
                             </div>
                           </div>
                           <div className="text-left sm:text-right">
-                            <p className="font-bold text-base">{formatPrice(order.amount, order.currency)}</p>
+                            <p className="font-bold text-lg">{formatPrice(order.amount, order.currency)}</p>
                           </div>
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
-              )}
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
