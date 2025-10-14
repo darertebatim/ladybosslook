@@ -72,16 +72,69 @@ serve(async (req) => {
       logStep('Payment successful, creating order record');
       
       // Extract customer details from the session
-      // Note: customer is already expanded in the session retrieve call above
       const customer = session.customer;
+      const customerEmail = session.customer_details?.email || (customer as any)?.email || 'unknown@example.com';
+      const customerName = session.customer_details?.name || (customer as any)?.name || 'Customer';
+      const customerPhone = session.customer_details?.phone || (customer as any)?.phone;
+      const billingCity = session.customer_details?.address?.city || (customer as any)?.address?.city || "";
+
+      // Check if user account already exists
+      logStep('Checking for existing user account', { email: customerEmail });
+      const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
       
-      // Create order record only after successful payment
+      let userId = null;
+      const existingUser = users?.find(u => u.email === customerEmail);
+      
+      if (existingUser) {
+        logStep('Found existing user account', { userId: existingUser.id });
+        userId = existingUser.id;
+      } else {
+        // Create new user account with random password
+        logStep('Creating new user account');
+        const randomPassword = crypto.randomUUID() + crypto.randomUUID();
+        
+        const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
+          email: customerEmail,
+          password: randomPassword,
+          email_confirm: true,
+          user_metadata: {
+            full_name: customerName,
+            phone: customerPhone,
+            city: billingCity
+          }
+        });
+
+        if (signUpError) {
+          logStep('Error creating user account', signUpError);
+        } else if (newUser.user) {
+          userId = newUser.user.id;
+          logStep('User account created', { userId });
+
+          // Send password reset email so user can set their own password
+          const { error: resetError } = await supabase.auth.admin.generateLink({
+            type: 'recovery',
+            email: customerEmail,
+            options: {
+              redirectTo: `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovable.app') || ''}/dashboard`
+            }
+          });
+
+          if (resetError) {
+            logStep('Error sending password reset email', resetError);
+          } else {
+            logStep('Password reset email sent');
+          }
+        }
+      }
+      
+      // Create order record with user_id
       const { data: newOrder, error: orderError } = await supabase
         .from('orders')
         .insert({
-          email: session.customer_details?.email || (customer as any)?.email || 'unknown@example.com',
-          name: session.customer_details?.name || (customer as any)?.name || 'Customer',
-          phone: session.customer_details?.phone || (customer as any)?.phone,
+          user_id: userId,
+          email: customerEmail,
+          name: customerName,
+          phone: customerPhone,
           stripe_session_id: sanitizedSessionId,
           amount: session.amount_total || 0,
           currency: session.currency || 'usd',
@@ -93,7 +146,6 @@ serve(async (req) => {
 
       if (orderError) {
         logStep('Error creating order record', orderError);
-        // Don't throw error - payment was successful, just log the issue
       } else {
         orderDetails = newOrder;
         logStep('Order record created', { orderId: newOrder.id });

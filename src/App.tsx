@@ -35,6 +35,7 @@ import Privacy from "./pages/Privacy";
 import SMSTerms from "./pages/SMSTerms";
 import ThankFreeLive from "./pages/ThankFreeLive";
 import Video from "./pages/Video";
+import Dashboard from "./pages/Dashboard";
 import CalendarRedirect from "./components/CalendarRedirect";
 import Redirect from "./components/Redirect";
 
@@ -76,6 +77,7 @@ const App = () => (
             <Route path="/thankfreelive" element={<ThankFreeLive />} />
             <Route path="/iqmoney" element={<IQMoneyWorkshop />} />
             <Route path="/rathus" element={<RathusAssessment />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/calendar" element={<CalendarRedirect />} />
             <Route path="/firststepbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/RightsnboundariesLadybossgift.pdf" />} />
             <Route path="/fnpbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/fnpbonus.pdf" />} />
