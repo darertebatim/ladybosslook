@@ -317,7 +317,7 @@ const Admin = () => {
                     const { data: orders, error } = await supabase
                       .from('orders')
                       .select('email, product_name, user_id')
-                      .eq('status', 'completed');
+                      .eq('status', 'paid');
 
                     if (error) throw error;
 
