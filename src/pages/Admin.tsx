@@ -59,7 +59,7 @@ const Admin = () => {
   const [announcementForm, setAnnouncementForm] = useState({
     title: '',
     message: '',
-    targetCourse: '',
+    targetCourse: 'all',
     type: 'general',
     badge: ''
   });
@@ -152,7 +152,7 @@ const Admin = () => {
         .insert({
           title: announcementForm.title,
           message: announcementForm.message,
-          target_course: announcementForm.targetCourse || null,
+          target_course: announcementForm.targetCourse === 'all' ? null : announcementForm.targetCourse,
           type: announcementForm.type,
           badge: announcementForm.badge || announcementForm.type
         });
@@ -161,14 +161,14 @@ const Admin = () => {
 
       toast({
         title: "Success!",
-        description: `Announcement sent${announcementForm.targetCourse ? ` to ${announcementForm.targetCourse} students` : ' to all students'}`,
+        description: `Announcement sent${announcementForm.targetCourse !== 'all' ? ` to ${announcementForm.targetCourse} students` : ' to all students'}`,
       });
 
       // Reset form
       setAnnouncementForm({
         title: '',
         message: '',
-        targetCourse: '',
+        targetCourse: 'all',
         type: 'general',
         badge: ''
       });
@@ -378,7 +378,7 @@ const Admin = () => {
                       <SelectValue placeholder="All students" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Students</SelectItem>
+                      <SelectItem value="all">All Students</SelectItem>
                       {AVAILABLE_COURSES.map(course => (
                         <SelectItem key={course} value={course}>{course}</SelectItem>
                       ))}
