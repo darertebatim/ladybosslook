@@ -47,6 +47,13 @@ const Navigation = () => {
 
           {/* CTA Button and Auth Links */}
           <div className="hidden md:flex items-center space-x-4">
+            {user && !isAdmin && (
+              <Link to="/dashboard">
+                <Button variant="outline" size="sm">
+                  My Dashboard
+                </Button>
+              </Link>
+            )}
             {isAdmin && (
               <Link to="/admin">
                 <Button variant="outline" size="sm">
@@ -98,7 +105,14 @@ const Navigation = () => {
               >
                 {item.label}
               </a>
-            ))}
+              ))}
+              {user && !isAdmin && (
+                <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="outline" size="sm" className="w-full">
+                    My Dashboard
+                  </Button>
+                </Link>
+              )}
               {isAdmin && (
                 <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="outline" size="sm" className="w-full">
