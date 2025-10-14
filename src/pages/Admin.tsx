@@ -308,8 +308,45 @@ const Admin = () => {
                 <GraduationCap className="h-5 w-5" />
                 <CardTitle>Students Per Course</CardTitle>
               </div>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  try {
+                    setIsLoading(true);
+                    toast({
+                      title: "Checking Refunds...",
+                      description: "Checking Stripe for refunded orders"
+                    });
+
+                    const { data, error } = await supabase.functions.invoke('handle-refunds');
+
+                    if (error) throw error;
+
+                    toast({
+                      title: "Refunds Processed",
+                      description: `Found ${data.refundedCount} refunded orders and removed them from enrollments`,
+                    });
+
+                    fetchCourseStats();
+                  } catch (error: any) {
+                    console.error('Refund check error:', error);
+                    toast({
+                      title: "Error",
+                      description: error.message || 'Failed to check refunds',
+                      variant: "destructive"
+                    });
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Check Refunds
+              </Button>
+
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={async () => {
                   try {
