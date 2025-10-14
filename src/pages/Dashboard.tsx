@@ -21,8 +21,10 @@ import {
   Mail,
   Phone,
   MapPin,
-  Calendar
+  Calendar,
+  BookOpen
 } from 'lucide-react';
+import { CourseLibrary } from '@/components/dashboard/CourseLibrary';
 
 interface Profile {
   id: string;
@@ -186,9 +188,25 @@ export default function Dashboard() {
         </header>
 
         <div className="container mx-auto px-4 py-8">
+          {/* Course Library Section - Full Width */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Course Library
+              </CardTitle>
+              <CardDescription>
+                Browse all available courses and access your enrolled programs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CourseLibrary purchasedCourses={orders.map(o => o.product_name)} />
+            </CardContent>
+          </Card>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Profile Section */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -304,7 +322,7 @@ export default function Dashboard() {
               </Card>
 
               {/* WhatsApp Support Card */}
-              <Card className="mt-6">
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">
                     <MessageCircle className="h-5 w-5" />
@@ -327,58 +345,49 @@ export default function Dashboard() {
               </Card>
             </div>
 
-            {/* Orders Section */}
+            {/* Purchase History Section */}
             <div className="lg:col-span-2">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <ShoppingBag className="h-5 w-5" />
-                    My Courses & Workshops
+                    Purchase History
                   </CardTitle>
                   <CardDescription>
-                    All your purchased programs and training sessions
+                    Your transaction history and receipts
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {orders.length === 0 ? (
-                    <div className="text-center py-12">
-                      <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">
-                        You haven't purchased any courses yet.
+                    <div className="text-center py-8">
+                      <ShoppingBag className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+                      <p className="text-sm text-muted-foreground">
+                        No purchases yet
                       </p>
-                      <Button 
-                        className="mt-4"
-                        onClick={() => navigate('/')}
-                      >
-                        Browse Courses
-                      </Button>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {orders.map((order) => (
-                        <Card key={order.id}>
-                          <CardContent className="pt-6">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <h4 className="font-semibold text-lg mb-2">
-                                  {order.product_name}
-                                </h4>
-                                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                                  <div className="flex items-center gap-1">
-                                    <Calendar className="h-4 w-4" />
-                                    {formatDate(order.created_at)}
-                                  </div>
-                                  <div className="font-medium text-foreground">
-                                    {formatPrice(order.amount, order.currency)}
-                                  </div>
-                                </div>
+                        <div key={order.id} className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-sm mb-1 truncate">
+                              {order.product_name}
+                            </h4>
+                            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                <span className="hidden sm:inline">{formatDate(order.created_at)}</span>
+                                <span className="sm:hidden">{new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}</span>
                               </div>
-                              <Badge variant={order.status === 'paid' ? 'default' : 'secondary'}>
-                                {order.status}
-                              </Badge>
+                              <div className="font-medium text-foreground">
+                                {formatPrice(order.amount, order.currency)}
+                              </div>
                             </div>
-                          </CardContent>
-                        </Card>
+                          </div>
+                          <Badge variant={order.status === 'paid' ? 'default' : 'secondary'} className="ml-2">
+                            {order.status}
+                          </Badge>
+                        </div>
                       ))}
                     </div>
                   )}
