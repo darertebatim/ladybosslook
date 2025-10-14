@@ -303,10 +303,75 @@ const Admin = () => {
         {/* Course Enrollment Stats */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5" />
-              Students Per Course
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <GraduationCap className="h-5 w-5" />
+                <CardTitle>Students Per Course</CardTitle>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={async () => {
+                  try {
+                    // Get all orders with their product names
+                    const { data: orders, error } = await supabase
+                      .from('orders')
+                      .select('email, product_name, user_id')
+                      .eq('status', 'completed');
+
+                    if (error) throw error;
+
+                    if (!orders || orders.length === 0) {
+                      toast({
+                        title: "No Orders Found",
+                        description: "No completed orders to sync",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+
+                    // Create enrollments for each order
+                    const enrollments = orders
+                      .filter(order => order.user_id) // Only orders with user_id
+                      .map(order => ({
+                        user_id: order.user_id,
+                        course_name: order.product_name
+                      }));
+
+                    if (enrollments.length === 0) {
+                      toast({
+                        title: "No Valid Orders",
+                        description: "No orders with user accounts found",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+
+                    // Insert enrollments (on conflict do nothing)
+                    const { error: insertError } = await supabase
+                      .from('course_enrollments')
+                      .upsert(enrollments, { onConflict: 'user_id,course_name' });
+
+                    if (insertError) throw insertError;
+
+                    toast({
+                      title: "Success!",
+                      description: `Synced ${enrollments.length} enrollments from orders`
+                    });
+
+                    fetchCourseStats();
+                  } catch (error: any) {
+                    toast({
+                      title: "Error",
+                      description: error.message,
+                      variant: "destructive"
+                    });
+                  }
+                }}
+              >
+                Sync from Orders
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             {courseStats.length > 0 ? (
@@ -320,7 +385,7 @@ const Admin = () => {
               </div>
             ) : (
               <div className="text-center py-4 text-muted-foreground text-sm">
-                No enrollments yet
+                No enrollments yet - Click "Sync from Orders" to import from completed purchases
               </div>
             )}
           </CardContent>
