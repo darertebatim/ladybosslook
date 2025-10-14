@@ -89,13 +89,12 @@ serve(async (req) => {
         logStep('Found existing user account', { userId: existingUser.id });
         userId = existingUser.id;
       } else {
-        // Create new user account with random password
+        // Create new user account with email as password
         logStep('Creating new user account');
-        const randomPassword = crypto.randomUUID() + crypto.randomUUID();
         
         const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
           email: customerEmail,
-          password: randomPassword,
+          password: customerEmail,
           email_confirm: true,
           user_metadata: {
             full_name: customerName,

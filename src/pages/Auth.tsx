@@ -65,6 +65,11 @@ export default function Auth() {
               : 'Enter your information to create an account'
             }
           </CardDescription>
+          {isLogin && (
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              💡 If you purchased a course, use your email as both username and password
+            </p>
+          )}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

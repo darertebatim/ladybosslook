@@ -192,6 +192,55 @@ const Admin = () => {
         <div className="mb-6 space-y-4">
           <UpdateMailchimpCities />
           <FixMailchimpAmounts />
+          
+          {/* Create Profiles for Existing Customers */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Create Student Profiles</CardTitle>
+              <CardDescription>
+                Create user accounts and profiles for existing customers who made purchases before the profile system was added
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={async () => {
+                  try {
+                    toast({
+                      title: "Creating profiles...",
+                      description: "This may take a moment"
+                    });
+
+                    const { data: session } = await supabase.auth.getSession();
+                    
+                    const { data, error } = await supabase.functions.invoke('create-existing-profiles', {
+                      headers: {
+                        Authorization: `Bearer ${session.session?.access_token}`
+                      }
+                    });
+
+                    if (error) throw error;
+
+                    toast({
+                      title: "Success!",
+                      description: data.message
+                    });
+                  } catch (error: any) {
+                    toast({
+                      title: "Error",
+                      description: error.message,
+                      variant: "destructive"
+                    });
+                  }
+                }}
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Create Profiles for Existing Customers
+              </Button>
+              <p className="text-xs text-muted-foreground mt-2">
+                This will create accounts for all past customers with their email as the password
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Submissions Table */}
