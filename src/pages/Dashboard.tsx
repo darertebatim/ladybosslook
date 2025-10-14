@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
+import { CourseLibrary } from '@/components/dashboard/CourseLibrary';
 import { 
   User, 
   ShoppingBag, 
@@ -176,17 +177,22 @@ export default function Dashboard() {
       <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="border-b bg-card">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 className="text-2xl font-bold">My Dashboard</h1>
-            <Button variant="ghost" onClick={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </Button>
+          <div className="container mx-auto px-4 py-4 lg:py-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold">My Dashboard</h1>
+                <p className="text-sm text-muted-foreground mt-1">Welcome back, {profile?.full_name || 'there'}!</p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </Button>
+            </div>
           </div>
         </header>
 
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="container mx-auto px-4 py-6 lg:py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Profile Section */}
             <div className="lg:col-span-1">
               <Card>
@@ -327,63 +333,48 @@ export default function Dashboard() {
               </Card>
             </div>
 
-            {/* Orders Section */}
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ShoppingBag className="h-5 w-5" />
-                    My Courses & Workshops
-                  </CardTitle>
-                  <CardDescription>
-                    All your purchased programs and training sessions
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {orders.length === 0 ? (
-                    <div className="text-center py-12">
-                      <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">
-                        You haven't purchased any courses yet.
-                      </p>
-                      <Button 
-                        className="mt-4"
-                        onClick={() => navigate('/')}
-                      >
-                        Browse Courses
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
+            {/* Course Library & Purchase History */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Course Library */}
+              <CourseLibrary purchasedCourses={orders.map(o => o.product_name)} />
+
+              {/* Purchase History */}
+              {orders.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-xl">
+                      <ShoppingBag className="h-5 w-5" />
+                      Purchase History
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
                       {orders.map((order) => (
-                        <Card key={order.id}>
-                          <CardContent className="pt-6">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <h4 className="font-semibold text-lg mb-2">
-                                  {order.product_name}
-                                </h4>
-                                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                                  <div className="flex items-center gap-1">
-                                    <Calendar className="h-4 w-4" />
-                                    {formatDate(order.created_at)}
-                                  </div>
-                                  <div className="font-medium text-foreground">
-                                    {formatPrice(order.amount, order.currency)}
-                                  </div>
-                                </div>
+                        <div 
+                          key={order.id} 
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 lg:p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                        >
+                          <div className="space-y-1 flex-1 min-w-0">
+                            <h4 className="font-medium text-sm lg:text-base">{order.product_name}</h4>
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                <span>{formatDate(order.created_at)}</span>
                               </div>
-                              <Badge variant={order.status === 'paid' ? 'default' : 'secondary'}>
+                              <Badge variant={order.status === 'paid' ? 'default' : 'secondary'} className="text-xs">
                                 {order.status}
                               </Badge>
                             </div>
-                          </CardContent>
-                        </Card>
+                          </div>
+                          <div className="text-left sm:text-right">
+                            <p className="font-bold text-base">{formatPrice(order.amount, order.currency)}</p>
+                          </div>
+                        </div>
                       ))}
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>
