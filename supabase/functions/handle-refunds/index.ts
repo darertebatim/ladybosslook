@@ -54,12 +54,19 @@ serve(async (req) => {
         const session = await stripe.checkout.sessions.retrieve(order.stripe_session_id);
         
         if (session.payment_intent) {
-          const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent as string);
+          const paymentIntent = await stripe.paymentIntents.retrieve(
+            session.payment_intent as string,
+            { expand: ['charges'] }
+          );
           
-          // Check if payment was refunded
-          if (paymentIntent.status === 'canceled' || 
-              (paymentIntent.charges.data[0] && paymentIntent.charges.data[0].refunded)) {
-            console.log(`[HANDLE-REFUNDS] Found refunded order: ${order.id}`);
+          console.log(`[HANDLE-REFUNDS] Checking order ${order.id}, PI status: ${paymentIntent.status}, amount_refunded: ${paymentIntent.amount_received || 0}`);
+          
+          // Check if payment was refunded - check amount_refunded or refunded flag
+          const isRefunded = paymentIntent.amount_refunded > 0 || 
+                           (paymentIntent.charges?.data?.[0]?.refunded === true);
+          
+          if (isRefunded) {
+            console.log(`[HANDLE-REFUNDS] Found refunded order: ${order.id}, email: ${order.email}`);
             refundedOrders.push(order);
 
             // Update order status
