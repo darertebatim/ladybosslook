@@ -2,15 +2,17 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp } from 'lucide-react';
+import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp, Send, GraduationCap } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import UpdateMailchimpCities from '@/components/UpdateMailchimpCities';
 import FixMailchimpAmounts from '@/components/FixMailchimpAmounts';
 import SetupAdmin from '@/components/SetupAdmin';
-import { CourseStats } from '@/components/admin/CourseStats';
-import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
 
 interface FormSubmission {
   id: string;
@@ -26,8 +28,27 @@ interface FormSubmission {
   ip_address: string | null;
 }
 
+interface CourseStats {
+  course_name: string;
+  student_count: number;
+}
+
+const AVAILABLE_COURSES = [
+  'Courageous Character Workshop',
+  'Money Literacy Workshop',
+  'IQ Money Program',
+  'Ladyboss Coaching',
+  'Business Growth Accelerator',
+  'Business Startup Accelerator',
+  'Instagram Growth Course',
+  'Connection Literacy Program',
+  'Networking Program',
+  'Assertiveness Training'
+];
+
 const Admin = () => {
   const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
+  const [courseStats, setCourseStats] = useState<CourseStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     total: 0,
@@ -35,6 +56,14 @@ const Admin = () => {
     failed: 0,
     today: 0
   });
+  const [announcementForm, setAnnouncementForm] = useState({
+    title: '',
+    message: '',
+    targetCourse: '',
+    type: 'general',
+    badge: ''
+  });
+  const [isSendingAnnouncement, setIsSendingAnnouncement] = useState(false);
   const { toast } = useToast();
 
   const fetchSubmissions = async () => {
@@ -75,6 +104,85 @@ const Admin = () => {
     }
   };
 
+  const fetchCourseStats = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .select('course_name');
+
+      if (error) throw error;
+
+      // Count enrollments per course
+      const statsMap = new Map<string, number>();
+      data?.forEach(enrollment => {
+        const count = statsMap.get(enrollment.course_name) || 0;
+        statsMap.set(enrollment.course_name, count + 1);
+      });
+
+      const statsArray: CourseStats[] = Array.from(statsMap.entries()).map(([course_name, student_count]) => ({
+        course_name,
+        student_count
+      }));
+
+      setCourseStats(statsArray.sort((a, b) => b.student_count - a.student_count));
+    } catch (error: any) {
+      console.error('Error fetching course stats:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch course statistics",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const sendAnnouncement = async () => {
+    if (!announcementForm.title || !announcementForm.message) {
+      toast({
+        title: "Validation Error",
+        description: "Title and message are required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingAnnouncement(true);
+    try {
+      const { error } = await supabase
+        .from('announcements')
+        .insert({
+          title: announcementForm.title,
+          message: announcementForm.message,
+          target_course: announcementForm.targetCourse || null,
+          type: announcementForm.type,
+          badge: announcementForm.badge || announcementForm.type
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: `Announcement sent${announcementForm.targetCourse ? ` to ${announcementForm.targetCourse} students` : ' to all students'}`,
+      });
+
+      // Reset form
+      setAnnouncementForm({
+        title: '',
+        message: '',
+        targetCourse: '',
+        type: 'general',
+        badge: ''
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingAnnouncement(false);
+    }
+  };
+
   const exportData = () => {
     const csvContent = [
       ['Name', 'Email', 'City', 'Phone', 'Mailchimp Success', 'Error', 'Submitted At'].join(','),
@@ -100,6 +208,7 @@ const Admin = () => {
 
   useEffect(() => {
     fetchSubmissions();
+    fetchCourseStats();
   }, []);
 
   const formatDate = (dateString: string) => {
@@ -121,14 +230,14 @@ const Admin = () => {
     <>
       <SEOHead />
       <div className="min-h-screen bg-background p-4">
-      <div className="container mx-auto max-w-6xl">
+      <div className="container mx-auto max-w-7xl">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold">Landing Page Admin</h1>
-            <p className="text-muted-foreground">Monitor form submissions and performance</p>
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <p className="text-muted-foreground">Monitor submissions, enrollments, and send announcements</p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={fetchSubmissions} variant="outline" size="sm">
+            <Button onClick={() => { fetchSubmissions(); fetchCourseStats(); }} variant="outline" size="sm">
               <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
             </Button>
@@ -191,11 +300,132 @@ const Admin = () => {
           </Card>
         </div>
 
-        {/* Course Management */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <CourseStats />
-          <AnnouncementCreator />
-        </div>
+        {/* Course Enrollment Stats */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <GraduationCap className="h-5 w-5" />
+              Course Enrollment Statistics
+            </CardTitle>
+            <CardDescription>Number of students enrolled in each course</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {courseStats.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {courseStats.map((stat) => (
+                  <div key={stat.course_name} className="flex items-center justify-between p-4 rounded-lg border bg-card">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">{stat.course_name}</p>
+                      <p className="text-2xl font-bold text-primary">{stat.student_count}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {stat.student_count === 1 ? 'student' : 'students'}
+                      </p>
+                    </div>
+                    <Users className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No enrollment data yet
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Send Announcement */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Send className="h-5 w-5" />
+              Send Announcement
+            </CardTitle>
+            <CardDescription>
+              Send announcements to all students or target specific courses
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  placeholder="Announcement title"
+                  value={announcementForm.title}
+                  onChange={(e) => setAnnouncementForm({ ...announcementForm, title: e.target.value })}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  placeholder="Your announcement message..."
+                  value={announcementForm.message}
+                  onChange={(e) => setAnnouncementForm({ ...announcementForm, message: e.target.value })}
+                  rows={4}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="targetCourse">Target Course (Optional)</Label>
+                  <Select 
+                    value={announcementForm.targetCourse} 
+                    onValueChange={(value) => setAnnouncementForm({ ...announcementForm, targetCourse: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="All students" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All Students</SelectItem>
+                      {AVAILABLE_COURSES.map(course => (
+                        <SelectItem key={course} value={course}>{course}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="type">Type</Label>
+                  <Select 
+                    value={announcementForm.type} 
+                    onValueChange={(value) => setAnnouncementForm({ ...announcementForm, type: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="general">General</SelectItem>
+                      <SelectItem value="new">New Course</SelectItem>
+                      <SelectItem value="event">Event</SelectItem>
+                      <SelectItem value="update">Update</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="badge">Badge Text (Optional)</Label>
+                  <Input
+                    id="badge"
+                    placeholder="e.g., Urgent, New"
+                    value={announcementForm.badge}
+                    onChange={(e) => setAnnouncementForm({ ...announcementForm, badge: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <Button 
+                onClick={sendAnnouncement} 
+                disabled={isSendingAnnouncement}
+                className="w-full md:w-auto"
+              >
+                <Send className="mr-2 h-4 w-4" />
+                {isSendingAnnouncement ? 'Sending...' : 'Send Announcement'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Mailchimp Update Tools */}
         <div className="mb-6 space-y-4">

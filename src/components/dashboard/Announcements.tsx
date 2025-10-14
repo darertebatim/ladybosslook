@@ -12,11 +12,12 @@ interface Announcement {
   type: string;
   badge: string | null;
   created_at: string;
+  target_course: string | null;
 }
 
 export function Announcements() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export function Announcements() {
         .from('announcements')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(5);
+        .limit(10);
 
       if (error) throw error;
 
@@ -42,21 +43,21 @@ export function Announcements() {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const getRelativeTime = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    return `${Math.floor(diffDays / 30)} months ago`;
+    if (diffInDays === 0) return "Today";
+    if (diffInDays === 1) return "Yesterday";
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+    return `${Math.floor(diffInDays / 30)} months ago`;
   };
 
   const getIcon = (type: string) => {
@@ -70,7 +71,7 @@ export function Announcements() {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Card>
         <CardHeader>
@@ -78,8 +79,12 @@ export function Announcements() {
             <Bell className="h-5 w-5" />
             Announcements & Updates
           </CardTitle>
-          <CardDescription>Loading announcements...</CardDescription>
         </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-muted-foreground">
+            Loading announcements...
+          </div>
+        </CardContent>
       </Card>
     );
   }
@@ -94,9 +99,7 @@ export function Announcements() {
         <CardDescription>Stay updated with the latest news and events</CardDescription>
       </CardHeader>
       <CardContent>
-        {announcements.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No announcements yet</p>
-        ) : (
+        {announcements.length > 0 ? (
           <div className="space-y-4">
             {announcements.map((announcement) => (
               <div key={announcement.id} className="flex gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
@@ -107,14 +110,18 @@ export function Announcements() {
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <h4 className="font-medium text-sm">{announcement.title}</h4>
                     <Badge variant="secondary" className="text-xs flex-shrink-0">
-                      {announcement.badge || 'General'}
+                      {announcement.badge || announcement.type}
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mb-2">{announcement.message}</p>
-                  <p className="text-xs text-muted-foreground">{formatDate(announcement.created_at)}</p>
+                  <p className="text-xs text-muted-foreground">{getRelativeTime(announcement.created_at)}</p>
                 </div>
               </div>
             ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            No announcements yet
           </div>
         )}
       </CardContent>
