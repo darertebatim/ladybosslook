@@ -305,29 +305,22 @@ const Admin = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <GraduationCap className="h-5 w-5" />
-              Course Enrollment Statistics
+              Students Per Course
             </CardTitle>
-            <CardDescription>Number of students enrolled in each course</CardDescription>
           </CardHeader>
           <CardContent>
             {courseStats.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-2">
                 {courseStats.map((stat) => (
-                  <div key={stat.course_name} className="flex items-center justify-between p-4 rounded-lg border bg-card">
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">{stat.course_name}</p>
-                      <p className="text-2xl font-bold text-primary">{stat.student_count}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {stat.student_count === 1 ? 'student' : 'students'}
-                      </p>
-                    </div>
-                    <Users className="h-8 w-8 text-muted-foreground" />
+                  <div key={stat.course_name} className="flex justify-between items-center py-2 border-b last:border-0">
+                    <span className="text-sm">{stat.course_name}</span>
+                    <span className="font-bold">{stat.student_count}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                No enrollment data yet
+              <div className="text-center py-4 text-muted-foreground text-sm">
+                No enrollments yet
               </div>
             )}
           </CardContent>
