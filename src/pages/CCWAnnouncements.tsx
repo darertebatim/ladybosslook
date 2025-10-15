@@ -57,7 +57,7 @@ export default function CCWAnnouncements() {
     <div className="min-h-screen bg-gradient-luxury">
       <SEOHead 
         title="CCW News & Announcements | تابلوی اعلانات دوره آموزشی کارکتر پرجرات"
-        description="Stay updated with the latest news, announcements, and resources from Courageous Character Workshop community. Visit weekly for new updates."
+        description="Stay updated with the latest news, announcements, and resources from Courageous Character Course community. Visit weekly for new updates."
       />
       
       <div className="container mx-auto px-4 py-8 md:py-12">

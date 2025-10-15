@@ -104,7 +104,7 @@ serve(async (req) => {
     // Define program pricing (whitelist approach)
     const programPricing = {
       "courageous-character": {
-        name: "Courageous Character Workshop",
+        name: "Courageous Character Course",
         amount: 9700, // $97 in cents
         description: "Transform your mindset and build unshakeable confidence"
       },

@@ -166,11 +166,11 @@ serve(async (req) => {
               city: billingCity, // Use actual billing city instead of "Online"
               phone: orderDetails.phone || "",
               source: "workshop_purchase",
-              workshop_name: "Courageous Character Workshop",
+              workshop_name: "Courageous Character Course",
               purchase_amount: orderDetails.amount,
               purchase_date: new Date().toISOString(),
               payment_status: "paid",
-              tags: ["workshop_courageous_character"],
+              tags: ["ccc"],
               session_id: sanitizedSessionId
             }
           });

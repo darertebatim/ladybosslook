@@ -9,8 +9,8 @@ const Checkout = () => {
   
   const programDetails = {
     'courageous-character': {
-      name: 'Courageous Character Workshop',
-      displayName: 'Courageous Character Workshop',
+      name: 'Courageous Character Course',
+      displayName: 'Courageous Character Course',
       price: 9700, // $97
       originalPrice: 49700, // $497
       description: 'Transform your mindset and build unshakeable confidence',
@@ -99,7 +99,7 @@ const Checkout = () => {
                   
                   <div className="text-center mb-6">
                     <p className="text-luxury-silver mb-4 leading-relaxed">
-                      <span className="whitespace-nowrap">Join the Courageous Character Workshop</span><br />
+                      <span className="whitespace-nowrap">Join the Courageous Character Course</span><br />
                       and Behave like a confident Ladyboss
                     </p>
                     

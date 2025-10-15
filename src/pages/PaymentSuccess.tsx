@@ -25,7 +25,7 @@ export default function PaymentSuccess() {
         setPaymentVerified(true);
         setOrderDetails({
           id: 'test-order-123',
-          product_name: 'Courageous Character Workshop',
+          product_name: 'Courageous Character Course',
           amount: 4999, // $49.99 in cents
           email: 'test@example.com',
           name: 'Sarah Johnson',
@@ -88,7 +88,7 @@ export default function PaymentSuccess() {
   const getWorkshopDisplayName = (productName: string) => {
     if (productName.toLowerCase().includes('courageous')) {
       return {
-        english: 'Courageous Character Workshop',
+        english: 'Courageous Character Course',
         farsi: 'کاراکتر پرجرات'
       };
     }

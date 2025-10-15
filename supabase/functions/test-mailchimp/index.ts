@@ -50,7 +50,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Testing Mailchimp integration for Courageous Character Workshop');
+    console.log('Testing Mailchimp integration for Courageous Character Course');
 
     // Initialize Supabase with service role key for internal operations
     const supabaseAdmin = createClient(
@@ -66,11 +66,11 @@ serve(async (req) => {
       city: "Austin",
       phone: "+15125558888",
       source: "workshop_test",
-      workshop_name: "Courageous Character Workshop",
+      workshop_name: "Courageous Character Course",
       purchase_amount: 4700, // $47 in cents
       purchase_date: new Date().toISOString(),
       payment_status: "paid",
-      tags: ["workshop_courageous_character"],
+      tags: ["ccc"],
       session_id: "cs_test_" + Math.random().toString(36).substring(2, 15)
     };
 

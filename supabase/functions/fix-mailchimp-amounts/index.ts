@@ -66,7 +66,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { data: orders, error: ordersError } = await supabaseAdmin
       .from('orders')
       .select('email, name, amount, product_name')
-      .eq('product_name', 'Courageous Character Workshop')
+      .eq('product_name', 'Courageous Character Course')
       .eq('amount', 9700);
 
     if (ordersError) {

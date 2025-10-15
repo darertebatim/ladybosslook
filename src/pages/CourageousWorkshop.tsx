@@ -282,7 +282,7 @@ const CourageousWorkshop = () => {
 
             {/* Mobile Optimized Description */}
             <p className="text-sm sm:text-base lg:text-xl text-luxury-silver mb-8 max-w-2xl mx-auto leading-relaxed px-6 text-center">
-              <span className="block whitespace-nowrap">Join the Courageous Character Workshop</span>
+              <span className="block whitespace-nowrap">Join the Courageous Character Course</span>
               <span className="block whitespace-nowrap">and Behave like a confident Ladyboss</span>
             </p>
 

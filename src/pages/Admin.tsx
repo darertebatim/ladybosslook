@@ -35,7 +35,7 @@ interface CourseStats {
 }
 
 const AVAILABLE_COURSES = [
-  'Courageous Character Workshop',
+  'Courageous Character Course',
   'Money Literacy Workshop',
   'IQ Money Program',
   'Ladyboss Coaching',
