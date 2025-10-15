@@ -22,11 +22,12 @@ export interface Program {
   limitedSpots?: string;
   popular: boolean;
   link: string;
+  type: 'course' | 'group-coaching' | '1o1-session' | 'event';
 }
 
 export const programs: Program[] = [
   {
-    title: 'IQMoney - Income Growth Program',
+    title: 'IQMoney Course - Income Growth',
     description: 'Advanced strategies to dramatically increase your income. Learn multiple income streams, negotiation mastery, and proven tactics to maximize your earning potential as an ambitious entrepreneur.',
     image: iqmoneyImage,
     duration: 'Self-paced',
@@ -41,10 +42,11 @@ export const programs: Program[] = [
     ],
     price: '$1,997',
     popular: true,
-    link: '/iqmoney-income'
+    link: '/iqmoney-income',
+    type: 'course'
   },
   {
-    title: 'Money Literacy for LadyBoss',
+    title: 'Money Literacy Course',
     description: 'Complete financial education system with 52 video lessons covering budgeting, investing, debt elimination, and wealth building. Designed specifically for ambitious women seeking financial independence.',
     image: moneyLiteracyImage,
     duration: 'Self-paced',
@@ -59,10 +61,11 @@ export const programs: Program[] = [
     ],
     price: '$997',
     popular: false,
-    link: '/iqmoney'
+    link: '/iqmoney',
+    type: 'course'
   },
   {
-    title: 'Ladyboss VIP Club',
+    title: 'Ladyboss VIP Club Group Coaching',
     description: 'Join our most exclusive 12-month VIP coaching program. Weekly group sessions with premium access, advanced strategies, and an elite community of successful women entrepreneurs.',
     image: ladybossVipImage,
     duration: '12 months',
@@ -77,7 +80,8 @@ export const programs: Program[] = [
     ],
     price: '$4,997',
     popular: true,
-    link: '/ladyboss-vip'
+    link: '/ladyboss-vip',
+    type: 'group-coaching'
   },
   {
     title: 'Empowered Ladyboss Group Coaching',
@@ -95,10 +99,11 @@ export const programs: Program[] = [
     ],
     price: '$997',
     popular: false,
-    link: '/empowered-ladyboss'
+    link: '/empowered-ladyboss',
+    type: 'group-coaching'
   },
   {
-    title: 'Business Growth Accelerator',
+    title: 'Business Growth Accelerator - 3-Month 1o1 Weekly Session',
     description: 'Transform your existing business into a profitable empire with our comprehensive coaching program and proven growth frameworks. 3-month semi-private weekly sessions.',
     image: businessCoachingImage,
     duration: '3 months',
@@ -113,10 +118,11 @@ export const programs: Program[] = [
     ],
     price: '$4,997',
     popular: false,
-    link: '/business-growth-accelerator'
+    link: '/business-growth-accelerator',
+    type: '1o1-session'
   },
   {
-    title: 'Business Startup Accelerator',
+    title: 'Business Startup Accelerator - 3-Month 1o1 Weekly Session',
     description: 'Launch your business from idea to profit in 3 months. Complete startup program with step-by-step guidance, legal setup, and launch strategy. Semi-private weekly sessions.',
     image: networkingImage,
     duration: '3 months',
@@ -131,7 +137,8 @@ export const programs: Program[] = [
     ],
     price: '$4,997',
     popular: false,
-    link: '/business-startup-accelerator'
+    link: '/business-startup-accelerator',
+    type: '1o1-session'
   },
   {
     title: 'Instagram Fast Growth Course',
@@ -149,7 +156,8 @@ export const programs: Program[] = [
     ],
     price: '$2,997',
     popular: true,
-    link: '/instagram-growth'
+    link: '/instagram-growth',
+    type: 'course'
   },
   {
     title: '1-Hour Private Session with Razie',
@@ -167,10 +175,11 @@ export const programs: Program[] = [
     ],
     price: '$597',
     popular: false,
-    link: '/private-coaching'
+    link: '/private-coaching',
+    type: '1o1-session'
   },
   {
-    title: 'Connection Literacy for Ladyboss',
+    title: 'Connection Literacy Course',
     description: 'Master the art of building meaningful relationships and expanding your professional network. Learn proven strategies for networking, making lasting connections, and leveraging relationships to grow your influence and business.',
     image: connectionLiteracyImage,
     duration: '8 weeks',
@@ -185,7 +194,8 @@ export const programs: Program[] = [
     ],
     price: '$497',
     popular: false,
-    link: '/connection-literacy'
+    link: '/connection-literacy',
+    type: 'course'
   },
   {
     title: 'Courageous Character Course',
@@ -205,6 +215,7 @@ export const programs: Program[] = [
     originalPrice: '$497',
     limitedSpots: 'Limited to 100',
     popular: false,
-    link: '/cc'
+    link: '/cc',
+    type: 'course'
   }
 ];
