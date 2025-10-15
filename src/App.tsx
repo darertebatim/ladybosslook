@@ -39,6 +39,7 @@ import Video from "./pages/Video";
 import Dashboard from "./pages/Dashboard";
 import CalendarRedirect from "./components/CalendarRedirect";
 import Redirect from "./components/Redirect";
+import SendTestEmail from "./pages/SendTestEmail";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => (
             <Route path="/rathus" element={<RathusAssessment />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/calendar" element={<CalendarRedirect />} />
+            <Route path="/send-test-email" element={<SendTestEmail />} />
             <Route path="/firststepbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/RightsnboundariesLadybossgift.pdf" />} />
             <Route path="/fnpbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/fnpbonus.pdf" />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
