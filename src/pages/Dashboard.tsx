@@ -25,7 +25,8 @@ import {
   Mail,
   Phone,
   MapPin,
-  Calendar
+  Calendar,
+  Send
 } from 'lucide-react';
 
 interface Profile {
@@ -45,6 +46,8 @@ interface Order {
   currency: string;
   status: string;
   created_at: string;
+  phone: string | null;
+  city: string | null;
 }
 
 export default function Dashboard() {
@@ -62,6 +65,7 @@ export default function Dashboard() {
     city: '',
     bio: ''
   });
+  const [refundMessage, setRefundMessage] = useState('');
 
   useEffect(() => {
     if (!user) {
@@ -111,7 +115,25 @@ export default function Dashboard() {
 
       if (ordersError) throw ordersError;
 
-      setOrders(ordersData || []);
+      const ordersWithLocation = (ordersData || []).map(order => ({
+        ...order,
+        city: null // Orders table doesn't have city field, will need to get from form_submissions if needed
+      }));
+      
+      setOrders(ordersWithLocation);
+
+      // Update profile with phone from most recent order if profile data is missing
+      if (ordersData && ordersData.length > 0 && profileData) {
+        const latestOrder = ordersData[0];
+        if (!profileData.phone && latestOrder.phone) {
+          await supabase
+            .from('profiles')
+            .update({ phone: latestOrder.phone })
+            .eq('id', user!.id);
+          
+          setProfile({ ...profileData, phone: latestOrder.phone });
+        }
+      }
     } catch (error: any) {
       toast({
         title: "Error loading data",
@@ -151,6 +173,37 @@ export default function Dashboard() {
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+  };
+
+  const handleSendRefundRequest = async () => {
+    if (!refundMessage.trim()) {
+      toast({
+        title: "Message required",
+        description: "Please enter your refund request details",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Send refund request via WhatsApp
+      const message = encodeURIComponent(
+        `REFUND REQUEST\n\nFrom: ${profile?.full_name || 'Student'}\nEmail: ${profile?.email}\n\nMessage: ${refundMessage}`
+      );
+      window.open(`https://wa.me/16265028589?text=${message}`, '_blank');
+      
+      setRefundMessage('');
+      toast({
+        title: "Request sent",
+        description: "Your refund request has been sent to admin via WhatsApp"
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
 
   const formatPrice = (cents: number, currency: string = 'usd') => {
@@ -346,10 +399,36 @@ export default function Dashboard() {
                   <Button 
                     className="w-full" 
                     variant="default"
-                    onClick={() => window.open('https://wa.me/19292603007', '_blank')}
+                    onClick={() => window.open('https://wa.me/16265028589', '_blank')}
                   >
                     <MessageCircle className="mr-2 h-4 w-4" />
                     Message on WhatsApp
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Refund Request Card */}
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Send className="h-5 w-5" />
+                    Refund Request
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Textarea
+                    placeholder="Describe your refund request..."
+                    value={refundMessage}
+                    onChange={(e) => setRefundMessage(e.target.value)}
+                    rows={4}
+                  />
+                  <Button 
+                    className="w-full" 
+                    variant="default"
+                    onClick={handleSendRefundRequest}
+                  >
+                    <Send className="mr-2 h-4 w-4" />
+                    Send Request to Admin
                   </Button>
                 </CardContent>
               </Card>
@@ -366,12 +445,12 @@ export default function Dashboard() {
               {/* Announcements */}
               <Announcements />
 
-              {/* My Courses */}
+              {/* My Events */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <ShoppingBag className="h-5 w-5" />
-                    My Courses & Workshops
+                    My Events
                   </CardTitle>
                   <CardDescription>
                     Your enrolled programs and training sessions
@@ -382,10 +461,10 @@ export default function Dashboard() {
                     <div className="text-center py-8">
                       <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
                       <p className="text-sm text-muted-foreground mb-4">
-                        You haven't enrolled in any courses yet
+                        You haven't enrolled in any events yet
                       </p>
                       <Button onClick={() => navigate("/#programs")}>
-                        Browse Courses
+                        Browse Events
                       </Button>
                     </div>
                   ) : (

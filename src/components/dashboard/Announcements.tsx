@@ -114,7 +114,16 @@ export function Announcements() {
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mb-2">{announcement.message}</p>
-                  <p className="text-xs text-muted-foreground">{getRelativeTime(announcement.created_at)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(announcement.created_at).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true
+                    })}
+                  </p>
                 </div>
               </div>
             ))}
