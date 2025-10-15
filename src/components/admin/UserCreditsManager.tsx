@@ -1,152 +1,122 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Wallet, Search } from 'lucide-react';
+import { Wallet, Plus, Users } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 
 interface UserWallet {
-  id: string;
   user_id: string;
   credits_balance: number;
-  email: string;
-  full_name: string | null;
+  profiles: {
+    email: string;
+    full_name: string | null;
+  };
 }
 
 export function UserCreditsManager() {
-  const [searchEmail, setSearchEmail] = useState('');
-  const [selectedUser, setSelectedUser] = useState<UserWallet | null>(null);
-  const [creditAmount, setCreditAmount] = useState('');
-  const [description, setDescription] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
+  const [users, setUsers] = useState<UserWallet[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [creditAmount, setCreditAmount] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const searchUser = async () => {
-    if (!searchEmail.trim()) {
-      toast({
-        title: "Email required",
-        description: "Please enter a user email to search",
-        variant: "destructive"
-      });
-      return;
-    }
+  useEffect(() => {
+    loadUsers();
+  }, []);
 
-    setIsSearching(true);
+  const loadUsers = async () => {
     try {
-      // Search for user profile
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('id, email, full_name')
-        .eq('email', searchEmail.trim())
-        .maybeSingle();
-
-      if (profileError) throw profileError;
-
-      if (!profile) {
-        toast({
-          title: "User not found",
-          description: "No user found with this email",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Get or create wallet for user
-      const { data: wallet, error: walletError } = await supabase
+      const { data, error } = await supabase
         .from('user_wallets')
-        .select('*')
-        .eq('user_id', profile.id)
-        .maybeSingle();
+        .select(`
+          user_id,
+          credits_balance,
+          profiles:user_id (
+            email,
+            full_name
+          )
+        `)
+        .order('credits_balance', { ascending: false });
 
-      if (walletError) throw walletError;
-
-      setSelectedUser({
-        id: wallet?.id || '',
-        user_id: profile.id,
-        credits_balance: wallet?.credits_balance || 0,
-        email: profile.email,
-        full_name: profile.full_name
-      });
-
-      toast({
-        title: "User found",
-        description: `${profile.full_name || profile.email} - Current balance: $${wallet?.credits_balance || 0}`
-      });
+      if (error) throw error;
+      setUsers(data as any || []);
     } catch (error: any) {
       toast({
-        title: "Search failed",
-        description: error.message,
+        title: "Error",
+        description: "Failed to load users",
         variant: "destructive"
       });
-    } finally {
-      setIsSearching(false);
     }
   };
 
-  const addCredits = async () => {
-    if (!selectedUser) return;
-
-    const amount = parseInt(creditAmount);
-    if (isNaN(amount) || amount === 0) {
+  const handleAddCredits = async () => {
+    if (!selectedUserId || !creditAmount || parseInt(creditAmount) <= 0) {
       toast({
-        title: "Invalid amount",
-        description: "Please enter a valid credit amount",
+        title: "Invalid input",
+        description: "Please select a user and enter a valid amount",
         variant: "destructive"
       });
       return;
     }
 
-    setIsAdding(true);
+    setIsLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
+      // Get current balance
+      const { data: walletData, error: walletError } = await supabase
+        .from('user_wallets')
+        .select('credits_balance')
+        .eq('user_id', selectedUserId)
+        .single();
+
+      if (walletError) throw walletError;
+
+      const newBalance = (walletData?.credits_balance || 0) + parseInt(creditAmount);
+
       // Update wallet balance
-      const newBalance = selectedUser.credits_balance + amount;
       const { error: updateError } = await supabase
         .from('user_wallets')
         .update({ credits_balance: newBalance })
-        .eq('user_id', selectedUser.user_id);
+        .eq('user_id', selectedUserId);
 
       if (updateError) throw updateError;
 
       // Record transaction
-      const { error: txError } = await supabase
+      const { error: transactionError } = await supabase
         .from('credit_transactions')
         .insert({
-          user_id: selectedUser.user_id,
-          amount: Math.abs(amount),
-          transaction_type: amount > 0 ? 'credit' : 'debit',
-          description: description || (amount > 0 ? 'Credits added by admin' : 'Credits deducted by admin'),
+          user_id: selectedUserId,
+          amount: parseInt(creditAmount),
+          transaction_type: 'credit',
+          description: description || 'Credits added by admin',
           admin_id: user?.id
         });
 
-      if (txError) throw txError;
+      if (transactionError) throw transactionError;
 
       toast({
         title: "Success",
-        description: `${amount > 0 ? 'Added' : 'Deducted'} $${Math.abs(amount)} ${amount > 0 ? 'to' : 'from'} ${selectedUser.email}'s account`
-      });
-
-      // Update local state
-      setSelectedUser({
-        ...selectedUser,
-        credits_balance: newBalance
+        description: `Added ${creditAmount} credits successfully`
       });
 
       setCreditAmount('');
       setDescription('');
+      loadUsers();
     } catch (error: any) {
       toast({
-        title: "Failed to update credits",
+        title: "Error",
         description: error.message,
         variant: "destructive"
       });
     } finally {
-      setIsAdding(false);
+      setIsLoading(false);
     }
   };
 
@@ -155,79 +125,93 @@ export function UserCreditsManager() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Wallet className="h-5 w-5" />
-          Manage User Credits
+          User Credits Management
         </CardTitle>
-        <CardDescription>
-          Search for users and add or deduct store credits
-        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Search Section */}
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <Label htmlFor="searchEmail">User Email</Label>
+      <CardContent className="space-y-6">
+        {/* Add Credits Form */}
+        <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+          <h3 className="font-semibold flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add Credits to User
+          </h3>
+          
+          <div className="space-y-2">
+            <Label htmlFor="user-select">Select User</Label>
+            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+              <SelectTrigger id="user-select">
+                <SelectValue placeholder="Choose a user..." />
+              </SelectTrigger>
+              <SelectContent>
+                {users.map((wallet) => (
+                  <SelectItem key={wallet.user_id} value={wallet.user_id}>
+                    {wallet.profiles?.email} - Current: {wallet.credits_balance} credits
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="credit-amount">Credits Amount</Label>
             <Input
-              id="searchEmail"
-              type="email"
-              placeholder="user@example.com"
-              value={searchEmail}
-              onChange={(e) => setSearchEmail(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && searchUser()}
+              id="credit-amount"
+              type="number"
+              min="1"
+              value={creditAmount}
+              onChange={(e) => setCreditAmount(e.target.value)}
+              placeholder="Enter amount to add..."
             />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description (Optional)</Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Reason for adding credits..."
+              rows={2}
+            />
+          </div>
+
           <Button 
-            onClick={searchUser} 
-            disabled={isSearching}
-            className="mt-6"
+            onClick={handleAddCredits}
+            disabled={isLoading || !selectedUserId || !creditAmount}
+            className="w-full"
           >
-            <Search className="mr-2 h-4 w-4" />
-            {isSearching ? 'Searching...' : 'Search'}
+            {isLoading ? 'Processing...' : 'Add Credits'}
           </Button>
         </div>
 
-        {/* User Details & Credit Management */}
-        {selectedUser && (
-          <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
-            <div>
-              <h3 className="font-semibold text-lg">{selectedUser.full_name || 'No name'}</h3>
-              <p className="text-sm text-muted-foreground">{selectedUser.email}</p>
-              <p className="text-2xl font-bold mt-2">
-                Current Balance: <span className="text-green-600">${selectedUser.credits_balance}</span>
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="creditAmount">Amount (use negative to deduct)</Label>
-                <Input
-                  id="creditAmount"
-                  type="number"
-                  placeholder="e.g., 100 or -50"
-                  value={creditAmount}
-                  onChange={(e) => setCreditAmount(e.target.value)}
-                />
+        {/* Users List */}
+        <div className="space-y-3">
+          <h3 className="font-semibold flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            All Users ({users.length})
+          </h3>
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {users.map((wallet) => (
+              <div
+                key={wallet.user_id}
+                className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex-1">
+                  <p className="font-medium text-sm">
+                    {wallet.profiles?.full_name || 'No name'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {wallet.profiles?.email}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-lg">{wallet.credits_balance}</p>
+                  <p className="text-xs text-muted-foreground">credits</p>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="description">Description (Optional)</Label>
-                <Input
-                  id="description"
-                  placeholder="Reason for credit adjustment"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <Button 
-              onClick={addCredits} 
-              disabled={isAdding || !creditAmount}
-              className="w-full"
-            >
-              <Wallet className="mr-2 h-4 w-4" />
-              {isAdding ? 'Processing...' : 'Update Credits'}
-            </Button>
+            ))}
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );
