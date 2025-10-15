@@ -35,6 +35,8 @@ const handler = async (req: Request): Promise<Response> => {
     let userEmails: string[] = [];
     
     if (targetCourse) {
+      console.log(`Querying enrollments for course: ${targetCourse}`);
+      
       // Get users enrolled in specific course
       const { data: enrollments, error: enrollError } = await supabase
         .from('course_enrollments')
@@ -42,8 +44,12 @@ const handler = async (req: Request): Promise<Response> => {
         .eq('course_name', targetCourse)
         .eq('status', 'active');
       
-      if (enrollError) throw enrollError;
+      if (enrollError) {
+        console.error('Error fetching enrollments:', enrollError);
+        throw enrollError;
+      }
       
+      console.log(`Found ${enrollments?.length || 0} enrollments`);
       const userIds = enrollments?.map(e => e.user_id) || [];
       
       if (userIds.length > 0) {
@@ -52,17 +58,30 @@ const handler = async (req: Request): Promise<Response> => {
           .select('email')
           .in('id', userIds);
         
-        if (profileError) throw profileError;
-        userEmails = profiles?.map(p => p.email) || [];
+        if (profileError) {
+          console.error('Error fetching profiles:', profileError);
+          throw profileError;
+        }
+        
+        userEmails = profiles?.map(p => p.email).filter(email => email) || [];
+        console.log(`Retrieved ${userEmails.length} user emails`);
+      } else {
+        console.log('No enrollments found for this course');
       }
     } else {
       // Get all users
+      console.log('Fetching all user profiles');
       const { data: profiles, error: profileError } = await supabase
         .from('profiles')
         .select('email');
       
-      if (profileError) throw profileError;
-      userEmails = profiles?.map(p => p.email) || [];
+      if (profileError) {
+        console.error('Error fetching all profiles:', profileError);
+        throw profileError;
+      }
+      
+      userEmails = profiles?.map(p => p.email).filter(email => email) || [];
+      console.log(`Retrieved ${userEmails.length} total user emails`);
     }
 
     console.log(`Sending announcement to ${userEmails.length} users`);
