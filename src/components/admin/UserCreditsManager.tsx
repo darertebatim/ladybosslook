@@ -32,30 +32,35 @@ export function UserCreditsManager() {
 
   const loadUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          email,
-          full_name,
-          user_wallets!inner (
-            credits_balance
-          )
-        `);
+      // Get all wallets
+      const { data: wallets, error: walletsError } = await supabase
+        .from('user_wallets')
+        .select('user_id, credits_balance')
+        .order('credits_balance', { ascending: false });
 
-      if (error) throw error;
-      
-      // Transform the data to match our interface
-      const transformedData = (data || []).map((profile: any) => ({
-        user_id: profile.id,
-        credits_balance: profile.user_wallets?.[0]?.credits_balance || 0,
-        profiles: {
-          email: profile.email,
-          full_name: profile.full_name
-        }
-      }));
-      
-      setUsers(transformedData);
+      if (walletsError) throw walletsError;
+
+      // Get all profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email, full_name');
+
+      if (profilesError) throw profilesError;
+
+      // Combine the data
+      const combined = (wallets || []).map(wallet => {
+        const profile = (profiles || []).find(p => p.id === wallet.user_id);
+        return {
+          user_id: wallet.user_id,
+          credits_balance: wallet.credits_balance,
+          profiles: {
+            email: profile?.email || 'Unknown',
+            full_name: profile?.full_name || 'Unknown User'
+          }
+        };
+      });
+
+      setUsers(combined);
     } catch (error: any) {
       console.error('Error loading users:', error);
       toast({
