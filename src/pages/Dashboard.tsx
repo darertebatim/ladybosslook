@@ -53,6 +53,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [creditsBalance, setCreditsBalance] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     full_name: '',
@@ -89,6 +90,16 @@ export default function Dashboard() {
         city: profileData.city || '',
         bio: profileData.bio || ''
       });
+
+      // Load wallet balance
+      const { data: walletData, error: walletError } = await supabase
+        .from('user_wallets')
+        .select('credits_balance')
+        .eq('user_id', user!.id)
+        .maybeSingle();
+
+      if (walletError) throw walletError;
+      setCreditsBalance(walletData?.credits_balance || 0);
 
       // Load orders
       const { data: ordersData, error: ordersError } = await supabase
@@ -195,7 +206,7 @@ export default function Dashboard() {
 
         <div className="container mx-auto px-4 py-6 lg:py-8 space-y-6">
           {/* Stats Cards */}
-          <StatsCards enrolledCount={orders.length} />
+          <StatsCards enrolledCount={orders.length} creditsBalance={creditsBalance} />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Profile Section */}

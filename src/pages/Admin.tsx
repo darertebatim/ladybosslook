@@ -13,6 +13,7 @@ import { SEOHead } from '@/components/SEOHead';
 import UpdateMailchimpCities from '@/components/UpdateMailchimpCities';
 import FixMailchimpAmounts from '@/components/FixMailchimpAmounts';
 import SetupAdmin from '@/components/SetupAdmin';
+import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
 
 interface FormSubmission {
   id: string;
@@ -552,6 +553,9 @@ const Admin = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* User Credits Management */}
+        <UserCreditsManager />
 
         {/* Mailchimp Update Tools */}
         <div className="mb-6 space-y-4">
