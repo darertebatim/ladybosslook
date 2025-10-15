@@ -77,7 +77,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send emails
     const emailPromises = userEmails.map(email => 
       resend.emails.send({
-        from: "Razie Mah <noreply@yourdomain.com>",
+        from: "Razie Mah <support@ladybosslook.com>",
         to: [email],
         subject: `${badge ? `[${badge}] ` : ''}${title}`,
         html: `
