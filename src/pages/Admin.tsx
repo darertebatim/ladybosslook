@@ -14,6 +14,7 @@ import UpdateMailchimpCities from '@/components/UpdateMailchimpCities';
 import FixMailchimpAmounts from '@/components/FixMailchimpAmounts';
 import SetupAdmin from '@/components/SetupAdmin';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
+import { CourseEnrollmentManager } from '@/components/admin/CourseEnrollmentManager';
 
 interface FormSubmission {
   id: string;
@@ -299,6 +300,11 @@ const Admin = () => {
               </p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Course Enrollment Manager */}
+        <div className="mb-6">
+          <CourseEnrollmentManager />
         </div>
 
         {/* Course Enrollment Stats */}
