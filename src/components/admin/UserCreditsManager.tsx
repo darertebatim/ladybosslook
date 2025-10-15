@@ -33,20 +33,31 @@ export function UserCreditsManager() {
   const loadUsers = async () => {
     try {
       const { data, error } = await supabase
-        .from('user_wallets')
+        .from('profiles')
         .select(`
-          user_id,
-          credits_balance,
-          profiles:user_id (
-            email,
-            full_name
+          id,
+          email,
+          full_name,
+          user_wallets!inner (
+            credits_balance
           )
-        `)
-        .order('credits_balance', { ascending: false });
+        `);
 
       if (error) throw error;
-      setUsers(data as any || []);
+      
+      // Transform the data to match our interface
+      const transformedData = (data || []).map((profile: any) => ({
+        user_id: profile.id,
+        credits_balance: profile.user_wallets?.[0]?.credits_balance || 0,
+        profiles: {
+          email: profile.email,
+          full_name: profile.full_name
+        }
+      }));
+      
+      setUsers(transformedData);
     } catch (error: any) {
+      console.error('Error loading users:', error);
       toast({
         title: "Error",
         description: "Failed to load users",
