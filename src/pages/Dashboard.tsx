@@ -173,6 +173,11 @@ export default function Dashboard() {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
+  const normalizeProductName = (productName: string) => {
+    // Replace "Workshop" with "Course" for Courageous Character products
+    return productName.replace(/Courageous Character Workshop/gi, 'Courageous Character Course');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -391,7 +396,7 @@ export default function Dashboard() {
                           className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                         >
                           <div className="space-y-1 flex-1">
-                            <h4 className="font-semibold">{order.product_name}</h4>
+                            <h4 className="font-semibold">{normalizeProductName(order.product_name)}</h4>
                             <div className="flex items-center gap-3 text-sm text-muted-foreground">
                               <div className="flex items-center gap-1">
                                 <Calendar className="h-4 w-4" />
