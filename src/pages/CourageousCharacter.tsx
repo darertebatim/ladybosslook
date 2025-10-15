@@ -285,13 +285,13 @@ const CourageousWorkshop = () => {
               <div className="text-center mb-4 sm:mb-6">
                 <div className="inline-flex items-center gap-2 bg-urgency text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-xs sm:text-sm mb-3 sm:mb-4 shadow-cta">
                   <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="whitespace-nowrap">ویدیو معرفی ورکشاپ را حتماً تماشا کنید</span>
+                  <span className="whitespace-nowrap">ویدیو معرفی دوره آموزشی را حتماً تماشا کنید</span>
                 </div>
                 <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3 leading-tight whitespace-nowrap">
-                  ویدیو معرفی ورکشاپ کاراکتر پرجرات
+                  ویدیو معرفی دوره آموزشی کارکتر پرجرات
                 </h2>
                 <p className="text-white/90 text-sm sm:text-base max-w-2xl mx-auto">
-                  در این ویدیو با جزئیات کامل ورکشاپ و روش‌های تحول آفرین آشنا می‌شوید
+                  در این ویدیو با جزئیات کامل دوره آموزشی و روش‌های تحول آفرین آشنا می‌شوید
                 </p>
               </div>
               <div className="relative bg-gradient-to-r from-luxury-charcoal via-luxury-accent to-luxury-charcoal border border-luxury-silver/30 rounded-lg p-2 sm:p-3 shadow-luxury-glow">
@@ -322,7 +322,7 @@ const CourageousWorkshop = () => {
           <section className="text-center mb-12 sm:mb-16">
             <div className="inline-flex items-center px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-luxury-white/10 text-luxury-white text-xs sm:text-sm font-bold mb-4 sm:mb-6 border border-luxury-white/20 backdrop-blur-sm">
               <Diamond className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-              <span className="whitespace-nowrap">ورکشاپ مخصوص خانم‌های مهاجر</span>
+              <span className="whitespace-nowrap">دوره آموزشی مخصوص خانم‌های مهاجر</span>
             </div>
 
             {/* Pricing Section - Mobile Optimized */}
@@ -332,7 +332,7 @@ const CourageousWorkshop = () => {
               </div>
               <div className="text-center pt-2">
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-6 text-white font-farsi leading-tight">
-                  ورکشاپ کاراکتر پرجرات
+                  دوره آموزشی کارکتر پرجرات
                 </h1>
                 <p className="text-sm sm:text-base text-luxury-white mb-3 sm:mb-4 font-bold font-farsi">سرمایه‌گذاری در آینده خودتان</p>
                 <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-5">
@@ -526,7 +526,7 @@ const CourageousWorkshop = () => {
               <div className="text-center space-y-4 bg-luxury-white/5 rounded-lg p-5 border border-luxury-white/10">
                 <p className="text-luxury-white font-bold text-base sm:text-lg font-farsi leading-relaxed">شما خجالتی و کمرو هستید و فرصت‌ها یکی یکی از جلوی چشمتان رد می‌شوند.</p>
                 <p className="text-luxury-silver text-sm sm:text-base leading-relaxed font-farsi">برای از بین بردن چالش‌هایی که با آن دست و پنجه نرم می‌کنید، یک راه حل قطعی و تضمینی با کمترین تلاش وجود دارد:</p>
-                <p className="text-luxury-white font-bold text-xl sm:text-2xl bg-gradient-luxury-text bg-clip-text text-transparent font-farsi">ورکشاپ کاراکتر پرجرات</p>
+                <p className="text-luxury-white font-bold text-xl sm:text-2xl bg-gradient-luxury-text bg-clip-text text-transparent font-farsi">دوره آموزشی کارکتر پرجرات</p>
               </div>
             </div>
           </section>
@@ -979,7 +979,7 @@ const CourageousWorkshop = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-3 text-luxury-white text-xl">
                   <Award className="w-6 h-6 text-luxury-silver" />
-                  مزایای شرکت در ورکشاپ کاراکتر پرجرات
+                  مزایای شرکت در دوره آموزشی کارکتر پرجرات
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1086,7 +1086,7 @@ const CourageousWorkshop = () => {
                   <div className="bg-luxury-black/30 rounded-lg p-5 border border-green-500/20">
                     <div className="text-3xl mb-2">⏱️</div>
                     <h3 className="text-luxury-white font-bold mb-2">ضمانت زمانی</h3>
-                    <p className="text-luxury-silver text-sm">تا پایان ورکشاپ وقت دارید تصمیم بگیرید - بدون هیچ سوالی</p>
+                    <p className="text-luxury-silver text-sm">تا پایان دوره آموزشی وقت دارید تصمیم بگیرید - بدون هیچ سوالی</p>
                   </div>
                 </div>
                 <div className="mt-6 p-4 bg-luxury-white/10 rounded-lg">
@@ -1103,7 +1103,7 @@ const CourageousWorkshop = () => {
             <div className="bg-gradient-to-br from-luxury-white/10 to-luxury-white/5 backdrop-blur-sm rounded-xl p-6 sm:p-8 border border-luxury-white/20 shadow-luxury">
               <div className="text-center mb-8">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-luxury-white font-farsi">
-                  مبلغ سرمایه‌گذاری شما برای ورکشاپ کاراکتر پرجرات
+                  مبلغ سرمایه‌گذاری شما برای دوره آموزشی کارکتر پرجرات
                 </h2>
                 <div className="inline-block bg-urgency/20 text-urgency px-6 py-3 rounded-full font-bold text-sm sm:text-base border border-urgency/40">
                   یک درخواست جدی! لطفاً این مبالغ را یادداشت کنید
@@ -1327,22 +1327,22 @@ const CourageousWorkshop = () => {
                   },
                   {
                     q: "اگر بعد از خرید پشیمان شدم چطور؟",
-                    a: "هیچ مشکلی نیست! تا پایان ورکشاپ می‌توانید بدون هیچ سوال و دلیلی درخواست بازگشت پول دهید و کل مبلغ شما برگشت داده می‌شود."
+                    a: "هیچ مشکلی نیست! تا پایان دوره آموزشی می‌توانید بدون هیچ سوال و دلیلی درخواست بازگشت پول دهید و کل مبلغ شما برگشت داده می‌شود."
                   },
                   {
                     q: "چرا قیمت این‌قدر کم است؟",
-                    a: "این قیمت ویژه فقط برای 1000 نفر اول است و به زودی به قیمت اصلی $497 برمی‌گردد. ما می‌خواهیم این ورکشاپ برای هر زن ایرانی قابل دسترس باشد، به همین دلیل این تخفیف محدود را ارائه می‌دهیم."
+                    a: "این قیمت ویژه فقط برای 1000 نفر اول است و به زودی به قیمت اصلی $497 برمی‌گردد. ما می‌خواهیم این دوره آموزشی برای هر زن ایرانی قابل دسترس باشد، به همین دلیل این تخفیف محدود را ارائه می‌دهیم."
                   },
                   {
-                    q: "من تازه به کانادا/آمریکا آمده‌ام، آیا این ورکشاپ به من کمک می‌کند؟",
-                    a: "بله! در واقع همین الان بهترین زمان برای شروع است. خیلی از زنان مهاجر آرزو می‌کنند کاش از همان ابتدا این مهارت‌ها را یاد گرفته بودند. این ورکشاپ به شما کمک می‌کند سریع‌تر در جامعه جدید جا بیفتید و فرصت‌های شغلی بهتری پیدا کنید."
+                    q: "من تازه به کانادا/آمریکا آمده‌ام، آیا این دوره آموزشی به من کمک می‌کند؟",
+                    a: "بله! در واقع همین الان بهترین زمان برای شروع است. خیلی از زنان مهاجر آرزو می‌کنند کاش از همان ابتدا این مهارت‌ها را یاد گرفته بودند. این دوره آموزشی به شما کمک می‌کند سریع‌تر در جامعه جدید جا بیفتید و فرصت‌های شغلی بهتری پیدا کنید."
                   },
                   {
                     q: "من سال‌هاست که مهاجر هستم، آیا دیر نشده؟",
                     a: "هرگز دیر نیست! خیلی از دانشجویان ما 10-20 سال است که مهاجرند و می‌گویند کاش زودتر این دوره را می‌دیدند. شما همین حالا هم می‌توانید تغییرات شگفت‌انگیزی در زندگی شخصی و حرفه‌ای خود ایجاد کنید."
                   },
                   {
-                    q: "بعد از ورکشاپ چه اتفاقی می‌افتد؟",
+                    q: "بعد از دوره آموزشی چه اتفاقی می‌افتد؟",
                     a: "شما برای همیشه به ضبط جلسات، ورک‌بوک‌ها، و کتاب صوتی دسترسی خواهید داشت. می‌توانید بارها و بارها به مطالب مراجعه کنید و از آن‌ها استفاده کنید."
                   },
                   {

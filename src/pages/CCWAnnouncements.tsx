@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 const announcements = [
   {
     id: 1,
-    title: "سلام سلام دوباره، بازم تبریک میگم بخاطر حضورتون توی ورکشاپ کاراکتر پرجرات",
+    title: "سلام سلام دوباره، بازم تبریک میگم بخاطر حضورتون توی دوره آموزشی کارکتر پرجرات",
     date: "۲۹ سپتامبر ۲۰۲۵",
     category: "مهم",
-    content: "سلام سلام دوباره، بازم تبریک میگم بخاطر حضورتون توی ورکشاپ کاراکتر پرجرات. در حال آماده کردن زیر ساخت ها هستیم، فردا اشانتیون هاتون رو براتون میفرستیم. ورکشاپ ۳ جلسه آنلاینه، توی ۳ هفته از هفته سوم اکتبر شروع می کنیم. برای راحتی شما ۲ تا سانس داریم (یک سانس مخصوص امریکا/کانادا/اروپا) (یک سانس مخصوص اروپا/انگلیس/دبی)",
+    content: "سلام سلام دوباره، بازم تبریک میگم بخاطر حضورتون توی دوره آموزشی کارکتر پرجرات. در حال آماده کردن زیر ساخت ها هستیم، فردا اشانتیون هاتون رو براتون میفرستیم. دوره آموزشی ۳ جلسه آنلاینه، توی ۳ هفته از هفته سوم اکتبر شروع می کنیم. برای راحتی شما ۲ تا سانس داریم (یک سانس مخصوص امریکا/کانادا/اروپا) (یک سانس مخصوص اروپا/انگلیس/دبی)",
     phone: undefined,
     meetLink: undefined,
     supportEmail: undefined,
@@ -22,7 +22,7 @@ const announcements = [
   },
   {
     id: 2,
-    title: "ویدیوی ضبط شده جلسات ورکشاپ کارکتر پرجرات",
+    title: "ویدیوی ضبط شده جلسات دوره آموزشی کارکتر پرجرات",
     date: "۹ سپتامبر ۲۰۲۵",
     category: "ویدیو",
     content: "برای دسترسی به ویدیوی جلسه ها روی کلاس خودتان وارد شوید",
@@ -37,7 +37,7 @@ const announcements = [
   },
   {
     id: 3,
-    title: "آموزشهای صوتی ورکشاپ کارکتر پرجرات",
+    title: "آموزشهای صوتی دوره آموزشی کارکتر پرجرات",
     date: "۸ سپتامبر ۲۰۲۵",
     category: "آموزش",
     content: "آموزشهای صوتی ارزشمند برای تقویت مهارت‌های شما در دسترس است",
@@ -56,7 +56,7 @@ export default function CCWAnnouncements() {
   return (
     <div className="min-h-screen bg-gradient-luxury">
       <SEOHead 
-        title="CCW News & Announcements | تابلوی اعلانات ورکشاپ کارکتر پرجرات"
+        title="CCW News & Announcements | تابلوی اعلانات دوره آموزشی کارکتر پرجرات"
         description="Stay updated with the latest news, announcements, and resources from Courageous Character Workshop community. Visit weekly for new updates."
       />
       
@@ -71,7 +71,7 @@ export default function CCWAnnouncements() {
           </div>
           <div className="mb-4 md:mb-6" dir="rtl">
             <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-[hsl(var(--luxury-gold))] font-persian mb-2" dir="rtl">
-              تابلوی اعلانات ورکشاپ کارکتر پرجرات
+              تابلوی اعلانات دوره آموزشی کارکتر پرجرات
             </h2>
             <p className="text-base md:text-xl text-[hsl(var(--luxury-silver))] font-persian" dir="rtl">
               هر هفته به این صفحه سر بزنید
@@ -90,7 +90,7 @@ export default function CCWAnnouncements() {
                 </span>
               </div>
               <p className="text-sm md:text-base text-[hsl(var(--luxury-silver))] font-persian" dir="rtl">
-                لطفا هر هفته به این صفحه سر بزنید چون آخرین خبرها، تمرین‌ها و جزوه‌های ورکشاپ به این صفحه اضافه میشن
+                لطفا هر هفته به این صفحه سر بزنید چون آخرین خبرها، تمرین‌ها و جزوه‌های دوره آموزشی به این صفحه اضافه میشن
               </p>
             </CardContent>
           </Card>

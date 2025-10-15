@@ -42,7 +42,7 @@ const CCPayDirect = () => {
           <div className="text-white">
             <p className="text-xl mb-4">{error}</p>
             <a href="/cc" className="text-luxury-accent hover:underline">
-              بازگشت به صفحه ورکشاپ
+              بازگشت به صفحه دوره آموزشی
             </a>
           </div>
         ) : (
