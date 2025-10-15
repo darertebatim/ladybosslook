@@ -15,6 +15,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { StatsCards } from '@/components/dashboard/StatsCards';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { Announcements } from '@/components/dashboard/Announcements';
+import { CreditTransactions } from '@/components/dashboard/CreditTransactions';
 import { 
   User, 
   ShoppingBag, 
@@ -353,6 +354,9 @@ export default function Dashboard() {
             <div className="lg:col-span-2 space-y-6">
               {/* Quick Actions */}
               <QuickActions />
+
+              {/* Credit Transactions */}
+              <CreditTransactions />
 
               {/* Announcements */}
               <Announcements />
