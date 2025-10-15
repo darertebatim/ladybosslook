@@ -49,7 +49,7 @@ export function AnnouncementCreator() {
 
     setLoading(true);
     try {
-      const { error } = await supabase
+      const { data: announcementData, error } = await supabase
         .from('announcements')
         .insert({
           title: title.trim(),
@@ -58,14 +58,36 @@ export function AnnouncementCreator() {
           badge: badge,
           type: type,
           created_by: (await supabase.auth.getUser()).data.user?.id
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
 
-      toast({
-        title: "Success!",
-        description: `Announcement sent to ${targetCourse === 'all' ? 'all students' : targetCourse}`,
+      // Send email notifications
+      const { error: emailError } = await supabase.functions.invoke('send-announcement-email', {
+        body: {
+          announcementId: announcementData.id,
+          title: title.trim(),
+          message: message.trim(),
+          targetCourse: targetCourse === 'all' ? undefined : targetCourse,
+          badge: badge,
+        }
       });
+
+      if (emailError) {
+        console.error('Email notification error:', emailError);
+        toast({
+          title: "Announcement Created",
+          description: "Announcement posted but email notifications may have failed. Check logs.",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "Success!",
+          description: `Announcement sent to ${targetCourse === 'all' ? 'all students' : targetCourse}. Email notifications are being sent.`,
+        });
+      }
 
       // Reset form
       setTitle('');
