@@ -291,6 +291,64 @@ const Admin = () => {
           </Card>
         </div>
 
+        {/* Program Sync Tool */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <RefreshCw className="h-5 w-5" />
+              Program Catalog Sync
+            </CardTitle>
+            <CardDescription>
+              Sync program definitions from code to database. Run this after updating program details.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={async () => {
+                setIsLoading(true);
+                try {
+                  const programCatalogData = programs.map(p => ({
+                    slug: p.slug,
+                    title: p.title,
+                    type: p.type,
+                    payment_type: p.paymentType,
+                    price_amount: p.priceAmount,
+                    is_active: true
+                  }));
+
+                  const { error } = await supabase
+                    .from('program_catalog')
+                    .upsert(programCatalogData, { 
+                      onConflict: 'slug',
+                      ignoreDuplicates: false 
+                    });
+
+                  if (error) throw error;
+
+                  toast({
+                    title: "Success",
+                    description: `Synced ${programs.length} programs to database`,
+                  });
+                } catch (error: any) {
+                  console.error('Sync error:', error);
+                  toast({
+                    title: "Error",
+                    description: error.message,
+                    variant: "destructive",
+                  });
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+              disabled={isLoading}
+              className="w-full"
+            >
+              <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+              {isLoading ? 'Syncing...' : `Sync ${programs.length} Programs to Database`}
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Course Enrollment Manager */}
         <div className="mb-6">
           <CourseEnrollmentManager />
