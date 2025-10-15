@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -65,7 +66,11 @@ export default function Dashboard() {
     city: '',
     bio: ''
   });
-  const [refundMessage, setRefundMessage] = useState('');
+  const [messageForm, setMessageForm] = useState({
+    subject: '',
+    course: '',
+    message: ''
+  });
 
   useEffect(() => {
     if (!user) {
@@ -175,27 +180,28 @@ export default function Dashboard() {
     navigate('/');
   };
 
-  const handleSendRefundRequest = async () => {
-    if (!refundMessage.trim()) {
+  const handleSendMessage = async () => {
+    if (!messageForm.subject || !messageForm.message.trim()) {
       toast({
-        title: "Message required",
-        description: "Please enter your refund request details",
+        title: "Required fields missing",
+        description: "Please select a subject and enter your message",
         variant: "destructive"
       });
       return;
     }
 
     try {
-      // Send refund request via WhatsApp
+      // Build message for WhatsApp
+      const courseInfo = messageForm.course ? `\nCourse: ${messageForm.course}` : '';
       const message = encodeURIComponent(
-        `REFUND REQUEST\n\nFrom: ${profile?.full_name || 'Student'}\nEmail: ${profile?.email}\n\nMessage: ${refundMessage}`
+        `SUPPORT REQUEST\n\nSubject: ${messageForm.subject}\nFrom: ${profile?.full_name || 'Student'}\nEmail: ${profile?.email}${courseInfo}\n\nMessage:\n${messageForm.message}`
       );
       window.open(`https://wa.me/16265028589?text=${message}`, '_blank');
       
-      setRefundMessage('');
+      setMessageForm({ subject: '', course: '', message: '' });
       toast({
-        title: "Request sent",
-        description: "Your refund request has been sent to admin via WhatsApp"
+        title: "Message sent",
+        description: "Your message has been sent to admin via WhatsApp"
       });
     } catch (error: any) {
       toast({
@@ -407,28 +413,74 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              {/* Refund Request Card */}
+              {/* Message Admin Card */}
               <Card className="mt-6">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">
                     <Send className="h-5 w-5" />
-                    Refund Request
+                    Contact Admin
                   </CardTitle>
+                  <CardDescription>Send a message or request to admin</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <Textarea
-                    placeholder="Describe your refund request..."
-                    value={refundMessage}
-                    onChange={(e) => setRefundMessage(e.target.value)}
-                    rows={4}
-                  />
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="subject">Subject *</Label>
+                    <Select
+                      value={messageForm.subject}
+                      onValueChange={(value) => setMessageForm({ ...messageForm, subject: value })}
+                    >
+                      <SelectTrigger id="subject">
+                        <SelectValue placeholder="Select a subject" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Refund Request">Refund Request</SelectItem>
+                        <SelectItem value="Technical Support">Technical Support</SelectItem>
+                        <SelectItem value="Course Question">Course Question</SelectItem>
+                        <SelectItem value="Billing Issue">Billing Issue</SelectItem>
+                        <SelectItem value="General Inquiry">General Inquiry</SelectItem>
+                        <SelectItem value="Feedback">Feedback</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="course">Related Course (Optional)</Label>
+                    <Select
+                      value={messageForm.course}
+                      onValueChange={(value) => setMessageForm({ ...messageForm, course: value })}
+                    >
+                      <SelectTrigger id="course">
+                        <SelectValue placeholder="Select a course" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="None">None</SelectItem>
+                        <SelectItem value="Courageous Character Course">Courageous Character Course</SelectItem>
+                        <SelectItem value="IQ Money Workshop">IQ Money Workshop</SelectItem>
+                        <SelectItem value="Assertiveness Training">Assertiveness Training</SelectItem>
+                        <SelectItem value="Business Coaching">Business Coaching</SelectItem>
+                        <SelectItem value="Ladyboss VIP Club">Ladyboss VIP Club</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="message">Message *</Label>
+                    <Textarea
+                      id="message"
+                      placeholder="Type your message here..."
+                      value={messageForm.message}
+                      onChange={(e) => setMessageForm({ ...messageForm, message: e.target.value })}
+                      rows={5}
+                    />
+                  </div>
+
                   <Button 
                     className="w-full" 
                     variant="default"
-                    onClick={handleSendRefundRequest}
+                    onClick={handleSendMessage}
                   >
                     <Send className="mr-2 h-4 w-4" />
-                    Send Request to Admin
+                    Send Message to Admin
                   </Button>
                 </CardContent>
               </Card>
