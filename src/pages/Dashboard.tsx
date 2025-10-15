@@ -497,12 +497,12 @@ export default function Dashboard() {
               {/* Announcements */}
               <Announcements />
 
-              {/* My Events */}
+              {/* My Orders */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <ShoppingBag className="h-5 w-5" />
-                    My Purchases
+                    My Orders
                   </CardTitle>
                   <CardDescription>
                     Your enrolled programs and training sessions

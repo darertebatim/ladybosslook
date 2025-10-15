@@ -119,6 +119,17 @@ export function CourseEnrollmentManager() {
 
     setIsLoading(true);
     try {
+      // Get user profile for order details
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('email, full_name, phone')
+        .eq('id', selectedUserId)
+        .single();
+
+      if (!profile) {
+        throw new Error('User profile not found');
+      }
+
       // Check if already enrolled
       const { data: existing } = await supabase
         .from('course_enrollments')
@@ -137,7 +148,8 @@ export function CourseEnrollmentManager() {
         return;
       }
 
-      const { error } = await supabase
+      // Create enrollment
+      const { error: enrollError } = await supabase
         .from('course_enrollments')
         .insert({
           user_id: selectedUserId,
@@ -145,11 +157,28 @@ export function CourseEnrollmentManager() {
           status: 'active'
         });
 
-      if (error) throw error;
+      if (enrollError) throw enrollError;
+
+      // Create a test order as well
+      const { error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: selectedUserId,
+          product_name: selectedCourse,
+          amount: 9700, // $97.00 in cents as default
+          currency: 'usd',
+          status: 'paid',
+          email: profile.email,
+          name: profile.full_name || 'Test User',
+          phone: profile.phone,
+          stripe_session_id: `test_${Date.now()}`
+        });
+
+      if (orderError) throw orderError;
 
       toast({
         title: "Success",
-        description: "User enrolled successfully"
+        description: "User enrolled and test order created successfully"
       });
 
       setSelectedUserId('');
