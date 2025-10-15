@@ -23,7 +23,8 @@ import {
   Globe,
   Crown,
   Diamond,
-  Sparkles
+  Sparkles,
+  Loader2
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -311,9 +312,27 @@ const CourageousWorkshop = () => {
                 </div>
               </div>
               <div className="mt-4 sm:mt-6 text-center">
-                <p className="text-white/90 text-xs sm:text-sm font-medium">
+                <p className="text-white/90 text-xs sm:text-sm font-medium mb-4">
                   ⏱️ مدت زمان: 15 دقیقه | 🎯 این ویدیو می‌تواند نقطه عطف زندگی شما باشد
                 </p>
+                <Button 
+                  size="lg" 
+                  className="bg-green-600 hover:bg-green-700 text-white px-8 sm:px-10 py-5 sm:py-6 text-lg sm:text-xl font-extrabold rounded-xl sm:rounded-2xl shadow-lg min-h-[56px] sm:min-h-[64px] active:scale-95 transition-transform"
+                  onClick={() => handleDirectPayment('video_cta')}
+                  disabled={isProcessingPayment}
+                >
+                  {isProcessingPayment ? (
+                    <>
+                      <Loader2 className="ml-2 h-5 w-5 animate-spin" />
+                      در حال انتقال...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="ml-2 h-6 w-6" />
+                      همین الان شروع کنید - فقط $۹۷
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </div>
