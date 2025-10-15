@@ -15,6 +15,7 @@ import FixMailchimpAmounts from '@/components/FixMailchimpAmounts';
 import SetupAdmin from '@/components/SetupAdmin';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
 import { CourseEnrollmentManager } from '@/components/admin/CourseEnrollmentManager';
+import { programs } from '@/data/programs';
 
 interface FormSubmission {
   id: string;
@@ -35,18 +36,8 @@ interface CourseStats {
   student_count: number;
 }
 
-const AVAILABLE_COURSES = [
-  'Courageous Character Course',
-  'Money Literacy Workshop',
-  'IQ Money Program',
-  'Ladyboss Coaching',
-  'Business Growth Accelerator',
-  'Business Startup Accelerator',
-  'Instagram Growth Course',
-  'Connection Literacy Program',
-  'Networking Program',
-  'Assertiveness Training'
-];
+// Get course names from the programs data
+const AVAILABLE_COURSES = programs.map(p => p.title);
 
 const Admin = () => {
   const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
