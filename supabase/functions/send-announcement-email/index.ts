@@ -160,7 +160,7 @@ const handler = async (req: Request): Promise<Response> => {
         
         try {
           const result = await resend.emails.send({
-            from: "Razie Mah <support@ladybosslook.com>",
+            from: "Support Ladyboss <support@ladybosslook.com>",
             to: [email],
             subject: `${badge ? `[${badge}] ` : ''}${title}`,
             html: `
@@ -190,10 +190,11 @@ const handler = async (req: Request): Promise<Response> => {
                         ${message.replace(/\n/g, '<br>')}
                       </div>
                       ${targetCourse ? `<p><strong>Course:</strong> ${targetCourse}</p>` : ''}
-                      <a href="https://9d54663c-1af5-4066-9ceb-1723206ae5f8.lovableproject.com/dashboard" class="button">View in Dashboard</a>
+                      <a href="https://ladybosslook.com/dashboard" class="button">View in Dashboard</a>
                       <div class="footer">
                         <p>This announcement was sent to you based on your course enrollment.</p>
-                        <p>© ${new Date().getFullYear()} Razie Mah. All rights reserved.</p>
+                        <p>© ${new Date().getFullYear()} Ladybosslook Academy. All rights reserved.</p>
+                        <p><a href="https://ladybosslook.com" style="color: #667eea; text-decoration: none;">ladybosslook.com</a></p>
                       </div>
                     </div>
                   </div>
