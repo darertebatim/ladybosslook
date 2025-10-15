@@ -2,9 +2,19 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "npm:resend@2.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+console.log('Edge function initialized');
+console.log('Resend API Key exists:', !!RESEND_API_KEY);
+console.log('Supabase URL exists:', !!supabaseUrl);
+
+if (!RESEND_API_KEY) {
+  console.error('CRITICAL: RESEND_API_KEY is not set!');
+}
+
+const resend = new Resend(RESEND_API_KEY);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,11 +30,19 @@ interface AnnouncementEmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  console.log('Function invoked - Method:', req.method);
+  
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    console.log('Starting announcement email processing...');
+    
+    if (!RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not configured');
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
     const { announcementId, title, message, targetCourse, badge }: AnnouncementEmailRequest = await req.json();
