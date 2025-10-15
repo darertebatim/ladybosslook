@@ -501,8 +501,8 @@ const Admin = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Students</SelectItem>
-                      {AVAILABLE_COURSES.map(course => (
-                        <SelectItem key={course} value={course}>{course}</SelectItem>
+                      {programs.map(program => (
+                        <SelectItem key={program.slug} value={program.title}>{program.title}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

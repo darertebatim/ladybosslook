@@ -52,6 +52,7 @@ export type Database = {
           course_name: string
           enrolled_at: string
           id: string
+          program_slug: string | null
           status: string | null
           user_id: string
         }
@@ -59,6 +60,7 @@ export type Database = {
           course_name: string
           enrolled_at?: string
           id?: string
+          program_slug?: string | null
           status?: string | null
           user_id: string
         }
@@ -66,6 +68,7 @@ export type Database = {
           course_name?: string
           enrolled_at?: string
           id?: string
+          program_slug?: string | null
           status?: string | null
           user_id?: string
         }
@@ -151,8 +154,10 @@ export type Database = {
           email: string
           id: string
           name: string
+          payment_type: string | null
           phone: string | null
           product_name: string
+          program_slug: string | null
           status: string | null
           stripe_session_id: string | null
           updated_at: string
@@ -165,8 +170,10 @@ export type Database = {
           email: string
           id?: string
           name: string
+          payment_type?: string | null
           phone?: string | null
           product_name: string
+          program_slug?: string | null
           status?: string | null
           stripe_session_id?: string | null
           updated_at?: string
@@ -179,8 +186,10 @@ export type Database = {
           email?: string
           id?: string
           name?: string
+          payment_type?: string | null
           phone?: string | null
           product_name?: string
+          program_slug?: string | null
           status?: string | null
           stripe_session_id?: string | null
           updated_at?: string
@@ -221,6 +230,42 @@ export type Database = {
           id?: string
           phone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      program_catalog: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          payment_type: string
+          price_amount: number
+          slug: string
+          title: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          payment_type: string
+          price_amount?: number
+          slug: string
+          title: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          payment_type?: string
+          price_amount?: number
+          slug?: string
+          title?: string
+          type?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -318,6 +363,10 @@ export type Database = {
       log_security_event: {
         Args: { p_action: string; p_details?: Json; p_user_id?: string }
         Returns: undefined
+      }
+      map_course_name_to_slug: {
+        Args: { course_name: string }
+        Returns: string
       }
     }
     Enums: {
