@@ -94,9 +94,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    setIsAdmin(false);
-    return { error };
+    try {
+      // Clear local state immediately
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
+      
+      // Then perform the sign out
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Sign out error:', error);
+      }
+      
+      return { error };
+    } catch (error: any) {
+      console.error('Sign out exception:', error);
+      return { error };
+    }
   };
 
   const logSecurityEvent = async (action: string, details?: any): Promise<void> => {
