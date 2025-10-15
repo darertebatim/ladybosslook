@@ -1,45 +1,42 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowRight, Star, Clock, Users } from 'lucide-react';
-import { programs } from '@/data/programs';
+import { usePrograms } from '@/hooks/usePrograms';
+import { Link } from 'react-router-dom';
 
 const Programs = () => {
+  const { programs } = usePrograms();
+  
+  // Get only popular programs
+  const popularPrograms = programs.filter(p => p.popular);
 
   return (
-    <section id="programs" className="py-16 lg:py-24 bg-muted/50">
+    <section className="py-16 lg:py-24 bg-background">
       <div className="container mx-auto px-6">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full mb-6">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full mb-4">
             <Star size={16} className="mr-2 text-primary" />
-            <span className="text-sm font-medium text-primary">
-              Featured Programs
-            </span>
+            <span className="text-sm font-medium text-primary">Most Popular Programs</span>
           </div>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-            Accelerate Your{' '}
-            <span className="gradient-text">Success Journey</span>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+            Featured Programs
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Our core programs are designed to fast-track your success with proven methodologies, 
-            expert coaching, and a supportive community of like-minded women.
+            Join thousands of successful women who transformed their lives with our most popular programs
           </p>
         </div>
 
-        {/* Programs Grid - Show only first 6 programs */}
-        <div className="grid lg:grid-cols-3 gap-8">
-          {programs.slice(0, 6).map((program, index) => (
+        {/* Popular Programs Grid */}
+        <div className="grid lg:grid-cols-3 gap-8 mb-12">
+          {popularPrograms.map((program, index) => (
             <Card 
               key={index}
-              className={`group relative overflow-hidden bg-gradient-card border-border hover:shadow-medium transition-all duration-300 hover:-translate-y-2 ${
-                program.popular ? 'ring-2 ring-primary shadow-glow' : ''
-              }`}
+              className="group relative overflow-hidden bg-gradient-card border-border hover:shadow-medium transition-all duration-300 hover:-translate-y-2 ring-2 ring-primary shadow-glow"
             >
-              {program.popular && (
-                <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold z-10">
-                  Most Popular
-                </div>
-              )}
+              <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold z-10">
+                Most Popular
+              </div>
 
               {/* Program Image */}
               <div className="aspect-video overflow-hidden">
@@ -74,7 +71,7 @@ const Programs = () => {
                     {program.title}
                   </h3>
                   
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed line-clamp-3">
                     {program.description}
                   </p>
                 </div>
@@ -83,7 +80,7 @@ const Programs = () => {
                 <div className="mb-6">
                   <h4 className="font-semibold mb-3">What's Included:</h4>
                   <ul className="space-y-2">
-                    {program.features.map((feature, featureIndex) => (
+                    {program.features.slice(0, 3).map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-center text-sm">
                         <div className="w-2 h-2 bg-primary rounded-full mr-3 flex-shrink-0"></div>
                         {feature}
@@ -116,8 +113,8 @@ const Programs = () => {
                         </span>
                       )}
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      One-time payment
+                    <span className="text-sm text-muted-foreground capitalize">
+                      {program.paymentType === 'one-time' ? 'One-time' : program.paymentType}
                     </span>
                   </div>
                   
@@ -134,37 +131,18 @@ const Programs = () => {
           ))}
         </div>
 
-        {/* View All Programs Button */}
-        <div className="text-center mt-12">
-          <Button 
-            size="lg"
-            variant="outline"
-            onClick={() => window.location.href = '/programs'}
-          >
-            View All Programs
-            <ArrowRight size={16} className="ml-2" />
-          </Button>
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="text-center mt-16">
-          <div className="bg-gradient-hero p-8 rounded-2xl text-white">
-            <h3 className="font-display text-2xl md:text-3xl font-bold mb-4">
-              Not Sure Which Program is Right for You?
-            </h3>
-            <p className="text-white/90 mb-6 max-w-2xl mx-auto">
-              Book a free 30-minute consultation with our success coaches to find the perfect 
-              program that matches your goals and current business stage.
-            </p>
+        {/* See All Programs Button */}
+        <div className="text-center">
+          <Link to="/programs">
             <Button 
-              variant="secondary"
               size="lg"
-              className="bg-white text-primary hover:bg-white/90"
-              onClick={() => window.open('https://wa.me/16265028589', '_blank')}
+              variant="outline"
+              className="bg-gradient-subtle hover:bg-gradient-card border-2"
             >
-              Book Free Consultation
+              View All Programs
+              <ArrowRight size={20} className="ml-2" />
             </Button>
-          </div>
+          </Link>
         </div>
       </div>
     </section>
