@@ -502,7 +502,7 @@ export default function Dashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <ShoppingBag className="h-5 w-5" />
-                    My Events
+                    My Purchases
                   </CardTitle>
                   <CardDescription>
                     Your enrolled programs and training sessions
@@ -516,7 +516,7 @@ export default function Dashboard() {
                         You haven't enrolled in any events yet
                       </p>
                       <Button onClick={() => navigate("/#programs")}>
-                        Browse Events
+                        Browse Programs
                       </Button>
                     </div>
                   ) : (

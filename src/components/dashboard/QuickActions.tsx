@@ -30,7 +30,7 @@ export function QuickActions() {
     },
     {
       icon: GraduationCap,
-      label: "My Workshops",
+      label: "My Events",
       description: "View upcoming events",
       action: () => navigate("/"),
       color: "text-orange-600"
