@@ -49,14 +49,6 @@ const Admin = () => {
     failed: 0,
     today: 0
   });
-  const [announcementForm, setAnnouncementForm] = useState({
-    title: '',
-    message: '',
-    targetCourse: 'all',
-    type: 'general',
-    badge: ''
-  });
-  const [isSendingAnnouncement, setIsSendingAnnouncement] = useState(false);
   const { toast } = useToast();
 
   const fetchSubmissions = async () => {
@@ -128,53 +120,6 @@ const Admin = () => {
     }
   };
 
-  const sendAnnouncement = async () => {
-    if (!announcementForm.title || !announcementForm.message) {
-      toast({
-        title: "Validation Error",
-        description: "Title and message are required",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSendingAnnouncement(true);
-    try {
-      const { error } = await supabase
-        .from('announcements')
-        .insert({
-          title: announcementForm.title,
-          message: announcementForm.message,
-          target_course: announcementForm.targetCourse === 'all' ? null : announcementForm.targetCourse,
-          type: announcementForm.type,
-          badge: announcementForm.badge || announcementForm.type
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success!",
-        description: `Announcement sent${announcementForm.targetCourse !== 'all' ? ` to ${announcementForm.targetCourse} students` : ' to all students'}`,
-      });
-
-      // Reset form
-      setAnnouncementForm({
-        title: '',
-        message: '',
-        targetCourse: 'all',
-        type: 'general',
-        badge: ''
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsSendingAnnouncement(false);
-    }
-  };
 
   const exportData = () => {
     const csvContent = [
@@ -512,100 +457,6 @@ const Admin = () => {
                 No enrollments yet - Click "Sync from Orders" to import from completed purchases
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Send Announcement */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Send className="h-5 w-5" />
-              Send Announcement
-            </CardTitle>
-            <CardDescription>
-              Send announcements to all students or target specific courses
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  id="title"
-                  placeholder="Announcement title"
-                  value={announcementForm.title}
-                  onChange={(e) => setAnnouncementForm({ ...announcementForm, title: e.target.value })}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="message">Message</Label>
-                <Textarea
-                  id="message"
-                  placeholder="Your announcement message..."
-                  value={announcementForm.message}
-                  onChange={(e) => setAnnouncementForm({ ...announcementForm, message: e.target.value })}
-                  rows={4}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="targetCourse">Target Course (Optional)</Label>
-                  <Select 
-                    value={announcementForm.targetCourse} 
-                    onValueChange={(value) => setAnnouncementForm({ ...announcementForm, targetCourse: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="All students" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Students</SelectItem>
-                      {programs.map(program => (
-                        <SelectItem key={program.slug} value={program.title}>{program.title}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="type">Type</Label>
-                  <Select 
-                    value={announcementForm.type} 
-                    onValueChange={(value) => setAnnouncementForm({ ...announcementForm, type: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="general">General</SelectItem>
-                      <SelectItem value="new">New Course</SelectItem>
-                      <SelectItem value="event">Event</SelectItem>
-                      <SelectItem value="update">Update</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="badge">Badge Text (Optional)</Label>
-                  <Input
-                    id="badge"
-                    placeholder="e.g., Urgent, New"
-                    value={announcementForm.badge}
-                    onChange={(e) => setAnnouncementForm({ ...announcementForm, badge: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <Button 
-                onClick={sendAnnouncement} 
-                disabled={isSendingAnnouncement}
-                className="w-full md:w-auto"
-              >
-                <Send className="mr-2 h-4 w-4" />
-                {isSendingAnnouncement ? 'Sending...' : 'Send Announcement'}
-              </Button>
-            </div>
           </CardContent>
         </Card>
 
