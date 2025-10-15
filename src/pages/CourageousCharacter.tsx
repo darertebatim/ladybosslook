@@ -371,6 +371,62 @@ const CourageousWorkshop = () => {
                 </div>
               </div>
             </div>
+
+            {/* What You Get Section */}
+            <div className="bg-gradient-to-br from-green-900/30 to-green-800/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-6 sm:p-8 mb-8 sm:mb-10 mx-2 sm:mx-4 border-2 border-green-500/40 shadow-lg">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-6 text-center font-farsi">
+                دقیقا چیا دریافت می‌کنی وقتی بلیط ۹۷ دلاری دوره آموزشی کارکترپرجرات رو می‌گیری؟
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3 bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center font-bold text-white">1</div>
+                  <p className="text-white/90 text-sm sm:text-base">مجموعا ساعت آموزش آنلاین کارگاهی + ‌۶ ساعت آموزش ضبط شده آفلاین</p>
+                </div>
+                <div className="flex items-start gap-3 bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center font-bold text-white">2</div>
+                  <p className="text-white/90 text-sm sm:text-base">سه تا جلسه دوساعته کارگاهی آنلاین (در گوگل میت)</p>
+                </div>
+                <div className="flex items-start gap-3 bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center font-bold text-white">3</div>
+                  <p className="text-white/90 text-sm sm:text-base">همه جلسات آنلاین برای شما ضبط می‌شه و فیلم‌ش رو در اختیارت می‌داریم تا چندین بار مرور کنی.</p>
+                </div>
+                <div className="flex items-start gap-3 bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center font-bold text-white">4</div>
+                  <p className="text-white/90 text-sm sm:text-base">یک ماه پشتیبانی (با ایمیل / واتسپ جدا مخصوص ورکشاپ) می‌تونی همه سوالاتو درباره کارکتر پرجرات بپرسی.</p>
+                </div>
+                <div className="flex items-start gap-3 bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center font-bold text-white">5</div>
+                  <p className="text-white/90 text-sm sm:text-base">بیشتر از ۶ ساعت فایل صوتی و ویدیوی اضافه دریافت می‌کنی (جزییات تکنیک‌ها و نمونه دیالوگ‌های آماده ۲ زبانه)</p>
+                </div>
+                <div className="flex items-start gap-3 bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center font-bold text-white">6</div>
+                  <p className="text-white/90 text-sm sm:text-base">جزوه ورک‌بوک ورکشاپ ۲ زبانه (شامل مثال+دیالوگ) بصورت PDF برای شما ارسال میشه و می‌تونی پرینت بگیری.</p>
+                </div>
+                <div className="flex items-start gap-3 bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center font-bold text-white">7</div>
+                  <p className="text-white/90 text-sm sm:text-base">هدیه: بلیط وبینار (ذهن آگاهی و حفظ خونسردی) به همراه مدیتیشن مخصوص رو👇دریافت می‌کنی</p>
+                </div>
+                <div className="flex items-start gap-3 bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center font-bold text-white">8</div>
+                  <p className="text-white/90 text-sm sm:text-base">عضو کانال تلگرامی مخصوص اعضای کاراکتر پرجرات میشی که به اطلاع‌رسانی‌ها و آپدیت‌های آینده ورکشاپ دسترسی داری</p>
+                </div>
+                <div className="flex items-start gap-3 bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center font-bold text-white">9</div>
+                  <p className="text-white/90 text-sm sm:text-base">کتاب کاراکتر پرجرات رو بصورت صوتی (Audio Book) با صدای استاد راضیه لیدی‌باس هدیه دریافت می‌کنی.</p>
+                </div>
+                <div className="flex items-start gap-3 bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center font-bold text-white">10</div>
+                  <p className="text-white/90 text-sm sm:text-base">ضمانت بازگشت ۱۰۰٪ وجه بدون سوال تا پایان ورکشاپ (به مدت یک ماه)</p>
+                </div>
+                <div className="flex items-start gap-3 bg-white/5 p-4 rounded-lg backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center font-bold text-white">11</div>
+                  <p className="text-white/90 text-sm sm:text-base">عضو رسمی آکادمی بین المللی لیدی‌باس میشی و از این به بعد بالاترین تخفیف‌ها و اشانتیون‌ها اول به شما اطلاع‌رسانی میشه.</p>
+                </div>
+              </div>
+              <div className="mt-6 text-center">
+                <p className="text-white text-2xl sm:text-3xl font-bold">👇👇👇👇</p>
+              </div>
+            </div>
             
             {/* CTA Buttons - Mobile Optimized */}
             <div className="flex flex-col gap-3 sm:gap-4 justify-center items-center mb-10 sm:mb-12 px-4">
