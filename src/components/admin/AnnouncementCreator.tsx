@@ -30,8 +30,12 @@ export function AnnouncementCreator() {
     }
 
     setLoading(true);
+    let announcementData: any = null;
+    
     try {
-      const { data: announcementData, error } = await supabase
+      // Step 1: Create announcement
+      console.log('📝 Creating announcement...');
+      const { data, error } = await supabase
         .from('announcements')
         .insert({
           title: title.trim(),
@@ -44,55 +48,95 @@ export function AnnouncementCreator() {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Announcement creation failed:', error);
+        throw error;
+      }
+      
+      announcementData = data;
+      console.log('✅ Announcement created:', announcementData.id);
 
-      // Send email notifications
-      console.log('Invoking send-announcement-email function with:', {
+      // Step 2: Send email notifications
+      const emailPayload = {
         announcementId: announcementData.id,
+        title: title.trim(),
+        message: message.trim(),
         targetCourse: targetCourse === 'all' ? undefined : targetCourse,
+        badge: badge,
+      };
+      
+      console.log('📧 Invoking send-announcement-email function with:', emailPayload);
+      console.log('⏰ Starting email send at:', new Date().toISOString());
+      
+      // Set a timeout for the function call
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Email function timeout after 30 seconds')), 30000)
+      );
+      
+      const emailPromise = supabase.functions.invoke('send-announcement-email', {
+        body: emailPayload
       });
       
-      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-announcement-email', {
-        body: {
-          announcementId: announcementData.id,
-          title: title.trim(),
-          message: message.trim(),
-          targetCourse: targetCourse === 'all' ? undefined : targetCourse,
-          badge: badge,
-        }
+      const { data: emailData, error: emailError } = await Promise.race([
+        emailPromise,
+        timeoutPromise
+      ]) as any;
+
+      console.log('📬 Email function completed at:', new Date().toISOString());
+      console.log('📊 Email function response:', { 
+        data: emailData, 
+        error: emailError,
+        hasData: !!emailData,
+        hasError: !!emailError
       });
 
-      console.log('Email function response:', { emailData, emailError });
-
       if (emailError) {
-        console.error('Email notification error:', emailError);
+        console.error('❌ Email notification error:', {
+          message: emailError.message,
+          status: emailError.status,
+          statusText: emailError.statusText,
+          full: emailError
+        });
+        
         toast({
-          title: "Announcement Created",
-          description: `Announcement posted but email failed: ${emailError.message}`,
+          title: "⚠️ Partial Success",
+          description: `Announcement created but emails failed to send: ${emailError.message}. Check logs for details.`,
           variant: "default",
         });
       } else {
+        const emailCount = emailData?.stats?.successful || 0;
+        const failedCount = emailData?.stats?.failed || 0;
+        
+        console.log(`✅ Emails sent: ${emailCount} successful, ${failedCount} failed`);
+        
         toast({
-          title: "Success!",
-          description: `Announcement sent to ${targetCourse === 'all' ? 'all students' : targetCourse}. Emails sent: ${emailData?.stats?.successful || 0}`,
+          title: "🎉 Success!",
+          description: `Announcement sent! Emails delivered: ${emailCount}${failedCount > 0 ? `, ${failedCount} failed` : ''}`,
         });
       }
 
-      // Reset form
+      // Reset form on success
       setTitle('');
       setMessage('');
       setTargetCourse('all');
       setBadge('General');
       setType('general');
+      
     } catch (error: any) {
-      console.error('Error creating announcement:', error);
+      console.error('❌ Error in announcement flow:', {
+        message: error.message,
+        stack: error.stack,
+        full: error
+      });
+      
       toast({
         title: "Error",
-        description: error.message,
+        description: `Failed: ${error.message}. ${announcementData ? 'Announcement was created but emails may not have sent.' : 'Announcement was not created.'}`,
         variant: "destructive",
       });
     } finally {
       setLoading(false);
+      console.log('🏁 Announcement flow completed');
     }
   };
 

@@ -15,6 +15,8 @@ import FixMailchimpAmounts from '@/components/FixMailchimpAmounts';
 import SetupAdmin from '@/components/SetupAdmin';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
 import { CourseEnrollmentManager } from '@/components/admin/CourseEnrollmentManager';
+import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
+import { EmailLogsViewer } from '@/components/admin/EmailLogsViewer';
 import { usePrograms } from '@/hooks/usePrograms';
 
 interface FormSubmission {
@@ -606,6 +608,16 @@ const Admin = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Announcement Creator */}
+        <div className="mb-6">
+          <AnnouncementCreator />
+        </div>
+
+        {/* Email Delivery Logs */}
+        <div className="mb-6">
+          <EmailLogsViewer />
+        </div>
 
         {/* User Credits Management */}
         <UserCreditsManager />
