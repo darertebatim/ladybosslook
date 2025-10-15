@@ -77,7 +77,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send emails
     const emailPromises = userEmails.map(email => 
       resend.emails.send({
-        from: "Razie Mah <onboarding@resend.dev>",
+        from: "Razie Mah <noreply@yourdomain.com>",
         to: [email],
         subject: `${badge ? `[${badge}] ` : ''}${title}`,
         html: `
@@ -107,7 +107,7 @@ const handler = async (req: Request): Promise<Response> => {
                     ${message.replace(/\n/g, '<br>')}
                   </div>
                   ${targetCourse ? `<p><strong>Course:</strong> ${targetCourse}</p>` : ''}
-                  <a href="https://mnukhzjcvbwpvktxqlej.supabase.co/dashboard" class="button">View in Dashboard</a>
+                  <a href="https://9d54663c-1af5-4066-9ceb-1723206ae5f8.lovableproject.com/dashboard" class="button">View in Dashboard</a>
                   <div class="footer">
                     <p>This announcement was sent to you based on your course enrollment.</p>
                     <p>© ${new Date().getFullYear()} Razie Mah. All rights reserved.</p>
