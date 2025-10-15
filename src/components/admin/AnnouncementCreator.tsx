@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { Megaphone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { programs } from '@/data/programs';
 
 export function AnnouncementCreator() {
   const [title, setTitle] = useState('');
@@ -14,28 +15,11 @@ export function AnnouncementCreator() {
   const [targetCourse, setTargetCourse] = useState<string>('all');
   const [badge, setBadge] = useState('General');
   const [type, setType] = useState('general');
-  const [courses, setCourses] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchCourses();
-  }, []);
-
-  const fetchCourses = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('course_enrollments')
-        .select('course_name');
-
-      if (error) throw error;
-
-      const uniqueCourses = [...new Set(data?.map(e => e.course_name) || [])];
-      setCourses(uniqueCourses);
-    } catch (error: any) {
-      console.error('Error fetching courses:', error);
-    }
-  };
+  // Use program titles from the programs data
+  const courseNames = programs.map(p => p.title);
 
   const handleSubmit = async () => {
     if (!title.trim() || !message.trim()) {
@@ -145,7 +129,7 @@ export function AnnouncementCreator() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Students</SelectItem>
-                {courses.map((course) => (
+                {courseNames.map((course) => (
                   <SelectItem key={course} value={course}>
                     {course}
                   </SelectItem>
