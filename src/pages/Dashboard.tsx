@@ -17,7 +17,6 @@ import { StatsCards } from '@/components/dashboard/StatsCards';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { Announcements } from '@/components/dashboard/Announcements';
 import { CreditTransactions } from '@/components/dashboard/CreditTransactions';
-import { AddTestEnrollment } from '@/components/AddTestEnrollment';
 import { 
   User, 
   ShoppingBag, 
@@ -501,18 +500,13 @@ export default function Dashboard() {
               {/* My Orders */}
               <Card>
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <ShoppingBag className="h-5 w-5" />
-                        My Orders
-                      </CardTitle>
-                      <CardDescription>
-                        Your enrolled programs and training sessions
-                      </CardDescription>
-                    </div>
-                    <AddTestEnrollment />
-                  </div>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShoppingBag className="h-5 w-5" />
+                    My Orders
+                  </CardTitle>
+                  <CardDescription>
+                    Your enrolled programs and training sessions
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {orders.length === 0 ? (
