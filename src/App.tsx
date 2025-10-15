@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import Programs from "./pages/Programs";
 import About from "./pages/About";
 import Admin from "./pages/Admin";
 import AssertLanding from "./pages/AssertLanding";
@@ -51,6 +52,7 @@ const App = () => (
           <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/programs" element={<Programs />} />
             <Route path="/about" element={<About />} />
             <Route path="/landing" element={<Landing />} />
             <Route path="/asac" element={<AssertLanding />} />

@@ -1,202 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowRight, Star, Clock, Users } from 'lucide-react';
-import moneyLiteracyImage from '@/assets/money-literacy-program.jpg';
-import businessCoachingImage from '@/assets/business-coaching-program.jpg';
-import networkingImage from '@/assets/networking-program.jpg';
-import courageousCharacterImage from '@/assets/courageous-character-course.jpg';
-import iqmoneyImage from '@/assets/iqmoney-program.jpg';
-import empoweredLadybossImage from '@/assets/empowered-ladyboss-coaching.jpg';
-import ladybossVipImage from '@/assets/ladyboss-vip-club.jpg';
-import connectionLiteracyImage from '@/assets/connection-literacy-program.jpg';
-import instagramGrowthImage from '@/assets/instagram-growth-course.jpg';
-import privateCoachingImage from '@/assets/private-coaching-session.jpg';
+import { programs } from '@/data/programs';
 
 const Programs = () => {
-  const programs = [
-    {
-      title: 'IQMoney - Income Growth Program',
-      description: 'Advanced strategies to dramatically increase your income. Learn multiple income streams, negotiation mastery, and proven tactics to maximize your earning potential as an ambitious entrepreneur.',
-      image: iqmoneyImage,
-      duration: 'Self-paced',
-      participants: '12,000+',
-      rating: 5.0,
-      features: [
-        'Multiple Income Stream Strategies',
-        'Advanced Negotiation Mastery',
-        'Premium Pricing Psychology',
-        'High-Ticket Sales Training',
-        'Income Multiplication Framework'
-      ],
-      price: '$1,997',
-      popular: true,
-      link: '/iqmoney-income'
-    },
-    {
-      title: 'Money Literacy for LadyBoss',
-      description: 'Complete financial education system with 52 video lessons covering budgeting, investing, debt elimination, and wealth building. Designed specifically for ambitious women seeking financial independence.',
-      image: moneyLiteracyImage,
-      duration: 'Self-paced',
-      participants: '60,000+',
-      rating: 4.9,
-      features: [
-        '52 Expert-Led Video Lessons',
-        'Financial Confidence Building',
-        'Investment Psychology Mastery',
-        'Business Building Strategies',
-        'Lifetime Access & Community'
-      ],
-      price: '$997',
-      popular: false,
-      link: '/iqmoney'
-    },
-    {
-      title: 'Ladyboss VIP Club',
-      description: 'Join our most exclusive 12-month VIP coaching program. Weekly group sessions with premium access, advanced strategies, and an elite community of successful women entrepreneurs.',
-      image: ladybossVipImage,
-      duration: '12 months',
-      participants: '500+',
-      rating: 5.0,
-      features: [
-        'Weekly VIP Group Coaching',
-        'Exclusive Elite Community Access',
-        'Advanced Business Strategies',
-        'Priority Support & Resources',
-        'Year-Long Transformation Program'
-      ],
-      price: '$4,997',
-      popular: true,
-      link: '/ladyboss-vip'
-    },
-    {
-      title: 'Empowered Ladyboss Group Coaching',
-      description: 'Join our exclusive 3-month group coaching program for ambitious women entrepreneurs. Weekly sessions focused on leadership, business growth, and building your empire with a supportive community.',
-      image: empoweredLadybossImage,
-      duration: '3 months',
-      participants: '2,500+',
-      rating: 4.9,
-      features: [
-        'Weekly Live Group Coaching',
-        'Empowered Leadership Training',
-        'Business Strategy & Growth',
-        'Supportive Community Network',
-        'Accountability & Support System'
-      ],
-      price: '$997',
-      popular: false,
-      link: '/empowered-ladyboss'
-    },
-    {
-      title: 'Business Growth Accelerator',
-      description: 'Transform your existing business into a profitable empire with our comprehensive coaching program and proven growth frameworks. 3-month semi-private weekly sessions.',
-      image: businessCoachingImage,
-      duration: '3 months',
-      participants: '3,200+',
-      rating: 5.0,
-      features: [
-        'Advanced Business Strategy',
-        'Revenue Optimization',
-        'Marketing & Sales Mastery',
-        'Leadership Development',
-        'Semi-Private Weekly Sessions'
-      ],
-      price: '$4,997',
-      popular: false,
-      link: '/business-growth-accelerator'
-    },
-    {
-      title: 'Business Startup Accelerator',
-      description: 'Launch your business from idea to profit in 3 months. Complete startup program with step-by-step guidance, legal setup, and launch strategy. Semi-private weekly sessions.',
-      image: networkingImage,
-      duration: '3 months',
-      participants: '1,800+',
-      rating: 4.9,
-      features: [
-        'Business Idea Validation',
-        'Complete Legal Setup',
-        'Brand & Website Creation',
-        'Launch Strategy & Marketing',
-        'Semi-Private Weekly Sessions'
-      ],
-      price: '$4,997',
-      popular: false,
-      link: '/business-startup-accelerator'
-    },
-    {
-      title: 'Instagram Fast Growth Course',
-      description: 'Rapidly grow your Instagram following and engagement with proven strategies. 3-month semi-private coaching program teaching content creation, algorithm mastery, monetization tactics, and building an engaged community.',
-      image: instagramGrowthImage,
-      duration: '3 months',
-      participants: '2,800+',
-      rating: 5.0,
-      features: [
-        'Content Strategy & Creation',
-        'Algorithm Mastery & Growth Hacks',
-        'Engagement & Community Building',
-        'Monetization Strategies',
-        'Semi-Private Weekly Sessions'
-      ],
-      price: '$2,997',
-      popular: true,
-      link: '/instagram-growth'
-    },
-    {
-      title: '1-Hour Private Session with Razie',
-      description: 'Get personalized guidance and breakthrough strategies in an exclusive one-on-one coaching session with Razie Ladyboss. Perfect for tackling specific challenges and accelerating your success.',
-      image: privateCoachingImage,
-      duration: '1 hour',
-      participants: '500+',
-      rating: 5.0,
-      features: [
-        'Personalized One-on-One Coaching',
-        'Breakthrough Strategy Session',
-        'Customized Action Plan',
-        'Direct Access to Razie',
-        'Follow-up Resources Included'
-      ],
-      price: '$597',
-      popular: false,
-      link: '/private-coaching'
-    },
-    {
-      title: 'Connection Literacy for Ladyboss',
-      description: 'Master the art of building meaningful relationships and expanding your professional network. Learn proven strategies for networking, making lasting connections, and leveraging relationships to grow your influence and business.',
-      image: connectionLiteracyImage,
-      duration: '8 weeks',
-      participants: '3,500+',
-      rating: 4.9,
-      features: [
-        'Strategic Networking Techniques',
-        'Relationship Building Mastery',
-        'Social Influence & Persuasion',
-        'Professional Connection Strategies',
-        'Community Building Skills'
-      ],
-      price: '$497',
-      popular: false,
-      link: '/connection-literacy'
-    },
-    {
-      title: 'Courageous Character Course',
-      description: 'Master assertiveness & confidence as an immigrant. Build the mindset & communication skills you need to succeed in the U.S.',
-      image: courageousCharacterImage,
-      duration: '6 weeks',
-      participants: '1,800+',
-      rating: 4.9,
-      features: [
-        'Overcome Fear & Self-Doubt',
-        'Master Assertive Communication',
-        'Negotiate for What You Deserve',
-        'Build Powerful Connections',
-        'Lead with Confidence'
-      ],
-      price: '$97',
-      originalPrice: '$497',
-      limitedSpots: 'Limited to 100',
-      popular: false,
-      link: '/cc'
-    }
-  ];
 
   return (
     <section id="programs" className="py-16 lg:py-24 bg-muted/50">
@@ -219,9 +26,9 @@ const Programs = () => {
           </p>
         </div>
 
-        {/* Programs Grid */}
+        {/* Programs Grid - Show only first 6 programs */}
         <div className="grid lg:grid-cols-3 gap-8">
-          {programs.map((program, index) => (
+          {programs.slice(0, 6).map((program, index) => (
             <Card 
               key={index}
               className={`group relative overflow-hidden bg-gradient-card border-border hover:shadow-medium transition-all duration-300 hover:-translate-y-2 ${
@@ -325,6 +132,18 @@ const Programs = () => {
               </div>
             </Card>
           ))}
+        </div>
+
+        {/* View All Programs Button */}
+        <div className="text-center mt-12">
+          <Button 
+            size="lg"
+            variant="outline"
+            onClick={() => window.location.href = '/programs'}
+          >
+            View All Programs
+            <ArrowRight size={16} className="ml-2" />
+          </Button>
         </div>
 
         {/* Bottom CTA */}
