@@ -47,7 +47,12 @@ export function AnnouncementCreator() {
       if (error) throw error;
 
       // Send email notifications
-      const { error: emailError } = await supabase.functions.invoke('send-announcement-email', {
+      console.log('Invoking send-announcement-email function with:', {
+        announcementId: announcementData.id,
+        targetCourse: targetCourse === 'all' ? undefined : targetCourse,
+      });
+      
+      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-announcement-email', {
         body: {
           announcementId: announcementData.id,
           title: title.trim(),
@@ -57,17 +62,19 @@ export function AnnouncementCreator() {
         }
       });
 
+      console.log('Email function response:', { emailData, emailError });
+
       if (emailError) {
         console.error('Email notification error:', emailError);
         toast({
           title: "Announcement Created",
-          description: "Announcement posted but email notifications may have failed. Check logs.",
+          description: `Announcement posted but email failed: ${emailError.message}`,
           variant: "default",
         });
       } else {
         toast({
           title: "Success!",
-          description: `Announcement sent to ${targetCourse === 'all' ? 'all students' : targetCourse}. Email notifications are being sent.`,
+          description: `Announcement sent to ${targetCourse === 'all' ? 'all students' : targetCourse}. Emails sent: ${emailData?.stats?.successful || 0}`,
         });
       }
 
