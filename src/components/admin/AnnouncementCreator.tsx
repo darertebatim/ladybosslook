@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { Megaphone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { programs } from '@/data/programs';
+import { usePrograms } from '@/hooks/usePrograms';
 
 export function AnnouncementCreator() {
   const [title, setTitle] = useState('');
@@ -17,9 +17,7 @@ export function AnnouncementCreator() {
   const [type, setType] = useState('general');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-
-  // Use program titles from the programs data
-  const courseNames = programs.map(p => p.title);
+  const { programs } = usePrograms();
 
   const handleSubmit = async () => {
     if (!title.trim() || !message.trim()) {
@@ -129,9 +127,9 @@ export function AnnouncementCreator() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Students</SelectItem>
-                {courseNames.map((course) => (
-                  <SelectItem key={course} value={course}>
-                    {course}
+                {programs.map((program) => (
+                  <SelectItem key={program.slug} value={program.title}>
+                    {program.title} • {program.type === 'course' ? '📚' : program.type === 'group-coaching' ? '👥' : program.type === '1o1-session' ? '💼' : '🎉'}
                   </SelectItem>
                 ))}
               </SelectContent>

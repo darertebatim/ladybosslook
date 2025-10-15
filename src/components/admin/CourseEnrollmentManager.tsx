@@ -5,19 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { BookOpen, Plus, Users } from 'lucide-react';
-
-const AVAILABLE_COURSES = [
-  'Courageous Character Course',
-  'IQMoney Course - Income Growth',
-  'Money Literacy Course',
-  'Connection Literacy Course',
-  'Instagram Fast Growth Course',
-  'Ladyboss VIP Club Group Coaching',
-  'Empowered Ladyboss Group Coaching',
-  'Business Growth Accelerator - 3-Month 1o1 Weekly Session',
-  'Business Startup Accelerator - 3-Month 1o1 Weekly Session',
-  '1-Hour Private Session with Razie'
-];
+import { usePrograms } from '@/hooks/usePrograms';
 
 interface UserProfile {
   id: string;
@@ -43,6 +31,7 @@ export function CourseEnrollmentManager() {
   const [selectedCourse, setSelectedCourse] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { programs } = usePrograms();
 
   useEffect(() => {
     loadUsers();
@@ -234,9 +223,9 @@ export function CourseEnrollmentManager() {
                 <SelectValue placeholder="Choose a course..." />
               </SelectTrigger>
               <SelectContent>
-                {AVAILABLE_COURSES.map((course) => (
-                  <SelectItem key={course} value={course}>
-                    {course}
+                {programs.map((program) => (
+                  <SelectItem key={program.slug} value={program.title}>
+                    {program.title} ({program.type})
                   </SelectItem>
                 ))}
               </SelectContent>

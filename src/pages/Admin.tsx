@@ -15,7 +15,7 @@ import FixMailchimpAmounts from '@/components/FixMailchimpAmounts';
 import SetupAdmin from '@/components/SetupAdmin';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
 import { CourseEnrollmentManager } from '@/components/admin/CourseEnrollmentManager';
-import { programs } from '@/data/programs';
+import { usePrograms } from '@/hooks/usePrograms';
 
 interface FormSubmission {
   id: string;
@@ -36,10 +36,8 @@ interface CourseStats {
   student_count: number;
 }
 
-// Get course names from the programs data
-const AVAILABLE_COURSES = programs.map(p => p.title);
-
 const Admin = () => {
+  const { programs } = usePrograms();
   const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
   const [courseStats, setCourseStats] = useState<CourseStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
