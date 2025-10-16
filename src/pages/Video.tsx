@@ -126,9 +126,15 @@ const Video = () => {
         });
       }
 
+      // Extract name from email if not provided
+      const emailName = email.split('@')[0].replace(/[^a-zA-Z]/g, ' ').trim() || 'Ladyboss Member';
+      
       const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
         body: {
           email,
+          name: emailName,
+          city: '',
+          phone: '',
           source: 'video_page',
           tags: ['firststepbonus']
         }
