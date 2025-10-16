@@ -18,6 +18,7 @@ declare global {
 const Video = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [city, setCity] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -88,6 +89,15 @@ const Video = () => {
       return;
     }
 
+    if (!city) {
+      toast({
+        title: "City Required",
+        description: "Please enter your city to receive the bonus.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!password || password.toLowerCase() !== 'jorat') {
       toast({
         title: "Wrong Password", 
@@ -129,11 +139,12 @@ const Video = () => {
       // Extract name from email if not provided
       const emailName = email.split('@')[0].replace(/[^a-zA-Z]/g, ' ').trim() || 'Ladyboss Member';
       
+      // Add to Mailchimp with city information and firststepbonus tag
       const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
         body: {
           email,
           name: emailName,
-          city: '',
+          city: city,
           phone: '',
           source: 'video_page',
           tags: ['firststepbonus']
@@ -141,18 +152,28 @@ const Video = () => {
       });
 
       if (error) {
-        throw error;
+        console.error('Mailchimp error:', error);
+        // Don't throw error, just log it - we still want to show WhatsApp
       }
 
+      // Create WhatsApp message
+      const whatsappNumber = '16265028538'; // +1 (626) 502-8538
+      const message = `Hello! I want to get the bonus from the First Step video.%0A%0AEmail: ${email}%0ACity: ${city}`;
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+      
+      // Open WhatsApp
+      window.open(whatsappUrl, '_blank');
+
       toast({
-        title: "Bonus Sent! 🎁",
-        description: "Check your email for your first step bonus materials!",
+        title: "Success! 🎉",
+        description: "Added to our system and redirecting to WhatsApp for your bonus!",
       });
 
       setEmail('');
       setPassword('');
+      setCity('');
     } catch (error: any) {
-      console.error('Error subscribing to bonus:', error);
+      console.error('Error processing request:', error);
       toast({
         title: "Something went wrong",
         description: "Please try again or contact support.",
@@ -290,6 +311,13 @@ const Video = () => {
                   placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitting}
+                />
+                <Input
+                  type="text"
+                  placeholder="Enter your city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
                   disabled={isSubmitting}
                 />
                 <Button 
