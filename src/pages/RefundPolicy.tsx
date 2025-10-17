@@ -25,7 +25,7 @@ const RefundPolicy = () => {
             سیاست بازگشت وجه
           </h1>
           <p className="text-muted-foreground text-lg font-farsi">
-            <strong>تاریخ به‌روزرسانی:</strong> دی ۱۴۰۳
+            <strong>تاریخ به‌روزرسانی:</strong> January 2025
           </p>
         </header>
 
