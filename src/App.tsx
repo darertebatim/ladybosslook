@@ -33,6 +33,7 @@ import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import Privacy from "./pages/Privacy";
+import RefundPolicy from "./pages/RefundPolicy";
 import SMSTerms from "./pages/SMSTerms";
 import ThankFreeLive from "./pages/ThankFreeLive";
 import Video from "./pages/Video";
@@ -71,6 +72,7 @@ const App = () => (
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/checkout" element={<Checkout />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/refund-policy" element={<RefundPolicy />} />
             <Route path="/sms-terms" element={<SMSTerms />} />
             <Route path="/giveaway" element={<Giveaway />} />
             <Route path="/ladyboss-coaching" element={<LadybossCoaching />} />

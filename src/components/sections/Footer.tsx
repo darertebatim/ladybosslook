@@ -161,6 +161,9 @@ const Footer = () => {
               <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-smooth">
                 Privacy Policy
               </Link>
+              <Link to="/refund-policy" className="text-muted-foreground hover:text-primary transition-smooth">
+                Refund Policy
+              </Link>
               <a href="#" className="text-muted-foreground hover:text-primary transition-smooth">
                 Terms of Service
               </a>
