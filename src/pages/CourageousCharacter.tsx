@@ -1484,7 +1484,7 @@ const CourageousWorkshop = () => {
                   <span className="farsi-nums">{isProcessingPayment ? 'در حال پردازش...' : 'بله، می‌خواهم پرجرات شوم - $۹۷'}</span>
                 </Button>
                 <p className="text-luxury-silver text-xs">
-                  ✓ گارانتی بازگشت وجه بدون سوال | ✓ دسترسی دائمی | ✓ بونس‌های رایگان $300
+                  گارانتی بازگشت وجه بدون سوال تا پایان دوره یک ماهه
                 </p>
               </div>
             </div>
