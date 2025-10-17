@@ -71,6 +71,33 @@ const RefundPolicy = () => {
                   برای جلسات کوچینگ خصوصی، در صورت عدم رضایت از جلسه اول، می‌توانید تا ۷۲ ساعت پس از برگزاری جلسه، درخواست بازگشت وجه کنید. برای جلسات بعدی، امکان بازگشت وجه وجود ندارد.
                 </p>
               </div>
+
+              <div className="bg-muted p-6 rounded-lg">
+                <h3 className="text-xl font-medium text-foreground mb-3 font-farsi">
+                  دوره‌های اشتراکی
+                </h3>
+                <p className="text-foreground/80 leading-relaxed">
+                  برای دوره‌هایی که به صورت اشتراک ماهانه ارائه می‌شوند، تنها آخرین پرداخت انجام شده قابل بازگشت است. در صورت درخواست بازگشت وجه، مبلغ آخرین پرداخت ماهانه شما بازگردانده خواهد شد.
+                </p>
+              </div>
+
+              <div className="bg-muted p-6 rounded-lg">
+                <h3 className="text-xl font-medium text-foreground mb-3 font-farsi">
+                  بازگشت وجه نسبی دوره‌های بلندمدت
+                </h3>
+                <p className="text-foreground/80 leading-relaxed">
+                  برای دوره‌های سه ماهه و بلندمدت‌تر، پس از گذشت یک ماه از شروع دوره، می‌توانید درخواست بازگشت وجه برای مدت باقیمانده دوره را داشته باشید. در این صورت، مبلغ متناسب با زمان باقیمانده به شما بازگردانده می‌شود.
+                </p>
+              </div>
+
+              <div className="bg-muted p-6 rounded-lg">
+                <h3 className="text-xl font-medium text-foreground mb-3 font-farsi">
+                  برنامه‌های دایموند و اکسلریتور
+                </h3>
+                <p className="text-foreground/80 leading-relaxed">
+                  برنامه‌های دایموند و اکسلریتور به دلیل ماهیت ویژه و سرمایه‌گذاری قابل توجه روی هر شرکت‌کننده، هیچ‌گونه امکان بازگشت وجه ندارند. قبل از ثبت‌نام در این برنامه‌ها، لطفاً از تصمیم خود کاملاً اطمینان حاصل کنید.
+                </p>
+              </div>
             </div>
           </section>
 
