@@ -89,13 +89,10 @@ const RefundPolicy = () => {
                 </a>
               </li>
               <li className="leading-relaxed">
-                تماس با شماره:{" "}
-                <a href="tel:+16265028538" className="text-primary hover:underline" dir="ltr">
-                  +1 (626) 502-8538
+                ارسال پیام از طریق واتساپ به شماره:{" "}
+                <a href="https://wa.me/16265028589" className="text-primary hover:underline" dir="ltr">
+                  +1 (626) 502-8589
                 </a>
-              </li>
-              <li className="leading-relaxed">
-                ارسال پیام از طریق واتساپ به شماره فوق
               </li>
             </ul>
             <p className="text-foreground/80 mb-6 leading-relaxed">
@@ -185,9 +182,9 @@ const RefundPolicy = () => {
                 </a>
               </p>
               <p className="text-foreground/80">
-                تلفن:{" "}
-                <a href="tel:+16265028538" className="text-primary hover:underline" dir="ltr">
-                  +1 (626) 502-8538
+                واتساپ:{" "}
+                <a href="https://wa.me/16265028589" className="text-primary hover:underline" dir="ltr">
+                  +1 (626) 502-8589
                 </a>
               </p>
             </div>
