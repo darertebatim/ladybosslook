@@ -23,6 +23,7 @@ import CCPayDirect from "./pages/CCPayDirect";
 import EventIrvine from "./pages/EventIrvine";
 import ExpressAssert from "./pages/ExpressAssert";
 import FreeLive from "./pages/FreeLive";
+import One from "./pages/One";
 import Giveaway from "./pages/Giveaway";
 import IQMoneyWorkshop from "./pages/IQMoneyWorkshop";
 import Index from "./pages/Index";
@@ -79,6 +80,7 @@ const App = () => (
             <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
             <Route path="/announcements/ccw" element={<CCWAnnouncements />} />
             <Route path="/freelive" element={<FreeLive />} />
+            <Route path="/one" element={<One />} />
             <Route path="/thankfreelive" element={<ThankFreeLive />} />
             <Route path="/iqmoney" element={<IQMoneyWorkshop />} />
             <Route path="/rathus" element={<RathusAssessment />} />
