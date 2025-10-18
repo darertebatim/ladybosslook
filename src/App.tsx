@@ -37,6 +37,7 @@ import Privacy from "./pages/Privacy";
 import RefundPolicy from "./pages/RefundPolicy";
 import SMSTerms from "./pages/SMSTerms";
 import ThankFreeLive from "./pages/ThankFreeLive";
+import ThankOne from "./pages/ThankOne";
 import Video from "./pages/Video";
 import Dashboard from "./pages/Dashboard";
 import CalendarRedirect from "./components/CalendarRedirect";
@@ -82,6 +83,7 @@ const App = () => (
             <Route path="/freelive" element={<FreeLive />} />
             <Route path="/one" element={<One />} />
             <Route path="/thankfreelive" element={<ThankFreeLive />} />
+            <Route path="/thankone" element={<ThankOne />} />
             <Route path="/iqmoney" element={<IQMoneyWorkshop />} />
             <Route path="/rathus" element={<RathusAssessment />} />
             <Route path="/dashboard" element={<Dashboard />} />

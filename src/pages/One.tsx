@@ -102,45 +102,50 @@ const One = () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
+      // First, subscribe to mailchimp
+      const { error: mailchimpError } = await supabase.functions.invoke('mailchimp-subscribe', {
         body: {
           email: email.trim().toLowerCase(),
           name: name.trim(),
           city: city.trim(),
           phone: '',
-          source: 'freelive',
-          tags: ['freelive']
+          source: 'one_bilingual',
+          tags: ['one_bilingual', 'paid_class']
         }
       });
 
-      if (error) throw error;
+      if (mailchimpError) throw mailchimpError;
 
-      // Track successful lead generation
+      // Create Stripe payment session
+      const { data: paymentData, error: paymentError } = await supabase.functions.invoke('create-payment', {
+        body: {
+          email: email.trim().toLowerCase(),
+          name: name.trim(),
+          amount: 100, // $1.00 in cents
+          programTitle: 'قدرت دوزبانه - Bilingual Power Class',
+          successUrl: `${window.location.origin}/thankone`,
+          cancelUrl: `${window.location.origin}/one`
+        }
+      });
+
+      if (paymentError) throw paymentError;
+
+      // Track registration attempt
       if (typeof window !== 'undefined' && (window as any).fbq) {
-        (window as any).fbq('trackCustom', 'FreeLiveLead', {
-          content_name: 'Free Live Webinar Registration',
-          content_category: 'webinar_registration',
-          value: 97,
+        (window as any).fbq('trackCustom', 'BilingualClassRegistration', {
+          content_name: 'Bilingual Power Class',
+          content_category: 'paid_class',
+          value: 1,
           currency: 'USD'
-        });
-
-        (window as any).fbq('trackCustom', 'WebinarRegistration', {
-          event_type: 'freelive_registration',
-          user_city: city,
-          registration_source: 'freelive_page',
-          gift_claimed: true
         });
       }
 
-      // Success - directly redirect without showing toast
-      // Reset form and close modal
-      setEmail('');
-      setName('');
-      setCity('');
-      setShowModal(false);
-      
-      // Redirect to thank you page
-      navigate('/thankfreelive');
+      // Redirect to Stripe checkout
+      if (paymentData?.url) {
+        window.location.href = paymentData.url;
+      } else {
+        throw new Error('Payment URL not received');
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({
