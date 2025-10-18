@@ -156,17 +156,17 @@ const One = () => {
   return (
     <>
       <SEOHead
-        title="Free Live: Courage Roadmap for Persian Women"
-        description="Free webinar for Persian immigrant women. Register now!"
+        title="قدرت دوزبانه - Online Class for Persian Women"
+        description="Master bilingual power as an immigrant woman. $1 for first 100 registrants!"
       />
       
       {/* Event Banner */}
       <div className="bg-secondary text-luxury-black py-4 text-center">
         <p className="font-bold text-lg md:text-xl">
-          🎯 وبینار رایگان | ۲۸ سپتامبر
+          🎯 کلاس آنلاین قدرت دوزبانه
         </p>
         <p className="text-sm md:text-base mt-1">
-          ساعت ۹:۳۰ صبح به وقت کالیفرنیا
+          فقط ۱۰۰ نفر اول | ۱ دلار به جای ۱۰۰ دلار
         </p>
       </div>
 
@@ -195,9 +195,26 @@ const One = () => {
               <div className="text-center lg:text-right space-y-8">
                 <div>
                   <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-luxury-white leading-tight mb-6 font-persian">
-                    <span className="text-secondary block text-5xl md:text-7xl lg:text-8xl">نقشه راه جرات</span>
-                    <span className="text-luxury-white block text-3xl md:text-5xl lg:text-6xl">برای زنان مهاجر</span>
+                    <span className="text-secondary block text-5xl md:text-7xl lg:text-8xl">قدرت دوزبانه</span>
+                    <span className="text-luxury-white block text-3xl md:text-5xl lg:text-6xl">کلاس آنلاین</span>
                   </h1>
+                  
+                  <div className="text-luxury-silver/90 text-base md:text-lg leading-relaxed space-y-4 mb-6 font-farsi text-center lg:text-right">
+                    <p>
+                      «قدرت دو زبانه» در ظاهر درباره‌ی زبان است،<br/>
+                      ولی در عمق، درباره‌ی دو جهان درون یک زن مهاجر است:
+                    </p>
+                    <p>
+                      زبانی برای ارتباط بیرونی (جامعه‌ی جدید، فرهنگ جدید)
+                    </p>
+                    <p>
+                      و زبانی برای قدرت درونی (هویت، احساس، ارزش‌ها)
+                    </p>
+                    <p className="text-secondary font-bold">
+                      یعنی زنی که یاد گرفته نه فقط دو زبان حرف بزند، بلکه<br/>
+                      «در دو دنیا، با اعتمادبه‌نفس حضور داشته باشد.»
+                    </p>
+                  </div>
                   
                   {/* Location Restriction */}
                   <div className="text-center mb-4">
@@ -225,13 +242,16 @@ const One = () => {
 
                 <div className="bg-luxury-white/5 backdrop-blur-sm border border-secondary/20 rounded-xl p-6 mb-8">
                   <p className="text-luxury-white font-bold text-lg mb-2 font-farsi">
-                    🎁 هدیه ویژه شرکت‌کنندگان
+                    💰 پیشنهاد ویژه
                   </p>
-                  <p className="text-secondary font-medium font-farsi">
-                    کتابچه راهنمای عملی "قدرت در زبان دوم"
+                  <p className="text-secondary font-medium text-2xl font-farsi">
+                    فقط ۱ دلار برای ۱۰۰ نفر اول
                   </p>
-                  <p className="text-luxury-silver/80 text-sm mt-2 font-farsi">
-                    (ارزش ۹۷ دلار - رایگان!)
+                  <p className="text-luxury-silver/80 text-sm mt-2 font-farsi line-through">
+                    قیمت اصلی: ۱۰۰ دلار
+                  </p>
+                  <p className="text-red-400 font-bold text-sm mt-1 font-farsi">
+                    ۹۹٪ تخفیف!
                   </p>
                 </div>
               </div>
@@ -240,14 +260,17 @@ const One = () => {
               <div className="lg:sticky lg:top-8 text-center space-y-6">
                 <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-6">
                   <p className="text-secondary font-bold text-xl mb-2 font-farsi">
-                    ⚡ تنها ۱۰۰۰ نفر ظرفیت داریم!
+                    ⚡ فقط ۱۰۰ نفر اول!
                   </p>
-                  <p className="text-luxury-silver/90 font-farsi">تعداد شرکت‌کنندگان محدود است</p>
+                  <p className="text-luxury-silver/90 font-farsi">با قیمت ۱ دلار ثبت نام کنید</p>
+                  <p className="text-red-400 font-bold text-sm mt-2 font-farsi">
+                    بعد از ۱۰۰ نفر، قیمت ۱۰۰ دلار می‌شود
+                  </p>
                 </div>
 
                 <div className="text-center text-sm text-luxury-silver/80 font-farsi">
                   <p>🔒 اطلاعات شما کاملاً محفوظ است</p>
-                  <p className="mt-1">💌 فقط محتوای ارزشمند دریافت خواهید کرد</p>
+                  <p className="mt-1">💳 پرداخت امن</p>
                 </div>
               </div>
             </div>
@@ -282,7 +305,7 @@ const One = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h3 className="text-3xl md:text-4xl font-display font-bold text-luxury-white mb-12 font-farsi">
-              چرا این وبینار را از دست ندهید؟
+              چرا این کلاس را از دست ندهید؟
             </h3>
             
             <div className="grid md:grid-cols-3 gap-8">
@@ -325,10 +348,10 @@ const One = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h3 className="text-3xl md:text-4xl font-display font-bold text-luxury-black mb-8 font-farsi">
-              آماده برای تحول زندگی‌تان هستید؟
+              آماده برای تسلط بر قدرت دوزبانه هستید؟
             </h3>
             <p className="text-xl text-luxury-black/80 mb-8 font-farsi">
-              فقط چند کلیک تا دسترسی به وبینار رایگان که زندگی شما را تغییر خواهد داد
+              فقط ۱ دلار برای ۱۰۰ نفر اول - قیمت اصلی ۱۰۰ دلار
             </p>
             <Button 
               onClick={handleModalOpen}
@@ -345,13 +368,13 @@ const One = () => {
         <DialogContent className="sm:max-w-md bg-luxury-white border-2 border-secondary/20 shadow-luxury">
           <DialogHeader className="text-center">
             <DialogTitle className="text-2xl font-bold text-luxury-black mb-2 font-farsi">
-              🎉 رزرو جای شما در وبینار رایگان
+              💎 ثبت نام در کلاس قدرت دوزبانه
             </DialogTitle>
             <p className="text-green-600 font-farsi mb-2 font-bold text-xl">
-              مخصوص ایرانیان مهاجر به خارج
+              فقط ۱ دلار برای ۱۰۰ نفر اول
             </p>
-            <p className="text-red-600 font-farsi text-lg font-medium">
-              لطفا از داخل ایران ثبت نام نکنید
+            <p className="text-luxury-accent/70 font-farsi text-base font-medium">
+              مخصوص ایرانیان مهاجر به خارج
             </p>
           </DialogHeader>
 
@@ -410,13 +433,13 @@ const One = () => {
               className="w-full h-14 text-lg font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'در حال ارسال...' : '✅ کامل! لینک وبینار را ارسال کن'}
+              {isSubmitting ? 'در حال ارسال...' : '✅ ادامه به پرداخت ۱ دلار'}
             </Button>
           </form>
 
           <div className="mt-4 text-center text-sm text-luxury-accent font-farsi">
-            <p>🔒 اطلاعات شما کاملاً محفوظ است</p>
-            <p className="mt-1">💌 فقط محتوای ارزشمند دریافت خواهید کرد</p>
+            <p>🔒 پرداخت امن</p>
+            <p className="mt-1">💳 قیمت: فقط ۱ دلار برای ۱۰۰ نفر اول</p>
           </div>
         </DialogContent>
       </Dialog>
@@ -427,7 +450,7 @@ const One = () => {
           onClick={handleModalOpen}
           className="w-full h-14 text-base md:text-lg font-bold bg-luxury-black hover:bg-luxury-charcoal text-secondary font-farsi transition-colors duration-200 rounded-lg"
         >
-          🚀 رزرو جای شما در وبینار رایگان
+          💎 ثبت نام با ۱ دلار (۱۰۰ نفر اول)
         </Button>
       </div>
 
