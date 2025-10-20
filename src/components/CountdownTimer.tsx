@@ -6,9 +6,8 @@ interface CountdownTimerProps {
 }
 
 const CountdownTimer = ({ targetDate, className = "" }: CountdownTimerProps) => {
-  // Default to a future date if none provided
   const defaultTarget = new Date();
-  defaultTarget.setHours(defaultTarget.getHours() + 24); // 24 hours from now
+  defaultTarget.setHours(defaultTarget.getHours() + 24);
   
   const target = targetDate || defaultTarget;
   
@@ -38,23 +37,25 @@ const CountdownTimer = ({ targetDate, className = "" }: CountdownTimerProps) => 
   }, [target]);
 
   const TimeUnit = ({ value, label }: { value: number; label: string }) => (
-    <div className="flex flex-col items-center">
-      <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-luxury-white/10 backdrop-blur-sm border border-secondary/30 flex items-center justify-center text-2xl md:text-3xl font-bold text-secondary">
-        {value.toString().padStart(2, '0')}
+    <div className="flex items-center gap-0.5">
+      <div className="bg-accent/20 backdrop-blur-sm border border-accent/40 rounded-lg px-2 py-1 min-w-[32px] text-center">
+        <span className="text-accent font-bold text-base md:text-lg tabular-nums">
+          {value.toString().padStart(2, '0')}
+        </span>
       </div>
-      <span className="text-xs md:text-sm text-luxury-silver/80 mt-2 font-medium uppercase tracking-wider">
+      <span className="text-[10px] text-luxury-silver/70 font-medium">
         {label}
       </span>
     </div>
   );
 
   return (
-    <div className={`flex items-center justify-center gap-4 md:gap-6 ${className}`}>
-      <TimeUnit value={timeLeft.hours} label="ساعت" />
-      <div className="text-secondary text-2xl font-bold animate-pulse">:</div>
-      <TimeUnit value={timeLeft.minutes} label="دقیقه" />
-      <div className="text-secondary text-2xl font-bold animate-pulse">:</div>
-      <TimeUnit value={timeLeft.seconds} label="ثانیه" />
+    <div className={`inline-flex items-center gap-1 ${className}`}>
+      <TimeUnit value={timeLeft.hours} label="h" />
+      <span className="text-accent text-sm font-bold">:</span>
+      <TimeUnit value={timeLeft.minutes} label="m" />
+      <span className="text-accent text-sm font-bold">:</span>
+      <TimeUnit value={timeLeft.seconds} label="s" />
     </div>
   );
 };
