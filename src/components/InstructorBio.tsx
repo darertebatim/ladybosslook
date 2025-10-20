@@ -1,4 +1,5 @@
 import { Award, Users, BookOpen, TrendingUp } from 'lucide-react';
+import razieImage from '@/assets/razie-6.jpg';
 
 const InstructorBio = () => {
   return (
@@ -19,10 +20,10 @@ const InstructorBio = () => {
             <div className="space-y-6">
               <div>
                 <h3 className="text-2xl font-bold text-secondary mb-3 font-farsi">
-                  رزیه مرادی - بنیانگذار LadyBoss Academy
+                  راضیه میرزایی - بنیانگذار LadyBoss Academy
                 </h3>
                 <p className="text-luxury-silver/90 leading-relaxed font-farsi">
-                  رزیه خودش یک زن مهاجر ایرانی است که مسیر شما را طی کرده. او با تجربه بیش از 10 سال در حوزه توسعه فردی و کسب‌وکار، به صدها زن کمک کرده تا با اعتماد به نفس در زندگی جدیدشان موفق شوند.
+                  راضیه خودش یک زن مهاجر ایرانی است که از یک آژانس مشاوره کوچک تا توانمندسازی بیش از 264,000 زن در سراسر جهان را تجربه کرده. او با بیش از 2.7 میلیون فالوور در اینستاگرام و سال‌ها تجربه در حوزه توسعه فردی، به هزاران زن کمک کرده تا با اعتماد به نفس کامل در زندگی جدیدشان موفق شوند.
                 </p>
               </div>
 
@@ -32,8 +33,8 @@ const InstructorBio = () => {
                     <Users className="w-5 h-5 text-secondary" />
                   </div>
                   <div>
-                    <p className="font-bold text-luxury-white font-farsi">بیش از 500+ زن توانمند شده</p>
-                    <p className="text-luxury-silver/70 text-sm font-farsi">در کانادا، آمریکا، و اروپا</p>
+                    <p className="font-bold text-luxury-white font-farsi">بیش از 264,000 زن توانمند شده</p>
+                    <p className="text-luxury-silver/70 text-sm font-farsi">در کانادا، آمریکا، اروپا و سراسر جهان</p>
                   </div>
                 </div>
 
@@ -42,8 +43,8 @@ const InstructorBio = () => {
                     <Award className="w-5 h-5 text-secondary" />
                   </div>
                   <div>
-                    <p className="font-bold text-luxury-white font-farsi">مدارک معتبر بین‌المللی</p>
-                    <p className="text-luxury-silver/70 text-sm font-farsi">در حوزه کوچینگ و توسعه فردی</p>
+                    <p className="font-bold text-luxury-white font-farsi">2.7 میلیون فالوور اینستاگرام</p>
+                    <p className="text-luxury-silver/70 text-sm font-farsi">یکی از تاثیرگذارترین مربیان زنان</p>
                   </div>
                 </div>
 
@@ -52,8 +53,8 @@ const InstructorBio = () => {
                     <BookOpen className="w-5 h-5 text-secondary" />
                   </div>
                   <div>
-                    <p className="font-bold text-luxury-white font-farsi">نویسنده و سخنران</p>
-                    <p className="text-luxury-silver/70 text-sm font-farsi">در زمینه توانمندسازی زنان مهاجر</p>
+                    <p className="font-bold text-luxury-white font-farsi">120,000+ زن آموزش دیده</p>
+                    <p className="text-luxury-silver/70 text-sm font-farsi">در برنامه‌های موفقیت کسب‌وکار</p>
                   </div>
                 </div>
 
@@ -63,7 +64,7 @@ const InstructorBio = () => {
                   </div>
                   <div>
                     <p className="font-bold text-luxury-white font-farsi">نرخ موفقیت بالا</p>
-                    <p className="text-luxury-silver/70 text-sm font-farsi">4.9/5 رضایت شرکت‌کنندگان</p>
+                    <p className="text-luxury-silver/70 text-sm font-farsi">5,000+ داستان موفقیت</p>
                   </div>
                 </div>
               </div>
@@ -72,8 +73,12 @@ const InstructorBio = () => {
             {/* Image/Quote Section */}
             <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-2xl p-8">
               <div className="mb-6">
-                <div className="w-32 h-32 bg-secondary rounded-full mx-auto flex items-center justify-center mb-4">
-                  <span className="text-6xl">👩‍💼</span>
+                <div className="w-48 h-48 mx-auto rounded-2xl overflow-hidden mb-4 border-4 border-secondary/30">
+                  <img 
+                    src={razieImage} 
+                    alt="راضیه میرزایی - Razieh Mirzaei"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
 
@@ -82,7 +87,7 @@ const InstructorBio = () => {
               </blockquote>
 
               <p className="text-secondary font-bold text-center mt-6 font-farsi">
-                - رزیه مرادی
+                - راضیه میرزایی
               </p>
             </div>
           </div>

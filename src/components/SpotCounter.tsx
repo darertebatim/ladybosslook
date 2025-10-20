@@ -6,9 +6,9 @@ interface SpotCounterProps {
   className?: string;
 }
 
-const SpotCounter = ({ totalSpots = 100, className = "" }: SpotCounterProps) => {
+const SpotCounter = ({ totalSpots = 1000, className = "" }: SpotCounterProps) => {
   // Simulate spots taken - in production, this would come from your database
-  const [spotsTaken, setSpotsTaken] = useState(73);
+  const [spotsTaken, setSpotsTaken] = useState(927);
   const spotsLeft = totalSpots - spotsTaken;
   const percentageFilled = (spotsTaken / totalSpots) * 100;
 

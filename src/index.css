@@ -71,23 +71,28 @@
     --gradient-accent: linear-gradient(120deg, hsl(330 50% 85%), hsl(285 40% 90%));
     --gradient-text: linear-gradient(135deg, hsl(280 60% 50%), hsl(45 90% 60%));
     
-    /* Luxury Black & White Theme - Vibrant Gold Accent */
-    --luxury-black: 0 0% 8%;
-    --luxury-charcoal: 0 0% 15%;
-    --luxury-silver: 0 0% 85%;
-    --luxury-white: 0 0% 98%;
-    --luxury-accent: 0 0% 25%;
-    --luxury-gold: 45 96% 58%;
-    --luxury-gold-dark: 38 92% 50%;
-    --luxury-gold-light: 48 100% 88%;
+    /* Luxury Black & White Theme - Updated Clear Palette */
+    --luxury-black: 240 15% 12%;
+    --luxury-charcoal: 240 12% 20%;
+    --luxury-silver: 240 5% 75%;
+    --luxury-white: 0 0% 99%;
+    --luxury-accent: 240 10% 35%;
+    --luxury-gold: 280 60% 55%;
+    --luxury-gold-dark: 280 65% 45%;
+    --luxury-gold-light: 280 50% 70%;
     --pure-black: 0 0% 0%;
     --pure-white: 0 0% 100%;
     
-    /* Conversion-Focused Colors */
-    --cta-primary: 45 96% 58%;
-    --cta-primary-hover: 45 100% 65%;
-    --cta-urgent: 15 90% 55%;
-    --cta-urgent-hover: 15 95% 60%;
+    /* Conversion-Focused Colors - Clear and Vibrant */
+    --cta-primary: 280 70% 60%;
+    --cta-primary-hover: 280 75% 65%;
+    --cta-urgent: 345 85% 55%;
+    --cta-urgent-hover: 345 90% 60%;
+    
+    /* Secondary - Teal/Turquoise accent */
+    --secondary: 280 70% 60%;
+    --secondary-light: 280 75% 70%;
+    --secondary-dark: 280 75% 50%;
     
     /* Luxury Gradients */
     --gradient-luxury: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 15%), hsl(0 0% 25%));
