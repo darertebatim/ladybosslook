@@ -1,61 +1,50 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Users } from 'lucide-react';
 
-interface SpotCounterProps {
-  totalSpots?: number;
-  className?: string;
-}
+const SpotCounter = () => {
+  const [spotsLeft, setSpotsLeft] = useState<number>(73);
+  const totalSpots = 1000;
 
-const SpotCounter = ({ totalSpots = 1000, className = "" }: SpotCounterProps) => {
-  // Simulate spots taken - in production, this would come from your database
-  const [spotsTaken, setSpotsTaken] = useState(927);
-  const spotsLeft = totalSpots - spotsTaken;
-  const percentageFilled = (spotsTaken / totalSpots) * 100;
-
-  // Simulate real-time updates (optional - remove in production)
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSpotsTaken(prev => {
-        if (prev < totalSpots - 5) {
-          return prev + Math.floor(Math.random() * 2);
+    const fetchOrderCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('orders')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'paid');
+
+        if (error) {
+          console.error('Error fetching order count:', error);
+          return;
         }
-        return prev;
-      });
-    }, 45000); // Update every 45 seconds
+
+        const remaining = totalSpots - (count || 0);
+        setSpotsLeft(Math.max(0, remaining));
+      } catch (error) {
+        console.error('Error in fetchOrderCount:', error);
+      }
+    };
+
+    fetchOrderCount();
+    const interval = setInterval(fetchOrderCount, 30000);
 
     return () => clearInterval(interval);
-  }, [totalSpots]);
+  }, []);
+
+  const percentageFilled = ((totalSpots - spotsLeft) / totalSpots) * 100;
 
   return (
-    <div className={`bg-luxury-white/10 backdrop-blur-sm border border-secondary/30 rounded-xl p-6 ${className}`}>
-      <div className="flex items-center justify-center gap-3 mb-3">
-        <Users className="text-secondary w-6 h-6" />
-        <span className="text-secondary font-bold text-xl font-farsi">
-          تعداد جای باقی‌مانده
-        </span>
-      </div>
-      
-      <div className="text-center">
-        <div className="text-4xl font-bold text-luxury-white mb-2 animate-pulse">
-          {spotsLeft}
-        </div>
-        <div className="text-luxury-silver/80 text-sm font-farsi">
-          از {totalSpots} جای اولیه
-        </div>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="mt-4 bg-luxury-black/30 rounded-full h-3 overflow-hidden">
+    <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5">
+      <Users className="w-3 h-3 text-secondary flex-shrink-0" />
+      <span className="text-white/90 text-xs whitespace-nowrap">
+        <span className="font-bold text-secondary">{spotsLeft}</span> جا باقی
+      </span>
+      <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden flex-shrink-0">
         <div 
-          className="bg-secondary h-full rounded-full transition-all duration-1000 ease-out"
+          className="h-full bg-gradient-to-r from-secondary to-secondary-light transition-all duration-1000"
           style={{ width: `${percentageFilled}%` }}
         />
-      </div>
-
-      <div className="mt-3 text-center">
-        <span className="text-red-400 font-bold text-sm font-farsi animate-pulse">
-          ⚠️ در حال تکمیل شدن
-        </span>
       </div>
     </div>
   );
