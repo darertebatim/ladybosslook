@@ -183,7 +183,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                 مراحل بعدی
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+              <div className="grid grid-cols-3 gap-4 md:gap-8">
                 {/* Step 1 */}
                 <Card className="backdrop-blur-sm border" 
                       style={{ 
