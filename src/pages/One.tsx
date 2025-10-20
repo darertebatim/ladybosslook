@@ -3,25 +3,35 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import CountdownTimer from "@/components/CountdownTimer";
+import SpotCounter from "@/components/SpotCounter";
+import TestimonialsSection from "@/components/TestimonialsSection";
+import FAQSection from "@/components/FAQSection";
+import InstructorBio from "@/components/InstructorBio";
+import ExitIntentPopup from "@/components/ExitIntentPopup";
+import BonusMaterialsSection from "@/components/BonusMaterialsSection";
+import RecentRegistrations from "@/components/RecentRegistrations";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
-import { subscriptionFormSchema } from '@/lib/validation';
+import { simpleSubscriptionSchema } from '@/lib/validation';
 import { z } from 'zod';
+import { Video, Shield, Zap } from 'lucide-react';
 
 const One = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
-  const [city, setCity] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Set countdown target date (you can adjust this)
+  const countdownTarget = new Date();
+  countdownTarget.setDate(countdownTarget.getDate() + 3); // 3 days from now
 
   // Meta Pixel tracking - Page view and content tracking
   useEffect(() => {
@@ -31,20 +41,20 @@ const One = () => {
       
       // Track content view with page-specific data
       (window as any).fbq('track', 'ViewContent', {
-        content_type: 'webinar_landing',
-        content_name: 'Free Live Courage Roadmap',
-        content_category: 'webinar_registration',
-        value: 97, // Value of the free gift
+        content_type: 'paid_class',
+        content_name: 'Bilingual Power Class',
+        content_category: 'online_class',
+        value: 100, // Original value
         currency: 'USD'
       });
 
       // Track custom event for landing page visit
-      (window as any).fbq('trackCustom', 'FreeLivePageVisit', {
-        page_type: 'webinar_landing',
-        event_type: 'freelive_registration',
+      (window as any).fbq('trackCustom', 'BilingualClassPageVisit', {
+        page_type: 'paid_class_landing',
+        event_type: 'bilingual_class_registration',
         target_audience: 'persian_immigrant_women',
-        webinar_date: '2024-09-28',
-        gift_value: 97
+        offer_price: 1,
+        original_price: 100
       });
     }
   }, []);
@@ -56,8 +66,8 @@ const One = () => {
     // Track modal open event
     if (typeof window !== 'undefined' && (window as any).fbq) {
       (window as any).fbq('trackCustom', 'RegistrationModalOpen', {
-        source: 'freelive_page',
-        modal_type: 'webinar_registration'
+        source: 'one_bilingual',
+        modal_type: 'paid_class_registration'
       });
     }
   };
@@ -66,9 +76,9 @@ const One = () => {
   const handleFormStart = (fieldName: string) => {
     if (typeof window !== 'undefined' && (window as any).fbq) {
       (window as any).fbq('trackCustom', 'FormStart', {
-        form_type: 'webinar_registration',
+        form_type: 'paid_class_registration',
         first_field: fieldName,
-        source: 'freelive_page'
+        source: 'one_bilingual'
       });
     }
   };
@@ -76,10 +86,10 @@ const One = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form data with Zod
+    // Validate form data with Zod (removed city field)
     setValidationErrors({});
     try {
-      subscriptionFormSchema.parse({ name, email, city, phone: '' });
+      simpleSubscriptionSchema.parse({ name, email });
     } catch (error) {
       if (error instanceof z.ZodError) {
         const errors: Record<string, string> = {};
@@ -107,7 +117,7 @@ const One = () => {
         body: {
           email: email.trim().toLowerCase(),
           name: name.trim(),
-          city: city.trim(),
+          city: '',
           phone: '',
           source: 'one_bilingual',
           tags: ['one_bilingual', 'paid_class']
@@ -165,14 +175,18 @@ const One = () => {
         description="Master bilingual power as an immigrant woman. $1 for first 100 registrants!"
       />
       
-      {/* Event Banner */}
-      <div className="bg-secondary text-luxury-black py-4 text-center">
-        <p className="font-bold text-lg md:text-xl">
+      {/* Event Banner with Countdown */}
+      <div className="bg-secondary text-luxury-black py-6 text-center">
+        <p className="font-bold text-lg md:text-xl mb-2">
           🎯 کلاس آنلاین قدرت دوزبانه
         </p>
-        <p className="text-sm md:text-base mt-1">
+        <p className="text-sm md:text-base mb-3">
           فقط ۱۰۰ نفر اول | ۱ دلار به جای ۱۰۰ دلار
         </p>
+        <div className="max-w-md mx-auto">
+          <p className="text-xs font-bold mb-2 font-farsi">⏰ زمان باقی‌مانده تا افزایش قیمت:</p>
+          <CountdownTimer targetDate={countdownTarget} />
+        </div>
       </div>
 
       {/* Hero Section */}
@@ -261,21 +275,31 @@ const One = () => {
                 </div>
               </div>
 
-              {/* Right Side - Additional Info */}
+              {/* Right Side - Additional Info with Spot Counter */}
               <div className="lg:sticky lg:top-8 text-center space-y-6">
-                <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-6">
-                  <p className="text-secondary font-bold text-xl mb-2 font-farsi">
-                    ⚡ فقط ۱۰۰ نفر اول!
-                  </p>
-                  <p className="text-luxury-silver/90 font-farsi">با قیمت ۱ دلار ثبت نام کنید</p>
-                  <p className="text-red-400 font-bold text-sm mt-2 font-farsi">
-                    بعد از ۱۰۰ نفر، قیمت ۱۰۰ دلار می‌شود
-                  </p>
+                {/* Spot Counter */}
+                <SpotCounter totalSpots={100} />
+
+                {/* Trust Badges */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-3">
+                    <Shield className="w-6 h-6 text-secondary mx-auto mb-1" />
+                    <p className="text-luxury-silver/90 text-xs font-farsi">پرداخت امن</p>
+                  </div>
+                  <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-3">
+                    <Video className="w-6 h-6 text-secondary mx-auto mb-1" />
+                    <p className="text-luxury-silver/90 text-xs font-farsi">دسترسی مادام‌العمر</p>
+                  </div>
+                  <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-3">
+                    <Zap className="w-6 h-6 text-secondary mx-auto mb-1" />
+                    <p className="text-luxury-silver/90 text-xs font-farsi">شروع فوری</p>
+                  </div>
                 </div>
 
-                <div className="text-center text-sm text-luxury-silver/80 font-farsi">
-                  <p>🔒 اطلاعات شما کاملاً محفوظ است</p>
-                  <p className="mt-1">💳 پرداخت امن</p>
+                {/* Money Back Guarantee */}
+                <div className="bg-green-500/20 border-2 border-green-500/50 rounded-xl p-4">
+                  <p className="text-green-400 font-bold text-lg font-farsi">✅ ضمانت بازگشت پول</p>
+                  <p className="text-luxury-silver/90 text-sm mt-1 font-farsi">تا ۷ روز بعد از خرید</p>
                 </div>
               </div>
             </div>
@@ -301,6 +325,38 @@ const One = () => {
               <span>• جلوگیری از بی‌انصافی</span>
               <span>• مذاکرهٔ روزمره</span>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Video Intro Section */}
+      <div className="bg-luxury-charcoal py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h3 className="text-3xl md:text-4xl font-display font-bold text-luxury-white mb-6 font-farsi">
+              📹 نگاهی به کلاس قدرت دوزبانه
+            </h3>
+            <p className="text-luxury-silver/90 mb-8 font-farsi">
+              ببینید این کلاس چگونه زندگی شما را تغییر می‌دهد
+            </p>
+            <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl mb-6">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/qQalgp5Sg0w?rel=0&modestbranding=1"
+                title="Bilingual Power Class Preview"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+            <Button 
+              onClick={handleModalOpen}
+              className="bg-secondary hover:bg-secondary-dark text-luxury-black font-bold text-xl px-12 py-4 h-auto rounded-2xl shadow-luxury transition-all duration-300 transform hover:scale-105 font-farsi"
+            >
+              🚀 همین الان با ۱ دلار شروع کنید
+            </Button>
           </div>
         </div>
       </div>
@@ -347,6 +403,18 @@ const One = () => {
           </div>
         </div>
       </div>
+
+      {/* Instructor Bio */}
+      <InstructorBio />
+
+      {/* Testimonials Section */}
+      <TestimonialsSection />
+
+      {/* Bonus Materials */}
+      <BonusMaterialsSection />
+
+      {/* FAQ Section */}
+      <FAQSection />
 
       {/* Final CTA Section */}
       <div className="bg-secondary py-16">
@@ -417,21 +485,6 @@ const One = () => {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="modal-city" className="text-left block text-luxury-black font-medium">
-                Your City
-              </Label>
-              <Input
-                id="modal-city"
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Your City"
-                required
-                className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
-                dir="ltr"
-              />
-            </div>
 
             <Button
               type="submit"
@@ -449,15 +502,21 @@ const One = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Sticky Bottom Button - Optimized for Performance */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-secondary/95 backdrop-blur-sm border-t border-luxury-white/10">
+      {/* Sticky Bottom Button - Enhanced with Pulse */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-secondary/95 backdrop-blur-sm border-t border-luxury-white/10 shadow-2xl">
         <Button
           onClick={handleModalOpen}
-          className="w-full h-14 text-base md:text-lg font-bold bg-luxury-black hover:bg-luxury-charcoal text-secondary font-farsi transition-colors duration-200 rounded-lg"
+          className="w-full h-14 text-base md:text-lg font-bold bg-luxury-black hover:bg-luxury-charcoal text-secondary font-farsi transition-all duration-300 rounded-lg animate-pulse hover:animate-none shadow-glow"
         >
           💎 ثبت نام با ۱ دلار (۱۰۰ نفر اول)
         </Button>
       </div>
+
+      {/* Exit Intent Popup */}
+      <ExitIntentPopup onRegisterClick={handleModalOpen} />
+
+      {/* Recent Registrations Notification */}
+      <RecentRegistrations />
 
       {/* Performance Monitor - Enable during high traffic testing */}
       <PerformanceMonitor 
