@@ -19,6 +19,26 @@ const ThankOne = () => {
     window.scrollTo(0, 0);
     
     const fetchOrderDetails = async () => {
+      // Check for test mode
+      const isTestMode = searchParams.get('test') === 'true';
+      
+      if (isTestMode) {
+        // Show test data for Bilingual Power Class
+        setOrderDetails({
+          id: 'test-order-bilingual-123',
+          product_name: 'Bilingual Power Class',
+          amount: 9700, // $97 in cents
+          email: 'test@example.com',
+          name: 'Sara Ahmadi',
+          phone: '+1 (818) 555-1234',
+          status: 'paid',
+          created_at: new Date().toISOString()
+        });
+        setIsLoading(false);
+        toast.success('Test Mode - Registration Confirmed!');
+        return;
+      }
+      
       if (!sessionId) {
         setIsLoading(false);
         return;
@@ -43,7 +63,7 @@ const ThankOne = () => {
     };
     
     fetchOrderDetails();
-  }, [sessionId]);
+  }, [sessionId, searchParams]);
 
   const createWhatsAppMessage = () => {
     if (!orderDetails) {
