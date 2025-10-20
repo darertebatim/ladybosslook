@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useToast } from "@/components/ui/use-toast";
-import { SEOHead } from "@/components/SEOHead";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Shield, Lock, CreditCard, CheckCircle2, Clock, Users, Star, Sparkles, Gift, Award, TrendingUp, Zap, Heart, MessageCircle, Brain, Mic, Globe } from "lucide-react";
 import CountdownTimer from "@/components/CountdownTimer";
 import SpotCounter from "@/components/SpotCounter";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -15,78 +14,40 @@ import InstructorBio from "@/components/InstructorBio";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
 import BonusMaterialsSection from "@/components/BonusMaterialsSection";
 import RecentRegistrations from "@/components/RecentRegistrations";
-import { PerformanceMonitor } from "@/components/PerformanceMonitor";
+import { SEOHead } from "@/components/SEOHead";
 import { simpleSubscriptionSchema } from '@/lib/validation';
 import { z } from 'zod';
-import { Video, Shield, Zap } from 'lucide-react';
 
 const One = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showRegistrationForm, setShowRegistrationForm] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
-  const navigate = useNavigate();
 
-  // Set countdown target date (you can adjust this)
-  const countdownTarget = new Date();
-  countdownTarget.setDate(countdownTarget.getDate() + 3); // 3 days from now
-
-  // Meta Pixel tracking - Page view and content tracking
+  // Meta Pixel tracking
   useEffect(() => {
-    // Track page view
     if (typeof window !== 'undefined' && (window as any).fbq) {
       (window as any).fbq('track', 'PageView');
-      
-      // Track content view with page-specific data
       (window as any).fbq('track', 'ViewContent', {
         content_type: 'paid_class',
         content_name: 'Bilingual Power Class',
         content_category: 'online_class',
-        value: 100, // Original value
+        value: 100,
         currency: 'USD'
       });
-
-      // Track custom event for landing page visit
       (window as any).fbq('trackCustom', 'BilingualClassPageVisit', {
         page_type: 'paid_class_landing',
-        event_type: 'bilingual_class_registration',
-        target_audience: 'persian_immigrant_women',
         offer_price: 1,
         original_price: 100
       });
     }
   }, []);
 
-  // Track modal interactions
-  const handleModalOpen = () => {
-    setShowModal(true);
-    
-    // Track modal open event
-    if (typeof window !== 'undefined' && (window as any).fbq) {
-      (window as any).fbq('trackCustom', 'RegistrationModalOpen', {
-        source: 'one_bilingual',
-        modal_type: 'paid_class_registration'
-      });
-    }
-  };
-
-  // Track form start
-  const handleFormStart = (fieldName: string) => {
-    if (typeof window !== 'undefined' && (window as any).fbq) {
-      (window as any).fbq('trackCustom', 'FormStart', {
-        form_type: 'paid_class_registration',
-        first_field: fieldName,
-        source: 'one_bilingual'
-      });
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form data with Zod (removed city field)
     setValidationErrors({});
     try {
       simpleSubscriptionSchema.parse({ name, email });
@@ -99,7 +60,6 @@ const One = () => {
           }
         });
         setValidationErrors(errors);
-        
         toast({
           title: "خطا",
           description: "لطفا فرم را با دقت کامل کنید",
@@ -112,7 +72,6 @@ const One = () => {
     setIsSubmitting(true);
 
     try {
-      // First, subscribe to mailchimp
       const { error: mailchimpError } = await supabase.functions.invoke('mailchimp-subscribe', {
         body: {
           email: email.trim().toLowerCase(),
@@ -126,12 +85,11 @@ const One = () => {
 
       if (mailchimpError) throw mailchimpError;
 
-      // Create Stripe payment session
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke('create-payment', {
         body: {
           email: email.trim().toLowerCase(),
           name: name.trim(),
-          amount: 100, // $1.00 in cents
+          amount: 100,
           programTitle: 'قدرت دوزبانه - Bilingual Power Class',
           successUrl: `${window.location.origin}/thankone`,
           cancelUrl: `${window.location.origin}/one`
@@ -140,17 +98,14 @@ const One = () => {
 
       if (paymentError) throw paymentError;
 
-      // Track registration attempt
       if (typeof window !== 'undefined' && (window as any).fbq) {
         (window as any).fbq('trackCustom', 'BilingualClassRegistration', {
           content_name: 'Bilingual Power Class',
-          content_category: 'paid_class',
           value: 1,
           currency: 'USD'
         });
       }
 
-      // Redirect to Stripe checkout
       if (paymentData?.url) {
         window.location.href = paymentData.url;
       } else {
@@ -170,288 +125,563 @@ const One = () => {
 
   return (
     <>
-      <SEOHead
-        title="قدرت دوزبانه - Online Class for Persian Women"
-        description="Master bilingual power as an immigrant woman. $1 for first 100 registrants!"
+      <SEOHead 
+        title="قدرت دو زبانه - کلاس آنلاین تنها $1 | LadyBoss Academy"
+        description="یاد بگیرید چطور در هر زبانی با قدرت و اعتماد به نفس حرف بزنید. کلاس ویژه زنان ایرانی مهاجر - فقط $1 برای 100 نفر اول"
+        type="website"
       />
+      <RecentRegistrations />
+      <ExitIntentPopup onRegisterClick={() => setShowRegistrationForm(true)} />
       
-      {/* Event Banner with Countdown */}
-      <div className="bg-secondary text-luxury-black py-6 text-center">
-        <p className="font-bold text-lg md:text-xl mb-2">
-          🎯 کلاس آنلاین قدرت دوزبانه
-        </p>
-        <p className="text-sm md:text-base mb-3">
-          فقط ۱۰۰ نفر اول | ۱ دلار به جای ۱۰۰ دلار
-        </p>
-        <div className="max-w-md mx-auto">
-          <p className="text-xs font-bold mb-2 font-farsi">⏰ زمان باقی‌مانده تا افزایش قیمت:</p>
-          <CountdownTimer targetDate={countdownTarget} />
-        </div>
-      </div>
-
-      {/* Hero Section */}
-      <div className="min-h-screen bg-gradient-luxury relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-luxury-black via-luxury-charcoal to-luxury-accent opacity-90"></div>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
-        
-        <div className="container mx-auto px-4 py-12 relative z-10">
-          {/* Logo Area */}
-          <div className="text-center mb-8">
-            <div className="text-lg md:text-xl text-luxury-silver/90 font-persian">
-              مخصوص خانم‌های مهاجرت کرده به خارج
-            </div>
-            <div className="text-base md:text-lg text-luxury-silver/80 mt-2">
-              Free Live Training for Persian Women
-            </div>
+      <div className="min-h-screen bg-gradient-to-br from-luxury-black via-luxury-charcoal to-luxury-accent font-farsi">
+        {/* Hero Section - Above the Fold */}
+        <div className="relative overflow-hidden">
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-20 left-10 w-72 h-72 bg-secondary rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/50 rounded-full blur-3xl animate-pulse delay-1000"></div>
           </div>
 
-          {/* Main Hero Content */}
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              
-              {/* Left Side - Hero Text */}
-              <div className="text-center lg:text-right space-y-8">
-                <div>
-                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-luxury-white leading-tight mb-6 font-persian">
-                    <span className="text-secondary block text-5xl md:text-7xl lg:text-8xl">قدرت دوزبانه</span>
-                    <span className="text-luxury-white block text-3xl md:text-5xl lg:text-6xl">کلاس آنلاین</span>
-                  </h1>
-                  
-                  <div className="text-luxury-silver/90 text-base md:text-lg leading-relaxed space-y-4 mb-6 font-farsi text-center lg:text-right">
-                    <p>
-                      «قدرت دو زبانه» در ظاهر درباره‌ی زبان است،<br/>
-                      ولی در عمق، درباره‌ی دو جهان درون یک زن مهاجر است:
-                    </p>
-                    <p>
-                      زبانی برای ارتباط بیرونی (جامعه‌ی جدید، فرهنگ جدید)
-                    </p>
-                    <p>
-                      و زبانی برای قدرت درونی (هویت، احساس، ارزش‌ها)
-                    </p>
-                    <p className="text-secondary font-bold">
-                      یعنی زنی که یاد گرفته نه فقط دو زبان حرف بزند، بلکه<br/>
-                      «در دو دنیا، با اعتمادبه‌نفس حضور داشته باشد.»
-                    </p>
-                  </div>
-                  
-                  {/* Location Restriction */}
-                  <div className="text-center mb-4">
-                    <p className="text-luxury-silver/90 font-medium text-lg md:text-xl font-persian">
-                      فقط ساکن امریکا | کانادا | اروپا | استرالیا | دبی
-                    </p>
-                    {/* Arrows pointing down */}
-                    <div className="flex justify-center gap-2 mt-3">
-                      <div className="text-secondary text-2xl animate-bounce" style={{ animationDelay: '0ms' }}>⬇️</div>
-                      <div className="text-secondary text-2xl animate-bounce" style={{ animationDelay: '200ms' }}>⬇️</div>
-                      <div className="text-secondary text-2xl animate-bounce" style={{ animationDelay: '400ms' }}>⬇️</div>
+          <div className="container mx-auto px-4 py-8 relative z-10">
+            {/* Urgency Banner */}
+            <div className="bg-secondary/20 border-2 border-secondary rounded-2xl p-4 mb-6 text-center backdrop-blur-sm animate-fade-in">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-secondary animate-pulse" />
+                  <span className="text-luxury-white font-bold">⏰ پیشنهاد محدود تمام می‌شود:</span>
+                </div>
+                <CountdownTimer targetDate={new Date('2025-12-31T23:59:59')} />
+              </div>
+              <SpotCounter />
+            </div>
+
+            {/* Main Hero Content */}
+            <div className="max-w-5xl mx-auto text-center py-12">
+              {/* Pre-headline */}
+              <div className="inline-block bg-secondary/20 border border-secondary rounded-full px-6 py-2 mb-6 animate-fade-in">
+                <span className="text-secondary font-bold">💎 ویژه زنان ایرانی مهاجر</span>
+              </div>
+
+              {/* Main Headline */}
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-luxury-white mb-6 leading-tight animate-fade-in">
+                قدرت دو زبانه
+                <br />
+                <span className="text-secondary">زبان تو، پل قدرتت است</span>
+                <br />
+                <span className="text-2xl md:text-3xl text-luxury-silver/90">نه دیوار ترسش</span>
+              </h1>
+
+              {/* Subheadline */}
+              <p className="text-xl md:text-2xl text-luxury-white/90 mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in">
+                یاد بگیر در <span className="text-secondary font-bold">هر زبانی خودت باشی</span>،
+                <br className="hidden md:block" />
+                محترمانه ولی <span className="text-secondary font-bold">محکم صحبت کنی</span>،
+                <br className="hidden md:block" />
+                و با اعتماد‌به‌نفس در جامعه‌ی جدید <span className="text-secondary font-bold">بدرخشی</span>
+              </p>
+
+              {/* Price & Offer */}
+              <div className="bg-luxury-white/10 backdrop-blur-md border-2 border-secondary rounded-3xl p-8 mb-8 max-w-2xl mx-auto animate-scale-in">
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <span className="text-5xl md:text-7xl font-bold text-secondary">$1</span>
+                  <div className="text-right">
+                    <div className="text-luxury-silver/60 line-through text-2xl">$100</div>
+                    <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold inline-block">
+                      99% تخفیف
                     </div>
                   </div>
-                  
-                  {/* Signup Button - Mobile centered, Desktop right-aligned */}
-                  <div className="flex justify-center lg:justify-end mb-8">
-                  <Button
-                    onClick={handleModalOpen}
-                    className="w-full max-w-sm h-16 text-lg md:text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-persian transition-all duration-300 transform hover:scale-105 shadow-glow pulse-glow rounded-2xl"
+                </div>
+                <p className="text-luxury-white/80 text-lg mb-4">
+                  ✨ فقط برای <span className="text-secondary font-bold">100 نفر اول</span>
+                </p>
+                <p className="text-red-400 font-bold text-sm">
+                  ⚠️ بعد از تکمیل ظرفیت، قیمت به $100 برمی‌گردد
+                </p>
+              </div>
+
+              {/* Primary CTA */}
+              <Button
+                onClick={() => setShowRegistrationForm(true)}
+                className="w-full md:w-auto px-12 py-8 text-2xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black rounded-2xl shadow-glow transform hover:scale-105 transition-all duration-300 mb-6 animate-pulse"
+              >
+                🚀 همین الان با $1 ثبت نام کن
+              </Button>
+
+              {/* Trust Indicators */}
+              <div className="flex flex-wrap items-center justify-center gap-6 text-luxury-silver/80 text-sm">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-secondary" />
+                  <span>پرداخت 100% امن</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Award className="w-4 h-4 text-secondary" />
+                  <span>ضمانت بازگشت وجه</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-secondary" />
+                  <span>بیش از 500+ زن توانمند</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-secondary fill-secondary" />
+                  <span>4.9/5 امتیاز</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Video/Image Section */}
+            <div className="max-w-4xl mx-auto mb-12">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-secondary/30">
+                <div className="aspect-video bg-luxury-charcoal flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <Sparkles className="w-16 h-16 text-secondary mx-auto mb-4" />
+                    <p className="text-luxury-white text-xl">🎥 ویدیوی معرفی کلاس</p>
+                    <p className="text-luxury-silver/70 text-sm mt-2">(به زودی اضافه می‌شود)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Problem-Agitate Section */}
+        <div className="bg-luxury-white/5 backdrop-blur-sm py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-3xl md:text-5xl font-bold text-luxury-white mb-6">
+                آیا این چالش‌ها را تجربه کردی؟
+              </h2>
+              
+              <div className="grid md:grid-cols-2 gap-6 text-right">
+                {[
+                  "😔 وقتی صحبت می‌کنی، احساس می‌کنی شنیده نمی‌شوی",
+                  "😰 از لهجه‌ات خجالت می‌کشی و ترجیح می‌دهی ساکت باشی",
+                  "🤐 نمی‌دانی چطور «نه» بگویی بدون احساس گناه",
+                  "😞 در محیط کاری احساس می‌کنی دیده نمی‌شوی",
+                  "🤔 بین دو فرهنگ احساس گم‌شدگی می‌کنی",
+                  "😣 می‌خواهی قاطع باشی اما نمی‌دانی چطور"
+                ].map((problem, index) => (
+                  <div 
+                    key={index}
+                    className="bg-luxury-white/10 border border-luxury-accent/20 rounded-2xl p-6 hover:border-secondary/50 transition-all"
                   >
-                    🚀 کلیک کنید و جای خود را رزرو کنید
-                  </Button>
+                    <p className="text-luxury-white/90 text-lg">{problem}</p>
                   </div>
-                </div>
-
-                <div className="bg-luxury-white/5 backdrop-blur-sm border border-secondary/20 rounded-xl p-6 mb-8">
-                  <p className="text-luxury-white font-bold text-lg mb-2 font-farsi">
-                    💰 پیشنهاد ویژه
-                  </p>
-                  <p className="text-secondary font-medium text-2xl font-farsi">
-                    فقط ۱ دلار برای ۱۰۰ نفر اول
-                  </p>
-                  <p className="text-luxury-silver/80 text-sm mt-2 font-farsi line-through">
-                    قیمت اصلی: ۱۰۰ دلار
-                  </p>
-                  <p className="text-red-400 font-bold text-sm mt-1 font-farsi">
-                    ۹۹٪ تخفیف!
-                  </p>
-                </div>
+                ))}
               </div>
 
-              {/* Right Side - Additional Info with Spot Counter */}
-              <div className="lg:sticky lg:top-8 text-center space-y-6">
-                {/* Spot Counter */}
-                <SpotCounter totalSpots={100} />
-
-                {/* Trust Badges */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-3">
-                    <Shield className="w-6 h-6 text-secondary mx-auto mb-1" />
-                    <p className="text-luxury-silver/90 text-xs font-farsi">پرداخت امن</p>
-                  </div>
-                  <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-3">
-                    <Video className="w-6 h-6 text-secondary mx-auto mb-1" />
-                    <p className="text-luxury-silver/90 text-xs font-farsi">دسترسی مادام‌العمر</p>
-                  </div>
-                  <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-xl p-3">
-                    <Zap className="w-6 h-6 text-secondary mx-auto mb-1" />
-                    <p className="text-luxury-silver/90 text-xs font-farsi">شروع فوری</p>
-                  </div>
-                </div>
-
-                {/* Money Back Guarantee */}
-                <div className="bg-green-500/20 border-2 border-green-500/50 rounded-xl p-4">
-                  <p className="text-green-400 font-bold text-lg font-farsi">✅ ضمانت بازگشت پول</p>
-                  <p className="text-luxury-silver/90 text-sm mt-1 font-farsi">تا ۷ روز بعد از خرید</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Benefits of Being an Assertive Woman */}
-      <div className="bg-luxury-white/95 py-8">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs md:text-sm text-luxury-accent/80 font-farsi">
-              <span>• مرزبندی قدرتمند</span>
-              <span>• اعتماد به نفس پایدار</span>
-              <span>• ابراز وجود بدون گناه</span>
-              <span>• مدیریت تعارضات</span>
-              <span>• ارتباط مؤثر</span>
-              <span>• استقلال از تأیید دیگران</span>
-              <span>• نه گفتن با اعتماد</span>
-              <span>• بیان اَسِرتیو</span>
-              <span>• حق گرفتن</span>
-              <span>• پاسخ به انتقاد</span>
-              <span>• جلوگیری از بی‌انصافی</span>
-              <span>• مذاکرهٔ روزمره</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Video Intro Section */}
-      <div className="bg-luxury-charcoal py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h3 className="text-3xl md:text-4xl font-display font-bold text-luxury-white mb-6 font-farsi">
-              📹 نگاهی به کلاس قدرت دوزبانه
-            </h3>
-            <p className="text-luxury-silver/90 mb-8 font-farsi">
-              ببینید این کلاس چگونه زندگی شما را تغییر می‌دهد
-            </p>
-            <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl mb-6">
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://www.youtube.com/embed/qQalgp5Sg0w?rel=0&modestbranding=1"
-                title="Bilingual Power Class Preview"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full"
-              />
-            </div>
-            <Button 
-              onClick={handleModalOpen}
-              className="bg-secondary hover:bg-secondary-dark text-luxury-black font-bold text-xl px-12 py-4 h-auto rounded-2xl shadow-luxury transition-all duration-300 transform hover:scale-105 font-farsi"
-            >
-              🚀 همین الان با ۱ دلار شروع کنید
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Why Choose Section */}
-      <div className="bg-gradient-luxury py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h3 className="text-3xl md:text-4xl font-display font-bold text-luxury-white mb-12 font-farsi">
-              چرا این کلاس را از دست ندهید؟
-            </h3>
-            
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-2xl p-8">
-                <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-3xl">🎯</span>
-                </div>
-                <h4 className="text-xl font-bold text-secondary mb-4 font-farsi">تخصصی و هدفمند</h4>
-                <p className="text-luxury-silver/90 font-farsi">
-                  مخصوص چالش‌های واقعی زنان مهاجر طراحی شده
+              <div className="mt-12 bg-secondary/20 border-2 border-secondary rounded-2xl p-8">
+                <p className="text-2xl md:text-3xl font-bold text-secondary mb-4">
+                  ✨ خبر خوب: همه اینها قابل تغییر است!
+                </p>
+                <p className="text-luxury-white/90 text-lg">
+                  با کلاس «قدرت دو زبانه»، یاد می‌گیری چطور زبان را از مانع به <span className="text-secondary font-bold">ابزار قدرت</span> تبدیل کنی
                 </p>
               </div>
+
+              <Button
+                onClick={() => setShowRegistrationForm(true)}
+                className="mt-8 px-10 py-6 text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black rounded-xl shadow-glow transform hover:scale-105 transition-all"
+              >
+                ✅ می‌خواهم این تغییر را تجربه کنم
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* What You'll Learn - 5 Modules */}
+        <div className="py-16 bg-gradient-to-b from-transparent to-luxury-white/5">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl md:text-5xl font-bold text-luxury-white mb-4">
+                  🌿 در قدرت دو زبانه، چه یاد می‌گیری؟
+                </h2>
+                <p className="text-luxury-silver/80 text-xl">
+                  5 زبان قدرت که زندگی‌ات را متحول می‌کند
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {/* Module 1 */}
+                <div className="bg-luxury-white/10 backdrop-blur-sm border-2 border-secondary/30 rounded-3xl p-8 hover:border-secondary transition-all group">
+                  <div className="flex items-start gap-6">
+                    <div className="bg-secondary rounded-2xl p-4 group-hover:scale-110 transition-transform">
+                      <Brain className="w-8 h-8 text-luxury-black" />
+                    </div>
+                    <div className="flex-1 text-right">
+                      <h3 className="text-2xl md:text-3xl font-bold text-secondary mb-3">
+                        ۱. زبان درونی قدرت
+                      </h3>
+                      <p className="text-luxury-white/80 text-lg mb-4 leading-relaxed">
+                        زبان درونی تو یعنی طرز فکر، گفت‌وگو با خودت و روایت‌هایی که از خودت داری.
+                      </p>
+                      <div className="space-y-2 mb-4">
+                        <p className="text-luxury-white/90">🔹 یاد می‌گیری:</p>
+                        <ul className="space-y-2 text-luxury-silver/80">
+                          <li>✓ چطور حرف‌های ذهنی منفی را خاموش و بازنویسی کنی</li>
+                          <li>✓ واژه‌هایی که قدرت را می‌برند (مثل «نمی‌تونم») بشناسی و جایگزینشان کنی</li>
+                          <li>✓ با خودت به زبان احترام حرف بزنی، نه به زبان ترس</li>
+                        </ul>
+                      </div>
+                      <div className="bg-luxury-black/50 rounded-xl p-4 border border-secondary/20">
+                        <p className="text-secondary font-bold mb-2">🧠 تمرین‌ها:</p>
+                        <p className="text-luxury-silver/70 text-sm">
+                          بازنویسی صدای درونی • کلمات ممنوعه در گفت‌وگوی ذهنی • چطور به خودم انرژی زبانی بدهم
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Module 2 */}
+                <div className="bg-luxury-white/10 backdrop-blur-sm border-2 border-secondary/30 rounded-3xl p-8 hover:border-secondary transition-all group">
+                  <div className="flex items-start gap-6">
+                    <div className="bg-secondary rounded-2xl p-4 group-hover:scale-110 transition-transform">
+                      <MessageCircle className="w-8 h-8 text-luxury-black" />
+                    </div>
+                    <div className="flex-1 text-right">
+                      <h3 className="text-2xl md:text-3xl font-bold text-secondary mb-3">
+                        ۲. زبان بیرونی قدرت (Communication Skills)
+                      </h3>
+                      <p className="text-luxury-white/80 text-lg mb-4 leading-relaxed">
+                        چطور صحبت می‌کنی = چطور دیده می‌شوی.
+                      </p>
+                      <div className="space-y-2 mb-4">
+                        <p className="text-luxury-white/90">🔹 در این بخش یاد می‌گیری:</p>
+                        <ul className="space-y-2 text-luxury-silver/80">
+                          <li>✓ ساختار جملات قاطع ولی محترمانه</li>
+                          <li>✓ تکنیک‌های «نه گفتن» بدون احساس گناه</li>
+                          <li>✓ نحوه‌ی شروع، ادامه و پایان گفت‌وگوهای سخت</li>
+                          <li>✓ چطور در محیط کاری و اجتماعی با اعتماد به نفس حرف بزنی</li>
+                          <li>✓ چطور لهجه‌ات را ابزار اصالت بدانی، نه ضعف</li>
+                        </ul>
+                      </div>
+                      <div className="bg-luxury-black/50 rounded-xl p-4 border border-secondary/20">
+                        <p className="text-secondary font-bold mb-2">💬 تمرین‌ها:</p>
+                        <p className="text-luxury-silver/70 text-sm">
+                          "I feel / I need / I propose" (فارسی و انگلیسی) • چطور درخواست کنم بدون عذرخواهی • معرفی مؤثر
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Module 3 */}
+                <div className="bg-luxury-white/10 backdrop-blur-sm border-2 border-secondary/30 rounded-3xl p-8 hover:border-secondary transition-all group">
+                  <div className="flex items-start gap-6">
+                    <div className="bg-secondary rounded-2xl p-4 group-hover:scale-110 transition-transform">
+                      <Globe className="w-8 h-8 text-luxury-black" />
+                    </div>
+                    <div className="flex-1 text-right">
+                      <h3 className="text-2xl md:text-3xl font-bold text-secondary mb-3">
+                        ۳. زبان فرهنگی (Cultural Language)
+                      </h3>
+                      <p className="text-luxury-white/80 text-lg mb-4 leading-relaxed">
+                        وقتی مهاجرت می‌کنی، فقط کلمات عوض نمی‌شوند — قوانین ناگفته هم تغییر می‌کنند.
+                      </p>
+                      <div className="space-y-2 mb-4">
+                        <p className="text-luxury-white/90">🔹 در این بخش یاد می‌گیری:</p>
+                        <ul className="space-y-2 text-luxury-silver/80">
+                          <li>✓ تفاوت سبک گفت‌وگو در فرهنگ میزبان (مثلاً آمریکایی) و فرهنگ خودت</li>
+                          <li>✓ چطور بدون سوءتفاهم، احساساتت را بیان کنی</li>
+                          <li>✓ آداب گفت‌وگو، مرزبندی، و assertiveness در محیط چندفرهنگی</li>
+                        </ul>
+                      </div>
+                      <div className="bg-luxury-black/50 rounded-xl p-4 border border-secondary/20">
+                        <p className="text-secondary font-bold mb-2">🌎 تمرین‌ها:</p>
+                        <p className="text-luxury-silver/70 text-sm">
+                          چطور در آمریکا 'نه' بگوییم • حضور محترمانه ولی فعال در جلسات • عبارات طلایی بین‌فرهنگی
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Module 4 */}
+                <div className="bg-luxury-white/10 backdrop-blur-sm border-2 border-secondary/30 rounded-3xl p-8 hover:border-secondary transition-all group">
+                  <div className="flex items-start gap-6">
+                    <div className="bg-secondary rounded-2xl p-4 group-hover:scale-110 transition-transform">
+                      <Mic className="w-8 h-8 text-luxury-black" />
+                    </div>
+                    <div className="flex-1 text-right">
+                      <h3 className="text-2xl md:text-3xl font-bold text-secondary mb-3">
+                        ۴. زبان حضور (Body Language & Voice)
+                      </h3>
+                      <p className="text-luxury-white/80 text-lg mb-4 leading-relaxed">
+                        قدرت فقط در کلمات نیست — در لحن و بدن توست.
+                      </p>
+                      <div className="space-y-2 mb-4">
+                        <p className="text-luxury-white/90">🔹 یاد می‌گیری:</p>
+                        <ul className="space-y-2 text-luxury-silver/80">
+                          <li>✓ تن صدای محکم، آرام، و مطمئن بسازی</li>
+                          <li>✓ با زبان بدن اعتمادبه‌نفس را منتقل کنی</li>
+                          <li>✓ حضور فیزیکی و ذهنی داشته باشی وقتی صحبت می‌کنی</li>
+                        </ul>
+                      </div>
+                      <div className="bg-luxury-black/50 rounded-xl p-4 border border-secondary/20">
+                        <p className="text-secondary font-bold mb-2">🎤 تمرین‌ها:</p>
+                        <p className="text-luxury-silver/70 text-sm">
+                          چطور بایستم تا قاطع به‌نظر برسم • تمرین صدای آرام ولی مقتدر • میکروحرکات قدرت
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Module 5 */}
+                <div className="bg-luxury-white/10 backdrop-blur-sm border-2 border-secondary/30 rounded-3xl p-8 hover:border-secondary transition-all group">
+                  <div className="flex items-start gap-6">
+                    <div className="bg-secondary rounded-2xl p-4 group-hover:scale-110 transition-transform">
+                      <Zap className="w-8 h-8 text-luxury-black" />
+                    </div>
+                    <div className="flex-1 text-right">
+                      <h3 className="text-2xl md:text-3xl font-bold text-secondary mb-3">
+                        ۵. زبان تأثیر (Influence & Storytelling)
+                      </h3>
+                      <p className="text-luxury-white/80 text-lg mb-4 leading-relaxed">
+                        در آخر، یاد می‌گیری چطور از زبانت برای الهام دادن، متقاعد کردن، و ساختن جایگاه شخصی استفاده کنی.
+                      </p>
+                      <div className="space-y-2 mb-4">
+                        <p className="text-luxury-white/90">🔹 تمرکز روی:</p>
+                        <ul className="space-y-2 text-luxury-silver/80">
+                          <li>✓ روایت شخصی و storytelling</li>
+                          <li>✓ گفت‌وگوهایی که اعتماد می‌سازند، نه فقط اطلاعات</li>
+                          <li>✓ چطور با زبان، رابطه و فرصت بسازی</li>
+                        </ul>
+                      </div>
+                      <div className="bg-luxury-black/50 rounded-xl p-4 border border-secondary/20">
+                        <p className="text-secondary font-bold mb-2">🪶 تمرین‌ها:</p>
+                        <p className="text-luxury-silver/70 text-sm">
+                          داستان مهاجرت من • سه جمله‌ای که برند شخصی مرا می‌سازد • چطور حرفم اثر بگذارد
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-12 text-center">
+                <Button
+                  onClick={() => setShowRegistrationForm(true)}
+                  className="px-12 py-7 text-2xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black rounded-2xl shadow-glow transform hover:scale-105 transition-all animate-pulse"
+                >
+                  🎯 می‌خواهم این 5 زبان قدرت را یاد بگیرم - فقط $1
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Transformation/Results Section */}
+        <div className="bg-luxury-white/5 backdrop-blur-sm py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl md:text-5xl font-bold text-luxury-white mb-4">
+                  💫 نتیجه‌ای که تجربه می‌کنی
+                </h2>
+                <p className="text-luxury-silver/80 text-xl">
+                  بعد از این کلاس، زندگی‌ات اینطور می‌شود:
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  {
+                    icon: <Heart className="w-12 h-12 text-secondary" />,
+                    title: "لهجه‌ات، امضای توست",
+                    desc: "دیگر محدودیت نیست، امضای اوست"
+                  },
+                  {
+                    icon: <TrendingUp className="w-12 h-12 text-secondary" />,
+                    title: "حضور با قدرت",
+                    desc: "می‌تواند در هر گفت‌وگویی با احترام و قاطعیت حضور داشته باشد"
+                  },
+                  {
+                    icon: <Sparkles className="w-12 h-12 text-secondary" />,
+                    title: "بدون ترس از قضاوت",
+                    desc: "دیگر از قضاوت، سکوت، یا اشتباه در زبان دوم نمی‌ترسد"
+                  }
+                ].map((result, index) => (
+                  <div 
+                    key={index}
+                    className="bg-luxury-white/10 backdrop-blur-sm border-2 border-secondary/30 rounded-3xl p-8 text-center hover:border-secondary hover:transform hover:scale-105 transition-all"
+                  >
+                    <div className="mb-6 flex justify-center">
+                      {result.icon}
+                    </div>
+                    <h3 className="text-2xl font-bold text-secondary mb-3">
+                      {result.title}
+                    </h3>
+                    <p className="text-luxury-white/80 leading-relaxed">
+                      {result.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-12 bg-gradient-to-r from-secondary/20 via-secondary/30 to-secondary/20 border-2 border-secondary rounded-3xl p-10 text-center">
+                <h3 className="text-3xl md:text-4xl font-bold text-secondary mb-4">
+                  زبانت، پل قدرتت می‌شود
+                </h3>
+                <p className="text-2xl text-luxury-white/90 mb-6">
+                  نه دیوار ترسش ✨
+                </p>
+                <Button
+                  onClick={() => setShowRegistrationForm(true)}
+                  className="px-10 py-6 text-xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black rounded-xl shadow-glow transform hover:scale-105 transition-all"
+                >
+                  🚀 من آماده‌ی این تحول هستم
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Instructor Bio */}
+        <InstructorBio />
+
+        {/* Testimonials */}
+        <TestimonialsSection />
+
+        {/* FAQ Section */}
+        <FAQSection />
+
+        {/* Bonus Materials */}
+        <BonusMaterialsSection />
+
+        {/* Final CTA Section - Stronger Close */}
+        <div className="bg-gradient-to-br from-secondary/20 via-secondary/10 to-transparent py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-4xl md:text-5xl font-bold text-luxury-white mb-6">
+                ⏰ زمان تصمیم‌گیری رسیده
+              </h2>
               
-              <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-2xl p-8">
-                <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-3xl">💡</span>
+              <p className="text-2xl text-luxury-silver/90 mb-8">
+                دو راه پیش روت هست...
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-8 mb-12">
+                {/* Option 1 - Take Action */}
+                <div className="bg-secondary/20 border-4 border-secondary rounded-3xl p-8 transform hover:scale-105 transition-all">
+                  <div className="text-6xl mb-4">✅</div>
+                  <h3 className="text-2xl font-bold text-secondary mb-4">همین الان عمل کن</h3>
+                  <ul className="space-y-3 text-right text-luxury-white/90 mb-6">
+                    <li>✨ 5 زبان قدرت را یاد بگیر</li>
+                    <li>💪 با اعتماد‌به‌نفس صحبت کن</li>
+                    <li>🚀 در محیط کار بدرخش</li>
+                    <li>🎁 بونوس $20 رایگان</li>
+                    <li>💰 فقط $1 (به‌جای $100)</li>
+                  </ul>
+                  <p className="text-secondary font-bold text-lg">
+                    = زندگی بهتر، قدرتمندتر، موفق‌تر
+                  </p>
                 </div>
-                <h4 className="text-xl font-bold text-secondary mb-4 font-farsi">راهکارهای عملی</h4>
-                <p className="text-luxury-silver/90 font-farsi">
-                  استراتژی‌هایی که می‌توانید همین امروز شروع کنید
+
+                {/* Option 2 - Do Nothing */}
+                <div className="bg-luxury-white/5 border-2 border-luxury-accent/20 rounded-3xl p-8 opacity-70">
+                  <div className="text-6xl mb-4">❌</div>
+                  <h3 className="text-2xl font-bold text-luxury-white/70 mb-4">هیچ کاری نکن</h3>
+                  <ul className="space-y-3 text-right text-luxury-white/60 mb-6">
+                    <li>😔 همچنان شنیده نشوی</li>
+                    <li>😰 از لهجه‌ات خجالت بکشی</li>
+                    <li>🤐 نتوانی «نه» بگویی</li>
+                    <li>😞 در محیط کار نادیده بمانی</li>
+                    <li>💸 بعداً $100 بپردازی</li>
+                  </ul>
+                  <p className="text-luxury-white/50 font-bold text-lg">
+                    = همان مشکلات، همان ترس‌ها
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-red-500/20 border-2 border-red-500 rounded-2xl p-6 mb-8 animate-pulse">
+                <p className="text-red-400 font-bold text-2xl mb-3">
+                  ⚠️ هشدار: فقط چند جای خالی باقی مانده!
+                </p>
+                <SpotCounter />
+                <div className="mt-4">
+                  <CountdownTimer targetDate={new Date('2025-12-31T23:59:59')} />
+                </div>
+              </div>
+
+              <Button
+                onClick={() => setShowRegistrationForm(true)}
+                className="w-full md:w-auto px-16 py-10 text-3xl font-bold bg-secondary hover:bg-secondary-dark text-luxury-black rounded-2xl shadow-glow transform hover:scale-110 transition-all animate-pulse mb-6"
+              >
+                🚀 بله! انتخاب من تحول است - ثبت نام با $1
+              </Button>
+
+              <p className="text-luxury-silver/60 text-sm mb-8">
+                ✓ پرداخت 100% امن | ✓ ضمانت 7 روزه بازگشت وجه | ✓ دسترسی فوری
+              </p>
+
+              <div className="bg-luxury-white/10 backdrop-blur-sm rounded-2xl p-8 border border-secondary/30">
+                <p className="text-luxury-white/90 text-lg italic leading-relaxed">
+                  "بهترین سرمایه‌گذاری، سرمایه‌گذاری روی خودت است.
+                  <br />
+                  <span className="text-secondary font-bold">فقط $1 می‌تواند آینده‌ات را تغییر دهد.</span>"
                 </p>
               </div>
-              
-              <div className="bg-luxury-white/10 backdrop-blur-sm border border-secondary/20 rounded-2xl p-8">
-                <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-3xl">🚀</span>
+
+              <div className="flex items-center justify-center gap-8 text-luxury-silver/70 mt-8">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-secondary" />
+                  <span>SSL Encrypted</span>
                 </div>
-                <h4 className="text-xl font-bold text-secondary mb-4 font-farsi">تحول سریع</h4>
-                <p className="text-luxury-silver/90 font-farsi">
-                  نتایج قابل مشاهده در کمترین زمان ممکن
-                </p>
+                <div className="flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-secondary" />
+                  <span>Secure Payment</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-secondary" />
+                  <span>Stripe Powered</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Instructor Bio */}
-      <InstructorBio />
-
-      {/* Testimonials Section */}
-      <TestimonialsSection />
-
-      {/* Bonus Materials */}
-      <BonusMaterialsSection />
-
-      {/* FAQ Section */}
-      <FAQSection />
-
-      {/* Final CTA Section */}
-      <div className="bg-secondary py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h3 className="text-3xl md:text-4xl font-display font-bold text-luxury-black mb-8 font-farsi">
-              آماده برای تسلط بر قدرت دوزبانه هستید؟
-            </h3>
-            <p className="text-xl text-luxury-black/80 mb-8 font-farsi">
-              فقط ۱ دلار برای ۱۰۰ نفر اول - قیمت اصلی ۱۰۰ دلار
-            </p>
-            <Button 
-              onClick={handleModalOpen}
-              className="bg-luxury-black hover:bg-luxury-charcoal text-secondary font-bold text-xl px-12 py-4 h-auto rounded-2xl shadow-luxury transition-all duration-300 transform hover:scale-105 font-farsi"
-            >
-              ⬆️ همین الان ثبت نام کنید
-            </Button>
+        {/* Sticky Bottom CTA for Mobile - Enhanced */}
+        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-luxury-black via-luxury-charcoal to-luxury-black border-t-4 border-secondary p-3 z-50 md:hidden shadow-2xl">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="text-right flex-1">
+              <p className="text-secondary font-bold text-sm">فقط $1 • 73 جا باقی</p>
+              <p className="text-luxury-white/70 text-xs">قیمت به زودی $100 می‌شود</p>
+            </div>
+            <div className="bg-red-500/20 rounded-full px-3 py-1 animate-pulse">
+              <Clock className="w-4 h-4 text-red-400 inline" />
+              <span className="text-red-400 text-xs font-bold ml-1">محدود</span>
+            </div>
           </div>
+          <Button
+            onClick={() => setShowRegistrationForm(true)}
+            className="w-full py-6 text-lg font-bold bg-secondary hover:bg-secondary-dark text-luxury-black rounded-xl shadow-glow transform active:scale-95 transition-all"
+          >
+            🚀 ثبت نام فوری
+          </Button>
         </div>
       </div>
 
       {/* Registration Modal */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="sm:max-w-md bg-luxury-white border-2 border-secondary/20 shadow-luxury">
+      <Dialog open={showRegistrationForm} onOpenChange={setShowRegistrationForm}>
+        <DialogContent className="sm:max-w-md bg-luxury-white border-4 border-secondary shadow-2xl">
           <DialogHeader className="text-center">
-            <DialogTitle className="text-2xl font-bold text-luxury-black mb-2 font-farsi">
+            <DialogTitle className="text-3xl font-bold text-luxury-black mb-3 font-farsi">
               💎 ثبت نام در کلاس قدرت دوزبانه
             </DialogTitle>
-            <p className="text-green-600 font-farsi mb-2 font-bold text-xl">
-              فقط ۱ دلار برای ۱۰۰ نفر اول
-            </p>
-            <p className="text-luxury-accent/70 font-farsi text-base font-medium">
-              مخصوص ایرانیان مهاجر به خارج
-            </p>
+            <div className="bg-secondary/10 border-2 border-secondary rounded-xl p-4 mb-3">
+              <p className="text-secondary font-bold text-2xl mb-1">
+                فقط $1
+              </p>
+              <p className="text-luxury-accent/70 font-farsi text-sm">
+                برای 100 نفر اول • قیمت اصلی: $100
+              </p>
+            </div>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6 mt-6">
+          <form onSubmit={handleSubmit} className="space-y-6 mt-4">
             <div className="space-y-2">
               <Label htmlFor="modal-name" className="text-left block text-luxury-black font-medium">
                 Your Name
@@ -461,12 +691,14 @@ const One = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                onFocus={() => handleFormStart('name')}
                 placeholder="Your Name"
                 required
                 className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
                 dir="ltr"
               />
+              {validationErrors.name && (
+                <p className="text-red-500 text-sm">{validationErrors.name}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -483,46 +715,38 @@ const One = () => {
                 className="text-left h-12 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
                 dir="ltr"
               />
+              {validationErrors.email && (
+                <p className="text-red-500 text-sm">{validationErrors.email}</p>
+              )}
             </div>
-
 
             <Button
               type="submit"
               className="w-full h-14 text-lg font-bold bg-secondary hover:bg-secondary-dark text-luxury-black font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'در حال ارسال...' : '✅ ادامه به پرداخت ۱ دلار'}
+              {isSubmitting ? 'در حال ارسال...' : '✅ ادامه به پرداخت $1'}
             </Button>
           </form>
 
-          <div className="mt-4 text-center text-sm text-luxury-accent font-farsi">
-            <p>🔒 پرداخت امن</p>
-            <p className="mt-1">💳 قیمت: فقط ۱ دلار برای ۱۰۰ نفر اول</p>
+          <div className="mt-4 space-y-2">
+            <div className="flex items-center justify-center gap-6 text-luxury-accent/70 text-xs">
+              <div className="flex items-center gap-1">
+                <Shield className="w-3 h-3 text-secondary" />
+                <span>پرداخت امن</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Lock className="w-3 h-3 text-secondary" />
+                <span>SSL Protected</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-secondary" />
+                <span>ضمانت بازگشت وجه</span>
+              </div>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Sticky Bottom Button - Enhanced with Pulse */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-secondary/95 backdrop-blur-sm border-t border-luxury-white/10 shadow-2xl">
-        <Button
-          onClick={handleModalOpen}
-          className="w-full h-14 text-base md:text-lg font-bold bg-luxury-black hover:bg-luxury-charcoal text-secondary font-farsi transition-all duration-300 rounded-lg animate-pulse hover:animate-none shadow-glow"
-        >
-          💎 ثبت نام با ۱ دلار (۱۰۰ نفر اول)
-        </Button>
-      </div>
-
-      {/* Exit Intent Popup */}
-      <ExitIntentPopup onRegisterClick={handleModalOpen} />
-
-      {/* Recent Registrations Notification */}
-      <RecentRegistrations />
-
-      {/* Performance Monitor - Enable during high traffic testing */}
-      <PerformanceMonitor 
-        enabled={window.location.search.includes('monitor=true')} 
-        monitoringInterval={15000} 
-      />
     </>
   );
 };
