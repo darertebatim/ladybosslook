@@ -71,7 +71,7 @@
     --gradient-accent: linear-gradient(120deg, hsl(330 50% 85%), hsl(285 40% 90%));
     --gradient-text: linear-gradient(135deg, hsl(280 60% 50%), hsl(45 90% 60%));
     
-    /* Luxury Black & White Theme */
+    /* Luxury Black & White Theme - Vibrant Gold Accent */
     --luxury-black: 0 0% 8%;
     --luxury-charcoal: 0 0% 15%;
     --luxury-silver: 0 0% 85%;
@@ -82,6 +82,12 @@
     --luxury-gold-light: 48 100% 88%;
     --pure-black: 0 0% 0%;
     --pure-white: 0 0% 100%;
+    
+    /* Conversion-Focused Colors */
+    --cta-primary: 45 96% 58%;
+    --cta-primary-hover: 45 100% 65%;
+    --cta-urgent: 15 90% 55%;
+    --cta-urgent-hover: 15 95% 60%;
     
     /* Luxury Gradients */
     --gradient-luxury: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 15%), hsl(0 0% 25%));
