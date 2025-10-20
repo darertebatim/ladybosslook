@@ -47,10 +47,13 @@ const ThankOne = () => {
 
   const createWhatsAppMessage = () => {
     if (!orderDetails) {
-      return 'https://wa.me/16265028589?text=Hello%2C%20I%20just%20registered%20for%20the%20Bilingual%20Power%20Class!';
+      return 'https://wa.me/16265028589?text=Hello%2C%20I%20just%20registered!';
     }
     
-    const message = `سلام ادمین! من در کلاس قدرت دو زبانه ثبت نام کردم
+    // Get the program name from order details
+    const programName = orderDetails.product_name || 'the program';
+    
+    const message = `سلام ادمین! من در ${programName} ثبت نام کردم
     
 اطلاعات من:
 نام: ${orderDetails.name}
@@ -76,13 +79,15 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
         }
       `}</style>
       
-      <SEOHead title="Thank You - Payment Successful" description="Registration successful! Welcome to کلاس قدرت دو زبانه online class." />
+      <SEOHead title="Thank You - Payment Successful" description={`Registration successful! Welcome to ${orderDetails?.product_name || 'your program'}.`} />
       
       <div className="thankone-page-green">
         {/* Success Banner */}
         <div className="py-3 md:py-4 text-center px-4" style={{ background: 'linear-gradient(135deg, hsl(var(--cta-primary)), hsl(var(--cta-primary-hover)))' }}>
           <p className="font-bold text-base md:text-lg lg:text-xl text-white">🎉 پرداخت موفق - خوش آمدید!</p>
-          <p className="font-bold text-base md:text-lg lg:text-xl text-white">ثبت نام شما در کلاس قدرت دو زبانه تکمیل شد</p>
+          <p className="font-bold text-base md:text-lg lg:text-xl text-white">
+            {isLoading ? 'در حال بارگذاری...' : `ثبت نام شما در ${orderDetails?.product_name || 'دوره'} تکمیل شد`}
+          </p>
         </div>
 
         {/* Main Content */}
@@ -97,7 +102,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                 این ویدیو را ببینید<br />تا ۱۰۰٪ آماده کلاس شوید
               </h1>
               <p className="text-lg md:text-xl text-white/90 mb-6 md:mb-8 px-2 font-bold">
-                همین الان ویدیوی پایین را ببینید تا آماده کلاس قدرت دو زبانه شوید!
+                {isLoading ? '' : `همین الان ویدیوی پایین را ببینید تا آماده ${orderDetails?.product_name || 'کلاس'} شوید!`}
               </p>
             </div>
 

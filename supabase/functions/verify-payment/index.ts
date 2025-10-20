@@ -126,7 +126,55 @@ serve(async (req) => {
         }
       }
       
-      // Create order record with user_id
+      // Get program info from payment intent metadata
+      const paymentIntent = session.payment_intent;
+      let programSlug = null;
+      let programName = "Purchase";
+      
+      if (paymentIntent && typeof paymentIntent === 'object' && 'metadata' in paymentIntent) {
+        programSlug = (paymentIntent as any).metadata?.program || null;
+        
+        // Map program slug to display name
+        switch(programSlug) {
+          case 'one-bilingual':
+            programName = "Bilingual Power Class";
+            break;
+          case 'courageous-character':
+            programName = "Courageous Character Course";
+            break;
+          case 'money-literacy':
+            programName = "Money Literacy Program";
+            break;
+          case 'iqmoney':
+            programName = "IQMoney Program";
+            break;
+          case 'empowered-ladyboss':
+            programName = "Empowered Ladyboss Coaching";
+            break;
+          case 'business-startup':
+            programName = "Business Startup Accelerator";
+            break;
+          case 'business-growth':
+            programName = "Business Growth Accelerator";
+            break;
+          case 'ladyboss-vip':
+            programName = "Ladyboss VIP Club";
+            break;
+          case 'connection-literacy':
+            programName = "Connection Literacy Program";
+            break;
+          case 'instagram-growth':
+            programName = "Instagram Growth Course";
+            break;
+          case 'private-coaching':
+            programName = "Private Coaching Session";
+            break;
+          default:
+            programName = session.line_items?.data[0]?.description || 'Purchase';
+        }
+      }
+      
+      // Create order record with user_id and program info
       const { data: newOrder, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -138,7 +186,8 @@ serve(async (req) => {
           amount: session.amount_total || 0,
           currency: session.currency || 'usd',
           status: 'paid',
-          product_name: session.line_items?.data[0]?.description || 'Purchase'
+          product_name: programName,
+          program_slug: programSlug
         })
         .select()
         .single();
