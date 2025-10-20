@@ -8,7 +8,7 @@ const Hero = () => {
       <div className="container mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Content */}
-          <div className="space-y-8">
+          <div className="space-y-8 order-2 lg:order-1">
             <div className="space-y-6">
               <div className="inline-flex items-center px-4 py-2 bg-accent rounded-full">
                 <Users size={16} className="mr-2 text-primary" />
@@ -66,7 +66,7 @@ const Hero = () => {
           </div>
 
           {/* Hero Image */}
-          <div className="relative">
+          <div className="relative order-1 lg:order-2">
             <div className="relative z-10">
               <img
                 src={heroImage}
