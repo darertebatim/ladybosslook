@@ -72,7 +72,7 @@ const One = () => {
           city: '',
           phone: '',
           source: 'one_bilingual',
-          tags: ['one_bilingual', 'paid_class']
+          tags: ['one', 'one_bilingual', 'paid_class']
         }
       });
 
@@ -171,7 +171,7 @@ const One = () => {
               
               {/* Persian Title */}
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary mb-2 leading-tight">
-                قدرت دو زبانه
+                کلاس قدرت دو زبانه
               </h2>
 
               {/* Tagline */}

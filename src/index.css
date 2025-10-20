@@ -20,16 +20,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 230 15% 15%;
 
-    /* Primary - Bright Teal (High Converting) */
-    --primary: 174 72% 56%;
-    --primary-light: 174 77% 66%;
-    --primary-dark: 174 67% 46%;
+    /* Primary - Bright Green (High Converting) */
+    --primary: 142 76% 36%;
+    --primary-light: 145 70% 42%;
+    --primary-dark: 140 70% 30%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Bright Teal (Main CTA Color) */
-    --secondary: 174 72% 56%;
-    --secondary-light: 174 77% 66%;
-    --secondary-dark: 174 67% 46%;
+    /* Secondary - Bright Green (Main CTA Color) */
+    --secondary: 142 76% 36%;
+    --secondary-light: 145 70% 42%;
+    --secondary-dark: 140 70% 30%;
     --secondary-foreground: 0 0% 100%;
 
     /* Accent - Coral/Orange (Urgency) */
@@ -65,11 +65,11 @@
 
     --radius: 0.75rem;
 
-    /* Gradients - Teal & Navy */
-    --gradient-hero: linear-gradient(135deg, hsl(174 72% 56%), hsl(174 77% 66%));
+    /* Gradients - Green & Navy */
+    --gradient-hero: linear-gradient(135deg, hsl(142 76% 36%), hsl(145 70% 42%));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(215 25% 97%));
-    --gradient-accent: linear-gradient(120deg, hsl(6 78% 67%), hsl(174 72% 56%));
-    --gradient-text: linear-gradient(135deg, hsl(174 72% 56%), hsl(174 77% 66%));
+    --gradient-accent: linear-gradient(120deg, hsl(6 78% 67%), hsl(142 76% 36%));
+    --gradient-text: linear-gradient(135deg, hsl(142 76% 36%), hsl(145 70% 42%));
     
     /* Luxury Black & White Theme - Clean Navy */
     --luxury-black: 222 47% 11%;
@@ -77,15 +77,15 @@
     --luxury-silver: 215 16% 65%;
     --luxury-white: 0 0% 100%;
     --luxury-accent: 217 19% 27%;
-    --luxury-gold: 174 72% 56%;
-    --luxury-gold-dark: 174 67% 46%;
-    --luxury-gold-light: 174 77% 66%;
+    --luxury-gold: 142 76% 36%;
+    --luxury-gold-dark: 140 70% 30%;
+    --luxury-gold-light: 145 70% 42%;
     --pure-black: 0 0% 0%;
     --pure-white: 0 0% 100%;
     
-    /* Conversion-Focused Colors - Teal & Coral */
-    --cta-primary: 174 72% 56%;
-    --cta-primary-hover: 174 77% 66%;
+    /* Conversion-Focused Colors - Green & Coral */
+    --cta-primary: 142 76% 36%;
+    --cta-primary-hover: 145 70% 42%;
     --cta-urgent: 6 78% 67%;
     --cta-urgent-hover: 6 83% 77%;
     
@@ -124,7 +124,7 @@
     
     /* Gradients - Urgency & Conversion */
     --gradient-urgency: linear-gradient(135deg, hsl(6 78% 67%), hsl(6 83% 77%));
-    --gradient-cta: linear-gradient(135deg, hsl(174 72% 56%), hsl(174 82% 61%));
+    --gradient-cta: linear-gradient(135deg, hsl(142 76% 36%), hsl(145 70% 42%));
     --gradient-success: linear-gradient(135deg, hsl(160 84% 39%), hsl(160 89% 49%));
 
     --sidebar-background: 0 0% 98%;
