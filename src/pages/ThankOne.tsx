@@ -50,7 +50,7 @@ const ThankOne = () => {
       return 'https://wa.me/16265028589?text=Hello%2C%20I%20just%20registered%20for%20the%20Bilingual%20Power%20Class!';
     }
     
-    const message = `سلام رضیه! من در کلاس قدرت دو زبانه ثبت نام کردم
+    const message = `سلام ادمین! من در کلاس قدرت دو زبانه ثبت نام کردم
     
 اطلاعات من:
 نام: ${orderDetails.name}
@@ -161,7 +161,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                       }}
                     >
                       <MessageCircle className="w-5 h-5 md:w-6 md:h-6 ml-2" />
-                      <span>تماس با رضیه از طریق واتساپ</span>
+                      <span>تماس با ادمین از طریق واتساپ</span>
                     </Button>
                   )}
                   <p className="text-white/60 text-xs md:text-sm px-2">
