@@ -58,7 +58,7 @@ serve(async (req) => {
 
     // Retrieve the checkout session from Stripe with expanded data
     const session = await stripe.checkout.sessions.retrieve(sanitizedSessionId, {
-      expand: ['line_items', 'customer']
+      expand: ['line_items', 'customer', 'payment_intent']
     });
 
     logStep('Payment verification completed', { 
@@ -159,18 +159,79 @@ serve(async (req) => {
                              (customer as any)?.address?.city || 
                              "";
           
+          // Get program from payment intent metadata
+          const paymentIntent = session.payment_intent;
+          let programName = "Unknown Program";
+          let tags: string[] = [];
+          
+          // Extract program metadata from payment intent
+          if (paymentIntent && typeof paymentIntent === 'object' && 'metadata' in paymentIntent) {
+            const program = (paymentIntent as any).metadata?.program;
+            
+            // Map program to Mailchimp tags
+            switch(program) {
+              case 'one-bilingual':
+                programName = "Bilingual Power Class";
+                tags = ["one", "one_bilingual", "paid_class"];
+                break;
+              case 'courageous-character':
+                programName = "Courageous Character Course";
+                tags = ["ccc"];
+                break;
+              case 'money-literacy':
+                programName = "Money Literacy Program";
+                tags = ["money_literacy"];
+                break;
+              case 'iqmoney':
+                programName = "IQMoney Program";
+                tags = ["iqmoney"];
+                break;
+              case 'empowered-ladyboss':
+                programName = "Empowered Ladyboss Coaching";
+                tags = ["ladyboss_coaching_program"];
+                break;
+              case 'business-startup':
+                programName = "Business Startup Accelerator";
+                tags = ["bsac"];
+                break;
+              case 'business-growth':
+                programName = "Business Growth Accelerator";
+                tags = ["bgac"];
+                break;
+              case 'ladyboss-vip':
+                programName = "Ladyboss VIP Club";
+                tags = ["vip_club"];
+                break;
+              case 'connection-literacy':
+                programName = "Connection Literacy Program";
+                tags = ["connection_literacy"];
+                break;
+              case 'instagram-growth':
+                programName = "Instagram Growth Course";
+                tags = ["instagram_course"];
+                break;
+              case 'private-coaching':
+                programName = "Private Coaching Session";
+                tags = ["private_session"];
+                break;
+              default:
+                programName = "General Purchase";
+                tags = ["paid_customer"];
+            }
+          }
+          
           const mailchimpResponse = await supabase.functions.invoke('mailchimp-subscribe', {
             body: {
               email: orderDetails.email,
               name: orderDetails.name,
-              city: billingCity, // Use actual billing city instead of "Online"
+              city: billingCity,
               phone: orderDetails.phone || "",
               source: "workshop_purchase",
-              workshop_name: "Courageous Character Course",
+              workshop_name: programName,
               purchase_amount: orderDetails.amount,
               purchase_date: new Date().toISOString(),
               payment_status: "paid",
-              tags: ["ccc"],
+              tags: tags,
               session_id: sanitizedSessionId
             }
           });
