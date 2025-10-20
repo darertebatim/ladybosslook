@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -80,12 +80,9 @@ const One = () => {
 
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke('create-payment', {
         body: {
+          program: 'one-bilingual',
           email: email.trim().toLowerCase(),
-          name: name.trim(),
-          amount: 100,
-          programTitle: 'کلاس قدرت دوزبانه - Bilingual Power Class',
-          successUrl: `${window.location.origin}/thankone`,
-          cancelUrl: `${window.location.origin}/one`
+          name: name.trim()
         }
       });
 
@@ -437,6 +434,9 @@ const One = () => {
             <DialogTitle className="text-2xl md:text-3xl font-bold text-luxury-black mb-2 font-farsi">
               💎 ثبت نام Bilingual Power Class !
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Register for the Bilingual Power Class for only $1
+            </DialogDescription>
             <div className="bg-gradient-to-r from-secondary/20 via-secondary/30 to-secondary/20 border-2 border-secondary rounded-xl p-3 mb-2">
               <p className="text-secondary font-bold text-xl md:text-2xl">
                 فقط $1

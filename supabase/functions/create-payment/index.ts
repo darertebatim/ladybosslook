@@ -30,7 +30,7 @@ const sanitizeString = (input: string, maxLength: number = 255): string => {
 };
 
 const validateProgram = (program: string): boolean => {
-  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney', 'empowered-ladyboss', 'ladyboss-vip', 'connection-literacy', 'instagram-growth', 'private-coaching'];
+  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney', 'empowered-ladyboss', 'ladyboss-vip', 'connection-literacy', 'instagram-growth', 'private-coaching', 'one-bilingual'];
   return validPrograms.includes(program);
 };
 
@@ -157,6 +157,11 @@ serve(async (req) => {
         name: "1-Hour Private Session with Razie Ladyboss",
         amount: 59700, // $597 in cents
         description: "Exclusive one-on-one coaching session with Razie for personalized guidance"
+      },
+      "one-bilingual": {
+        name: "کلاس قدرت دو زبانه - Bilingual Power Class",
+        amount: 100, // $1 in cents
+        description: "Learn to speak with power in any language - special for Iranian immigrant women"
       }
     };
 
@@ -192,8 +197,8 @@ serve(async (req) => {
         enabled: true
       },
       customer_creation: 'always',
-      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/ccw?payment=cancelled`,
+      success_url: `${req.headers.get("origin")}/thankone?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get("origin")}/one`,
       payment_intent_data: {
         setup_future_usage: 'off_session', // Save payment method for future charges
         metadata: {
