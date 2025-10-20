@@ -72,7 +72,7 @@ const One = () => {
           city: '',
           phone: '',
           source: 'one_bilingual',
-          tags: ['one_bilingual', 'paid_class']
+          tags: ['one', 'one_bilingual', 'paid_class']
         }
       });
 
@@ -83,7 +83,7 @@ const One = () => {
           email: email.trim().toLowerCase(),
           name: name.trim(),
           amount: 100,
-          programTitle: 'قدرت دوزبانه - Bilingual Power Class',
+          programTitle: 'کلاس قدرت دوزبانه - Bilingual Power Class',
           successUrl: `${window.location.origin}/thankone`,
           cancelUrl: `${window.location.origin}/one`
         }
@@ -126,6 +126,15 @@ const One = () => {
 
   return (
     <>
+      <style>{`
+        .one-page-green {
+          --secondary: 142 76% 45%;
+          --secondary-light: 142 70% 55%;
+          --secondary-dark: 142 80% 35%;
+          --cta-primary: 142 76% 45%;
+          --cta-primary-hover: 142 70% 55%;
+        }
+      `}</style>
       <SEOHead 
         title="قدرت دو زبانه Class - کلاس آنلاین $1 | LadyBoss Academy"
         description="یاد بگیرید چطور در هر زبانی با قدرت حرف بزنید. کلاس ویژه زنان ایرانی مهاجر - فقط $1"
@@ -133,7 +142,7 @@ const One = () => {
       <RecentRegistrations />
       <ExitIntentPopup onRegisterClick={() => setShowRegistrationForm(true)} />
       
-      <div className="min-h-screen bg-gradient-to-br from-luxury-black via-luxury-charcoal to-luxury-black font-farsi">
+      <div className="one-page-green min-h-screen bg-gradient-to-br from-luxury-black via-luxury-charcoal to-luxury-black font-farsi">
         {/* Compact Hero Section */}
         <div className="relative overflow-hidden pb-12">
           {/* Animated Purple Glow */}
@@ -173,7 +182,7 @@ const One = () => {
               
               {/* Persian Title - Smaller than main */}
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-secondary mb-2 leading-tight">
-                قدرت دو زبانه
+                کلاس قدرت دو زبانه
               </h2>
 
               {/* Tagline - Smallest */}
@@ -259,7 +268,7 @@ const One = () => {
                   ✨ خبر خوب: قابل تغییر است!
                 </p>
                 <p className="text-luxury-white/90 text-sm md:text-base mb-3">
-                  با «قدرت دو زبانه»، زبان را به <span className="text-secondary font-bold">ابزار قدرت</span> تبدیل کن
+                  با «کلاس قدرت دو زبانه»، زبان را به <span className="text-secondary font-bold">ابزار قدرت</span> تبدیل کن
                 </p>
                 <Button
                   onClick={() => setShowRegistrationForm(true)}
@@ -278,7 +287,7 @@ const One = () => {
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-6">
                 <h2 className="text-2xl md:text-3xl font-bold text-luxury-white mb-2">
-                  🌿 در قدرت دو زبانه چه یاد می‌گیری؟
+                  🌿 در کلاس قدرت دو زبانه چه یاد می‌گیری؟
                 </h2>
                 <p className="text-luxury-silver/80 text-sm">
                   5 زبان قدرت که زندگی‌ات را متحول می‌کند
