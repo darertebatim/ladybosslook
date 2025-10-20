@@ -20,22 +20,22 @@
     --popover: 0 0% 100%;
     --popover-foreground: 230 15% 15%;
 
-    /* Primary - Bright Green (High Converting) */
-    --primary: 142 76% 36%;
-    --primary-light: 145 70% 42%;
-    --primary-dark: 140 70% 30%;
+    /* Primary - Empowerment Purple */
+    --primary: 280 60% 50%;
+    --primary-light: 285 65% 60%;
+    --primary-dark: 275 65% 35%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Bright Green (Main CTA Color) */
-    --secondary: 142 76% 36%;
-    --secondary-light: 145 70% 42%;
-    --secondary-dark: 140 70% 30%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary - Luxe Gold */
+    --secondary: 45 90% 60%;
+    --secondary-light: 45 95% 70%;
+    --secondary-dark: 40 85% 45%;
+    --secondary-foreground: 230 15% 15%;
 
-    /* Accent - Coral/Orange (Urgency) */
-    --accent: 6 78% 67%;
-    --accent-light: 6 83% 77%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent - Soft Rose */
+    --accent: 330 50% 85%;
+    --accent-light: 330 60% 90%;
+    --accent-foreground: 230 15% 15%;
 
     /* Muted Colors */
     --muted: 320 15% 95%;
@@ -48,14 +48,14 @@
     --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
     
-    /* Urgency & Conversion Colors - Coral */
-    --urgency: 6 78% 67%;
-    --urgency-light: 6 83% 77%;
-    --urgency-dark: 6 73% 57%;
+    /* Urgency & Conversion Colors */
+    --urgency: 15 90% 55%;
+    --urgency-light: 20 95% 65%;
+    --urgency-dark: 10 85% 45%;
     --urgency-foreground: 0 0% 100%;
     
-    --warning: 6 78% 67%;
-    --warning-light: 6 83% 77%;
+    --warning: 38 92% 50%;
+    --warning-light: 45 95% 60%;
     --warning-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
@@ -65,33 +65,34 @@
 
     --radius: 0.75rem;
 
-    /* Gradients - Green & Navy */
-    --gradient-hero: linear-gradient(135deg, hsl(142 76% 36%), hsl(145 70% 42%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(215 25% 97%));
-    --gradient-accent: linear-gradient(120deg, hsl(6 78% 67%), hsl(142 76% 36%));
-    --gradient-text: linear-gradient(135deg, hsl(142 76% 36%), hsl(145 70% 42%));
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(280 60% 50%), hsl(320 65% 55%), hsl(45 90% 60%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(320 20% 98%));
+    --gradient-accent: linear-gradient(120deg, hsl(330 50% 85%), hsl(285 40% 90%));
+    --gradient-text: linear-gradient(135deg, hsl(280 60% 50%), hsl(45 90% 60%));
     
-    /* Luxury Black & White Theme - Clean Navy */
-    --luxury-black: 222 47% 11%;
-    --luxury-charcoal: 217 33% 17%;
-    --luxury-silver: 215 16% 65%;
-    --luxury-white: 0 0% 100%;
-    --luxury-accent: 217 19% 27%;
-    --luxury-gold: 142 76% 36%;
-    --luxury-gold-dark: 140 70% 30%;
-    --luxury-gold-light: 145 70% 42%;
+    /* Luxury Black & White Theme - Updated Clear Palette */
+    --luxury-black: 240 15% 12%;
+    --luxury-charcoal: 240 12% 20%;
+    --luxury-silver: 240 5% 75%;
+    --luxury-white: 0 0% 99%;
+    --luxury-accent: 240 10% 35%;
+    --luxury-gold: 280 60% 55%;
+    --luxury-gold-dark: 280 65% 45%;
+    --luxury-gold-light: 280 50% 70%;
     --pure-black: 0 0% 0%;
     --pure-white: 0 0% 100%;
     
-    /* Conversion-Focused Colors - Green & Coral */
-    --cta-primary: 142 76% 36%;
-    --cta-primary-hover: 145 70% 42%;
-    --cta-urgent: 6 78% 67%;
-    --cta-urgent-hover: 6 83% 77%;
+    /* Conversion-Focused Colors - Clear and Vibrant */
+    --cta-primary: 280 70% 60%;
+    --cta-primary-hover: 280 75% 65%;
+    --cta-urgent: 345 85% 55%;
+    --cta-urgent-hover: 345 90% 60%;
     
-    /* Success Color - Green */
-    --cta-success: 160 84% 39%;
-    --cta-success-hover: 160 89% 49%;
+    /* Secondary - Teal/Turquoise accent */
+    --secondary: 280 70% 60%;
+    --secondary-light: 280 75% 70%;
+    --secondary-dark: 280 75% 50%;
     
     /* Luxury Gradients */
     --gradient-luxury: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 15%), hsl(0 0% 25%));
@@ -123,9 +124,9 @@
     --transition-fast: all 0.15s ease;
     
     /* Gradients - Urgency & Conversion */
-    --gradient-urgency: linear-gradient(135deg, hsl(6 78% 67%), hsl(6 83% 77%));
-    --gradient-cta: linear-gradient(135deg, hsl(142 76% 36%), hsl(145 70% 42%));
-    --gradient-success: linear-gradient(135deg, hsl(160 84% 39%), hsl(160 89% 49%));
+    --gradient-urgency: linear-gradient(135deg, hsl(15 90% 55%), hsl(20 95% 65%));
+    --gradient-cta: linear-gradient(135deg, hsl(15 90% 55%), hsl(10 85% 45%));
+    --gradient-success: linear-gradient(135deg, hsl(140 60% 45%), hsl(145 65% 55%));
 
     --sidebar-background: 0 0% 98%;
 
