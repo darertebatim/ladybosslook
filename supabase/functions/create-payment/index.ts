@@ -197,8 +197,12 @@ serve(async (req) => {
         enabled: true
       },
       customer_creation: 'always',
-      success_url: `${req.headers.get("origin")}/thankone?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/one`,
+      success_url: program === 'one-bilingual' 
+        ? `${req.headers.get("origin")}/thankone?session_id={CHECKOUT_SESSION_ID}`
+        : `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: program === 'one-bilingual'
+        ? `${req.headers.get("origin")}/one`
+        : `${req.headers.get("origin")}/programs`,
       payment_intent_data: {
         setup_future_usage: 'off_session', // Save payment method for future charges
         metadata: {
