@@ -18,8 +18,5 @@ verify_jwt = false
 [functions.create-existing-profiles]
 verify_jwt = true
 
-[functions.setup-admin]
-verify_jwt = false
-
 [functions.send-announcement-email]
 verify_jwt = false

@@ -12,7 +12,6 @@ import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp, Send,
 import { SEOHead } from '@/components/SEOHead';
 import UpdateMailchimpCities from '@/components/UpdateMailchimpCities';
 import FixMailchimpAmounts from '@/components/FixMailchimpAmounts';
-import SetupAdmin from '@/components/SetupAdmin';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
 import { CourseEnrollmentManager } from '@/components/admin/CourseEnrollmentManager';
 import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
@@ -475,7 +474,6 @@ const Admin = () => {
 
         {/* Mailchimp Update Tools */}
         <div className="mb-6 space-y-4">
-          <SetupAdmin />
           <UpdateMailchimpCities />
           <FixMailchimpAmounts />
           
