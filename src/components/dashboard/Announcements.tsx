@@ -91,37 +91,33 @@ export function Announcements() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="h-5 w-5" />
-          Announcements & Updates
+      <CardHeader className="pb-2 lg:pb-6">
+        <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+          <Bell className="h-4 w-4 lg:h-5 lg:w-5" />
+          Announcements
         </CardTitle>
-        <CardDescription>Stay updated with the latest news and events</CardDescription>
+        <CardDescription className="text-xs lg:text-sm hidden lg:block">Latest news and events</CardDescription>
       </CardHeader>
       <CardContent>
         {announcements.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-2 lg:space-y-4">
             {announcements.map((announcement) => (
-              <div key={announcement.id} className="flex gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  {getIcon(announcement.type)}
+              <div key={announcement.id} className="flex gap-2 lg:gap-4 p-2 lg:p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                <div className="h-7 w-7 lg:h-10 lg:w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <div className="scale-75 lg:scale-100">{getIcon(announcement.type)}</div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <h4 className="font-medium text-sm">{announcement.title}</h4>
-                    <Badge variant="secondary" className="text-xs flex-shrink-0">
+                  <div className="flex items-start justify-between gap-2 mb-0.5 lg:mb-1">
+                    <h4 className="font-medium text-xs lg:text-sm line-clamp-1">{announcement.title}</h4>
+                    <Badge variant="secondary" className="text-[10px] lg:text-xs flex-shrink-0 h-5 lg:h-auto">
                       {announcement.badge || announcement.type}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-2">{announcement.message}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs lg:text-sm text-muted-foreground mb-1 lg:mb-2 line-clamp-2">{announcement.message}</p>
+                  <p className="text-[10px] lg:text-xs text-muted-foreground">
                     {new Date(announcement.created_at).toLocaleDateString('en-US', {
                       month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true
+                      day: 'numeric'
                     })}
                   </p>
                 </div>
@@ -129,7 +125,7 @@ export function Announcements() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="text-center py-6 lg:py-8 text-muted-foreground text-xs lg:text-sm">
             No announcements yet
           </div>
         )}

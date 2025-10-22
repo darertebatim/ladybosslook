@@ -62,45 +62,45 @@ export function CreditTransactions() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <History className="h-5 w-5" />
-          Recent Credit Transactions
+      <CardHeader className="pb-2 lg:pb-6">
+        <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+          <History className="h-4 w-4 lg:h-5 lg:w-5" />
+          Credit History
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs lg:text-sm hidden lg:block">
           Your latest store credit activity
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className="space-y-2 lg:space-y-3">
           {transactions.map((transaction) => (
             <div
               key={transaction.id}
-              className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+              className="flex items-center justify-between p-2 lg:p-3 border rounded-lg hover:bg-muted/50 transition-colors"
             >
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-full ${
+              <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                <div className={`p-1.5 lg:p-2 rounded-full flex-shrink-0 ${
                   transaction.transaction_type === 'credit' 
                     ? 'bg-green-500/10' 
                     : 'bg-red-500/10'
                 }`}>
                   {transaction.transaction_type === 'credit' ? (
-                    <TrendingUp className="h-4 w-4 text-green-600" />
+                    <TrendingUp className="h-3 w-3 lg:h-4 lg:w-4 text-green-600" />
                   ) : (
-                    <TrendingDown className="h-4 w-4 text-red-600" />
+                    <TrendingDown className="h-3 w-3 lg:h-4 lg:w-4 text-red-600" />
                   )}
                 </div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm">
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-xs lg:text-sm truncate">
                     {transaction.description || 'Credit transaction'}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatDate(transaction.created_at)}
+                  <p className="text-[10px] lg:text-xs text-muted-foreground">
+                    {new Date(transaction.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className={`font-bold ${
+              <div className="text-right flex-shrink-0">
+                <p className={`font-bold text-xs lg:text-base ${
                   transaction.transaction_type === 'credit' 
                     ? 'text-green-600' 
                     : 'text-red-600'
