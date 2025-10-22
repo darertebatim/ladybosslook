@@ -49,6 +49,26 @@ interface Order {
   created_at: string;
   phone: string | null;
   city: string | null;
+  program_slug?: string | null;
+}
+
+interface Enrollment {
+  id: string;
+  course_name: string;
+  enrolled_at: string;
+  status: string;
+  program_slug: string | null;
+}
+
+interface CombinedCourse {
+  id: string;
+  product_name: string;
+  amount: number;
+  currency: string;
+  status: string;
+  created_at: string;
+  program_slug?: string | null;
+  source: 'order' | 'enrollment';
 }
 
 export default function Dashboard() {
@@ -58,6 +78,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [combinedCourses, setCombinedCourses] = useState<CombinedCourse[]>([]);
   const [creditsBalance, setCreditsBalance] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -122,10 +144,48 @@ export default function Dashboard() {
 
       const ordersWithLocation = (ordersData || []).map(order => ({
         ...order,
-        city: null // Orders table doesn't have city field, will need to get from form_submissions if needed
+        city: null
       }));
       
       setOrders(ordersWithLocation);
+
+      // Load course enrollments
+      const { data: enrollmentsData, error: enrollmentsError } = await supabase
+        .from('course_enrollments')
+        .select('*')
+        .eq('user_id', user!.id)
+        .order('enrolled_at', { ascending: false });
+
+      if (enrollmentsError) throw enrollmentsError;
+      setEnrollments(enrollmentsData || []);
+
+      // Combine orders and enrollments
+      const combined: CombinedCourse[] = [
+        ...ordersWithLocation.map(order => ({
+          id: order.id,
+          product_name: order.product_name,
+          amount: order.amount,
+          currency: order.currency,
+          status: order.status,
+          created_at: order.created_at,
+          program_slug: order.program_slug,
+          source: 'order' as const
+        })),
+        ...(enrollmentsData || []).map(enrollment => ({
+          id: enrollment.id,
+          product_name: enrollment.course_name,
+          amount: 0,
+          currency: 'usd',
+          status: enrollment.status,
+          created_at: enrollment.enrolled_at,
+          program_slug: enrollment.program_slug,
+          source: 'enrollment' as const
+        }))
+      ];
+
+      // Sort by date, most recent first
+      combined.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      setCombinedCourses(combined);
 
       // Update profile with phone from most recent order if profile data is missing
       if (ordersData && ordersData.length > 0 && profileData) {
@@ -255,48 +315,48 @@ export default function Dashboard() {
       <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="border-b bg-card">
-          <div className="container mx-auto px-4 py-4 lg:py-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="container mx-auto px-3 py-3 lg:px-4 lg:py-4">
+            <div className="flex items-center justify-between gap-2">
               <div>
-                <h1 className="text-2xl lg:text-3xl font-bold">My Dashboard</h1>
-                <p className="text-sm text-muted-foreground mt-1">Welcome back, {profile?.full_name || 'there'}!</p>
+                <h1 className="text-xl lg:text-2xl font-bold">Dashboard</h1>
+                <p className="text-xs text-muted-foreground mt-0.5">Welcome, {profile?.full_name || 'there'}!</p>
               </div>
-              <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign Out
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="h-8 text-xs">
+                <LogOut className="mr-1 h-3 w-3" />
+                <span className="hidden sm:inline">Sign Out</span>
               </Button>
             </div>
           </div>
         </header>
 
-        <div className="container mx-auto px-4 py-6 lg:py-8 space-y-6">
+        <div className="container mx-auto px-3 py-4 lg:px-4 lg:py-6 space-y-4 lg:space-y-6">
           {/* Stats Cards */}
-          <StatsCards enrolledCount={orders.length} creditsBalance={creditsBalance} />
+          <StatsCards enrolledCount={combinedCourses.length} creditsBalance={creditsBalance} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
             {/* Profile Section */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 space-y-4">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <User className="h-4 w-4" />
                     Profile
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex flex-col items-center space-y-4">
-                    <Avatar className="h-24 w-24">
+                <CardContent className="space-y-3">
+                  <div className="flex flex-col items-center space-y-3">
+                    <Avatar className="h-16 w-16">
                       <AvatarImage src={profile?.avatar_url || undefined} />
-                      <AvatarFallback className="text-2xl">
+                      <AvatarFallback className="text-lg">
                         {getInitials(profile?.full_name || null)}
                       </AvatarFallback>
                     </Avatar>
                     
                     <div className="text-center w-full">
-                      <h3 className="font-semibold text-lg">
+                      <h3 className="font-semibold text-base">
                         {profile?.full_name || 'Student'}
                       </h3>
-                      <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mt-1">
+                      <p className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-0.5">
                         <Mail className="h-3 w-3" />
                         {profile?.email}
                       </p>
@@ -306,72 +366,79 @@ export default function Dashboard() {
                   <Separator />
 
                   {!isEditing ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {profile?.phone && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Phone className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex items-center gap-2 text-xs">
+                          <Phone className="h-3 w-3 text-muted-foreground" />
                           <span>{profile.phone}</span>
                         </div>
                       )}
                       {profile?.city && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex items-center gap-2 text-xs">
+                          <MapPin className="h-3 w-3 text-muted-foreground" />
                           <span>{profile.city}</span>
                         </div>
                       )}
                       {profile?.bio && (
-                        <p className="text-sm text-muted-foreground">{profile.bio}</p>
+                        <p className="text-xs text-muted-foreground">{profile.bio}</p>
                       )}
                       <Button 
                         variant="outline" 
-                        className="w-full"
+                        size="sm"
+                        className="w-full h-8 text-xs"
                         onClick={() => setIsEditing(true)}
                       >
-                        <Settings className="mr-2 h-4 w-4" />
+                        <Settings className="mr-1 h-3 w-3" />
                         Edit Profile
                       </Button>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <div>
-                        <Label htmlFor="full_name">Full Name</Label>
+                        <Label htmlFor="full_name" className="text-xs">Full Name</Label>
                         <Input
                           id="full_name"
+                          className="h-8 text-xs"
                           value={formData.full_name}
                           onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="phone">Phone</Label>
+                        <Label htmlFor="phone" className="text-xs">Phone</Label>
                         <Input
                           id="phone"
+                          className="h-8 text-xs"
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="city">City</Label>
+                        <Label htmlFor="city" className="text-xs">City</Label>
                         <Input
                           id="city"
+                          className="h-8 text-xs"
                           value={formData.city}
                           onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="bio">Bio</Label>
+                        <Label htmlFor="bio" className="text-xs">Bio</Label>
                         <Textarea
                           id="bio"
+                          className="text-xs"
                           value={formData.bio}
                           onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                          rows={3}
+                          rows={2}
                         />
                       </div>
                       <div className="flex gap-2">
-                        <Button onClick={handleUpdateProfile} className="flex-1">
-                          Save Changes
+                        <Button onClick={handleUpdateProfile} className="flex-1 h-8 text-xs">
+                          Save
                         </Button>
                         <Button 
                           variant="outline" 
+                          size="sm"
+                          className="h-8 text-xs"
                           onClick={() => {
                             setIsEditing(false);
                             setFormData({
@@ -391,45 +458,45 @@ export default function Dashboard() {
               </Card>
 
               {/* WhatsApp Support Card */}
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <MessageCircle className="h-5 w-5" />
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <MessageCircle className="h-4 w-4" />
                     Need Help?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Contact us on WhatsApp for support
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Contact us on WhatsApp
                   </p>
                   <Button 
-                    className="w-full" 
+                    className="w-full h-8 text-xs" 
                     variant="default"
                     onClick={() => window.open('https://wa.me/16265028589', '_blank')}
                   >
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                    Message on WhatsApp
+                    <MessageCircle className="mr-1 h-3 w-3" />
+                    WhatsApp
                   </Button>
                 </CardContent>
               </Card>
 
               {/* Message Admin Card */}
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Send className="h-5 w-5" />
+              <Card className="hidden lg:block">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <Send className="h-4 w-4" />
                     Contact Admin
                   </CardTitle>
-                  <CardDescription>Send a message or request to admin</CardDescription>
+                  <CardDescription className="text-xs">Send a message</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="subject">Subject *</Label>
+                <CardContent className="space-y-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="subject" className="text-xs">Subject *</Label>
                     <Select
                       value={messageForm.subject}
                       onValueChange={(value) => setMessageForm({ ...messageForm, subject: value })}
                     >
-                      <SelectTrigger id="subject">
+                      <SelectTrigger id="subject" className="h-8 text-xs">
                         <SelectValue placeholder="Select a subject" />
                       </SelectTrigger>
                       <SelectContent>
@@ -443,39 +510,40 @@ export default function Dashboard() {
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="course">Related Course (Optional)</Label>
+                  <div className="space-y-1">
+                    <Label htmlFor="course" className="text-xs">Related Course</Label>
                     <Select
                       value={messageForm.course}
                       onValueChange={(value) => setMessageForm({ ...messageForm, course: value })}
                     >
-                      <SelectTrigger id="course">
+                      <SelectTrigger id="course" className="h-8 text-xs">
                         <SelectValue placeholder="Select a course" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="None">None</SelectItem>
-                        <SelectItem value="Courageous Character Course">Courageous Character Course</SelectItem>
-                        <SelectItem value="IQ Money Workshop">IQ Money Workshop</SelectItem>
-                        <SelectItem value="Assertiveness Training">Assertiveness Training</SelectItem>
+                        <SelectItem value="Courageous Character Course">Courageous Character</SelectItem>
+                        <SelectItem value="IQ Money Workshop">IQ Money</SelectItem>
+                        <SelectItem value="Assertiveness Training">Assertiveness</SelectItem>
                         <SelectItem value="Business Coaching">Business Coaching</SelectItem>
-                        <SelectItem value="Ladyboss VIP Club">Ladyboss VIP Club</SelectItem>
+                        <SelectItem value="Ladyboss VIP Club">Ladyboss VIP</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Message *</Label>
+                  <div className="space-y-1">
+                    <Label htmlFor="message" className="text-xs">Message *</Label>
                     <Textarea
                       id="message"
-                      placeholder="Type your message here..."
+                      className="text-xs"
+                      placeholder="Type your message..."
                       value={messageForm.message}
                       onChange={(e) => setMessageForm({ ...messageForm, message: e.target.value })}
-                      rows={5}
+                      rows={3}
                     />
                   </div>
 
                   <Button 
-                    className="w-full" 
+                    className="w-full h-8 text-xs"
                     variant="default"
                     onClick={handleSendMessage}
                   >
@@ -487,66 +555,81 @@ export default function Dashboard() {
             </div>
 
             {/* Main Content */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-4">
               {/* Quick Actions */}
               <QuickActions />
 
-              {/* Credit Transactions */}
-              <CreditTransactions />
-
-              {/* Announcements */}
-              <Announcements />
-
               {/* My Orders */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ShoppingBag className="h-5 w-5" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <ShoppingBag className="h-4 w-4" />
                     My Orders
                   </CardTitle>
-                  <CardDescription>
-                    Your enrolled programs and training sessions
+                  <CardDescription className="text-xs">
+                    Your enrolled programs
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {orders.length === 0 ? (
-                    <div className="text-center py-8">
-                      <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                      <p className="text-sm text-muted-foreground mb-4">
-                        You haven't enrolled in any events yet
+                  {combinedCourses.length === 0 ? (
+                    <div className="text-center py-6">
+                      <ShoppingBag className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
+                      <p className="text-xs text-muted-foreground mb-3">
+                        You haven't enrolled yet
                       </p>
-                      <Button onClick={() => navigate("/#programs")}>
+                      <Button size="sm" onClick={() => navigate("/#programs")} className="h-8 text-xs">
                         Browse Programs
                       </Button>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      {orders.map((order) => (
+                    <div className="space-y-2">
+                      {combinedCourses.map((course) => (
                         <div 
-                          key={order.id} 
-                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                          key={course.id} 
+                          className="flex flex-col gap-2 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                         >
-                          <div className="space-y-1 flex-1">
-                            <h4 className="font-semibold">{normalizeProductName(order.product_name)}</h4>
-                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-4 w-4" />
-                                <span>{formatDate(order.created_at)}</span>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="space-y-1 flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <h4 className="font-semibold text-sm">{normalizeProductName(course.product_name)}</h4>
+                                {course.source === 'enrollment' && (
+                                  <Badge variant="outline" className="text-xs h-5">Admin</Badge>
+                                )}
+                                <Badge variant={course.status === 'paid' || course.status === 'active' ? 'default' : 'secondary'} className="text-xs h-5">
+                                  {course.status}
+                                </Badge>
                               </div>
-                              <Badge variant={order.status === 'paid' ? 'default' : 'secondary'}>
-                                {order.status}
-                              </Badge>
+                              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <Calendar className="h-3 w-3" />
+                                <span>{formatDate(course.created_at)}</span>
+                              </div>
                             </div>
+                            {course.source === 'order' && course.amount > 0 && (
+                              <p className="font-bold text-sm whitespace-nowrap">{formatPrice(course.amount, course.currency)}</p>
+                            )}
                           </div>
-                          <div className="text-left sm:text-right">
-                            <p className="font-bold text-lg">{formatPrice(order.amount, order.currency)}</p>
-                          </div>
+                          {course.program_slug && (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              className="w-full h-7 text-xs"
+                              onClick={() => navigate(`/payment-success?test=true&program=${course.program_slug}`)}
+                            >
+                              View Details
+                            </Button>
+                          )}
                         </div>
                       ))}
                     </div>
                   )}
                 </CardContent>
               </Card>
+
+              {/* Credit Transactions */}
+              <CreditTransactions />
+
+              {/* Announcements */}
+              <Announcements />
             </div>
           </div>
         </div>

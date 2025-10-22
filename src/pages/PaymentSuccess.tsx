@@ -6,14 +6,17 @@ import { CheckCircle, ArrowRight, Download, Calendar, MessageCircle } from 'luci
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
+import { usePrograms } from '@/hooks/usePrograms';
 
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
+  const programSlug = searchParams.get('program');
   const [paymentVerified, setPaymentVerified] = useState(false);
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { getProgramBySlug } = usePrograms();
 
   useEffect(() => {
     const verifyPayment = async () => {
@@ -21,12 +24,17 @@ export default function PaymentSuccess() {
       const isTestMode = searchParams.get('test') === 'true';
       
       if (isTestMode) {
+        // Get program info if slug is provided
+        const program = programSlug ? getProgramBySlug(programSlug) : null;
+        const productName = program?.title || 'Courageous Character Course';
+        const amount = program?.priceAmount ? program.priceAmount * 100 : 4999;
+        
         // Show test data
         setPaymentVerified(true);
         setOrderDetails({
           id: 'test-order-123',
-          product_name: 'Courageous Character Course',
-          amount: 4999, // $49.99 in cents
+          product_name: productName,
+          amount: amount,
           email: 'test@example.com',
           name: 'Sarah Johnson',
           phone: '+1 (555) 123-4567',
