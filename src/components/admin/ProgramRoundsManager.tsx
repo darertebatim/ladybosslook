@@ -111,6 +111,13 @@ export const ProgramRoundsManager = () => {
   // Create/Update mutation
   const saveMutation = useMutation({
     mutationFn: async (data: RoundFormData) => {
+      // Convert datetime-local to ISO string with timezone
+      let firstSessionISO = null;
+      if (data.first_session_date) {
+        const localDate = new Date(data.first_session_date);
+        firstSessionISO = localDate.toISOString();
+      }
+
       const roundData = {
         program_slug: data.program_slug,
         round_name: data.round_name,
@@ -121,7 +128,7 @@ export const ProgramRoundsManager = () => {
         max_students: data.max_students ? parseInt(data.max_students) : null,
         google_meet_link: data.google_meet_link || null,
         google_drive_link: data.google_drive_link || null,
-        first_session_date: data.first_session_date || null,
+        first_session_date: firstSessionISO,
         first_session_duration: data.first_session_duration ? parseInt(data.first_session_duration) : 90,
         important_message: data.important_message || null,
         whatsapp_support_number: data.whatsapp_support_number || null,
@@ -188,6 +195,19 @@ export const ProgramRoundsManager = () => {
   };
 
   const handleEdit = (round: ProgramRound) => {
+    // Convert ISO string back to datetime-local format (YYYY-MM-DDTHH:mm)
+    let localDateTime = "";
+    if (round.first_session_date) {
+      const date = new Date(round.first_session_date);
+      // Format to YYYY-MM-DDTHH:mm for datetime-local input
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
     setFormData({
       program_slug: round.program_slug,
       round_name: round.round_name,
@@ -198,7 +218,7 @@ export const ProgramRoundsManager = () => {
       max_students: round.max_students?.toString() || "",
       google_meet_link: round.google_meet_link || "",
       google_drive_link: round.google_drive_link || "",
-      first_session_date: round.first_session_date ? round.first_session_date.slice(0, 16) : "",
+      first_session_date: localDateTime,
       first_session_duration: round.first_session_duration?.toString() || "90",
       important_message: round.important_message || "",
       whatsapp_support_number: round.whatsapp_support_number || "",
