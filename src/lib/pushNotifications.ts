@@ -36,22 +36,35 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
 
 export async function subscribeToPushNotifications(userId: string): Promise<boolean> {
   try {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      console.error('Push notifications not supported');
-      return false;
+    console.log('[Push] Starting subscription process for user:', userId);
+    
+    if (!('serviceWorker' in navigator)) {
+      console.error('[Push] Service Workers not supported');
+      throw new Error('Service Workers not supported');
+    }
+    
+    if (!('PushManager' in window)) {
+      console.error('[Push] Push notifications not supported');
+      throw new Error('Push notifications not supported');
     }
 
+    console.log('[Push] Waiting for service worker...');
     const registration = await navigator.serviceWorker.ready;
+    console.log('[Push] Service worker ready:', registration);
     
+    console.log('[Push] Subscribing to push manager...');
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as any,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as BufferSource,
     });
 
+    console.log('[Push] Subscription created:', subscription);
     const subscriptionJSON = subscription.toJSON();
+    console.log('[Push] Subscription JSON:', subscriptionJSON);
 
-    // Save subscription to database (table will be created via migration)
-    const { error } = await supabase.from('push_subscriptions' as any).insert({
+    // Save subscription to database
+    console.log('[Push] Saving to database...');
+    const { error } = await supabase.from('push_subscriptions').insert({
       user_id: userId,
       endpoint: subscriptionJSON.endpoint || '',
       p256dh_key: subscriptionJSON.keys?.p256dh || '',
@@ -59,13 +72,14 @@ export async function subscribeToPushNotifications(userId: string): Promise<bool
     });
 
     if (error) {
-      console.error('Error saving subscription:', error);
-      return false;
+      console.error('[Push] Error saving subscription to database:', error);
+      throw error;
     }
 
+    console.log('[Push] Subscription saved successfully!');
     return true;
   } catch (error) {
-    console.error('Error subscribing to push notifications:', error);
+    console.error('[Push] Error during subscription:', error);
     return false;
   }
 }
