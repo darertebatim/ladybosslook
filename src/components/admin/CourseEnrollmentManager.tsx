@@ -53,19 +53,33 @@ export function CourseEnrollmentManager() {
   useEffect(() => {
     loadUsers();
     loadEnrollments();
+    loadAllRounds();
   }, []);
+
+  const loadAllRounds = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('program_rounds')
+        .select('id, round_name, program_slug, status')
+        .order('round_number', { ascending: false });
+
+      if (error) throw error;
+      setAvailableRounds(data || []);
+    } catch (error: any) {
+      console.error('Error loading all rounds:', error);
+    }
+  };
 
   useEffect(() => {
     if (selectedCourse) {
       const program = programs.find(p => p.title === selectedCourse);
       if (program?.slug) {
-        loadRoundsForCourse(program.slug);
+        // Filter already loaded rounds
+        const filtered = availableRounds.filter(r => r.program_slug === program.slug);
+        console.log('Filtered rounds for', program.slug, ':', filtered);
       }
-    } else {
-      setAvailableRounds([]);
-      setSelectedRoundId('');
     }
-  }, [selectedCourse, programs]);
+  }, [selectedCourse, programs, availableRounds]);
 
   const loadUsers = async () => {
     try {
@@ -329,7 +343,10 @@ export function CourseEnrollmentManager() {
             </Select>
           </div>
 
-          {availableRounds.length > 0 && (
+          {selectedCourse && availableRounds.filter(r => {
+            const program = programs.find(p => p.title === selectedCourse);
+            return r.program_slug === program?.slug;
+          }).length > 0 && (
             <div className="space-y-2">
               <label className="text-sm font-medium">Select Round (Optional)</label>
               <Select value={selectedRoundId} onValueChange={setSelectedRoundId}>
@@ -338,11 +355,16 @@ export function CourseEnrollmentManager() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">No round</SelectItem>
-                  {availableRounds.map((round) => (
-                    <SelectItem key={round.id} value={round.id}>
-                      {round.round_name} ({round.status})
-                    </SelectItem>
-                  ))}
+                  {availableRounds
+                    .filter(r => {
+                      const program = programs.find(p => p.title === selectedCourse);
+                      return r.program_slug === program?.slug;
+                    })
+                    .map((round) => (
+                      <SelectItem key={round.id} value={round.id}>
+                        {round.round_name} ({round.status})
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
@@ -448,10 +470,9 @@ export function CourseEnrollmentManager() {
                       onClick={async () => {
                         setEditingEnrollmentId(enrollment.id);
                         setEditRoundId(enrollment.round_id || 'none');
-                        // Load rounds for this enrollment's program
-                        if (enrollment.program_slug) {
-                          await loadRoundsForCourse(enrollment.program_slug);
-                        }
+                        console.log('Editing enrollment:', enrollment);
+                        console.log('Available rounds:', availableRounds);
+                        console.log('Program slug:', enrollment.program_slug);
                       }}
                     >
                       <Edit className="h-3 w-3" />
