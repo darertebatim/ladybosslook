@@ -172,11 +172,17 @@ export function CourseEnrollmentManager() {
     }
   };
 
-  const handleUpdateRound = async (enrollmentId: string, newRoundId: string) => {
+  const handleUpdateRound = async (enrollmentId: string, newRoundId: string, enrollment: Enrollment) => {
     try {
+      // Find the program slug if not already set
+      const program = programs.find(p => p.title === enrollment.course_name);
+      
       const { error } = await supabase
         .from('course_enrollments')
-        .update({ round_id: newRoundId || null })
+        .update({ 
+          round_id: newRoundId || null,
+          program_slug: enrollment.program_slug || program?.slug || null
+        })
         .eq('id', enrollmentId);
 
       if (error) throw error;
@@ -410,7 +416,15 @@ export function CourseEnrollmentManager() {
                         <SelectContent>
                           <SelectItem value="none">No round</SelectItem>
                           {availableRounds
-                            .filter(r => r.program_slug === enrollment.program_slug)
+                            .filter(r => {
+                              // If enrollment has program_slug, filter by it
+                              if (enrollment.program_slug) {
+                                return r.program_slug === enrollment.program_slug;
+                              }
+                              // Otherwise, find the program by course name
+                              const program = programs.find(p => p.title === enrollment.course_name);
+                              return program ? r.program_slug === program.slug : false;
+                            })
                             .map((round) => (
                               <SelectItem key={round.id} value={round.id}>
                                 {round.round_name}
@@ -421,7 +435,7 @@ export function CourseEnrollmentManager() {
                       <Button 
                         size="sm" 
                         className="h-7 text-xs"
-                        onClick={() => handleUpdateRound(enrollment.id, editRoundId === 'none' ? '' : editRoundId)}
+                        onClick={() => handleUpdateRound(enrollment.id, editRoundId === 'none' ? '' : editRoundId, enrollment)}
                       >
                         Save
                       </Button>
