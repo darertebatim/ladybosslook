@@ -2,10 +2,17 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import AppLayout from "@/layouts/AppLayout";
+import AppHome from "@/pages/app/AppHome";
+import AppCourses from "@/pages/app/AppCourses";
+import AppCourseDetail from "@/pages/app/AppCourseDetail";
+import AppNotifications from "@/pages/app/AppNotifications";
+import AppProfile from "@/pages/app/AppProfile";
+import AppInstall from "@/pages/app/AppInstall";
 import Programs from "./pages/Programs";
 import About from "./pages/About";
 import Admin from "./pages/Admin";
@@ -86,7 +93,19 @@ const App = () => (
             <Route path="/thankone" element={<ThankOne />} />
             <Route path="/iqmoney" element={<IQMoneyWorkshop />} />
             <Route path="/rathus" element={<RathusAssessment />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Navigate to="/app/home" replace />} />
+            
+            {/* App Routes - PWA Experience */}
+            <Route path="/app/install" element={<AppInstall />} />
+            <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+              <Route index element={<Navigate to="/app/home" replace />} />
+              <Route path="home" element={<AppHome />} />
+              <Route path="courses" element={<AppCourses />} />
+              <Route path="course/:slug" element={<AppCourseDetail />} />
+              <Route path="notifications" element={<AppNotifications />} />
+              <Route path="profile" element={<AppProfile />} />
+            </Route>
+            
             <Route path="/calendar" element={<CalendarRedirect />} />
             <Route path="/send-test-email" element={<SendTestEmail />} />
             <Route path="/firststepbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/RightsnboundariesLadybossgift.pdf" />} />
