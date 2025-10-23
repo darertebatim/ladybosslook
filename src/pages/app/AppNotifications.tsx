@@ -3,9 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Bell, BellOff, Check, X } from 'lucide-react';
+import { Bell, BellOff, Check, X, Download } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 import { 
   requestNotificationPermission, 
   subscribeToPushNotifications, 
@@ -20,9 +21,12 @@ const AppNotifications = () => {
   const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>('default');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPWA, setIsPWA] = useState(false);
 
   useEffect(() => {
     setPermissionStatus(checkPermissionStatus());
+    // Check if running as PWA
+    setIsPWA(window.matchMedia('(display-mode: standalone)').matches);
   }, []);
 
   const handleEnableNotifications = async () => {
@@ -139,6 +143,26 @@ const AppNotifications = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {!isPWA && (
+              <div className="rounded-lg bg-blue-500/10 p-4 text-sm mb-4">
+                <div className="flex items-start gap-2">
+                  <Download className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-blue-600 dark:text-blue-400">Install the app for best experience</p>
+                    <p className="text-muted-foreground mt-1 mb-3">
+                      Push notifications work best when the app is installed. Install now to get instant updates!
+                    </p>
+                    <Button asChild size="sm" variant="outline">
+                      <Link to="/app/install">
+                        <Download className="mr-2 h-4 w-4" />
+                        Install App
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="push-notifications">Enable push notifications</Label>

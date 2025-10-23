@@ -17,7 +17,10 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
-      scope: '/app/',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      strategies: 'injectManifest',
+      injectRegister: 'auto',
       manifest: {
         name: 'LadyBoss Academy',
         short_name: 'LadyBoss',
@@ -25,7 +28,7 @@ export default defineConfig(({ mode }) => ({
         theme_color: '#8B5CF6',
         background_color: '#ffffff',
         display: 'standalone',
-        scope: '/app/',
+        scope: '/',
         start_url: '/app/home',
         icons: [
           {
@@ -46,38 +49,14 @@ export default defineConfig(({ mode }) => ({
           }
         ]
       },
-      workbox: {
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4MB limit
-        globIgnores: ['**/lovable-uploads/dc841674-07ae-49e3-8de6-23c9bb303342.png'],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/mnukhzjcvbwpvktxqlej\.supabase\.co\/.*$/,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'supabase-api-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 300 // 5 minutes
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          },
-          {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*$/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'supabase-storage-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 86400 // 24 hours
-              }
-            }
-          }
-        ],
-        navigateFallback: null
+        globIgnores: ['**/lovable-uploads/dc841674-07ae-49e3-8de6-23c9bb303342.png']
+      },
+      devOptions: {
+        enabled: true,
+        type: 'module'
       }
     })
   ].filter(Boolean),
