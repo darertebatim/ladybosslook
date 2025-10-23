@@ -11,7 +11,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Generate VAPID keys using Web Crypto API
+    // Generate VAPID keys using Web Crypto API with correct format
     const keyPair = await crypto.subtle.generateKey(
       {
         name: 'ECDSA',
@@ -21,26 +21,42 @@ const handler = async (req: Request): Promise<Response> => {
       ['sign', 'verify']
     );
 
+    // Export public key as raw (uncompressed format - 65 bytes)
     const publicKey = await crypto.subtle.exportKey('raw', keyPair.publicKey);
-    const privateKey = await crypto.subtle.exportKey('pkcs8', keyPair.privateKey);
+    
+    // Export private key in JWK format to extract the raw 32-byte 'd' value
+    const privateKeyJwk = await crypto.subtle.exportKey('jwk', keyPair.privateKey);
+    
+    // Extract the 'd' parameter which is the raw private key (32 bytes when decoded)
+    if (!privateKeyJwk.d) {
+      throw new Error('Failed to extract private key material');
+    }
+    
+    // Decode the base64url 'd' parameter to get raw bytes
+    const privateKeyBase64Url = privateKeyJwk.d;
+    const privateKeyBase64 = privateKeyBase64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const privateKeyRaw = Uint8Array.from(atob(privateKeyBase64), c => c.charCodeAt(0));
 
-    // Convert to base64url format
+    // Convert public key to base64url format (65 bytes)
     const publicKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(publicKey)))
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
       .replace(/=/g, '');
 
-    const privateKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(privateKey)))
+    // Convert private key to base64url format (32 bytes)
+    const privateKeyBase64Final = btoa(String.fromCharCode(...privateKeyRaw))
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
       .replace(/=/g, '');
 
     console.log('VAPID keys generated successfully');
+    console.log('Public key length (bytes):', new Uint8Array(publicKey).length);
+    console.log('Private key length (bytes):', privateKeyRaw.length);
 
     return new Response(
       JSON.stringify({
         publicKey: publicKeyBase64,
-        privateKey: privateKeyBase64,
+        privateKey: privateKeyBase64Final,
         instructions: 'Store these keys as VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY in Supabase secrets'
       }),
       {
