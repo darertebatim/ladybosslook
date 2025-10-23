@@ -5,7 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp, GraduationCap, LayoutDashboard, UserCog, Send, FileText, Shield } from 'lucide-react';
+import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp, GraduationCap, LayoutDashboard, UserCog, Send, FileText, Shield, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
 import { CourseEnrollmentManager } from '@/components/admin/CourseEnrollmentManager';
@@ -152,6 +153,25 @@ const Admin = () => {
     fetchCourseStats();
   }, []);
 
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out"
+      });
+      navigate('/auth');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out",
+        variant: "destructive"
+      });
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
   };
@@ -177,10 +197,16 @@ const Admin = () => {
               <h1 className="text-3xl font-bold">Admin Dashboard</h1>
               <p className="text-muted-foreground">Comprehensive admin controls</p>
             </div>
-            <Button onClick={() => { fetchSubmissions(); fetchCourseStats(); }} variant="outline" size="sm">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => { fetchSubmissions(); fetchCourseStats(); }} variant="outline" size="sm">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
+              <Button onClick={handleSignOut} variant="outline" size="sm">
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
           </div>
 
           <Tabs defaultValue="overview" className="w-full">
