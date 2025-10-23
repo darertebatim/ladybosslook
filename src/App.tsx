@@ -9,6 +9,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import AppLayout from "@/layouts/AppLayout";
 import AppHome from "@/pages/app/AppHome";
 import AppCourses from "@/pages/app/AppCourses";
+import AppMyClass from "@/pages/app/AppMyClass";
 import AppCourseDetail from "@/pages/app/AppCourseDetail";
 import AppNotifications from "@/pages/app/AppNotifications";
 import AppProfile from "@/pages/app/AppProfile";
@@ -100,6 +101,7 @@ const App = () => (
               <Route index element={<Navigate to="/app/home" replace />} />
               <Route path="home" element={<AppHome />} />
               <Route path="courses" element={<AppCourses />} />
+              <Route path="my-class" element={<AppMyClass />} />
               <Route path="course/:slug" element={<AppCourseDetail />} />
               <Route path="notifications" element={<AppNotifications />} />
               <Route path="profile" element={<AppProfile />} />
