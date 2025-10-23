@@ -219,7 +219,11 @@ export function PushNotificationSender() {
         {targetCourse && rounds && rounds.length > 0 && (
           <div className="space-y-2">
             <Label htmlFor="targetRound">Target Round (Optional)</Label>
-            <Select value={targetRoundId} onValueChange={setTargetRoundId}>
+            <Select 
+              value={targetRoundId || ""} 
+              onValueChange={setTargetRoundId}
+              key={targetCourse}
+            >
               <SelectTrigger id="targetRound">
                 <SelectValue placeholder="All rounds" />
               </SelectTrigger>
