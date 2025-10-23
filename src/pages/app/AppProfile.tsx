@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { LogOut, User, Mail, Phone, MapPin } from 'lucide-react';
+import { LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
@@ -94,6 +94,31 @@ const AppProfile = () => {
                 <span>{profile.city}</span>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Contact & Support</CardTitle>
+            <CardDescription>Get help or schedule a consultation</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => window.open('https://wa.me/19292603007', '_blank')}
+            >
+              <MessageCircle className="mr-2 h-4 w-4" />
+              Message on WhatsApp
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => window.open('https://calendar.app.google/kEWxSqUkm27SZHdk7', '_blank')}
+            >
+              <Calendar className="mr-2 h-4 w-4" />
+              Book a Consultation
+            </Button>
           </CardContent>
         </Card>
 
