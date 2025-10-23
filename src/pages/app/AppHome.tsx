@@ -64,8 +64,8 @@ const AppHome = () => {
           creditsBalance={wallet?.credits_balance || 0}
         />
         <ActiveRound />
-        <QuickActions />
         <Announcements />
+        <QuickActions />
       </div>
     </div>
   );
