@@ -147,7 +147,7 @@ export type Database = {
           city: string
           email: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           mailchimp_error: string | null
           mailchimp_success: boolean | null
           name: string
@@ -160,7 +160,7 @@ export type Database = {
           city: string
           email: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           mailchimp_error?: string | null
           mailchimp_success?: boolean | null
           name: string
@@ -173,7 +173,7 @@ export type Database = {
           city?: string
           email?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           mailchimp_error?: string | null
           mailchimp_success?: boolean | null
           name?: string
@@ -307,13 +307,40 @@ export type Database = {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          auth_key: string
+          created_at: string | null
+          endpoint: string
+          id: string
+          p256dh_key: string
+          user_id: string
+        }
+        Insert: {
+          auth_key: string
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          p256dh_key: string
+          user_id: string
+        }
+        Update: {
+          auth_key?: string
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          p256dh_key?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       security_audit_log: {
         Row: {
           action: string
           created_at: string | null
           details: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
           user_id: string | null
         }
@@ -322,7 +349,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
         }
@@ -331,7 +358,7 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
         }
@@ -387,10 +414,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_current_user_role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      get_current_user_role: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

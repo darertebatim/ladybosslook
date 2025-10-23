@@ -15,6 +15,7 @@ import FixMailchimpAmounts from '@/components/FixMailchimpAmounts';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
 import { CourseEnrollmentManager } from '@/components/admin/CourseEnrollmentManager';
 import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
+import { PushNotificationSender } from '@/components/admin/PushNotificationSender';
 import { EmailLogsViewer } from '@/components/admin/EmailLogsViewer';
 import { usePrograms } from '@/hooks/usePrograms';
 
@@ -462,6 +463,11 @@ const Admin = () => {
         {/* Announcement Creator */}
         <div className="mb-6">
           <AnnouncementCreator />
+        </div>
+
+        {/* Push Notification Sender */}
+        <div className="mb-6">
+          <PushNotificationSender />
         </div>
 
         {/* Email Delivery Logs */}

@@ -42,11 +42,18 @@ const AuthButtons = ({ mobile, onClose }: { mobile?: boolean; onClose?: () => vo
   return (
     <>
       {user && !isAdmin && (
-        <Link to="/dashboard" onClick={onClose}>
-          <Button variant="outline" size="sm" className={buttonClass}>
-            My Dashboard
-          </Button>
-        </Link>
+        <>
+          <Link to="/app/home" onClick={onClose}>
+            <Button variant="outline" size="sm" className={buttonClass}>
+              Open App
+            </Button>
+          </Link>
+          <Link to="/dashboard" onClick={onClose}>
+            <Button variant="ghost" size="sm" className={buttonClass}>
+              Dashboard
+            </Button>
+          </Link>
+        </>
       )}
       {isAdmin && (
         <Link to="/admin" onClick={onClose}>
@@ -74,9 +81,11 @@ const AuthButtons = ({ mobile, onClose }: { mobile?: boolean; onClose?: () => vo
           </Button>
         </Link>
       )}
-      <Button variant="default" className={`bg-primary hover:bg-primary-dark ${buttonClass}`}>
-        Join Community
-      </Button>
+      {!user && (
+        <Button variant="default" className={`bg-primary hover:bg-primary-dark ${buttonClass}`}>
+          Join Community
+        </Button>
+      )}
     </>
   );
 };

@@ -18,7 +18,6 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       scope: '/app/',
-      start_url: '/app/home',
       manifest: {
         name: 'LadyBoss Academy',
         short_name: 'LadyBoss',
