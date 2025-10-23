@@ -7,6 +7,7 @@ import { Bell, BellOff, Check, X, Download } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   requestNotificationPermission, 
   subscribeToPushNotifications, 
@@ -41,6 +42,21 @@ const AppNotifications = () => {
         const result = await subscribeToPushNotifications(user.id);
         if (result.success) {
           setIsSubscribed(true);
+          
+          // Track PWA installation when notifications are enabled
+          try {
+            await supabase.from('pwa_installations').upsert({
+              user_id: user.id,
+              user_agent: navigator.userAgent,
+              platform: navigator.platform,
+            }, {
+              onConflict: 'user_id'
+            });
+            console.log('[PWA] Installation tracked via notifications');
+          } catch (error) {
+            console.error('[PWA] Error tracking installation:', error);
+          }
+          
           toast({
             title: 'Notifications enabled',
             description: 'You will now receive push notifications',
