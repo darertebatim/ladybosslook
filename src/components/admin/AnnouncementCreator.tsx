@@ -89,7 +89,7 @@ export function AnnouncementCreator() {
           title: title.trim(),
           message: message.trim(),
           target_course: targetCourse === 'all' ? null : targetCourse,
-          target_round_id: targetRoundId === 'all' ? null : targetRoundId,
+          target_round_id: (targetRoundId === 'all' || !targetRoundId) ? null : targetRoundId,
           badge: badge,
           type: type,
           created_by: (await supabase.auth.getUser()).data.user?.id

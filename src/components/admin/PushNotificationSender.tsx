@@ -23,7 +23,7 @@ export function PushNotificationSender() {
   const [destinationUrl, setDestinationUrl] = useState('/app/home');
   const [targetType, setTargetType] = useState<'all' | 'course'>('all');
   const [targetCourse, setTargetCourse] = useState('');
-  const [targetRoundId, setTargetRoundId] = useState('');
+  const [targetRoundId, setTargetRoundId] = useState('all-rounds');
   const [isLoading, setIsLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
@@ -65,13 +65,13 @@ export function PushNotificationSender() {
   // Reset round when target type changes
   useEffect(() => {
     if (targetType === 'all') {
-      setTargetRoundId('');
+      setTargetRoundId('all-rounds');
     }
   }, [targetType]);
 
   // Reset round when course changes
   useEffect(() => {
-    setTargetRoundId('');
+    setTargetRoundId('all-rounds');
   }, [targetCourse]);
 
   const handleSend = async () => {
@@ -95,7 +95,7 @@ export function PushNotificationSender() {
 
       if (targetType === 'course' && targetCourse) {
         payload.targetCourse = targetCourse;
-        if (targetRoundId) {
+        if (targetRoundId && targetRoundId !== 'all-rounds') {
           payload.targetRoundId = targetRoundId;
         }
       }
@@ -117,7 +117,7 @@ export function PushNotificationSender() {
       setDestinationUrl('/app/home');
       setTargetType('all');
       setTargetCourse('');
-      setTargetRoundId('');
+      setTargetRoundId('all-rounds');
     } catch (error: any) {
       console.error('Error sending push notifications:', error);
       toast({
@@ -220,7 +220,7 @@ export function PushNotificationSender() {
           <div className="space-y-2">
             <Label htmlFor="targetRound">Target Round (Optional)</Label>
             <Select 
-              value={targetRoundId || ""} 
+              value={targetRoundId} 
               onValueChange={setTargetRoundId}
               key={targetCourse}
             >
@@ -228,7 +228,7 @@ export function PushNotificationSender() {
                 <SelectValue placeholder="All rounds" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Rounds</SelectItem>
+                <SelectItem value="all-rounds">All Rounds</SelectItem>
                 {rounds.map((round: any) => (
                   <SelectItem key={round.id} value={round.id}>
                     {round.round_name} (Round #{round.round_number})
