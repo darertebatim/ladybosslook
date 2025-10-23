@@ -39,6 +39,7 @@ interface ProgramRound {
   first_session_date: string | null;
   first_session_duration: number | null;
   important_message: string | null;
+  whatsapp_support_number: string | null;
 }
 
 interface RoundFormData {
@@ -54,6 +55,7 @@ interface RoundFormData {
   first_session_date: string;
   first_session_duration: string;
   important_message: string;
+  whatsapp_support_number: string;
 }
 
 export const ProgramRoundsManager = () => {
@@ -72,6 +74,7 @@ export const ProgramRoundsManager = () => {
     first_session_date: "",
     first_session_duration: "90",
     important_message: "",
+    whatsapp_support_number: "",
   });
 
   // Fetch programs for dropdown
@@ -121,6 +124,7 @@ export const ProgramRoundsManager = () => {
         first_session_date: data.first_session_date || null,
         first_session_duration: data.first_session_duration ? parseInt(data.first_session_duration) : 90,
         important_message: data.important_message || null,
+        whatsapp_support_number: data.whatsapp_support_number || null,
       };
 
       if (editingId) {
@@ -178,6 +182,7 @@ export const ProgramRoundsManager = () => {
       first_session_date: "",
       first_session_duration: "90",
       important_message: "",
+      whatsapp_support_number: "",
     });
     setEditingId(null);
   };
@@ -196,6 +201,7 @@ export const ProgramRoundsManager = () => {
       first_session_date: round.first_session_date ? round.first_session_date.slice(0, 16) : "",
       first_session_duration: round.first_session_duration?.toString() || "90",
       important_message: round.important_message || "",
+      whatsapp_support_number: round.whatsapp_support_number || "",
     });
     setEditingId(round.id);
   };
@@ -391,6 +397,18 @@ export const ProgramRoundsManager = () => {
                 placeholder="Write a welcome message or important instructions for students in this round..."
                 rows={4}
               />
+            </div>
+
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="whatsapp_support_number">WhatsApp Support Number</Label>
+              <Input
+                id="whatsapp_support_number"
+                type="tel"
+                value={formData.whatsapp_support_number}
+                onChange={(e) => setFormData({ ...formData, whatsapp_support_number: e.target.value })}
+                placeholder="e.g., +1234567890"
+              />
+              <p className="text-xs text-muted-foreground">Include country code (e.g., +1 for US)</p>
             </div>
 
             <div className="flex gap-2 mt-6">

@@ -367,6 +367,7 @@ export type Database = {
           start_date: string
           status: string
           updated_at: string
+          whatsapp_support_number: string | null
         }
         Insert: {
           created_at?: string
@@ -384,6 +385,7 @@ export type Database = {
           start_date: string
           status?: string
           updated_at?: string
+          whatsapp_support_number?: string | null
         }
         Update: {
           created_at?: string
@@ -401,6 +403,7 @@ export type Database = {
           start_date?: string
           status?: string
           updated_at?: string
+          whatsapp_support_number?: string | null
         }
         Relationships: []
       }

@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info } from 'lucide-react';
+import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { generateGoogleCalendarUrl } from '@/utils/calendar';
 import { format } from 'date-fns';
@@ -27,6 +27,24 @@ const AppCourseDetail = () => {
         .eq('user_id', user.id)
         .eq('program_slug', slug)
         .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch user profile for WhatsApp message
+  const { data: profile } = useQuery({
+    queryKey: ['user-profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
       if (error) throw error;
       return data;
@@ -66,6 +84,18 @@ const AppCourseDetail = () => {
     const calendarUrl = generateGoogleCalendarUrl(event);
     window.open(calendarUrl, '_blank');
     toast.success('Opening Google Calendar...');
+  };
+
+  const handleContactSupport = () => {
+    if (!round?.whatsapp_support_number || !profile || !program) return;
+
+    const message = `Hi! I need support with my enrollment.\n\nName: ${profile.full_name || 'N/A'}\nEmail: ${profile.email}\nPhone: ${profile.phone || 'N/A'}\nCity: ${profile.city || 'N/A'}\nCourse: ${program.title}\nRound: ${round.round_name}`;
+    
+    const whatsappNumber = round.whatsapp_support_number.replace(/[^0-9]/g, '');
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    
+    window.open(whatsappUrl, '_blank');
+    toast.success('Opening WhatsApp...');
   };
 
   return (
@@ -187,6 +217,22 @@ const AppCourseDetail = () => {
                     <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">Session schedule will be announced soon</p>
                   </div>
+                )}
+
+                {round?.whatsapp_support_number && (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start bg-green-50 hover:bg-green-100 border-green-200"
+                    size="lg"
+                    onClick={handleContactSupport}
+                  >
+                    <MessageCircle className="h-5 w-5 mr-3 text-green-600" />
+                    <div className="flex-1 text-left">
+                      <div className="font-semibold text-green-900">Contact Support</div>
+                      <div className="text-xs opacity-70">Get help via WhatsApp</div>
+                    </div>
+                    <ExternalLink className="h-4 w-4 ml-2 text-green-600" />
+                  </Button>
                 )}
               </CardContent>
             </Card>
