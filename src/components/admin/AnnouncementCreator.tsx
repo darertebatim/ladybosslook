@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { Megaphone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
 
 interface Program {
   id: string;
@@ -18,11 +20,30 @@ export function AnnouncementCreator() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [targetCourse, setTargetCourse] = useState<string>('all');
+  const [targetRoundId, setTargetRoundId] = useState<string>('all');
   const [badge, setBadge] = useState('General');
   const [type, setType] = useState('general');
   const [loading, setLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
+
+  // Fetch rounds for the selected course
+  const { data: rounds } = useQuery({
+    queryKey: ["program-rounds", targetCourse],
+    queryFn: async () => {
+      if (targetCourse === "all") return [];
+      
+      const { data, error } = await supabase
+        .from("program_rounds")
+        .select("*")
+        .eq("program_slug", targetCourse)
+        .order("round_number", { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: targetCourse !== "all",
+  });
 
   useEffect(() => {
     const fetchPrograms = async () => {
@@ -62,6 +83,7 @@ export function AnnouncementCreator() {
           title: title.trim(),
           message: message.trim(),
           target_course: targetCourse === 'all' ? null : targetCourse,
+          target_round_id: targetRoundId === 'all' ? null : targetRoundId,
           badge: badge,
           type: type,
           created_by: (await supabase.auth.getUser()).data.user?.id
@@ -140,6 +162,7 @@ export function AnnouncementCreator() {
       setTitle('');
       setMessage('');
       setTargetCourse('all');
+      setTargetRoundId('all');
       setBadge('General');
       setType('general');
       
@@ -207,6 +230,25 @@ export function AnnouncementCreator() {
               </SelectContent>
             </Select>
           </div>
+
+          {targetCourse !== "all" && rounds && rounds.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="targetRound">Target Round</Label>
+              <Select value={targetRoundId} onValueChange={setTargetRoundId}>
+                <SelectTrigger id="targetRound">
+                  <SelectValue placeholder="Select round" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Rounds</SelectItem>
+                  {rounds.map((round) => (
+                    <SelectItem key={round.id} value={round.id}>
+                      {round.round_name} (Round #{round.round_number})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Badge</label>

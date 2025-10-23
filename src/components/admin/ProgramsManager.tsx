@@ -45,6 +45,7 @@ export function ProgramsManager() {
     original_price: 0,
     duration: '',
     delivery_method: 'on-demand',
+    subscription_duration: '',
     subscription_full_payment_discount: 0,
     description: '',
     is_active: true,
@@ -82,6 +83,7 @@ export function ProgramsManager() {
       original_price: 0,
       duration: '',
       delivery_method: 'on-demand',
+      subscription_duration: '',
       subscription_full_payment_discount: 0,
       description: '',
       is_active: true,
@@ -141,6 +143,7 @@ export function ProgramsManager() {
       original_price: program.original_price || 0,
       duration: program.duration || '',
       delivery_method: program.delivery_method || 'on-demand',
+      subscription_duration: (program as any).subscription_duration || '',
       subscription_full_payment_discount: program.subscription_full_payment_discount || 0,
       description: program.description || '',
       is_active: program.is_active,
@@ -326,6 +329,23 @@ export function ProgramsManager() {
                     placeholder="e.g., 6 weeks, 3 months, Self-paced"
                   />
                 </div>
+
+                {formData.payment_type === 'subscription' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="subscription_duration">Subscription Duration</Label>
+                    <Select value={formData.subscription_duration} onValueChange={(value) => setFormData({ ...formData, subscription_duration: value })}>
+                      <SelectTrigger id="subscription_duration">
+                        <SelectValue placeholder="Select duration" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1-month">1 Month</SelectItem>
+                        <SelectItem value="3-months">3 Months</SelectItem>
+                        <SelectItem value="6-months">6 Months</SelectItem>
+                        <SelectItem value="12-months">12 Months</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="payment_type">Payment Type</Label>

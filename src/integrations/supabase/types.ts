@@ -22,6 +22,7 @@ export type Database = {
           id: string
           message: string
           target_course: string | null
+          target_round_id: string | null
           title: string
           type: string | null
         }
@@ -32,6 +33,7 @@ export type Database = {
           id?: string
           message: string
           target_course?: string | null
+          target_round_id?: string | null
           title: string
           type?: string | null
         }
@@ -42,10 +44,19 @@ export type Database = {
           id?: string
           message?: string
           target_course?: string | null
+          target_round_id?: string | null
           title?: string
           type?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "announcements_target_round_id_fkey"
+            columns: ["target_round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       course_enrollments: {
         Row: {
@@ -53,6 +64,7 @@ export type Database = {
           enrolled_at: string
           id: string
           program_slug: string | null
+          round_id: string | null
           status: string | null
           user_id: string
         }
@@ -61,6 +73,7 @@ export type Database = {
           enrolled_at?: string
           id?: string
           program_slug?: string | null
+          round_id?: string | null
           status?: string | null
           user_id: string
         }
@@ -69,10 +82,19 @@ export type Database = {
           enrolled_at?: string
           id?: string
           program_slug?: string | null
+          round_id?: string | null
           status?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "course_enrollments_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       credit_transactions: {
         Row: {
@@ -284,6 +306,7 @@ export type Database = {
           payment_type: string
           price_amount: number
           slug: string
+          subscription_duration: string | null
           subscription_full_payment_discount: number | null
           title: string
           type: string
@@ -301,6 +324,7 @@ export type Database = {
           payment_type: string
           price_amount?: number
           slug: string
+          subscription_duration?: string | null
           subscription_full_payment_discount?: number | null
           title: string
           type: string
@@ -318,10 +342,50 @@ export type Database = {
           payment_type?: string
           price_amount?: number
           slug?: string
+          subscription_duration?: string | null
           subscription_full_payment_discount?: number | null
           title?: string
           type?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      program_rounds: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          max_students: number | null
+          program_slug: string
+          round_name: string
+          round_number: number
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          max_students?: number | null
+          program_slug: string
+          round_name: string
+          round_number: number
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          max_students?: number | null
+          program_slug?: string
+          round_name?: string
+          round_number?: number
+          start_date?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -335,6 +399,7 @@ export type Database = {
           message: string
           sent_count: number
           target_course: string | null
+          target_round_id: string | null
           target_type: string
           title: string
         }
@@ -347,6 +412,7 @@ export type Database = {
           message: string
           sent_count?: number
           target_course?: string | null
+          target_round_id?: string | null
           target_type?: string
           title: string
         }
@@ -359,10 +425,19 @@ export type Database = {
           message?: string
           sent_count?: number
           target_course?: string | null
+          target_round_id?: string | null
           target_type?: string
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "push_notification_logs_target_round_id_fkey"
+            columns: ["target_round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       push_subscriptions: {
         Row: {

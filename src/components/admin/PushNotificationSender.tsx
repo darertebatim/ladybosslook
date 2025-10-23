@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Bell, Send } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 interface Program {
   id: string;
@@ -21,9 +22,28 @@ export function PushNotificationSender() {
   const [destinationUrl, setDestinationUrl] = useState('/app/home');
   const [targetType, setTargetType] = useState<'all' | 'course'>('all');
   const [targetCourse, setTargetCourse] = useState('');
+  const [targetRoundId, setTargetRoundId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
+
+  // Fetch rounds for the selected course
+  const { data: rounds } = useQuery({
+    queryKey: ["program-rounds", targetCourse],
+    queryFn: async () => {
+      if (!targetCourse) return [];
+      
+      const { data, error } = await supabase
+        .from("program_rounds")
+        .select("*")
+        .eq("program_slug", targetCourse)
+        .order("round_number", { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!targetCourse,
+  });
 
   useEffect(() => {
     const fetchPrograms = async () => {
@@ -62,6 +82,9 @@ export function PushNotificationSender() {
 
       if (targetType === 'course' && targetCourse) {
         payload.targetCourse = targetCourse;
+        if (targetRoundId) {
+          payload.targetRoundId = targetRoundId;
+        }
       }
 
       const { data, error } = await supabase.functions.invoke('send-push-notification', {
@@ -81,6 +104,7 @@ export function PushNotificationSender() {
       setDestinationUrl('/app/home');
       setTargetType('all');
       setTargetCourse('');
+      setTargetRoundId('');
     } catch (error: any) {
       console.error('Error sending push notifications:', error);
       toast({
@@ -172,6 +196,25 @@ export function PushNotificationSender() {
                 {programs.map((program) => (
                   <SelectItem key={program.id} value={program.title}>
                     {program.title} • {program.type === 'course' ? '📚' : program.type === 'group-coaching' ? '👥' : program.type === '1o1-session' ? '💼' : program.type === 'webinar' ? '🎥' : '🎉'}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {targetCourse && rounds && rounds.length > 0 && (
+          <div className="space-y-2">
+            <Label htmlFor="targetRound">Target Round (Optional)</Label>
+            <Select value={targetRoundId} onValueChange={setTargetRoundId}>
+              <SelectTrigger id="targetRound">
+                <SelectValue placeholder="All rounds" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Rounds</SelectItem>
+                {rounds.map((round: any) => (
+                  <SelectItem key={round.id} value={round.id}>
+                    {round.round_name} (Round #{round.round_number})
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -17,6 +17,7 @@ import { VapidKeyGenerator } from '@/components/admin/VapidKeyGenerator';
 import { EmailLogsViewer } from '@/components/admin/EmailLogsViewer';
 import { PWAInstallStats } from '@/components/admin/PWAInstallStats';
 import { ProgramsManager } from '@/components/admin/ProgramsManager';
+import { ProgramRoundsManager } from '@/components/admin/ProgramRoundsManager';
 import SecurityAuditLog from '@/components/SecurityAuditLog';
 import { usePrograms } from '@/hooks/usePrograms';
 
@@ -438,7 +439,18 @@ const Admin = () => {
 
             {/* Tab 4: Programs */}
             <TabsContent value="programs" className="space-y-6">
-              <ProgramsManager />
+              <Tabs defaultValue="catalog" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="catalog">Program Catalog</TabsTrigger>
+                  <TabsTrigger value="rounds">Course Rounds</TabsTrigger>
+                </TabsList>
+                <TabsContent value="catalog">
+                  <ProgramsManager />
+                </TabsContent>
+                <TabsContent value="rounds">
+                  <ProgramRoundsManager />
+                </TabsContent>
+              </Tabs>
             </TabsContent>
 
             {/* Tab 5: System & Security */}
