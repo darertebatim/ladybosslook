@@ -18,6 +18,7 @@ import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
 import { PushNotificationSender } from '@/components/admin/PushNotificationSender';
 import { VapidKeyGenerator } from '@/components/admin/VapidKeyGenerator';
 import { EmailLogsViewer } from '@/components/admin/EmailLogsViewer';
+import { PWAInstallStats } from '@/components/admin/PWAInstallStats';
 import { usePrograms } from '@/hooks/usePrograms';
 
 interface FormSubmission {
@@ -474,6 +475,11 @@ const Admin = () => {
         {/* Push Notification Sender */}
         <div className="mb-6">
           <PushNotificationSender />
+        </div>
+
+        {/* PWA Installation Stats */}
+        <div className="mb-6">
+          <PWAInstallStats />
         </div>
 
         {/* Email Delivery Logs */}
