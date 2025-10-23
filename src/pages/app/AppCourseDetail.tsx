@@ -4,11 +4,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, FolderOpen, Calendar, ExternalLink } from 'lucide-react';
+import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { generateGoogleCalendarUrl } from '@/utils/calendar';
 import { format } from 'date-fns';
 import { toast } from "sonner";
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const AppCourseDetail = () => {
   const { slug } = useParams();
@@ -103,6 +104,15 @@ const AppCourseDetail = () => {
           </Card>
         ) : (
           <>
+            {round?.important_message && (
+              <Alert className="border-primary/20 bg-primary/5">
+                <Info className="h-4 w-4" />
+                <AlertDescription className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {round.important_message}
+                </AlertDescription>
+              </Alert>
+            )}
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

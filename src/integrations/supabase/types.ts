@@ -359,6 +359,7 @@ export type Database = {
           google_drive_link: string | null
           google_meet_link: string | null
           id: string
+          important_message: string | null
           max_students: number | null
           program_slug: string
           round_name: string
@@ -375,6 +376,7 @@ export type Database = {
           google_drive_link?: string | null
           google_meet_link?: string | null
           id?: string
+          important_message?: string | null
           max_students?: number | null
           program_slug: string
           round_name: string
@@ -391,6 +393,7 @@ export type Database = {
           google_drive_link?: string | null
           google_meet_link?: string | null
           id?: string
+          important_message?: string | null
           max_students?: number | null
           program_slug?: string
           round_name?: string

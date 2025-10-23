@@ -23,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ProgramRound {
   id: string;
@@ -37,6 +38,7 @@ interface ProgramRound {
   google_drive_link: string | null;
   first_session_date: string | null;
   first_session_duration: number | null;
+  important_message: string | null;
 }
 
 interface RoundFormData {
@@ -51,6 +53,7 @@ interface RoundFormData {
   google_drive_link: string;
   first_session_date: string;
   first_session_duration: string;
+  important_message: string;
 }
 
 export const ProgramRoundsManager = () => {
@@ -68,6 +71,7 @@ export const ProgramRoundsManager = () => {
     google_drive_link: "",
     first_session_date: "",
     first_session_duration: "90",
+    important_message: "",
   });
 
   // Fetch programs for dropdown
@@ -116,6 +120,7 @@ export const ProgramRoundsManager = () => {
         google_drive_link: data.google_drive_link || null,
         first_session_date: data.first_session_date || null,
         first_session_duration: data.first_session_duration ? parseInt(data.first_session_duration) : 90,
+        important_message: data.important_message || null,
       };
 
       if (editingId) {
@@ -172,6 +177,7 @@ export const ProgramRoundsManager = () => {
       google_drive_link: "",
       first_session_date: "",
       first_session_duration: "90",
+      important_message: "",
     });
     setEditingId(null);
   };
@@ -189,6 +195,7 @@ export const ProgramRoundsManager = () => {
       google_drive_link: round.google_drive_link || "",
       first_session_date: round.first_session_date ? round.first_session_date.slice(0, 16) : "",
       first_session_duration: round.first_session_duration?.toString() || "90",
+      important_message: round.important_message || "",
     });
     setEditingId(round.id);
   };
@@ -375,7 +382,18 @@ export const ProgramRoundsManager = () => {
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="important_message">Important Message (Welcome/Instructions)</Label>
+              <Textarea
+                id="important_message"
+                value={formData.important_message}
+                onChange={(e) => setFormData({ ...formData, important_message: e.target.value })}
+                placeholder="Write a welcome message or important instructions for students in this round..."
+                rows={4}
+              />
+            </div>
+
+            <div className="flex gap-2 mt-6">
               <Button type="submit" disabled={saveMutation.isPending}>
                 <Plus className="h-4 w-4 mr-2" />
                 {editingId ? "Update Round" : "Create Round"}
