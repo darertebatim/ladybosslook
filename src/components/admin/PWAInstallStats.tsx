@@ -9,7 +9,8 @@ import { format } from 'date-fns';
 interface PWAInstall {
   id: string;
   user_id: string;
-  created_at: string;
+  installed_at: string;
+  platform?: string;
   full_name?: string;
   email?: string;
 }
@@ -24,30 +25,30 @@ export function PWAInstallStats() {
 
   const fetchInstalls = async () => {
     try {
-      const { data: subscriptions, error } = await supabase
-        .from('push_subscriptions')
-        .select('id, user_id, created_at')
-        .order('created_at', { ascending: false });
+      const { data: installations, error } = await supabase
+        .from('pwa_installations')
+        .select('id, user_id, installed_at, platform')
+        .order('installed_at', { ascending: false });
 
       if (error) throw error;
 
-      if (!subscriptions || subscriptions.length === 0) {
+      if (!installations || installations.length === 0) {
         setInstalls([]);
         return;
       }
 
       // Get profiles for all users
-      const userIds = subscriptions.map(s => s.user_id);
+      const userIds = installations.map(i => i.user_id);
       const { data: profiles } = await supabase
         .from('profiles')
         .select('id, full_name, email')
         .in('id', userIds);
 
-      // Merge subscription data with profile data
-      const installsWithProfiles = subscriptions.map(sub => {
-        const profile = profiles?.find(p => p.id === sub.user_id);
+      // Merge installation data with profile data
+      const installsWithProfiles = installations.map(install => {
+        const profile = profiles?.find(p => p.id === install.user_id);
         return {
-          ...sub,
+          ...install,
           full_name: profile?.full_name,
           email: profile?.email,
         };
@@ -95,6 +96,7 @@ export function PWAInstallStats() {
                   <TableRow>
                     <TableHead>User</TableHead>
                     <TableHead>Email</TableHead>
+                    <TableHead>Platform</TableHead>
                     <TableHead>Installed At</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -106,7 +108,12 @@ export function PWAInstallStats() {
                       </TableCell>
                       <TableCell>{install.email || 'N/A'}</TableCell>
                       <TableCell>
-                        {format(new Date(install.created_at), 'MMM d, yyyy HH:mm')}
+                        <Badge variant="secondary">
+                          {install.platform || 'Unknown'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {format(new Date(install.installed_at), 'MMM d, yyyy HH:mm')}
                       </TableCell>
                     </TableRow>
                   ))}

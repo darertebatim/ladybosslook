@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -5,9 +6,17 @@ import { StatsCards } from '@/components/dashboard/StatsCards';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { Announcements } from '@/components/dashboard/Announcements';
 import { SEOHead } from '@/components/SEOHead';
+import { trackPWAInstallation, isPWAInstalled } from '@/lib/pwaTracking';
 
 const AppHome = () => {
   const { user } = useAuth();
+
+  // Track PWA installation if detected
+  useEffect(() => {
+    if (user?.id && isPWAInstalled()) {
+      trackPWAInstallation(user.id);
+    }
+  }, [user?.id]);
 
   const { data: enrollments } = useQuery({
     queryKey: ['course-enrollments', user?.id],
