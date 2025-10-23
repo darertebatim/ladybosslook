@@ -23,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { Textarea } from "@/components/ui/textarea";
 
 interface ProgramRound {
@@ -54,6 +55,7 @@ interface RoundFormData {
   google_drive_link: string;
   first_session_date: string;
   first_session_duration: string;
+  first_session_timezone: string;
   important_message: string;
   whatsapp_support_number: string;
 }
@@ -73,6 +75,7 @@ export const ProgramRoundsManager = () => {
     google_drive_link: "",
     first_session_date: "",
     first_session_duration: "90",
+    first_session_timezone: "America/New_York",
     important_message: "",
     whatsapp_support_number: "",
   });
@@ -111,11 +114,14 @@ export const ProgramRoundsManager = () => {
   // Create/Update mutation
   const saveMutation = useMutation({
     mutationFn: async (data: RoundFormData) => {
-      // Convert datetime-local to ISO string with timezone
+      // Convert datetime-local with timezone to UTC ISO string
       let firstSessionISO = null;
-      if (data.first_session_date) {
+      if (data.first_session_date && data.first_session_timezone) {
+        // Parse the datetime-local value as being in the selected timezone
         const localDate = new Date(data.first_session_date);
-        firstSessionISO = localDate.toISOString();
+        // Convert from the selected timezone to UTC
+        const utcDate = fromZonedTime(localDate, data.first_session_timezone);
+        firstSessionISO = utcDate.toISOString();
       }
 
       const roundData = {
@@ -188,6 +194,7 @@ export const ProgramRoundsManager = () => {
       google_drive_link: "",
       first_session_date: "",
       first_session_duration: "90",
+      first_session_timezone: "America/New_York",
       important_message: "",
       whatsapp_support_number: "",
     });
@@ -195,16 +202,20 @@ export const ProgramRoundsManager = () => {
   };
 
   const handleEdit = (round: ProgramRound) => {
-    // Convert ISO string back to datetime-local format (YYYY-MM-DDTHH:mm)
+    // Convert UTC ISO string to local datetime for the default timezone
     let localDateTime = "";
+    const defaultTimezone = "America/New_York";
+    
     if (round.first_session_date) {
-      const date = new Date(round.first_session_date);
+      const utcDate = new Date(round.first_session_date);
+      // Convert to the default timezone
+      const zonedDate = toZonedTime(utcDate, defaultTimezone);
       // Format to YYYY-MM-DDTHH:mm for datetime-local input
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const year = zonedDate.getFullYear();
+      const month = String(zonedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(zonedDate.getDate()).padStart(2, '0');
+      const hours = String(zonedDate.getHours()).padStart(2, '0');
+      const minutes = String(zonedDate.getMinutes()).padStart(2, '0');
       localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
     }
 
@@ -220,6 +231,7 @@ export const ProgramRoundsManager = () => {
       google_drive_link: round.google_drive_link || "",
       first_session_date: localDateTime,
       first_session_duration: round.first_session_duration?.toString() || "90",
+      first_session_timezone: defaultTimezone,
       important_message: round.important_message || "",
       whatsapp_support_number: round.whatsapp_support_number || "",
     });
@@ -390,6 +402,33 @@ export const ProgramRoundsManager = () => {
                       setFormData({ ...formData, first_session_date: e.target.value })
                     }
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Timezone</Label>
+                  <Select
+                    value={formData.first_session_timezone}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, first_session_timezone: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="America/New_York">Eastern Time (ET)</SelectItem>
+                      <SelectItem value="America/Chicago">Central Time (CT)</SelectItem>
+                      <SelectItem value="America/Denver">Mountain Time (MT)</SelectItem>
+                      <SelectItem value="America/Los_Angeles">Pacific Time (PT)</SelectItem>
+                      <SelectItem value="America/Phoenix">Arizona (MST)</SelectItem>
+                      <SelectItem value="America/Anchorage">Alaska Time (AKT)</SelectItem>
+                      <SelectItem value="Pacific/Honolulu">Hawaii Time (HT)</SelectItem>
+                      <SelectItem value="UTC">UTC</SelectItem>
+                      <SelectItem value="Europe/London">London (GMT/BST)</SelectItem>
+                      <SelectItem value="Europe/Paris">Paris (CET)</SelectItem>
+                      <SelectItem value="Asia/Dubai">Dubai (GST)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
