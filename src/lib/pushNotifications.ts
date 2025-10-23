@@ -34,18 +34,18 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
   return permission;
 }
 
-export async function subscribeToPushNotifications(userId: string): Promise<boolean> {
+export async function subscribeToPushNotifications(userId: string): Promise<{ success: boolean; error?: string }> {
   try {
     console.log('[Push] Starting subscription process for user:', userId);
     
     if (!('serviceWorker' in navigator)) {
       console.error('[Push] Service Workers not supported');
-      throw new Error('Service Workers not supported');
+      throw new Error('Service Workers are not supported in your browser');
     }
     
     if (!('PushManager' in window)) {
       console.error('[Push] Push notifications not supported');
-      throw new Error('Push notifications not supported');
+      throw new Error('Push notifications are not supported. On iOS, you need iOS 16.4+ and the app must be installed to your home screen.');
     }
 
     console.log('[Push] Waiting for service worker...');
@@ -73,18 +73,21 @@ export async function subscribeToPushNotifications(userId: string): Promise<bool
 
     if (error) {
       console.error('[Push] Error saving subscription to database:', error);
-      throw error;
+      throw new Error(`Database error: ${error.message}`);
     }
 
     console.log('[Push] Subscription saved successfully!');
-    return true;
-  } catch (error) {
+    return { success: true };
+  } catch (error: any) {
     console.error('[Push] Error during subscription:', error);
-    return false;
+    return { 
+      success: false, 
+      error: error.message || 'Failed to subscribe to push notifications'
+    };
   }
 }
 
-export async function unsubscribeFromPushNotifications(userId: string): Promise<boolean> {
+export async function unsubscribeFromPushNotifications(userId: string): Promise<{ success: boolean; error?: string }> {
   try {
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.getSubscription();
@@ -101,12 +104,15 @@ export async function unsubscribeFromPushNotifications(userId: string): Promise<
 
     if (error) {
       console.error('Error removing subscription:', error);
-      return false;
+      return { success: false, error: error.message };
     }
 
-    return true;
-  } catch (error) {
-    console.error('Error unsubscribing:', error);
-    return false;
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error unsubscribing from push notifications:', error);
+    return { 
+      success: false, 
+      error: error.message || 'Failed to unsubscribe from push notifications'
+    };
   }
 }

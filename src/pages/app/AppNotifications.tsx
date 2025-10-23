@@ -34,8 +34,8 @@ const AppNotifications = () => {
       setPermissionStatus(permission);
 
       if (permission === 'granted') {
-        const success = await subscribeToPushNotifications(user.id);
-        if (success) {
+        const result = await subscribeToPushNotifications(user.id);
+        if (result.success) {
           setIsSubscribed(true);
           toast({
             title: 'Notifications enabled',
@@ -44,7 +44,7 @@ const AppNotifications = () => {
         } else {
           toast({
             title: 'Subscription failed',
-            description: 'Could not subscribe to notifications',
+            description: result.error || 'Could not subscribe to notifications',
             variant: 'destructive',
           });
         }
@@ -72,19 +72,25 @@ const AppNotifications = () => {
 
     setIsLoading(true);
     try {
-      const success = await unsubscribeFromPushNotifications(user.id);
-      if (success) {
+      const result = await unsubscribeFromPushNotifications(user.id);
+      if (result.success) {
         setIsSubscribed(false);
         toast({
           title: 'Notifications disabled',
           description: 'You will no longer receive push notifications',
         });
+      } else {
+        toast({
+          title: 'Error',
+          description: result.error || 'Failed to disable notifications',
+          variant: 'destructive',
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error disabling notifications:', error);
       toast({
         title: 'Error',
-        description: 'Failed to disable notifications',
+        description: error.message || 'Failed to disable notifications',
         variant: 'destructive',
       });
     } finally {
