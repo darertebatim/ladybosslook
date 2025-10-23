@@ -354,6 +354,10 @@ export type Database = {
         Row: {
           created_at: string
           end_date: string | null
+          first_session_date: string | null
+          first_session_duration: number | null
+          google_drive_link: string | null
+          google_meet_link: string | null
           id: string
           max_students: number | null
           program_slug: string
@@ -366,6 +370,10 @@ export type Database = {
         Insert: {
           created_at?: string
           end_date?: string | null
+          first_session_date?: string | null
+          first_session_duration?: number | null
+          google_drive_link?: string | null
+          google_meet_link?: string | null
           id?: string
           max_students?: number | null
           program_slug: string
@@ -378,6 +386,10 @@ export type Database = {
         Update: {
           created_at?: string
           end_date?: string | null
+          first_session_date?: string | null
+          first_session_duration?: number | null
+          google_drive_link?: string | null
+          google_meet_link?: string | null
           id?: string
           max_students?: number | null
           program_slug?: string

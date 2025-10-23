@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Calendar, Plus, Trash2, Edit } from "lucide-react";
+import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
 
 interface ProgramRound {
@@ -33,6 +33,10 @@ interface ProgramRound {
   end_date: string | null;
   status: 'upcoming' | 'active' | 'completed';
   max_students: number | null;
+  google_meet_link: string | null;
+  google_drive_link: string | null;
+  first_session_date: string | null;
+  first_session_duration: number | null;
 }
 
 interface RoundFormData {
@@ -43,6 +47,10 @@ interface RoundFormData {
   end_date: string;
   status: 'upcoming' | 'active' | 'completed';
   max_students: string;
+  google_meet_link: string;
+  google_drive_link: string;
+  first_session_date: string;
+  first_session_duration: string;
 }
 
 export const ProgramRoundsManager = () => {
@@ -56,6 +64,10 @@ export const ProgramRoundsManager = () => {
     end_date: "",
     status: "upcoming",
     max_students: "",
+    google_meet_link: "",
+    google_drive_link: "",
+    first_session_date: "",
+    first_session_duration: "90",
   });
 
   // Fetch programs for dropdown
@@ -100,6 +112,10 @@ export const ProgramRoundsManager = () => {
         end_date: data.end_date || null,
         status: data.status,
         max_students: data.max_students ? parseInt(data.max_students) : null,
+        google_meet_link: data.google_meet_link || null,
+        google_drive_link: data.google_drive_link || null,
+        first_session_date: data.first_session_date || null,
+        first_session_duration: data.first_session_duration ? parseInt(data.first_session_duration) : 90,
       };
 
       if (editingId) {
@@ -152,6 +168,10 @@ export const ProgramRoundsManager = () => {
       end_date: "",
       status: "upcoming",
       max_students: "",
+      google_meet_link: "",
+      google_drive_link: "",
+      first_session_date: "",
+      first_session_duration: "90",
     });
     setEditingId(null);
   };
@@ -165,6 +185,10 @@ export const ProgramRoundsManager = () => {
       end_date: round.end_date || "",
       status: round.status,
       max_students: round.max_students?.toString() || "",
+      google_meet_link: round.google_meet_link || "",
+      google_drive_link: round.google_drive_link || "",
+      first_session_date: round.first_session_date ? round.first_session_date.slice(0, 16) : "",
+      first_session_duration: round.first_session_duration?.toString() || "90",
     });
     setEditingId(round.id);
   };
@@ -297,6 +321,60 @@ export const ProgramRoundsManager = () => {
               </div>
             </div>
 
+            <div className="space-y-4 mt-6">
+              <h3 className="text-lg font-semibold">Course Resources</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Google Meet Link</Label>
+                  <Input
+                    type="url"
+                    value={formData.google_meet_link}
+                    onChange={(e) =>
+                      setFormData({ ...formData, google_meet_link: e.target.value })
+                    }
+                    placeholder="https://meet.google.com/..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Google Drive Folder Link</Label>
+                  <Input
+                    type="url"
+                    value={formData.google_drive_link}
+                    onChange={(e) =>
+                      setFormData({ ...formData, google_drive_link: e.target.value })
+                    }
+                    placeholder="https://drive.google.com/..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>First Session Date & Time</Label>
+                  <Input
+                    type="datetime-local"
+                    value={formData.first_session_date}
+                    onChange={(e) =>
+                      setFormData({ ...formData, first_session_date: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Session Duration (minutes)</Label>
+                  <Input
+                    type="number"
+                    min="15"
+                    step="15"
+                    value={formData.first_session_duration}
+                    onChange={(e) =>
+                      setFormData({ ...formData, first_session_duration: e.target.value })
+                    }
+                    placeholder="90"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="flex gap-2">
               <Button type="submit" disabled={saveMutation.isPending}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -328,7 +406,7 @@ export const ProgramRoundsManager = () => {
                   <TableHead>Number</TableHead>
                   <TableHead>Start Date</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Max Students</TableHead>
+                  <TableHead>Resources</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -346,7 +424,25 @@ export const ProgramRoundsManager = () => {
                         {round.status}
                       </span>
                     </TableCell>
-                    <TableCell>{round.max_students || 'Unlimited'}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        {round.google_meet_link && (
+                          <div title="Meet link added">
+                            <Video className="h-4 w-4 text-primary" />
+                          </div>
+                        )}
+                        {round.google_drive_link && (
+                          <div title="Drive folder added">
+                            <FolderOpen className="h-4 w-4 text-primary" />
+                          </div>
+                        )}
+                        {round.first_session_date && (
+                          <div title="First session scheduled">
+                            <CalendarDays className="h-4 w-4 text-primary" />
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         <Button
