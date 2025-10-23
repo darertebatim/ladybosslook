@@ -217,8 +217,8 @@ const Admin = () => {
                 <span>Overview</span>
               </TabsTrigger>
               <TabsTrigger value="leads" className="flex items-center gap-2">
-                <Search className="h-4 w-4" />
-                <span>Leads</span>
+                <Users className="h-4 w-4" />
+                <span>Users</span>
               </TabsTrigger>
               <TabsTrigger value="users" className="flex items-center gap-2">
                 <GraduationCap className="h-4 w-4" />
@@ -321,7 +321,7 @@ const Admin = () => {
               <PWAInstallStats />
             </TabsContent>
 
-            {/* Tab 2: Leads */}
+            {/* Tab 2: Users */}
             <TabsContent value="leads" className="space-y-6">
               <LeadsManager />
             </TabsContent>
