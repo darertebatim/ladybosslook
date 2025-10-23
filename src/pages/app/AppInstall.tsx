@@ -1,11 +1,22 @@
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Check, Smartphone } from 'lucide-react';
+import { Download, Check, Smartphone, Bell, Loader2 } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
+import { checkPermissionStatus } from '@/lib/pushNotifications';
 
 const AppInstall = () => {
-  const { deferredPrompt, isInstalled, handleInstallClick } = usePWAInstall();
+  const { deferredPrompt, isInstalled, handleCompleteSetup } = usePWAInstall();
+  const [isLoading, setIsLoading] = useState(false);
+  const notificationPermission = checkPermissionStatus();
+  const isNotificationsEnabled = notificationPermission === 'granted';
+
+  const handleSetup = async () => {
+    setIsLoading(true);
+    await handleCompleteSetup();
+    setIsLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -23,34 +34,76 @@ const AppInstall = () => {
           </p>
         </div>
 
-        {isInstalled ? (
+        {isInstalled && isNotificationsEnabled ? (
           <Card className="border-green-500/50 bg-green-500/5">
-            <CardContent className="pt-6 text-center">
-              <Check className="h-12 w-12 mx-auto mb-4 text-green-500" />
-              <h2 className="text-xl font-semibold mb-2">App Installed!</h2>
+            <CardContent className="pt-6 text-center space-y-4">
+              <div className="flex justify-center gap-4">
+                <div className="flex flex-col items-center">
+                  <Check className="h-12 w-12 mb-2 text-green-500" />
+                  <span className="text-sm text-muted-foreground">App Installed</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <Check className="h-12 w-12 mb-2 text-green-500" />
+                  <span className="text-sm text-muted-foreground">Notifications On</span>
+                </div>
+              </div>
+              <h2 className="text-xl font-semibold">All Set!</h2>
               <p className="text-muted-foreground">
-                The LadyBoss Academy app is installed on your device.
+                You're ready to use LadyBoss Academy with full features.
               </p>
             </CardContent>
           </Card>
         ) : (
           <>
-            {deferredPrompt && (
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle>Quick Install</CardTitle>
-                  <CardDescription>
-                    Click the button below to install the app
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button onClick={handleInstallClick} className="w-full" size="lg">
-                    <Download className="mr-2 h-5 w-5" />
-                    Install App Now
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+            <Card className="mb-6 border-primary/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Smartphone className="h-5 w-5" />
+                  One-Click Setup
+                </CardTitle>
+                <CardDescription>
+                  Install the app and enable notifications in one step
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    {isInstalled ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
+                    <span>{isInstalled ? 'App Installed' : 'Install App'}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {isNotificationsEnabled ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Bell className="h-4 w-4" />
+                    )}
+                    <span>{isNotificationsEnabled ? 'Notifications On' : 'Enable Notifications'}</span>
+                  </div>
+                </div>
+                <Button 
+                  onClick={handleSetup} 
+                  className="w-full" 
+                  size="lg"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Setting up...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="mr-2 h-5 w-5" />
+                      Complete Setup Now
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
 
             <div className="space-y-6">
               <Card>

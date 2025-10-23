@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { requestNotificationPermission, subscribeToPushNotifications } from '@/lib/pushNotifications';
+import { trackPWAInstallation } from '@/lib/pwaTracking';
+import { toast } from 'sonner';
 
 export function usePWAInstall() {
   const { user } = useAuth();
@@ -96,10 +99,66 @@ export function usePWAInstall() {
     setDeferredPrompt(null);
   };
 
+  const handleCompleteSetup = async (): Promise<{ success: boolean; error?: string }> => {
+    try {
+      console.log('[PWA] Starting complete setup...');
+
+      // Step 1: Try to install PWA if prompt is available
+      if (deferredPrompt) {
+        console.log('[PWA] Showing install prompt...');
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        console.log('[PWA] Install outcome:', outcome);
+        
+        if (outcome === 'dismissed') {
+          toast.error('Installation cancelled');
+          return { success: false, error: 'User dismissed installation' };
+        }
+        
+        setIsInstalled(true);
+        setDeferredPrompt(null);
+        
+        // Track installation
+        if (user?.id) {
+          await trackPWAInstallation(user.id);
+        }
+      }
+
+      // Step 2: Request notification permission
+      console.log('[PWA] Requesting notification permission...');
+      const permission = await requestNotificationPermission();
+      
+      if (permission === 'denied') {
+        toast.warning('App installed, but notifications were denied. You can enable them later in settings.');
+        return { success: true };
+      }
+
+      if (permission === 'granted' && user?.id) {
+        // Step 3: Subscribe to push notifications
+        console.log('[PWA] Subscribing to push notifications...');
+        const subscribeResult = await subscribeToPushNotifications(user.id);
+        
+        if (!subscribeResult.success) {
+          toast.warning('App installed, but notification setup failed. You can try again later.');
+          return { success: true };
+        }
+      }
+
+      toast.success('Setup complete! App installed and notifications enabled.');
+      return { success: true };
+    } catch (error: any) {
+      console.error('[PWA] Complete setup error:', error);
+      toast.error('Setup failed. Please try again.');
+      return { success: false, error: error.message };
+    }
+  };
+
   return {
     deferredPrompt,
     isInstalled,
     handleInstallClick,
+    handleCompleteSetup,
   };
 }
 
