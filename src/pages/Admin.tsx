@@ -10,10 +10,13 @@ import { SEOHead } from '@/components/SEOHead';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
 import { CourseEnrollmentManager } from '@/components/admin/CourseEnrollmentManager';
 import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
+import { AnnouncementsList } from '@/components/admin/AnnouncementsList';
 import { PushNotificationSender } from '@/components/admin/PushNotificationSender';
+import { PushNotificationsHistory } from '@/components/admin/PushNotificationsHistory';
 import { VapidKeyGenerator } from '@/components/admin/VapidKeyGenerator';
 import { EmailLogsViewer } from '@/components/admin/EmailLogsViewer';
 import { PWAInstallStats } from '@/components/admin/PWAInstallStats';
+import { ProgramsManager } from '@/components/admin/ProgramsManager';
 import SecurityAuditLog from '@/components/SecurityAuditLog';
 import { usePrograms } from '@/hooks/usePrograms';
 
@@ -192,9 +195,9 @@ const Admin = () => {
                 <Send className="h-4 w-4" />
                 <span>Communications</span>
               </TabsTrigger>
-              <TabsTrigger value="submissions" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                <span>Submissions</span>
+              <TabsTrigger value="programs" className="flex items-center gap-2">
+                <GraduationCap className="h-4 w-4" />
+                <span>Programs</span>
               </TabsTrigger>
               <TabsTrigger value="system" className="flex items-center gap-2">
                 <Shield className="h-4 w-4" />
@@ -427,77 +430,15 @@ const Admin = () => {
             {/* Tab 3: Communications */}
             <TabsContent value="communications" className="space-y-6">
               <AnnouncementCreator />
+              <AnnouncementsList />
               <PushNotificationSender />
+              <PushNotificationsHistory />
               <EmailLogsViewer />
             </TabsContent>
 
-            {/* Tab 4: Form Submissions */}
-            <TabsContent value="submissions" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>Recent Submissions</CardTitle>
-                      <CardDescription>
-                        Latest 100 form submissions with status and error details
-                      </CardDescription>
-                    </div>
-                    <Button onClick={exportData} variant="outline" size="sm">
-                      <Download className="w-4 h-4 mr-2" />
-                      Export CSV
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left p-2">Name</th>
-                          <th className="text-left p-2">Email</th>
-                          <th className="text-left p-2">City</th>
-                          <th className="text-left p-2">Status</th>
-                          <th className="text-left p-2">Error</th>
-                          <th className="text-left p-2">Submitted</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {submissions.map((submission) => (
-                          <tr key={submission.id} className="border-b hover:bg-muted/50">
-                            <td className="p-2 font-medium">{submission.name}</td>
-                            <td className="p-2">{submission.email}</td>
-                            <td className="p-2">{submission.city}</td>
-                            <td className="p-2">
-                              <Badge variant={submission.mailchimp_success ? "default" : "destructive"}>
-                                {submission.mailchimp_success ? "Success" : "Failed"}
-                              </Badge>
-                            </td>
-                            <td className="p-2 max-w-xs">
-                              {submission.mailchimp_error && (
-                                <span className="text-xs text-muted-foreground truncate block">
-                                  {submission.mailchimp_error.length > 50 
-                                    ? submission.mailchimp_error.substring(0, 50) + "..."
-                                    : submission.mailchimp_error
-                                  }
-                                </span>
-                              )}
-                            </td>
-                            <td className="p-2 text-xs text-muted-foreground">
-                              {formatDate(submission.submitted_at)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    
-                    {submissions.length === 0 && (
-                      <div className="text-center py-8 text-muted-foreground">
-                        No submissions found
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Tab 4: Programs */}
+            <TabsContent value="programs" className="space-y-6">
+              <ProgramsManager />
             </TabsContent>
 
             {/* Tab 5: System & Security */}

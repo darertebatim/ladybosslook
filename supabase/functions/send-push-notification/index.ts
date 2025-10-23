@@ -36,6 +36,16 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
+    // Get auth header to identify admin user
+    const authHeader = req.headers.get('Authorization');
+    let adminUserId: string | null = null;
+    
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user } } = await supabase.auth.getUser(token);
+      adminUserId = user?.id || null;
+    }
+
     // Get target user subscriptions
     let query = supabase.from('push_subscriptions').select('*');
 
@@ -134,6 +144,25 @@ const handler = async (req: Request): Promise<Response> => {
         .delete()
         .in('id', failedSubscriptions);
       console.log(`Removed ${failedSubscriptions.length} invalid subscriptions`);
+    }
+
+    // Log the push notification
+    const targetType = userIds?.length ? 'specific' : targetCourse ? 'course' : 'all';
+    const { error: logError } = await supabase
+      .from('push_notification_logs')
+      .insert({
+        title,
+        message: body,
+        destination_url: url || '/app/home',
+        target_type: targetType,
+        target_course: targetCourse || null,
+        sent_count: successCount,
+        failed_count: failedCount,
+        created_by: adminUserId,
+      });
+
+    if (logError) {
+      console.error('Error logging notification:', logError);
     }
 
     return new Response(

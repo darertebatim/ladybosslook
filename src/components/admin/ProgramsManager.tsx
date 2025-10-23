@@ -1,0 +1,353 @@
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { GraduationCap, Plus, RefreshCw, Pencil, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+
+interface ProgramCatalog {
+  id: string;
+  slug: string;
+  title: string;
+  type: string;
+  payment_type: string;
+  price_amount: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export function ProgramsManager() {
+  const [programs, setPrograms] = useState<ProgramCatalog[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const [formData, setFormData] = useState({
+    slug: '',
+    title: '',
+    type: 'course',
+    payment_type: 'one-time',
+    price_amount: 0,
+    is_active: true,
+  });
+
+  const fetchPrograms = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('program_catalog')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPrograms(data || []);
+    } catch (error: any) {
+      console.error('Error fetching programs:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch programs',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      slug: '',
+      title: '',
+      type: 'course',
+      payment_type: 'one-time',
+      price_amount: 0,
+      is_active: true,
+    });
+    setEditingId(null);
+    setShowForm(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      if (editingId) {
+        const { error } = await supabase
+          .from('program_catalog')
+          .update(formData)
+          .eq('id', editingId);
+
+        if (error) throw error;
+
+        toast({
+          title: 'Success',
+          description: 'Program updated successfully',
+        });
+      } else {
+        const { error } = await supabase
+          .from('program_catalog')
+          .insert([formData]);
+
+        if (error) throw error;
+
+        toast({
+          title: 'Success',
+          description: 'Program created successfully',
+        });
+      }
+
+      resetForm();
+      fetchPrograms();
+    } catch (error: any) {
+      console.error('Error saving program:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to save program',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleEdit = (program: ProgramCatalog) => {
+    setFormData({
+      slug: program.slug,
+      title: program.title,
+      type: program.type,
+      payment_type: program.payment_type,
+      price_amount: program.price_amount,
+      is_active: program.is_active,
+    });
+    setEditingId(program.id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('program_catalog')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: 'Program deleted successfully',
+      });
+
+      fetchPrograms();
+    } catch (error: any) {
+      console.error('Error deleting program:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete program',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeleteId(null);
+    }
+  };
+
+  useEffect(() => {
+    fetchPrograms();
+  }, []);
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <GraduationCap className="h-5 w-5" />
+                Programs Management
+              </CardTitle>
+              <CardDescription>
+                Manage your programs, courses, and coaching offerings
+              </CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={fetchPrograms} variant="outline" size="sm" disabled={isLoading}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              <Button onClick={() => setShowForm(!showForm)} size="sm">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Program
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {showForm && (
+            <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg bg-accent/5">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Program Title</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="e.g., Money Literacy Course"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="slug">Slug (URL identifier)</Label>
+                  <Input
+                    id="slug"
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    placeholder="e.g., money-literacy-course"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="type">Program Type</Label>
+                  <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+                    <SelectTrigger id="type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="course">Course</SelectItem>
+                      <SelectItem value="group-coaching">Group Coaching</SelectItem>
+                      <SelectItem value="1o1-session">1-on-1 Session</SelectItem>
+                      <SelectItem value="webinar">Webinar</SelectItem>
+                      <SelectItem value="event">Event</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="payment_type">Payment Type</Label>
+                  <Select value={formData.payment_type} onValueChange={(value) => setFormData({ ...formData, payment_type: value })}>
+                    <SelectTrigger id="payment_type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="one-time">One-Time</SelectItem>
+                      <SelectItem value="subscription">Subscription</SelectItem>
+                      <SelectItem value="free">Free</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="price">Price (in cents)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    value={formData.price_amount}
+                    onChange={(e) => setFormData({ ...formData, price_amount: parseInt(e.target.value) || 0 })}
+                    placeholder="e.g., 9700 for $97"
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    ${(formData.price_amount / 100).toFixed(2)}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={formData.is_active ? 'active' : 'inactive'} onValueChange={(value) => setFormData({ ...formData, is_active: value === 'active' })}>
+                    <SelectTrigger id="status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <Button type="submit">
+                  {editingId ? 'Update Program' : 'Create Program'}
+                </Button>
+                <Button type="button" variant="outline" onClick={resetForm}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {isLoading ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Loading programs...
+            </div>
+          ) : programs.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No programs found. Click "Add Program" to create one.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {programs.map((program) => (
+                <div
+                  key={program.id}
+                  className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-accent/5 transition-colors"
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h4 className="font-semibold">{program.title}</h4>
+                      <Badge variant={program.is_active ? 'default' : 'secondary'}>
+                        {program.is_active ? 'Active' : 'Inactive'}
+                      </Badge>
+                      <Badge variant="outline">{program.type}</Badge>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>Slug: {program.slug}</span>
+                      <span>•</span>
+                      <span>Price: ${(program.price_amount / 100).toFixed(2)}</span>
+                      <span>•</span>
+                      <span>{program.payment_type}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(program)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDeleteId(program.id)}
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Program</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this program? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deleteId && handleDelete(deleteId)} className="bg-destructive hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}

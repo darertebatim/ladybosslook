@@ -12,6 +12,7 @@ import { Bell, Send } from 'lucide-react';
 export function PushNotificationSender() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
+  const [destinationUrl, setDestinationUrl] = useState('/app/home');
   const [targetType, setTargetType] = useState<'all' | 'course'>('all');
   const [targetCourse, setTargetCourse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +34,7 @@ export function PushNotificationSender() {
         title,
         body: message,
         icon: '/pwa-192x192.png',
-        url: '/app/home',
+        url: destinationUrl,
       };
 
       if (targetType === 'course' && targetCourse) {
@@ -54,6 +55,7 @@ export function PushNotificationSender() {
       // Reset form
       setTitle('');
       setMessage('');
+      setDestinationUrl('/app/home');
       setTargetType('all');
       setTargetCourse('');
     } catch (error: any) {
@@ -103,6 +105,24 @@ export function PushNotificationSender() {
             maxLength={200}
           />
           <p className="text-xs text-muted-foreground">{message.length}/200 characters</p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="destination-url">Destination (app page)</Label>
+          <Select value={destinationUrl} onValueChange={setDestinationUrl}>
+            <SelectTrigger id="destination-url">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="/app/home">Home</SelectItem>
+              <SelectItem value="/app/courses">Courses</SelectItem>
+              <SelectItem value="/app/notifications">Notifications</SelectItem>
+              <SelectItem value="/app/profile">Profile</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Page to open when user clicks the notification
+          </p>
         </div>
 
         <div className="space-y-2">
