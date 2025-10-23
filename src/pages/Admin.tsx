@@ -9,6 +9,7 @@ import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp, Gradu
 import { SEOHead } from '@/components/SEOHead';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
 import { CourseEnrollmentManager } from '@/components/admin/CourseEnrollmentManager';
+import { BulkEnrollCourageousCourse } from '@/components/admin/BulkEnrollCourageousCourse';
 import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
 import { AnnouncementsList } from '@/components/admin/AnnouncementsList';
 import { PushNotificationSender } from '@/components/admin/PushNotificationSender';
@@ -291,6 +292,8 @@ const Admin = () => {
 
             {/* Tab 2: Users & Enrollments */}
             <TabsContent value="users" className="space-y-6">
+              <BulkEnrollCourageousCourse />
+              
               <CourseEnrollmentManager />
               
               <Card>
