@@ -137,19 +137,8 @@ export function CourseEnrollmentManager() {
         return;
       }
 
-      // Create enrollment
-      const { error: enrollError } = await supabase
-        .from('course_enrollments')
-        .insert({
-          user_id: selectedUserId,
-          course_name: selectedCourse,
-          status: 'active'
-        });
-
-      if (enrollError) throw enrollError;
-
-      // Create a test order as well
-      const { error: orderError } = await supabase
+      // Create a test order first
+      const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
           user_id: selectedUserId,
@@ -161,9 +150,22 @@ export function CourseEnrollmentManager() {
           name: profile.full_name || 'Test User',
           phone: profile.phone,
           stripe_session_id: `test_${Date.now()}`
-        });
+        })
+        .select()
+        .single();
 
       if (orderError) throw orderError;
+
+      // Create enrollment
+      const { error: enrollError } = await supabase
+        .from('course_enrollments')
+        .insert({
+          user_id: selectedUserId,
+          course_name: selectedCourse,
+          status: 'active'
+        });
+
+      if (enrollError) throw enrollError;
 
       toast({
         title: "Success",

@@ -15,7 +15,15 @@ const AppCourses = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('course_enrollments')
-        .select('*')
+        .select(`
+          *,
+          program_rounds (
+            round_name,
+            round_number,
+            start_date,
+            status
+          )
+        `)
         .eq('user_id', user?.id)
         .order('enrolled_at', { ascending: false });
 
@@ -71,7 +79,18 @@ const AppCourses = () => {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <CardTitle className="text-lg">{enrollment.course_name}</CardTitle>
-                        <CardDescription className="mt-1">
+                        <CardDescription className="mt-2 space-y-1">
+                          {enrollment.program_rounds && (
+                            <div className="flex items-center gap-1.5">
+                              <BookOpen className="h-3 w-3" />
+                              <span className="text-xs font-medium">
+                                {enrollment.program_rounds.round_name}
+                              </span>
+                              <Badge variant="outline" className="text-[10px] h-4 px-1">
+                                {enrollment.program_rounds.status}
+                              </Badge>
+                            </div>
+                          )}
                           <div className="flex items-center gap-2">
                             <Clock className="h-3 w-3" />
                             <span className="text-xs">
