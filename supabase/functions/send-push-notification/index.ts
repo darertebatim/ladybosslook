@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
+import { encode as base64UrlEncode } from "https://deno.land/std@0.190.0/encoding/base64url.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -86,17 +87,46 @@ const handler = async (req: Request): Promise<Response> => {
     let failedCount = 0;
     const failedSubscriptions: string[] = [];
 
+    // Generate VAPID JWT token
+    const vapidHeader = {
+      typ: 'JWT',
+      alg: 'ES256',
+    };
+
+    const jwtPayload = {
+      aud: new URL(subscriptions[0]?.endpoint).origin,
+      exp: Math.floor(Date.now() / 1000) + 12 * 60 * 60, // 12 hours
+      sub: 'mailto:noreply@lovable.app',
+    };
+
+    // Import VAPID private key
+    const privateKeyBuffer = Uint8Array.from(atob(vapidPrivateKey.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+    const privateKey = await crypto.subtle.importKey(
+      'pkcs8',
+      privateKeyBuffer,
+      { name: 'ECDSA', namedCurve: 'P-256' },
+      false,
+      ['sign']
+    );
+
+    // Create JWT
+    const encoder = new TextEncoder();
+    const headerB64 = base64UrlEncode(encoder.encode(JSON.stringify(vapidHeader)));
+    const payloadB64 = base64UrlEncode(encoder.encode(JSON.stringify(jwtPayload)));
+    const unsignedToken = `${headerB64}.${payloadB64}`;
+    
+    const signature = await crypto.subtle.sign(
+      { name: 'ECDSA', hash: 'SHA-256' },
+      privateKey,
+      encoder.encode(unsignedToken)
+    );
+    
+    const signatureB64 = base64UrlEncode(new Uint8Array(signature));
+    const jwt = `${unsignedToken}.${signatureB64}`;
+
     // Send push notifications
     for (const subscription of subscriptions) {
       try {
-        const pushSubscription = {
-          endpoint: subscription.endpoint,
-          keys: {
-            p256dh: subscription.p256dh_key,
-            auth: subscription.auth_key,
-          },
-        };
-
         const payload = JSON.stringify({
           title,
           body,
@@ -104,24 +134,24 @@ const handler = async (req: Request): Promise<Response> => {
           url: url || '/app/home',
         });
 
-        // Note: Using web-push requires npm:web-push package
-        // For now, we'll use the Web Push Protocol directly via fetch
-        const response = await fetch(pushSubscription.endpoint, {
+        const response = await fetch(subscription.endpoint, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/octet-stream',
+            'Content-Encoding': 'aes128gcm',
+            'Authorization': `vapid t=${jwt}, k=${vapidPublicKey}`,
             'TTL': '86400',
           },
           body: payload,
         });
 
-        if (response.ok) {
+        if (response.ok || response.status === 201) {
           successCount++;
           console.log(`Push notification sent to user ${subscription.user_id}`);
         } else {
           failedCount++;
           failedSubscriptions.push(subscription.id);
-          console.error(`Failed to send push notification to user ${subscription.user_id}:`, await response.text());
+          console.error(`Failed to send push notification to user ${subscription.user_id}:`, response.status, await response.text());
         }
       } catch (error: any) {
         failedCount++;
