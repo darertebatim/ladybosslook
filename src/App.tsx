@@ -45,6 +45,7 @@ import SMSTerms from "./pages/SMSTerms";
 import ThankFreeLive from "./pages/ThankFreeLive";
 import ThankOne from "./pages/ThankOne";
 import Video from "./pages/Video";
+import Dashboard from "./pages/Dashboard";
 import CalendarRedirect from "./components/CalendarRedirect";
 import Redirect from "./components/Redirect";
 import SendTestEmail from "./pages/SendTestEmail";
@@ -91,7 +92,7 @@ const App = () => (
             <Route path="/thankone" element={<ThankOne />} />
             <Route path="/iqmoney" element={<IQMoneyWorkshop />} />
             <Route path="/rathus" element={<RathusAssessment />} />
-            <Route path="/dashboard" element={<Navigate to="/app/home" replace />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             
             {/* App Routes - PWA Experience */}
             <Route path="/app/install" element={<AppInstall />} />

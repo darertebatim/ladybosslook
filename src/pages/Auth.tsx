@@ -20,7 +20,7 @@ export default function Auth() {
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate('/app/home');
     }
   }, [user, navigate]);
 
