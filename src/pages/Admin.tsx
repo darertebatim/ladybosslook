@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp, GraduationCap, LayoutDashboard, UserCog, Send, FileText, Shield, LogOut } from 'lucide-react';
+import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp, GraduationCap, LayoutDashboard, UserCog, Send, FileText, Shield, LogOut, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
@@ -20,6 +20,7 @@ import { EmailLogsViewer } from '@/components/admin/EmailLogsViewer';
 import { PWAInstallStats } from '@/components/admin/PWAInstallStats';
 import { ProgramsManager } from '@/components/admin/ProgramsManager';
 import { ProgramRoundsManager } from '@/components/admin/ProgramRoundsManager';
+import { LeadsManager } from '@/components/admin/LeadsManager';
 import SecurityAuditLog from '@/components/SecurityAuditLog';
 import { usePrograms } from '@/hooks/usePrograms';
 
@@ -210,10 +211,14 @@ const Admin = () => {
           </div>
 
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsList className="grid w-full grid-cols-6 mb-6">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4" />
                 <span>Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="leads" className="flex items-center gap-2">
+                <Search className="h-4 w-4" />
+                <span>Leads</span>
               </TabsTrigger>
               <TabsTrigger value="users" className="flex items-center gap-2">
                 <UserCog className="h-4 w-4" />
@@ -316,7 +321,12 @@ const Admin = () => {
               <PWAInstallStats />
             </TabsContent>
 
-            {/* Tab 2: Users & Enrollments */}
+            {/* Tab 2: Leads */}
+            <TabsContent value="leads" className="space-y-6">
+              <LeadsManager />
+            </TabsContent>
+
+            {/* Tab 3: Users & Enrollments */}
             <TabsContent value="users" className="space-y-6">
               <BulkEnrollCourageousCourse />
               
@@ -457,7 +467,7 @@ const Admin = () => {
               <UserCreditsManager />
             </TabsContent>
 
-            {/* Tab 3: Communications */}
+            {/* Tab 4: Communications */}
             <TabsContent value="communications" className="space-y-6">
               <AnnouncementCreator />
               <AnnouncementsList />
@@ -466,7 +476,7 @@ const Admin = () => {
               <EmailLogsViewer />
             </TabsContent>
 
-            {/* Tab 4: Programs */}
+            {/* Tab 5: Programs */}
             <TabsContent value="programs" className="space-y-6">
               <Tabs defaultValue="catalog" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
@@ -482,7 +492,7 @@ const Admin = () => {
               </Tabs>
             </TabsContent>
 
-            {/* Tab 5: System & Security */}
+            {/* Tab 6: System & Security */}
             <TabsContent value="system" className="space-y-6">
               <Card>
                 <CardHeader>
