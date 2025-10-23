@@ -64,11 +64,13 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
 
     // Save subscription to database
     console.log('[Push] Saving to database...');
-    const { error } = await supabase.from('push_subscriptions').insert({
+    const { error } = await supabase.from('push_subscriptions').upsert({
       user_id: userId,
       endpoint: subscriptionJSON.endpoint || '',
       p256dh_key: subscriptionJSON.keys?.p256dh || '',
       auth_key: subscriptionJSON.keys?.auth || '',
+    }, {
+      onConflict: 'user_id,endpoint'
     });
 
     if (error) {
