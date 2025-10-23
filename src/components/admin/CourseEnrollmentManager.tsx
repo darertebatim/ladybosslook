@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { BookOpen, Plus, Users } from 'lucide-react';
+import { BookOpen, Plus, Users, Edit } from 'lucide-react';
 import { usePrograms } from '@/hooks/usePrograms';
 
 interface UserProfile {
@@ -13,11 +13,24 @@ interface UserProfile {
   full_name: string | null;
 }
 
+interface ProgramRound {
+  id: string;
+  round_name: string;
+  program_slug: string;
+  status: string;
+}
+
 interface Enrollment {
   id: string;
   course_name: string;
   status: string;
   enrolled_at: string;
+  round_id: string | null;
+  program_slug: string | null;
+  program_rounds: {
+    round_name: string;
+    status: string;
+  } | null;
   profiles: {
     email: string;
     full_name: string | null;
@@ -29,6 +42,10 @@ export function CourseEnrollmentManager() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [selectedCourse, setSelectedCourse] = useState<string>('');
+  const [selectedRoundId, setSelectedRoundId] = useState<string>('');
+  const [availableRounds, setAvailableRounds] = useState<ProgramRound[]>([]);
+  const [editingEnrollmentId, setEditingEnrollmentId] = useState<string>('');
+  const [editRoundId, setEditRoundId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { programs } = usePrograms();
@@ -37,6 +54,18 @@ export function CourseEnrollmentManager() {
     loadUsers();
     loadEnrollments();
   }, []);
+
+  useEffect(() => {
+    if (selectedCourse) {
+      const program = programs.find(p => p.title === selectedCourse);
+      if (program?.slug) {
+        loadRoundsForCourse(program.slug);
+      }
+    } else {
+      setAvailableRounds([]);
+      setSelectedRoundId('');
+    }
+  }, [selectedCourse, programs]);
 
   const loadUsers = async () => {
     try {
@@ -61,7 +90,19 @@ export function CourseEnrollmentManager() {
     try {
       const { data, error } = await supabase
         .from('course_enrollments')
-        .select('id, course_name, status, enrolled_at, user_id')
+        .select(`
+          id, 
+          course_name, 
+          status, 
+          enrolled_at, 
+          user_id,
+          round_id,
+          program_slug,
+          program_rounds (
+            round_name,
+            status
+          )
+        `)
         .order('enrolled_at', { ascending: false });
 
       if (error) throw error;
@@ -91,6 +132,54 @@ export function CourseEnrollmentManager() {
       toast({
         title: "Error",
         description: "Failed to load enrollments",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const loadRoundsForCourse = async (courseSlug: string) => {
+    if (!courseSlug) {
+      setAvailableRounds([]);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('program_rounds')
+        .select('id, round_name, program_slug, status')
+        .eq('program_slug', courseSlug)
+        .order('round_number', { ascending: false });
+
+      if (error) throw error;
+      setAvailableRounds(data || []);
+    } catch (error: any) {
+      console.error('Error loading rounds:', error);
+      setAvailableRounds([]);
+    }
+  };
+
+  const handleUpdateRound = async (enrollmentId: string, newRoundId: string) => {
+    try {
+      const { error } = await supabase
+        .from('course_enrollments')
+        .update({ round_id: newRoundId || null })
+        .eq('id', enrollmentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Round updated successfully"
+      });
+
+      setEditingEnrollmentId('');
+      setEditRoundId('');
+      loadEnrollments();
+    } catch (error: any) {
+      console.error('Error updating round:', error);
+      toast({
+        title: "Error",
+        description: error.message,
         variant: "destructive"
       });
     }
@@ -156,12 +245,17 @@ export function CourseEnrollmentManager() {
 
       if (orderError) throw orderError;
 
+      // Get program slug for the enrollment
+      const program = programs.find(p => p.title === selectedCourse);
+
       // Create enrollment
       const { error: enrollError } = await supabase
         .from('course_enrollments')
         .insert({
           user_id: selectedUserId,
           course_name: selectedCourse,
+          program_slug: program?.slug || null,
+          round_id: selectedRoundId || null,
           status: 'active'
         });
 
@@ -174,6 +268,7 @@ export function CourseEnrollmentManager() {
 
       setSelectedUserId('');
       setSelectedCourse('');
+      setSelectedRoundId('');
       loadEnrollments();
     } catch (error: any) {
       toast({
@@ -234,6 +329,25 @@ export function CourseEnrollmentManager() {
             </Select>
           </div>
 
+          {availableRounds.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Select Round (Optional)</label>
+              <Select value={selectedRoundId} onValueChange={setSelectedRoundId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a round..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No round</SelectItem>
+                  {availableRounds.map((round) => (
+                    <SelectItem key={round.id} value={round.id}>
+                      {round.round_name} ({round.status})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <Button 
             onClick={handleEnrollUser}
             disabled={isLoading || !selectedUserId || !selectedCourse}
@@ -262,11 +376,63 @@ export function CourseEnrollmentManager() {
                   <p className="text-xs text-muted-foreground mt-1">
                     {enrollment.course_name}
                   </p>
+                  {editingEnrollmentId === enrollment.id ? (
+                    <div className="mt-2 flex items-center gap-2">
+                      <Select 
+                        value={editRoundId} 
+                        onValueChange={setEditRoundId}
+                      >
+                        <SelectTrigger className="h-7 text-xs w-[200px]">
+                          <SelectValue placeholder="Select round..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">No round</SelectItem>
+                          {availableRounds
+                            .filter(r => r.program_slug === enrollment.program_slug)
+                            .map((round) => (
+                              <SelectItem key={round.id} value={round.id}>
+                                {round.round_name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                      <Button 
+                        size="sm" 
+                        className="h-7 text-xs"
+                        onClick={() => handleUpdateRound(enrollment.id, editRoundId)}
+                      >
+                        Save
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="h-7 text-xs"
+                        onClick={() => {
+                          setEditingEnrollmentId('');
+                          setEditRoundId('');
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      {enrollment.program_rounds ? (
+                        <p className="text-xs text-muted-foreground">
+                          Round: {enrollment.program_rounds.round_name}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground text-orange-600">
+                          No round assigned
+                        </p>
+                      )}
+                    </>
+                  )}
                   <p className="text-xs text-muted-foreground">
                     Enrolled: {new Date(enrollment.enrolled_at).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex flex-col gap-2 items-end">
                   <span className={`text-xs px-2 py-1 rounded-full ${
                     enrollment.status === 'active' 
                       ? 'bg-green-500/20 text-green-700 dark:text-green-300' 
@@ -274,6 +440,23 @@ export function CourseEnrollmentManager() {
                   }`}>
                     {enrollment.status}
                   </span>
+                  {editingEnrollmentId !== enrollment.id && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 w-7 p-0"
+                      onClick={async () => {
+                        setEditingEnrollmentId(enrollment.id);
+                        setEditRoundId(enrollment.round_id || '');
+                        // Load rounds for this enrollment's program
+                        if (enrollment.program_slug) {
+                          await loadRoundsForCourse(enrollment.program_slug);
+                        }
+                      }}
+                    >
+                      <Edit className="h-3 w-3" />
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}
