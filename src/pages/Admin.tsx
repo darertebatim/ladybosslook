@@ -221,15 +221,15 @@ const Admin = () => {
                 <span>Leads</span>
               </TabsTrigger>
               <TabsTrigger value="users" className="flex items-center gap-2">
-                <UserCog className="h-4 w-4" />
-                <span>Users</span>
+                <GraduationCap className="h-4 w-4" />
+                <span>Enrollment</span>
               </TabsTrigger>
               <TabsTrigger value="communications" className="flex items-center gap-2">
                 <Send className="h-4 w-4" />
                 <span>Communications</span>
               </TabsTrigger>
               <TabsTrigger value="programs" className="flex items-center gap-2">
-                <GraduationCap className="h-4 w-4" />
+                <UserCog className="h-4 w-4" />
                 <span>Programs</span>
               </TabsTrigger>
               <TabsTrigger value="system" className="flex items-center gap-2">
@@ -326,7 +326,7 @@ const Admin = () => {
               <LeadsManager />
             </TabsContent>
 
-            {/* Tab 3: Users & Enrollments */}
+            {/* Tab 3: Enrollment Management */}
             <TabsContent value="users" className="space-y-6">
               <BulkEnrollCourageousCourse />
               
