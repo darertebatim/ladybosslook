@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { StatsCards } from '@/components/dashboard/StatsCards';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { Announcements } from '@/components/dashboard/Announcements';
+import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { SEOHead } from '@/components/SEOHead';
 import { trackPWAInstallation, isPWAInstalled } from '@/lib/pwaTracking';
 
@@ -62,6 +63,7 @@ const AppHome = () => {
           enrolledCount={enrollments?.length || 0}
           creditsBalance={wallet?.credits_balance || 0}
         />
+        <ActiveRound />
         <QuickActions />
         <Announcements />
       </div>

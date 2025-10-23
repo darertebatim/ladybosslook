@@ -48,13 +48,13 @@ const AppLayout = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto pb-16">
+      <main className="flex-1 overflow-auto pb-20">
         <Outlet />
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t">
-        <div className="grid grid-cols-4 h-16">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg">
+        <div className="grid grid-cols-4 h-20 safe-area-inset-bottom">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
@@ -62,14 +62,14 @@ const AppLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+                className={`flex flex-col items-center justify-center gap-1.5 transition-colors min-h-[48px] ${
                   isActive
                     ? 'text-primary'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''}`} />
-                <span className="text-xs">{item.label}</span>
+                <Icon className={`h-6 w-6 ${isActive ? 'fill-current' : ''}`} />
+                <span className="text-xs font-medium">{item.label}</span>
               </Link>
             );
           })}
