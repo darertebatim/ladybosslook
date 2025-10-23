@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Bell, Send } from 'lucide-react';
 
+interface Program {
+  id: string;
+  title: string;
+  type: string;
+}
+
 export function PushNotificationSender() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -16,7 +22,24 @@ export function PushNotificationSender() {
   const [targetType, setTargetType] = useState<'all' | 'course'>('all');
   const [targetCourse, setTargetCourse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      const { data, error } = await supabase
+        .from('program_catalog')
+        .select('id, title, type')
+        .eq('is_active', true)
+        .order('title');
+
+      if (!error && data) {
+        setPrograms(data);
+      }
+    };
+
+    fetchPrograms();
+  }, []);
 
   const handleSend = async () => {
     if (!title || !message) {
@@ -140,13 +163,19 @@ export function PushNotificationSender() {
 
         {targetType === 'course' && (
           <div className="space-y-2">
-            <Label htmlFor="target-course">Course Name</Label>
-            <Input
-              id="target-course"
-              placeholder="Enter course name"
-              value={targetCourse}
-              onChange={(e) => setTargetCourse(e.target.value)}
-            />
+            <Label htmlFor="target-course">Select Program</Label>
+            <Select value={targetCourse} onValueChange={setTargetCourse}>
+              <SelectTrigger id="target-course">
+                <SelectValue placeholder="Choose a program" />
+              </SelectTrigger>
+              <SelectContent>
+                {programs.map((program) => (
+                  <SelectItem key={program.id} value={program.title}>
+                    {program.title} • {program.type === 'course' ? '📚' : program.type === 'group-coaching' ? '👥' : program.type === '1o1-session' ? '💼' : program.type === 'webinar' ? '🎥' : '🎉'}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
 

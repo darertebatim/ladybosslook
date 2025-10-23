@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { Megaphone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { usePrograms } from '@/hooks/usePrograms';
+
+interface Program {
+  id: string;
+  title: string;
+  type: string;
+}
 
 export function AnnouncementCreator() {
   const [title, setTitle] = useState('');
@@ -16,8 +21,24 @@ export function AnnouncementCreator() {
   const [badge, setBadge] = useState('General');
   const [type, setType] = useState('general');
   const [loading, setLoading] = useState(false);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
-  const { programs } = usePrograms();
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      const { data, error } = await supabase
+        .from('program_catalog')
+        .select('id, title, type')
+        .eq('is_active', true)
+        .order('title');
+
+      if (!error && data) {
+        setPrograms(data);
+      }
+    };
+
+    fetchPrograms();
+  }, []);
 
   const handleSubmit = async () => {
     if (!title.trim() || !message.trim()) {
@@ -179,8 +200,8 @@ export function AnnouncementCreator() {
               <SelectContent>
                 <SelectItem value="all">All Students</SelectItem>
                 {programs.map((program) => (
-                  <SelectItem key={program.slug} value={program.title}>
-                    {program.title} • {program.type === 'course' ? '📚' : program.type === 'group-coaching' ? '👥' : program.type === '1o1-session' ? '💼' : '🎉'}
+                  <SelectItem key={program.id} value={program.title}>
+                    {program.title} • {program.type === 'course' ? '📚' : program.type === 'group-coaching' ? '👥' : program.type === '1o1-session' ? '💼' : program.type === 'webinar' ? '🎥' : '🎉'}
                   </SelectItem>
                 ))}
               </SelectContent>

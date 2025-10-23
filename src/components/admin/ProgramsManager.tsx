@@ -182,6 +182,58 @@ export function ProgramsManager() {
                 <Plus className="w-4 h-4 mr-2" />
                 Add Program
               </Button>
+              <Button 
+                onClick={async () => {
+                  try {
+                    setIsLoading(true);
+                    const { programs } = await import('@/data/programs');
+                    
+                    for (const program of programs) {
+                      const programData = {
+                        slug: program.slug,
+                        title: program.title,
+                        type: program.type,
+                        payment_type: program.paymentType,
+                        price_amount: program.priceAmount,
+                        is_active: true,
+                      };
+
+                      const { error } = await supabase
+                        .from('program_catalog')
+                        .upsert(programData, { 
+                          onConflict: 'slug',
+                          ignoreDuplicates: false 
+                        });
+
+                      if (error && error.code !== '23505') {
+                        throw error;
+                      }
+                    }
+
+                    toast({
+                      title: 'Success',
+                      description: `Synced ${programs.length} programs from code`,
+                    });
+
+                    fetchPrograms();
+                  } catch (error: any) {
+                    console.error('Sync error:', error);
+                    toast({
+                      title: 'Error',
+                      description: 'Failed to sync programs',
+                      variant: 'destructive',
+                    });
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }} 
+                variant="outline" 
+                size="sm"
+                disabled={isLoading}
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                Sync from Code
+              </Button>
             </div>
           </div>
         </CardHeader>

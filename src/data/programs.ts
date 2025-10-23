@@ -24,7 +24,7 @@ export interface Program {
   limitedSpots?: string;
   popular: boolean;
   link: string;
-  type: 'course' | 'group-coaching' | '1o1-session' | 'event';
+  type: 'course' | 'group-coaching' | '1o1-session' | 'event' | 'webinar';
   paymentType: 'one-time' | 'subscription' | 'free';
   isFree: boolean;
 }
@@ -259,6 +259,31 @@ export const programs: Program[] = [
     popular: false,
     link: '/cc',
     type: 'course',
+    paymentType: 'one-time',
+    isFree: false
+  },
+  {
+    title: 'Bilingual Power Class - کلاس قدرت دو زبانه',
+    slug: 'bilingual-power-class',
+    description: 'Learn to speak with power in any language. Special online class for Iranian immigrant women - master 5 languages of power to transform your life.',
+    image: courageousCharacterImage, // Reusing for now, can be updated later
+    duration: '1 session',
+    participants: '264,000+',
+    rating: 4.9,
+    features: [
+      'Internal Language of Power',
+      'External Language of Power',
+      'Cultural Language Mastery',
+      'Language of Presence',
+      'Language of Influence'
+    ],
+    price: '$1',
+    priceAmount: 1,
+    originalPrice: '$100',
+    limitedSpots: 'Limited to 1000',
+    popular: true,
+    link: '/one',
+    type: 'webinar',
     paymentType: 'one-time',
     isFree: false
   }

@@ -13,6 +13,7 @@ const Programs = () => {
   const courses = getProgramsByType('course');
   const groupCoaching = getProgramsByType('group-coaching');
   const oneOnOneSessions = getProgramsByType('1o1-session');
+  const webinars = getProgramsByType('webinar');
   const events = getProgramsByType('event');
 
   const renderProgramCard = (program: Program) => (
@@ -233,6 +234,28 @@ const Programs = () => {
               </div>
               <div className="grid lg:grid-cols-3 gap-8">
                 {events.map(renderProgramCard)}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Webinars Section */}
+        {webinars.length > 0 && (
+          <section className="py-16 lg:py-24 bg-background">
+            <div className="container mx-auto px-6">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <Video className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h2 className="font-display text-3xl md:text-4xl font-bold">
+                    Online Webinars
+                  </h2>
+                  <p className="text-muted-foreground">Interactive online sessions for learning and transformation</p>
+                </div>
+              </div>
+              <div className="grid lg:grid-cols-3 gap-8">
+                {webinars.map(renderProgramCard)}
               </div>
             </div>
           </section>
