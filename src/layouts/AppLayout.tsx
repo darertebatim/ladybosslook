@@ -1,13 +1,35 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Bell, User } from 'lucide-react';
+import { Home, BookOpen, Bell, User, GraduationCap } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { InstallPromptDialog } from '@/components/InstallPromptDialog';
 
 const AppLayout = () => {
   const location = useLocation();
+  const { user } = useAuth();
   const { isInstalled } = usePWAInstall();
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+
+  // Fetch active enrollment for quick access
+  const { data: activeEnrollment } = useQuery({
+    queryKey: ['active-enrollment', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .select('*, program_rounds(*)')
+        .eq('user_id', user?.id)
+        .eq('status', 'active')
+        .order('enrolled_at', { ascending: false })
+        .limit(1)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
   useEffect(() => {
     // Check if we should show the install prompt
@@ -25,9 +47,14 @@ const AppLayout = () => {
     }
   }, [isInstalled, location.pathname]);
 
+  const activeClassPath = activeEnrollment 
+    ? `/app/course/${activeEnrollment.id}`
+    : '/app/courses';
+
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home' },
     { path: '/app/courses', icon: BookOpen, label: 'Courses' },
+    { path: activeClassPath, icon: GraduationCap, label: 'My Class', isActive: activeEnrollment?.id },
     { path: '/app/notifications', icon: Bell, label: 'Notifications' },
     { path: '/app/profile', icon: User, label: 'Profile' },
   ];
@@ -54,7 +81,7 @@ const AppLayout = () => {
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg">
-        <div className="grid grid-cols-4 h-20 safe-area-inset-bottom">
+        <div className="grid grid-cols-5 h-20 safe-area-inset-bottom">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
