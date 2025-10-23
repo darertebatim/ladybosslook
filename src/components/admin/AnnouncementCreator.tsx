@@ -14,6 +14,7 @@ interface Program {
   id: string;
   title: string;
   type: string;
+  slug: string;
 }
 
 export function AnnouncementCreator() {
@@ -49,7 +50,7 @@ export function AnnouncementCreator() {
     const fetchPrograms = async () => {
       const { data, error } = await supabase
         .from('program_catalog')
-        .select('id, title, type')
+        .select('id, title, type, slug')
         .eq('is_active', true)
         .order('title');
 
@@ -223,7 +224,7 @@ export function AnnouncementCreator() {
               <SelectContent>
                 <SelectItem value="all">All Students</SelectItem>
                 {programs.map((program) => (
-                  <SelectItem key={program.id} value={program.title}>
+                  <SelectItem key={program.id} value={program.slug}>
                     {program.title} • {program.type === 'course' ? '📚' : program.type === 'group-coaching' ? '👥' : program.type === '1o1-session' ? '💼' : program.type === 'webinar' ? '🎥' : '🎉'}
                   </SelectItem>
                 ))}
