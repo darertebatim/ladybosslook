@@ -16,6 +16,7 @@ const ROUND_2_COUNTRIES = ['GB', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'AT', 'CH',
 
 export function BulkEnrollCourageousCourse() {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isReassigning, setIsReassigning] = useState(false);
   const [results, setResults] = useState<any[]>([]);
   const { toast } = useToast();
 
@@ -150,6 +151,132 @@ export function BulkEnrollCourageousCourse() {
     }
   };
 
+  const handleReassignStudents = async () => {
+    setIsReassigning(true);
+    setResults([]);
+    const reassignResults: any[] = [];
+
+    try {
+      // Fetch all Courageous Character enrollments
+      const { data: enrollments, error: enrollError } = await supabase
+        .from('course_enrollments')
+        .select('*')
+        .eq('course_name', 'Courageous Character Course');
+
+      if (enrollError) throw enrollError;
+
+      toast({
+        title: "Processing",
+        description: `Found ${enrollments?.length || 0} enrollments to check`
+      });
+
+      for (const enrollment of enrollments || []) {
+        try {
+          // Get user email from profiles
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('id', enrollment.user_id)
+            .maybeSingle();
+          
+          const email = profile?.email || 'unknown';
+          
+          // Find the order for this user
+          const { data: order } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('user_id', enrollment.user_id)
+            .or('program_slug.eq.courageous-character-course,program_slug.eq.courageous-character,product_name.ilike.%courageous%')
+            .eq('status', 'paid')
+            .maybeSingle();
+
+          if (!order?.stripe_session_id || !order.stripe_session_id.startsWith('cs_')) {
+            reassignResults.push({
+              email,
+              status: 'skipped',
+              reason: 'No valid Stripe session'
+            });
+            continue;
+          }
+
+          // Get country from Stripe
+          let country = null;
+          try {
+            const { data: stripeData } = await supabase.functions.invoke('get-stripe-session-details', {
+              body: { sessionId: order.stripe_session_id }
+            });
+            country = stripeData?.customer_details?.address?.country;
+          } catch (e) {
+            console.log('Could not fetch Stripe details:', e);
+          }
+
+          if (!country) {
+            reassignResults.push({
+              email,
+              status: 'skipped',
+              reason: 'No country found'
+            });
+            continue;
+          }
+
+          // Determine correct round based on country
+          const correctRoundId = determineRoundByCountry(country);
+
+          // Check if student is in wrong round
+          if (enrollment.round_id === correctRoundId) {
+            reassignResults.push({
+              email,
+              status: 'skipped',
+              reason: `Already in correct round (${country})`
+            });
+            continue;
+          }
+
+          // Update enrollment to correct round
+          const { error: updateError } = await supabase
+            .from('course_enrollments')
+            .update({ round_id: correctRoundId })
+            .eq('id', enrollment.id);
+
+          if (updateError) throw updateError;
+
+          const oldRound = enrollment.round_id === ROUND_1_ID ? 'Round 1' : 'Round 2';
+          const newRound = correctRoundId === ROUND_1_ID ? 'Round 1' : 'Round 2';
+
+          reassignResults.push({
+            email,
+            status: 'success',
+            reason: `Moved from ${oldRound} to ${newRound} (${country})`
+          });
+
+        } catch (error: any) {
+          reassignResults.push({
+            email: 'error',
+            status: 'error',
+            reason: error.message
+          });
+        }
+      }
+
+      setResults(reassignResults);
+      
+      const successCount = reassignResults.filter(r => r.status === 'success').length;
+      toast({
+        title: "Reassignment Complete",
+        description: `Successfully reassigned ${successCount} students`
+      });
+
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsReassigning(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -169,21 +296,38 @@ export function BulkEnrollCourageousCourse() {
           </ul>
         </div>
 
-        <Button
-          onClick={handleBulkEnroll}
-          disabled={isProcessing}
-          className="w-full"
-          size="lg"
-        >
-          {isProcessing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Processing...
-            </>
-          ) : (
-            'Start Bulk Enrollment'
-          )}
-        </Button>
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            onClick={handleBulkEnroll}
+            disabled={isProcessing || isReassigning}
+            size="lg"
+            variant="outline"
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Enrolling...
+              </>
+            ) : (
+              'Bulk Enroll New Students'
+            )}
+          </Button>
+
+          <Button
+            onClick={handleReassignStudents}
+            disabled={isProcessing || isReassigning}
+            size="lg"
+          >
+            {isReassigning ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Reassigning...
+              </>
+            ) : (
+              'Reassign to Correct Rounds'
+            )}
+          </Button>
+        </div>
 
         {results.length > 0 && (
           <div className="space-y-2 max-h-96 overflow-y-auto">
