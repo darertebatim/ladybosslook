@@ -17,16 +17,10 @@ interface UserLead {
     city: string | null;
     created_at: string;
   } | null;
-  submissions: Array<{
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    city: string;
-    source: string;
-    submitted_at: string;
-    mailchimp_success: boolean;
-  }>;
+  paymentInfo: {
+    city: string | null;
+    country: string | null;
+  } | null;
   orders: Array<{
     id: string;
     product_name: string;
@@ -35,6 +29,7 @@ interface UserLead {
     status: string;
     created_at: string;
     payment_type: string | null;
+    stripe_session_id: string | null;
   }>;
   enrollments: Array<{
     id: string;
@@ -74,19 +69,34 @@ export function LeadsManager() {
         .or(`email.ilike.%${email}%,full_name.ilike.%${searchQuery}%`)
         .maybeSingle();
 
-      // Search form submissions
-      const { data: submissions } = await supabase
-        .from('form_submissions')
-        .select('*')
-        .or(`email.ilike.%${email}%,name.ilike.%${searchQuery}%`)
-        .order('submitted_at', { ascending: false });
-
       // Search orders
       const { data: orders } = await supabase
         .from('orders')
         .select('*')
         .or(`email.ilike.%${email}%,name.ilike.%${searchQuery}%`)
         .order('created_at', { ascending: false });
+
+      // Get payment info (city/country) from the most recent paid order
+      let paymentInfo: { city: string | null; country: string | null } | null = null;
+      if (orders && orders.length > 0) {
+        const mostRecentOrder = orders.find(o => o.status === 'paid' && o.stripe_session_id);
+        if (mostRecentOrder?.stripe_session_id) {
+          try {
+            const { data: sessionDetails } = await supabase.functions.invoke('get-stripe-session-details', {
+              body: { sessionId: mostRecentOrder.stripe_session_id }
+            });
+            
+            if (sessionDetails?.customer_details) {
+              paymentInfo = {
+                city: sessionDetails.customer_details.address?.city || null,
+                country: sessionDetails.customer_details.address?.country || null
+              };
+            }
+          } catch (error) {
+            console.error('Error fetching payment details:', error);
+          }
+        }
+      }
 
       // Search enrollments
       let enrollments: any[] = [];
@@ -104,7 +114,7 @@ export function LeadsManager() {
         enrollments = enrollmentData || [];
       }
 
-      if (!profile && (!submissions || submissions.length === 0) && (!orders || orders.length === 0)) {
+      if (!profile && (!orders || orders.length === 0)) {
         toast({
           title: "No results",
           description: "No user found with that email or name",
@@ -116,7 +126,7 @@ export function LeadsManager() {
 
       setSearchResults({
         profile,
-        submissions: submissions || [],
+        paymentInfo,
         orders: orders || [],
         enrollments
       });
@@ -197,10 +207,13 @@ export function LeadsManager() {
                         <span className="text-sm">{searchResults.profile.phone}</span>
                       </div>
                     )}
-                    {searchResults.profile.city && (
+                    {(searchResults.paymentInfo?.city || searchResults.profile.city) && (
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{searchResults.profile.city}</span>
+                        <span className="text-sm">
+                          {searchResults.paymentInfo?.city || searchResults.profile.city}
+                          {searchResults.paymentInfo?.country && `, ${searchResults.paymentInfo.country}`}
+                        </span>
                       </div>
                     )}
                     <div className="flex items-center gap-2">
@@ -223,15 +236,12 @@ export function LeadsManager() {
 
             {/* Detailed Information Tabs */}
             <Tabs defaultValue="orders" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="orders">
                   Orders ({searchResults.orders.length})
                 </TabsTrigger>
                 <TabsTrigger value="enrollments">
                   Enrollments ({searchResults.enrollments.length})
-                </TabsTrigger>
-                <TabsTrigger value="submissions">
-                  Submissions ({searchResults.submissions.length})
                 </TabsTrigger>
               </TabsList>
 
@@ -311,55 +321,6 @@ export function LeadsManager() {
                   <div className="text-center py-8 text-muted-foreground">
                     <GraduationCap className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">No enrollments found</p>
-                  </div>
-                )}
-              </TabsContent>
-
-              {/* Submissions Tab */}
-              <TabsContent value="submissions" className="space-y-3">
-                {searchResults.submissions.length > 0 ? (
-                  searchResults.submissions.map((submission) => (
-                    <Card key={submission.id}>
-                      <CardContent className="pt-4">
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-start">
-                            <div className="space-y-1">
-                              <p className="font-medium">{submission.name}</p>
-                              <p className="text-sm text-muted-foreground">{submission.email}</p>
-                            </div>
-                            <Badge variant={submission.mailchimp_success ? 'default' : 'destructive'}>
-                              {submission.mailchimp_success ? 'Synced' : 'Not synced'}
-                            </Badge>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                            {submission.phone && (
-                              <div className="flex items-center gap-1">
-                                <Phone className="h-3 w-3" />
-                                {submission.phone}
-                              </div>
-                            )}
-                            {submission.city && (
-                              <div className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                {submission.city}
-                              </div>
-                            )}
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {new Date(submission.submitted_at).toLocaleDateString()}
-                            </div>
-                            <div>
-                              Source: {submission.source}
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Mail className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No form submissions found</p>
                   </div>
                 )}
               </TabsContent>

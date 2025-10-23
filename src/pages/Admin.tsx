@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, Users, CheckCircle, AlertCircle, Download, TrendingUp, GraduationCap, LayoutDashboard, UserCog, Send, FileText, Shield, LogOut, Search } from 'lucide-react';
+import { RefreshCw, GraduationCap, LayoutDashboard, UserCog, Send, Shield, LogOut, Search, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
@@ -24,20 +24,6 @@ import { LeadsManager } from '@/components/admin/LeadsManager';
 import SecurityAuditLog from '@/components/SecurityAuditLog';
 import { usePrograms } from '@/hooks/usePrograms';
 
-interface FormSubmission {
-  id: string;
-  email: string;
-  name: string;
-  city: string;
-  phone: string;
-  source: string;
-  mailchimp_success: boolean;
-  mailchimp_error: string | null;
-  submitted_at: string;
-  user_agent: string | null;
-  ip_address: string | null;
-}
-
 interface CourseStats {
   course_name: string;
   student_count: number;
@@ -45,56 +31,30 @@ interface CourseStats {
 
 const Admin = () => {
   const { programs } = usePrograms();
-  const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
+  const navigate = useNavigate();
   const [courseStats, setCourseStats] = useState<CourseStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({
-    total: 0,
-    successful: 0,
-    failed: 0,
-    today: 0
-  });
   const { toast } = useToast();
 
-  const fetchSubmissions = async () => {
-    setIsLoading(true);
+  const handleSignOut = async () => {
     try {
-      const { data, error } = await supabase
-        .from('form_submissions')
-        .select('*')
-        .order('submitted_at', { ascending: false })
-        .limit(100);
-
-      if (error) {
-        throw error;
-      }
-
-      setSubmissions((data as FormSubmission[]) || []);
-      
-      // Calculate stats
-      const total = data?.length || 0;
-      const successful = data?.filter(s => s.mailchimp_success).length || 0;
-      const failed = total - successful;
-      
-      const today = new Date().toISOString().split('T')[0];
-      const todayCount = data?.filter(s => 
-        s.submitted_at.startsWith(today)
-      ).length || 0;
-
-      setStats({ total, successful, failed, today: todayCount });
+      await supabase.auth.signOut();
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out"
+      });
+      navigate('/auth');
     } catch (error: any) {
-      console.error('Error fetching submissions:', error);
       toast({
         title: "Error",
-        description: "Failed to fetch submissions",
-        variant: "destructive",
+        description: "Failed to sign out",
+        variant: "destructive"
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const fetchCourseStats = async () => {
+    setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('course_enrollments')
@@ -122,56 +82,14 @@ const Admin = () => {
         description: "Failed to fetch course statistics",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-
-  const exportData = () => {
-    const csvContent = [
-      ['Name', 'Email', 'City', 'Phone', 'Mailchimp Success', 'Error', 'Submitted At'].join(','),
-      ...submissions.map(sub => [
-        sub.name,
-        sub.email,
-        sub.city,
-        sub.phone,
-        sub.mailchimp_success ? 'Yes' : 'No',
-        sub.mailchimp_error || '',
-        new Date(sub.submitted_at).toLocaleString()
-      ].map(field => `"${field}"`).join(','))
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `form-submissions-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
-    fetchSubmissions();
     fetchCourseStats();
   }, []);
-
-  const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Signed out",
-        description: "You have been successfully signed out"
-      });
-      navigate('/auth');
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to sign out",
-        variant: "destructive"
-      });
-    }
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
@@ -199,7 +117,7 @@ const Admin = () => {
               <p className="text-muted-foreground">Comprehensive admin controls</p>
             </div>
             <div className="flex gap-2">
-              <Button onClick={() => { fetchSubmissions(); fetchCourseStats(); }} variant="outline" size="sm">
+              <Button onClick={fetchCourseStats} variant="outline" size="sm">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh
               </Button>
@@ -240,58 +158,6 @@ const Admin = () => {
 
             {/* Tab 1: Overview */}
             <TabsContent value="overview" className="space-y-6">
-              {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Submissions</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stats.total}</div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Successful</CardTitle>
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-green-600">{stats.successful}</div>
-                    <p className="text-xs text-muted-foreground">
-                      {stats.total > 0 ? Math.round((stats.successful / stats.total) * 100) : 0}% success rate
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Failed</CardTitle>
-                    <AlertCircle className="h-4 w-4 text-red-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-red-600">{stats.failed}</div>
-                    <p className="text-xs text-muted-foreground">
-                      {stats.total > 0 ? Math.round((stats.failed / stats.total) * 100) : 0}% failure rate
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Today</CardTitle>
-                    <TrendingUp className="h-4 w-4 text-blue-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-blue-600">{stats.today}</div>
-                    <p className="text-xs text-muted-foreground">
-                      Submissions today
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
               {/* Course Enrollment Stats */}
               <Card>
                 <CardHeader>
