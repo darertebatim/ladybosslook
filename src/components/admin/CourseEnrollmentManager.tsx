@@ -255,7 +255,7 @@ export function CourseEnrollmentManager() {
           user_id: selectedUserId,
           course_name: selectedCourse,
           program_slug: program?.slug || null,
-          round_id: selectedRoundId || null,
+          round_id: selectedRoundId && selectedRoundId !== 'none' ? selectedRoundId : null,
           status: 'active'
         });
 
@@ -337,7 +337,7 @@ export function CourseEnrollmentManager() {
                   <SelectValue placeholder="Choose a round..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No round</SelectItem>
+                  <SelectItem value="none">No round</SelectItem>
                   {availableRounds.map((round) => (
                     <SelectItem key={round.id} value={round.id}>
                       {round.round_name} ({round.status})
@@ -386,7 +386,7 @@ export function CourseEnrollmentManager() {
                           <SelectValue placeholder="Select round..." />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">No round</SelectItem>
+                          <SelectItem value="none">No round</SelectItem>
                           {availableRounds
                             .filter(r => r.program_slug === enrollment.program_slug)
                             .map((round) => (
@@ -399,7 +399,7 @@ export function CourseEnrollmentManager() {
                       <Button 
                         size="sm" 
                         className="h-7 text-xs"
-                        onClick={() => handleUpdateRound(enrollment.id, editRoundId)}
+                        onClick={() => handleUpdateRound(enrollment.id, editRoundId === 'none' ? '' : editRoundId)}
                       >
                         Save
                       </Button>
@@ -447,7 +447,7 @@ export function CourseEnrollmentManager() {
                       className="h-7 w-7 p-0"
                       onClick={async () => {
                         setEditingEnrollmentId(enrollment.id);
-                        setEditRoundId(enrollment.round_id || '');
+                        setEditRoundId(enrollment.round_id || 'none');
                         // Load rounds for this enrollment's program
                         if (enrollment.program_slug) {
                           await loadRoundsForCourse(enrollment.program_slug);
