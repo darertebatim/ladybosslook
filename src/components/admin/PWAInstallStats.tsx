@@ -9,8 +9,7 @@ import { format } from 'date-fns';
 interface PWAInstall {
   id: string;
   user_id: string;
-  installed_at: string;
-  platform?: string;
+  created_at: string;
   full_name?: string;
   email?: string;
 }
@@ -48,7 +47,9 @@ export function PWAInstallStats() {
       const installsWithProfiles = installations.map(install => {
         const profile = profiles?.find(p => p.id === install.user_id);
         return {
-          ...install,
+          id: install.id,
+          user_id: install.user_id,
+          created_at: install.installed_at,
           full_name: profile?.full_name,
           email: profile?.email,
         };
@@ -96,7 +97,6 @@ export function PWAInstallStats() {
                   <TableRow>
                     <TableHead>User</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Platform</TableHead>
                     <TableHead>Installed At</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -108,12 +108,7 @@ export function PWAInstallStats() {
                       </TableCell>
                       <TableCell>{install.email || 'N/A'}</TableCell>
                       <TableCell>
-                        <Badge variant="secondary">
-                          {install.platform || 'Unknown'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {format(new Date(install.installed_at), 'MMM d, yyyy HH:mm')}
+                        {format(new Date(install.created_at), 'MMM d, yyyy HH:mm')}
                       </TableCell>
                     </TableRow>
                   ))}

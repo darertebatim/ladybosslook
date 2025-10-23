@@ -1,70 +1,11 @@
-import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Check, Smartphone } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
-import { useAuth } from '@/hooks/useAuth';
-import { trackPWAInstallation } from '@/lib/pwaTracking';
-import { useToast } from '@/hooks/use-toast';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 
 const AppInstall = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isInstalled, setIsInstalled] = useState(false);
-
-  useEffect(() => {
-    // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true);
-      // Track installation if user is logged in
-      if (user?.id) {
-        trackPWAInstallation(user.id);
-      }
-    }
-
-    const handler = (e: any) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
-
-    const installedHandler = async () => {
-      console.log('PWA was installed');
-      setIsInstalled(true);
-      // Track installation
-      if (user?.id) {
-        const result = await trackPWAInstallation(user.id);
-        if (result.success) {
-          toast({
-            title: 'App installed!',
-            description: 'Welcome to LadyBoss Academy',
-          });
-        }
-      }
-    };
-
-    window.addEventListener('beforeinstallprompt', handler);
-    window.addEventListener('appinstalled', installedHandler);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
-      window.removeEventListener('appinstalled', installedHandler);
-    };
-  }, [user, toast]);
-
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      setIsInstalled(true);
-      // The appinstalled event will handle tracking
-    }
-    
-    setDeferredPrompt(null);
-  };
+  const { deferredPrompt, isInstalled, handleInstallClick } = usePWAInstall();
 
   return (
     <div className="min-h-screen bg-background">

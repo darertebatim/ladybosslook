@@ -1,8 +1,10 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Bell, User } from 'lucide-react';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 
 const AppLayout = () => {
   const location = useLocation();
+  usePWAInstall(); // Track PWA installation status
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home' },
