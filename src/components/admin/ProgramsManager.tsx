@@ -18,6 +18,12 @@ interface ProgramCatalog {
   type: string;
   payment_type: string;
   price_amount: number;
+  original_price?: number | null;
+  duration?: string | null;
+  delivery_method?: string | null;
+  subscription_full_payment_discount?: number | null;
+  description?: string | null;
+  features?: any;
   is_active: boolean;
   created_at: string;
 }
@@ -36,6 +42,11 @@ export function ProgramsManager() {
     type: 'course',
     payment_type: 'one-time',
     price_amount: 0,
+    original_price: 0,
+    duration: '',
+    delivery_method: 'on-demand',
+    subscription_full_payment_discount: 0,
+    description: '',
     is_active: true,
   });
 
@@ -68,6 +79,11 @@ export function ProgramsManager() {
       type: 'course',
       payment_type: 'one-time',
       price_amount: 0,
+      original_price: 0,
+      duration: '',
+      delivery_method: 'on-demand',
+      subscription_full_payment_discount: 0,
+      description: '',
       is_active: true,
     });
     setEditingId(null);
@@ -122,6 +138,11 @@ export function ProgramsManager() {
       type: program.type,
       payment_type: program.payment_type,
       price_amount: program.price_amount,
+      original_price: program.original_price || 0,
+      duration: program.duration || '',
+      delivery_method: program.delivery_method || 'on-demand',
+      subscription_full_payment_discount: program.subscription_full_payment_discount || 0,
+      description: program.description || '',
       is_active: program.is_active,
     });
     setEditingId(program.id);
@@ -194,7 +215,11 @@ export function ProgramsManager() {
                         title: program.title,
                         type: program.type,
                         payment_type: program.paymentType,
-                        price_amount: program.priceAmount,
+                        price_amount: program.priceAmount * 100, // Convert dollars to cents
+                        original_price: program.originalPrice ? parseFloat(program.originalPrice.replace('$', '').replace(',', '')) * 100 : null,
+                        duration: program.duration,
+                        delivery_method: program.type === 'course' ? 'on-demand' : 'live-online',
+                        description: program.description,
                         is_active: true,
                       };
 
@@ -280,6 +305,29 @@ export function ProgramsManager() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="delivery_method">Delivery Method</Label>
+                  <Select value={formData.delivery_method} onValueChange={(value) => setFormData({ ...formData, delivery_method: value })}>
+                    <SelectTrigger id="delivery_method">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="live-online">Live Online Course</SelectItem>
+                      <SelectItem value="on-demand">On-Demand Course</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="duration">Duration</Label>
+                  <Input
+                    id="duration"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    placeholder="e.g., 6 weeks, 3 months, Self-paced"
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="payment_type">Payment Type</Label>
                   <Select value={formData.payment_type} onValueChange={(value) => setFormData({ ...formData, payment_type: value })}>
                     <SelectTrigger id="payment_type">
@@ -294,19 +342,49 @@ export function ProgramsManager() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="price">Price (in cents)</Label>
+                  <Label htmlFor="original_price">Original Price ($)</Label>
+                  <Input
+                    id="original_price"
+                    type="number"
+                    value={formData.original_price / 100}
+                    onChange={(e) => setFormData({ ...formData, original_price: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                    placeholder="e.g., 497"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Original: ${(formData.original_price / 100).toFixed(2)}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="price">Sale Price ($)</Label>
                   <Input
                     id="price"
                     type="number"
-                    value={formData.price_amount}
-                    onChange={(e) => setFormData({ ...formData, price_amount: parseInt(e.target.value) || 0 })}
-                    placeholder="e.g., 9700 for $97"
+                    value={formData.price_amount / 100}
+                    onChange={(e) => setFormData({ ...formData, price_amount: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                    placeholder="e.g., 97"
                     required
                   />
                   <p className="text-xs text-muted-foreground">
-                    ${(formData.price_amount / 100).toFixed(2)}
+                    Sale: ${(formData.price_amount / 100).toFixed(2)}
                   </p>
                 </div>
+
+                {formData.payment_type === 'subscription' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="subscription_discount">Full Payment Discount ($)</Label>
+                    <Input
+                      id="subscription_discount"
+                      type="number"
+                      value={formData.subscription_full_payment_discount / 100}
+                      onChange={(e) => setFormData({ ...formData, subscription_full_payment_discount: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                      placeholder="e.g., 500 for $500 off"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Discount for paying in full: ${(formData.subscription_full_payment_discount / 100).toFixed(2)}
+                    </p>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
@@ -320,6 +398,17 @@ export function ProgramsManager() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Program description..."
+                  rows={3}
+                />
               </div>
 
               <div className="flex gap-2">
@@ -356,12 +445,31 @@ export function ProgramsManager() {
                       </Badge>
                       <Badge variant="outline">{program.type}</Badge>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>Slug: {program.slug}</span>
-                      <span>•</span>
-                      <span>Price: ${(program.price_amount / 100).toFixed(2)}</span>
-                      <span>•</span>
-                      <span>{program.payment_type}</span>
+                    <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-4">
+                        <span>Slug: {program.slug}</span>
+                        <span>•</span>
+                        <span>{program.duration || 'N/A'}</span>
+                        <span>•</span>
+                        <span>{program.delivery_method === 'live-online' ? 'Live Online' : 'On-Demand'}</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        {program.original_price && (
+                          <>
+                            <span className="line-through">${(program.original_price / 100).toFixed(2)}</span>
+                            <span>→</span>
+                          </>
+                        )}
+                        <span className="font-semibold text-primary">${(program.price_amount / 100).toFixed(2)}</span>
+                        <span>•</span>
+                        <span>{program.payment_type}</span>
+                        {program.subscription_full_payment_discount > 0 && (
+                          <>
+                            <span>•</span>
+                            <span>Full payment: -${(program.subscription_full_payment_discount / 100).toFixed(2)}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="flex gap-2">

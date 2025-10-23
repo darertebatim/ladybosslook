@@ -274,33 +274,51 @@ export type Database = {
       program_catalog: {
         Row: {
           created_at: string | null
+          delivery_method: string | null
+          description: string | null
+          duration: string | null
+          features: Json | null
           id: string
           is_active: boolean | null
+          original_price: number | null
           payment_type: string
           price_amount: number
           slug: string
+          subscription_full_payment_discount: number | null
           title: string
           type: string
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          delivery_method?: string | null
+          description?: string | null
+          duration?: string | null
+          features?: Json | null
           id?: string
           is_active?: boolean | null
+          original_price?: number | null
           payment_type: string
           price_amount?: number
           slug: string
+          subscription_full_payment_discount?: number | null
           title: string
           type: string
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          delivery_method?: string | null
+          description?: string | null
+          duration?: string | null
+          features?: Json | null
           id?: string
           is_active?: boolean | null
+          original_price?: number | null
           payment_type?: string
           price_amount?: number
           slug?: string
+          subscription_full_payment_discount?: number | null
           title?: string
           type?: string
           updated_at?: string | null
