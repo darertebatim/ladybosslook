@@ -8,11 +8,11 @@ import { UserPlus, Loader2 } from 'lucide-react';
 const ROUND_1_ID = '71b674b8-0bf4-467d-bbd9-fca6b4bc57c8'; // US1
 const ROUND_2_ID = '68c08fe6-c94c-4157-971b-9c93278f0c57'; // europe2
 
-// US, Canada, Australia → Round #1
-const ROUND_1_COUNTRIES = ['US', 'CA', 'AU', 'NZ'];
+// Round #1 (17:30 LA time): Americas, Australia, East Asia
+const ROUND_1_COUNTRIES = ['US', 'CA', 'AU', 'NZ', 'MX', 'BR', 'AR', 'CL', 'CO', 'PE', 'CN', 'JP', 'KR', 'TW', 'HK', 'SG', 'MY', 'TH', 'VN', 'PH', 'ID'];
 
-// Europe, Middle East, Asia → Round #2
-const ROUND_2_COUNTRIES = ['GB', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI', 'IE', 'PT', 'GR', 'PL', 'CZ', 'TR', 'AE', 'SA', 'IR', 'IL', 'MY', 'SG'];
+// Round #2 (9:30 LA time): Europe, Middle East, Central/South Asia
+const ROUND_2_COUNTRIES = ['GB', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI', 'IE', 'PT', 'GR', 'PL', 'CZ', 'RO', 'HU', 'TR', 'AE', 'SA', 'IR', 'IL', 'IN', 'PK', 'AF', 'UZ', 'KZ', 'IS', 'RS', 'HR', 'BG', 'UA'];
 
 export function BulkEnrollCourageousCourse() {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -164,8 +164,8 @@ export function BulkEnrollCourageousCourse() {
             This will automatically enroll all paid Courageous Character students into their rounds:
           </p>
           <ul className="text-xs text-muted-foreground space-y-1 ml-4">
-            <li>• Round #1: US, Canada, Australia, New Zealand</li>
-            <li>• Round #2: Europe, Middle East, Asia</li>
+            <li>• Round #1 (17:30 LA): Americas, Australia, East Asia</li>
+            <li>• Round #2 (9:30 LA): Europe, Middle East, Central/South Asia</li>
           </ul>
         </div>
 
@@ -202,7 +202,7 @@ export function BulkEnrollCourageousCourse() {
                 <p className="font-medium">{result.email}</p>
                 <p className="text-muted-foreground">
                   {result.status === 'success'
-                    ? `✓ Enrolled in ${result.round} (Country: ${result.country})`
+                    ? `✓ ${result.round} (${result.country})`
                     : result.status === 'skipped'
                     ? `⊘ ${result.reason}`
                     : `✗ ${result.reason}`}
