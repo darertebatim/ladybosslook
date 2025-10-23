@@ -62,6 +62,18 @@ export function PushNotificationSender() {
     fetchPrograms();
   }, []);
 
+  // Reset round when target type changes
+  useEffect(() => {
+    if (targetType === 'all') {
+      setTargetRoundId('');
+    }
+  }, [targetType]);
+
+  // Reset round when course changes
+  useEffect(() => {
+    setTargetRoundId('');
+  }, [targetCourse]);
+
   const handleSend = async () => {
     if (!title || !message) {
       toast({

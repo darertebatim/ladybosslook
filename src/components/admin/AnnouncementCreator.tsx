@@ -62,6 +62,11 @@ export function AnnouncementCreator() {
     fetchPrograms();
   }, []);
 
+  // Reset round when course changes
+  useEffect(() => {
+    setTargetRoundId('all');
+  }, [targetCourse]);
+
   const handleSubmit = async () => {
     if (!title.trim() || !message.trim()) {
       toast({
