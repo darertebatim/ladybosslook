@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, GraduationCap, LayoutDashboard, UserCog, Send, Shield, LogOut, Search, Users } from 'lucide-react';
+import { RefreshCw, GraduationCap, LayoutDashboard, UserCog, Send, Shield, LogOut, Search, Users, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
@@ -117,6 +117,10 @@ const Admin = () => {
               <p className="text-muted-foreground">Comprehensive admin controls</p>
             </div>
             <div className="flex gap-2">
+              <Button onClick={() => navigate('/auth')} variant="outline" size="sm">
+                <UserPlus className="w-4 h-4 mr-2" />
+                Sign Up New User
+              </Button>
               <Button onClick={fetchCourseStats} variant="outline" size="sm">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh
