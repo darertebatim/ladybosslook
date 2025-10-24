@@ -27,5 +27,8 @@ verify_jwt = true
 [functions.send-push-notification]
 verify_jwt = true
 
+[functions.admin-create-enrollment]
+verify_jwt = true
+
 [functions.get-stripe-session-details]
 verify_jwt = true

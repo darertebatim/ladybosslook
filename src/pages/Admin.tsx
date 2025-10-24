@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { RefreshCw, GraduationCap, LayoutDashboard, UserCog, Send, Shield, LogOut, Search, Users, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
+import { QuickEnrollUser } from '@/components/admin/QuickEnrollUser';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
 import { CourseEnrollmentManager } from '@/components/admin/CourseEnrollmentManager';
 import { BulkEnrollCourageousCourse } from '@/components/admin/BulkEnrollCourageousCourse';
@@ -198,6 +199,8 @@ const Admin = () => {
 
             {/* Tab 3: Enrollment Management */}
             <TabsContent value="users" className="space-y-6">
+              <QuickEnrollUser />
+              
               <BulkEnrollCourageousCourse />
               
               <CourseEnrollmentManager />
