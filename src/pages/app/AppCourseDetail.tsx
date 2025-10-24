@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
-import { generateGoogleCalendarUrl } from '@/utils/calendar';
+import { downloadICSFile } from '@/utils/calendar';
 import { format } from 'date-fns';
 import { toast } from "sonner";
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -81,9 +81,8 @@ const AppCourseDetail = () => {
       location: round.google_meet_link || undefined,
     };
 
-    const calendarUrl = generateGoogleCalendarUrl(event);
-    window.open(calendarUrl, '_blank');
-    toast.success('Opening Google Calendar...');
+    downloadICSFile(event, `${program.title.replace(/\s+/g, '-')}.ics`);
+    toast.success('Calendar event downloaded!');
   };
 
   const handleContactSupport = () => {
