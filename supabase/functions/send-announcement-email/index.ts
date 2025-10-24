@@ -44,6 +44,47 @@ const handler = async (req: Request): Promise<Response> => {
   let requestBody: any = null;
   
   try {
+    // Verify admin authentication
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const authHeader = req.headers.get('Authorization');
+    
+    if (!authHeader) {
+      console.error(`❌ [${requestId}] No authorization header provided`);
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error(`❌ [${requestId}] Invalid authentication:`, authError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication' }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Verify admin role
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .single();
+
+    if (!roleData) {
+      console.error(`❌ [${requestId}] User ${user.id} is not an admin`);
+      return new Response(
+        JSON.stringify({ error: 'Admin access required' }),
+        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    console.log(`✅ [${requestId}] Admin user verified: ${user.id}`);
+    
     // Parse and log request body
     const rawBody = await req.text();
     console.log(`📦 [${requestId}] Raw request body length: ${rawBody.length} bytes`);
@@ -77,9 +118,6 @@ const handler = async (req: Request): Promise<Response> => {
       console.error(`🚨 [${requestId}] RESEND_API_KEY is not configured`);
       throw new Error('Email service not configured');
     }
-    
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    console.log(`✅ [${requestId}] Supabase client created`);
 
     // Get target users based on course enrollment
     let userEmails: string[] = [];
