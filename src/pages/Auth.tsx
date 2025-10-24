@@ -65,11 +65,11 @@ export default function Auth() {
               : 'Enter your information to create an account'
             }
           </CardDescription>
-          {isLogin && (
-            <p className="text-xs text-muted-foreground text-center mt-2">
-              💡 If you purchased a course, use your email as both username and password
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mt-4">
+            <p className="text-base font-semibold text-foreground text-center">
+              If you purchased a course, use your email as both username and password
             </p>
-          )}
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -103,19 +103,6 @@ export default function Auth() {
               {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Sign Up')}
             </Button>
           </form>
-          
-          <div className="mt-4 text-center">
-            <Button
-              variant="link"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm"
-            >
-              {isLogin 
-                ? "Don't have an account? Sign up" 
-                : "Already have an account? Sign in"
-              }
-            </Button>
-          </div>
         </CardContent>
       </Card>
     </div>
