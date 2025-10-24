@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Check, Smartphone, Bell, Loader2, AlertCircle, Share2, Plus, MoreVertical, Home, Compass } from 'lucide-react';
+import { Download, Check, Smartphone, Bell, Loader2, AlertCircle, Plus, MoreVertical, Home, Compass, SquareArrowOutUpRight } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { SEOHead } from '@/components/SEOHead';
@@ -262,7 +262,7 @@ const AppInstall = () => {
                     
                     <div className="flex gap-3 items-start">
                       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Share2 className="h-4 w-4 text-primary" />
+                        <SquareArrowOutUpRight className="h-4 w-4 text-primary" />
                       </div>
                       <div className="flex-1">
                         <p><strong>Step 2:</strong> Tap the <strong>Share</strong> button (square with arrow pointing up)</p>
