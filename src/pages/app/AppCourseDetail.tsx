@@ -145,13 +145,37 @@ const AppCourseDetail = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Video className="h-5 w-5" />
-                  Course Resources
+                  <Calendar className="h-5 w-5" />
+                  Quick Actions
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                {/* Add to Calendar - First Priority */}
+                {round?.first_session_date ? (
+                  <Button
+                    className="w-full justify-start"
+                    size="lg"
+                    onClick={handleAddToCalendar}
+                  >
+                    <Calendar className="h-5 w-5 mr-3" />
+                    <div className="flex-1 text-left">
+                      <div className="font-semibold">Add to Calendar</div>
+                      <div className="text-xs opacity-90">
+                        {format(new Date(round.first_session_date), 'EEEE, MMMM d, yyyy • h:mm a')}
+                      </div>
+                    </div>
+                  </Button>
+                ) : (
+                  <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
+                    <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Session schedule will be announced soon</p>
+                  </div>
+                )}
+
+                {/* Join Live Session */}
                 {round?.google_meet_link ? (
                   <Button
+                    variant="outline"
                     className="w-full justify-start"
                     size="lg"
                     onClick={() => window.open(round.google_meet_link!, '_blank')}
@@ -159,13 +183,9 @@ const AppCourseDetail = () => {
                     <Video className="h-5 w-5 mr-3" />
                     <div className="flex-1 text-left">
                       <div className="font-semibold">Join Live Session</div>
-                      {round.first_session_date && (
-                        <div className="text-xs opacity-80">
-                          Next session: {format(new Date(round.first_session_date), 'MMM d, yyyy • h:mm a')}
-                        </div>
-                      )}
+                      <div className="text-xs opacity-70">Google Meet link</div>
                     </div>
-                    <ExternalLink className="h-4 w-4 ml-2" />
+                    <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
                   </Button>
                 ) : (
                   <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
@@ -174,6 +194,7 @@ const AppCourseDetail = () => {
                   </div>
                 )}
 
+                {/* Access Course Files */}
                 {round?.google_drive_link ? (
                   <Button
                     variant="outline"
@@ -186,7 +207,7 @@ const AppCourseDetail = () => {
                       <div className="font-semibold">Access Course Files</div>
                       <div className="text-xs opacity-70">Materials, slides, and resources</div>
                     </div>
-                    <ExternalLink className="h-4 w-4 ml-2" />
+                    <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
                   </Button>
                 ) : (
                   <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
@@ -194,47 +215,34 @@ const AppCourseDetail = () => {
                     <p className="text-sm">Course materials will be shared soon</p>
                   </div>
                 )}
+              </CardContent>
+            </Card>
 
-                {round?.first_session_date ? (
+            {/* Support Section - Separate Card */}
+            {round?.whatsapp_support_number && (
+              <Card className="border-green-200 bg-green-50/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-green-900">
+                    <MessageCircle className="h-5 w-5" />
+                    Need Help?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
                   <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    size="lg"
-                    onClick={handleAddToCalendar}
-                  >
-                    <Calendar className="h-5 w-5 mr-3" />
-                    <div className="flex-1 text-left">
-                      <div className="font-semibold">Add to Calendar</div>
-                      <div className="text-xs opacity-70">
-                        First session: {format(new Date(round.first_session_date), 'MMM d, yyyy • h:mm a')}
-                      </div>
-                    </div>
-                    <ExternalLink className="h-4 w-4 ml-2" />
-                  </Button>
-                ) : (
-                  <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
-                    <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Session schedule will be announced soon</p>
-                  </div>
-                )}
-
-                {round?.whatsapp_support_number && (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start bg-green-50 hover:bg-green-100 border-green-200"
+                    className="w-full justify-start bg-green-600 hover:bg-green-700 text-white"
                     size="lg"
                     onClick={handleContactSupport}
                   >
-                    <MessageCircle className="h-5 w-5 mr-3 text-green-600" />
+                    <MessageCircle className="h-5 w-5 mr-3" />
                     <div className="flex-1 text-left">
-                      <div className="font-semibold text-green-900">Contact Support</div>
-                      <div className="text-xs opacity-70">Get help via WhatsApp</div>
+                      <div className="font-semibold">Contact Support via WhatsApp</div>
+                      <div className="text-xs opacity-90">We're here to help you</div>
                     </div>
-                    <ExternalLink className="h-4 w-4 ml-2 text-green-600" />
+                    <ExternalLink className="h-4 w-4 ml-2" />
                   </Button>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
             <Card>
               <CardHeader>
