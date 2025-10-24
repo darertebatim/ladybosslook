@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Check, Smartphone, Bell, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { SEOHead } from '@/components/SEOHead';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications } from '@/lib/pushNotifications';
@@ -14,7 +15,15 @@ const AppInstall = () => {
   const { deferredPrompt, isInstalled, isIOS, handleCompleteSetup } = usePWAInstall();
   const [isLoading, setIsLoading] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState(checkPermissionStatus());
+  const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const isNotificationsEnabled = notificationPermission === 'granted';
+
+  // Show popup when iOS app gets installed and notifications aren't enabled
+  useEffect(() => {
+    if (isIOS && isInstalled && !isNotificationsEnabled) {
+      setShowNotificationPopup(true);
+    }
+  }, [isIOS, isInstalled, isNotificationsEnabled]);
 
   const handleSetup = async () => {
     if (isIOS) {
@@ -36,6 +45,7 @@ const AppInstall = () => {
     }
     
     setIsLoading(true);
+    setShowNotificationPopup(false);
     try {
       const permission = await requestNotificationPermission();
       setNotificationPermission(permission);
@@ -67,6 +77,39 @@ const AppInstall = () => {
         title="Install App - LadyBoss Academy"
         description="Install the LadyBoss Academy app on your device"
       />
+
+      <AlertDialog open={showNotificationPopup} onOpenChange={setShowNotificationPopup}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5 text-primary" />
+              Enable Notifications?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Stay updated with course announcements, new content, and important updates. 
+              You can change this anytime in your device settings.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowNotificationPopup(false)}>
+              Maybe Later
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleEnableNotifications} disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Enabling...
+                </>
+              ) : (
+                <>
+                  <Bell className="mr-2 h-4 w-4" />
+                  Enable Now
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       
       <div className="container max-w-4xl py-12 px-4">
         <div className="text-center mb-8">
