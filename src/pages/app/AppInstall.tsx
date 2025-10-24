@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Check, Smartphone, Bell, Loader2, AlertCircle, Share2, Plus, Chrome, MoreVertical, Home, Globe } from 'lucide-react';
+import { Download, Check, Smartphone, Bell, Loader2, AlertCircle, Share2, Plus, MoreVertical, Home, Compass } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { SEOHead } from '@/components/SEOHead';
@@ -253,7 +253,7 @@ const AppInstall = () => {
                   <div className="space-y-3">
                     <div className="flex gap-3 items-start">
                       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Globe className="h-4 w-4 text-primary" />
+                        <Compass className="h-4 w-4 text-primary" />
                       </div>
                       <div className="flex-1">
                         <p><strong>Step 1:</strong> Open this page in <strong>Safari</strong> browser</p>
