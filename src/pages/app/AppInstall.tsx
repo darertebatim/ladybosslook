@@ -20,10 +20,12 @@ const AppInstall = () => {
 
   // Show popup when iOS app gets installed and notifications aren't enabled
   useEffect(() => {
+    console.log('[AppInstall] Debug:', { isIOS, isInstalled, isNotificationsEnabled, notificationPermission });
     if (isIOS && isInstalled && !isNotificationsEnabled) {
+      console.log('[AppInstall] Showing notification popup');
       setShowNotificationPopup(true);
     }
-  }, [isIOS, isInstalled, isNotificationsEnabled]);
+  }, [isIOS, isInstalled, isNotificationsEnabled, notificationPermission]);
 
   const handleSetup = async () => {
     if (isIOS) {
