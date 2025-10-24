@@ -249,59 +249,14 @@ const AppInstall = () => {
                     iOS (iPhone/iPad)
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4 text-sm">
-                  <div className="space-y-3">
-                    <div className="flex gap-3 items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                        1
-                      </div>
-                      <div className="flex-1">
-                        <p>Open this page in <strong>Safari</strong> browser</p>
-                      </div>
-                      <Chrome className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    </div>
-                    
-                    <div className="flex gap-3 items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                        2
-                      </div>
-                      <div className="flex-1">
-                        <p>Tap the <strong>Share</strong> button (square with arrow pointing up)</p>
-                      </div>
-                      <Share2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    </div>
-                    
-                    <div className="flex gap-3 items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                        3
-                      </div>
-                      <div className="flex-1">
-                        <p>Scroll down and tap <strong>"Add to Home Screen"</strong></p>
-                      </div>
-                      <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    </div>
-                    
-                    <div className="flex gap-3 items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                        4
-                      </div>
-                      <div className="flex-1">
-                        <p>Tap <strong>"Add"</strong> in the top right corner</p>
-                      </div>
-                      <Check className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    </div>
-                    
-                    <div className="flex gap-3 items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                        5
-                      </div>
-                      <div className="flex-1">
-                        <p>The LadyBoss Academy app icon will appear on your home screen</p>
-                      </div>
-                      <Home className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    </div>
-                  </div>
-                  
+                <CardContent className="space-y-3 text-sm">
+                  <ol className="list-decimal list-inside space-y-2 ml-2">
+                    <li>Open this page in <strong>Safari</strong> browser</li>
+                    <li>Tap the <strong>Share</strong> button (square with arrow pointing up)</li>
+                    <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
+                    <li>Tap <strong>"Add"</strong> in the top right corner</li>
+                    <li>The LadyBoss Academy app icon will appear on your home screen</li>
+                  </ol>
                   <p className="text-muted-foreground mt-4">
                     <strong>Note:</strong> iOS 16.4 or later is required for push notifications.
                   </p>
@@ -317,58 +272,14 @@ const AppInstall = () => {
                     Android
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4 text-sm">
-                  <div className="space-y-3">
-                    <div className="flex gap-3 items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                        1
-                      </div>
-                      <div className="flex-1">
-                        <p>Open this page in <strong>Chrome</strong> browser</p>
-                      </div>
-                      <Chrome className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    </div>
-                    
-                    <div className="flex gap-3 items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                        2
-                      </div>
-                      <div className="flex-1">
-                        <p>Tap the <strong>three dots menu</strong> in the top right</p>
-                      </div>
-                      <MoreVertical className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    </div>
-                    
-                    <div className="flex gap-3 items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                        3
-                      </div>
-                      <div className="flex-1">
-                        <p>Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong></p>
-                      </div>
-                      <Download className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    </div>
-                    
-                    <div className="flex gap-3 items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                        4
-                      </div>
-                      <div className="flex-1">
-                        <p>Tap <strong>"Install"</strong> in the popup</p>
-                      </div>
-                      <Check className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    </div>
-                    
-                    <div className="flex gap-3 items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                        5
-                      </div>
-                      <div className="flex-1">
-                        <p>The app will be added to your home screen and app drawer</p>
-                      </div>
-                      <Home className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    </div>
-                  </div>
+                <CardContent className="space-y-3 text-sm">
+                  <ol className="list-decimal list-inside space-y-2 ml-2">
+                    <li>Open this page in <strong>Chrome</strong> browser</li>
+                    <li>Tap the <strong>three dots menu</strong> in the top right</li>
+                    <li>Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong></li>
+                    <li>Tap <strong>"Install"</strong> in the popup</li>
+                    <li>The app will be added to your home screen and app drawer</li>
+                  </ol>
                 </CardContent>
               </Card>
 
