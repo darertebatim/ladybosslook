@@ -176,7 +176,7 @@ export const QuickEnrollUser = () => {
         </Button>
 
         <p className="text-xs text-muted-foreground">
-          * A password reset email will be sent automatically
+          * Password will be set to email address
         </p>
       </CardContent>
     </Card>

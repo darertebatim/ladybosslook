@@ -110,17 +110,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       userId = userData.user.id;
-
-      // Send password reset email
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${Deno.env.get('SUPABASE_URL')}/auth/v1/verify`
-      });
-
-      if (resetError) {
-        console.error('Error sending password reset:', resetError);
-      }
-
-      console.log(`User created successfully: ${userId}`);
+      console.log(`User created successfully: ${userId} with password set to email`);
     }
 
     // Check if enrollment already exists
