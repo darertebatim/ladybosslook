@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Check, Smartphone, Bell, Loader2, AlertCircle, Share2, Plus, Chrome, MoreVertical, Home } from 'lucide-react';
+import { Download, Check, Smartphone, Bell, Loader2, AlertCircle, Share2, Plus, Chrome, MoreVertical, Home, Globe } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { SEOHead } from '@/components/SEOHead';
@@ -249,14 +249,54 @@ const AppInstall = () => {
                     iOS (iPhone/iPad)
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3 text-sm">
-                  <ol className="list-decimal list-inside space-y-2 ml-2">
-                    <li>Open this page in <strong>Safari</strong> browser</li>
-                    <li>Tap the <strong>Share</strong> button (square with arrow pointing up)</li>
-                    <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
-                    <li>Tap <strong>"Add"</strong> in the top right corner</li>
-                    <li>The LadyBoss Academy app icon will appear on your home screen</li>
-                  </ol>
+                <CardContent className="space-y-4 text-sm">
+                  <div className="space-y-3">
+                    <div className="flex gap-3 items-start">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Globe className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p><strong>Step 1:</strong> Open this page in <strong>Safari</strong> browser</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3 items-start">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Share2 className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p><strong>Step 2:</strong> Tap the <strong>Share</strong> button (square with arrow pointing up)</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3 items-start">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Plus className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p><strong>Step 3:</strong> Scroll down and tap <strong>"Add to Home Screen"</strong></p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3 items-start">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Check className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p><strong>Step 4:</strong> Tap <strong>"Add"</strong> in the top right corner</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3 items-start">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center">
+                        <Home className="h-4 w-4 text-green-500" />
+                      </div>
+                      <div className="flex-1">
+                        <p><strong>Done!</strong> The LadyBoss Academy app icon will appear on your home screen</p>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <p className="text-muted-foreground mt-4">
                     <strong>Note:</strong> iOS 16.4 or later is required for push notifications.
                   </p>
