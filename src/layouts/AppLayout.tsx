@@ -86,6 +86,10 @@ const AppLayout = () => {
   };
 
   const handleDismissNotificationPopup = () => {
+    setShowNotificationPopup(false);
+  };
+
+  const handleNeverAsk = () => {
     localStorage.setItem('hasSeenNotificationPrompt', 'true');
     setShowNotificationPopup(false);
   };
@@ -116,23 +120,31 @@ const AppLayout = () => {
               You can change this anytime in your device settings.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDismissNotificationPopup}>
-              Maybe Later
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleEnableNotifications} disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enabling...
-                </>
-              ) : (
-                <>
-                  <Bell className="mr-2 h-4 w-4" />
-                  Enable Now
-                </>
-              )}
-            </AlertDialogAction>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <button 
+              onClick={handleNeverAsk}
+              className="text-sm text-muted-foreground hover:text-foreground underline"
+            >
+              Don't ask again
+            </button>
+            <div className="flex gap-2 flex-1 justify-end">
+              <AlertDialogCancel onClick={handleDismissNotificationPopup}>
+                Maybe Later
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={handleEnableNotifications} disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Enabling...
+                  </>
+                ) : (
+                  <>
+                    <Bell className="mr-2 h-4 w-4" />
+                    Enable Now
+                  </>
+                )}
+              </AlertDialogAction>
+            </div>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
