@@ -5,10 +5,16 @@ import { requestNotificationPermission, subscribeToPushNotifications } from '@/l
 import { trackPWAInstallation } from '@/lib/pwaTracking';
 import { toast } from 'sonner';
 
+// Detect iOS devices
+const isIOSDevice = () => {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+};
+
 export function usePWAInstall() {
   const { user } = useAuth();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
+  const isIOS = isIOSDevice();
 
   useEffect(() => {
     // Check if already installed
@@ -157,6 +163,7 @@ export function usePWAInstall() {
   return {
     deferredPrompt,
     isInstalled,
+    isIOS,
     handleInstallClick,
     handleCompleteSetup,
   };

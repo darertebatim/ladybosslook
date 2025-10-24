@@ -1,20 +1,63 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Check, Smartphone, Bell, Loader2 } from 'lucide-react';
+import { Download, Check, Smartphone, Bell, Loader2, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { SEOHead } from '@/components/SEOHead';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
-import { checkPermissionStatus } from '@/lib/pushNotifications';
+import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications } from '@/lib/pushNotifications';
+import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 const AppInstall = () => {
-  const { deferredPrompt, isInstalled, handleCompleteSetup } = usePWAInstall();
+  const { user } = useAuth();
+  const { deferredPrompt, isInstalled, isIOS, handleCompleteSetup } = usePWAInstall();
   const [isLoading, setIsLoading] = useState(false);
-  const notificationPermission = checkPermissionStatus();
+  const [notificationPermission, setNotificationPermission] = useState(checkPermissionStatus());
   const isNotificationsEnabled = notificationPermission === 'granted';
 
   const handleSetup = async () => {
+    if (isIOS) {
+      toast.error('On iPhone, please use Safari\'s Share menu to install the app first');
+      return;
+    }
     setIsLoading(true);
-    await handleCompleteSetup();
+    const result = await handleCompleteSetup();
+    setIsLoading(false);
+    if (result.success) {
+      setNotificationPermission(checkPermissionStatus());
+    }
+  };
+
+  const handleEnableNotifications = async () => {
+    if (!user?.id) {
+      toast.error('Please log in first');
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      const permission = await requestNotificationPermission();
+      setNotificationPermission(permission);
+      
+      if (permission === 'denied') {
+        toast.error('Notifications were denied. Enable them in your device settings.');
+        setIsLoading(false);
+        return;
+      }
+
+      if (permission === 'granted') {
+        const subscribeResult = await subscribeToPushNotifications(user.id);
+        if (subscribeResult.success) {
+          toast.success('Notifications enabled successfully!');
+        } else {
+          toast.error('Failed to enable notifications. Please try again.');
+        }
+      }
+    } catch (error) {
+      console.error('[Notifications] Error:', error);
+      toast.error('Failed to enable notifications');
+    }
     setIsLoading(false);
   };
 
@@ -55,55 +98,101 @@ const AppInstall = () => {
           </Card>
         ) : (
           <>
-            <Card className="mb-6 border-primary/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Smartphone className="h-5 w-5" />
-                  One-Click Setup
-                </CardTitle>
-                <CardDescription>
-                  Install the app and enable notifications in one step
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-2 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    {isInstalled ? (
-                      <Check className="h-4 w-4 text-green-500" />
+            {isIOS && !isInstalled && (
+              <Alert className="mb-6 border-amber-500/50 bg-amber-500/10">
+                <AlertCircle className="h-5 w-5 text-amber-500" />
+                <AlertDescription className="ml-2">
+                  <strong>iPhone/iPad users:</strong> Please follow the manual installation steps below. 
+                  iOS requires installation through Safari's Share menu.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {isInstalled && !isNotificationsEnabled && isIOS && (
+              <Card className="mb-6 border-primary/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bell className="h-5 w-5" />
+                    Enable Notifications
+                  </CardTitle>
+                  <CardDescription>
+                    Stay updated with course announcements and updates
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={handleEnableNotifications} 
+                    className="w-full" 
+                    size="lg"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Enabling...
+                      </>
                     ) : (
-                      <Download className="h-4 w-4" />
+                      <>
+                        <Bell className="mr-2 h-5 w-5" />
+                        Enable Push Notifications
+                      </>
                     )}
-                    <span>{isInstalled ? 'App Installed' : 'Install App'}</span>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {!isIOS && (
+              <Card className="mb-6 border-primary/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Smartphone className="h-5 w-5" />
+                    One-Click Setup
+                  </CardTitle>
+                  <CardDescription>
+                    Install the app and enable notifications in one step
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      {isInstalled ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <Download className="h-4 w-4" />
+                      )}
+                      <span>{isInstalled ? 'App Installed' : 'Install App'}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {isNotificationsEnabled ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <Bell className="h-4 w-4" />
+                      )}
+                      <span>{isNotificationsEnabled ? 'Notifications On' : 'Enable Notifications'}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    {isNotificationsEnabled ? (
-                      <Check className="h-4 w-4 text-green-500" />
+                  <Button 
+                    onClick={handleSetup} 
+                    className="w-full" 
+                    size="lg"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Setting up...
+                      </>
                     ) : (
-                      <Bell className="h-4 w-4" />
+                      <>
+                        <Download className="mr-2 h-5 w-5" />
+                        Complete Setup Now
+                      </>
                     )}
-                    <span>{isNotificationsEnabled ? 'Notifications On' : 'Enable Notifications'}</span>
-                  </div>
-                </div>
-                <Button 
-                  onClick={handleSetup} 
-                  className="w-full" 
-                  size="lg"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Setting up...
-                    </>
-                  ) : (
-                    <>
-                      <Download className="mr-2 h-5 w-5" />
-                      Complete Setup Now
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
 
             <div className="space-y-6">
               <Card>
