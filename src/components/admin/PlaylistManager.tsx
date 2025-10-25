@@ -40,7 +40,15 @@ export const PlaylistManager = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingPlaylist, setEditingPlaylist] = useState<any>(null);
 
-  const [formData, setFormData] = useState({
+  const [createFormData, setCreateFormData] = useState({
+    name: "",
+    description: "",
+    program_slug: "",
+    is_free: true,
+    sort_order: 0,
+  });
+
+  const [editFormData, setEditFormData] = useState({
     name: "",
     description: "",
     program_slug: "",
@@ -71,11 +79,11 @@ export const PlaylistManager = () => {
       const { error } = await supabase
         .from('audio_playlists')
         .insert({
-          name: formData.name,
-          description: formData.description,
-          program_slug: formData.program_slug || null,
-          is_free: formData.is_free,
-          sort_order: formData.sort_order,
+          name: createFormData.name,
+          description: createFormData.description,
+          program_slug: createFormData.program_slug || null,
+          is_free: createFormData.is_free,
+          sort_order: createFormData.sort_order,
         });
 
       if (error) throw error;
@@ -132,8 +140,18 @@ export const PlaylistManager = () => {
     },
   });
 
-  const resetForm = () => {
-    setFormData({
+  const resetCreateForm = () => {
+    setCreateFormData({
+      name: "",
+      description: "",
+      program_slug: "",
+      is_free: true,
+      sort_order: 0,
+    });
+  };
+
+  const resetEditForm = () => {
+    setEditFormData({
       name: "",
       description: "",
       program_slug: "",
@@ -148,13 +166,13 @@ export const PlaylistManager = () => {
   };
 
   const handleOpenCreate = () => {
-    resetForm();
+    resetCreateForm();
     setIsCreateDialogOpen(true);
   };
 
   const handleEdit = (playlist: any) => {
     setEditingPlaylist(playlist);
-    setFormData({
+    setEditFormData({
       name: playlist.name,
       description: playlist.description || "",
       program_slug: playlist.program_slug || "",
@@ -166,12 +184,12 @@ export const PlaylistManager = () => {
 
   const handleCloseCreate = () => {
     setIsCreateDialogOpen(false);
-    resetForm();
+    resetCreateForm();
   };
 
   const handleCloseEdit = () => {
     setIsEditDialogOpen(false);
-    resetForm();
+    resetEditForm();
     setEditingPlaylist(null);
   };
 
@@ -182,16 +200,16 @@ export const PlaylistManager = () => {
     updateMutation.mutate({
       id: editingPlaylist.id,
       updates: {
-        name: formData.name,
-        description: formData.description,
-        program_slug: formData.program_slug || null,
-        is_free: formData.is_free,
-        sort_order: formData.sort_order,
+        name: editFormData.name,
+        description: editFormData.description,
+        program_slug: editFormData.program_slug || null,
+        is_free: editFormData.is_free,
+        sort_order: editFormData.sort_order,
       },
     });
   };
 
-  const PlaylistForm = ({ 
+  const CreateForm = ({ 
     onSubmit, 
     isSubmitting,
     onCancel 
@@ -202,30 +220,30 @@ export const PlaylistManager = () => {
   }) => (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="playlist_name">Playlist/Album Name *</Label>
+        <Label htmlFor="create_playlist_name">Playlist/Album Name *</Label>
         <Input
-          id="playlist_name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          id="create_playlist_name"
+          value={createFormData.name}
+          onChange={(e) => setCreateFormData({ ...createFormData, name: e.target.value })}
           required
         />
       </div>
 
       <div>
-        <Label htmlFor="playlist_description">Description</Label>
+        <Label htmlFor="create_playlist_description">Description</Label>
         <Textarea
-          id="playlist_description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          id="create_playlist_description"
+          value={createFormData.description}
+          onChange={(e) => setCreateFormData({ ...createFormData, description: e.target.value })}
           rows={3}
         />
       </div>
 
       <div>
-        <Label htmlFor="playlist_program">Linked Program (Optional)</Label>
+        <Label htmlFor="create_playlist_program">Linked Program (Optional)</Label>
         <Select
-          value={formData.program_slug || undefined}
-          onValueChange={(value) => setFormData({ ...formData, program_slug: value })}
+          value={createFormData.program_slug || undefined}
+          onValueChange={(value) => setCreateFormData({ ...createFormData, program_slug: value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="None - Free content for everyone" />
@@ -242,20 +260,20 @@ export const PlaylistManager = () => {
 
       <div className="flex items-center space-x-2">
         <Switch
-          id="playlist_is_free"
-          checked={formData.is_free}
-          onCheckedChange={(checked) => setFormData({ ...formData, is_free: checked })}
+          id="create_playlist_is_free"
+          checked={createFormData.is_free}
+          onCheckedChange={(checked) => setCreateFormData({ ...createFormData, is_free: checked })}
         />
-        <Label htmlFor="playlist_is_free">Free for everyone</Label>
+        <Label htmlFor="create_playlist_is_free">Free for everyone</Label>
       </div>
 
       <div>
-        <Label htmlFor="playlist_sort_order">Sort Order</Label>
+        <Label htmlFor="create_playlist_sort_order">Sort Order</Label>
         <Input
-          id="playlist_sort_order"
+          id="create_playlist_sort_order"
           type="number"
-          value={formData.sort_order}
-          onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
+          value={createFormData.sort_order}
+          onChange={(e) => setCreateFormData({ ...createFormData, sort_order: parseInt(e.target.value) || 0 })}
         />
       </div>
 
@@ -271,10 +289,100 @@ export const PlaylistManager = () => {
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {editingPlaylist ? 'Updating...' : 'Creating...'}
+              Creating...
             </>
           ) : (
-            editingPlaylist ? 'Update Playlist' : 'Create Playlist'
+            'Create Playlist'
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+
+  const EditForm = ({ 
+    onSubmit, 
+    isSubmitting,
+    onCancel 
+  }: { 
+    onSubmit: (e: React.FormEvent) => void; 
+    isSubmitting: boolean;
+    onCancel: () => void;
+  }) => (
+    <form onSubmit={onSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="edit_playlist_name">Playlist/Album Name *</Label>
+        <Input
+          id="edit_playlist_name"
+          value={editFormData.name}
+          onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="edit_playlist_description">Description</Label>
+        <Textarea
+          id="edit_playlist_description"
+          value={editFormData.description}
+          onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+          rows={3}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="edit_playlist_program">Linked Program (Optional)</Label>
+        <Select
+          value={editFormData.program_slug || undefined}
+          onValueChange={(value) => setEditFormData({ ...editFormData, program_slug: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="None - Free content for everyone" />
+          </SelectTrigger>
+          <SelectContent>
+            {programs.map((program) => (
+              <SelectItem key={program.slug} value={program.slug}>
+                {program.title}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="edit_playlist_is_free"
+          checked={editFormData.is_free}
+          onCheckedChange={(checked) => setEditFormData({ ...editFormData, is_free: checked })}
+        />
+        <Label htmlFor="edit_playlist_is_free">Free for everyone</Label>
+      </div>
+
+      <div>
+        <Label htmlFor="edit_playlist_sort_order">Sort Order</Label>
+        <Input
+          id="edit_playlist_sort_order"
+          type="number"
+          value={editFormData.sort_order}
+          onChange={(e) => setEditFormData({ ...editFormData, sort_order: parseInt(e.target.value) || 0 })}
+        />
+      </div>
+
+      <div className="flex justify-end gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+        >
+          Cancel
+        </Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Updating...
+            </>
+          ) : (
+            'Update Playlist'
           )}
         </Button>
       </div>
@@ -349,7 +457,7 @@ export const PlaylistManager = () => {
           <DialogHeader>
             <DialogTitle>Create New Playlist</DialogTitle>
           </DialogHeader>
-          <PlaylistForm 
+          <CreateForm 
             onSubmit={handleCreate} 
             isSubmitting={createMutation.isPending}
             onCancel={handleCloseCreate}
@@ -362,7 +470,7 @@ export const PlaylistManager = () => {
           <DialogHeader>
             <DialogTitle>Edit Playlist</DialogTitle>
           </DialogHeader>
-          <PlaylistForm 
+          <EditForm 
             onSubmit={handleUpdate} 
             isSubmitting={updateMutation.isPending}
             onCancel={handleCloseEdit}
