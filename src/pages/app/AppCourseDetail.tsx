@@ -171,28 +171,6 @@ const AppCourseDetail = () => {
                   </div>
                 )}
 
-                {/* Join Live Session */}
-                {round?.google_meet_link ? (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    size="lg"
-                    onClick={() => window.location.href = round.google_meet_link!}
-                  >
-                    <Video className="h-5 w-5 mr-3" />
-                    <div className="flex-1 text-left">
-                      <div className="font-semibold">Join Live Session</div>
-                      <div className="text-xs opacity-70">Google Meet link</div>
-                    </div>
-                    <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
-                  </Button>
-                ) : (
-                  <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
-                    <Video className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Live session link will be shared soon</p>
-                  </div>
-                )}
-
                 {/* Access Course Files */}
                 {round?.google_drive_link ? (
                   <Button
@@ -212,6 +190,28 @@ const AppCourseDetail = () => {
                   <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
                     <FolderOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">Course materials will be shared soon</p>
+                  </div>
+                )}
+
+                {/* Join Live Session */}
+                {round?.google_meet_link ? (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    size="lg"
+                    onClick={() => window.location.href = round.google_meet_link!}
+                  >
+                    <Video className="h-5 w-5 mr-3" />
+                    <div className="flex-1 text-left">
+                      <div className="font-semibold">Join Live Session</div>
+                      <div className="text-xs opacity-70">Google Meet link</div>
+                    </div>
+                    <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
+                  </Button>
+                ) : (
+                  <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
+                    <Video className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Live session link will be shared soon</p>
                   </div>
                 )}
               </CardContent>
