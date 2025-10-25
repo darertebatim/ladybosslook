@@ -84,14 +84,7 @@ export const PlaylistManager = () => {
       toast.success('Playlist created successfully');
       queryClient.invalidateQueries({ queryKey: ['audio-playlists-with-count'] });
       queryClient.invalidateQueries({ queryKey: ['audio-playlists'] });
-      setFormData({
-        name: "",
-        description: "",
-        program_slug: "",
-        is_free: true,
-        sort_order: 0,
-      });
-      setIsCreateDialogOpen(false);
+      handleCloseDialogs();
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to create playlist');
@@ -112,8 +105,7 @@ export const PlaylistManager = () => {
       toast.success('Playlist updated successfully');
       queryClient.invalidateQueries({ queryKey: ['audio-playlists-with-count'] });
       queryClient.invalidateQueries({ queryKey: ['audio-playlists'] });
-      setIsEditDialogOpen(false);
-      setEditingPlaylist(null);
+      handleCloseDialogs();
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to update playlist');
@@ -140,9 +132,24 @@ export const PlaylistManager = () => {
     },
   });
 
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      description: "",
+      program_slug: "",
+      is_free: true,
+      sort_order: 0,
+    });
+  };
+
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     createMutation.mutate();
+  };
+
+  const handleOpenCreate = () => {
+    resetForm();
+    setIsCreateDialogOpen(true);
   };
 
   const handleEdit = (playlist: any) => {
@@ -155,6 +162,13 @@ export const PlaylistManager = () => {
       sort_order: playlist.sort_order,
     });
     setIsEditDialogOpen(true);
+  };
+
+  const handleCloseDialogs = () => {
+    setIsCreateDialogOpen(false);
+    setIsEditDialogOpen(false);
+    resetForm();
+    setEditingPlaylist(null);
   };
 
   const handleUpdate = (e: React.FormEvent) => {
@@ -237,10 +251,7 @@ export const PlaylistManager = () => {
         <Button
           type="button"
           variant="outline"
-          onClick={() => {
-            setIsCreateDialogOpen(false);
-            setIsEditDialogOpen(false);
-          }}
+          onClick={handleCloseDialogs}
         >
           Cancel
         </Button>
@@ -262,7 +273,7 @@ export const PlaylistManager = () => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Playlists/Albums</CardTitle>
-        <Button onClick={() => setIsCreateDialogOpen(true)} size="sm">
+        <Button onClick={handleOpenCreate} size="sm">
           <Plus className="mr-2 h-4 w-4" />
           New Playlist
         </Button>
@@ -321,7 +332,7 @@ export const PlaylistManager = () => {
         </Table>
       </CardContent>
 
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+      <Dialog open={isCreateDialogOpen} onOpenChange={(open) => !open && handleCloseDialogs()}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Playlist</DialogTitle>
@@ -330,7 +341,7 @@ export const PlaylistManager = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      <Dialog open={isEditDialogOpen} onOpenChange={(open) => !open && handleCloseDialogs()}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Playlist</DialogTitle>
