@@ -11,14 +11,14 @@ export function QuickActions() {
       icon: BookOpen,
       label: "Browse Courses",
       description: "Explore all available programs",
-      action: () => navigate("/#programs"),
+      action: () => navigate("/programs"),
       color: "text-blue-600"
     },
     {
       icon: Calendar,
       label: "Book Consultation",
-      description: "Schedule a free call",
-      action: () => window.location.href = "https://calendar.app.google/kEWxSqUkm27SZHdk7",
+      description: "1-on-1 coaching session",
+      action: () => navigate("/one"),
       color: "text-green-600"
     },
     {
@@ -32,7 +32,7 @@ export function QuickActions() {
       icon: GraduationCap,
       label: "My Events",
       description: "View upcoming events",
-      action: () => navigate("/"),
+      action: () => navigate("/events"),
       color: "text-orange-600"
     }
   ];
