@@ -33,6 +33,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { PlaylistManager } from "./PlaylistManager";
 
 export const AudioManager = () => {
   const queryClient = useQueryClient();
@@ -320,6 +321,8 @@ export const AudioManager = () => {
 
   return (
     <div className="space-y-6">
+      <PlaylistManager />
+      
       <Card>
         <CardHeader>
           <CardTitle>Upload New Audio</CardTitle>
