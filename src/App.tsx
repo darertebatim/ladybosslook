@@ -12,6 +12,8 @@ import AppCourses from "@/pages/app/AppCourses";
 import AppCourseDetail from "@/pages/app/AppCourseDetail";
 import AppProfile from "@/pages/app/AppProfile";
 import AppInstall from "@/pages/app/AppInstall";
+import AppPlayer from "@/pages/app/AppPlayer";
+import AppAudioPlayer from "@/pages/app/AppAudioPlayer";
 import Programs from "./pages/Programs";
 import About from "./pages/About";
 import Admin from "./pages/Admin";
@@ -100,6 +102,8 @@ const App = () => (
               <Route path="home" element={<AppHome />} />
               <Route path="courses" element={<AppCourses />} />
               <Route path="course/:slug" element={<AppCourseDetail />} />
+              <Route path="player" element={<AppPlayer />} />
+              <Route path="player/:audioId" element={<AppAudioPlayer />} />
               <Route path="profile" element={<AppProfile />} />
             </Route>
             

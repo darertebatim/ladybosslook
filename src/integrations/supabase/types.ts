@@ -58,6 +58,177 @@ export type Database = {
           },
         ]
       }
+      audio_content: {
+        Row: {
+          category: Database["public"]["Enums"]["audio_category"]
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          duration_seconds: number
+          file_size_mb: number | null
+          file_url: string
+          id: string
+          is_free: boolean
+          metadata: Json | null
+          program_slug: string | null
+          published_at: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["audio_category"]
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds: number
+          file_size_mb?: number | null
+          file_url: string
+          id?: string
+          is_free?: boolean
+          metadata?: Json | null
+          program_slug?: string | null
+          published_at?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["audio_category"]
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number
+          file_size_mb?: number | null
+          file_url?: string
+          id?: string
+          is_free?: boolean
+          metadata?: Json | null
+          program_slug?: string | null
+          published_at?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      audio_playlist_items: {
+        Row: {
+          audio_id: string
+          created_at: string
+          id: string
+          playlist_id: string
+          sort_order: number
+        }
+        Insert: {
+          audio_id: string
+          created_at?: string
+          id?: string
+          playlist_id: string
+          sort_order?: number
+        }
+        Update: {
+          audio_id?: string
+          created_at?: string
+          id?: string
+          playlist_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audio_playlist_items_audio_id_fkey"
+            columns: ["audio_id"]
+            isOneToOne: false
+            referencedRelation: "audio_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audio_playlist_items_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "audio_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audio_playlists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_free: boolean
+          name: string
+          program_slug: string | null
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_free?: boolean
+          name: string
+          program_slug?: string | null
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_free?: boolean
+          name?: string
+          program_slug?: string | null
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      audio_progress: {
+        Row: {
+          audio_id: string
+          completed: boolean
+          created_at: string
+          current_position_seconds: number
+          id: string
+          last_played_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_id: string
+          completed?: boolean
+          created_at?: string
+          current_position_seconds?: number
+          id?: string
+          last_played_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_id?: string
+          completed?: boolean
+          created_at?: string
+          current_position_seconds?: number
+          id?: string
+          last_played_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audio_progress_audio_id_fkey"
+            columns: ["audio_id"]
+            isOneToOne: false
+            referencedRelation: "audio_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audio_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_enrollments: {
         Row: {
           course_name: string
@@ -607,6 +778,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      audio_category: "audiobook" | "course_supplement" | "podcast"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -735,6 +907,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      audio_category: ["audiobook", "course_supplement", "podcast"],
     },
   },
 } as const

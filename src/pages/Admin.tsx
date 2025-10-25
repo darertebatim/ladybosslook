@@ -24,6 +24,7 @@ import { ProgramRoundsManager } from '@/components/admin/ProgramRoundsManager';
 import { LeadsManager } from '@/components/admin/LeadsManager';
 import SecurityAuditLog from '@/components/SecurityAuditLog';
 import { usePrograms } from '@/hooks/usePrograms';
+import { AudioManager } from '@/components/admin/AudioManager';
 
 interface CourseStats {
   course_name: string;
@@ -134,30 +135,34 @@ const Admin = () => {
           </div>
 
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-6 mb-6">
+            <TabsList className="grid w-full grid-cols-7 mb-6">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4" />
-                <span>Overview</span>
+                <span className="hidden sm:inline">Overview</span>
               </TabsTrigger>
               <TabsTrigger value="leads" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                <span>Users</span>
+                <span className="hidden sm:inline">Users</span>
               </TabsTrigger>
               <TabsTrigger value="users" className="flex items-center gap-2">
                 <GraduationCap className="h-4 w-4" />
-                <span>Enrollment</span>
+                <span className="hidden sm:inline">Enrollment</span>
+              </TabsTrigger>
+              <TabsTrigger value="audio" className="flex items-center gap-2">
+                <Send className="h-4 w-4" />
+                <span className="hidden sm:inline">Audio</span>
               </TabsTrigger>
               <TabsTrigger value="communications" className="flex items-center gap-2">
                 <Send className="h-4 w-4" />
-                <span>Communications</span>
+                <span className="hidden sm:inline">Comms</span>
               </TabsTrigger>
               <TabsTrigger value="programs" className="flex items-center gap-2">
                 <UserCog className="h-4 w-4" />
-                <span>Programs</span>
+                <span className="hidden sm:inline">Programs</span>
               </TabsTrigger>
               <TabsTrigger value="system" className="flex items-center gap-2">
                 <Shield className="h-4 w-4" />
-                <span>System</span>
+                <span className="hidden sm:inline">System</span>
               </TabsTrigger>
             </TabsList>
 
@@ -340,7 +345,12 @@ const Admin = () => {
               <UserCreditsManager />
             </TabsContent>
 
-            {/* Tab 4: Communications */}
+            {/* Tab 4: Audio Management */}
+            <TabsContent value="audio" className="space-y-6">
+              <AudioManager />
+            </TabsContent>
+
+            {/* Tab 5: Communications */}
             <TabsContent value="communications" className="space-y-6">
               <AnnouncementCreator />
               <AnnouncementsList />
@@ -349,7 +359,7 @@ const Admin = () => {
               <EmailLogsViewer />
             </TabsContent>
 
-            {/* Tab 5: Programs */}
+            {/* Tab 6: Programs */}
             <TabsContent value="programs" className="space-y-6">
               <Tabs defaultValue="catalog" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
@@ -365,7 +375,7 @@ const Admin = () => {
               </Tabs>
             </TabsContent>
 
-            {/* Tab 6: System & Security */}
+            {/* Tab 7: System & Security */}
             <TabsContent value="system" className="space-y-6">
               <Card>
                 <CardHeader>
