@@ -25,7 +25,7 @@ export function QuickActions() {
       icon: MessageCircle,
       label: "Get Support",
       description: "Contact us on WhatsApp",
-      action: () => window.location.href = "https://wa.me/19292603007",
+      action: () => window.location.href = "https://wa.me/6265028589",
       color: "text-purple-600"
     },
     {
