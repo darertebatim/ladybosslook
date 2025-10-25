@@ -38,6 +38,7 @@ interface PlaylistFormData {
   description: string;
   program_slug: string;
   is_free: boolean;
+  category: 'audiobook' | 'course_supplement' | 'podcast';
   sort_order: number;
 }
 
@@ -79,6 +80,25 @@ const PlaylistForm = ({
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         rows={3}
       />
+    </div>
+
+    <div>
+      <Label htmlFor="playlist_category">Category *</Label>
+      <Select
+        value={formData.category}
+        onValueChange={(value: 'audiobook' | 'course_supplement' | 'podcast') => 
+          setFormData({ ...formData, category: value })
+        }
+      >
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="audiobook">Audiobook</SelectItem>
+          <SelectItem value="course_supplement">Course Supplement</SelectItem>
+          <SelectItem value="podcast">Podcast</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
 
     <div>
@@ -149,6 +169,7 @@ export const PlaylistManager = () => {
     description: "",
     program_slug: "",
     is_free: true,
+    category: "audiobook" as 'audiobook' | 'course_supplement' | 'podcast',
     sort_order: 0,
   });
 
@@ -157,6 +178,7 @@ export const PlaylistManager = () => {
     description: "",
     program_slug: "",
     is_free: true,
+    category: "audiobook" as 'audiobook' | 'course_supplement' | 'podcast',
     sort_order: 0,
   });
 
@@ -185,6 +207,7 @@ export const PlaylistManager = () => {
         .insert({
           name: createFormData.name,
           description: createFormData.description,
+          category: createFormData.category,
           program_slug: createFormData.program_slug || null,
           is_free: createFormData.is_free,
           sort_order: createFormData.sort_order,
@@ -250,6 +273,7 @@ export const PlaylistManager = () => {
       description: "",
       program_slug: "",
       is_free: true,
+      category: "audiobook",
       sort_order: 0,
     });
   };
@@ -260,6 +284,7 @@ export const PlaylistManager = () => {
       description: "",
       program_slug: "",
       is_free: true,
+      category: "audiobook",
       sort_order: 0,
     });
   };
@@ -281,6 +306,7 @@ export const PlaylistManager = () => {
       description: playlist.description || "",
       program_slug: playlist.program_slug || "",
       is_free: playlist.is_free,
+      category: playlist.category || "audiobook",
       sort_order: playlist.sort_order,
     });
     setIsEditDialogOpen(true);
@@ -306,6 +332,7 @@ export const PlaylistManager = () => {
       updates: {
         name: editFormData.name,
         description: editFormData.description,
+        category: editFormData.category,
         program_slug: editFormData.program_slug || null,
         is_free: editFormData.is_free,
         sort_order: editFormData.sort_order,

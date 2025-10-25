@@ -47,9 +47,6 @@ export const AudioManager = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    category: "podcast" as "audiobook" | "course_supplement" | "podcast",
-    program_slug: "",
-    is_free: true,
     sort_order: 0,
     playlist_id: "",
   });
@@ -141,9 +138,9 @@ export const AudioManager = () => {
           duration_seconds: duration,
           file_size_mb: audioFile.size / (1024 * 1024),
           cover_image_url: coverUrl,
-          category: formData.category,
-          program_slug: formData.program_slug || null,
-          is_free: formData.is_free,
+          category: 'podcast', // Deprecated: now managed at playlist level
+          program_slug: null,
+          is_free: true,
           sort_order: formData.sort_order,
           published_at: new Date().toISOString(),
         })
@@ -172,9 +169,6 @@ export const AudioManager = () => {
       setFormData({
         title: "",
         description: "",
-        category: "podcast",
-        program_slug: "",
-        is_free: true,
         sort_order: 0,
         playlist_id: "",
       });
@@ -282,9 +276,6 @@ export const AudioManager = () => {
     setFormData({
       title: audio.title,
       description: audio.description || "",
-      category: audio.category,
-      program_slug: audio.program_slug || "",
-      is_free: audio.is_free,
       sort_order: audio.sort_order,
       playlist_id: audio.audio_playlist_items?.[0]?.playlist_id || "",
     });
@@ -300,9 +291,6 @@ export const AudioManager = () => {
       updates: {
         title: formData.title,
         description: formData.description,
-        category: formData.category,
-        program_slug: formData.program_slug || null,
-        is_free: formData.is_free,
         sort_order: formData.sort_order,
       },
       playlistId: formData.playlist_id,
@@ -349,49 +337,8 @@ export const AudioManager = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="category">Category *</Label>
-                <Select
-                  value={formData.category}
-                  onValueChange={(value: any) => setFormData({ ...formData, category: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="audiobook">Audiobook</SelectItem>
-                    <SelectItem value="course_supplement">Course Audio</SelectItem>
-                    <SelectItem value="podcast">Podcast</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="program">Linked Program (Optional)</Label>
-                <Select
-                  value={formData.program_slug || undefined}
-                  onValueChange={(value) => setFormData({ ...formData, program_slug: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="None - Free content for everyone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {programs.map((program) => (
-                      <SelectItem key={program.slug} value={program.slug}>
-                        {program.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Leave unselected for free content accessible to everyone
-                </p>
-              </div>
-            </div>
-
             <div>
-              <Label htmlFor="playlist">Album/Playlist (Optional)</Label>
+              <Label htmlFor="playlist">Album/Playlist *</Label>
               <Select
                 value={formData.playlist_id || undefined}
                 onValueChange={(value) => setFormData({ ...formData, playlist_id: value })}
@@ -407,15 +354,9 @@ export const AudioManager = () => {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="is_free"
-                checked={formData.is_free}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_free: checked })}
-              />
-              <Label htmlFor="is_free">Free for everyone</Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Access control and category are managed at the playlist level
+              </p>
             </div>
 
             <div>
@@ -493,11 +434,9 @@ export const AudioManager = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Title</TableHead>
-                <TableHead>Category</TableHead>
                 <TableHead>Album/Playlist</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>Size</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -505,12 +444,6 @@ export const AudioManager = () => {
               {audioContent?.map((audio) => (
                 <TableRow key={audio.id}>
                   <TableCell className="font-medium">{audio.title}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {audio.category === 'audiobook' ? 'Audiobook' : 
-                       audio.category === 'course_supplement' ? 'Course' : 'Podcast'}
-                    </Badge>
-                  </TableCell>
                   <TableCell>
                     {audio.audio_playlist_items?.[0]?.audio_playlists?.name ? (
                       <Badge variant="secondary">
@@ -522,13 +455,6 @@ export const AudioManager = () => {
                   </TableCell>
                   <TableCell>{formatDuration(audio.duration_seconds)}</TableCell>
                   <TableCell>{formatFileSize(audio.file_size_mb || 0)}</TableCell>
-                  <TableCell>
-                    {audio.is_free ? (
-                      <Badge variant="secondary">Free</Badge>
-                    ) : (
-                      <Badge>Premium</Badge>
-                    )}
-                  </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
@@ -580,46 +506,8 @@ export const AudioManager = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="edit_category">Category *</Label>
-                <Select
-                  value={formData.category}
-                  onValueChange={(value: any) => setFormData({ ...formData, category: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="audiobook">Audiobook</SelectItem>
-                    <SelectItem value="course_supplement">Course Audio</SelectItem>
-                    <SelectItem value="podcast">Podcast</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="edit_program">Linked Program (Optional)</Label>
-                <Select
-                  value={formData.program_slug || undefined}
-                  onValueChange={(value) => setFormData({ ...formData, program_slug: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="None - Free content for everyone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {programs.map((program) => (
-                      <SelectItem key={program.slug} value={program.slug}>
-                        {program.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
             <div>
-              <Label htmlFor="edit_playlist">Album/Playlist (Optional)</Label>
+              <Label htmlFor="edit_playlist">Album/Playlist *</Label>
               <Select
                 value={formData.playlist_id || undefined}
                 onValueChange={(value) => setFormData({ ...formData, playlist_id: value })}
@@ -635,15 +523,9 @@ export const AudioManager = () => {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="edit_is_free"
-                checked={formData.is_free}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_free: checked })}
-              />
-              <Label htmlFor="edit_is_free">Free for everyone</Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Access control and category are managed at the playlist level
+              </p>
             </div>
 
             <div>
