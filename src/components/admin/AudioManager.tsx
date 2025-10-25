@@ -14,7 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Trash2, Upload, RefreshCw } from "lucide-react";
+import { Loader2, Trash2, Upload, RefreshCw, Pencil } from "lucide-react";
 import { usePrograms } from "@/hooks/usePrograms";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -26,6 +26,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export const AudioManager = () => {
   const queryClient = useQueryClient();
@@ -33,6 +40,8 @@ export const AudioManager = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [editingAudio, setEditingAudio] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -41,15 +50,36 @@ export const AudioManager = () => {
     program_slug: "",
     is_free: true,
     sort_order: 0,
+    playlist_id: "",
   });
 
-  // Fetch existing audio content
+  // Fetch playlists
+  const { data: playlists } = useQuery({
+    queryKey: ['audio-playlists'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlists')
+        .select('*')
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch existing audio content with playlist info
   const { data: audioContent } = useQuery({
     queryKey: ['admin-audio-content'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('audio_content')
-        .select('*')
+        .select(`
+          *,
+          audio_playlist_items(
+            playlist_id,
+            audio_playlists(name)
+          )
+        `)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -101,7 +131,7 @@ export const AudioManager = () => {
       const duration = Math.floor(audio.duration);
 
       // Create database record
-      const { error: dbError } = await supabase
+      const { data: newAudio, error: dbError } = await supabase
         .from('audio_content')
         .insert({
           title: formData.title,
@@ -115,13 +145,29 @@ export const AudioManager = () => {
           is_free: formData.is_free,
           sort_order: formData.sort_order,
           published_at: new Date().toISOString(),
-        });
+        })
+        .select()
+        .single();
 
       if (dbError) throw dbError;
+
+      // Add to playlist if selected
+      if (formData.playlist_id && newAudio) {
+        const { error: playlistError } = await supabase
+          .from('audio_playlist_items')
+          .insert({
+            playlist_id: formData.playlist_id,
+            audio_id: newAudio.id,
+            sort_order: 0,
+          });
+
+        if (playlistError) throw playlistError;
+      }
     },
     onSuccess: () => {
       toast.success('Audio uploaded successfully');
       queryClient.invalidateQueries({ queryKey: ['admin-audio-content'] });
+      queryClient.invalidateQueries({ queryKey: ['audio-playlists'] });
       setFormData({
         title: "",
         description: "",
@@ -129,6 +175,7 @@ export const AudioManager = () => {
         program_slug: "",
         is_free: true,
         sort_order: 0,
+        playlist_id: "",
       });
       setAudioFile(null);
       setCoverFile(null);
@@ -156,6 +203,50 @@ export const AudioManager = () => {
     },
   });
 
+  // Update audio mutation
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, updates, playlistId }: { id: string; updates: any; playlistId?: string }) => {
+      const { error: updateError } = await supabase
+        .from('audio_content')
+        .update(updates)
+        .eq('id', id);
+
+      if (updateError) throw updateError;
+
+      // Handle playlist assignment
+      if (playlistId !== undefined) {
+        // First remove existing playlist assignments
+        await supabase
+          .from('audio_playlist_items')
+          .delete()
+          .eq('audio_id', id);
+
+        // Then add new assignment if playlist selected
+        if (playlistId) {
+          const { error: playlistError } = await supabase
+            .from('audio_playlist_items')
+            .insert({
+              playlist_id: playlistId,
+              audio_id: id,
+              sort_order: 0,
+            });
+
+          if (playlistError) throw playlistError;
+        }
+      }
+    },
+    onSuccess: () => {
+      toast.success('Audio updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['admin-audio-content'] });
+      queryClient.invalidateQueries({ queryKey: ['audio-playlists'] });
+      setIsEditDialogOpen(false);
+      setEditingAudio(null);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update audio');
+    },
+  });
+
   // Delete audio mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -169,6 +260,7 @@ export const AudioManager = () => {
     onSuccess: () => {
       toast.success('Audio deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['admin-audio-content'] });
+      queryClient.invalidateQueries({ queryKey: ['audio-playlists'] });
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to delete audio');
@@ -182,6 +274,38 @@ export const AudioManager = () => {
       return;
     }
     uploadMutation.mutate();
+  };
+
+  const handleEdit = (audio: any) => {
+    setEditingAudio(audio);
+    setFormData({
+      title: audio.title,
+      description: audio.description || "",
+      category: audio.category,
+      program_slug: audio.program_slug || "",
+      is_free: audio.is_free,
+      sort_order: audio.sort_order,
+      playlist_id: audio.audio_playlist_items?.[0]?.playlist_id || "",
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingAudio) return;
+
+    updateMutation.mutate({
+      id: editingAudio.id,
+      updates: {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        program_slug: formData.program_slug || null,
+        is_free: formData.is_free,
+        sort_order: formData.sort_order,
+      },
+      playlistId: formData.playlist_id,
+    });
   };
 
   const formatFileSize = (mb: number) => {
@@ -263,6 +387,25 @@ export const AudioManager = () => {
               </div>
             </div>
 
+            <div>
+              <Label htmlFor="playlist">Album/Playlist (Optional)</Label>
+              <Select
+                value={formData.playlist_id || undefined}
+                onValueChange={(value) => setFormData({ ...formData, playlist_id: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a playlist" />
+                </SelectTrigger>
+                <SelectContent>
+                  {playlists?.map((playlist) => (
+                    <SelectItem key={playlist.id} value={playlist.id}>
+                      {playlist.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="flex items-center space-x-2">
               <Switch
                 id="is_free"
@@ -338,6 +481,7 @@ export const AudioManager = () => {
               <TableRow>
                 <TableHead>Title</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Album/Playlist</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>Size</TableHead>
                 <TableHead>Status</TableHead>
@@ -354,6 +498,15 @@ export const AudioManager = () => {
                        audio.category === 'course_supplement' ? 'Course' : 'Podcast'}
                     </Badge>
                   </TableCell>
+                  <TableCell>
+                    {audio.audio_playlist_items?.[0]?.audio_playlists?.name ? (
+                      <Badge variant="secondary">
+                        {audio.audio_playlist_items[0].audio_playlists.name}
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">No playlist</span>
+                    )}
+                  </TableCell>
                   <TableCell>{formatDuration(audio.duration_seconds)}</TableCell>
                   <TableCell>{formatFileSize(audio.file_size_mb || 0)}</TableCell>
                   <TableCell>
@@ -364,13 +517,22 @@ export const AudioManager = () => {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => deleteMutation.mutate(audio.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(audio)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteMutation.mutate(audio.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -378,6 +540,121 @@ export const AudioManager = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Audio Content</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleUpdate} className="space-y-4">
+            <div>
+              <Label htmlFor="edit_title">Title *</Label>
+              <Input
+                id="edit_title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="edit_description">Description</Label>
+              <Textarea
+                id="edit_description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={3}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit_category">Category *</Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value: any) => setFormData({ ...formData, category: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="audiobook">Audiobook</SelectItem>
+                    <SelectItem value="course_supplement">Course Audio</SelectItem>
+                    <SelectItem value="podcast">Podcast</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="edit_program">Linked Program (Optional)</Label>
+                <Select
+                  value={formData.program_slug || undefined}
+                  onValueChange={(value) => setFormData({ ...formData, program_slug: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="None - Free content for everyone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {programs.map((program) => (
+                      <SelectItem key={program.slug} value={program.slug}>
+                        {program.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="edit_playlist">Album/Playlist (Optional)</Label>
+              <Select
+                value={formData.playlist_id || undefined}
+                onValueChange={(value) => setFormData({ ...formData, playlist_id: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a playlist" />
+                </SelectTrigger>
+                <SelectContent>
+                  {playlists?.map((playlist) => (
+                    <SelectItem key={playlist.id} value={playlist.id}>
+                      {playlist.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="edit_is_free"
+                checked={formData.is_free}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_free: checked })}
+              />
+              <Label htmlFor="edit_is_free">Free for everyone</Label>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={updateMutation.isPending}>
+                {updateMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  'Update Audio'
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
