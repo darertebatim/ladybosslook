@@ -99,12 +99,37 @@ export default function AppAudioPlayer() {
       saveProgressMutation.mutate(audio.duration);
     };
     const handleError = (e: Event) => {
-      console.error('Audio error:', e);
-      toast.error('Failed to load audio file');
+      const target = e.target as HTMLAudioElement;
+      console.error('Audio error:', {
+        error: target.error,
+        networkState: target.networkState,
+        readyState: target.readyState,
+        src: target.src
+      });
+      
+      let errorMessage = 'Failed to load audio file';
+      if (target.error) {
+        switch (target.error.code) {
+          case MediaError.MEDIA_ERR_ABORTED:
+            errorMessage = 'Audio loading aborted';
+            break;
+          case MediaError.MEDIA_ERR_NETWORK:
+            errorMessage = 'Network error loading audio';
+            break;
+          case MediaError.MEDIA_ERR_DECODE:
+            errorMessage = 'Audio file corrupted';
+            break;
+          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            errorMessage = 'Audio format not supported or file not accessible';
+            break;
+        }
+      }
+      
+      toast.error(errorMessage);
       setIsPlaying(false);
     };
     const handleLoadedMetadata = () => {
-      console.log('Audio loaded, duration:', audio.duration);
+      console.log('Audio loaded successfully, duration:', audio.duration);
     };
 
     audio.addEventListener('timeupdate', handleTimeUpdate);
