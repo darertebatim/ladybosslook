@@ -33,6 +33,110 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+interface PlaylistFormData {
+  name: string;
+  description: string;
+  program_slug: string;
+  is_free: boolean;
+  sort_order: number;
+}
+
+interface PlaylistFormProps {
+  formData: PlaylistFormData;
+  setFormData: (data: PlaylistFormData) => void;
+  onSubmit: (e: React.FormEvent) => void;
+  onCancel: () => void;
+  isSubmitting: boolean;
+  submitLabel: string;
+  programs: any[];
+}
+
+const PlaylistForm = ({ 
+  formData, 
+  setFormData, 
+  onSubmit, 
+  onCancel, 
+  isSubmitting, 
+  submitLabel,
+  programs 
+}: PlaylistFormProps) => (
+  <form onSubmit={onSubmit} className="space-y-4">
+    <div>
+      <Label htmlFor="playlist_name">Playlist/Album Name *</Label>
+      <Input
+        id="playlist_name"
+        value={formData.name}
+        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        required
+      />
+    </div>
+
+    <div>
+      <Label htmlFor="playlist_description">Description</Label>
+      <Textarea
+        id="playlist_description"
+        value={formData.description}
+        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+        rows={3}
+      />
+    </div>
+
+    <div>
+      <Label htmlFor="playlist_program">Linked Program (Optional)</Label>
+      <Select
+        value={formData.program_slug || undefined}
+        onValueChange={(value) => setFormData({ ...formData, program_slug: value })}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="None - Free content for everyone" />
+        </SelectTrigger>
+        <SelectContent>
+          {programs.map((program) => (
+            <SelectItem key={program.slug} value={program.slug}>
+              {program.title}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+
+    <div className="flex items-center space-x-2">
+      <Switch
+        id="playlist_is_free"
+        checked={formData.is_free}
+        onCheckedChange={(checked) => setFormData({ ...formData, is_free: checked })}
+      />
+      <Label htmlFor="playlist_is_free">Free for everyone</Label>
+    </div>
+
+    <div>
+      <Label htmlFor="playlist_sort_order">Sort Order</Label>
+      <Input
+        id="playlist_sort_order"
+        type="number"
+        value={formData.sort_order}
+        onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
+      />
+    </div>
+
+    <div className="flex justify-end gap-2">
+      <Button type="button" variant="outline" onClick={onCancel}>
+        Cancel
+      </Button>
+      <Button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            {submitLabel}...
+          </>
+        ) : (
+          submitLabel
+        )}
+      </Button>
+    </div>
+  </form>
+);
+
 export const PlaylistManager = () => {
   const queryClient = useQueryClient();
   const { programs } = usePrograms();
@@ -209,186 +313,6 @@ export const PlaylistManager = () => {
     });
   };
 
-  const CreateForm = ({ 
-    onSubmit, 
-    isSubmitting,
-    onCancel 
-  }: { 
-    onSubmit: (e: React.FormEvent) => void; 
-    isSubmitting: boolean;
-    onCancel: () => void;
-  }) => (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div>
-        <Label htmlFor="create_playlist_name">Playlist/Album Name *</Label>
-        <Input
-          id="create_playlist_name"
-          value={createFormData.name}
-          onChange={(e) => setCreateFormData({ ...createFormData, name: e.target.value })}
-          required
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="create_playlist_description">Description</Label>
-        <Textarea
-          id="create_playlist_description"
-          value={createFormData.description}
-          onChange={(e) => setCreateFormData({ ...createFormData, description: e.target.value })}
-          rows={3}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="create_playlist_program">Linked Program (Optional)</Label>
-        <Select
-          value={createFormData.program_slug || undefined}
-          onValueChange={(value) => setCreateFormData({ ...createFormData, program_slug: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="None - Free content for everyone" />
-          </SelectTrigger>
-          <SelectContent>
-            {programs.map((program) => (
-              <SelectItem key={program.slug} value={program.slug}>
-                {program.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <Switch
-          id="create_playlist_is_free"
-          checked={createFormData.is_free}
-          onCheckedChange={(checked) => setCreateFormData({ ...createFormData, is_free: checked })}
-        />
-        <Label htmlFor="create_playlist_is_free">Free for everyone</Label>
-      </div>
-
-      <div>
-        <Label htmlFor="create_playlist_sort_order">Sort Order</Label>
-        <Input
-          id="create_playlist_sort_order"
-          type="number"
-          value={createFormData.sort_order}
-          onChange={(e) => setCreateFormData({ ...createFormData, sort_order: parseInt(e.target.value) || 0 })}
-        />
-      </div>
-
-      <div className="flex justify-end gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating...
-            </>
-          ) : (
-            'Create Playlist'
-          )}
-        </Button>
-      </div>
-    </form>
-  );
-
-  const EditForm = ({ 
-    onSubmit, 
-    isSubmitting,
-    onCancel 
-  }: { 
-    onSubmit: (e: React.FormEvent) => void; 
-    isSubmitting: boolean;
-    onCancel: () => void;
-  }) => (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div>
-        <Label htmlFor="edit_playlist_name">Playlist/Album Name *</Label>
-        <Input
-          id="edit_playlist_name"
-          value={editFormData.name}
-          onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-          required
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="edit_playlist_description">Description</Label>
-        <Textarea
-          id="edit_playlist_description"
-          value={editFormData.description}
-          onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-          rows={3}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="edit_playlist_program">Linked Program (Optional)</Label>
-        <Select
-          value={editFormData.program_slug || undefined}
-          onValueChange={(value) => setEditFormData({ ...editFormData, program_slug: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="None - Free content for everyone" />
-          </SelectTrigger>
-          <SelectContent>
-            {programs.map((program) => (
-              <SelectItem key={program.slug} value={program.slug}>
-                {program.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <Switch
-          id="edit_playlist_is_free"
-          checked={editFormData.is_free}
-          onCheckedChange={(checked) => setEditFormData({ ...editFormData, is_free: checked })}
-        />
-        <Label htmlFor="edit_playlist_is_free">Free for everyone</Label>
-      </div>
-
-      <div>
-        <Label htmlFor="edit_playlist_sort_order">Sort Order</Label>
-        <Input
-          id="edit_playlist_sort_order"
-          type="number"
-          value={editFormData.sort_order}
-          onChange={(e) => setEditFormData({ ...editFormData, sort_order: parseInt(e.target.value) || 0 })}
-        />
-      </div>
-
-      <div className="flex justify-end gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Updating...
-            </>
-          ) : (
-            'Update Playlist'
-          )}
-        </Button>
-      </div>
-    </form>
-  );
-
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -457,10 +381,14 @@ export const PlaylistManager = () => {
           <DialogHeader>
             <DialogTitle>Create New Playlist</DialogTitle>
           </DialogHeader>
-          <CreateForm 
-            onSubmit={handleCreate} 
-            isSubmitting={createMutation.isPending}
+          <PlaylistForm
+            formData={createFormData}
+            setFormData={setCreateFormData}
+            onSubmit={handleCreate}
             onCancel={handleCloseCreate}
+            isSubmitting={createMutation.isPending}
+            submitLabel="Create Playlist"
+            programs={programs}
           />
         </DialogContent>
       </Dialog>
@@ -470,10 +398,14 @@ export const PlaylistManager = () => {
           <DialogHeader>
             <DialogTitle>Edit Playlist</DialogTitle>
           </DialogHeader>
-          <EditForm 
-            onSubmit={handleUpdate} 
-            isSubmitting={updateMutation.isPending}
+          <PlaylistForm
+            formData={editFormData}
+            setFormData={setEditFormData}
+            onSubmit={handleUpdate}
             onCancel={handleCloseEdit}
+            isSubmitting={updateMutation.isPending}
+            submitLabel="Update Playlist"
+            programs={programs}
           />
         </DialogContent>
       </Dialog>
