@@ -14,7 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Trash2, Upload } from "lucide-react";
+import { Loader2, Trash2, Upload, RefreshCw } from "lucide-react";
 import { usePrograms } from "@/hooks/usePrograms";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -137,6 +137,22 @@ export const AudioManager = () => {
     onError: (error: any) => {
       toast.error(error.message || 'Failed to upload audio');
       setIsUploading(false);
+    },
+  });
+
+  // Sync storage files mutation
+  const syncMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('sync-audio-files');
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || 'Storage synced successfully');
+      queryClient.invalidateQueries({ queryKey: ['admin-audio-content'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to sync storage');
     },
   });
 
@@ -295,8 +311,26 @@ export const AudioManager = () => {
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Existing Audio Content</CardTitle>
+          <Button
+            onClick={() => syncMutation.mutate()}
+            disabled={syncMutation.isPending}
+            variant="outline"
+            size="sm"
+          >
+            {syncMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Syncing...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Sync Storage Files
+              </>
+            )}
+          </Button>
         </CardHeader>
         <CardContent>
           <Table>
