@@ -18,14 +18,14 @@ export function QuickActions() {
       icon: Calendar,
       label: "Book Consultation",
       description: "Schedule a free call",
-      action: () => window.open("https://calendar.app.google/kEWxSqUkm27SZHdk7", "_blank"),
+      action: () => window.location.href = "https://calendar.app.google/kEWxSqUkm27SZHdk7",
       color: "text-green-600"
     },
     {
       icon: MessageCircle,
       label: "Get Support",
       description: "Contact us on WhatsApp",
-      action: () => window.open("https://wa.me/19292603007", "_blank"),
+      action: () => window.location.href = "https://wa.me/19292603007",
       color: "text-purple-600"
     },
     {

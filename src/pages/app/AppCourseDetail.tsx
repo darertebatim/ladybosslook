@@ -93,8 +93,7 @@ const AppCourseDetail = () => {
     const whatsappNumber = round.whatsapp_support_number.replace(/[^0-9]/g, '');
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     
-    window.open(whatsappUrl, '_blank');
-    toast.success('Opening WhatsApp...');
+    window.location.href = whatsappUrl;
   };
 
   return (
@@ -178,7 +177,7 @@ const AppCourseDetail = () => {
                     variant="outline"
                     className="w-full justify-start"
                     size="lg"
-                    onClick={() => window.open(round.google_meet_link!, '_blank')}
+                    onClick={() => window.location.href = round.google_meet_link!}
                   >
                     <Video className="h-5 w-5 mr-3" />
                     <div className="flex-1 text-left">
@@ -200,7 +199,7 @@ const AppCourseDetail = () => {
                     variant="outline"
                     className="w-full justify-start"
                     size="lg"
-                    onClick={() => window.open(round.google_drive_link!, '_blank')}
+                    onClick={() => window.location.href = round.google_drive_link!}
                   >
                     <FolderOpen className="h-5 w-5 mr-3" />
                     <div className="flex-1 text-left">
