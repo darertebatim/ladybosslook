@@ -419,6 +419,16 @@ export const AudioManager = () => {
             </div>
 
             <div>
+              <Label htmlFor="sort_order">Sort Order</Label>
+              <Input
+                id="sort_order"
+                type="number"
+                value={formData.sort_order}
+                onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
+              />
+            </div>
+
+            <div>
               <Label htmlFor="audio_file">Audio File * (MP3, M4A)</Label>
               <Input
                 id="audio_file"
@@ -634,6 +644,16 @@ export const AudioManager = () => {
                 onCheckedChange={(checked) => setFormData({ ...formData, is_free: checked })}
               />
               <Label htmlFor="edit_is_free">Free for everyone</Label>
+            </div>
+
+            <div>
+              <Label htmlFor="edit_sort_order">Sort Order</Label>
+              <Input
+                id="edit_sort_order"
+                type="number"
+                value={formData.sort_order}
+                onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
+              />
             </div>
 
             <div className="flex justify-end gap-2">
