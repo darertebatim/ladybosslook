@@ -332,7 +332,7 @@ const AppProfile = () => {
                   return;
                 }
                 const whatsappMessage = `Subject: ${contactSubject}\n\nMessage:\n${contactMessage}`;
-                window.location.href = `https://wa.me/6265028589?text=${encodeURIComponent(whatsappMessage)}`;
+                window.location.href = `https://wa.me/16265028589?text=${encodeURIComponent(whatsappMessage)}`;
               }}
             >
               <MessageCircle className="mr-2 h-4 w-4" />
