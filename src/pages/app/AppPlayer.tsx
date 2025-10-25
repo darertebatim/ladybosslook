@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import { AudioCard } from "@/components/audio/AudioCard";
+import { Search, Clock } from "lucide-react";
+import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,15 +11,36 @@ export default function AppPlayer() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState<"all" | "in_progress" | "completed">("all");
 
-  // Fetch audio content
-  const { data: audioContent, isLoading } = useQuery({
-    queryKey: ['audio-content'],
+  // Fetch playlists
+  const { data: playlists, isLoading } = useQuery({
+    queryKey: ['audio-playlists'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('audio_content')
+        .from('audio_playlists')
         .select('*')
-        .order('sort_order', { ascending: true })
-        .order('created_at', { ascending: false });
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch all playlist items with tracks
+  const { data: playlistItems } = useQuery({
+    queryKey: ['playlist-items'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlist_items')
+        .select(`
+          playlist_id,
+          audio_id,
+          audio_content (
+            id,
+            duration_seconds,
+            cover_image_url
+          )
+        `)
+        .order('sort_order', { ascending: true });
       
       if (error) throw error;
       return data;
@@ -61,44 +82,72 @@ export default function AppPlayer() {
     },
   });
 
-  const getAudioProgress = (audioId: string) => {
-    const progress = progressData?.find(p => p.audio_id === audioId);
-    if (!progress) return 0;
-    const percentage = (progress.current_position_seconds / (audioContent?.find(a => a.id === audioId)?.duration_seconds || 1)) * 100;
-    return Math.min(percentage, 100);
+  const getPlaylistStats = (playlistId: string) => {
+    const items = playlistItems?.filter(item => item.playlist_id === playlistId) || [];
+    const trackCount = items.length;
+    const totalDuration = items.reduce((sum, item) => sum + (item.audio_content?.duration_seconds || 0), 0);
+    
+    const completedTracks = items.filter(item => {
+      const progress = progressData?.find(p => p.audio_id === item.audio_id);
+      return progress?.completed || false;
+    }).length;
+
+    const coverImage = items[0]?.audio_content?.cover_image_url;
+
+    return { trackCount, totalDuration, completedTracks, coverImage };
   };
 
-  const isAudioLocked = (audio: any) => {
-    if (audio.is_free) return false;
-    if (!audio.program_slug) return false;
-    return !enrollments?.includes(audio.program_slug);
+  const isPlaylistLocked = (playlist: any) => {
+    if (playlist.is_free) return false;
+    if (!playlist.program_slug) return false;
+    return !enrollments?.includes(playlist.program_slug);
   };
 
-  const filterAudioByProgress = (audio: any) => {
-    const progress = getAudioProgress(audio.id);
+  const filterPlaylistByProgress = (playlist: any) => {
+    const stats = getPlaylistStats(playlist.id);
+    const progress = stats.trackCount > 0 ? (stats.completedTracks / stats.trackCount) * 100 : 0;
+    
     if (filterTab === "in_progress") return progress > 0 && progress < 100;
     if (filterTab === "completed") return progress >= 100;
     return true;
   };
 
-  const filterAudioBySearch = (audio: any) => {
+  const filterPlaylistBySearch = (playlist: any) => {
     if (!searchQuery) return true;
-    return audio.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           audio.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    return playlist.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+           playlist.description?.toLowerCase().includes(searchQuery.toLowerCase());
   };
 
   const filterByCategory = (category: string) => {
-    return audioContent
-      ?.filter(a => a.category === category)
-      .filter(filterAudioBySearch)
-      .filter(filterAudioByProgress) || [];
+    return playlists
+      ?.filter(p => p.category === category)
+      .filter(filterPlaylistBySearch)
+      .filter(filterPlaylistByProgress) || [];
   };
 
-  const audiobooks = filterByCategory('audiobook');
-  const courseAudio = filterByCategory('course_supplement');
-  const podcasts = filterByCategory('podcast');
+  // Sort playlists: in-progress first, then others
+  const sortPlaylists = (playlistList: any[]) => {
+    return [...playlistList].sort((a, b) => {
+      const statsA = getPlaylistStats(a.id);
+      const statsB = getPlaylistStats(b.id);
+      
+      const progressA = statsA.trackCount > 0 ? (statsA.completedTracks / statsA.trackCount) * 100 : 0;
+      const progressB = statsB.trackCount > 0 ? (statsB.completedTracks / statsB.trackCount) * 100 : 0;
+      
+      const inProgressA = progressA > 0 && progressA < 100;
+      const inProgressB = progressB > 0 && progressB < 100;
+      
+      if (inProgressA && !inProgressB) return -1;
+      if (!inProgressA && inProgressB) return 1;
+      return 0;
+    });
+  };
 
-  const renderAudioGrid = (items: any[]) => {
+  const audiobooks = sortPlaylists(filterByCategory('audiobook'));
+  const coursePlaylists = sortPlaylists(filterByCategory('course_supplement'));
+  const podcasts = sortPlaylists(filterByCategory('podcast'));
+
+  const renderPlaylistGrid = (items: any[]) => {
     if (isLoading) {
       return (
         <div className="grid grid-cols-2 gap-4">
@@ -112,34 +161,62 @@ export default function AppPlayer() {
     if (items.length === 0) {
       return (
         <div className="text-center py-12 text-muted-foreground">
-          <p>No audio content found</p>
+          <p>No playlists found</p>
         </div>
       );
     }
 
     return (
       <div className="grid grid-cols-2 gap-4">
-        {items.map((audio) => (
-          <AudioCard
-            key={audio.id}
-            id={audio.id}
-            title={audio.title}
-            description={audio.description}
-            coverImageUrl={audio.cover_image_url}
-            durationSeconds={audio.duration_seconds}
-            isFree={audio.is_free}
-            isLocked={isAudioLocked(audio)}
-            progress={getAudioProgress(audio.id)}
-            category={audio.category}
-          />
-        ))}
+        {items.map((playlist) => {
+          const stats = getPlaylistStats(playlist.id);
+          return (
+            <PlaylistCard
+              key={playlist.id}
+              id={playlist.id}
+              name={playlist.name}
+              description={playlist.description}
+              coverImageUrl={stats.coverImage}
+              category={playlist.category}
+              isFree={playlist.is_free}
+              isLocked={isPlaylistLocked(playlist)}
+              programSlug={playlist.program_slug}
+              trackCount={stats.trackCount}
+              completedTracks={stats.completedTracks}
+              totalDuration={stats.totalDuration}
+            />
+          );
+        })}
       </div>
     );
   };
 
+  // Continue Learning section
+  const continueListening = playlists?.filter(playlist => {
+    const stats = getPlaylistStats(playlist.id);
+    const progress = stats.trackCount > 0 ? (stats.completedTracks / stats.trackCount) * 100 : 0;
+    return progress > 0 && progress < 100 && !isPlaylistLocked(playlist);
+  }).sort((a, b) => {
+    // Sort by most recently played
+    const itemsA = playlistItems?.filter(i => i.playlist_id === a.id) || [];
+    const itemsB = playlistItems?.filter(i => i.playlist_id === b.id) || [];
+    
+    const lastPlayedA = Math.max(...itemsA.map(i => {
+      const p = progressData?.find(pr => pr.audio_id === i.audio_id);
+      return p ? new Date(p.last_played_at).getTime() : 0;
+    }));
+    
+    const lastPlayedB = Math.max(...itemsB.map(i => {
+      const p = progressData?.find(pr => pr.audio_id === i.audio_id);
+      return p ? new Date(p.last_played_at).getTime() : 0;
+    }));
+    
+    return lastPlayedB - lastPlayedA;
+  }) || [];
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      <div className="sticky top-0 z-10 bg-background border-b">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b">
         <div className="p-4 space-y-4">
           <div>
             <h1 className="text-2xl font-bold">Audio Library</h1>
@@ -149,7 +226,7 @@ export default function AppPlayer() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search audio..."
+              placeholder="Search playlists..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -166,25 +243,59 @@ export default function AppPlayer() {
         </div>
       </div>
 
-      <Tabs defaultValue="audiobooks" className="p-4">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
-          <TabsTrigger value="audiobooks">Audiobooks</TabsTrigger>
-          <TabsTrigger value="courses">Courses</TabsTrigger>
-          <TabsTrigger value="podcasts">Podcasts</TabsTrigger>
-        </TabsList>
+      <div className="p-4 space-y-6">
+        {/* Continue Learning Section */}
+        {filterTab === "all" && !searchQuery && continueListening.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold">Continue Learning</h2>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {continueListening.slice(0, 4).map((playlist) => {
+                const stats = getPlaylistStats(playlist.id);
+                return (
+                  <PlaylistCard
+                    key={playlist.id}
+                    id={playlist.id}
+                    name={playlist.name}
+                    description={playlist.description}
+                    coverImageUrl={stats.coverImage}
+                    category={playlist.category}
+                    isFree={playlist.is_free}
+                    isLocked={isPlaylistLocked(playlist)}
+                    programSlug={playlist.program_slug}
+                    trackCount={stats.trackCount}
+                    completedTracks={stats.completedTracks}
+                    totalDuration={stats.totalDuration}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
 
-        <TabsContent value="audiobooks" className="mt-0">
-          {renderAudioGrid(audiobooks)}
-        </TabsContent>
+        {/* Category Tabs */}
+        <Tabs defaultValue="audiobooks">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="audiobooks">Audiobooks</TabsTrigger>
+            <TabsTrigger value="courses">Courses</TabsTrigger>
+            <TabsTrigger value="podcasts">Podcasts</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="courses" className="mt-0">
-          {renderAudioGrid(courseAudio)}
-        </TabsContent>
+          <TabsContent value="audiobooks" className="mt-4">
+            {renderPlaylistGrid(audiobooks)}
+          </TabsContent>
 
-        <TabsContent value="podcasts" className="mt-0">
-          {renderAudioGrid(podcasts)}
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="courses" className="mt-4">
+            {renderPlaylistGrid(coursePlaylists)}
+          </TabsContent>
+
+          <TabsContent value="podcasts" className="mt-4">
+            {renderPlaylistGrid(podcasts)}
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }

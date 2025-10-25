@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Pause, Headphones } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 
 interface MiniPlayerProps {
   audioId: string;
@@ -11,6 +12,8 @@ interface MiniPlayerProps {
   isPlaying: boolean;
   progress: number;
   onPlayPause: () => void;
+  playlistName?: string;
+  trackPosition?: string;
 }
 
 export const MiniPlayer = ({
@@ -20,6 +23,8 @@ export const MiniPlayer = ({
   isPlaying,
   progress,
   onPlayPause,
+  playlistName,
+  trackPosition,
 }: MiniPlayerProps) => {
   const navigate = useNavigate();
 
@@ -40,7 +45,17 @@ export const MiniPlayer = ({
         </div>
         
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm truncate">{title}</p>
+          {playlistName && (
+            <p className="text-xs text-muted-foreground truncate">{playlistName}</p>
+          )}
+          <div className="flex items-center gap-2">
+            <p className="font-semibold text-sm truncate">{title}</p>
+            {trackPosition && (
+              <Badge variant="secondary" className="text-xs flex-shrink-0">
+                {trackPosition}
+              </Badge>
+            )}
+          </div>
           <Progress value={progress} className="h-1 mt-1" />
         </div>
 

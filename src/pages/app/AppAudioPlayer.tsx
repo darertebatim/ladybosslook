@@ -1,13 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Headphones } from "lucide-react";
+import { ArrowLeft, Headphones, ChevronLeft, ChevronRight, List } from "lucide-react";
 import { AudioControls } from "@/components/audio/AudioControls";
 import { ProgressBar } from "@/components/audio/ProgressBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export default function AppAudioPlayer() {
   const { audioId } = useParams();
@@ -34,6 +42,54 @@ export default function AppAudioPlayer() {
       return data;
     },
     enabled: !!audioId,
+  });
+
+  // Fetch playlist info for current audio
+  const { data: playlistInfo } = useQuery({
+    queryKey: ['audio-playlist-info', audioId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlist_items')
+        .select(`
+          playlist_id,
+          sort_order,
+          audio_playlists (
+            id,
+            name,
+            category
+          )
+        `)
+        .eq('audio_id', audioId)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!audioId,
+  });
+
+  // Fetch all tracks in the same playlist
+  const { data: playlistTracks } = useQuery({
+    queryKey: ['playlist-all-tracks', playlistInfo?.playlist_id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlist_items')
+        .select(`
+          audio_id,
+          sort_order,
+          audio_content (
+            id,
+            title,
+            duration_seconds
+          )
+        `)
+        .eq('playlist_id', playlistInfo!.playlist_id)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!playlistInfo?.playlist_id,
   });
 
   // Fetch progress
@@ -97,6 +153,13 @@ export default function AppAudioPlayer() {
     const handleEnded = () => {
       setIsPlaying(false);
       saveProgressMutation.mutate(audio.duration);
+      
+      // Auto-advance to next track if available
+      const currentIndex = playlistTracks?.findIndex(t => t.audio_id === audioId);
+      if (currentIndex !== undefined && currentIndex >= 0 && playlistTracks && currentIndex < playlistTracks.length - 1) {
+        const nextTrack = playlistTracks[currentIndex + 1];
+        navigate(`/app/player/${nextTrack.audio_id}`);
+      }
     };
     const handleError = (e: Event) => {
       const target = e.target as HTMLAudioElement;
@@ -145,7 +208,7 @@ export default function AppAudioPlayer() {
       audio.removeEventListener('error', handleError);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
-  }, [audio?.file_url]);
+  }, [audio?.file_url, playlistTracks, audioId]);
 
   // Save progress every 5 seconds
   useEffect(() => {
@@ -197,6 +260,33 @@ export default function AppAudioPlayer() {
     }
   };
 
+  // Track navigation
+  const currentTrackIndex = playlistTracks?.findIndex(t => t.audio_id === audioId) ?? -1;
+  const hasPrevious = currentTrackIndex > 0;
+  const hasNext = playlistTracks && currentTrackIndex >= 0 && currentTrackIndex < playlistTracks.length - 1;
+
+  const handlePreviousTrack = () => {
+    if (hasPrevious && playlistTracks) {
+      const prevTrack = playlistTracks[currentTrackIndex - 1];
+      navigate(`/app/player/${prevTrack.audio_id}`);
+    }
+  };
+
+  const handleNextTrack = () => {
+    if (hasNext && playlistTracks) {
+      const nextTrack = playlistTracks[currentTrackIndex + 1];
+      navigate(`/app/player/${nextTrack.audio_id}`);
+    }
+  };
+
+  const upNextTracks = playlistTracks?.slice(currentTrackIndex + 1, currentTrackIndex + 4) || [];
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background p-4">
@@ -224,16 +314,78 @@ export default function AppAudioPlayer() {
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="p-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate('/app/player')}
-          className="mb-6"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+        {/* Header with breadcrumb */}
+        <div className="flex items-center gap-2 mb-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => playlistInfo?.playlist_id ? navigate(`/app/player/playlist/${playlistInfo.playlist_id}`) : navigate('/app/player')}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          
+          {playlistInfo && (
+            <div className="flex-1 min-w-0">
+              <button
+                onClick={() => navigate(`/app/player/playlist/${playlistInfo.playlist_id}`)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors truncate block"
+              >
+                {playlistInfo.audio_playlists.name}
+              </button>
+              {playlistTracks && currentTrackIndex >= 0 && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Badge variant="outline" className="text-xs">
+                    Track {currentTrackIndex + 1} of {playlistTracks.length}
+                  </Badge>
+                </div>
+              )}
+            </div>
+          )}
 
-        <div className="max-w-md mx-auto space-y-8">
+          {playlistTracks && playlistTracks.length > 1 && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <List className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-[70vh]">
+                <SheetHeader>
+                  <SheetTitle>Playlist Tracks</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4 space-y-2 overflow-y-auto h-[calc(70vh-80px)]">
+                  {playlistTracks.map((track, index) => (
+                    <button
+                      key={track.audio_id}
+                      onClick={() => navigate(`/app/player/${track.audio_id}`)}
+                      className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                        track.audio_id === audioId 
+                          ? 'bg-primary/10 border-primary' 
+                          : 'hover:bg-accent'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-muted-foreground w-6">{index + 1}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-medium truncate ${
+                            track.audio_id === audioId ? 'text-primary' : ''
+                          }`}>
+                            {track.audio_content.title}
+                          </p>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {formatDuration(track.audio_content.duration_seconds)}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
+        </div>
+
+        <div className="max-w-md mx-auto space-y-6">
           {/* Cover Art */}
           <div className="aspect-square rounded-lg overflow-hidden shadow-2xl">
             {audio.cover_image_url ? (
@@ -253,7 +405,7 @@ export default function AppAudioPlayer() {
           <div className="text-center space-y-2">
             <h1 className="text-2xl font-bold">{audio.title}</h1>
             {audio.description && (
-              <p className="text-muted-foreground">{audio.description}</p>
+              <p className="text-muted-foreground text-sm">{audio.description}</p>
             )}
           </div>
 
@@ -264,6 +416,31 @@ export default function AppAudioPlayer() {
             onSeek={handleSeek}
           />
 
+          {/* Track Navigation */}
+          {(hasPrevious || hasNext) && (
+            <div className="flex justify-center items-center gap-4">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handlePreviousTrack}
+                disabled={!hasPrevious}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {currentTrackIndex + 1} / {playlistTracks?.length}
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleNextTrack}
+                disabled={!hasNext}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
+          )}
+
           {/* Controls */}
           <AudioControls
             isPlaying={isPlaying}
@@ -273,6 +450,36 @@ export default function AppAudioPlayer() {
             playbackRate={playbackRate}
             onPlaybackRateChange={handlePlaybackRateChange}
           />
+
+          {/* Up Next Section */}
+          {upNextTracks.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-muted-foreground">Up Next</h3>
+              <div className="space-y-2">
+                {upNextTracks.map((track, index) => (
+                  <button
+                    key={track.audio_id}
+                    onClick={() => navigate(`/app/player/${track.audio_id}`)}
+                    className="w-full text-left p-3 rounded-lg border hover:bg-accent transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground w-6">
+                        {currentTrackIndex + index + 2}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {track.audio_content.title}
+                        </p>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {formatDuration(track.audio_content.duration_seconds)}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Hidden Audio Element */}
           <audio
