@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
 import { LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Bell, BellOff, Check, X } from 'lucide-react';
@@ -29,6 +30,8 @@ const AppProfile = () => {
   const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>('default');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
+  const [contactSubject, setContactSubject] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -284,24 +287,56 @@ const AppProfile = () => {
         <Card>
           <CardHeader>
             <CardTitle>Contact & Support</CardTitle>
-            <CardDescription>Get help or schedule a consultation</CardDescription>
+            <CardDescription>Send us a message on WhatsApp</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="subject">Subject</Label>
+              <select
+                id="subject"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                value={contactSubject}
+                onChange={(e) => setContactSubject(e.target.value)}
+              >
+                <option value="">Select a topic...</option>
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Technical Support">Technical Support</option>
+                <option value="Refund Request">Refund Request</option>
+                <option value="Cancel Subscription">Cancel Subscription</option>
+                <option value="Course Question">Course Question</option>
+                <option value="Billing Issue">Billing Issue</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="message">Message</Label>
+              <Textarea
+                id="message"
+                placeholder="Type your message here..."
+                value={contactMessage}
+                onChange={(e) => setContactMessage(e.target.value)}
+                rows={4}
+              />
+            </div>
+
             <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => window.location.href = 'https://wa.me/19292603007'}
+              className="w-full"
+              onClick={() => {
+                if (!contactSubject || !contactMessage.trim()) {
+                  toast({
+                    title: 'Error',
+                    description: 'Please select a subject and enter a message',
+                    variant: 'destructive',
+                  });
+                  return;
+                }
+                const whatsappMessage = `Subject: ${contactSubject}\n\nMessage:\n${contactMessage}`;
+                window.location.href = `https://wa.me/19292603007?text=${encodeURIComponent(whatsappMessage)}`;
+              }}
             >
               <MessageCircle className="mr-2 h-4 w-4" />
-              Message on WhatsApp
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => window.location.href = 'https://calendar.app.google/kEWxSqUkm27SZHdk7'}
-            >
-              <Calendar className="mr-2 h-4 w-4" />
-              Book a Consultation
+              Send via WhatsApp
             </Button>
           </CardContent>
         </Card>
