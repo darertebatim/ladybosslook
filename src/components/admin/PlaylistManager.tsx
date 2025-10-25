@@ -84,7 +84,7 @@ export const PlaylistManager = () => {
       toast.success('Playlist created successfully');
       queryClient.invalidateQueries({ queryKey: ['audio-playlists-with-count'] });
       queryClient.invalidateQueries({ queryKey: ['audio-playlists'] });
-      handleCloseDialogs();
+      handleCloseCreate();
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to create playlist');
@@ -105,7 +105,7 @@ export const PlaylistManager = () => {
       toast.success('Playlist updated successfully');
       queryClient.invalidateQueries({ queryKey: ['audio-playlists-with-count'] });
       queryClient.invalidateQueries({ queryKey: ['audio-playlists'] });
-      handleCloseDialogs();
+      handleCloseEdit();
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to update playlist');
@@ -164,8 +164,12 @@ export const PlaylistManager = () => {
     setIsEditDialogOpen(true);
   };
 
-  const handleCloseDialogs = () => {
+  const handleCloseCreate = () => {
     setIsCreateDialogOpen(false);
+    resetForm();
+  };
+
+  const handleCloseEdit = () => {
     setIsEditDialogOpen(false);
     resetForm();
     setEditingPlaylist(null);
@@ -187,7 +191,15 @@ export const PlaylistManager = () => {
     });
   };
 
-  const PlaylistForm = ({ onSubmit, isSubmitting }: { onSubmit: (e: React.FormEvent) => void; isSubmitting: boolean }) => (
+  const PlaylistForm = ({ 
+    onSubmit, 
+    isSubmitting,
+    onCancel 
+  }: { 
+    onSubmit: (e: React.FormEvent) => void; 
+    isSubmitting: boolean;
+    onCancel: () => void;
+  }) => (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
         <Label htmlFor="playlist_name">Playlist/Album Name *</Label>
@@ -251,7 +263,7 @@ export const PlaylistManager = () => {
         <Button
           type="button"
           variant="outline"
-          onClick={handleCloseDialogs}
+          onClick={onCancel}
         >
           Cancel
         </Button>
@@ -332,21 +344,29 @@ export const PlaylistManager = () => {
         </Table>
       </CardContent>
 
-      <Dialog open={isCreateDialogOpen} onOpenChange={(open) => !open && handleCloseDialogs()}>
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Playlist</DialogTitle>
           </DialogHeader>
-          <PlaylistForm onSubmit={handleCreate} isSubmitting={createMutation.isPending} />
+          <PlaylistForm 
+            onSubmit={handleCreate} 
+            isSubmitting={createMutation.isPending}
+            onCancel={handleCloseCreate}
+          />
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isEditDialogOpen} onOpenChange={(open) => !open && handleCloseDialogs()}>
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Playlist</DialogTitle>
           </DialogHeader>
-          <PlaylistForm onSubmit={handleUpdate} isSubmitting={updateMutation.isPending} />
+          <PlaylistForm 
+            onSubmit={handleUpdate} 
+            isSubmitting={updateMutation.isPending}
+            onCancel={handleCloseEdit}
+          />
         </DialogContent>
       </Dialog>
     </Card>
