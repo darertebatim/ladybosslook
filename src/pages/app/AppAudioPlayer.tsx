@@ -98,17 +98,29 @@ export default function AppAudioPlayer() {
       setIsPlaying(false);
       saveProgressMutation.mutate(audio.duration);
     };
+    const handleError = (e: Event) => {
+      console.error('Audio error:', e);
+      toast.error('Failed to load audio file');
+      setIsPlaying(false);
+    };
+    const handleLoadedMetadata = () => {
+      console.log('Audio loaded, duration:', audio.duration);
+    };
 
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('durationchange', handleDurationChange);
     audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
 
     return () => {
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('durationchange', handleDurationChange);
       audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
-  }, []);
+  }, [audio?.file_url]);
 
   // Save progress every 5 seconds
   useEffect(() => {
@@ -242,6 +254,7 @@ export default function AppAudioPlayer() {
             ref={audioRef}
             src={audio.file_url}
             preload="metadata"
+            crossOrigin="anonymous"
           />
         </div>
       </div>
