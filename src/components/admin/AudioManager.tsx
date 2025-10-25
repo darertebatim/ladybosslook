@@ -225,16 +225,15 @@ export const AudioManager = () => {
               </div>
 
               <div>
-                <Label htmlFor="program">Linked Program</Label>
+                <Label htmlFor="program">Linked Program (Optional)</Label>
                 <Select
-                  value={formData.program_slug}
+                  value={formData.program_slug || undefined}
                   onValueChange={(value) => setFormData({ ...formData, program_slug: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="None (Free content)" />
+                    <SelectValue placeholder="None - Free content for everyone" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
                     {programs.map((program) => (
                       <SelectItem key={program.slug} value={program.slug}>
                         {program.title}
@@ -242,6 +241,9 @@ export const AudioManager = () => {
                     ))}
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Leave unselected for free content accessible to everyone
+                </p>
               </div>
             </div>
 
