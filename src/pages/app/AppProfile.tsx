@@ -6,11 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Bell, BellOff, Check, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { 
+  requestNotificationPermission, 
+  subscribeToPushNotifications, 
+  unsubscribeFromPushNotifications,
+  checkPermissionStatus 
+} from '@/lib/pushNotifications';
 
 const AppProfile = () => {
   const { user, signOut } = useAuth();
@@ -19,6 +26,9 @@ const AppProfile = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>('default');
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -35,6 +45,32 @@ const AppProfile = () => {
     enabled: !!user?.id,
   });
 
+  // Check notification permission status and subscription
+  useEffect(() => {
+    setPermissionStatus(checkPermissionStatus());
+    
+    // Check if user has an active push subscription
+    const checkSubscription = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('push_subscriptions')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        if (!error && data) {
+          setIsSubscribed(true);
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+      }
+    };
+    
+    checkSubscription();
+  }, [user?.id]);
+
   const handleSignOut = async () => {
     await signOut();
     toast({
@@ -42,6 +78,93 @@ const AppProfile = () => {
       description: 'You have been signed out successfully',
     });
     navigate('/');
+  };
+
+  const handleEnableNotifications = async () => {
+    if (!user?.id) return;
+
+    setIsLoadingNotifications(true);
+    try {
+      const permission = await requestNotificationPermission();
+      setPermissionStatus(permission);
+
+      if (permission === 'granted') {
+        const result = await subscribeToPushNotifications(user.id);
+        if (result.success) {
+          setIsSubscribed(true);
+          
+          // Track PWA installation when notifications are enabled
+          try {
+            await supabase.from('pwa_installations').upsert({
+              user_id: user.id,
+              user_agent: navigator.userAgent,
+              platform: navigator.platform,
+            }, {
+              onConflict: 'user_id'
+            });
+          } catch (error) {
+            console.error('[PWA] Error tracking installation:', error);
+          }
+          
+          toast({
+            title: 'Notifications enabled',
+            description: 'You will now receive push notifications',
+          });
+        } else {
+          toast({
+            title: 'Subscription failed',
+            description: result.error || 'Could not subscribe to notifications',
+            variant: 'destructive',
+          });
+        }
+      } else {
+        toast({
+          title: 'Permission denied',
+          description: 'Please enable notifications in your browser settings',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error enabling notifications:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to enable notifications',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoadingNotifications(false);
+    }
+  };
+
+  const handleDisableNotifications = async () => {
+    if (!user?.id) return;
+
+    setIsLoadingNotifications(true);
+    try {
+      const result = await unsubscribeFromPushNotifications(user.id);
+      if (result.success) {
+        setIsSubscribed(false);
+        toast({
+          title: 'Notifications disabled',
+          description: 'You will no longer receive push notifications',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: result.error || 'Failed to disable notifications',
+          variant: 'destructive',
+        });
+      }
+    } catch (error: any) {
+      console.error('Error disabling notifications:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to disable notifications',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoadingNotifications(false);
+    }
   };
 
   const handlePasswordChange = async () => {
@@ -167,7 +290,7 @@ const AppProfile = () => {
             <Button
               variant="outline"
               className="w-full justify-start"
-              onClick={() => window.open('https://wa.me/19292603007', '_blank')}
+              onClick={() => window.location.href = 'https://wa.me/19292603007'}
             >
               <MessageCircle className="mr-2 h-4 w-4" />
               Message on WhatsApp
@@ -175,11 +298,65 @@ const AppProfile = () => {
             <Button
               variant="outline"
               className="w-full justify-start"
-              onClick={() => window.open('https://calendar.app.google/kEWxSqUkm27SZHdk7', '_blank')}
+              onClick={() => window.location.href = 'https://calendar.app.google/kEWxSqUkm27SZHdk7'}
             >
               <Calendar className="mr-2 h-4 w-4" />
               Book a Consultation
             </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {permissionStatus === 'granted' ? (
+                <Check className="h-5 w-5 text-green-500" />
+              ) : permissionStatus === 'denied' ? (
+                <X className="h-5 w-5 text-destructive" />
+              ) : (
+                <Bell className="h-5 w-5" />
+              )}
+              Push Notifications
+            </CardTitle>
+            <CardDescription>
+              Status: {permissionStatus === 'granted' ? 'Enabled' : permissionStatus === 'denied' ? 'Blocked' : 'Not enabled'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="push-notifications">Enable push notifications</Label>
+                <p className="text-sm text-muted-foreground">
+                  Receive updates about announcements and courses
+                </p>
+              </div>
+              <Switch
+                id="push-notifications"
+                checked={isSubscribed}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    handleEnableNotifications();
+                  } else {
+                    handleDisableNotifications();
+                  }
+                }}
+                disabled={isLoadingNotifications || permissionStatus === 'denied'}
+              />
+            </div>
+
+            {permissionStatus === 'denied' && (
+              <div className="rounded-lg bg-destructive/10 p-4 text-sm">
+                <div className="flex items-start gap-2">
+                  <BellOff className="h-5 w-5 text-destructive mt-0.5" />
+                  <div>
+                    <p className="font-medium text-destructive">Notifications blocked</p>
+                    <p className="text-muted-foreground mt-1">
+                      Please enable notifications in your browser settings to receive updates.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 

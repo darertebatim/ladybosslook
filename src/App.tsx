@@ -10,7 +10,6 @@ import AppLayout from "@/layouts/AppLayout";
 import AppHome from "@/pages/app/AppHome";
 import AppCourses from "@/pages/app/AppCourses";
 import AppCourseDetail from "@/pages/app/AppCourseDetail";
-import AppNotifications from "@/pages/app/AppNotifications";
 import AppProfile from "@/pages/app/AppProfile";
 import AppInstall from "@/pages/app/AppInstall";
 import Programs from "./pages/Programs";
@@ -101,7 +100,6 @@ const App = () => (
               <Route path="home" element={<AppHome />} />
               <Route path="courses" element={<AppCourses />} />
               <Route path="course/:slug" element={<AppCourseDetail />} />
-              <Route path="notifications" element={<AppNotifications />} />
               <Route path="profile" element={<AppProfile />} />
             </Route>
             
