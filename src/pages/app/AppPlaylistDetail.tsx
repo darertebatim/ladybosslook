@@ -104,6 +104,10 @@ export default function AppPlaylistDetail() {
     },
   });
 
+  console.log('Debug - Playlist:', playlist?.name, 'Program Slug:', playlist?.program_slug, 'Is Free:', playlist?.is_free);
+  console.log('Debug - User Enrollments:', enrollments);
+  console.log('Debug - Has Access Check:', playlist?.is_free || enrollments?.includes(playlist?.program_slug));
+  
   const hasAccess = playlist?.is_free || enrollments?.includes(playlist?.program_slug);
 
   const getTrackProgress = (audioId: string) => {
