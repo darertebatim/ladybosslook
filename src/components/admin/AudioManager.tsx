@@ -47,7 +47,6 @@ export const AudioManager = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    sort_order: 0,
     playlist_id: "",
   });
 
@@ -141,7 +140,7 @@ export const AudioManager = () => {
           category: 'podcast', // Deprecated: now managed at playlist level
           program_slug: null,
           is_free: true,
-          sort_order: formData.sort_order,
+          sort_order: 0, // Deprecated: now managed at playlist level
           published_at: new Date().toISOString(),
         })
         .select()
@@ -169,7 +168,6 @@ export const AudioManager = () => {
       setFormData({
         title: "",
         description: "",
-        sort_order: 0,
         playlist_id: "",
       });
       setAudioFile(null);
@@ -276,7 +274,6 @@ export const AudioManager = () => {
     setFormData({
       title: audio.title,
       description: audio.description || "",
-      sort_order: audio.sort_order,
       playlist_id: audio.audio_playlist_items?.[0]?.playlist_id || "",
     });
     setIsEditDialogOpen(true);
@@ -291,7 +288,6 @@ export const AudioManager = () => {
       updates: {
         title: formData.title,
         description: formData.description,
-        sort_order: formData.sort_order,
       },
       playlistId: formData.playlist_id,
     });
@@ -355,18 +351,8 @@ export const AudioManager = () => {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">
-                Access control and category are managed at the playlist level
+                Access control and category are managed at the playlist level. Track order within playlists is managed in the Playlist Tracks Manager.
               </p>
-            </div>
-
-            <div>
-              <Label htmlFor="sort_order">Sort Order</Label>
-              <Input
-                id="sort_order"
-                type="number"
-                value={formData.sort_order}
-                onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
-              />
             </div>
 
             <div>
@@ -524,18 +510,8 @@ export const AudioManager = () => {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">
-                Access control and category are managed at the playlist level
+                Access control and category are managed at the playlist level. Track order within playlists is managed in the Playlist Tracks Manager.
               </p>
-            </div>
-
-            <div>
-              <Label htmlFor="edit_sort_order">Sort Order</Label>
-              <Input
-                id="edit_sort_order"
-                type="number"
-                value={formData.sort_order}
-                onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
-              />
             </div>
 
             <div className="flex justify-end gap-2">
