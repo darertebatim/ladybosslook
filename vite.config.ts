@@ -51,7 +51,7 @@ export default defineConfig(({ mode }) => ({
       },
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
-        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4MB limit
+        maximumFileSizeToCacheInBytes: 100 * 1024 * 1024, // 100MB limit
         globIgnores: ['**/lovable-uploads/dc841674-07ae-49e3-8de6-23c9bb303342.png']
       },
       devOptions: {
