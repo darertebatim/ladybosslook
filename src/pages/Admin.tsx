@@ -12,7 +12,7 @@ import { QuickEnrollUser } from '@/components/admin/QuickEnrollUser';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
 import { CourseEnrollmentManager } from '@/components/admin/CourseEnrollmentManager';
 import BulkEnrollUsers from '@/components/admin/BulkEnrollUsers';
-import AutoEnrollUsers from '@/components/admin/AutoEnrollUsers';
+
 import { BulkEnrollCourageousCourse } from '@/components/admin/BulkEnrollCourageousCourse';
 import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
 import { AnnouncementsList } from '@/components/admin/AnnouncementsList';
@@ -221,8 +221,6 @@ const Admin = () => {
 
             {/* Tab 3: Enrollment Management */}
             <TabsContent value="users" className="space-y-6">
-              <AutoEnrollUsers />
-              
               <QuickEnrollUser />
               
               <BulkEnrollUsers />
