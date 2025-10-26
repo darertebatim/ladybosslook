@@ -12,7 +12,7 @@ import { usePrograms } from '@/hooks/usePrograms';
 
 export const QuickEnrollUser = () => {
   const { toast } = useToast();
-  const { programs } = usePrograms();
+  const { programs, isLoading: programsLoading } = usePrograms();
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('');
@@ -127,9 +127,13 @@ export const QuickEnrollUser = () => {
 
         <div className="space-y-2">
           <Label htmlFor="course">Course *</Label>
-          <Select value={selectedCourse} onValueChange={setSelectedCourse} disabled={isLoading}>
+          <Select 
+            value={selectedCourse} 
+            onValueChange={setSelectedCourse} 
+            disabled={isLoading || programsLoading}
+          >
             <SelectTrigger>
-              <SelectValue placeholder="Select a course" />
+              <SelectValue placeholder={programsLoading ? "Loading programs..." : "Select a course"} />
             </SelectTrigger>
             <SelectContent>
               {programs.map((program) => (

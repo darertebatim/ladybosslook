@@ -48,7 +48,7 @@ export function CourseEnrollmentManager() {
   const [editRoundId, setEditRoundId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { programs } = usePrograms();
+  const { programs, isLoading: programsLoading } = usePrograms();
 
   useEffect(() => {
     loadUsers();
@@ -342,14 +342,20 @@ export function CourseEnrollmentManager() {
             <label className="text-sm font-medium">Select Course</label>
             <Select value={selectedCourse} onValueChange={setSelectedCourse}>
               <SelectTrigger>
-                <SelectValue placeholder="Choose a course..." />
+                <SelectValue placeholder={programsLoading ? "Loading programs..." : "Choose a course..."} />
               </SelectTrigger>
               <SelectContent>
-                {programs.map((program) => (
-                  <SelectItem key={program.slug} value={program.title}>
-                    {program.title} ({program.type})
-                  </SelectItem>
-                ))}
+                {programsLoading ? (
+                  <SelectItem value="loading" disabled>Loading programs...</SelectItem>
+                ) : programs.length === 0 ? (
+                  <SelectItem value="none" disabled>No programs available</SelectItem>
+                ) : (
+                  programs.map((program) => (
+                    <SelectItem key={program.slug} value={program.title}>
+                      {program.title} ({program.type})
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
