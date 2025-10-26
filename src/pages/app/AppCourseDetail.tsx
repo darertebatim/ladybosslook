@@ -221,7 +221,7 @@ const AppCourseDetail = () => {
                     variant="outline"
                     className="w-full justify-start"
                     size="lg"
-                    onClick={() => window.location.href = `/app/playlist/${round.audio_playlist_id}`}
+                    onClick={() => window.location.href = `/app/player/playlist/${round.audio_playlist_id}`}
                   >
                     <Music className="h-5 w-5 mr-3" />
                     <div className="flex-1 text-left">
