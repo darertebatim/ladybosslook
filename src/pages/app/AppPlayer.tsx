@@ -125,6 +125,12 @@ export default function AppPlayer() {
       .filter(filterPlaylistByProgress) || [];
   };
 
+  const getAllPlaylists = () => {
+    return playlists
+      ?.filter(filterPlaylistBySearch)
+      .filter(filterPlaylistByProgress) || [];
+  };
+
   // Sort playlists: in-progress first, then others
   const sortPlaylists = (playlistList: any[]) => {
     return [...playlistList].sort((a, b) => {
@@ -143,6 +149,7 @@ export default function AppPlayer() {
     });
   };
 
+  const allPlaylists = sortPlaylists(getAllPlaylists());
   const audiobooks = sortPlaylists(filterByCategory('audiobook'));
   const coursePlaylists = sortPlaylists(filterByCategory('course_supplement'));
   const podcasts = sortPlaylists(filterByCategory('podcast'));
@@ -276,12 +283,17 @@ export default function AppPlayer() {
         )}
 
         {/* Category Tabs */}
-        <Tabs defaultValue="audiobooks">
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs defaultValue="all">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="audiobooks">Audiobooks</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="podcasts">Podcasts</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="all" className="mt-4">
+            {renderPlaylistGrid(allPlaylists)}
+          </TabsContent>
 
           <TabsContent value="audiobooks" className="mt-4">
             {renderPlaylistGrid(audiobooks)}
