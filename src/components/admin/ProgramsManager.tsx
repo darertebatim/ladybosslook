@@ -341,6 +341,7 @@ export function ProgramsManager() {
                         <SelectItem value="1-month">1 Month</SelectItem>
                         <SelectItem value="3-months">3 Months</SelectItem>
                         <SelectItem value="6-months">6 Months</SelectItem>
+                        <SelectItem value="9-months">9 Months</SelectItem>
                         <SelectItem value="12-months">12 Months</SelectItem>
                       </SelectContent>
                     </Select>
