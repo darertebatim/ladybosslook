@@ -70,7 +70,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Admin ${user.id} creating enrollment for ${email} in ${courseName}`);
 
-    // Check if user already exists
+    // Check if user already exists in profiles
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('id, email')
@@ -83,34 +83,44 @@ const handler = async (req: Request): Promise<Response> => {
       console.log(`User already exists: ${existingProfile.id}`);
       userId = existingProfile.id;
     } else {
-      // Create new user
-      console.log(`Creating new user: ${email}`);
-      const { data: userData, error: userError } = await supabase.auth.admin.createUser({
-        email: email,
-        email_confirm: true,
-        password: email, // Temporary password (same as email)
-        user_metadata: {
-          full_name: fullName || ''
+      // Check if auth user exists
+      const { data: { users: authUsers } } = await supabase.auth.admin.listUsers();
+      const existingAuthUser = authUsers.find(u => u.email?.toLowerCase() === email.toLowerCase());
+
+      if (existingAuthUser) {
+        // Auth user exists but profile doesn't - use existing auth user ID
+        console.log(`Auth user exists but profile missing, using existing ID: ${existingAuthUser.id}`);
+        userId = existingAuthUser.id;
+      } else {
+        // Create new user
+        console.log(`Creating new user: ${email}`);
+        const { data: userData, error: userError } = await supabase.auth.admin.createUser({
+          email: email,
+          email_confirm: true,
+          password: email, // Temporary password (same as email)
+          user_metadata: {
+            full_name: fullName || ''
+          }
+        });
+
+        if (userError) {
+          console.error('Error creating user:', userError);
+          return new Response(
+            JSON.stringify({ error: `Failed to create user: ${userError.message}` }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+          );
         }
-      });
 
-      if (userError) {
-        console.error('Error creating user:', userError);
-        return new Response(
-          JSON.stringify({ error: `Failed to create user: ${userError.message}` }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-        );
+        if (!userData.user) {
+          return new Response(
+            JSON.stringify({ error: 'User creation failed' }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+          );
+        }
+
+        userId = userData.user.id;
+        console.log(`User created successfully: ${userId} with password set to email`);
       }
-
-      if (!userData.user) {
-        return new Response(
-          JSON.stringify({ error: 'User creation failed' }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-        );
-      }
-
-      userId = userData.user.id;
-      console.log(`User created successfully: ${userId} with password set to email`);
     }
 
     // Check if enrollment already exists
