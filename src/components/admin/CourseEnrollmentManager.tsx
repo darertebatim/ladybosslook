@@ -128,11 +128,16 @@ export function CourseEnrollmentManager() {
         .select('id, email, full_name')
         .in('id', userIds);
 
-      // Combine the data
+      // Combine the data and get current program names
       const enrichedData = (data || []).map(enrollment => {
         const profile = profiles?.find(p => p.id === enrollment.user_id);
+        // Get current program name from the catalog using slug
+        const currentProgram = programs.find(p => p.slug === enrollment.program_slug);
+        const displayName = currentProgram ? currentProgram.title : enrollment.course_name;
+        
         return {
           ...enrollment,
+          course_name: displayName, // Use current name from catalog
           profiles: {
             email: profile?.email || 'Unknown',
             full_name: profile?.full_name || null
