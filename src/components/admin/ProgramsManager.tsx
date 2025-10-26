@@ -393,16 +393,16 @@ export function ProgramsManager() {
 
                 {formData.payment_type === 'subscription' && (
                   <div className="space-y-2">
-                    <Label htmlFor="subscription_discount">Full Payment Discount ($)</Label>
+                    <Label htmlFor="subscription_discount">Full Payment Amount ($)</Label>
                     <Input
                       id="subscription_discount"
                       type="number"
                       value={formData.subscription_full_payment_discount / 100}
                       onChange={(e) => setFormData({ ...formData, subscription_full_payment_discount: Math.round(parseFloat(e.target.value || '0') * 100) })}
-                      placeholder="e.g., 500 for $500 off"
+                      placeholder="e.g., 800 for $800 total"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Discount for paying in full: ${(formData.subscription_full_payment_discount / 100).toFixed(2)}
+                      Total amount if paying for entire subscription upfront: ${(formData.subscription_full_payment_discount / 100).toFixed(2)}
                     </p>
                   </div>
                 )}
@@ -487,7 +487,7 @@ export function ProgramsManager() {
                         {program.subscription_full_payment_discount > 0 && (
                           <>
                             <span>•</span>
-                            <span>Full payment: -${(program.subscription_full_payment_discount / 100).toFixed(2)}</span>
+                            <span>Full payment: ${(program.subscription_full_payment_discount / 100).toFixed(2)}</span>
                           </>
                         )}
                       </div>
