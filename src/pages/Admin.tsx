@@ -5,13 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, GraduationCap, LayoutDashboard, UserCog, Send, Shield, LogOut, Search, Users, UserPlus } from 'lucide-react';
+import { RefreshCw, GraduationCap, LayoutDashboard, UserCog, Send, Shield, LogOut, Search, Users, UserPlus, Music } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
 import { QuickEnrollUser } from '@/components/admin/QuickEnrollUser';
 import { UserCreditsManager } from '@/components/admin/UserCreditsManager';
 import { CourseEnrollmentManager } from '@/components/admin/CourseEnrollmentManager';
-import BulkEnrollUsers from '@/components/admin/BulkEnrollUsers';
+
 
 import { BulkEnrollCourageousCourse } from '@/components/admin/BulkEnrollCourageousCourse';
 import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
@@ -166,7 +166,7 @@ const Admin = () => {
                 <span className="hidden sm:inline">Enrollment</span>
               </TabsTrigger>
               <TabsTrigger value="audio" className="flex items-center gap-2">
-                <Send className="h-4 w-4" />
+                <Music className="h-4 w-4" />
                 <span className="hidden sm:inline">Audio</span>
               </TabsTrigger>
               <TabsTrigger value="communications" className="flex items-center gap-2">
@@ -222,8 +222,6 @@ const Admin = () => {
             {/* Tab 3: Enrollment Management */}
             <TabsContent value="users" className="space-y-6">
               <QuickEnrollUser />
-              
-              <BulkEnrollUsers />
               
               <BulkEnrollCourageousCourse />
               
