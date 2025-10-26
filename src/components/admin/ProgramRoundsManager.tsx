@@ -80,7 +80,7 @@ export const ProgramRoundsManager = () => {
     first_session_timezone: "America/New_York",
     important_message: "",
     whatsapp_support_number: "",
-    audio_playlist_id: "",
+    audio_playlist_id: "none",
   });
 
   // Fetch programs for dropdown
@@ -155,7 +155,7 @@ export const ProgramRoundsManager = () => {
         first_session_duration: data.first_session_duration ? parseInt(data.first_session_duration) : 90,
         important_message: data.important_message || null,
         whatsapp_support_number: data.whatsapp_support_number || null,
-        audio_playlist_id: data.audio_playlist_id || null,
+        audio_playlist_id: data.audio_playlist_id === "none" ? null : data.audio_playlist_id || null,
       };
 
       if (editingId) {
@@ -215,7 +215,7 @@ export const ProgramRoundsManager = () => {
       first_session_timezone: "America/New_York",
       important_message: "",
       whatsapp_support_number: "",
-      audio_playlist_id: "",
+      audio_playlist_id: "none",
     });
     setEditingId(null);
   };
@@ -253,7 +253,7 @@ export const ProgramRoundsManager = () => {
       first_session_timezone: defaultTimezone,
       important_message: round.important_message || "",
       whatsapp_support_number: round.whatsapp_support_number || "",
-      audio_playlist_id: round.audio_playlist_id || "",
+      audio_playlist_id: round.audio_playlist_id || "none",
     });
     setEditingId(round.id);
   };
@@ -494,13 +494,13 @@ export const ProgramRoundsManager = () => {
               <Label htmlFor="audio_playlist">Audio Playlist (Optional)</Label>
               <Select
                 value={formData.audio_playlist_id}
-                onValueChange={(value) => setFormData({ ...formData, audio_playlist_id: value })}
+                onValueChange={(value) => setFormData({ ...formData, audio_playlist_id: value === "none" ? "" : value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select audio playlist" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {playlists?.map((playlist) => (
                     <SelectItem key={playlist.id} value={playlist.id}>
                       {playlist.name}
