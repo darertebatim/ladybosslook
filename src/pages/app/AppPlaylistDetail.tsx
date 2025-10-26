@@ -49,7 +49,17 @@ export default function AppPlaylistDetail() {
         .order('sort_order', { ascending: true });
       
       if (error) throw error;
-      return data;
+      
+      // Sort by sort_order, then by title as fallback
+      const sorted = (data || []).sort((a, b) => {
+        if (a.sort_order !== b.sort_order) {
+          return a.sort_order - b.sort_order;
+        }
+        // If sort_order is the same, sort by title
+        return a.audio_content.title.localeCompare(b.audio_content.title);
+      });
+      
+      return sorted;
     },
     enabled: !!playlistId,
   });

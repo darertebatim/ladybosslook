@@ -77,9 +77,12 @@ export const PlaylistTracksManager = ({
     onSuccess: () => {
       toast.success('Track order updated successfully');
       setHasChanges(false);
+      // Invalidate all related queries
       queryClient.invalidateQueries({ queryKey: ['playlist-tracks'] });
       queryClient.invalidateQueries({ queryKey: ['playlist-tracks-admin'] });
       queryClient.invalidateQueries({ queryKey: ['playlist-all-tracks'] });
+      queryClient.invalidateQueries({ queryKey: ['audio-playlists'] });
+      onClose();
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to update track order');
