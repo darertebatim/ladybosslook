@@ -128,11 +128,17 @@ export default function BulkEnrollUsers() {
               <SelectValue placeholder={programsLoading ? "Loading courses..." : "Select a course"} />
             </SelectTrigger>
             <SelectContent>
-              {programs.map((program) => (
-                <SelectItem key={program.slug} value={program.title}>
-                  {program.title}
+              {programs && programs.length > 0 ? (
+                programs.map((program) => (
+                  <SelectItem key={program.slug} value={program.title}>
+                    {program.title}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="no-programs" disabled>
+                  No programs available
                 </SelectItem>
-              ))}
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -148,14 +154,14 @@ export default function BulkEnrollUsers() {
               <SelectTrigger>
                 <SelectValue placeholder={roundsLoading ? "Loading rounds..." : "Select a round (optional)"} />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">No specific round</SelectItem>
-                {rounds.map((round) => (
-                  <SelectItem key={round.id} value={round.id}>
-                    {round.round_name} ({round.status})
-                  </SelectItem>
-                ))}
-              </SelectContent>
+            <SelectContent>
+              <SelectItem value="">No specific round</SelectItem>
+              {rounds && rounds.length > 0 && rounds.map((round) => (
+                <SelectItem key={round.id} value={round.id}>
+                  {round.round_name} ({round.status})
+                </SelectItem>
+              ))}
+            </SelectContent>
             </Select>
           </div>
         )}
