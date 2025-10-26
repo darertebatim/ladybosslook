@@ -360,7 +360,7 @@ export const AudioManager = () => {
               <Input
                 id="audio_file"
                 type="file"
-                accept="audio/mpeg,audio/mp4,audio/x-m4a"
+                accept="audio/mpeg,audio/mp3,audio/mp4,audio/m4a,audio/x-m4a,audio/aac"
                 onChange={(e) => setAudioFile(e.target.files?.[0] || null)}
                 required
               />
