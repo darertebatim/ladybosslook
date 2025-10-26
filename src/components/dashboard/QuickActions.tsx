@@ -51,7 +51,7 @@ export function QuickActions() {
         <CardDescription className="text-xs lg:text-sm hidden lg:block">Shortcuts to help you get started</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 lg:grid-cols-2 gap-2 lg:gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-3">
           {actions.map((action) => {
             const Icon = action.icon;
             return (
