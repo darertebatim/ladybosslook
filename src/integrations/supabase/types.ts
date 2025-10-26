@@ -526,6 +526,7 @@ export type Database = {
       }
       program_rounds: {
         Row: {
+          audio_playlist_id: string | null
           created_at: string
           end_date: string | null
           first_session_date: string | null
@@ -544,6 +545,7 @@ export type Database = {
           whatsapp_support_number: string | null
         }
         Insert: {
+          audio_playlist_id?: string | null
           created_at?: string
           end_date?: string | null
           first_session_date?: string | null
@@ -562,6 +564,7 @@ export type Database = {
           whatsapp_support_number?: string | null
         }
         Update: {
+          audio_playlist_id?: string | null
           created_at?: string
           end_date?: string | null
           first_session_date?: string | null
@@ -579,7 +582,15 @@ export type Database = {
           updated_at?: string
           whatsapp_support_number?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "program_rounds_audio_playlist_id_fkey"
+            columns: ["audio_playlist_id"]
+            isOneToOne: false
+            referencedRelation: "audio_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       push_notification_logs: {
         Row: {

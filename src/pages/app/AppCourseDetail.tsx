@@ -216,19 +216,21 @@ const AppCourseDetail = () => {
                 )}
 
                 {/* Audio Library */}
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  size="lg"
-                  onClick={() => window.location.href = '/app/player'}
-                >
-                  <Music className="h-5 w-5 mr-3" />
-                  <div className="flex-1 text-left">
-                    <div className="font-semibold">Audio Library</div>
-                    <div className="text-xs opacity-70">Course supplement audios</div>
-                  </div>
-                  <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
-                </Button>
+                {round?.audio_playlist_id ? (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    size="lg"
+                    onClick={() => window.location.href = `/app/playlist/${round.audio_playlist_id}`}
+                  >
+                    <Music className="h-5 w-5 mr-3" />
+                    <div className="flex-1 text-left">
+                      <div className="font-semibold">Audio Library</div>
+                      <div className="text-xs opacity-70">Course supplement audios</div>
+                    </div>
+                    <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
+                  </Button>
+                ) : null}
               </CardContent>
             </Card>
 

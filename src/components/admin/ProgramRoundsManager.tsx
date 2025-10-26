@@ -41,6 +41,7 @@ interface ProgramRound {
   first_session_duration: number | null;
   important_message: string | null;
   whatsapp_support_number: string | null;
+  audio_playlist_id: string | null;
 }
 
 interface RoundFormData {
@@ -58,6 +59,7 @@ interface RoundFormData {
   first_session_timezone: string;
   important_message: string;
   whatsapp_support_number: string;
+  audio_playlist_id: string;
 }
 
 export const ProgramRoundsManager = () => {
@@ -78,6 +80,7 @@ export const ProgramRoundsManager = () => {
     first_session_timezone: "America/New_York",
     important_message: "",
     whatsapp_support_number: "",
+    audio_playlist_id: "",
   });
 
   // Fetch programs for dropdown
@@ -90,6 +93,20 @@ export const ProgramRoundsManager = () => {
         .eq("is_active", true)
         .eq("delivery_method", "live-online")
         .order("title");
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch audio playlists for dropdown
+  const { data: playlists } = useQuery({
+    queryKey: ["audio-playlists"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("audio_playlists")
+        .select("id, name, program_slug")
+        .order("name");
       
       if (error) throw error;
       return data;
@@ -138,6 +155,7 @@ export const ProgramRoundsManager = () => {
         first_session_duration: data.first_session_duration ? parseInt(data.first_session_duration) : 90,
         important_message: data.important_message || null,
         whatsapp_support_number: data.whatsapp_support_number || null,
+        audio_playlist_id: data.audio_playlist_id || null,
       };
 
       if (editingId) {
@@ -197,6 +215,7 @@ export const ProgramRoundsManager = () => {
       first_session_timezone: "America/New_York",
       important_message: "",
       whatsapp_support_number: "",
+      audio_playlist_id: "",
     });
     setEditingId(null);
   };
@@ -234,6 +253,7 @@ export const ProgramRoundsManager = () => {
       first_session_timezone: defaultTimezone,
       important_message: round.important_message || "",
       whatsapp_support_number: round.whatsapp_support_number || "",
+      audio_playlist_id: round.audio_playlist_id || "",
     });
     setEditingId(round.id);
   };
@@ -468,6 +488,27 @@ export const ProgramRoundsManager = () => {
                 placeholder="e.g., +1234567890"
               />
               <p className="text-xs text-muted-foreground">Include country code (e.g., +1 for US)</p>
+            </div>
+
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="audio_playlist">Audio Playlist (Optional)</Label>
+              <Select
+                value={formData.audio_playlist_id}
+                onValueChange={(value) => setFormData({ ...formData, audio_playlist_id: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select audio playlist" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">None</SelectItem>
+                  {playlists?.map((playlist) => (
+                    <SelectItem key={playlist.id} value={playlist.id}>
+                      {playlist.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">Select the audio playlist for this round's supplementary materials</p>
             </div>
 
             <div className="flex gap-2 mt-6">
