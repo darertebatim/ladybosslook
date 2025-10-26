@@ -39,8 +39,9 @@ export const AudioManager = () => {
   const queryClient = useQueryClient();
   const { programs } = usePrograms();
   const [isUploading, setIsUploading] = useState(false);
-  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [audioFiles, setAudioFiles] = useState<File[]>([]);
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
   const [editingAudio, setEditingAudio] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
@@ -87,23 +88,12 @@ export const AudioManager = () => {
   // Upload audio mutation
   const uploadMutation = useMutation({
     mutationFn: async () => {
-      if (!audioFile) throw new Error('No audio file selected');
+      if (audioFiles.length === 0) throw new Error('No audio files selected');
 
       setIsUploading(true);
+      setUploadProgress({ current: 0, total: audioFiles.length });
 
-      // Upload audio file
-      const audioFileName = `${Date.now()}-${audioFile.name}`;
-      const { error: audioUploadError } = await supabase.storage
-        .from('audio_files')
-        .upload(audioFileName, audioFile);
-
-      if (audioUploadError) throw audioUploadError;
-
-      const { data: { publicUrl: audioUrl } } = supabase.storage
-        .from('audio_files')
-        .getPublicUrl(audioFileName);
-
-      // Upload cover image if provided
+      // Upload cover image once if provided
       let coverUrl = null;
       if (coverFile) {
         const coverFileName = `covers/${Date.now()}-${coverFile.name}`;
@@ -119,50 +109,74 @@ export const AudioManager = () => {
         }
       }
 
-      // Get audio duration
-      const audio = new Audio();
-      audio.src = URL.createObjectURL(audioFile);
-      await new Promise((resolve) => {
-        audio.addEventListener('loadedmetadata', resolve);
-      });
-      const duration = Math.floor(audio.duration);
+      // Upload each audio file
+      for (let i = 0; i < audioFiles.length; i++) {
+        const audioFile = audioFiles[i];
+        setUploadProgress({ current: i + 1, total: audioFiles.length });
 
-      // Create database record
-      const { data: newAudio, error: dbError } = await supabase
-        .from('audio_content')
-        .insert({
-          title: formData.title,
-          description: formData.description,
-          file_url: audioUrl,
-          duration_seconds: duration,
-          file_size_mb: audioFile.size / (1024 * 1024),
-          cover_image_url: coverUrl,
-          category: 'podcast', // Deprecated: now managed at playlist level
-          program_slug: null,
-          is_free: true,
-          sort_order: 0, // Deprecated: now managed at playlist level
-          published_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
+        // Upload audio file
+        const audioFileName = `${Date.now()}-${audioFile.name}`;
+        const { error: audioUploadError } = await supabase.storage
+          .from('audio_files')
+          .upload(audioFileName, audioFile);
 
-      if (dbError) throw dbError;
+        if (audioUploadError) throw audioUploadError;
 
-      // Add to playlist if selected
-      if (formData.playlist_id && newAudio) {
-        const { error: playlistError } = await supabase
-          .from('audio_playlist_items')
+        const { data: { publicUrl: audioUrl } } = supabase.storage
+          .from('audio_files')
+          .getPublicUrl(audioFileName);
+
+        // Get audio duration
+        const audio = new Audio();
+        audio.src = URL.createObjectURL(audioFile);
+        await new Promise((resolve) => {
+          audio.addEventListener('loadedmetadata', resolve);
+        });
+        const duration = Math.floor(audio.duration);
+
+        // Extract title from filename if form title is generic
+        const fileTitle = audioFiles.length > 1 
+          ? audioFile.name.replace(/\.[^/.]+$/, "") 
+          : formData.title;
+
+        // Create database record
+        const { data: newAudio, error: dbError } = await supabase
+          .from('audio_content')
           .insert({
-            playlist_id: formData.playlist_id,
-            audio_id: newAudio.id,
+            title: fileTitle,
+            description: formData.description,
+            file_url: audioUrl,
+            duration_seconds: duration,
+            file_size_mb: audioFile.size / (1024 * 1024),
+            cover_image_url: coverUrl,
+            category: 'podcast',
+            program_slug: null,
+            is_free: true,
             sort_order: 0,
-          });
+            published_at: new Date().toISOString(),
+          })
+          .select()
+          .single();
 
-        if (playlistError) throw playlistError;
+        if (dbError) throw dbError;
+
+        // Add to playlist if selected
+        if (formData.playlist_id && newAudio) {
+          const { error: playlistError } = await supabase
+            .from('audio_playlist_items')
+            .insert({
+              playlist_id: formData.playlist_id,
+              audio_id: newAudio.id,
+              sort_order: 0,
+            });
+
+          if (playlistError) throw playlistError;
+        }
       }
     },
     onSuccess: () => {
-      toast.success('Audio uploaded successfully');
+      const count = audioFiles.length;
+      toast.success(`${count} audio file${count > 1 ? 's' : ''} uploaded successfully`);
       queryClient.invalidateQueries({ queryKey: ['admin-audio-content'] });
       queryClient.invalidateQueries({ queryKey: ['audio-playlists'] });
       setFormData({
@@ -170,9 +184,10 @@ export const AudioManager = () => {
         description: "",
         playlist_id: "",
       });
-      setAudioFile(null);
+      setAudioFiles([]);
       setCoverFile(null);
       setIsUploading(false);
+      setUploadProgress({ current: 0, total: 0 });
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to upload audio');
@@ -262,8 +277,8 @@ export const AudioManager = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!audioFile) {
-      toast.error('Please select an audio file');
+    if (audioFiles.length === 0) {
+      toast.error('Please select at least one audio file');
       return;
     }
     uploadMutation.mutate();
@@ -314,13 +329,19 @@ export const AudioManager = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="title">Title *</Label>
+              <Label htmlFor="title">Title {audioFiles.length <= 1 && '*'}</Label>
               <Input
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                required
+                required={audioFiles.length <= 1}
+                placeholder={audioFiles.length > 1 ? "Filenames will be used as titles" : ""}
               />
+              {audioFiles.length > 1 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Uploading multiple files - each will use its filename as the title
+                </p>
+              )}
             </div>
 
             <div>
@@ -356,14 +377,20 @@ export const AudioManager = () => {
             </div>
 
             <div>
-              <Label htmlFor="audio_file">Audio File * (MP3, M4A)</Label>
+              <Label htmlFor="audio_file">Audio Files * (MP3, M4A) - Select multiple</Label>
               <Input
                 id="audio_file"
                 type="file"
                 accept="audio/mpeg,audio/mp3,audio/mp4,audio/m4a,audio/x-m4a,audio/aac"
-                onChange={(e) => setAudioFile(e.target.files?.[0] || null)}
+                onChange={(e) => setAudioFiles(Array.from(e.target.files || []))}
+                multiple
                 required
               />
+              {audioFiles.length > 0 && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {audioFiles.length} file{audioFiles.length > 1 ? 's' : ''} selected
+                </p>
+              )}
             </div>
 
             <div>
@@ -380,7 +407,7 @@ export const AudioManager = () => {
               {isUploading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Uploading...
+                  Uploading {uploadProgress.current}/{uploadProgress.total}...
                 </>
               ) : (
                 <>
