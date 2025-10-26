@@ -58,17 +58,32 @@ const Admin = () => {
   const fetchCourseStats = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data: enrollments, error } = await supabase
         .from('course_enrollments')
-        .select('course_name');
+        .select('program_slug, course_name');
 
       if (error) throw error;
 
-      // Count enrollments per course
+      // Get current program names from catalog
+      const { data: catalogPrograms } = await supabase
+        .from('program_catalog')
+        .select('slug, title');
+
+      // Create a map of slug to current title
+      const slugToTitle = new Map(
+        catalogPrograms?.map(p => [p.slug, p.title]) || []
+      );
+
+      // Count enrollments per course using current names
       const statsMap = new Map<string, number>();
-      data?.forEach(enrollment => {
-        const count = statsMap.get(enrollment.course_name) || 0;
-        statsMap.set(enrollment.course_name, count + 1);
+      enrollments?.forEach(enrollment => {
+        // Get current name from catalog, fallback to stored name
+        const currentName = enrollment.program_slug 
+          ? slugToTitle.get(enrollment.program_slug) || enrollment.course_name
+          : enrollment.course_name;
+        
+        const count = statsMap.get(currentName) || 0;
+        statsMap.set(currentName, count + 1);
       });
 
       const statsArray: CourseStats[] = Array.from(statsMap.entries()).map(([course_name, student_count]) => ({

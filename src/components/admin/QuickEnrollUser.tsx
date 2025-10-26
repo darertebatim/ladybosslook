@@ -8,18 +8,11 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { UserPlus } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-
-const COURSE_OPTIONS = [
-  { value: 'Courageous Character Course', label: 'Courageous Character Course', slug: 'courageous-character-course' },
-  { value: 'IQMoney Course - Income Growth', label: 'IQMoney Course', slug: 'iqmoney-income-growth' },
-  { value: 'Money Literacy Course', label: 'Money Literacy Course', slug: 'money-literacy-course' },
-  { value: 'Connection Literacy Course', label: 'Connection Literacy Course', slug: 'connection-literacy-course' },
-  { value: 'Ladyboss VIP Club Group Coaching', label: 'Ladyboss VIP Club', slug: 'ladyboss-vip-club' },
-  { value: 'Empowered Ladyboss Group Coaching', label: 'Empowered Ladyboss', slug: 'empowered-ladyboss-coaching' },
-];
+import { usePrograms } from '@/hooks/usePrograms';
 
 export const QuickEnrollUser = () => {
   const { toast } = useToast();
+  const { programs } = usePrograms();
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [selectedCourse, setSelectedCourse] = useState('');
@@ -32,20 +25,20 @@ export const QuickEnrollUser = () => {
     queryFn: async () => {
       if (!selectedCourse) return [];
       
-      const courseSlug = COURSE_OPTIONS.find(c => c.value === selectedCourse)?.slug;
-      if (!courseSlug) return [];
+      const selectedProgram = programs.find(p => p.title === selectedCourse);
+      if (!selectedProgram) return [];
 
       const { data, error } = await supabase
         .from('program_rounds')
         .select('*')
-        .eq('program_slug', courseSlug)
+        .eq('program_slug', selectedProgram.slug)
         .in('status', ['upcoming', 'active'])
         .order('round_number', { ascending: false });
 
       if (error) throw error;
       return data || [];
     },
-    enabled: !!selectedCourse,
+    enabled: !!selectedCourse && programs.length > 0,
   });
 
   const handleEnroll = async () => {
@@ -60,13 +53,13 @@ export const QuickEnrollUser = () => {
 
     setIsLoading(true);
     try {
-      const courseSlug = COURSE_OPTIONS.find(c => c.value === selectedCourse)?.slug;
+      const selectedProgram = programs.find(p => p.title === selectedCourse);
       
       const { data, error } = await supabase.functions.invoke('admin-create-enrollment', {
         body: {
           email: email.trim(),
           courseName: selectedCourse,
-          programSlug: courseSlug,
+          programSlug: selectedProgram?.slug,
           roundId: selectedRound || null,
           fullName: fullName.trim() || null,
         },
@@ -139,9 +132,9 @@ export const QuickEnrollUser = () => {
               <SelectValue placeholder="Select a course" />
             </SelectTrigger>
             <SelectContent>
-              {COURSE_OPTIONS.map((course) => (
-                <SelectItem key={course.value} value={course.value}>
-                  {course.label}
+              {programs.map((program) => (
+                <SelectItem key={program.slug} value={program.title}>
+                  {program.title}
                 </SelectItem>
               ))}
             </SelectContent>
