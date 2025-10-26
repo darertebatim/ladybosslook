@@ -4,24 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 const EMAILS_TO_ENROLL = [
-  "nazanin126@gmail.com",
-  "honeymobarhan@icloud.com",
   "lfallahi385@gmail.com",
-  "mahsa.akbaria.ma@gmail.com",
-  "elhamghorbani16@gmail.com",
-  "javanbakhtj@hotmail.com",
   "nooshcraft@yahoo.com",
-  "vmoji63@gmail.com",
-  "tabass1351@gmail.com",
-  "mahtabbenham@gmail.com",
-  "kianayazdan@yahoo.com",
-  "sara.parvizi4@gmail.com",
-  "ms.mary.abedi@gmail.com",
-  "rozhan.mokhtari1379@gmail.com",
   "niloofar.aboodii@gmail.com",
   "fatemehmedicine@gmail.com",
-  "zammarz@hotmail.com",
-  "yalda.momeni92@gmail.com",
 ];
 
 interface EnrollmentResult {
