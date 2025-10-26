@@ -14,7 +14,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Trash2, Plus, Pencil } from "lucide-react";
+import { Loader2, Trash2, Plus, Pencil, List } from "lucide-react";
+import { PlaylistTracksManager } from "./PlaylistTracksManager";
 import { usePrograms } from "@/hooks/usePrograms";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -163,6 +164,8 @@ export const PlaylistManager = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingPlaylist, setEditingPlaylist] = useState<any>(null);
+  const [isTracksDialogOpen, setIsTracksDialogOpen] = useState(false);
+  const [selectedPlaylist, setSelectedPlaylist] = useState<any>(null);
 
   const [createFormData, setCreateFormData] = useState({
     name: "",
@@ -340,6 +343,16 @@ export const PlaylistManager = () => {
     });
   };
 
+  const handleOpenTracks = (playlist: any) => {
+    setSelectedPlaylist(playlist);
+    setIsTracksDialogOpen(true);
+  };
+
+  const handleCloseTracks = () => {
+    setIsTracksDialogOpen(false);
+    setSelectedPlaylist(null);
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -381,6 +394,14 @@ export const PlaylistManager = () => {
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleOpenTracks(playlist)}
+                      title="Manage tracks"
+                    >
+                      <List className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -436,6 +457,15 @@ export const PlaylistManager = () => {
           />
         </DialogContent>
       </Dialog>
+
+      {selectedPlaylist && (
+        <PlaylistTracksManager
+          playlistId={selectedPlaylist.id}
+          playlistName={selectedPlaylist.name}
+          isOpen={isTracksDialogOpen}
+          onClose={handleCloseTracks}
+        />
+      )}
     </Card>
   );
 };
