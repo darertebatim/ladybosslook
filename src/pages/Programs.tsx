@@ -8,13 +8,28 @@ import { usePrograms } from '@/hooks/usePrograms';
 import type { Program } from '@/data/programs';
 
 const Programs = () => {
-  const { programs, getProgramsByType } = usePrograms();
+  const { programs, getProgramsByType, isLoading } = usePrograms();
 
   const courses = getProgramsByType('course');
   const groupCoaching = getProgramsByType('group-coaching');
   const oneOnOneSessions = getProgramsByType('1o1-session');
   const webinars = getProgramsByType('webinar');
   const events = getProgramsByType('event');
+
+  if (isLoading) {
+    return (
+      <>
+        <Navigation />
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground">Loading programs...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   const renderProgramCard = (program: Program) => (
     <Card 

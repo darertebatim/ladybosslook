@@ -5,7 +5,7 @@ import { usePrograms } from '@/hooks/usePrograms';
 import { Link } from 'react-router-dom';
 
 const Programs = () => {
-  const { programs } = usePrograms();
+  const { programs, isLoading } = usePrograms();
   
   // Get only popular programs
   const popularPrograms = programs.filter(p => p.popular);
@@ -27,8 +27,21 @@ const Programs = () => {
           </p>
         </div>
 
-        {/* Popular Programs Grid */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-12">
+        {/* Loading State */}
+        {isLoading ? (
+          <div className="grid lg:grid-cols-3 gap-8 mb-12">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="p-8 animate-pulse">
+                <div className="aspect-video bg-muted rounded mb-4"></div>
+                <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-muted rounded w-1/2"></div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Popular Programs Grid */}
+            <div className="grid lg:grid-cols-3 gap-8 mb-12">
           {popularPrograms.map((program, index) => (
             <Card 
               key={index}
@@ -144,6 +157,8 @@ const Programs = () => {
             </Button>
           </Link>
         </div>
+          </>
+        )}
       </div>
     </section>
   );

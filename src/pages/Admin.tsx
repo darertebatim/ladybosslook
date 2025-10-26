@@ -381,56 +381,24 @@ const Admin = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <RefreshCw className="h-5 w-5" />
-                    Program Catalog Sync
+                    Program Catalog Management
                   </CardTitle>
                   <CardDescription>
-                    Sync program definitions from code to database
+                    Program catalog is now managed through the Programs tab. All program data is stored in the database.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button
-                    onClick={async () => {
-                      setIsLoading(true);
-                      try {
-                        const programCatalogData = programs.map(p => ({
-                          slug: p.slug,
-                          title: p.title,
-                          type: p.type,
-                          payment_type: p.paymentType,
-                          price_amount: p.priceAmount,
-                          is_active: true
-                        }));
-
-                        const { error } = await supabase
-                          .from('program_catalog')
-                          .upsert(programCatalogData, { 
-                            onConflict: 'slug',
-                            ignoreDuplicates: false 
-                          });
-
-                        if (error) throw error;
-
-                        toast({
-                          title: "Success",
-                          description: `Synced ${programs.length} programs to database`,
-                        });
-                      } catch (error: any) {
-                        console.error('Sync error:', error);
-                        toast({
-                          title: "Error",
-                          description: error.message,
-                          variant: "destructive",
-                        });
-                      } finally {
-                        setIsLoading(false);
-                      }
-                    }}
-                    disabled={isLoading}
-                    className="w-full"
-                  >
-                    <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                    {isLoading ? 'Syncing...' : `Sync ${programs.length} Programs to Database`}
-                  </Button>
+                  <div className="space-y-2 p-4 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      ✓ Programs are now managed directly in the database via the Programs tab
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      ✓ All changes to program names, prices, and details are instantly reflected throughout the app
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      ✓ No need to sync - database is the single source of truth
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
 

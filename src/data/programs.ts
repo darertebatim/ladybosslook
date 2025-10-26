@@ -11,7 +11,7 @@ import privateCoachingImage from '@/assets/private-coaching-session.jpg';
 
 export interface Program {
   title: string;
-  slug: string; // Unique identifier for database consistency
+  slug: string;
   description: string;
   image: string;
   duration: string;
@@ -19,7 +19,7 @@ export interface Program {
   rating: number;
   features: string[];
   price: string;
-  priceAmount: number; // Numeric price for calculations
+  priceAmount: number;
   originalPrice?: string;
   limitedSpots?: string;
   popular: boolean;
@@ -27,8 +27,30 @@ export interface Program {
   type: 'course' | 'group-coaching' | '1o1-session' | 'event' | 'webinar';
   paymentType: 'one-time' | 'subscription' | 'free';
   isFree: boolean;
+  subscriptionDuration?: string;
+  subscriptionFullPaymentDiscount?: number;
+  deliveryMethod?: string;
 }
 
+// Image mapping for programs
+export const programImages: Record<string, string> = {
+  'iqmoney-income-growth': iqmoneyImage,
+  'money-literacy-course': moneyLiteracyImage,
+  'ladyboss-vip-club': ladybossVipImage,
+  'empowered-ladyboss-coaching': empoweredLadybossImage,
+  'business-growth-accelerator': businessCoachingImage,
+  'business-startup-accelerator': networkingImage,
+  'instagram-growth-course': instagramGrowthImage,
+  'private-coaching-session': privateCoachingImage,
+  'connection-literacy-course': connectionLiteracyImage,
+  'courageous-character-course': courageousCharacterImage,
+  'bilingual-power-class': courageousCharacterImage,
+  'default': moneyLiteracyImage,
+};
+
+// Legacy static programs array - DEPRECATED
+// All program data should now be managed through the database
+// This is kept for backwards compatibility during migration
 export const programs: Program[] = [
   {
     title: 'IQMoney Course - Income Growth',
