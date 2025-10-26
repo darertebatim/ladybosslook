@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Calendar, MessageCircle, GraduationCap } from "lucide-react";
+import { BookOpen, Calendar, MessageCircle, GraduationCap, Music } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export function QuickActions() {
@@ -13,6 +13,13 @@ export function QuickActions() {
       description: "Explore all available programs",
       action: () => navigate("/programs"),
       color: "text-blue-600"
+    },
+    {
+      icon: Music,
+      label: "Audio Library",
+      description: "Course supplement audios",
+      action: () => navigate("/app/player"),
+      color: "text-pink-600"
     },
     {
       icon: Calendar,
