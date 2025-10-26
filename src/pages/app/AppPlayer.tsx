@@ -131,28 +131,10 @@ export default function AppPlayer() {
       .filter(filterPlaylistByProgress) || [];
   };
 
-  // Sort playlists: in-progress first, then others
-  const sortPlaylists = (playlistList: any[]) => {
-    return [...playlistList].sort((a, b) => {
-      const statsA = getPlaylistStats(a.id);
-      const statsB = getPlaylistStats(b.id);
-      
-      const progressA = statsA.trackCount > 0 ? (statsA.completedTracks / statsA.trackCount) * 100 : 0;
-      const progressB = statsB.trackCount > 0 ? (statsB.completedTracks / statsB.trackCount) * 100 : 0;
-      
-      const inProgressA = progressA > 0 && progressA < 100;
-      const inProgressB = progressB > 0 && progressB < 100;
-      
-      if (inProgressA && !inProgressB) return -1;
-      if (!inProgressA && inProgressB) return 1;
-      return 0;
-    });
-  };
-
-  const allPlaylists = sortPlaylists(getAllPlaylists());
-  const audiobooks = sortPlaylists(filterByCategory('audiobook'));
-  const coursePlaylists = sortPlaylists(filterByCategory('course_supplement'));
-  const podcasts = sortPlaylists(filterByCategory('podcast'));
+  const allPlaylists = getAllPlaylists();
+  const audiobooks = filterByCategory('audiobook');
+  const coursePlaylists = filterByCategory('course_supplement');
+  const podcasts = filterByCategory('podcast');
 
   const renderPlaylistGrid = (items: any[]) => {
     if (isLoading) {
