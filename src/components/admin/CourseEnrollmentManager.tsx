@@ -251,25 +251,6 @@ export function CourseEnrollmentManager() {
         return;
       }
 
-      // Create a test order first
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          user_id: selectedUserId,
-          product_name: selectedCourse,
-          amount: 9700, // $97.00 in cents as default
-          currency: 'usd',
-          status: 'paid',
-          email: profile.email,
-          name: profile.full_name || 'Test User',
-          phone: profile.phone,
-          stripe_session_id: `test_${Date.now()}`
-        })
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-
       // Get program slug for the enrollment
       const program = programs.find(p => p.title === selectedCourse);
 
@@ -288,7 +269,7 @@ export function CourseEnrollmentManager() {
 
       toast({
         title: "Success",
-        description: "User enrolled and test order created successfully"
+        description: "User enrolled successfully"
       });
 
       setSelectedUserId('');
