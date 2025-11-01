@@ -301,7 +301,7 @@ export default function PaymentSuccess() {
             <p className="text-muted-foreground mb-2 sm:mb-4 text-xs sm:text-sm">
               You can also reach us through email if needed.
             </p>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center mb-4">
               <a 
                 href="mailto:support@ladybosslook.com" 
                 className="text-primary hover:underline text-sm"
@@ -317,6 +317,22 @@ export default function PaymentSuccess() {
                 Telegram: @ladybosslook
               </a>
             </div>
+            
+            <p className="text-muted-foreground text-sm mb-3">
+              اگه تلگرام نداری ایمیل بزن
+            </p>
+            <Button 
+              onClick={() => {
+                if (!orderDetails) return;
+                const workshop = getWorkshopDisplayName(orderDetails.product_name);
+                const emailBody = `Hello! I just completed my payment for the ${workshop.english} (${workshop.farsi}) workshop.\n\nMy details:\nName: ${orderDetails.name}\nEmail: ${orderDetails.email}\nPhone: ${orderDetails.phone || 'Not provided'}\nAmount Paid: ${formatPrice(orderDetails.amount)}\n\nPlease send me the workshop details and next steps. Thank you!`;
+                window.location.href = `mailto:support@ladybosslook.com?subject=Payment Successful - Workshop Access&body=${encodeURIComponent(emailBody)}`;
+              }}
+              variant="outline"
+              className="w-full sm:w-auto"
+            >
+              📧 ارسال ایمیل به پشتیبانی
+            </Button>
           </div>
         </div>
       </div>
