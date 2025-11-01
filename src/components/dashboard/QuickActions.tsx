@@ -1,10 +1,35 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Calendar, MessageCircle, GraduationCap, Music } from "lucide-react";
+import { BookOpen, Calendar, GraduationCap, Music, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export function QuickActions() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user?.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const handleContactSupport = () => {
+    const message = `Hi! I need support.\n\nName: ${profile?.full_name || 'N/A'}\nEmail: ${profile?.email || user?.email || 'N/A'}\nPhone: ${profile?.phone || 'N/A'}\nCity: ${profile?.city || 'N/A'}`;
+    const telegramUrl = `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
+    window.open(telegramUrl, '_blank');
+  };
 
   const actions = [
     {
@@ -29,10 +54,10 @@ export function QuickActions() {
       color: "text-green-600"
     },
     {
-      icon: MessageCircle,
+      icon: Send,
       label: "Get Support",
       description: "Contact us on Telegram",
-      action: () => window.open("https://t.me/ladybosslook", '_blank'),
+      action: handleContactSupport,
       color: "text-purple-600"
     },
     {
