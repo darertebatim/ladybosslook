@@ -169,6 +169,21 @@ const AppCourseDetail = () => {
                   </div>
                 )}
 
+                {/* Activate Support */}
+                <Button
+                  variant="outline"
+                  className="w-full justify-start border-blue-200 bg-blue-50/50 hover:bg-blue-100/50"
+                  size="lg"
+                  onClick={handleContactSupport}
+                >
+                  <MessageCircle className="h-5 w-5 mr-3 text-blue-600" />
+                  <div className="flex-1 text-left">
+                    <div className="font-semibold">Activate Support</div>
+                    <div className="text-xs opacity-70">@ladybosslook • Get help via Telegram</div>
+                  </div>
+                  <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
+                </Button>
+
                 {/* Access Course Files */}
                 {round?.google_drive_link ? (
                   <Button
@@ -229,21 +244,6 @@ const AppCourseDetail = () => {
                     <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
                   </Button>
                 ) : null}
-
-                {/* Activate Support */}
-                <Button
-                  variant="outline"
-                  className="w-full justify-start border-blue-200 bg-blue-50/50 hover:bg-blue-100/50"
-                  size="lg"
-                  onClick={handleContactSupport}
-                >
-                  <MessageCircle className="h-5 w-5 mr-3 text-blue-600" />
-                  <div className="flex-1 text-left">
-                    <div className="font-semibold">Activate Support</div>
-                    <div className="text-xs opacity-70">@ladybosslook • Get help via Telegram</div>
-                  </div>
-                  <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
-                </Button>
               </CardContent>
             </Card>
 
