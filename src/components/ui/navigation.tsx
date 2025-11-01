@@ -120,6 +120,11 @@ const Navigation = () => {
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-border pt-4">
             <div className="flex flex-col space-y-4">
+              <Link to="/app/home" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="default" size="lg" className="w-full bg-primary hover:bg-primary/90">
+                  📱 Open App
+                </Button>
+              </Link>
               <NavLinks mobile onClose={() => setIsMenuOpen(false)} />
               <AuthButtons mobile onClose={() => setIsMenuOpen(false)} />
             </div>
