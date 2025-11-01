@@ -86,7 +86,10 @@ const AppCourseDetail = () => {
   };
 
   const handleContactSupport = () => {
-    const message = "Hi! I need support with my enrollment.";
+    if (!profile || !program) return;
+
+    const message = `Hi! I need support with my enrollment.\n\nName: ${profile.full_name || 'N/A'}\nEmail: ${profile.email}\nPhone: ${profile.phone || 'N/A'}\nCity: ${profile.city || 'N/A'}\nCourse: ${program.title}\nRound: ${round?.round_name || 'N/A'}`;
+    
     const telegramUrl = `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
     window.open(telegramUrl, '_blank');
   };
