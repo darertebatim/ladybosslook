@@ -86,14 +86,8 @@ const AppCourseDetail = () => {
   };
 
   const handleContactSupport = () => {
-    if (!round?.whatsapp_support_number || !profile || !program) return;
-
-    const message = `Hi! I need support with my enrollment.\n\nName: ${profile.full_name || 'N/A'}\nEmail: ${profile.email}\nPhone: ${profile.phone || 'N/A'}\nCity: ${profile.city || 'N/A'}\nCourse: ${program.title}\nRound: ${round.round_name}`;
-    
-    const whatsappNumber = round.whatsapp_support_number.replace(/[^0-9]/g, '');
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    
-    window.location.href = whatsappUrl;
+    const telegramUrl = `https://t.me/ladybosslook`;
+    window.open(telegramUrl, '_blank');
   };
 
   return (
@@ -235,30 +229,28 @@ const AppCourseDetail = () => {
             </Card>
 
             {/* Support Section - Separate Card */}
-            {round?.whatsapp_support_number && (
-              <Card className="border-green-200 bg-green-50/50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-green-900">
-                    <MessageCircle className="h-5 w-5" />
-                    Need Help?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Button
-                    className="w-full justify-start bg-green-600 hover:bg-green-700 text-white"
-                    size="lg"
-                    onClick={handleContactSupport}
-                  >
-                    <MessageCircle className="h-5 w-5 mr-3" />
-                    <div className="flex-1 text-left">
-                      <div className="font-semibold">Contact Support via WhatsApp</div>
-                      <div className="text-xs opacity-90">We're here to help you</div>
-                    </div>
-                    <ExternalLink className="h-4 w-4 ml-2" />
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+            <Card className="border-blue-200 bg-blue-50/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-blue-900">
+                  <MessageCircle className="h-5 w-5" />
+                  Need Help?
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  className="w-full justify-start bg-blue-600 hover:bg-blue-700 text-white"
+                  size="lg"
+                  onClick={handleContactSupport}
+                >
+                  <MessageCircle className="h-5 w-5 mr-3" />
+                  <div className="flex-1 text-left">
+                    <div className="font-semibold">Contact Support via Telegram</div>
+                    <div className="text-xs opacity-90">@ladybosslook • We're here to help you</div>
+                  </div>
+                  <ExternalLink className="h-4 w-4 ml-2" />
+                </Button>
+              </CardContent>
+            </Card>
 
             <Card>
               <CardHeader>

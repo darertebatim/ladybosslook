@@ -31,8 +31,8 @@ export function QuickActions() {
     {
       icon: MessageCircle,
       label: "Get Support",
-      description: "Contact us on WhatsApp",
-      action: () => window.location.href = "https://wa.me/16265028589",
+      description: "Contact us on Telegram",
+      action: () => window.open("https://t.me/ladybosslook", '_blank'),
       color: "text-purple-600"
     },
     {
