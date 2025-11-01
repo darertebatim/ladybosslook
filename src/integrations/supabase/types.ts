@@ -542,6 +542,7 @@ export type Database = {
           start_date: string
           status: string
           updated_at: string
+          video_url: string | null
           whatsapp_support_number: string | null
         }
         Insert: {
@@ -561,6 +562,7 @@ export type Database = {
           start_date: string
           status?: string
           updated_at?: string
+          video_url?: string | null
           whatsapp_support_number?: string | null
         }
         Update: {
@@ -580,6 +582,7 @@ export type Database = {
           start_date?: string
           status?: string
           updated_at?: string
+          video_url?: string | null
           whatsapp_support_number?: string | null
         }
         Relationships: [

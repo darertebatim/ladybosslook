@@ -139,6 +139,18 @@ export function ActiveRound() {
                     </Button>
                   </div>
 
+                  {round.video_url && (
+                    <div className="mt-3 aspect-video rounded-md overflow-hidden bg-muted">
+                      <iframe
+                        src={round.video_url.replace('watch?v=', 'embed/')}
+                        title="Round video"
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  )}
+
                   {round.important_message && (
                     <div className="mt-3 p-2 bg-primary/5 rounded-md border border-primary/20">
                       <p className="text-xs text-foreground line-clamp-2">

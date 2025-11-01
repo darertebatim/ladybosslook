@@ -42,6 +42,7 @@ interface ProgramRound {
   important_message: string | null;
   whatsapp_support_number: string | null;
   audio_playlist_id: string | null;
+  video_url: string | null;
 }
 
 interface RoundFormData {
@@ -60,6 +61,7 @@ interface RoundFormData {
   important_message: string;
   whatsapp_support_number: string;
   audio_playlist_id: string;
+  video_url: string;
 }
 
 export const ProgramRoundsManager = () => {
@@ -81,6 +83,7 @@ export const ProgramRoundsManager = () => {
     important_message: "",
     whatsapp_support_number: "",
     audio_playlist_id: "none",
+    video_url: "",
   });
 
   // Fetch programs for dropdown
@@ -156,6 +159,7 @@ export const ProgramRoundsManager = () => {
         important_message: data.important_message || null,
         whatsapp_support_number: data.whatsapp_support_number || null,
         audio_playlist_id: data.audio_playlist_id === "none" ? null : data.audio_playlist_id || null,
+        video_url: data.video_url || null,
       };
 
       if (editingId) {
@@ -216,6 +220,7 @@ export const ProgramRoundsManager = () => {
       important_message: "",
       whatsapp_support_number: "",
       audio_playlist_id: "none",
+      video_url: "",
     });
     setEditingId(null);
   };
@@ -254,6 +259,7 @@ export const ProgramRoundsManager = () => {
       important_message: round.important_message || "",
       whatsapp_support_number: round.whatsapp_support_number || "",
       audio_playlist_id: round.audio_playlist_id || "none",
+      video_url: round.video_url || "",
     });
     setEditingId(round.id);
   };
@@ -465,6 +471,18 @@ export const ProgramRoundsManager = () => {
                   />
                 </div>
               </div>
+            </div>
+
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="video_url">Video URL (YouTube, Vimeo, etc.)</Label>
+              <Input
+                id="video_url"
+                type="url"
+                value={formData.video_url}
+                onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                placeholder="https://www.youtube.com/watch?v=..."
+              />
+              <p className="text-xs text-muted-foreground">Add a video to display above the important message</p>
             </div>
 
             <div className="space-y-2 mt-4">
