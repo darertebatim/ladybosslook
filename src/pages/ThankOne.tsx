@@ -289,6 +289,26 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                 <p className="text-white/60 text-xs md:text-sm mt-1 md:mt-2">
                   برای هرگونه سوال یا مشکل با ما تماس بگیرید
                 </p>
+                
+                <p className="text-white text-sm md:text-base mt-4 mb-3">
+                  اگه تلگرام نداری ایمیل بزن
+                </p>
+                <Button 
+                  onClick={() => {
+                    const emailBody = orderDetails 
+                      ? `سلام ادمین! من در کلاس قدرت دو زبانه ثبت نام کردم\n\nاطلاعات من:\nنام: ${orderDetails.name}\nایمیل: ${orderDetails.email}\n${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}\n\nمن آماده شروع کلاس هستم! 🎉`
+                      : 'Hello, I just registered for the Bilingual Power Class!';
+                    window.location.href = `mailto:support@ladybosslook.com?subject=Bilingual Power Class Registration&body=${encodeURIComponent(emailBody)}`;
+                  }}
+                  className="w-full font-bold text-sm md:text-base px-4 md:px-6 py-3 md:py-4 h-auto rounded-lg shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                  style={{
+                    background: 'hsl(var(--card-bg))',
+                    color: 'hsl(var(--cta-primary))',
+                    border: '2px solid hsl(var(--cta-primary))'
+                  }}
+                >
+                  📧 ارسال ایمیل به پشتیبانی
+                </Button>
               </div>
             </div>
           </div>
