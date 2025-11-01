@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music } from 'lucide-react';
+import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { downloadICSFile } from '@/utils/calendar';
 import { format } from 'date-fns';
@@ -176,7 +176,7 @@ const AppCourseDetail = () => {
                   size="lg"
                   onClick={handleContactSupport}
                 >
-                  <MessageCircle className="h-5 w-5 mr-3 text-blue-600" />
+                  <Send className="h-5 w-5 mr-3 text-blue-600" />
                   <div className="flex-1 text-left">
                     <div className="font-semibold">Activate Support</div>
                     <div className="text-xs opacity-70">@ladybosslook • Get help via Telegram</div>
