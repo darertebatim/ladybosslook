@@ -86,7 +86,11 @@ const AppCourseDetail = () => {
   };
 
   const handleContactSupport = () => {
-    const telegramUrl = `https://t.me/ladybosslook`;
+    if (!profile || !program) return;
+
+    const message = `Hi! I need support with my enrollment.\n\nName: ${profile.full_name || 'N/A'}\nEmail: ${profile.email}\nPhone: ${profile.phone || 'N/A'}\nCity: ${profile.city || 'N/A'}\nCourse: ${program.title}\nRound: ${round?.round_name || 'N/A'}`;
+    
+    const telegramUrl = `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
     window.open(telegramUrl, '_blank');
   };
 
@@ -225,29 +229,20 @@ const AppCourseDetail = () => {
                     <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
                   </Button>
                 ) : null}
-              </CardContent>
-            </Card>
 
-            {/* Support Section - Separate Card */}
-            <Card className="border-blue-200 bg-blue-50/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-900">
-                  <MessageCircle className="h-5 w-5" />
-                  Need Help?
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+                {/* Activate Support */}
                 <Button
-                  className="w-full justify-start bg-blue-600 hover:bg-blue-700 text-white"
+                  variant="outline"
+                  className="w-full justify-start border-blue-200 bg-blue-50/50 hover:bg-blue-100/50"
                   size="lg"
                   onClick={handleContactSupport}
                 >
-                  <MessageCircle className="h-5 w-5 mr-3" />
+                  <MessageCircle className="h-5 w-5 mr-3 text-blue-600" />
                   <div className="flex-1 text-left">
-                    <div className="font-semibold">Contact Support via Telegram</div>
-                    <div className="text-xs opacity-90">@ladybosslook • We're here to help you</div>
+                    <div className="font-semibold">Activate Support</div>
+                    <div className="text-xs opacity-70">@ladybosslook • Get help via Telegram</div>
                   </div>
-                  <ExternalLink className="h-4 w-4 ml-2" />
+                  <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
                 </Button>
               </CardContent>
             </Card>
