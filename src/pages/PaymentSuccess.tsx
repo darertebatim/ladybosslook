@@ -106,7 +106,7 @@ export default function PaymentSuccess() {
     };
   };
 
-  const createWhatsAppMessage = () => {
+  const createTelegramMessage = () => {
     if (!orderDetails) return '';
     
     const workshop = getWorkshopDisplayName(orderDetails.product_name);
@@ -119,7 +119,7 @@ export default function PaymentSuccess() {
       `Amount Paid: ${formatPrice(orderDetails.amount)}\n\n` +
       `Please send me the workshop details and next steps. Thank you!`
     );
-    return `https://wa.me/16265028589?text=${message}`;
+    return `https://t.me/ladybosslook?text=${message}`;
   };
 
   if (isLoading) {
@@ -207,7 +207,7 @@ export default function PaymentSuccess() {
             </Card>
           )}
 
-          {/* Next Steps - WhatsApp Focus - Mobile Optimized */}
+          {/* Next Steps - Telegram Focus - Mobile Optimized */}
           <Card className="mb-3 sm:mb-8 border-primary bg-primary/5">
             <CardHeader className="text-center pb-2 sm:pb-6">
               <CardTitle className="flex items-center justify-center text-lg sm:text-2xl">
@@ -224,12 +224,12 @@ export default function PaymentSuccess() {
                     {/* Mobile: 2 lines without arrows */}
                     <div className="sm:hidden mb-1 leading-tight">
                       <div className="font-bold text-center text-sm">Click the button below</div>
-                      <div className="font-bold text-center text-sm">and message our support on WhatsApp</div>
+                      <div className="font-bold text-center text-sm">and message our support on Telegram</div>
                     </div>
                     {/* Desktop: 1 line with arrows */}
                     <div className="hidden sm:flex items-center justify-center mb-2">
                       <ArrowRight className="mr-2 h-6 w-6 font-bold" />
-                      <span className="font-bold text-center">Click the button below and message our support on WhatsApp</span>
+                      <span className="font-bold text-center">Click the button below and message our support on Telegram</span>
                       <ArrowRight className="ml-2 h-6 w-6 font-bold" />
                     </div>
                     <p className="text-muted-foreground text-xs sm:text-base">
@@ -241,11 +241,11 @@ export default function PaymentSuccess() {
                   <div className="text-sm sm:text-lg font-semibold text-primary" dir="rtl">
                     <div className="flex items-center justify-center mb-1 sm:mb-2">
                       <ArrowRight className="ml-1 sm:ml-2 h-4 w-4 sm:h-6 sm:w-6 font-bold" />
-                      <span className="font-bold text-center">همین حالا روی دکمه پایین بزنید و به واتسپ پشتیبان پیام بزنید</span>
+                      <span className="font-bold text-center">همین حالا روی دکمه پایین بزنید و به تلگرام پشتیبان پیام بزنید</span>
                       <ArrowRight className="mr-1 sm:mr-2 h-4 w-4 sm:h-6 sm:w-6 font-bold" />
                     </div>
                     <p className="text-muted-foreground text-xs sm:text-base">
-                      <span className="font-persian">از واتسپ اطلاعات ورود به دوره آموزشی را دریافت کنید</span>
+                      <span className="font-persian">از تلگرام اطلاعات ورود به دوره آموزشی را دریافت کنید</span>
                     </p>
                   </div>
                   
@@ -258,23 +258,23 @@ export default function PaymentSuccess() {
                     </div>
                   </div>
                   
-                  {/* WhatsApp Button - Directly Under Arrow */}
+                  {/* Telegram Button - Directly Under Arrow */}
                   <div className="pt-1 sm:pt-2">
                     <a 
-                      href={createWhatsAppMessage()}
+                      href={createTelegramMessage()}
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="inline-block w-full sm:w-auto"
                     >
                       <Button 
                         size="lg" 
-                        className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white text-sm sm:text-lg py-3 sm:py-4 px-4 sm:px-6 animate-pulse"
+                        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-lg py-3 sm:py-4 px-4 sm:px-6 animate-pulse"
                       >
                         <MessageCircle className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                        Message Us on WhatsApp
+                        Message Us on Telegram
                       </Button>
                     </a>
-                    <p className="text-xs text-green-700 mt-1 sm:mt-2">
+                    <p className="text-xs text-blue-700 mt-1 sm:mt-2">
                       Your message is ready to send with all your details!
                     </p>
                   </div>
@@ -309,12 +309,12 @@ export default function PaymentSuccess() {
                 support@ladybosslook.com
               </a>
               <a 
-                href="https://wa.me/16265028589" 
+                href="https://t.me/ladybosslook" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-primary hover:underline text-sm"
               >
-                WhatsApp: +1 (626) 502-8589
+                Telegram: @ladybosslook
               </a>
             </div>
           </div>
