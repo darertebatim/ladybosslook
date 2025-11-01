@@ -65,9 +65,9 @@ const ThankOne = () => {
     fetchOrderDetails();
   }, [sessionId, searchParams]);
 
-  const createWhatsAppMessage = () => {
+  const createTelegramMessage = () => {
     if (!orderDetails) {
-      return 'https://wa.me/16265028589?text=Hello%2C%20I%20just%20registered%20for%20the%20Bilingual%20Power%20Class!';
+      return 'https://t.me/ladybosslook?text=Hello%2C%20I%20just%20registered%20for%20the%20Bilingual%20Power%20Class!';
     }
     
     const message = `سلام ادمین! من در کلاس قدرت دو زبانه ثبت نام کردم
@@ -79,7 +79,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
 
 من آماده شروع کلاس هستم! 🎉`;
     
-    return `https://wa.me/16265028589?text=${encodeURIComponent(message)}`;
+    return `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
   };
   return (
     <>
@@ -167,13 +167,13 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                   <div className="text-4xl animate-bounce">👇</div>
                 </div>
                 
-                {/* WhatsApp Contact Button */}
+                {/* Telegram Contact Button */}
                 <div className="text-center">
                   {isLoading ? (
                     <div className="w-full h-14 rounded-lg animate-pulse" style={{ background: 'hsl(var(--card-bg))' }}></div>
                   ) : (
                     <Button 
-                      onClick={() => window.open(createWhatsAppMessage(), '_blank')} 
+                      onClick={() => window.open(createTelegramMessage(), '_blank')} 
                       className="w-full font-bold text-sm md:text-lg px-4 md:px-8 py-4 md:py-5 h-auto rounded-lg md:rounded-xl shadow-lg transition-all duration-300 mb-3 md:mb-4 whitespace-normal leading-tight hover:scale-[1.02]"
                       style={{
                         background: 'linear-gradient(135deg, hsl(var(--cta-primary)), hsl(var(--cta-primary-hover)))',
@@ -181,7 +181,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                       }}
                     >
                       <MessageCircle className="w-5 h-5 md:w-6 md:h-6 ml-2" />
-                      <span>تماس با ادمین از طریق واتساپ</span>
+                      <span>تماس با ادمین از طریق تلگرام</span>
                     </Button>
                   )}
                   <p className="text-white/60 text-xs md:text-sm px-2">
@@ -241,7 +241,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                       با رضیه تماس بگیرید
                     </h3>
                     <p className="text-sm md:text-base text-white/70">
-                      روی دکمه بالا کلیک کنید تا از طریق واتساپ تماس بگیرید
+                      روی دکمه بالا کلیک کنید تا از طریق تلگرام تماس بگیرید
                     </p>
                   </CardContent>
                 </Card>
@@ -262,7 +262,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                       آماده کلاس شوید
                     </h3>
                     <p className="text-sm md:text-base text-white/70">
-                      جزئیات شروع کلاس از طریق ایمیل و واتساپ ارسال می‌شود
+                      جزئیات شروع کلاس از طریق ایمیل و تلگرام ارسال می‌شود
                     </p>
                   </CardContent>
                 </Card>
@@ -281,7 +281,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                   پشتیبانی:
                 </h3>
                 <p className="text-white text-base md:text-lg">
-                  📱 واتساپ: +1 (626) 502‑8589
+                  📱 تلگرام: @ladybosslook
                 </p>
                 <p className="text-white text-base md:text-lg mt-2">
                   📧 ایمیل: support@ladybosslook.com
