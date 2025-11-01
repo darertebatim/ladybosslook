@@ -61,9 +61,9 @@ const AppProfile = () => {
           .from('push_subscriptions')
           .select('id')
           .eq('user_id', user.id)
-          .maybeSingle();
+          .limit(1);
         
-        if (!error && data) {
+        if (!error && data && data.length > 0) {
           setIsSubscribed(true);
         }
       } catch (error) {
