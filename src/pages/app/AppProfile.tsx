@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
-import { LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Bell, BellOff, Check, X } from 'lucide-react';
+import { LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Bell, BellOff, Check, X, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
@@ -287,7 +287,7 @@ const AppProfile = () => {
         <Card>
           <CardHeader>
             <CardTitle>Contact & Support</CardTitle>
-            <CardDescription>Send us a message on WhatsApp</CardDescription>
+            <CardDescription>Send us a message on Telegram @ladybosslook</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -331,12 +331,12 @@ const AppProfile = () => {
                   });
                   return;
                 }
-                const whatsappMessage = `Subject: ${contactSubject}\n\nMessage:\n${contactMessage}`;
-                window.location.href = `https://wa.me/16265028589?text=${encodeURIComponent(whatsappMessage)}`;
+                const telegramMessage = `Subject: ${contactSubject}\n\nMessage:\n${contactMessage}`;
+                window.open(`https://t.me/ladybosslook?text=${encodeURIComponent(telegramMessage)}`, '_blank');
               }}
             >
-              <MessageCircle className="mr-2 h-4 w-4" />
-              Send via WhatsApp
+              <Send className="mr-2 h-4 w-4" />
+              Send via Telegram
             </Button>
           </CardContent>
         </Card>
