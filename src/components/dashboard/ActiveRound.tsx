@@ -140,15 +140,15 @@ export function ActiveRound() {
                   </div>
 
                   {round.video_url && (() => {
-                    // Extract video ID for thumbnail
+                    // Extract video ID for thumbnail - use hqdefault for better reliability
                     let thumbnailUrl = '';
                     
                     if (round.video_url.includes('youtube.com/watch')) {
                       const videoId = round.video_url.split('v=')[1]?.split('&')[0];
-                      thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                      thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
                     } else if (round.video_url.includes('youtu.be/')) {
                       const videoId = round.video_url.split('youtu.be/')[1]?.split('?')[0];
-                      thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                      thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
                     } else if (round.video_url.includes('vimeo.com/')) {
                       const videoId = round.video_url.split('vimeo.com/')[1]?.split('?')[0].replace('video/', '');
                       thumbnailUrl = `https://vumbnail.com/${videoId}.jpg`;
@@ -156,11 +156,17 @@ export function ActiveRound() {
                     
                     return (
                       <div className="mt-3 relative aspect-video rounded-md overflow-hidden bg-muted group">
-                        <img 
-                          src={thumbnailUrl} 
-                          alt="Video preview" 
-                          className="w-full h-full object-cover"
-                        />
+                        {thumbnailUrl && (
+                          <img 
+                            src={thumbnailUrl} 
+                            alt="Video preview" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Hide broken image, show fallback UI instead
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        )}
                         <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
                           <div className="w-16 h-16 rounded-full bg-background/90 flex items-center justify-center">
                             <div className="w-0 h-0 border-l-[16px] border-l-primary border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent ml-1" />
