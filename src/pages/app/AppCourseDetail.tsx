@@ -130,6 +130,38 @@ const AppCourseDetail = () => {
           </Card>
         ) : (
           <>
+            {round?.video_url && (() => {
+              let embedUrl = round.video_url;
+              
+              // Convert YouTube URLs to embed format
+              if (embedUrl.includes('youtube.com/watch')) {
+                embedUrl = embedUrl.replace('watch?v=', 'embed/');
+              } else if (embedUrl.includes('youtu.be/')) {
+                embedUrl = embedUrl.replace('youtu.be/', 'youtube.com/embed/');
+              }
+              
+              // Convert Vimeo URLs to embed format
+              if (embedUrl.includes('vimeo.com/') && !embedUrl.includes('/video/')) {
+                embedUrl = embedUrl.replace('vimeo.com/', 'player.vimeo.com/video/');
+              }
+              
+              return (
+                <Card>
+                  <CardContent className="p-0">
+                    <div className="aspect-video rounded-md overflow-hidden bg-muted">
+                      <iframe
+                        src={embedUrl}
+                        title="Course video"
+                        className="w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })()}
+
             {round?.important_message && (
               <Alert className="border-primary/20 bg-primary/5">
                 <Info className="h-4 w-4" />
