@@ -140,29 +140,32 @@ export function ActiveRound() {
                   </div>
 
                   {round.video_url && (() => {
-                    let embedUrl = round.video_url;
+                    // Extract video ID for thumbnail
+                    let thumbnailUrl = '';
                     
-                    // Convert YouTube URLs to embed format
-                    if (embedUrl.includes('youtube.com/watch')) {
-                      embedUrl = embedUrl.replace('watch?v=', 'embed/');
-                    } else if (embedUrl.includes('youtu.be/')) {
-                      embedUrl = embedUrl.replace('youtu.be/', 'youtube.com/embed/');
-                    }
-                    
-                    // Convert Vimeo URLs to embed format
-                    if (embedUrl.includes('vimeo.com/') && !embedUrl.includes('/video/')) {
-                      embedUrl = embedUrl.replace('vimeo.com/', 'player.vimeo.com/video/');
+                    if (round.video_url.includes('youtube.com/watch')) {
+                      const videoId = round.video_url.split('v=')[1]?.split('&')[0];
+                      thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                    } else if (round.video_url.includes('youtu.be/')) {
+                      const videoId = round.video_url.split('youtu.be/')[1]?.split('?')[0];
+                      thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                    } else if (round.video_url.includes('vimeo.com/')) {
+                      const videoId = round.video_url.split('vimeo.com/')[1]?.split('?')[0].replace('video/', '');
+                      thumbnailUrl = `https://vumbnail.com/${videoId}.jpg`;
                     }
                     
                     return (
-                      <div className="mt-3 aspect-video rounded-md overflow-hidden bg-muted">
-                        <iframe
-                          src={embedUrl}
-                          title="Round video"
-                          className="w-full h-full border-0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
+                      <div className="mt-3 relative aspect-video rounded-md overflow-hidden bg-muted group">
+                        <img 
+                          src={thumbnailUrl} 
+                          alt="Video preview" 
+                          className="w-full h-full object-cover"
                         />
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
+                          <div className="w-16 h-16 rounded-full bg-background/90 flex items-center justify-center">
+                            <div className="w-0 h-0 border-l-[16px] border-l-primary border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent ml-1" />
+                          </div>
+                        </div>
                       </div>
                     );
                   })()}
