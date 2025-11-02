@@ -139,17 +139,33 @@ export function ActiveRound() {
                     </Button>
                   </div>
 
-                  {round.video_url && (
-                    <div className="mt-3 aspect-video rounded-md overflow-hidden bg-muted">
-                      <iframe
-                        src={round.video_url.replace('watch?v=', 'embed/')}
-                        title="Round video"
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    </div>
-                  )}
+                  {round.video_url && (() => {
+                    let embedUrl = round.video_url;
+                    
+                    // Convert YouTube URLs to embed format
+                    if (embedUrl.includes('youtube.com/watch')) {
+                      embedUrl = embedUrl.replace('watch?v=', 'embed/');
+                    } else if (embedUrl.includes('youtu.be/')) {
+                      embedUrl = embedUrl.replace('youtu.be/', 'youtube.com/embed/');
+                    }
+                    
+                    // Convert Vimeo URLs to embed format
+                    if (embedUrl.includes('vimeo.com/') && !embedUrl.includes('/video/')) {
+                      embedUrl = embedUrl.replace('vimeo.com/', 'player.vimeo.com/video/');
+                    }
+                    
+                    return (
+                      <div className="mt-3 aspect-video rounded-md overflow-hidden bg-muted">
+                        <iframe
+                          src={embedUrl}
+                          title="Round video"
+                          className="w-full h-full border-0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    );
+                  })()}
 
                   {round.important_message && (
                     <div className="mt-3 p-2 bg-primary/5 rounded-md border border-primary/20">
