@@ -154,6 +154,7 @@ export type Database = {
       audio_playlists: {
         Row: {
           category: string | null
+          cover_image_url: string | null
           created_at: string
           description: string | null
           id: string
@@ -164,6 +165,7 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          cover_image_url?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -174,6 +176,7 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          cover_image_url?: string | null
           created_at?: string
           description?: string | null
           id?: string
