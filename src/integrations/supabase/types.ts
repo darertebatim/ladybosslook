@@ -431,6 +431,50 @@ export type Database = {
         }
         Relationships: []
       }
+      playlist_supplements: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          playlist_id: string
+          sort_order: number
+          title: string
+          type: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          playlist_id: string
+          sort_order?: number
+          title: string
+          type: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          playlist_id?: string
+          sort_order?: number
+          title?: string
+          type?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_supplements_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "audio_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

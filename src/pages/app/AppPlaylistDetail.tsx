@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Play, CheckCircle2, Circle, Music, Clock, Lock } from "lucide-react";
+import { ArrowLeft, Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
@@ -86,6 +87,22 @@ export default function AppPlaylistDetail() {
     enabled: !!tracks && tracks.length > 0,
   });
 
+  // Fetch supplements
+  const { data: supplements } = useQuery({
+    queryKey: ['playlist-supplements', playlistId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('playlist_supplements')
+        .select('*')
+        .eq('playlist_id', playlistId)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!playlistId,
+  });
+
   // Check if user has access
   const { data: enrollments } = useQuery({
     queryKey: ['user-enrollments'],
@@ -155,6 +172,15 @@ export default function AppPlaylistDetail() {
       case 'course_supplement': return 'Course';
       case 'podcast': return 'Podcast';
       default: return 'Audio';
+    }
+  };
+
+  const getSupplementIcon = (type: string) => {
+    switch (type) {
+      case 'video': return <Video className="h-5 w-5" />;
+      case 'pdf': return <FileText className="h-5 w-5" />;
+      case 'link': return <ExternalLink className="h-5 w-5" />;
+      default: return null;
     }
   };
 
@@ -258,6 +284,40 @@ export default function AppPlaylistDetail() {
           </div>
         )}
       </div>
+
+      {/* Course Supplements */}
+      {hasAccess && supplements && supplements.length > 0 && (
+        <div className="px-4 pb-4">
+          <h2 className="text-lg font-semibold mb-3">Course Supplements</h2>
+          <div className="space-y-2">
+            {supplements.map((supplement) => (
+              <a
+                key={supplement.id}
+                href={supplement.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors"
+              >
+                <div className="flex-shrink-0">
+                  {getSupplementIcon(supplement.type)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-sm">{supplement.title}</h3>
+                  {supplement.description && (
+                    <p className="text-xs text-muted-foreground truncate">
+                      {supplement.description}
+                    </p>
+                  )}
+                </div>
+                <Badge variant="outline" className="flex-shrink-0">
+                  {supplement.type.toUpperCase()}
+                </Badge>
+              </a>
+            ))}
+          </div>
+          <Separator className="my-6" />
+        </div>
+      )}
 
       {/* Track List */}
       <div className="px-4 pb-4 space-y-2">

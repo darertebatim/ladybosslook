@@ -14,8 +14,9 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Trash2, Plus, Pencil, List } from "lucide-react";
+import { Loader2, Trash2, Plus, Pencil, List, BookOpen } from "lucide-react";
 import { PlaylistTracksManager } from "./PlaylistTracksManager";
+import { PlaylistSupplementsManager } from "./PlaylistSupplementsManager";
 import { usePrograms } from "@/hooks/usePrograms";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -165,6 +166,7 @@ export const PlaylistManager = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingPlaylist, setEditingPlaylist] = useState<any>(null);
   const [isTracksDialogOpen, setIsTracksDialogOpen] = useState(false);
+  const [isSupplementsDialogOpen, setIsSupplementsDialogOpen] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState<any>(null);
 
   const [createFormData, setCreateFormData] = useState({
@@ -353,6 +355,16 @@ export const PlaylistManager = () => {
     setSelectedPlaylist(null);
   };
 
+  const handleOpenSupplements = (playlist: any) => {
+    setSelectedPlaylist(playlist);
+    setIsSupplementsDialogOpen(true);
+  };
+
+  const handleCloseSupplements = () => {
+    setIsSupplementsDialogOpen(false);
+    setSelectedPlaylist(null);
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -401,6 +413,14 @@ export const PlaylistManager = () => {
                       title="Manage tracks"
                     >
                       <List className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleOpenSupplements(playlist)}
+                      title="Manage supplements"
+                    >
+                      <BookOpen className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -459,12 +479,20 @@ export const PlaylistManager = () => {
       </Dialog>
 
       {selectedPlaylist && (
-        <PlaylistTracksManager
-          playlistId={selectedPlaylist.id}
-          playlistName={selectedPlaylist.name}
-          isOpen={isTracksDialogOpen}
-          onClose={handleCloseTracks}
-        />
+        <>
+          <PlaylistTracksManager
+            playlistId={selectedPlaylist.id}
+            playlistName={selectedPlaylist.name}
+            isOpen={isTracksDialogOpen}
+            onClose={handleCloseTracks}
+          />
+          <PlaylistSupplementsManager
+            playlistId={selectedPlaylist.id}
+            playlistName={selectedPlaylist.name}
+            isOpen={isSupplementsDialogOpen}
+            onClose={handleCloseSupplements}
+          />
+        </>
       )}
     </Card>
   );
