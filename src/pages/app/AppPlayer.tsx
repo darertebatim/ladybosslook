@@ -165,7 +165,7 @@ export default function AppPlayer() {
               id={playlist.id}
               name={playlist.name}
               description={playlist.description}
-              coverImageUrl={stats.coverImage}
+              coverImageUrl={playlist.cover_image_url}
               category={playlist.category}
               isFree={playlist.is_free}
               isLocked={isPlaylistLocked(playlist)}
@@ -249,7 +249,7 @@ export default function AppPlayer() {
                     id={playlist.id}
                     name={playlist.name}
                     description={playlist.description}
-                    coverImageUrl={stats.coverImage}
+                    coverImageUrl={playlist.cover_image_url}
                     category={playlist.category}
                     isFree={playlist.is_free}
                     isLocked={isPlaylistLocked(playlist)}
