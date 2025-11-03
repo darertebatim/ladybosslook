@@ -8,10 +8,17 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { SupplementViewer } from "@/components/app/SupplementViewer";
 
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
   const navigate = useNavigate();
+  const [selectedSupplement, setSelectedSupplement] = useState<{
+    title: string;
+    type: string;
+    url: string;
+    description?: string;
+  } | null>(null);
 
   // Fetch playlist details
   const { data: playlist, isLoading: playlistLoading } = useQuery({
@@ -291,12 +298,21 @@ export default function AppPlaylistDetail() {
           <h2 className="text-lg font-semibold mb-3">Course Supplements</h2>
           <div className="space-y-2">
             {supplements.map((supplement) => (
-              <a
+              <button
                 key={supplement.id}
-                href={supplement.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors"
+                onClick={() => {
+                  if (supplement.type === 'link') {
+                    window.open(supplement.url, '_blank', 'noopener,noreferrer');
+                  } else {
+                    setSelectedSupplement({
+                      title: supplement.title,
+                      type: supplement.type,
+                      url: supplement.url,
+                      description: supplement.description || undefined,
+                    });
+                  }
+                }}
+                className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors text-left"
               >
                 <div className="flex-shrink-0">
                   {getSupplementIcon(supplement.type)}
@@ -312,7 +328,7 @@ export default function AppPlaylistDetail() {
                 <Badge variant="outline" className="flex-shrink-0">
                   {supplement.type.toUpperCase()}
                 </Badge>
-              </a>
+              </button>
             ))}
           </div>
           <Separator className="my-6" />
@@ -378,6 +394,12 @@ export default function AppPlaylistDetail() {
           );
         })}
       </div>
+
+      <SupplementViewer
+        isOpen={!!selectedSupplement}
+        onClose={() => setSelectedSupplement(null)}
+        supplement={selectedSupplement}
+      />
     </div>
   );
 }
