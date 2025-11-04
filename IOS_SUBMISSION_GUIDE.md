@@ -1,11 +1,13 @@
-# 🍎 iOS App Store Submission Guide - LadyBoss Academy
+# 🍎 iOS App Store Submission Guide - Ladybosslook
 
 ## Quick Reference
 
-**App Name:** LadyBoss Academy  
+**App Name:** Ladybosslook  
 **Bundle ID:** app.lovable.9d54663c1af540669ceb1723206ae5f8  
+**Developer:** Ladybosslook LLC  
+**App Type:** Reader/Player App (authenticated content only)  
 **Current Status:** Ready for iOS submission  
-**Target:** Apple App Store  
+**Target:** Apple App Store
 
 ---
 
@@ -15,13 +17,16 @@
 - ✅ All plugins installed (push notifications, browser, status bar, splash)
 - ✅ Production config ready (server block commented out)
 - ✅ Code adapted for native iOS features
+- ✅ **App-only scope implemented** (no marketing pages in native app)
+- ✅ Admin routes hidden from native app
+- ✅ Auto-redirect to `/app/home` on native app launch
 - ✅ Privacy policy page at `/privacy`
 - ✅ Refund policy page at `/refund-policy`
 - ✅ SMS terms page at `/sms-terms`
 - ✅ Stripe payment integration (opens in Safari)
 - ✅ Push notifications infrastructure
 - ✅ PWA install prompts hidden in native app
-- ✅ App store metadata prepared
+- ✅ App store metadata prepared with correct branding
 
 ---
 
@@ -46,10 +51,10 @@
 3. **Create App Listing**
    - Click "My Apps" → "+" → "New App"
    - Platform: iOS
-   - Name: LadyBoss Academy
+   - Name: Ladybosslook
    - Primary Language: English (U.S.)
    - Bundle ID: app.lovable.9d54663c1af540669ceb1723206ae5f8
-   - SKU: ladyboss-academy-001 (or any unique identifier)
+   - SKU: ladybosslook-001 (or any unique identifier)
 
 **⏱️ Estimated Time: 1-3 days (waiting for approval)**
 
@@ -134,7 +139,7 @@ npx cap open ios
 #### D. Display Name
 1. Select "App" target
 2. Go to "Info" tab
-3. Change "Bundle display name" to: **LadyBoss Academy**
+3. Change "Bundle display name" to: **Ladybosslook**
 
 #### E. Version & Build Number
 1. Select "App" target
@@ -162,6 +167,9 @@ npx cap run ios
 
 **Test These Features:**
 - [ ] App launches without errors
+- [ ] App opens directly to `/app/home` (not website homepage)
+- [ ] Marketing routes (/, /programs, /about) redirect to `/app/home`
+- [ ] Admin route `/admin` is not accessible in native app
 - [ ] Login/signup works
 - [ ] Course browsing loads correctly
 - [ ] Audio playback works
@@ -170,7 +178,7 @@ npx cap run ios
 - [ ] Return from Safari after payment works
 - [ ] Offline mode works (enable airplane mode, test audio)
 - [ ] Profile page loads
-- [ ] All navigation works
+- [ ] All navigation works within `/app` routes
 
 **⏱️ Estimated Time: 2-3 hours (thorough testing)**
 
@@ -180,16 +188,16 @@ npx cap run ios
 
 **CRITICAL: Apple reviewers need working credentials**
 
-1. Create a test account: `reviewer@ladybossacademy.com`
+1. Create a test account in Supabase: `reviewer@ladybosslook.com`
 2. Enroll this account in sample courses
 3. Ensure it has access to:
    - At least 2-3 complete courses
    - Audio library access
-   - All main features
+   - All main features visible in the app
 4. Test the login yourself before submitting
 
 **Write down credentials (you'll need these):**
-- Email: `reviewer@ladybossacademy.com`
+- Email: `reviewer@ladybosslook.com`
 - Password: `ReviewAccess2025!` (or your chosen password)
 
 **⏱️ Estimated Time: 30 minutes**
@@ -274,8 +282,8 @@ npx cap run ios
 **Go to App Store Connect → Your App → App Information**
 
 #### A. Basic Information
-- **Name:** LadyBoss Academy
-- **Subtitle:** Business & Money Mastery
+- **Name:** Ladybosslook
+- **Subtitle:** Empower Your Business
 - **Category:** Education → Business
 - **Secondary Category:** Education → Self-Improvement (optional)
 
@@ -315,7 +323,7 @@ npx cap run ios
    - 1.0.0
 
 9. **Copyright**
-   - `2025 LadyBoss Academy`
+   - `2025 Ladybosslook LLC`
 
 10. **Age Rating**
     - Click "Edit" next to Rating
@@ -331,17 +339,19 @@ npx cap run ios
    - Email: [Your email]
 
 2. **Demo Account** (REQUIRED)
-   - Username: `reviewer@ladybossacademy.com`
+   - Username: `reviewer@ladybosslook.com`
    - Password: `ReviewAccess2025!`
    - ✅ Check "Sign-in required"
 
 3. **Notes**
    - Copy the reviewer notes from `APP_STORE_METADATA.md`
    - Key points:
+     - **This is a reader/player app** for enrolled users to access educational content
+     - App shows authenticated content only (no marketing pages)
      - Educational platform for women entrepreneurs
      - Push notifications for course updates and motivational content
-     - Stripe payment opens in Safari per Apple guidelines
-     - Demo account has full access to test features
+     - Stripe payment opens in Safari per Apple guidelines (Guideline 3.1.1)
+     - Demo account has full access to test all features
 
 #### E. App Privacy (Privacy Nutrition Labels)
 

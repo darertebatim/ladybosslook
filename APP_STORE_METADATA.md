@@ -1,8 +1,8 @@
-# 📱 iOS App Store Metadata - LadyBoss Academy
+# 📱 iOS App Store Metadata - Ladybosslook
 
 ## App Information
 
-**App Name:** LadyBoss Academy  
+**App Name:** Ladybosslook
 **Bundle ID:** app.lovable.9d54663c1af540669ceb1723206ae5f8  
 **Category:** Education > Business  
 **Age Rating:** 4+ (No objectionable content)
@@ -12,67 +12,104 @@
 ## App Description (Max 4000 characters)
 
 ### Title (30 characters max)
-LadyBoss Academy: Empower
+Ladybosslook: Empower
 
 ### Subtitle (30 characters max)
 Business & Money Mastery
 
 ### Full Description
 
-Transform your life and business with LadyBoss Academy - the ultimate empowerment platform for ambitious women entrepreneurs and professionals.
+Transform your business and money mindset with Ladybosslook – the ultimate platform for ambitious women ready to break barriers and build wealth.
 
-**What You'll Get:**
+**What is Ladybosslook?**
 
-🎯 **Expert Business Coaching**
-Access proven strategies from experienced business coaches to accelerate your entrepreneurial journey. Learn how to start, scale, and succeed in your business ventures.
+Ladybosslook is a comprehensive business education and personal development platform designed specifically for women entrepreneurs and aspiring business leaders. Created by Razieh Sharifi, a successful entrepreneur and certified business coach, our app delivers world-class training in business strategy, financial literacy, assertiveness, and personal growth.
 
-💰 **Financial Literacy Programs**
-Master money management, build wealth, and achieve financial confidence. Our comprehensive IQ Money program and financial workshops will transform your relationship with money.
+**Why Ladybosslook?**
 
-💪 **Personal Development Courses**
-Build courageous character, develop assertiveness, and become the empowered woman you're meant to be. Our signature Courageous Character course has transformed thousands of lives.
+Unlike generic business courses, Ladybosslook understands the unique challenges women face in entrepreneurship. Our content is culturally sensitive, bilingual-friendly (English and Persian), and addresses real-world scenarios that female entrepreneurs encounter daily.
 
-🎧 **Audio Library**
-Listen and learn on the go with our extensive collection of empowerment playlists covering topics like:
-- Financial Confidence
-- Bilingual Power (English/Japanese content)
-- Empowered Woman Mindset
-- Overcoming Poverty Mindset
-- Building Courageous Character
+**Key Features:**
 
-👥 **Community & Networking**
-Join a supportive community of like-minded women entrepreneurs. Access exclusive networking events, live workshops, and the LadyBoss VIP Club.
+📚 **Premium Audio Courses**
+- Business startup and growth strategies
+- Money literacy and financial independence
+- Assertiveness and boundary-setting
+- Personal development and mindset coaching
+- Bilingual content (English/Persian)
 
-**Featured Programs:**
+🎧 **On-the-Go Learning**
+- Download courses for offline listening
+- Audio-first approach perfect for busy schedules
+- Learn during commutes, workouts, or daily routines
 
-✨ Business Growth Accelerator - Scale your business with proven systems  
-✨ Money Literacy Workshop - Transform your financial future  
-✨ Assertiveness Training - Express yourself with confidence  
-✨ Instagram Growth Course - Build your social media presence  
-✨ Private Coaching Sessions - One-on-one guidance from experts  
+💼 **Business Coaching Programs**
+- Ladyboss VIP Coaching Club
+- Courageous Character Workshop
+- IQ Money Mastery Program
+- Business Growth Accelerator
+- Networking and connection literacy
+
+🌟 **Community & Support**
+- Join a supportive community of women entrepreneurs
+- Get motivated by success stories
+- Access exclusive announcements and updates
+- Personalized progress tracking
+
+**What You'll Learn:**
+
+💰 **Financial Mastery**
+- Break free from poverty mindset
+- Build multiple income streams
+- Master money management
+- Develop financial confidence
+
+🚀 **Business Skills**
+- Create winning business strategies
+- Scale your business effectively
+- Develop assertive leadership
+- Build strong professional boundaries
+
+👑 **Personal Empowerment**
+- Overcome self-doubt and fear
+- Build unshakeable confidence
+- Develop courageous character
+- Transform limiting beliefs
 
 **Perfect For:**
-- Women entrepreneurs starting or growing a business
+- Women starting their first business
+- Entrepreneurs scaling their ventures
 - Professionals seeking career advancement
-- Anyone wanting to improve financial literacy
-- Women ready to break through limiting beliefs
-- Business owners needing strategic guidance
+- Anyone pursuing financial independence
+- Women breaking cultural barriers in business
 
-**Features:**
-- Offline audio playback for learning anywhere
-- Push notifications for new content and live events
-- Personalized course recommendations
-- Progress tracking across all programs
-- Secure payment processing
-- Multi-language support (English/Japanese)
+**App Features:**
 
-**Why LadyBoss Academy?**
+✓ Seamless course enrollment and access
+✓ Intuitive audio player with progress tracking
+✓ Downloadable content for offline learning
+✓ Personalized dashboard with your courses
+✓ Push notifications for new content and updates
+✓ Secure payment through Stripe
+✓ Regular content updates and new programs
 
-With over [X] satisfied students and a proven track record of transforming lives, LadyBoss Academy provides the education, community, and support you need to achieve your biggest goals. Our expert instructors have decades of combined experience in business, finance, and personal development.
+**About the Creator:**
 
-Whether you're taking your first steps as an entrepreneur or ready to scale to seven figures, LadyBoss Academy has the resources, community, and expertise to help you succeed.
+Razieh Sharifi is a certified business coach, successful entrepreneur, and passionate advocate for women's financial empowerment. With years of experience helping women build profitable businesses, Razieh created Ladybosslook to scale her impact and reach ambitious women worldwide.
 
-Download now and start your transformation journey today!
+**Subscription & Pricing:**
+
+The app is free to download. Individual courses and coaching programs are available for purchase through our secure payment system. All purchases are handled via Stripe for your security and convenience.
+
+**Privacy & Security:**
+
+Your privacy matters. We use industry-standard encryption to protect your personal information and payment details. Read our full privacy policy at [privacy policy URL].
+
+**Start Your Transformation Today:**
+
+Download Ladybosslook and join thousands of women who've transformed their lives. Whether you're starting a business, scaling your venture, or pursuing financial freedom, we have the tools, training, and community to support your journey.
+
+Your future as an empowered, financially independent business woman starts now.
 
 ---
 
@@ -136,6 +173,10 @@ https://9d54663c-1af5-4066-9ceb-1723206ae5f8.lovableproject.com
 
 ---
 
+## Copyright
+
+© 2025 Ladybosslook LLC. All rights reserved.
+
 ## App Review Information
 
 ### Contact Information
@@ -146,7 +187,7 @@ https://9d54663c-1af5-4066-9ceb-1723206ae5f8.lovableproject.com
 
 ### Demo Account (REQUIRED for reviewers)
 
-**Username/Email:** reviewer@ladybossacademy.com  
+**Username/Email:** reviewer@ladybosslook.com  
 **Password:** ReviewAccess2025!
 
 **Instructions for Reviewers:**
@@ -159,7 +200,13 @@ https://9d54663c-1af5-4066-9ceb-1723206ae5f8.lovableproject.com
 ### Notes for App Review Team
 
 **App Purpose:**
-LadyBoss Academy is an educational platform providing business coaching, financial literacy, and personal development courses specifically for women entrepreneurs and professionals.
+Ladybosslook is an educational platform for women entrepreneurs seeking business coaching, financial literacy, and personal development training. The app provides access to premium audio courses, coaching programs, and community features.
+
+**App Scope:**
+This is a reader/player app focused on delivering educational content to enrolled users. The app displays only authenticated user content (dashboard, courses, audio) and does not include marketing pages. Users access the app after enrolling through our website.
+
+**Test Account:**
+- Email: reviewer@ladybosslook.com
 
 **Push Notifications Usage:**
 We use push notifications to:
@@ -175,7 +222,7 @@ Users can opt-in during onboarding and disable anytime in device settings.
 We use Stripe for payment processing, which opens in Safari/in-app browser per App Store guidelines. Users are redirected back to the app after completing payment. We do not process payments inside the app to comply with Apple's guidelines.
 
 **Content Rights:**
-All course content, images, and audio are created by or licensed to LadyBoss Academy. We have full rights to distribute this content.
+All course content, images, and audio are created by or licensed to Ladybosslook LLC. We have full rights to distribute this content.
 
 **Test Coverage:**
 The demo account has access to:
@@ -213,11 +260,13 @@ The demo account has access to:
 ## Content Rights Declaration
 
 ✅ I confirm that I have all necessary rights to use:
-- The app name "LadyBoss Academy"
+- The app name "Ladybosslook"
+- The app is owned and operated by Ladybosslook LLC
 - All course content and materials
 - All images and graphics in the app
 - All audio content in the library
 - Testimonials and user-generated content
+- No content infringes on third-party intellectual property rights
 
 ---
 
@@ -239,7 +288,7 @@ The demo account has access to:
 
 ## Version Release Notes (v1.0.0)
 
-Welcome to LadyBoss Academy! 
+Welcome to Ladybosslook! 
 
 🎉 Launch features:
 - Access business coaching and financial literacy courses

@@ -2,10 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { isNativeApp } from "@/lib/platform";
+import { useEffect } from "react";
 import AppLayout from "@/layouts/AppLayout";
 import AppHome from "@/pages/app/AppHome";
 import AppCourses from "@/pages/app/AppCourses";
@@ -54,6 +56,32 @@ import SendTestEmail from "./pages/SendTestEmail";
 
 const queryClient = new QueryClient();
 
+// Native App Router - Redirects to /app routes
+const NativeAppRedirect = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  useEffect(() => {
+    if (isNativeApp()) {
+      // Redirect root to app home
+      if (location.pathname === '/') {
+        navigate('/app/home', { replace: true });
+      }
+      // Redirect any marketing pages to app
+      const marketingRoutes = ['/programs', '/about', '/landing', '/asac', '/video', 
+        '/expressassert', '/business-ideas', '/business-growth-accelerator', 
+        '/business-startup-accelerator', '/event-irvine', '/ccw', '/cc', '/ccpay',
+        '/giveaway', '/ladyboss-coaching', '/freelive', '/one', '/iqmoney', '/rathus'];
+      
+      if (marketingRoutes.includes(location.pathname)) {
+        navigate('/app/home', { replace: true });
+      }
+    }
+  }, [location.pathname, navigate]);
+  
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <HelmetProvider>
@@ -62,6 +90,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <NativeAppRedirect />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/programs" element={<Programs />} />
@@ -69,7 +98,7 @@ const App = () => (
             <Route path="/landing" element={<Landing />} />
             <Route path="/asac" element={<AssertLanding />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={<Admin />} />
+            {!isNativeApp() && <Route path="/admin" element={<Admin />} />}
           <Route path="/video" element={<Video />} />
           <Route path="/expressassert" element={<ExpressAssert />} />
           <Route path="/business-ideas" element={<BusinessIdeas />} />
