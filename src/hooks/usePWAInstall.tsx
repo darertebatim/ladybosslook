@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { requestNotificationPermission, subscribeToPushNotifications } from '@/lib/pushNotifications';
 import { trackPWAInstallation } from '@/lib/pwaTracking';
 import { toast } from 'sonner';
+import { Capacitor } from '@capacitor/core';
 
 // Detect iOS devices
 const isIOSDevice = () => {
@@ -17,13 +18,16 @@ export function usePWAInstall() {
   const isIOS = isIOSDevice();
 
   useEffect(() => {
-    // Check if already installed
-    const checkInstalled = window.matchMedia('(display-mode: standalone)').matches;
+    // Check if running as native app or PWA
+    const isNativeApp = Capacitor.isNativePlatform();
+    const isPWAStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const checkInstalled = isNativeApp || isPWAStandalone;
+    
     setIsInstalled(checkInstalled);
 
     // Track installation immediately if user is logged in and app is installed
     if (checkInstalled && user?.id) {
-      console.log('[PWA] Detected standalone mode, tracking installation for user:', user.id);
+      console.log('[PWA] Detected app installation, tracking for user:', user.id);
       trackInstallation();
     }
   }, [user?.id]); // Re-run when user changes

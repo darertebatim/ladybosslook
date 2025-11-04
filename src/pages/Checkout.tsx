@@ -2,6 +2,8 @@ import { Button } from '@/components/ui/button';
 import { SEOHead } from '@/components/SEOHead';
 import { ArrowLeft, Shield, Crown, CheckCircle, ExternalLink } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 
 const Checkout = () => {
   const [searchParams] = useSearchParams();
@@ -26,14 +28,18 @@ const Checkout = () => {
 
   const details = programDetails[program as keyof typeof programDetails] || programDetails['courageous-character'];
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     // Add success and cancel URLs to the Stripe payment link
     const successUrl = encodeURIComponent(`${window.location.origin}/payment-success`);
     const cancelUrl = encodeURIComponent(`${window.location.origin}/checkout?cancelled=true`);
     const stripeUrl = `${details.stripePaymentLink}?success_url=${successUrl}&cancel_url=${cancelUrl}`;
     
-    // Redirect directly to Stripe
-    window.location.href = stripeUrl;
+    // Use native browser on mobile, regular redirect on web
+    if (Capacitor.isNativePlatform()) {
+      await Browser.open({ url: stripeUrl });
+    } else {
+      window.location.href = stripeUrl;
+    }
   };
 
   return (

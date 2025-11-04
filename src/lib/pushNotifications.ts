@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { Capacitor } from '@capacitor/core';
+import { PushNotifications } from '@capacitor/push-notifications';
 
 const VAPID_PUBLIC_KEY = 'BAri-GDjcQmDuVrGZnXHG1YhsXfpaKbB5VGZpATGVBkYhpJszSG36cjbXiUahGAgvAamJayRgq5EXThyILzbF7Y';
 
@@ -38,6 +40,40 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
   try {
     console.log('[Push] Starting subscription process for user:', userId);
     
+    // Use native push notifications on native platforms
+    if (Capacitor.isNativePlatform()) {
+      console.log('[Push] Using native push notifications');
+      
+      const permResult = await PushNotifications.checkPermissions();
+      if (permResult.receive === 'granted') {
+        await PushNotifications.register();
+        
+        // Listen for registration
+        PushNotifications.addListener('registration', async (token) => {
+          console.log('[Push] Native token received:', token.value);
+          
+          // Save native token to database
+          const { error } = await supabase.from('push_subscriptions').upsert({
+            user_id: userId,
+            endpoint: `native:${token.value}`,
+            p256dh_key: '',
+            auth_key: '',
+          }, {
+            onConflict: 'user_id,endpoint'
+          });
+          
+          if (error) {
+            console.error('[Push] Error saving native subscription:', error);
+          }
+        });
+        
+        return { success: true };
+      } else {
+        throw new Error('Push notification permission not granted');
+      }
+    }
+    
+    // Web push notifications for PWA/web
     if (!('serviceWorker' in navigator)) {
       console.error('[Push] Service Workers not supported');
       throw new Error('Service Workers are not supported in your browser');

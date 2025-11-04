@@ -7,6 +7,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications } from '@/lib/pushNotifications';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { Capacitor } from '@capacitor/core';
 
 const AppLayout = () => {
   const location = useLocation();
@@ -18,6 +19,11 @@ const AppLayout = () => {
   const [notificationPermission, setNotificationPermission] = useState(checkPermissionStatus());
 
   useEffect(() => {
+    // Don't show install prompt if already running as native app
+    if (Capacitor.isNativePlatform()) {
+      return;
+    }
+    
     // Check if we should show the install prompt
     const hasSeenPrompt = localStorage.getItem('hideInstallPrompt') === 'true';
     const isInstallPage = location.pathname === '/app/install';
