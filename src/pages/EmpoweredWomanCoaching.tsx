@@ -156,95 +156,170 @@ export default function EmpoweredWomanCoaching() {
       </section>
 
 
-      {/* Transformation Areas */}
+      {/* What You'll Gain - 7 Key Benefits */}
       <section className="py-12 md:py-16 lg:py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto rtl font-farsi">
           <div className="text-center mb-10 md:mb-16 animate-fade-in-up">
             <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
-              <span className="gradient-text">قدرت ۱۰ برابری</span> در ۳ حوزه کلیدی
+              💡 توی این مسیر <span className="gradient-text">۳ ماهه</span>، دقیقاً چه چیزی به دست میاری؟
             </h2>
-            <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
-              با این برنامه، قدرت واقعی خود را در سه بعد مهم زندگی کشف کنید
-            </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-            {/* Career Card */}
+          <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+            {/* 1. مدیریت ذهن و احساسات */}
             <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-card border-2 border-border">
-              <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 md:mb-6">
-                <Briefcase className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-primary" />
+              <div className="flex flex-col items-end text-right space-y-3 md:space-y-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
+                  <Brain className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">مدیریت ذهن و احساسات</h3>
+                <div className="space-y-2 md:space-y-3 w-full">
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">وقتی بتونی ذهنتو کنترل کنی، تصمیمات مالی‌ات دیگه از روی ترس یا عجله نیست</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">آرامش ذهنی یعنی فرصت‌ها رو می‌فهمی، نه اینکه از دستشون بدی</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">دیگه نمی‌گی "الان حسش نیست" → سریع اقدام می‌کنی، سریع نتیجه می‌گیری</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                </div>
               </div>
-              <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-foreground">کار و شغل</h3>
-              <ul className="space-y-2 md:space-y-3">
-                <li className="flex items-start gap-2 md:gap-3">
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">افزایش اعتماد به نفس در محیط کار</span>
-                </li>
-                <li className="flex items-start gap-2 md:gap-3">
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">مهارت مذاکره و ارتباط حرفه‌ای</span>
-                </li>
-                <li className="flex items-start gap-2 md:gap-3">
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">رشد و پیشرفت شغلی سریع‌تر</span>
-                </li>
-                <li className="flex items-start gap-2 md:gap-3">
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">رهبری و تاثیرگذاری بیشتر</span>
-                </li>
-              </ul>
             </Card>
 
-            {/* Relationships Card */}
+            {/* 2. اصلاح نگرش‌ها */}
             <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-card border-2 border-border">
-              <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mb-4 md:mb-6">
-                <Heart className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-secondary" />
+              <div className="flex flex-col items-end text-right space-y-3 md:space-y-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
+                  <Lightbulb className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">اصلاح نگرش‌ها</h3>
+                <div className="space-y-2 md:space-y-3 w-full">
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">اون صدایی که همیشه می‌گه "نمی‌تونی" یا "الان وقتش نیست" → ساکت میشه</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">وقتی نگرش‌هاتو درست کنی، هر موقعیت سختی می‌تونه یه سکوی پرتاب بشه</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                </div>
               </div>
-              <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-foreground">روابط</h3>
-              <ul className="space-y-2 md:space-y-3">
-                <li className="flex items-start gap-2 md:gap-3">
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">برقراری ارتباطات قدرتمند و واقعی</span>
-                </li>
-                <li className="flex items-start gap-2 md:gap-3">
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">تعیین مرزهای سالم و احترام</span>
-                </li>
-                <li className="flex items-start gap-2 md:gap-3">
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">روابط خانوادگی متعادل</span>
-                </li>
-                <li className="flex items-start gap-2 md:gap-3">
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">شبکه‌سازی موثر و حرفه‌ای</span>
-                </li>
-              </ul>
             </Card>
 
-            {/* Income Card */}
+            {/* 3. قدرت ارتباط و دیده شدن */}
             <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-card border-2 border-border">
-              <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-success/10 flex items-center justify-center mb-4 md:mb-6">
-                <DollarSign className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-success" />
+              <div className="flex flex-col items-end text-right space-y-3 md:space-y-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-pink-100 dark:bg-pink-900/20 flex items-center justify-center">
+                  <Users className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-pink-600 dark:text-pink-400" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">قدرت ارتباط و دیده شدن</h3>
+                <div className="space-y-2 md:space-y-3 w-full">
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">می‌تونی توی جمع‌ها با اعتمادبه‌نفس صحبت کنی → دیده می‌شی، پیشنهادهای کاری بیشتر می‌گیری</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">می‌تونی درخواست کنی بدون اینکه بترسی → درآمدت بیشتر میشه</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                </div>
               </div>
-              <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-foreground">درآمد</h3>
-              <ul className="space-y-2 md:space-y-3">
-                <li className="flex items-start gap-2 md:gap-3">
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">افزایش درآمد و فرصت‌های مالی</span>
-                </li>
-                <li className="flex items-start gap-2 md:gap-3">
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">ذهنیت ثروت و فراوانی</span>
-                </li>
-                <li className="flex items-start gap-2 md:gap-3">
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">مهارت سرمایه‌گذاری و مدیریت مالی</span>
-                </li>
-                <li className="flex items-start gap-2 md:gap-3">
-                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">استقلال و امنیت مالی</span>
-                </li>
-              </ul>
+            </Card>
+
+            {/* 4. ساختن لایف‌استایل زن موفق */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-card border-2 border-border">
+              <div className="flex flex-col items-end text-right space-y-3 md:space-y-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center">
+                  <Calendar className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-amber-600 dark:text-amber-400" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">ساختن لایف‌استایل زن موفق</h3>
+                <div className="space-y-2 md:space-y-3 w-full">
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">با برنامه‌ریزی و تغییر عادت‌ها، هر روز انرژی‌ات بالاست و تمرکزت قویه</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">عادت‌های مخرب حذف می‌شن، ذهنت برات کار می‌کنه نه بر علیه‌ات</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">بین خانواده، رشد شخصی و پول درآوردن تعادل واقعی ایجاد می‌کنی</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* 5. غلبه بر کمال‌گرایی و اهمال‌کاری */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-card border-2 border-border">
+              <div className="flex flex-col items-end text-right space-y-3 md:space-y-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
+                  <Zap className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-orange-600 dark:text-orange-400" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">غلبه بر کمال‌گرایی و اهمال‌کاری</h3>
+                <div className="space-y-2 md:space-y-3 w-full">
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">دیگه نمی‌گی "هنوز آمادگی ندارم" → زود شروع می‌کنی، زود نتیجه می‌گیری</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">مسیر پول‌سازی رو بدون کلافه شدن و تأخیر یاد می‌گیری</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* 6. آگاهی مالی و رشد درآمد */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-card border-2 border-border">
+              <div className="flex flex-col items-end text-right space-y-3 md:space-y-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
+                  <DollarSign className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-green-600 dark:text-green-400" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">آگاهی مالی و رشد درآمد</h3>
+                <div className="space-y-2 md:space-y-3 w-full">
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">پول درآوردن برات یه مهارت میشه، نه یه اتفاق نادر</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">می‌فهمی پول تو رو قدرتمندتر می‌کنه نه وابسته‌تر</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">با همون امکانات الان، پول بسازی و بعد بیشترش کنی</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* 7. بیزنس استایل و فروش حرفه‌ای */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-card border-2 border-border md:col-span-2">
+              <div className="flex flex-col items-end text-right space-y-3 md:space-y-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center">
+                  <Briefcase className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">بیزنس استایل و فروش حرفه‌ای</h3>
+                <div className="space-y-2 md:space-y-3 w-full">
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">می‌تونی از تخصصت پول بسازی—حتی اگه الان هیچ ایده‌ای نداری</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">سوشال مدیات رو تبدیل به پول واقعی کنی با استراتژی حرفه‌ای</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm md:text-base text-muted-foreground flex-1">خودتو به عنوان یه زن حرفه‌ای معرفی کنی که کسی نمی‌تونه نادیده‌اش بگیره</p>
+                    <Check className="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-0.5" />
+                  </div>
+                </div>
+              </div>
             </Card>
           </div>
         </div>
