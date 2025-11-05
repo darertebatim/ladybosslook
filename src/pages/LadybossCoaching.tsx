@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, Crown, Users, Calendar, Star, Sparkles, Bell } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
+import Navigation from '@/components/ui/navigation';
+import Footer from '@/components/sections/Footer';
 import { subscriptionFormSchema } from '@/lib/validation';
 import { z } from 'zod';
 
@@ -120,6 +122,7 @@ const LadybossCoaching = () => {
           title="Welcome to Ladyboss Coaching Program"
           description="You've successfully joined the Ladyboss Coaching Program. Get ready to transform your business and life."
         />
+        <Navigation />
         <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center py-8">
           <div className="container mx-auto px-4 max-w-2xl">
             <Card className="text-center shadow-lg">
@@ -158,6 +161,7 @@ const LadybossCoaching = () => {
             </Card>
           </div>
         </div>
+        <Footer />
       </>
     );
   }
@@ -168,6 +172,7 @@ const LadybossCoaching = () => {
         title="Ladyboss Coaching Program - Transform Your Business & Life"
         description="Join our exclusive coaching program designed for ambitious women entrepreneurs. Get personalized guidance, build confidence, and scale your business."
       />
+      <Navigation />
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-8">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-8 items-start max-w-6xl mx-auto">
@@ -342,6 +347,7 @@ const LadybossCoaching = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 };
