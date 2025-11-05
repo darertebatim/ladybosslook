@@ -71,7 +71,7 @@ const NativeAppRedirect = () => {
       const marketingRoutes = ['/programs', '/about', '/landing', '/asac', '/video', 
         '/expressassert', '/business-ideas', '/business-growth-accelerator', 
         '/business-startup-accelerator', '/event-irvine', '/ccw', '/cc', '/ccpay',
-        '/giveaway', '/ewc', '/freelive', '/one', '/iqmoney', '/rathus'];
+        '/giveaway', '/ewc', '/ewcnow', '/freelive', '/one', '/iqmoney', '/rathus'];
       
       if (marketingRoutes.includes(location.pathname)) {
         navigate('/app/home', { replace: true });
@@ -115,6 +115,7 @@ const App = () => (
             <Route path="/sms-terms" element={<SMSTerms />} />
             <Route path="/giveaway" element={<Giveaway />} />
             <Route path="/ewc" element={<EmpoweredWomanCoaching />} />
+            <Route path="/ewcnow" element={<EmpoweredWomanCoaching />} />
             <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
             <Route path="/announcements/ccw" element={<CCWAnnouncements />} />
             <Route path="/freelive" element={<FreeLive />} />
