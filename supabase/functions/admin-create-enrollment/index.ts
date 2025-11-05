@@ -14,6 +14,13 @@ interface EnrollmentRequest {
   fullName?: string;
 }
 
+// Generate cryptographically secure random password
+const generateSecurePassword = (): string => {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+};
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -92,12 +99,12 @@ const handler = async (req: Request): Promise<Response> => {
         console.log(`Auth user exists but profile missing, using existing ID: ${existingAuthUser.id}`);
         userId = existingAuthUser.id;
       } else {
-        // Create new user
+        // Create new user with secure random password
         console.log(`Creating new user: ${email}`);
         const { data: userData, error: userError } = await supabase.auth.admin.createUser({
           email: email,
           email_confirm: true,
-          password: email, // Temporary password (same as email)
+          password: generateSecurePassword(),
           user_metadata: {
             full_name: fullName || ''
           }
@@ -119,7 +126,19 @@ const handler = async (req: Request): Promise<Response> => {
         }
 
         userId = userData.user.id;
-        console.log(`User created successfully: ${userId} with password set to email`);
+        console.log(`User created successfully: ${userId} with secure random password`);
+        
+        // Send password reset email so user can set their own password
+        const { error: resetError } = await supabase.auth.admin.generateLink({
+          type: 'recovery',
+          email: email,
+        });
+
+        if (resetError) {
+          console.error('Error sending password reset email:', resetError);
+        } else {
+          console.log('Password reset email sent to:', email);
+        }
       }
     }
 

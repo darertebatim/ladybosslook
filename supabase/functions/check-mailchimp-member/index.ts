@@ -5,6 +5,29 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Rate limiting configuration
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const MAX_REQUESTS = 10; // 10 requests per minute
+
+// Check rate limit for IP address
+const checkRateLimit = (ip: string): boolean => {
+  const now = Date.now();
+  const record = rateLimitStore.get(ip);
+
+  if (!record || now > record.resetAt) {
+    rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+
+  if (record.count >= MAX_REQUESTS) {
+    return false;
+  }
+
+  record.count++;
+  return true;
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -12,10 +35,24 @@ serve(async (req) => {
   }
 
   try {
+    // Rate limiting check
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0] || 
+                     req.headers.get('x-real-ip') || 
+                     'unknown';
+    
+    if (!checkRateLimit(clientIP)) {
+      return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 429,
+      });
+    }
+
     const { email } = await req.json();
     
-    if (!email) {
-      return new Response(JSON.stringify({ error: "Email is required" }), {
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || typeof email !== 'string' || !emailRegex.test(email) || email.length > 255) {
+      return new Response(JSON.stringify({ error: "Invalid email format" }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       });
@@ -81,16 +118,10 @@ serve(async (req) => {
       });
     }
 
+    // Return only essential fields to limit information disclosure
     return new Response(JSON.stringify({
       exists: true,
-      member: {
-        email: data.email_address,
-        status: data.status,
-        merge_fields: data.merge_fields,
-        tags: data.tags || [],
-        subscribed_at: data.timestamp_opt,
-        last_changed: data.last_changed
-      }
+      status: data.status
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,

@@ -13,6 +13,13 @@ const logStep = (step: string, details?: any) => {
   console.log(`[VERIFY-PAYMENT] ${step}${detailsStr}`);
 };
 
+// Generate cryptographically secure random password
+const generateSecurePassword = (): string => {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -89,12 +96,12 @@ serve(async (req) => {
         logStep('Found existing user account', { userId: existingUser.id });
         userId = existingUser.id;
       } else {
-        // Create new user account with email as password
+        // Create new user account with secure random password
         logStep('Creating new user account');
         
         const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
           email: customerEmail,
-          password: customerEmail,
+          password: generateSecurePassword(),
           email_confirm: true,
           user_metadata: {
             full_name: customerName,
@@ -105,6 +112,8 @@ serve(async (req) => {
 
         if (signUpError) {
           logStep('Error creating user account', signUpError);
+          // Critical: Don't proceed with order creation if user creation fails
+          throw new Error(`Failed to create user account: ${signUpError.message}`);
         } else if (newUser.user) {
           userId = newUser.user.id;
           logStep('User account created', { userId });
@@ -123,7 +132,14 @@ serve(async (req) => {
           } else {
             logStep('Password reset email sent');
           }
+        } else {
+          throw new Error('User creation failed - no user returned');
         }
+      }
+      
+      // Ensure userId is set before proceeding
+      if (!userId) {
+        throw new Error('User ID is required to create order');
       }
       
       // Get program info from payment intent metadata
