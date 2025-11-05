@@ -169,6 +169,9 @@ serve(async (req) => {
           case 'private-coaching':
             programName = "Private Coaching Session";
             break;
+          case 'empowered-woman-coaching':
+            programName = "Empowered Woman Coaching";
+            break;
           default:
             programName = session.line_items?.data[0]?.description || 'Purchase';
         }
@@ -197,6 +200,26 @@ serve(async (req) => {
       } else {
         orderDetails = newOrder;
         logStep('Order record created', { orderId: newOrder.id });
+      }
+
+      // Auto-enroll user in course if program is empowered-woman-coaching
+      if (userId && programSlug === 'empowered-woman-coaching') {
+        logStep('Auto-enrolling user in Empowered Woman Coaching');
+        
+        const { error: enrollmentError } = await supabase
+          .from('course_enrollments')
+          .insert({
+            user_id: userId,
+            course_name: 'Empowered Woman Coaching',
+            program_slug: programSlug,
+            status: 'active'
+          });
+
+        if (enrollmentError) {
+          logStep('Error creating enrollment', enrollmentError);
+        } else {
+          logStep('User enrolled successfully');
+        }
       }
 
       // If payment successful, subscribe to Mailchimp with workshop details
@@ -262,6 +285,10 @@ serve(async (req) => {
               case 'private-coaching':
                 programName = "Private Coaching Session";
                 tags = ["private_session"];
+                break;
+              case 'empowered-woman-coaching':
+                programName = "Empowered Woman Coaching";
+                tags = ["ewc"];
                 break;
               default:
                 programName = "General Purchase";
