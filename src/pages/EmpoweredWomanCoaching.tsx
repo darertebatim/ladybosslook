@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { SEOHead } from "@/components/SEOHead";
 import {
   Check,
@@ -19,7 +20,15 @@ import {
   MessageCircle,
   Target,
   Zap,
-  Gift
+  Gift,
+  Brain,
+  Trophy,
+  Rocket,
+  X,
+  CheckCircle2,
+  Lightbulb,
+  UserCheck,
+  Compass
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -241,8 +250,621 @@ export default function EmpoweredWomanCoaching() {
         </div>
       </section>
 
-      {/* Program Details */}
+      {/* Detailed 12-Session Curriculum */}
       <section className="py-12 md:py-16 lg:py-20 px-4">
+        <div className="max-w-6xl mx-auto rtl font-farsi">
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
+              <span className="gradient-text">سرفصل ۱۲ جلسه</span> کوچینگ زن قوی
+            </h2>
+            <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
+              مسیر کامل تبدیل شدن به نسخه قدرتمند خودت
+            </p>
+          </div>
+
+          <Accordion type="single" collapsible className="space-y-4">
+            <AccordionItem value="session-1" className="border-2 border-border rounded-lg overflow-hidden bg-card">
+              <AccordionTrigger className="px-4 md:px-6 py-4 hover:bg-muted/50">
+                <div className="flex items-center gap-3 md:gap-4 text-right w-full">
+                  <Badge className="bg-primary/10 text-primary border-primary/20 text-sm md:text-base">جلسه ۱</Badge>
+                  <span className="font-bold text-base md:text-lg">چکاپ وضعیت فعلی و بازسازی تصویر از خود</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 md:px-6 pb-4">
+                <ul className="space-y-2 text-sm md:text-base text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>بازسازی تصویر فعلی و گذشته از خود</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>تمرین خودبخشی (صلح با خود)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>معناگرایی در وجود چالش‌های هر فرد</span>
+                  </li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="session-2" className="border-2 border-border rounded-lg overflow-hidden bg-card">
+              <AccordionTrigger className="px-4 md:px-6 py-4 hover:bg-muted/50">
+                <div className="flex items-center gap-3 md:gap-4 text-right w-full">
+                  <Badge className="bg-secondary/10 text-secondary border-secondary/20 text-sm md:text-base">جلسات ۲-۳</Badge>
+                  <span className="font-bold text-base md:text-lg">مدیریت و پرورش افکار و احساسات با متد ACT</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 md:px-6 pb-4">
+                <ul className="space-y-2 text-sm md:text-base text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span>غلبه بر افکار منفی و تسلط بر احساسات</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span>مدیریت فکر و احساس در شرایط سخت</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span>مدیریت افکار و احساسات تخریبگر و تنبیهی</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span>بازطراحی ماشین رفتار</span>
+                  </li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="session-4" className="border-2 border-border rounded-lg overflow-hidden bg-card">
+              <AccordionTrigger className="px-4 md:px-6 py-4 hover:bg-muted/50">
+                <div className="flex items-center gap-3 md:gap-4 text-right w-full">
+                  <Badge className="bg-success/10 text-success border-success/20 text-sm md:text-base">جلسه ۴</Badge>
+                  <span className="font-bold text-base md:text-lg">مکانیزم انگیزه و ایجاد انگیزه دائمی</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 md:px-6 pb-4">
+                <ul className="space-y-2 text-sm md:text-base text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-success mt-0.5 flex-shrink-0" />
+                    <span>طراحی فیلمنامه زندگی برای ایجاد انگیزه</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-success mt-0.5 flex-shrink-0" />
+                    <span>طراحی و ساخت توقع</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-success mt-0.5 flex-shrink-0" />
+                    <span>پیش‌زمینه احساس لیاقت</span>
+                  </li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="session-5" className="border-2 border-border rounded-lg overflow-hidden bg-card">
+              <AccordionTrigger className="px-4 md:px-6 py-4 hover:bg-muted/50">
+                <div className="flex items-center gap-3 md:gap-4 text-right w-full">
+                  <Badge className="bg-primary/10 text-primary border-primary/20 text-sm md:text-base">جلسه ۵</Badge>
+                  <span className="font-bold text-base md:text-lg">مکانیزم نگرش‌ها و تغییر باورها</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 md:px-6 pb-4">
+                <ul className="space-y-2 text-sm md:text-base text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>ریشه‌یابی نگرش‌های ۳ حوزه: فردی، ارتباطی، مستقل شدن</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>طراحی سوالات تخصصی برای ریشه‌یابی</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>آموزش شیوه تغییر نگرش شخصی</span>
+                  </li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="session-6" className="border-2 border-border rounded-lg overflow-hidden bg-card">
+              <AccordionTrigger className="px-4 md:px-6 py-4 hover:bg-muted/50">
+                <div className="flex items-center gap-3 md:gap-4 text-right w-full">
+                  <Badge className="bg-secondary/10 text-secondary border-secondary/20 text-sm md:text-base">جلسه ۶</Badge>
+                  <span className="font-bold text-base md:text-lg">قانون درخواست و فنون ارتباط‌سازی</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 md:px-6 pb-4">
+                <ul className="space-y-2 text-sm md:text-base text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span>غلبه بر ترس از نه شنیدن</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span>اصول یک درخواست قوی</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span>تمرین برای حضور در جمع</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span>اصول دوست‌یابی و ارتباط‌سازی</span>
+                  </li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="session-7" className="border-2 border-border rounded-lg overflow-hidden bg-card">
+              <AccordionTrigger className="px-4 md:px-6 py-4 hover:bg-muted/50">
+                <div className="flex items-center gap-3 md:gap-4 text-right w-full">
+                  <Badge className="bg-success/10 text-success border-success/20 text-sm md:text-base">جلسه ۷</Badge>
+                  <span className="font-bold text-base md:text-lg">لایف‌استایل خانم رئیس</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 md:px-6 pb-4">
+                <ul className="space-y-2 text-sm md:text-base text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-success mt-0.5 flex-shrink-0" />
+                    <span>طراحی روتین‌های روزانه شتاب‌دهنده</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-success mt-0.5 flex-shrink-0" />
+                    <span>اصول تغییر عادت و مدیریت زمان</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-success mt-0.5 flex-shrink-0" />
+                    <span>ژورنال‌نویسی روزانه و کنترل ذهن</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-success mt-0.5 flex-shrink-0" />
+                    <span>طراحی لایف‌استایل سالم غذایی</span>
+                  </li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="session-8" className="border-2 border-border rounded-lg overflow-hidden bg-card">
+              <AccordionTrigger className="px-4 md:px-6 py-4 hover:bg-muted/50">
+                <div className="flex items-center gap-3 md:gap-4 text-right w-full">
+                  <Badge className="bg-primary/10 text-primary border-primary/20 text-sm md:text-base">جلسه ۸</Badge>
+                  <span className="font-bold text-base md:text-lg">هدف‌گذاری پیشرفته</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 md:px-6 pb-4">
+                <ul className="space-y-2 text-sm md:text-base text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>مدیریت اهداف و ایجاد تعادل در زندگی</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>اصول زندگی پردستاورد</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>هدف‌نویسی و برنامه‌ریزی عملی</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>طراحی رویا + هدف + چشم‌انداز</span>
+                  </li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="session-9" className="border-2 border-border rounded-lg overflow-hidden bg-card">
+              <AccordionTrigger className="px-4 md:px-6 py-4 hover:bg-muted/50">
+                <div className="flex items-center gap-3 md:gap-4 text-right w-full">
+                  <Badge className="bg-secondary/10 text-secondary border-secondary/20 text-sm md:text-base">جلسه ۹</Badge>
+                  <span className="font-bold text-base md:text-lg">غلبه بر اهمال‌کاری و کمال‌گرایی</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 md:px-6 pb-4">
+                <ul className="space-y-2 text-sm md:text-base text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span>ریشه‌های کمبود عزت‌نفس و اعتماد به نفس</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span>آموزش اقدام‌گرایی</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span>رفع کمال‌گرایی و اهمال‌کاری</span>
+                  </li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="session-10" className="border-2 border-border rounded-lg overflow-hidden bg-card">
+              <AccordionTrigger className="px-4 md:px-6 py-4 hover:bg-muted/50">
+                <div className="flex items-center gap-3 md:gap-4 text-right w-full">
+                  <Badge className="bg-success/10 text-success border-success/20 text-sm md:text-base">جلسه ۱۰</Badge>
+                  <span className="font-bold text-base md:text-lg">پول و مدیریت مالی</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 md:px-6 pb-4">
+                <ul className="space-y-2 text-sm md:text-base text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-success mt-0.5 flex-shrink-0" />
+                    <span>نگرش درست برای پول</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-success mt-0.5 flex-shrink-0" />
+                    <span>تمرینات عملی مدیریت مالی</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-success mt-0.5 flex-shrink-0" />
+                    <span>اصول درآمدسازی</span>
+                  </li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="session-11" className="border-2 border-border rounded-lg overflow-hidden bg-card">
+              <AccordionTrigger className="px-4 md:px-6 py-4 hover:bg-muted/50">
+                <div className="flex items-center gap-3 md:gap-4 text-right w-full">
+                  <Badge className="bg-primary/10 text-primary border-primary/20 text-sm md:text-base">جلسات ۱۱-۱۲</Badge>
+                  <span className="font-bold text-base md:text-lg">بیزنس و بیزنس‌استایل</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 md:px-6 pb-4">
+                <ul className="space-y-2 text-sm md:text-base text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>نگرش‌های ایجاد بیزنس</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>طراحی مسیر شغلی شخصی</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>هدف‌گذاری برای پول‌سازی</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>مسیر راه‌اندازی و ارتقا کسب‌وکار</span>
+                  </li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </section>
+
+      {/* What You'll Gain Section */}
+      <section className="py-12 md:py-16 lg:py-20 px-4 bg-muted/30">
+        <div className="max-w-6xl mx-auto rtl font-farsi">
+          <div className="text-center mb-10 md:mb-16">
+            <div className="inline-block mb-4">
+              <Lightbulb className="w-12 h-12 md:w-16 md:h-16 text-secondary animate-pulse" />
+            </div>
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
+              توی این مسیر <span className="gradient-text">۳ ماهه</span>، دقیقاً چه چیزی به دست میاری؟
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+            {/* Mind Control */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-gradient-to-br from-primary/5 to-primary/10 border-2 border-primary/20">
+              <div className="flex items-start gap-3 md:gap-4 mb-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Brain className="w-6 h-6 md:w-7 md:h-7 text-primary" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">مدیریت ذهن و احساسات</h3>
+              </div>
+              <ul className="space-y-2 md:space-y-3">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">تصمیمات مالی از روی آرامش، نه ترس یا عجله</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">درک فرصت‌ها به جای از دست دادن</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">اقدام سریع و نتیجه‌گیری فوری بدون «بی‌انگیزگی»</span>
+                </li>
+              </ul>
+            </Card>
+
+            {/* Mindset Shift */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-gradient-to-br from-secondary/5 to-secondary/10 border-2 border-secondary/20">
+              <div className="flex items-start gap-3 md:gap-4 mb-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-secondary/20 flex items-center justify-center flex-shrink-0">
+                  <Compass className="w-6 h-6 md:w-7 md:h-7 text-secondary" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">اصلاح نگرش‌ها</h3>
+              </div>
+              <ul className="space-y-2 md:space-y-3">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">صدای «نمی‌تونی» یا «الان وقتش نیست» ساکت می‌شه</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">هر موقعیت سخت تبدیل به سکوی پرتاب می‌شه</span>
+                </li>
+              </ul>
+            </Card>
+
+            {/* Communication Power */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-gradient-to-br from-success/5 to-success/10 border-2 border-success/20">
+              <div className="flex items-start gap-3 md:gap-4 mb-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-success/20 flex items-center justify-center flex-shrink-0">
+                  <Users className="w-6 h-6 md:w-7 md:h-7 text-success" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">قدرت ارتباط و دیده شدن</h3>
+              </div>
+              <ul className="space-y-2 md:space-y-3">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">صحبت با اعتماد‌به‌نفس در جمع‌ها → دیده می‌شی</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">درخواست بدون ترس → درآمد بیشتر</span>
+                </li>
+              </ul>
+            </Card>
+
+            {/* Lifestyle Design */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-gradient-to-br from-urgency/5 to-urgency/10 border-2 border-urgency/20">
+              <div className="flex items-start gap-3 md:gap-4 mb-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-urgency/20 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-urgency" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">ساختن لایف‌استایل زن موفق</h3>
+              </div>
+              <ul className="space-y-2 md:space-y-3">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">انرژی بالا و تمرکز قوی هر روز</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">تعادل واقعی: خانواده، رشد شخصی، و پول</span>
+                </li>
+              </ul>
+            </Card>
+
+            {/* Overcome Procrastination */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-gradient-to-br from-primary/5 to-primary/10 border-2 border-primary/20">
+              <div className="flex items-start gap-3 md:gap-4 mb-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Rocket className="w-6 h-6 md:w-7 md:h-7 text-primary" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">غلبه بر کمال‌گرایی و اهمال‌کاری</h3>
+              </div>
+              <ul className="space-y-2 md:space-y-3">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">دیگه نمی‌گی «هنوز آمادگی ندارم»</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">زود شروع می‌کنی، زود نتیجه می‌گیری</span>
+                </li>
+              </ul>
+            </Card>
+
+            {/* Financial Intelligence */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-gradient-to-br from-secondary/5 to-secondary/10 border-2 border-secondary/20">
+              <div className="flex items-start gap-3 md:gap-4 mb-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-secondary/20 flex items-center justify-center flex-shrink-0">
+                  <DollarSign className="w-6 h-6 md:w-7 md:h-7 text-secondary" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">آگاهی مالی و رشد درآمد</h3>
+              </div>
+              <ul className="space-y-2 md:space-y-3">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">پول درآوردن یه مهارت می‌شه، نه اتفاق نادر</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">پول تو رو قدرتمندتر می‌کنه، نه وابسته‌تر</span>
+                </li>
+              </ul>
+            </Card>
+
+            {/* Business Style */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-gradient-to-br from-success/5 to-success/10 border-2 border-success/20">
+              <div className="flex items-start gap-3 md:gap-4 mb-4">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-success/20 flex items-center justify-center flex-shrink-0">
+                  <Briefcase className="w-6 h-6 md:w-7 md:h-7 text-success" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">بیزنس‌استایل و فروش حرفه‌ای</h3>
+              </div>
+              <ul className="space-y-2 md:space-y-3">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">از تخصصت پول بسازی—حتی بدون ایده</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base">خودت رو طوری نشون بدی که نادیده گرفته نشی</span>
+                </li>
+              </ul>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Transformation Results Grid */}
+      <section className="py-12 md:py-16 lg:py-20 px-4">
+        <div className="max-w-6xl mx-auto rtl font-farsi">
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
+              <span className="gradient-text">تحول واقعی</span> که تجربه می‌کنی
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+            {[
+              "ترس‌های بی‌اساس از بین می‌ره",
+              "حال و انرژیت همیشه متعادله",
+              "اضطراب و استرست خیلی کم می‌شه",
+              "هر شرایطی رو به نفع خودت تغییر می‌دی",
+              "با تمام وجود برای خواسته‌هات می‌جنگی",
+              "سرعت اقداماتت زیاد می‌شه",
+              "ایمانت به کاری که می‌کنی چند برابر می‌شه",
+              "راحت و با اعتماد‌به‌نفس تو جمع‌ها حاضر می‌شی",
+              "در مقابل افراد غریبه با قدرت ظاهر می‌شی",
+              "منظم می‌شی و عادت‌های بد رو از بین می‌بری",
+              "به همه چی می‌رسی: ورزش، خانواده، پول",
+              "عمرت هدر نمی‌ره برای اهداف بیهوده",
+              "به فکر و حرف دیگران عمیقاً فکر نمی‌کنی",
+              "هر کاری لازمه انجام می‌دی",
+              "زود شروع می‌کنی، لفت نمی‌دی",
+              "با امکانات موجود حرکت می‌کنی",
+              "در مورد پول می‌دونی چیکار کنی",
+              "پول‌هات بیشتر می‌شن و قدرتت می‌ره بالا"
+            ].map((result, index) => (
+              <Card key={index} className="p-4 hover-lift bg-card border-l-4 border-l-primary">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
+                  <span className="text-sm md:text-base font-medium">{result}</span>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* True Power Manifestations */}
+      <section className="py-12 md:py-16 lg:py-20 px-4 bg-muted/30">
+        <div className="max-w-6xl mx-auto rtl font-farsi">
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
+              نمودهای <span className="gradient-text">درست قدرت</span>
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+            <Card className="p-6 md:p-8 hover-lift bg-gradient-to-br from-primary/5 to-transparent border-2">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-14 h-14 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Target className="w-7 h-7 text-primary" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">خلق انتخاب جدید</h3>
+              </div>
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-3">
+                توانایی خلق انتخابی که قبلاً نداشتی! یعنی اگه تا دیروز دو تا راه داشتی: تسلیم یا فرار، قدرت راه سومی رو برات باز می‌کنه!
+              </p>
+              <div className="p-3 bg-primary/10 rounded-lg border-r-4 border-r-primary">
+                <p className="text-sm md:text-base italic">
+                  «وقتی مهاجرت کردم همه گفتن نمی‌تونی اینجا همون کار ایران رو کنی! ولی من رفتم کردم!»
+                </p>
+              </div>
+            </Card>
+
+            <Card className="p-6 md:p-8 hover-lift bg-gradient-to-br from-secondary/5 to-transparent border-2">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-14 h-14 rounded-xl bg-secondary/20 flex items-center justify-center flex-shrink-0">
+                  <UserCheck className="w-7 h-7 text-secondary" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">زندگی به انتخاب خودت</h3>
+              </div>
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-3">
+                با سطحی زندگی می‌کنی که خودت انتخاب می‌کنی، نه لولی که جامعه انتخاب کرده!
+              </p>
+              <div className="p-3 bg-secondary/10 rounded-lg border-r-4 border-r-secondary">
+                <p className="text-sm md:text-base italic">
+                  جامعه گفته دختر باید زود ازدواج کنه، مادر شد دیگه کار نکنه! من انتخاب می‌کنم آدما چجوری برخورد کنن.
+                </p>
+              </div>
+            </Card>
+
+            <Card className="p-6 md:p-8 hover-lift bg-gradient-to-br from-success/5 to-transparent border-2">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-14 h-14 rounded-xl bg-success/20 flex items-center justify-center flex-shrink-0">
+                  <Trophy className="w-7 h-7 text-success" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">دونستن کی و کجا رها کنی</h3>
+              </div>
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                آدمای ضعیف وقتی سخت می‌شه اهدافشونو رها می‌کنن. اما آدمای قوی افکارشونو و عقاید اشتباهشونو رها می‌کنن. یه چیزی تو سرم هست که باید تغییرش بدم.
+              </p>
+            </Card>
+
+            <Card className="p-6 md:p-8 hover-lift bg-gradient-to-br from-urgency/5 to-transparent border-2">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-14 h-14 rounded-xl bg-urgency/20 flex items-center justify-center flex-shrink-0">
+                  <Compass className="w-7 h-7 text-urgency" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold">انتخاب‌گر باشی</h3>
+              </div>
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                کی با من دوست بشه! چی بخورم! وقتامو چجوری بگذرونم! کجا کار کنم! نه صرفاً چون منو قبول کردن.
+              </p>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Self-Reflection Questions */}
+      <section className="py-12 md:py-16 lg:py-20 px-4">
+        <div className="max-w-5xl mx-auto rtl font-farsi">
+          <div className="text-center mb-10 md:mb-16">
+            <div className="inline-block mb-4">
+              <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-primary animate-pulse" />
+            </div>
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
+              <span className="gradient-text">از خودت بپرس...</span>
+            </h2>
+          </div>
+
+          <div className="space-y-4 md:space-y-6">
+            {[
+              "آیا تو هم کسی هستی که می‌خواد بتونه ذهن و احساساتش رو کنترل کنه، تا دیگه تصمیمات مهم زندگیش از روی ترس یا عجله نباشن؟",
+              "آیا تو هم دلت می‌خواد یه روزایی بیاد که بگی: «من هیچ‌وقت دیگه با جمله‌ی \"الان حسش نیست\" کارمو عقب نمی‌ندازم»؟",
+              "آیا خسته‌ای از صدای درونت که همیشه می‌گه: «نمی‌تونی»، «الان وقتش نیست»، «شرایط مناسب نیست»؟",
+              "آیا دوست داری بتونی بدون ترس، توی جمع‌ها با اعتمادبه‌نفس ظاهر بشی، دیده بشی، و فرصتا بیان سمتت؟",
+              "آیا تو هم می‌خوای لایف‌استایلی بسازی که توش هم آرامش داشته باشی، هم درآمد، هم رشد شخصی، هم زمان برای خانواده؟",
+              "آیا می‌خوای بالاخره دست از اهمال‌کاری برداری، زودتر اقدام کنی و زودتر نتیجه ببینی؟",
+              "آیا وقتشه که یاد بگیری چطور با امکانات الانت پول بسازی و بعد چندبرابرش کنی؟",
+              "آیا دلت می‌خواد از تخصصت، یا حتی بدون تخصص، یه کسب‌وکار واقعی بسازی که درآمد مستمر برات داشته باشه؟",
+              "آیا آماده‌ای که خودت رو طوری به دنیا نشون بدی که هیچ‌کس نتونه نادیده‌ت بگیره؟"
+            ].map((question, index) => (
+              <Card key={index} className="p-5 md:p-6 hover-lift border-2 bg-card">
+                <div className="flex items-start gap-3 md:gap-4">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <MessageCircle className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                  </div>
+                  <p className="text-base md:text-lg leading-relaxed">{question}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          <Card className="mt-8 md:mt-12 p-6 md:p-8 bg-gradient-to-br from-success/10 to-success/5 border-2 border-success">
+            <p className="text-lg md:text-xl lg:text-2xl font-bold text-center leading-relaxed">
+              اگه جواب بیشتر این سوالا «بله» بود، پس کوچینگ زن قوی <span className="text-success">برای تو طراحی شده</span>.
+            </p>
+          </Card>
+
+          <div className="text-center mt-8 md:mt-12">
+            <Button
+              size="lg"
+              onClick={handleDepositClick}
+              disabled={isLoading}
+              className="cta-button text-base md:text-lg px-8 md:px-10 py-5 md:py-7 text-white font-bold shadow-bold hover:shadow-glow w-full sm:w-auto"
+            >
+              <Shield className="w-4 h-4 md:w-5 md:h-5 ml-2" />
+              {isLoading ? "در حال انتقال..." : "بله، آماده‌ام برای تحول"}
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Program Details */}
+      <section className="py-12 md:py-16 lg:py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto rtl font-farsi">
           <div className="text-center mb-10 md:mb-16">
             <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
@@ -325,6 +947,142 @@ export default function EmpoweredWomanCoaching() {
       </section>
 
 
+      {/* Pricing Psychology Section */}
+      <section className="py-12 md:py-16 lg:py-20 px-4 bg-gradient-to-br from-primary/5 via-secondary/5 to-success/5">
+        <div className="max-w-5xl mx-auto rtl font-farsi">
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
+              این <span className="gradient-text">سرمایه‌گذاری</span> یعنی چی؟
+            </h2>
+          </div>
+
+          {/* Value of Past Losses */}
+          <Card className="p-6 md:p-8 mb-6 md:mb-8 border-2 border-urgency/30 bg-gradient-to-br from-urgency/5 to-transparent">
+            <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">بذار بپرسم...</h3>
+            <div className="space-y-3 md:space-y-4 mb-6">
+              <div className="flex items-start gap-3 p-3 md:p-4 bg-background/50 rounded-lg">
+                <X className="w-5 h-5 md:w-6 md:h-6 text-urgency flex-shrink-0 mt-0.5" />
+                <p className="text-base md:text-lg">چند بار به خاطر نداشتن اعتماد‌به‌نفس یه فرصت رو از دست دادی؟</p>
+              </div>
+              <div className="flex items-start gap-3 p-3 md:p-4 bg-background/50 rounded-lg">
+                <X className="w-5 h-5 md:w-6 md:h-6 text-urgency flex-shrink-0 mt-0.5" />
+                <p className="text-base md:text-lg">چند بار بخاطر نداشتن تسلط بر احساسات، یه رابطه یا یه شغل رو نابود کردی؟</p>
+              </div>
+              <div className="flex items-start gap-3 p-3 md:p-4 bg-background/50 rounded-lg">
+                <X className="w-5 h-5 md:w-6 md:h-6 text-urgency flex-shrink-0 mt-0.5" />
+                <p className="text-base md:text-lg">چند ساله فقط فکر می‌کنی یه روز باید تغییر کنی، اما هنوز همون‌جایی که بودی هستی؟</p>
+              </div>
+            </div>
+            <div className="p-4 md:p-6 bg-success/10 rounded-lg border-r-4 border-r-success">
+              <p className="text-lg md:text-xl font-bold leading-relaxed">
+                اگه فقط یکی از این اشتباهاتو نخوای دوباره تکرار کنی، کوچینگ زن قوی، نه تنها ارزون نیست—حتی گرون هم نیست. 
+                <span className="text-success"> این یه سرمایه‌گذاریه. روی خودت. روی آینده‌ت.</span>
+              </p>
+            </div>
+          </Card>
+
+          {/* ROI & Investment Return */}
+          <Card className="p-6 md:p-8 mb-6 md:mb-8 border-2 border-success/30 bg-gradient-to-br from-success/5 to-transparent">
+            <div className="flex items-start gap-4 mb-4">
+              <TrendingUp className="w-10 h-10 md:w-12 md:h-12 text-success flex-shrink-0" />
+              <div>
+                <h3 className="text-xl md:text-2xl font-bold mb-3">بازدهی واقعی</h3>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-4">
+                  این کوچینگ می‌تونه مستقیماً تبدیل بشه به پول توی حساب بانکی‌ت.
+                </p>
+                <div className="p-4 bg-background/50 rounded-lg">
+                  <p className="text-base md:text-lg font-semibold">
+                    فقط کافیه یک بار، یه تصمیم درست تو ارتباطاتت یا کارت بگیری، هزینه این دوره دراومده. 
+                    تازه بقیه دستاوردهاش می‌مونه برای تو.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Rare Opportunity */}
+          <Card className="p-6 md:p-8 mb-6 md:mb-8 border-2 border-secondary/30 bg-gradient-to-br from-secondary/5 to-transparent">
+            <div className="flex items-start gap-4 mb-4">
+              <Star className="w-10 h-10 md:w-12 md:h-12 text-secondary flex-shrink-0" />
+              <div>
+                <h3 className="text-xl md:text-2xl font-bold mb-3">فرصت نادر</h3>
+                <p className="text-base md:text-lg leading-relaxed">
+                  تو الان به چیزی دسترسی داری که شاید ۹۰٪ زن‌ها هیچ‌وقت بهش نمی‌رسن: یک مسیر واضح برای تبدیل شدن به نسخه‌ای از خودت که 
+                  <span className="font-bold text-secondary"> قدرت، نظم، حضور اجتماعی، عزت‌نفس و درآمد داره</span>.
+                </p>
+                <div className="mt-4 p-4 bg-background/50 rounded-lg">
+                  <p className="text-base md:text-lg font-semibold">
+                    خیلیا برای این مسیر، باید سال‌ها سردرگم باشن. ولی تو الان یه راه میانبر داری. این یعنی فرصت. نه هزینه.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Daily Cost Breakdown */}
+          <Card className="p-6 md:p-8 mb-6 md:mb-8 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
+            <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">۷۴۷ دلار یعنی چی واقعاً؟</h3>
+            <div className="space-y-3 md:space-y-4 mb-6">
+              <div className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
+                <Check className="w-5 h-5 text-success flex-shrink-0" />
+                <span className="text-base md:text-lg">کمتر از هزینه‌ی دو تا مانتوی گرون</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
+                <Check className="w-5 h-5 text-success flex-shrink-0" />
+                <span className="text-base md:text-lg">کمتر از یه مسافرت معمولی</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
+                <Check className="w-5 h-5 text-success flex-shrink-0" />
+                <span className="text-base md:text-lg">حتی بعضیا اینقد پول می‌دن واسه یه کرم دور چشم!</span>
+              </div>
+            </div>
+            <div className="p-5 md:p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border-2 border-primary/30">
+              <div className="text-center mb-4">
+                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">۱۰ دلار</div>
+                <div className="text-base md:text-lg text-muted-foreground">در روز</div>
+              </div>
+              <p className="text-base md:text-lg font-semibold text-center mb-4">کمتر از قیمت یه قهوه بیرون!</p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                  <span className="text-sm md:text-base">کنترل ذهنت</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                  <span className="text-sm md:text-base">اعتماد‌به‌نفس‌ت</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                  <span className="text-sm md:text-base">درآمدت</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                  <span className="text-sm md:text-base">آرامش و نظم زندگیت</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                  <span className="text-sm md:text-base">ساختن یک نسخه‌ی کاملاً جدید از خودت</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* You Deserve It */}
+          <Card className="p-6 md:p-8 bg-gradient-to-br from-urgency/10 to-urgency/5 border-2 border-urgency/30">
+            <div className="text-center">
+              <Award className="w-12 h-12 md:w-16 md:h-16 text-urgency mx-auto mb-4" />
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">تو لایق اینی...</h3>
+              <p className="text-lg md:text-xl leading-relaxed mb-4">
+                که یه مربی در کنارت باشه. لایق اینی که توی بیزنس، رابطه و زندگی بدرخشی.
+              </p>
+              <p className="text-xl md:text-2xl font-bold text-urgency">
+                این کوچینگ فقط یه کلاس نیست—یه بیانیه‌ست: اینکه تو دیگه قرار نیست نسخه ضعیف خودت باشی.
+              </p>
+            </div>
+          </Card>
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <section className="py-12 md:py-16 lg:py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto rtl font-farsi">
@@ -332,7 +1090,7 @@ export default function EmpoweredWomanCoaching() {
             <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
               <span className="gradient-text">سرمایه‌گذاری</span> روی خودتان
             </h2>
-            <p className="text-base md:text-lg lg:text-xl text-muted-foreground px-4">ارزشش را دارد، و با ضمانت بازگشت وجه محافظت می‌شوید</p>
+            <p className="text-base md:text-lg lg:text-xl text-muted-foreground px-4">با ضمانت بازگشت وجه محافظت می‌شوید</p>
           </div>
 
           <div className="max-w-4xl mx-auto">
