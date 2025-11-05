@@ -33,7 +33,7 @@ export default function EmpoweredWomanCoaching() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="کوچینگ زنان توانمند - برنامه ۳ ماهه تحول ۱۰ برابری"
+        title="کوچینگ زن قوی"
         description="برنامه کوچینگ گروهی ۳ ماهه برای زنان مهاجر. قدرت ۱۰ برابری در کار، روابط و درآمد. با راضیه لیدی باس"
         image="/lovable-uploads/cc26e040-a2f3-48d8-83ae-02a973799ac3.png"
       />
@@ -60,7 +60,7 @@ export default function EmpoweredWomanCoaching() {
 
             {/* Subheadline */}
             <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed px-4">
-              برنامه کوچینگ گروهی ۳ ماهه با راضیه لیدی باس
+              ۳ ماه قدرتمند ده‌برابر با راضیه لیدی‌باس
               <br />
               برای پیشرفت قدرتمند در کار، روابط و درآمد
             </p>
@@ -356,17 +356,17 @@ export default function EmpoweredWomanCoaching() {
                     <Card className="p-4 md:p-6 border-2 border-border hover-lift bg-background">
                       <div className="text-center">
                         <h4 className="text-lg md:text-xl font-bold mb-1.5 md:mb-2">پرداخت ماهانه</h4>
-                        <div className="text-3xl md:text-4xl font-bold text-primary mb-1 md:mb-2">۲۹۷$</div>
+                        <div className="text-3xl md:text-4xl font-bold text-primary mb-1 md:mb-2">۲۹۹$</div>
                         <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">به مدت ۳ ماه</p>
                         
                         <div className="border-t pt-3 md:pt-4 mb-3 md:mb-4">
                           <div className="flex justify-between items-center text-xs md:text-sm mb-1 md:mb-2">
                             <span className="text-muted-foreground">پرداخت ماهانه:</span>
-                            <span className="font-semibold">۲۹۷$ × ۳</span>
+                            <span className="font-semibold">۲۹۹$ × ۳</span>
                           </div>
                           <div className="flex justify-between items-center font-bold text-sm md:text-base">
                             <span>جمع:</span>
-                            <span className="text-primary">۸۹۱$</span>
+                            <span className="text-primary">۸۹۷$</span>
                           </div>
                         </div>
 
@@ -396,21 +396,21 @@ export default function EmpoweredWomanCoaching() {
                         <div className="border-t pt-3 md:pt-4 mb-3 md:mb-4">
                           <div className="flex justify-between items-center text-xs md:text-sm mb-1 md:mb-2">
                             <span className="text-muted-foreground">پرداخت ماهانه:</span>
-                            <span className="line-through opacity-60">۸۹۱$</span>
+                            <span className="line-through opacity-60">۸۹۷$</span>
                           </div>
                           <div className="flex justify-between items-center font-bold text-sm md:text-base">
                             <span>با تخفیف:</span>
                             <span className="text-success">۷۴۷$</span>
                           </div>
                           <div className="mt-1 md:mt-2 text-xs md:text-sm text-success font-semibold">
-                            صرفه‌جویی ۱۴۴ دلار!
+                            صرفه‌جویی ۱۵۰ دلار!
                           </div>
                         </div>
 
                         <ul className="space-y-1.5 md:space-y-2 text-right text-xs md:text-sm">
                           <li className="flex items-start gap-2">
                             <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-success mt-0.5 flex-shrink-0" />
-                            <span>صرفه‌جویی ۱۴۴ دلاری</span>
+                            <span>صرفه‌جویی ۱۵۰ دلاری</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-success mt-0.5 flex-shrink-0" />
