@@ -216,27 +216,22 @@ const AppCourseDetail = () => {
                   <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
                 </Button>
 
-                {/* Access Course Files */}
-                {round?.google_drive_link ? (
+                {/* Audio Library */}
+                {round?.audio_playlist_id ? (
                   <Button
                     variant="outline"
                     className="w-full justify-start"
                     size="lg"
-                    onClick={() => window.location.href = round.google_drive_link!}
+                    onClick={() => window.location.href = `/app/player/playlist/${round.audio_playlist_id}`}
                   >
-                    <FolderOpen className="h-5 w-5 mr-3" />
+                    <Music className="h-5 w-5 mr-3" />
                     <div className="flex-1 text-left">
-                      <div className="font-semibold">Access Course Files</div>
-                      <div className="text-xs opacity-70">Materials, slides, and resources</div>
+                      <div className="font-semibold">Audio Library</div>
+                      <div className="text-xs opacity-70">Course supplement audios</div>
                     </div>
                     <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
                   </Button>
-                ) : (
-                  <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
-                    <FolderOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Course materials will be shared soon</p>
-                  </div>
-                )}
+                ) : null}
 
                 {/* Join Live Session */}
                 {round?.google_meet_link ? (
@@ -260,22 +255,27 @@ const AppCourseDetail = () => {
                   </div>
                 )}
 
-                {/* Audio Library */}
-                {round?.audio_playlist_id ? (
+                {/* Access Course Files */}
+                {round?.google_drive_link ? (
                   <Button
                     variant="outline"
                     className="w-full justify-start"
                     size="lg"
-                    onClick={() => window.location.href = `/app/player/playlist/${round.audio_playlist_id}`}
+                    onClick={() => window.location.href = round.google_drive_link!}
                   >
-                    <Music className="h-5 w-5 mr-3" />
+                    <FolderOpen className="h-5 w-5 mr-3" />
                     <div className="flex-1 text-left">
-                      <div className="font-semibold">Audio Library</div>
-                      <div className="text-xs opacity-70">Course supplement audios</div>
+                      <div className="font-semibold">Access Course Files</div>
+                      <div className="text-xs opacity-70">Materials, slides, and resources</div>
                     </div>
                     <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
                   </Button>
-                ) : null}
+                ) : (
+                  <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
+                    <FolderOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Course materials will be shared soon</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
