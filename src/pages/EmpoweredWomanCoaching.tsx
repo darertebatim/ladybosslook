@@ -133,7 +133,7 @@ export default function EmpoweredWomanCoaching() {
         <div className="max-w-6xl mx-auto rtl font-farsi">
           <div className="text-center mb-10 md:mb-16 animate-fade-in-up">
             <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
-              <span className="gradient-text">تحول ۱۰ برابری</span> در ۳ حوزه کلیدی
+              <span className="gradient-text">قدرت ۱۰ برابری</span> در ۳ حوزه کلیدی
             </h2>
             <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
               با این برنامه، قدرت واقعی خود را در سه بعد مهم زندگی کشف کنید
