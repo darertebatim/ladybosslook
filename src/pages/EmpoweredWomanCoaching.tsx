@@ -246,7 +246,7 @@ const EmpoweredWomanCoaching = () => {
         image="/lovable-uploads/cc26e040-a2f3-48d8-83ae-02a973799ac3.png"
       />
       
-      <div className="min-h-screen bg-background" dir="rtl">
+      <div className="min-h-screen bg-background font-farsi" dir="rtl">
         {/* Hero Section - Mobile Optimized */}
         <section className="relative py-8 md:py-20 px-4 overflow-hidden bg-gradient-to-b from-primary/5 to-background">
           <div className="container mx-auto max-w-6xl">
@@ -274,7 +274,7 @@ const EmpoweredWomanCoaching = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <TrendingUp className="text-primary w-4 h-4 md:w-5 md:h-5" />
-                    <span className="font-semibold">۱۰ جلسه</span>
+                    <span className="font-semibold">۱۴+ جلسه</span>
                   </div>
                 </div>
 
@@ -376,7 +376,7 @@ const EmpoweredWomanCoaching = () => {
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-8 md:mb-16">
               <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 px-2">
-                سرفصل <span className="text-primary">۱۰ جلسه</span>
+                سرفصل <span className="text-primary">۱۴+ جلسه</span>
               </h2>
               <p className="text-base md:text-xl text-muted-foreground px-2">
                 برنامه جامع و کامل
@@ -498,9 +498,20 @@ const EmpoweredWomanCoaching = () => {
         <section className="py-12 md:py-20 px-4">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-8 md:mb-16 max-w-4xl mx-auto">
-              <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-6 md:mb-8 px-2">
+              <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 px-2">
                 این یه <span className="text-primary">سرمایه‌گذاریه</span>
               </h2>
+              <div className="mb-6 md:mb-8">
+                <p className="text-lg md:text-xl text-muted-foreground/60 line-through mb-2">
+                  قیمت اصلی: $1,200
+                </p>
+                <p className="text-3xl md:text-4xl font-bold text-primary mb-1">
+                  قیمت ویژه امروز: $997
+                </p>
+                <p className="text-base md:text-lg text-primary/80">
+                  🎁 صرفه‌جویی $203
+                </p>
+              </div>
               
               {/* Value Cards */}
               <Card className="p-6 md:p-8 mb-6 md:mb-8 bg-gradient-to-br from-primary/10 to-secondary/10">
@@ -579,6 +590,7 @@ const EmpoweredWomanCoaching = () => {
                       <Card className="p-4 md:p-6 border-2 hover-lift">
                         <div className="text-center">
                           <h4 className="text-base md:text-xl font-bold mb-2">ماهانه</h4>
+                          <p className="text-sm text-muted-foreground/60 line-through mb-1">$400/ماه</p>
                           <div className="text-3xl md:text-4xl font-bold text-primary mb-2">۲۹۹$</div>
                           <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">۳ ماه</p>
                           
@@ -586,6 +598,9 @@ const EmpoweredWomanCoaching = () => {
                             <div className="flex justify-between text-xs md:text-sm mb-1">
                               <span className="text-muted-foreground">جمع:</span>
                               <span className="font-semibold">۸۹۷$</span>
+                            </div>
+                            <div className="text-xs text-primary/80">
+                              صرفه‌جویی $303 نسبت به قیمت اصلی
                             </div>
                           </div>
 
@@ -605,6 +620,7 @@ const EmpoweredWomanCoaching = () => {
                         </div>
                         <div className="text-center mt-4 md:mt-6">
                           <h4 className="text-base md:text-xl font-bold mb-2">یکجا</h4>
+                          <p className="text-sm text-muted-foreground/60 line-through mb-1">$1,200</p>
                           <div className="text-3xl md:text-4xl font-bold text-success mb-2">۷۴۷$</div>
                           <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">کل دوره</p>
                           
@@ -614,7 +630,7 @@ const EmpoweredWomanCoaching = () => {
                               <span className="line-through">۸۹۷$</span>
                             </div>
                             <div className="text-xs md:text-sm text-success font-semibold">
-                              صرفه‌جویی ۱۵۰$
+                              صرفه‌جویی $453 نسبت به قیمت اصلی + $150 تخفیف یکجا
                             </div>
                           </div>
 
@@ -643,6 +659,78 @@ const EmpoweredWomanCoaching = () => {
                   </div>
                 </div>
               </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials Section - Mobile Optimized */}
+        <section className="py-12 md:py-20 px-4">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 px-2">
+                ⭐ نظرات شرکت‌کنندگان قبلی
+              </h2>
+              <p className="text-base md:text-lg text-muted-foreground px-2">
+                ببینید دیگران چه تحولی را تجربه کردند
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4 md:gap-6">
+              {[
+                {
+                  name: "سارا محمدی",
+                  location: "تورنتو، کانادا",
+                  text: "این کلاس برای من یک تحول واقعی بود. حالا می‌تونم با اعتماد به نفس کامل در محیط کار حرف بزنم.",
+                  rating: 5,
+                  result: "ارتقای شغلی پس از 3 ماه"
+                },
+                {
+                  name: "Maryam K.",
+                  location: "Los Angeles, USA",
+                  text: "I finally understood how to use both languages powerfully. My networking improved dramatically!",
+                  rating: 5,
+                  result: "Started her own business"
+                },
+                {
+                  name: "نگار رحمانی",
+                  location: "لندن، انگلستان",
+                  text: "خیلی کاربردی بود. الان دیگه احساس نمی‌کنم بین دو فرهنگ گم شدم. هر دو رو به نفع خودم استفاده می‌کنم.",
+                  rating: 5,
+                  result: "بهبود روابط خانوادگی و کاری"
+                }
+              ].map((testimonial, index) => (
+                <Card 
+                  key={index}
+                  className="p-4 md:p-6 hover-lift"
+                >
+                  <div className="flex gap-1 mb-3 md:mb-4 justify-center">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 md:w-5 md:h-5 fill-primary text-primary" />
+                    ))}
+                  </div>
+
+                  <p className="text-sm md:text-base mb-3 md:mb-4 italic text-center leading-relaxed text-muted-foreground">
+                    "{testimonial.text}"
+                  </p>
+
+                  <div className="bg-primary/10 border border-primary/20 rounded-lg py-2 px-3 mb-3 md:mb-4">
+                    <p className="text-primary font-bold text-xs md:text-sm text-center">
+                      ✅ {testimonial.result}
+                    </p>
+                  </div>
+
+                  <div className="text-center">
+                    <p className="font-bold text-sm md:text-base">{testimonial.name}</p>
+                    <p className="text-muted-foreground text-xs md:text-sm">{testimonial.location}</p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            <div className="text-center mt-8 md:mt-12">
+              <p className="text-primary font-bold text-lg md:text-xl">
+                ⭐ رتبه 4.9 از 5 - بیش از 500+ زن توانمند
+              </p>
             </div>
           </div>
         </section>
