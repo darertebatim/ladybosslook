@@ -19,12 +19,7 @@ import {
   MessageCircle,
   Target,
   Zap,
-  Gift,
-  CheckCircle2,
-  ArrowLeft,
-  Brain,
-  Lightbulb,
-  Rocket
+  Gift
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -54,190 +49,81 @@ export default function EmpoweredWomanCoaching() {
     }
   };
 
-  const curriculum = [
-    {
-      number: "۱",
-      title: "چکاپ وضعیت فعلی و بازسازی",
-      description: "بازسازی تصویر فعلی و گذشته از خود، تمرین خودبخششی (صلح با خود) و معناگرایی در وجود چالش‌های هر فرد"
-    },
-    {
-      number: "۲",
-      title: "مدیریت و پرورش افکار و احساسات",
-      description: "با متد ACT - غلبه بر افکار منفی، تسلط بر احساسات، مدیریت در شرایط سخت، غلبه بر احساس ضعف، مدیریت افکار تخریبگر و بازطراحی ماشین رفتار"
-    },
-    {
-      number: "۳",
-      title: "مکانیزم انگیزه و توقع",
-      description: "ایجاد انگیزه دائمی، طراحی فیلمنامه زندگی، طراحی و ساخت توقع، پیش‌زمینه احساس لیاقت"
-    },
-    {
-      number: "۴",
-      title: "مکانیزم نگرش‌ها",
-      description: "اصول شکل‌گیری نگرش‌ها، ریشه‌یابی نگرش‌های ۳ حوزه (فردی، ارتباطی، مستقل شدن/پولسازی)، طراحی سوالات تخصصی، آموزش شیوه تغییر نگرش"
-    },
-    {
-      number: "۵",
-      title: "قانون درخواست و فنون ارتباط‌سازی",
-      description: "غلبه بر ترس از نه شنیدن، اصول یک درخواست قوی، غلبه بر ترس‌های حضور در جمع، تمرین‌های حضور اجتماعی، اصول دوستی و ارتباط‌سازی"
-    },
-    {
-      number: "۶",
-      title: "لایف استایل خانم رئیس",
-      description: "فاکتورهای شتاب‌دهنده تغییر، طراحی روتین‌های روزانه، اصول تغییر عادت، مدیریت زمان، ژورنال‌نویسی، کنترل ذهن، لایف استایل سالم غذایی"
-    },
-    {
-      number: "۷",
-      title: "هدف‌گذاری پیشرفته",
-      description: "مدیریت اهداف، ایجاد تعادل در زندگی، زندگی پر دستاورد، هدف‌نویسی، برنامه‌ریزی برای اهداف، طراحی رویا + هدف + چشم‌انداز"
-    },
-    {
-      number: "۸",
-      title: "غلبه بر اهمال‌کاری و کمال‌گرایی",
-      description: "ریشه‌های کمبود عزت نفس و اعتماد به نفس، رفع کمال‌گرایی، آموزش اقدام‌گرایی، رفع اهمال‌کاری"
-    },
-    {
-      number: "۹",
-      title: "پول و مدیریت پول",
-      description: "نگرش برای پول، تمرینات عملی مدیریت مالی، اصول درآمدسازی"
-    },
-    {
-      number: "۱۰",
-      title: "بیزنس و بیزنس استایل",
-      description: "نگرش‌های ایجاد بیزنس، طراحی مسیر شغلی شخصی، هدف‌گذاری پولسازی، طراحی لایف استایل بیزنسی، مسیر راه‌اندازی و ارتقا کسب و کار"
-    }
-  ];
-
-  const transformations = [
-    { icon: Brain, text: "مدیریت ذهن و احساسات برای تصمیمات مالی آرام و هوشمندانه" },
-    { icon: Lightbulb, text: "اصلاح نگرش‌ها و ساکت کردن صدای «نمی‌تونی»" },
-    { icon: Users, text: "قدرت ارتباط و دیده شدن در جمع‌ها با اعتماد به نفس" },
-    { icon: Rocket, text: "ساختن لایف‌استایل زن موفق با انرژی و تمرکز بالا" },
-    { icon: Target, text: "غلبه بر کمال‌گرایی و اهمال‌کاری - شروع سریع، نتیجه سریع" },
-    { icon: DollarSign, text: "آگاهی مالی و رشد درآمد به عنوان یک مهارت" },
-    { icon: Briefcase, text: "بیزنس استایل و فروش حرفه‌ای - تبدیل تخصص به پول" }
-  ];
-
-  const benefits = [
-    "ترس‌های بی‌اساس که تو رو محدود کرده از بین می‌ره",
-    "حال و انرژی‌ات همیشه متعادله. حالت خوبه",
-    "اضطراب و استرس‌هات خیلی کم می‌شه",
-    "هر شرایطی رو به نفع خودت تغییر میدی",
-    "با تمام وجود برای خواسته‌هات می‌جنگی",
-    "سرعت اقداماتت زیاد می‌شه. سریع اقدام می‌کنی",
-    "ایمانت به کاری که می‌کنی چند برابر می‌شه",
-    "خیلی راحت و با اعتماد به نفس تو جمع‌ها حاضر می‌شی",
-    "در مقابل افراد غریبه با قدرت ظاهر می‌شی",
-    "منظم می‌شی و عادت‌های بد و مخرب رو از بین می‌بری",
-    "وقت‌هات یه‌جوری می‌شه که به همه‌چی می‌رسی (ورزش - خانواده - روابط خوب - پول)",
-    "عمرت هدر نمی‌ره برای اهداف بیهوده",
-    "توی زندگی‌ت معنا شکل می‌گیره",
-    "به اینکه دیگران چه فکری می‌کنن عمیقاً فکر نمی‌کنی و هرکاری لازمه انجام می‌دی",
-    "زود شروع می‌کنی، لفت نمی‌دی",
-    "یاد می‌گیری با امکانات موجود حرکت کنی",
-    "در مورد پول می‌دونی اگه دستت پول باشه می‌خوای باهاش چیکار کنی که قدرتت بیشتر بشه"
-  ];
-
-  const powerManifestations = [
-    {
-      title: "توانایی خلق انتخابی که قبلاً نداشتی",
-      description: "اگه تا دیروز دو تا راه داشتی: تسلیم یا فرار، قدرت راه سومی رو برات باز می‌کنه"
-    },
-    {
-      title: "زندگی در سطحی که خودت انتخاب می‌کنی",
-      description: "نه لولی که جامعه انتخاب کرده - تو انتخاب می‌کنی آدم‌ها چجوری برخورد کنن"
-    },
-    {
-      title: "دانستن کی و کجا رها کنی",
-      description: "آدم‌های ضعیف اهدافشون رو رها می‌کنن، آدم‌های قوی افکار اشتباهشون رو"
-    },
-    {
-      title: "انتخاب‌گر بودن",
-      description: "کی با من دوست بشه، چی بخورم، وقتا رو چجوری بگذرونم، کجا کار کنم - نه صرفاً چون منو قبول کردن"
-    }
-  ];
-
-  const questions = [
-    "آیا تو هم کسی هستی که می‌خواد بتونه ذهن و احساساتش رو کنترل کنه، تا دیگه تصمیمات مهم زندگیش از روی ترس یا عجله نباشن؟",
-    "آیا تو هم دلت می‌خواد یه روزایی بیاد که بگی: «من هیچ‌وقت دیگه با جمله‌ی 'الان حسش نیست' کارمو عقب نمی‌ندازم»؟",
-    "آیا خسته‌ای از صدای درونت که همیشه می‌گه: «نمی‌تونی»، «الان وقتش نیست»، «شرایط مناسب نیست»؟",
-    "آیا دوست داری بتونی بدون ترس، توی جمع‌ها با اعتماد به نفس ظاهر بشی، دیده بشی، و فرصتا بیان سمتت؟",
-    "آیا تو هم می‌خوای لایف‌استایلی بسازی که توش هم آرامش داشته باشی، هم درآمد، هم رشد شخصی، هم زمان برای خانواده؟",
-    "آیا می‌خوای بالاخره دست از اهمال‌کاری برداری، زودتر اقدام کنی و زودتر نتیجه ببینی؟",
-    "آیا وقتشه که یاد بگیری چطور با امکانات الانت پول بسازی و بعد چندبرابرش کنی؟",
-    "آیا دلت می‌خواد از تخصصت، یا حتی بدون تخصص، یه کسب‌وکار واقعی بسازی که درآمد مستمر برات داشته باشه؟",
-    "آیا آماده‌ای که خودت رو طوری به دنیا نشون بدی که هیچ‌کس نتونه نادیده‌ت بگیره؟"
-  ];
-
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="کوچینگ زن قوی - برنامه تحول ۳ ماهه با راضیه لیدی‌باس"
-        description="قدرت ۱۰ برابری در ذهن، احساسات، روابط، درآمد و بیزنس. ۱۰ جلسه کوچینگ تخصصی برای زنان مهاجر که می‌خواهند قدرتمند شوند."
+        title="کوچینگ زن قوی"
+        description="برنامه کوچینگ گروهی ۳ ماهه برای زنان مهاجر. قدرت ۱۰ برابری در کار، روابط و درآمد. با راضیه لیدی باس"
         image="/lovable-uploads/cc26e040-a2f3-48d8-83ae-02a973799ac3.png"
       />
 
       {/* Hero Section */}
-      <section className="relative pt-16 md:pt-24 pb-12 md:pb-16 px-4 overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-50" />
+      <section className="relative pt-20 md:pt-32 pb-12 md:pb-20 px-4 overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 gradient-hero opacity-10" />
         
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center animate-fade-in rtl font-farsi">
-            <Badge className="mb-6 text-base px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg">
-              <Sparkles className="w-4 h-4 ml-2" />
-              ویژه زنان مهاجری که می‌خواهند قدرتمند شوند
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="text-center animate-fade-in-up rtl font-farsi">
+            {/* Badge */}
+            <Badge className="mb-4 md:mb-6 text-sm md:text-base px-4 md:px-6 py-1.5 md:py-2 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20">
+              <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 ml-2" />
+              ویژه خانم‌های مهاجر
             </Badge>
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+            {/* Main Headline */}
+            <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold mb-4 md:mb-6 leading-tight px-2">
               <span className="gradient-text">کوچینگ زن قوی</span>
             </h1>
 
-            <p className="text-xl md:text-2xl lg:text-3xl text-foreground mb-4 max-w-4xl mx-auto leading-relaxed font-semibold">
+            {/* Subheadline */}
+            <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed px-4">
               ۳ ماه قدرتمند ده‌برابر با راضیه لیدی‌باس
-            </p>
-            
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              برنامه جامع ۱۰ جلسه‌ای برای تسلط بر ذهن، احساسات، روابط، پول و بیزنس
+              <br />
+              برای پیشرفت قدرتمند در کار، روابط و درآمد
             </p>
 
-            <div className="flex flex-wrap justify-center gap-4 mb-10">
-              <div className="flex items-center gap-2 bg-card px-4 py-2 rounded-full border border-border">
-                <Calendar className="w-5 h-5 text-primary" />
+            {/* Stats */}
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-8 md:mb-10 px-2">
+              <div className="flex items-center gap-2 text-foreground text-sm md:text-base">
+                <Calendar className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                 <span className="font-semibold">۳ ماه</span>
               </div>
-              <div className="flex items-center gap-2 bg-card px-4 py-2 rounded-full border border-border">
-                <Video className="w-5 h-5 text-primary" />
-                <span className="font-semibold">۱۰ جلسه کوچینگ زنده</span>
+              <div className="flex items-center gap-2 text-foreground text-sm md:text-base">
+                <Video className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                <span className="font-semibold">۱۲ جلسه زنده</span>
               </div>
-              <div className="flex items-center gap-2 bg-card px-4 py-2 rounded-full border border-border">
-                <Users className="w-5 h-5 text-primary" />
+              <div className="flex items-center gap-2 text-foreground text-sm md:text-base">
+                <Users className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                 <span className="font-semibold">کوچینگ گروهی</span>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center mb-8 md:mb-12 px-4">
               <Button
                 size="lg"
                 onClick={handleDepositClick}
                 disabled={isLoading}
-                className="text-lg px-10 py-7 bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xl hover:shadow-primary/50 transition-all duration-300 transform hover:scale-105"
+                className="cta-button text-base md:text-lg px-8 md:px-10 py-5 md:py-7 text-white font-bold shadow-bold hover:shadow-glow w-full sm:w-auto"
               >
-                <Shield className="w-5 h-5 ml-2" />
-                {isLoading ? "در حال انتقال..." : "رزرو جلسه مشاوره با پیش‌پرداخت ۱۰۰ دلار"}
+                <Shield className="w-4 h-4 md:w-5 md:h-5 ml-2" />
+                {isLoading ? "در حال انتقال به پرداخت..." : "رزرو با پیش‌پرداخت ۱۰۰ دلار"}
               </Button>
             </div>
 
-            <div className="flex flex-wrap justify-center items-center gap-4 text-sm text-muted-foreground">
+            {/* Trust Elements */}
+            <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-3 md:gap-6 text-xs md:text-sm text-muted-foreground px-4">
               <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-success" />
+                <Shield className="w-3.5 h-3.5 md:w-4 md:h-4 text-success" />
                 <span>ضمانت ۳۰ روزه بازگشت وجه</span>
               </div>
               <div className="flex items-center gap-2">
-                <Star className="w-4 h-4 text-secondary" />
+                <Star className="w-3.5 h-3.5 md:w-4 md:h-4 text-secondary" />
                 <span>مربی معتبر با سابقه</span>
               </div>
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-primary" />
-                <span>ظرفیت محدود</span>
+                <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
+                <span>محدودیت ظرفیت</span>
               </div>
             </div>
           </div>
@@ -245,359 +131,414 @@ export default function EmpoweredWomanCoaching() {
       </section>
 
       {/* Special Offer Banner */}
-      <section className="py-6 px-4 bg-gradient-to-r from-primary via-primary/90 to-primary">
+      <section className="py-4 md:py-6 px-4 bg-gradient-to-r from-urgency via-urgency-light to-urgency">
         <div className="max-w-6xl mx-auto text-center rtl font-farsi">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-primary-foreground">
-            <Gift className="w-8 h-8 animate-bounce" />
+          <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 text-white">
+            <Gift className="w-6 h-6 md:w-8 md:h-8 animate-bounce" />
             <div>
-              <p className="text-2xl md:text-4xl font-bold mb-1">
-                پرداخت یکجا: از <span className="line-through opacity-75">۸۹۷$</span> به <span className="text-3xl md:text-5xl">۷۴۷$</span>
+              <p className="text-lg md:text-2xl lg:text-3xl font-bold mb-0.5 md:mb-1">
+                پیشنهاد ویژه: از <span className="line-through opacity-75">۱۲۰۰$</span> به <span className="text-2xl md:text-4xl">۹۹۷$</span>
               </p>
-              <p className="text-lg opacity-90">صرفه‌جویی ۱۵۰ دلار - شروع برنامه‌ات با برد، نه با بدهی</p>
+              <p className="text-sm md:text-lg opacity-90">صرفه‌جویی ۲۰۳ دلار - فقط برای افراد واجد شرایط</p>
             </div>
-            <Gift className="w-8 h-8 animate-bounce" />
+            <Gift className="w-6 h-6 md:w-8 md:h-8 animate-bounce" />
           </div>
         </div>
       </section>
 
-      {/* What You'll Gain */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto rtl font-farsi">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              💡 توی این مسیر ۳ ماهه، <span className="gradient-text">دقیقاً چه چیزی به دست میاری؟</span>
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {transformations.map((item, index) => (
-              <Card key={index} className="p-6 hover-lift bg-card border-2 border-border hover:border-primary transition-all duration-300">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <item.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <p className="text-base leading-relaxed text-foreground">{item.text}</p>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Curriculum Section */}
-      <section className="py-20 px-4 bg-muted/30">
-        <div className="max-w-7xl mx-auto rtl font-farsi">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              سرفصل <span className="gradient-text">۱۰ جلسه کوچینگ زن قوی</span>
-            </h2>
-            <p className="text-xl text-muted-foreground">مسیر گام‌به‌گام تحول شخصی و حرفه‌ای شما</p>
-          </div>
-
-          <div className="grid gap-6 max-w-5xl mx-auto">
-            {curriculum.map((session, index) => (
-              <Card key={index} className="p-6 md:p-8 hover-lift bg-card border-2 border-border hover:border-primary transition-all duration-300">
-                <div className="flex items-start gap-6">
-                  <div className="w-14 h-14 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 text-2xl font-bold shadow-lg">
-                    {session.number}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl md:text-2xl font-bold mb-3 text-foreground">{session.title}</h3>
-                    <p className="text-base text-muted-foreground leading-relaxed">{session.description}</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits That Disappear */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto rtl font-farsi">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              <span className="gradient-text">تحولی که در زندگی‌ات اتفاق می‌افته</span>
-            </h2>
-            <p className="text-xl text-muted-foreground">وقتی این کوچینگ رو تموم کنی، این تغییرات رو توی خودت می‌بینی:</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4 max-w-5xl mx-auto">
-            {benefits.map((benefit, index) => (
-              <div key={index} className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 hover:bg-muted transition-smooth">
-                <CheckCircle2 className="w-5 h-5 text-success mt-0.5 flex-shrink-0" />
-                <span className="text-base text-foreground">{benefit}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Power Manifestations */}
-      <section className="py-20 px-4 bg-gradient-to-b from-muted/30 to-background">
+      {/* Transformation Areas */}
+      <section className="py-12 md:py-16 lg:py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto rtl font-farsi">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              <span className="gradient-text">نمودهای درست قدرت</span>
+          <div className="text-center mb-10 md:mb-16 animate-fade-in-up">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
+              <span className="gradient-text">قدرت ۱۰ برابری</span> در ۳ حوزه کلیدی
+            </h2>
+            <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
+              با این برنامه، قدرت واقعی خود را در سه بعد مهم زندگی کشف کنید
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+            {/* Career Card */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-card border-2 border-border">
+              <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 md:mb-6">
+                <Briefcase className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-primary" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-foreground">کار و شغل</h3>
+              <ul className="space-y-2 md:space-y-3">
+                <li className="flex items-start gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-muted-foreground">افزایش اعتماد به نفس در محیط کار</span>
+                </li>
+                <li className="flex items-start gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-muted-foreground">مهارت مذاکره و ارتباط حرفه‌ای</span>
+                </li>
+                <li className="flex items-start gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-muted-foreground">رشد و پیشرفت شغلی سریع‌تر</span>
+                </li>
+                <li className="flex items-start gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-muted-foreground">رهبری و تاثیرگذاری بیشتر</span>
+                </li>
+              </ul>
+            </Card>
+
+            {/* Relationships Card */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-card border-2 border-border">
+              <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mb-4 md:mb-6">
+                <Heart className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-secondary" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-foreground">روابط</h3>
+              <ul className="space-y-2 md:space-y-3">
+                <li className="flex items-start gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-muted-foreground">برقراری ارتباطات قدرتمند و واقعی</span>
+                </li>
+                <li className="flex items-start gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-muted-foreground">تعیین مرزهای سالم و احترام</span>
+                </li>
+                <li className="flex items-start gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-muted-foreground">روابط خانوادگی متعادل</span>
+                </li>
+                <li className="flex items-start gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-muted-foreground">شبکه‌سازی موثر و حرفه‌ای</span>
+                </li>
+              </ul>
+            </Card>
+
+            {/* Income Card */}
+            <Card className="p-5 md:p-6 lg:p-8 hover-lift bg-card border-2 border-border">
+              <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl bg-success/10 flex items-center justify-center mb-4 md:mb-6">
+                <DollarSign className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-success" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-foreground">درآمد</h3>
+              <ul className="space-y-2 md:space-y-3">
+                <li className="flex items-start gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-muted-foreground">افزایش درآمد و فرصت‌های مالی</span>
+                </li>
+                <li className="flex items-start gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-muted-foreground">ذهنیت ثروت و فراوانی</span>
+                </li>
+                <li className="flex items-start gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-muted-foreground">مهارت سرمایه‌گذاری و مدیریت مالی</span>
+                </li>
+                <li className="flex items-start gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-success mt-1 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-muted-foreground">استقلال و امنیت مالی</span>
+                </li>
+              </ul>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Program Details */}
+      <section className="py-12 md:py-16 lg:py-20 px-4">
+        <div className="max-w-6xl mx-auto rtl font-farsi">
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
+              برنامه <span className="gradient-text">کوچینگ چگونه است؟</span>
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {powerManifestations.map((power, index) => (
-              <Card key={index} className="p-8 hover-lift bg-card border-2 border-border">
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 font-bold text-lg">
-                    {index + 1}
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div className="space-y-4 md:space-y-6">
+              <Card className="p-4 md:p-6 hover-lift bg-card">
+                <div className="flex items-start gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-3 text-foreground">{power.title}</h3>
-                    <p className="text-base text-muted-foreground leading-relaxed">{power.description}</p>
+                    <h3 className="text-lg md:text-xl font-bold mb-1 md:mb-2">مدت زمان</h3>
+                    <p className="text-sm md:text-base text-muted-foreground">۳ ماه با ۱۲ جلسه هفتگی</p>
                   </div>
                 </div>
               </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Questions Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto rtl font-farsi">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              ❓ <span className="gradient-text">از خودت بپرس...</span>
-            </h2>
-            <p className="text-xl text-muted-foreground">اگه جواب بیشتر این سوالا «بله» بود، این کوچینگ برای تو طراحی شده</p>
-          </div>
-
-          <div className="space-y-4 max-w-4xl mx-auto">
-            {questions.map((question, index) => (
-              <Card key={index} className="p-6 hover-lift bg-card border-r-4 border-r-primary">
-                <p className="text-lg text-foreground leading-relaxed">{question}</p>
+              <Card className="p-4 md:p-6 hover-lift bg-card">
+                <div className="flex items-start gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                    <Video className="w-5 h-5 md:w-6 md:h-6 text-secondary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg md:text-xl font-bold mb-1 md:mb-2">فرمت جلسات</h3>
+                    <p className="text-sm md:text-base text-muted-foreground">کوچینگ گروهی آنلاین زنده (Face-to-Face)</p>
+                  </div>
+                </div>
               </Card>
-            ))}
-          </div>
 
-          <div className="text-center mt-12">
-            <p className="text-2xl font-bold text-foreground mb-8">
-              اگه جواب بیشتر این سوالا «بله» بود،<br />
-              پس کوچینگ زن قوی برای تو طراحی شده.
-            </p>
+              <Card className="p-4 md:p-6 hover-lift bg-card">
+                <div className="flex items-start gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
+                    <Award className="w-5 h-5 md:w-6 md:h-6 text-success" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg md:text-xl font-bold mb-1 md:mb-2">مربی شما</h3>
+                    <p className="text-sm md:text-base text-muted-foreground">راضیه لیدی باس - کوچ و مربی معتبر زنان</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-4 md:p-6 hover-lift bg-card">
+                <div className="flex items-start gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-urgency/10 flex items-center justify-center flex-shrink-0">
+                    <Users className="w-5 h-5 md:w-6 md:h-6 text-urgency" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg md:text-xl font-bold mb-1 md:mb-2">گروه هدف</h3>
+                    <p className="text-sm md:text-base text-muted-foreground">زنان مهاجری که می‌خواهند قدرتمند شوند</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            <div className="space-y-4 md:space-y-6">
+              <h3 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">شامل چه چیزهایی می‌شود؟</h3>
+              
+              <div className="space-y-3 md:space-y-4">
+                {[
+                  { icon: Video, text: "۱۲ جلسه کوچینگ گروهی زنده" },
+                  { icon: MessageCircle, text: "دسترسی به گروه پشتیبانی انحصاری" },
+                  { icon: Target, text: "برنامه شخصی‌سازی شده برای اهداف شما" },
+                  { icon: Zap, text: "تمرین‌ها و تکالیف هفتگی" },
+                  { icon: Award, text: "گواهینامه دیجیتال پایان دوره" },
+                  { icon: Users, text: "شبکه‌سازی با زنان موفق مهاجر" }
+                ].map((item, index) => (
+                  <div key={index} className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-lg bg-muted/50 hover:bg-muted transition-smooth">
+                    <item.icon className="w-5 h-5 md:w-6 md:h-6 text-primary flex-shrink-0" />
+                    <span className="text-sm md:text-base text-foreground font-medium">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 px-4 bg-muted/30">
+      <section className="py-12 md:py-16 lg:py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto rtl font-farsi">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              <span className="gradient-text">سرمایه‌گذاری</span> روی خودت
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
+              <span className="gradient-text">سرمایه‌گذاری</span> روی خودتان
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">این یه سرمایه‌گذاریه. روی خودت. روی آینده‌ت.</p>
+            <p className="text-base md:text-lg lg:text-xl text-muted-foreground px-4">ارزشش را دارد، و با ضمانت بازگشت وجه محافظت می‌شوید</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-12">
-            <Card className="p-8 border-2 border-border hover-lift">
-              <div className="text-center mb-6">
-                <Badge className="mb-4 bg-secondary text-secondary-foreground">پرداخت ماهانه</Badge>
-                <div className="text-4xl font-bold mb-2">۲۹۹$</div>
-                <p className="text-muted-foreground">در ماه</p>
-              </div>
-              <div className="space-y-3 mb-8">
-                <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-success" />
-                  <span>۳ پرداخت ماهانه</span>
+          <div className="max-w-4xl mx-auto">
+            {/* Step 1: Deposit */}
+            <Card className="p-5 md:p-6 lg:p-8 mb-6 md:mb-8 border-2 border-primary shadow-bold">
+              <div className="flex items-start gap-3 md:gap-4 mb-4 md:mb-6">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg md:text-xl flex-shrink-0">
+                  ۱
                 </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-success" />
-                  <span>جمعاً ۸۹۷ دلار</span>
+                <div className="flex-1">
+                  <h3 className="text-xl md:text-2xl font-bold mb-1.5 md:mb-2">مرحله اول: پیش‌پرداخت و مصاحبه</h3>
+                  <p className="text-sm md:text-base text-muted-foreground mb-3 md:mb-4 leading-relaxed">
+                    برای شروع، ۱۰۰ دلار پیش‌پرداخت کنید و وقت مصاحبه با راضیه لیدی باس را رزرو کنید.
+                    در مصاحبه مشخص می‌شود که این برنامه برای شما مناسب است یا خیر.
+                  </p>
+                  <Button
+                    size="lg"
+                    onClick={handleDepositClick}
+                    disabled={isLoading}
+                    className="cta-button text-base md:text-lg px-8 md:px-10 py-5 md:py-6 text-white font-bold w-full sm:w-auto"
+                  >
+                    {isLoading ? "در حال انتقال..." : "پرداخت ۱۰۰ دلار و رزرو مصاحبه"}
+                  </Button>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-success" />
-                  <span>انعطاف مالی بیشتر</span>
-                </div>
-              </div>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={handleDepositClick}
-                disabled={isLoading}
-                className="w-full text-lg py-6"
-              >
-                شروع با پیش‌پرداخت ۱۰۰$
-              </Button>
-            </Card>
-
-            <Card className="p-8 border-4 border-primary hover-lift relative overflow-hidden">
-              <div className="absolute top-4 left-4">
-                <Badge className="bg-success text-success-foreground">صرفه‌جویی ۱۵۰$</Badge>
-              </div>
-              <div className="text-center mb-6 mt-4">
-                <Badge className="mb-4 bg-primary text-primary-foreground">پرداخت یکجا (پیشنهاد ویژه)</Badge>
-                <div className="flex items-center justify-center gap-3 mb-2">
-                  <span className="text-2xl line-through text-muted-foreground">۸۹۷$</span>
-                  <span className="text-5xl font-bold text-primary">۷۴۷$</span>
-                </div>
-                <p className="text-muted-foreground">پرداخت یکجا</p>
-              </div>
-              <div className="space-y-3 mb-8">
-                <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-success" />
-                  <span className="font-semibold">صرفه‌جویی ۱۵۰ دلار</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-success" />
-                  <span>شروع با برد، نه با بدهی</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-success" />
-                  <span>دسترسی کامل فوری</span>
-                </div>
-              </div>
-              <Button
-                size="lg"
-                onClick={handleDepositClick}
-                disabled={isLoading}
-                className="w-full text-lg py-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xl"
-              >
-                شروع با پیش‌پرداخت ۱۰۰$
-              </Button>
-            </Card>
-          </div>
-
-          {/* Value Propositions */}
-          <div className="max-w-4xl mx-auto space-y-8 mb-12">
-            <Card className="p-8 bg-card">
-              <h3 className="text-2xl font-bold mb-4">حالا شاید بگی "۷۴۷ دلار زیاده"...</h3>
-              <div className="space-y-4 text-lg text-muted-foreground">
-                <p>ولی بذار بپرسم:</p>
-                <div className="space-y-2 pr-4">
-                  <p>✖️ چند بار به خاطر نداشتن اعتماد به نفس یه فرصت رو از دست دادی؟</p>
-                  <p>✖️ چند بار بخاطر نداشتن تسلط بر احساسات، یه رابطه یا یه شغل رو نابود کردی؟</p>
-                  <p>✖️ چند ساله فقط فکر می‌کنی یه روز باید تغییر کنی، اما هنوز همون‌جایی که بودی هستی؟</p>
-                </div>
-                <p className="font-bold text-foreground text-xl mt-6">
-                  اگه فقط یکی از این اشتباهاتو نخوای دوباره تکرار کنی، این کوچینگ نه تنها ارزون نیست—حتی گرون هم نیست.
-                </p>
               </div>
             </Card>
 
-            <Card className="p-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/20">
-              <h3 className="text-2xl font-bold mb-4">۷۴۷ دلار یعنی چی واقعاً؟</h3>
-              <div className="space-y-3 text-lg">
-                <p>یعنی روزی <span className="font-bold text-primary text-2xl">۱۰ دلار</span> داری سرمایه‌گذاری می‌کنی روی:</p>
-                <div className="grid md:grid-cols-2 gap-3 mt-4">
-                  {[
-                    "کنترل ذهنت",
-                    "اعتماد به نفس‌ت",
-                    "درآمدت",
-                    "آرامش و نظم زندگیت",
-                    "ساختن نسخه‌ی جدید از خودت",
-                    "قدرت در جمع‌ها و روابط"
-                  ].map((item, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Star className="w-5 h-5 text-primary" />
-                      <span className="font-medium">{item}</span>
-                    </div>
-                  ))}
+            {/* Step 2: After Acceptance */}
+            <Card className="p-5 md:p-6 lg:p-8 mb-6 md:mb-8 bg-card">
+              <div className="flex items-start gap-3 md:gap-4 mb-4 md:mb-6">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center font-bold text-lg md:text-xl flex-shrink-0">
+                  ۲
                 </div>
-                <p className="text-xl font-bold text-foreground mt-6">
-                  یعنی کمتر از قیمت یه قهوه بیرون! 🤔
-                </p>
+                <div className="flex-1">
+                  <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">مرحله دوم: پس از قبولی</h3>
+                  <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6 leading-relaxed">
+                    اگر در مصاحبه قبول شدید، یکی از دو گزینه پرداخت را انتخاب کنید:
+                  </p>
+
+                  <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+                    {/* Monthly Payment */}
+                    <Card className="p-4 md:p-6 border-2 border-border hover-lift bg-background">
+                      <div className="text-center">
+                        <h4 className="text-lg md:text-xl font-bold mb-1.5 md:mb-2">پرداخت ماهانه</h4>
+                        <div className="text-3xl md:text-4xl font-bold text-primary mb-1 md:mb-2">۲۹۹$</div>
+                        <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">به مدت ۳ ماه</p>
+                        
+                        <div className="border-t pt-3 md:pt-4 mb-3 md:mb-4">
+                          <div className="flex justify-between items-center text-xs md:text-sm mb-1 md:mb-2">
+                            <span className="text-muted-foreground">پرداخت ماهانه:</span>
+                            <span className="font-semibold">۲۹۹$ × ۳</span>
+                          </div>
+                          <div className="flex justify-between items-center font-bold text-sm md:text-base">
+                            <span>جمع:</span>
+                            <span className="text-primary">۸۹۷$</span>
+                          </div>
+                        </div>
+
+                        <ul className="space-y-1.5 md:space-y-2 text-right text-xs md:text-sm">
+                          <li className="flex items-start gap-2">
+                            <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-success mt-0.5 flex-shrink-0" />
+                            <span>انعطاف در پرداخت</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-success mt-0.5 flex-shrink-0" />
+                            <span>شروع فوری برنامه</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </Card>
+
+                    {/* One-time Payment - Recommended */}
+                    <Card className="p-4 md:p-6 border-2 border-success hover-lift bg-success/5 relative overflow-hidden">
+                      <div className="absolute top-0 left-0 bg-success text-success-foreground px-2 md:px-3 py-0.5 md:py-1 text-xs md:text-sm font-bold rounded-br-lg">
+                        توصیه می‌شود
+                      </div>
+                      <div className="text-center mt-4 md:mt-6">
+                        <h4 className="text-lg md:text-xl font-bold mb-1.5 md:mb-2">پرداخت یکجا</h4>
+                        <div className="text-3xl md:text-4xl font-bold text-success mb-1 md:mb-2">۷۴۷$</div>
+                        <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">کل دوره</p>
+                        
+                        <div className="border-t pt-3 md:pt-4 mb-3 md:mb-4">
+                          <div className="flex justify-between items-center text-xs md:text-sm mb-1 md:mb-2">
+                            <span className="text-muted-foreground">پرداخت ماهانه:</span>
+                            <span className="line-through opacity-60">۸۹۷$</span>
+                          </div>
+                          <div className="flex justify-between items-center font-bold text-sm md:text-base">
+                            <span>با تخفیف:</span>
+                            <span className="text-success">۷۴۷$</span>
+                          </div>
+                          <div className="mt-1 md:mt-2 text-xs md:text-sm text-success font-semibold">
+                            صرفه‌جویی ۱۵۰ دلار!
+                          </div>
+                        </div>
+
+                        <ul className="space-y-1.5 md:space-y-2 text-right text-xs md:text-sm">
+                          <li className="flex items-start gap-2">
+                            <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-success mt-0.5 flex-shrink-0" />
+                            <span>صرفه‌جویی ۱۵۰ دلاری</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-success mt-0.5 flex-shrink-0" />
+                            <span>بدون دغدغه پرداخت ماهانه</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-success mt-0.5 flex-shrink-0" />
+                            <span>بهترین ارزش</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
               </div>
             </Card>
-          </div>
 
-          <div className="text-center">
-            <div className="inline-block p-8 rounded-2xl bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-2 border-primary/20 mb-8">
-              <p className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                تو لایق اینی که یه مربی در کنارت باشه.
-              </p>
-              <p className="text-xl text-muted-foreground mb-2">
-                لایق اینی که توی بیزنس، رابطه و زندگی بدرخشی.
-              </p>
-              <p className="text-lg text-muted-foreground">
-                این کوچینگ فقط یه کلاس نیست—یه بیانیه‌ست:<br />
-                <span className="font-bold text-foreground">اینکه تو دیگه قرار نیست نسخه ضعیف خودت باشی.</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="py-20 px-4 bg-gradient-to-r from-primary via-primary/95 to-primary">
-        <div className="max-w-4xl mx-auto text-center rtl font-farsi text-primary-foreground">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            من اینجام که راهو نشونت بدم.
-          </h2>
-          <p className="text-xl md:text-2xl mb-8 opacity-90">
-            اگه تو هم آماده‌ای که بری...
-          </p>
-          <Button
-            size="lg"
-            onClick={handleDepositClick}
-            disabled={isLoading}
-            className="text-xl px-12 py-8 bg-background text-foreground hover:bg-background/90 shadow-2xl transform hover:scale-105 transition-all duration-300"
-          >
-            <Shield className="w-6 h-6 ml-2" />
-            {isLoading ? "در حال انتقال..." : "رزرو جلسه مشاوره - پیش‌پرداخت ۱۰۰ دلار"}
-          </Button>
-          <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm opacity-90">
-            <div className="flex items-center gap-2">
-              <Shield className="w-5 h-5" />
-              <span>ضمانت ۳۰ روزه بازگشت وجه</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              <span>ظرفیت محدود</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5" />
-              <span>شروع سریع</span>
-            </div>
+            {/* Money-Back Guarantee */}
+            <Card className="p-5 md:p-6 lg:p-8 bg-gradient-to-br from-success/10 to-success/5 border-2 border-success/30">
+              <div className="flex items-start gap-3 md:gap-4">
+                <Shield className="w-10 h-10 md:w-12 md:h-12 text-success flex-shrink-0" />
+                <div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3">ضمانت بازگشت وجه ۳۰ روزه - بدون سوال</h3>
+                  <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                    اگر تا ۳۰ روز اول احساس کنید این برنامه برای شما مناسب نیست، کافی است به ما اطلاع دهید 
+                    و کل مبلغ پرداختی شما بدون هیچ سوالی بازگردانده می‌شود. هیچ ریسکی وجود ندارد!
+                  </p>
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 px-4">
+      <section className="py-12 md:py-16 lg:py-20 px-4">
         <div className="max-w-4xl mx-auto rtl font-farsi">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">
-              سوالات <span className="gradient-text">متداول</span>
-            </h2>
-          </div>
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-center mb-8 md:mb-12 px-2">سوالات متداول</h2>
+          
+          <div className="space-y-4 md:space-y-6">
+            <Card className="p-4 md:p-6 hover-lift">
+              <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3">چرا باید ۱۰۰ دلار پیش‌پرداخت کنم؟</h3>
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                این مبلغ برای رزرو جایگاه شما و انجام مصاحبه اولیه با راضیه لیدی باس است تا مطمئن شویم این برنامه برای شما مناسب است. این فرآیند به نفع هر دو طرف است و تضمین می‌کند که افراد واقعاً متعهد در برنامه شرکت کنند.
+              </p>
+            </Card>
 
-          <div className="space-y-6">
-            {[
-              {
-                q: "پیش‌پرداخت ۱۰۰ دلار برای چیه؟",
-                a: "این پیش‌پرداخت برای رزرو جلسه مشاوره و بررسی واجد شرایط بودنه. بعد از جلسه اگه تصمیم بگیری ادامه بدی، این ۱۰۰ دلار از هزینه کل کم می‌شه."
-              },
-              {
-                q: "ضمانت بازگشت وجه چگونه کار می‌کنه؟",
-                a: "اگه تا ۳۰ روز اول احساس کردی این برنامه برات مناسب نیست، کل پولت رو بدون هیچ سوالی پس می‌گیری."
-              },
-              {
-                q: "جلسات به چه صورتی برگزار می‌شن؟",
-                a: "جلسات به صورت آنلاین و زنده (Face-to-Face) برگزار می‌شن. می‌تونی از هر کجای دنیا شرکت کنی."
-              },
-              {
-                q: "اگه یه جلسه رو از دست بدم چی؟",
-                a: "نگران نباش! تمام جلسات ضبط می‌شن و می‌تونی بعداً ببینی. همچنین گروه پشتیبانی برای سوالات همیشه فعاله."
-              },
-              {
-                q: "کی برنامه شروع می‌شه؟",
-                a: "بعد از تکمیل ثبت‌نام و جلسه مشاوره، تاریخ شروع دوره بهت اطلاع داده می‌شه. معمولاً ظرف ۲ هفته."
-              }
-            ].map((faq, index) => (
-              <Card key={index} className="p-6 hover-lift bg-card">
-                <h3 className="text-xl font-bold mb-3 text-foreground">{faq.q}</h3>
-                <p className="text-base text-muted-foreground leading-relaxed">{faq.a}</p>
-              </Card>
-            ))}
+            <Card className="p-4 md:p-6 hover-lift">
+              <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3">اگر در مصاحبه قبول نشوم چه می‌شود؟</h3>
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                اگر مشخص شود که این برنامه در حال حاضر برای شما مناسب نیست، کل مبلغ ۱۰۰ دلار بازگردانده می‌شود. هیچ ریسکی برای شما وجود ندارد.
+              </p>
+            </Card>
+
+            <Card className="p-4 md:p-6 hover-lift">
+              <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3">آیا جلسات رو در رو هستند؟</h3>
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                بله، تمام جلسات کوچینگ به صورت آنلاین و Face-to-Face (رو در رو) برگزار می‌شوند. این فرمت تجربه تحول‌آفرین و واقعی را برای شما فراهم می‌کند.
+              </p>
+            </Card>
+
+            <Card className="p-4 md:p-6 hover-lift">
+              <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3">ضمانت بازگشت وجه چگونه کار می‌کند؟</h3>
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                اگر تا ۳۰ روز اول احساس کنید این برنامه برای شما مناسب نیست، کافی است به ما اطلاع دهید و کل مبلغ پرداختی بدون هیچ سوالی بازگردانده می‌شود. ما کاملاً به پشت این برنامه ایستاده‌ایم.
+              </p>
+            </Card>
+
+            <Card className="p-4 md:p-6 hover-lift">
+              <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3">کی می‌توانم برنامه را شروع کنم؟</h3>
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                پس از پرداخت پیش‌پرداخت و تایید در مصاحبه، می‌توانید فوراً شروع کنید. دوره‌های جدید هر ماه شروع می‌شوند.
+              </p>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-12 md:py-16 lg:py-20 px-4 bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10">
+        <div className="max-w-4xl mx-auto text-center rtl font-farsi">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
+            آماده‌اید <span className="gradient-text">زن ۱۰ برابر قدرتمند</span> شوید؟
+          </h2>
+          <p className="text-base md:text-lg lg:text-xl text-muted-foreground mb-6 md:mb-8 px-4">
+            تعداد جایگاه محدود است. امروز جای خود را رزرو کنید و اولین قدم را به سوی تحول بردارید.
+          </p>
+          
+          <div className="space-y-4 md:space-y-6">
+            <Button
+              size="lg"
+              onClick={handleDepositClick}
+              disabled={isLoading}
+              className="cta-button text-base md:text-lg px-8 md:px-10 py-5 md:py-7 text-white font-bold shadow-bold hover:shadow-glow w-full sm:w-auto"
+            >
+              <Shield className="w-4 h-4 md:w-5 md:h-5 ml-2" />
+              {isLoading ? "در حال انتقال..." : "رزرو جایگاه با ۱۰۰ دلار پیش‌پرداخت"}
+            </Button>
+            
+            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 text-xs md:text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Shield className="w-3.5 h-3.5 md:w-4 md:h-4 text-success" />
+                <span>ضمانت بازگشت کامل وجه تا ۳۰ روز</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-3.5 h-3.5 md:w-4 md:h-4 text-urgency" />
+                <span>ظرفیت محدود</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
