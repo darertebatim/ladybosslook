@@ -21,13 +21,32 @@ import {
   Zap,
   Gift
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export default function EmpoweredWomanCoaching() {
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleDepositClick = () => {
-    navigate("/checkout?program=empowered-woman-coaching&amount=100");
+  const handleDepositClick = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-payment", {
+        body: { program: "empowered-woman-coaching" },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL received");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("خطا در ایجاد پرداخت. لطفاً دوباره تلاش کنید.");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -84,10 +103,11 @@ export default function EmpoweredWomanCoaching() {
               <Button
                 size="lg"
                 onClick={handleDepositClick}
+                disabled={isLoading}
                 className="cta-button text-base md:text-lg px-8 md:px-10 py-5 md:py-7 text-white font-bold shadow-bold hover:shadow-glow w-full sm:w-auto"
               >
                 <Shield className="w-4 h-4 md:w-5 md:h-5 ml-2" />
-                رزرو با پیش‌پرداخت ۱۰۰ دلار
+                {isLoading ? "در حال انتقال به پرداخت..." : "رزرو با پیش‌پرداخت ۱۰۰ دلار"}
               </Button>
             </div>
 
@@ -329,9 +349,10 @@ export default function EmpoweredWomanCoaching() {
                   <Button
                     size="lg"
                     onClick={handleDepositClick}
+                    disabled={isLoading}
                     className="cta-button text-base md:text-lg px-8 md:px-10 py-5 md:py-6 text-white font-bold w-full sm:w-auto"
                   >
-                    پرداخت ۱۰۰ دلار و رزرو مصاحبه
+                    {isLoading ? "در حال انتقال..." : "پرداخت ۱۰۰ دلار و رزرو مصاحبه"}
                   </Button>
                 </div>
               </div>
@@ -501,10 +522,11 @@ export default function EmpoweredWomanCoaching() {
             <Button
               size="lg"
               onClick={handleDepositClick}
+              disabled={isLoading}
               className="cta-button text-base md:text-lg px-8 md:px-10 py-5 md:py-7 text-white font-bold shadow-bold hover:shadow-glow w-full sm:w-auto"
             >
               <Shield className="w-4 h-4 md:w-5 md:h-5 ml-2" />
-              رزرو جایگاه با ۱۰۰ دلار پیش‌پرداخت
+              {isLoading ? "در حال انتقال..." : "رزرو جایگاه با ۱۰۰ دلار پیش‌پرداخت"}
             </Button>
             
             <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 text-xs md:text-sm text-muted-foreground">

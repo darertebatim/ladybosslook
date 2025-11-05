@@ -30,7 +30,7 @@ const sanitizeString = (input: string, maxLength: number = 255): string => {
 };
 
 const validateProgram = (program: string): boolean => {
-  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney', 'empowered-ladyboss', 'ladyboss-vip', 'connection-literacy', 'instagram-growth', 'private-coaching', 'one-bilingual'];
+  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney', 'empowered-ladyboss', 'ladyboss-vip', 'connection-literacy', 'instagram-growth', 'private-coaching', 'one-bilingual', 'empowered-woman-coaching'];
   return validPrograms.includes(program);
 };
 
@@ -162,6 +162,11 @@ serve(async (req) => {
         name: "کلاس قدرت دو زبانه - Bilingual Power Class",
         amount: 100, // $1 in cents
         description: "Learn to speak with power in any language - special for Iranian immigrant women"
+      },
+      "empowered-woman-coaching": {
+        name: "Empowered Woman Coaching - Interview Deposit",
+        amount: 10000, // $100 in cents
+        description: "$100 deposit to reserve your spot and schedule interview with Razie Ladyboss"
       }
     };
 
