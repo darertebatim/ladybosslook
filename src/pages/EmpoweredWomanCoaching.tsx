@@ -53,9 +53,7 @@ export default function EmpoweredWomanCoaching() {
 
             {/* Main Headline */}
             <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold mb-4 md:mb-6 leading-tight px-2">
-              <span className="gradient-text">زن ۱۰ برابر قدرتمند</span>
-              <br />
-              <span className="text-foreground">شما باشید</span>
+              <span className="gradient-text">کوچینگ زن قوی</span>
             </h1>
 
             {/* Subheadline */}
