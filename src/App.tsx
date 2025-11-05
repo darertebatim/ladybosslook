@@ -39,7 +39,7 @@ import IQMoneyWorkshop from "./pages/IQMoneyWorkshop";
 import Index from "./pages/Index";
 import LadybossAnnouncements from "./pages/LadybossAnnouncements";
 import CCWAnnouncements from "./pages/CCWAnnouncements";
-import LadybossCoaching from "./pages/LadybossCoaching";
+import EmpoweredWomanCoaching from "./pages/EmpoweredWomanCoaching";
 import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -71,7 +71,7 @@ const NativeAppRedirect = () => {
       const marketingRoutes = ['/programs', '/about', '/landing', '/asac', '/video', 
         '/expressassert', '/business-ideas', '/business-growth-accelerator', 
         '/business-startup-accelerator', '/event-irvine', '/ccw', '/cc', '/ccpay',
-        '/giveaway', '/ladyboss-coaching', '/freelive', '/one', '/iqmoney', '/rathus'];
+        '/giveaway', '/ewc', '/freelive', '/one', '/iqmoney', '/rathus'];
       
       if (marketingRoutes.includes(location.pathname)) {
         navigate('/app/home', { replace: true });
@@ -114,7 +114,7 @@ const App = () => (
             <Route path="/refund-policy" element={<RefundPolicy />} />
             <Route path="/sms-terms" element={<SMSTerms />} />
             <Route path="/giveaway" element={<Giveaway />} />
-            <Route path="/ladyboss-coaching" element={<LadybossCoaching />} />
+            <Route path="/ewc" element={<EmpoweredWomanCoaching />} />
             <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
             <Route path="/announcements/ccw" element={<CCWAnnouncements />} />
             <Route path="/freelive" element={<FreeLive />} />

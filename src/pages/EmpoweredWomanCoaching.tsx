@@ -4,14 +4,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, Crown, Users, Calendar, Star, Sparkles, Bell } from 'lucide-react';
+import { CheckCircle, Crown, Users, Calendar, Star, Sparkles, Bell, Heart } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import Navigation from '@/components/ui/navigation';
 import Footer from '@/components/sections/Footer';
 import { subscriptionFormSchema } from '@/lib/validation';
 import { z } from 'zod';
 
-const LadybossCoaching = () => {
+const EmpoweredWomanCoaching = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
@@ -62,8 +62,8 @@ const LadybossCoaching = () => {
         name: name.trim(),
         city: city.trim(),
         phone: phone.trim(),
-        source: 'ladyboss_coaching_page',
-        tags: ['ladyboss_coaching_program']
+        source: 'empowered_woman_coaching_page',
+        tags: ['empowered_woman_coaching']
       };
 
       const response = await fetch('https://mnukhzjcvbwpvktxqlej.supabase.co/functions/v1/mailchimp-subscribe', {
@@ -83,7 +83,7 @@ const LadybossCoaching = () => {
       setSubmitted(true);
       
       toast({
-        title: "Welcome to Ladyboss Coaching!",
+        title: "Welcome to Empowered Woman Coaching!",
         description: "You'll receive program details and next steps via email and SMS.",
       });
       
@@ -107,20 +107,22 @@ const LadybossCoaching = () => {
   };
 
   const coachingBenefits = [
-    "1-on-1 personalized coaching sessions",
-    "Business strategy development",  
-    "Confidence building techniques",
-    "Leadership skills training",
-    "Goal setting and accountability",
-    "Network building opportunities"
+    "12-week transformational group coaching program",
+    "Weekly live coaching sessions with Razieh Mirzaei",
+    "Personal development and empowerment strategies",
+    "Confidence building and self-leadership training",
+    "Exclusive community of ambitious women",
+    "Lifetime access to program resources and recordings",
+    "Weekly accountability and action plans",
+    "Bonus workshops on mindset and success"
   ];
 
   if (submitted) {
     return (
       <>
         <SEOHead 
-          title="Welcome to Ladyboss Coaching Program"
-          description="You've successfully joined the Ladyboss Coaching Program. Get ready to transform your business and life."
+          title="Welcome to Empowered Woman Coaching"
+          description="You've successfully joined the Empowered Woman Coaching Program. Get ready to transform your life."
         />
         <Navigation />
         <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center py-8">
@@ -130,9 +132,9 @@ const LadybossCoaching = () => {
                 <div className="mx-auto mb-4 p-3 bg-green-100 rounded-full w-fit">
                   <CheckCircle className="w-8 h-8 text-green-600" />
                 </div>
-                <CardTitle className="text-2xl text-green-700">Welcome to Ladyboss Coaching!</CardTitle>
+                <CardTitle className="text-2xl text-green-700">Welcome to Empowered Woman Coaching!</CardTitle>
                 <CardDescription className="text-lg">
-                  You're officially part of our exclusive coaching program.
+                  You're officially part of our exclusive transformation program.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -148,7 +150,7 @@ const LadybossCoaching = () => {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600" />
-                    Access to exclusive resources
+                    Access to exclusive community and resources
                   </li>
                 </ul>
                 <Button 
@@ -169,8 +171,8 @@ const LadybossCoaching = () => {
   return (
     <>
       <SEOHead 
-        title="Ladyboss Coaching Program - Transform Your Business & Life"
-        description="Join our exclusive coaching program designed for ambitious women entrepreneurs. Get personalized guidance, build confidence, and scale your business."
+        title="Empowered Woman Coaching - Transform Your Life"
+        description="Join our exclusive 12-week coaching program designed for women ready to step into their power, build confidence, and create lasting transformation."
       />
       <Navigation />
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-8">
@@ -181,17 +183,18 @@ const LadybossCoaching = () => {
             <div className="space-y-6 order-2 lg:order-1">
               <div className="space-y-4">
                 <div className="inline-flex items-center bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-full text-sm font-medium">
-                  <Crown className="w-4 h-4 mr-2" />
-                  Exclusive Ladyboss Coaching Program
+                  <Heart className="w-4 h-4 mr-2" />
+                  Empowered Woman Coaching Program
                 </div>
                 
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
-                  Transform Your Business &
-                  <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"> Unlock Your Potential</span>
+                  Step Into Your Power &
+                  <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"> Transform Your Life</span>
                 </h1>
                 
                 <p className="text-lg text-muted-foreground">
-                  Join our exclusive coaching program designed for ambitious women entrepreneurs ready to scale their business and build lasting success.
+                  Join our exclusive 12-week coaching program designed for women ready to embrace their strength, 
+                  build unshakeable confidence, and create the life they deserve.
                 </p>
               </div>
 
@@ -215,13 +218,13 @@ const LadybossCoaching = () => {
               <div className="grid grid-cols-3 gap-4 py-6">
                 <div className="text-center">
                   <Users className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <div className="text-2xl font-bold">500+</div>
-                  <div className="text-sm text-muted-foreground">Women Coached</div>
+                  <div className="text-2xl font-bold">1000+</div>
+                  <div className="text-sm text-muted-foreground">Women Empowered</div>
                 </div>
                 <div className="text-center">
                   <Star className="w-6 h-6 text-primary mx-auto mb-2" />
                   <div className="text-2xl font-bold">4.9/5</div>
-                  <div className="text-sm text-muted-foreground">Success Rate</div>
+                  <div className="text-sm text-muted-foreground">Satisfaction Rate</div>
                 </div>
                 <div className="text-center">
                   <Calendar className="w-6 h-6 text-primary mx-auto mb-2" />
@@ -260,7 +263,7 @@ const LadybossCoaching = () => {
                 <CardHeader className="text-center">
                   <CardTitle className="text-2xl">Join the Program</CardTitle>
                   <CardDescription>
-                    Secure your spot in our exclusive coaching program
+                    Secure your spot in this transformational journey
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -333,7 +336,7 @@ const LadybossCoaching = () => {
                       className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
                       disabled={isLoading}
                     >
-                      {isLoading ? 'Joining Program...' : 'Join Ladyboss Coaching Program'}
+                      {isLoading ? 'Joining Program...' : 'Join Empowered Woman Coaching'}
                     </Button>
 
                     <p className="text-xs text-center text-muted-foreground">
@@ -352,4 +355,4 @@ const LadybossCoaching = () => {
   );
 };
 
-export default LadybossCoaching;
+export default EmpoweredWomanCoaching;
