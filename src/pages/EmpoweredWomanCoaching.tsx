@@ -98,6 +98,83 @@ export default function EmpoweredWomanCoaching() {
               </div>
             </div>
 
+            {/* Pricing Options */}
+            <div className="max-w-4xl mx-auto mb-8 md:mb-10 px-4">
+              <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+                {/* Monthly Payment */}
+                <Card className="p-4 md:p-6 border-2 border-border hover-lift bg-card">
+                  <div className="text-center">
+                    <h4 className="text-lg md:text-xl font-bold mb-1.5 md:mb-2">پرداخت ماهانه</h4>
+                    <div className="text-3xl md:text-4xl font-bold text-primary mb-1 md:mb-2">۲۹۹$</div>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">به مدت ۳ ماه</p>
+                    
+                    <div className="border-t pt-3 md:pt-4 mb-3 md:mb-4">
+                      <div className="flex justify-between items-center text-xs md:text-sm mb-1 md:mb-2">
+                        <span className="text-muted-foreground">پرداخت ماهانه:</span>
+                        <span className="font-semibold">۲۹۹$ × ۳</span>
+                      </div>
+                      <div className="flex justify-between items-center font-bold text-sm md:text-base">
+                        <span>جمع:</span>
+                        <span className="text-primary">۸۹۷$</span>
+                      </div>
+                    </div>
+
+                    <ul className="space-y-1.5 md:space-y-2 text-right text-xs md:text-sm">
+                      <li className="flex items-start gap-2">
+                        <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-success mt-0.5 flex-shrink-0" />
+                        <span>انعطاف در پرداخت</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-success mt-0.5 flex-shrink-0" />
+                        <span>شروع فوری برنامه</span>
+                      </li>
+                    </ul>
+                  </div>
+                </Card>
+
+                {/* One-time Payment - Recommended */}
+                <Card className="p-4 md:p-6 border-2 border-success hover-lift bg-success/5 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 bg-success text-success-foreground px-2 md:px-3 py-0.5 md:py-1 text-xs md:text-sm font-bold rounded-br-lg">
+                    توصیه می‌شود
+                  </div>
+                  <div className="text-center mt-4 md:mt-6">
+                    <h4 className="text-lg md:text-xl font-bold mb-1.5 md:mb-2">پرداخت یکجا</h4>
+                    <div className="text-3xl md:text-4xl font-bold text-success mb-1 md:mb-2">۷۴۷$</div>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">کل دوره</p>
+                    
+                    <div className="border-t pt-3 md:pt-4 mb-3 md:mb-4">
+                      <div className="flex justify-between items-center text-xs md:text-sm mb-1 md:mb-2">
+                        <span className="text-muted-foreground">پرداخت ماهانه:</span>
+                        <span className="line-through opacity-60">۸۹۷$</span>
+                      </div>
+                      <div className="flex justify-between items-center font-bold text-sm md:text-base">
+                        <span>با تخفیف:</span>
+                        <span className="text-success">۷۴۷$</span>
+                      </div>
+                      <div className="mt-1 md:mt-2 text-xs md:text-sm text-success font-semibold">
+                        صرفه‌جویی ۱۵۰ دلار!
+                      </div>
+                    </div>
+
+                    <ul className="space-y-1.5 md:space-y-2 text-right text-xs md:text-sm">
+                      <li className="flex items-start gap-2">
+                        <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-success mt-0.5 flex-shrink-0" />
+                        <span>صرفه‌جویی ۱۵۰ دلاری</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-success mt-0.5 flex-shrink-0" />
+                        <span>بدون دغدغه پرداخت ماهانه</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-success mt-0.5 flex-shrink-0" />
+                        <span>بهترین ارزش</span>
+                      </li>
+                    </ul>
+                  </div>
+                </Card>
+              </div>
+            </div>
+
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center mb-8 md:mb-12 px-4">
               <Button
