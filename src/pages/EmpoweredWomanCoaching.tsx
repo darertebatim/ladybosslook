@@ -98,6 +98,22 @@ export default function EmpoweredWomanCoaching() {
               </div>
             </div>
 
+            {/* Special Offer Banner */}
+            <div className="py-4 md:py-6 px-4 bg-gradient-to-r from-urgency via-urgency-light to-urgency rounded-2xl mb-6 md:mb-8 mx-2">
+              <div className="text-center">
+                <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 text-white">
+                  <Gift className="w-6 h-6 md:w-8 md:h-8 animate-bounce" />
+                  <div>
+                    <p className="text-lg md:text-2xl lg:text-3xl font-bold mb-0.5 md:mb-1">
+                      پیشنهاد ویژه: از <span className="line-through opacity-75">۱۲۰۰$</span> به <span className="text-2xl md:text-4xl">۹۹۷$</span>
+                    </p>
+                    <p className="text-sm md:text-lg opacity-90">صرفه‌جویی ۲۰۳ دلار - فقط برای افراد واجد شرایط</p>
+                  </div>
+                  <Gift className="w-6 h-6 md:w-8 md:h-8 animate-bounce" />
+                </div>
+              </div>
+            </div>
+
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center mb-8 md:mb-12 px-4">
               <Button
@@ -130,21 +146,6 @@ export default function EmpoweredWomanCoaching() {
         </div>
       </section>
 
-      {/* Special Offer Banner */}
-      <section className="py-4 md:py-6 px-4 bg-gradient-to-r from-urgency via-urgency-light to-urgency">
-        <div className="max-w-6xl mx-auto text-center rtl font-farsi">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 text-white">
-            <Gift className="w-6 h-6 md:w-8 md:h-8 animate-bounce" />
-            <div>
-              <p className="text-lg md:text-2xl lg:text-3xl font-bold mb-0.5 md:mb-1">
-                پیشنهاد ویژه: از <span className="line-through opacity-75">۱۲۰۰$</span> به <span className="text-2xl md:text-4xl">۹۹۷$</span>
-              </p>
-              <p className="text-sm md:text-lg opacity-90">صرفه‌جویی ۲۰۳ دلار - فقط برای افراد واجد شرایط</p>
-            </div>
-            <Gift className="w-6 h-6 md:w-8 md:h-8 animate-bounce" />
-          </div>
-        </div>
-      </section>
 
       {/* Transformation Areas */}
       <section className="py-12 md:py-16 lg:py-20 px-4 bg-muted/30">
