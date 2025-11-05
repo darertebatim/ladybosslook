@@ -47,11 +47,11 @@ export function QuickActions() {
       color: "text-pink-600"
     },
     {
-      icon: Calendar,
-      label: "Book Consultation",
-      description: "1-on-1 coaching session",
-      action: () => navigate("/one"),
-      color: "text-green-600"
+      icon: GraduationCap,
+      label: "My Events",
+      description: "View upcoming events",
+      action: () => navigate("/events"),
+      color: "text-orange-600"
     },
     {
       icon: Send,
@@ -61,11 +61,11 @@ export function QuickActions() {
       color: "text-purple-600"
     },
     {
-      icon: GraduationCap,
-      label: "My Events",
-      description: "View upcoming events",
-      action: () => navigate("/events"),
-      color: "text-orange-600"
+      icon: Calendar,
+      label: "Book Consultation",
+      description: "1-on-1 coaching session",
+      action: () => navigate("/one"),
+      color: "text-green-600"
     }
   ];
 
