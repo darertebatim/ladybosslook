@@ -7,6 +7,8 @@ import { Announcements } from '@/components/dashboard/Announcements';
 import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { SEOHead } from '@/components/SEOHead';
 import { trackPWAInstallation, isPWAInstalled } from '@/lib/pwaTracking';
+import { Button } from '@/components/ui/button';
+import { Send } from 'lucide-react';
 
 const AppHome = () => {
   const { user } = useAuth();
@@ -17,6 +19,26 @@ const AppHome = () => {
       trackPWAInstallation(user.id);
     }
   }, [user?.id]);
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user?.id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const handleContactSupport = () => {
+    const message = `Hi! I need support.\n\nName: ${profile?.full_name || 'N/A'}\nEmail: ${profile?.email || user?.email || 'N/A'}\nPhone: ${profile?.phone || 'N/A'}\nCity: ${profile?.city || 'N/A'}`;
+    const telegramUrl = `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
+    window.open(telegramUrl, '_blank');
+  };
 
   const { data: enrollments } = useQuery({
     queryKey: ['course-enrollments', user?.id],
@@ -64,6 +86,17 @@ const AppHome = () => {
         />
         <ActiveRound />
         <Announcements />
+        
+        <div className="flex justify-center">
+          <Button
+            size="lg"
+            onClick={handleContactSupport}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Send className="mr-2 h-5 w-5" />
+            Contact Support on Telegram
+          </Button>
+        </div>
       </div>
     </div>
   );
