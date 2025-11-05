@@ -1,355 +1,429 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, Crown, Users, Calendar, Star, Sparkles, Bell, Heart } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { CheckCircle, Users, Calendar, Star, Sparkles, TrendingUp, Heart, DollarSign, Video, MessageCircle, Target, Award, Zap } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import Navigation from '@/components/ui/navigation';
 import Footer from '@/components/sections/Footer';
-import { subscriptionFormSchema } from '@/lib/validation';
-import { z } from 'zod';
+import { Badge } from '@/components/ui/badge';
 
 const EmpoweredWomanCoaching = () => {
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [name, setName] = useState('');
-  const [city, setCity] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  
-  const { toast } = useToast();
-
-  const validateForm = () => {
-    try {
-      subscriptionFormSchema.parse({ name, email, phone, city });
-      setValidationErrors({});
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const errors: Record<string, string> = {};
-        error.errors.forEach((err) => {
-          if (err.path[0]) {
-            errors[err.path[0].toString()] = err.message;
-          }
-        });
-        setValidationErrors(errors);
-        return false;
-      }
-      return false;
-    }
+  const handlePaymentClick = () => {
+    // Redirect to payment page with $100 deposit
+    window.location.href = '/checkout?program=empowered-woman-coaching&amount=100';
   };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      toast({
-        title: "Please fix the errors",
-        description: "Check the highlighted fields and try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    
-    try {
-      const submissionData = {
-        email: email.trim(),
-        name: name.trim(),
-        city: city.trim(),
-        phone: phone.trim(),
-        source: 'empowered_woman_coaching_page',
-        tags: ['empowered_woman_coaching']
-      };
-
-      const response = await fetch('https://mnukhzjcvbwpvktxqlej.supabase.co/functions/v1/mailchimp-subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(submissionData),
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to subscribe');
-      }
-      
-      setSubmitted(true);
-      
-      toast({
-        title: "Welcome to Empowered Woman Coaching!",
-        description: "You'll receive program details and next steps via email and SMS.",
-      });
-      
-      // Clear form data
-      setEmail('');
-      setName('');
-      setCity('');
-      setPhone('');
-      
-    } catch (error: any) {
-      console.error('Submission error:', error);
-      
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const coachingBenefits = [
-    "12-week transformational group coaching program",
-    "Weekly live coaching sessions with Razieh Mirzaei",
-    "Personal development and empowerment strategies",
-    "Confidence building and self-leadership training",
-    "Exclusive community of ambitious women",
-    "Lifetime access to program resources and recordings",
-    "Weekly accountability and action plans",
-    "Bonus workshops on mindset and success"
-  ];
-
-  if (submitted) {
-    return (
-      <>
-        <SEOHead 
-          title="Welcome to Empowered Woman Coaching"
-          description="You've successfully joined the Empowered Woman Coaching Program. Get ready to transform your life."
-        />
-        <Navigation />
-        <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center py-8">
-          <div className="container mx-auto px-4 max-w-2xl">
-            <Card className="text-center shadow-lg">
-              <CardHeader>
-                <div className="mx-auto mb-4 p-3 bg-green-100 rounded-full w-fit">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
-                </div>
-                <CardTitle className="text-2xl text-green-700">Welcome to Empowered Woman Coaching!</CardTitle>
-                <CardDescription className="text-lg">
-                  You're officially part of our exclusive transformation program.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p>You'll receive:</p>
-                <ul className="text-left space-y-2 max-w-md mx-auto">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    Program welcome email within 24 hours
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    SMS updates about coaching sessions
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    Access to exclusive community and resources
-                  </li>
-                </ul>
-                <Button 
-                  onClick={() => window.location.href = '/'}
-                  className="mt-6"
-                >
-                  Return to Homepage
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-        <Footer />
-      </>
-    );
-  }
 
   return (
     <>
       <SEOHead 
-        title="Empowered Woman Coaching - Transform Your Life"
-        description="Join our exclusive 12-week coaching program designed for women ready to step into their power, build confidence, and create lasting transformation."
+        title="10X Empowered Woman Coaching - Transform Your Life in 3 Months"
+        description="Join Razie Ladyboss's exclusive 3-month group coaching program for immigrant women. Get 10X more power in work, relationships, and income. Only $997 (was $1200)."
       />
       <Navigation />
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-8 items-start max-w-6xl mx-auto">
+      
+      {/* Hero Section */}
+      <section className="relative bg-gradient-hero text-white py-16 md:py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2YzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHptMCAwIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
+        
+        <div className="container mx-auto px-4 md:px-6 relative z-10">
+          <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8">
+            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm md:text-base font-medium mb-4">
+              <Heart className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+              3-Month Transformation Program for Immigrant Women
+            </div>
             
-            {/* Left Column - Content */}
-            <div className="space-y-6 order-2 lg:order-1">
-              <div className="space-y-4">
-                <div className="inline-flex items-center bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-full text-sm font-medium">
-                  <Heart className="w-4 h-4 mr-2" />
-                  Empowered Woman Coaching Program
-                </div>
-                
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
-                  Step Into Your Power &
-                  <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"> Transform Your Life</span>
-                </h1>
-                
-                <p className="text-lg text-muted-foreground">
-                  Join our exclusive 12-week coaching program designed for women ready to embrace their strength, 
-                  build unshakeable confidence, and create the life they deserve.
-                </p>
-              </div>
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight">
+              Become a <span className="text-secondary">10X Empowered Woman</span> in Just 3 Months
+            </h1>
+            
+            <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+              Face-to-face weekly group coaching with <span className="font-semibold">Razie Ladyboss</span> to gain 10X more power 
+              in your work, relationships, and income
+            </p>
 
-              {/* Program Benefits */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" />
-                  What You'll Get:
-                </h3>
-                <ul className="space-y-3">
-                  {coachingBenefits.map((benefit, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-muted-foreground">{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Program Stats */}
-              <div className="grid grid-cols-3 gap-4 py-6">
-                <div className="text-center">
-                  <Users className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <div className="text-2xl font-bold">1000+</div>
-                  <div className="text-sm text-muted-foreground">Women Empowered</div>
-                </div>
-                <div className="text-center">
-                  <Star className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <div className="text-2xl font-bold">4.9/5</div>
-                  <div className="text-sm text-muted-foreground">Satisfaction Rate</div>
-                </div>
-                <div className="text-center">
-                  <Calendar className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <div className="text-2xl font-bold">12 Week</div>
-                  <div className="text-sm text-muted-foreground">Program</div>
-                </div>
-              </div>
-
-              {/* Announcements Link */}
-              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4 border border-primary/20">
-                <div className="flex items-center gap-3 mb-2">
-                  <Bell className="w-5 h-5 text-primary" />
-                  <h4 className="font-semibold">Stay Updated</h4>
-                </div>
-                <p className="text-muted-foreground text-sm mb-3">
-                  Check our announcements page weekly for program updates, success stories, and community news.
-                </p>
-                <div className="text-sm text-muted-foreground mb-2" dir="rtl">
-                  <span className="font-semibold">هر هفته به این صفحه سر بزنید</span>
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => window.open('/announcements/coaching', '_blank')}
-                  className="gap-2"
-                >
-                  <Bell className="w-4 h-4" />
-                  View Announcements
-                </Button>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+              <Button 
+                size="lg"
+                onClick={handlePaymentClick}
+                className="bg-secondary hover:bg-secondary/90 text-white px-8 py-6 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 w-full sm:w-auto"
+              >
+                <DollarSign className="w-5 h-5 mr-2" />
+                Reserve Your Spot - $100 Deposit
+              </Button>
+              <Button 
+                size="lg"
+                variant="outline"
+                className="bg-white/10 hover:bg-white/20 border-white/30 text-white px-8 py-6 text-lg backdrop-blur-sm w-full sm:w-auto"
+                onClick={() => document.getElementById('details')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Learn More
+              </Button>
             </div>
 
-            {/* Right Column - Form */}
-            <div className="order-1 lg:order-2">
-              <Card className="shadow-xl border-2 border-primary/20">
-                <CardHeader className="text-center">
-                  <CardTitle className="text-2xl">Join the Program</CardTitle>
-                  <CardDescription>
-                    Secure your spot in this transformational journey
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Full Name *</Label>
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="Enter your full name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className={validationErrors.name ? 'border-red-500' : ''}
-                      />
-                      {validationErrors.name && (
-                        <p className="text-red-500 text-sm">{validationErrors.name}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Address *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className={validationErrors.email ? 'border-red-500' : ''}
-                      />
-                      {validationErrors.email && (
-                        <p className="text-red-500 text-sm">{validationErrors.email}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number (SMS) *</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="+1 (555) 123-4567"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className={validationErrors.phone ? 'border-red-500' : ''}
-                      />
-                      {validationErrors.phone && (
-                        <p className="text-red-500 text-sm">{validationErrors.phone}</p>
-                      )}
-                      <p className="text-xs text-muted-foreground">
-                        We'll send program updates and session reminders via SMS
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="city">City *</Label>
-                      <Input
-                        id="city"
-                        type="text"
-                        placeholder="Enter your city"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className={validationErrors.city ? 'border-red-500' : ''}
-                      />
-                      {validationErrors.city && (
-                        <p className="text-red-500 text-sm">{validationErrors.city}</p>
-                      )}
-                    </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? 'Joining Program...' : 'Join Empowered Woman Coaching'}
-                    </Button>
-
-                    <p className="text-xs text-center text-muted-foreground">
-                      By joining, you agree to receive program updates via email and SMS. 
-                      You can unsubscribe at any time.
-                    </p>
-                  </form>
-                </CardContent>
-              </Card>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 pt-8 md:pt-12">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 md:p-6">
+                <Calendar className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2 text-secondary" />
+                <div className="text-2xl md:text-3xl font-bold">3</div>
+                <div className="text-xs md:text-sm text-white/80">Months</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 md:p-6">
+                <Users className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2 text-secondary" />
+                <div className="text-2xl md:text-3xl font-bold">12</div>
+                <div className="text-xs md:text-sm text-white/80">Weekly Sessions</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 md:p-6">
+                <Video className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2 text-secondary" />
+                <div className="text-2xl md:text-3xl font-bold">Live</div>
+                <div className="text-xs md:text-sm text-white/80">Face-to-Face</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 md:p-6">
+                <TrendingUp className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2 text-secondary" />
+                <div className="text-2xl md:text-3xl font-bold">10X</div>
+                <div className="text-xs md:text-sm text-white/80">Empowerment</div>
+              </div>
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Special Offer Banner */}
+      <div className="bg-secondary py-3 md:py-4">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-4 text-white text-center">
+            <Badge variant="secondary" className="bg-white text-secondary font-bold px-3 py-1">
+              LIMITED TIME OFFER
+            </Badge>
+            <p className="text-sm md:text-base font-medium">
+              <span className="line-through opacity-75">$1,200</span> 
+              <span className="text-2xl md:text-3xl font-bold mx-2">$997</span>
+              <span className="text-xs md:text-sm">Save $203!</span>
+            </p>
+          </div>
+        </div>
       </div>
+
+      {/* What You'll Achieve Section */}
+      <section id="details" className="py-12 md:py-20 bg-background">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
+              What You'll <span className="gradient-text">Achieve</span>
+            </h2>
+            <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto">
+              This program is specifically designed for immigrant women ready to break through barriers 
+              and create extraordinary success in all areas of life
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+            <Card className="bg-gradient-card border-2 border-primary/20 hover:shadow-lg transition-all duration-300">
+              <CardContent className="p-6 md:p-8 text-center">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                  <Target className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Career & Work</h3>
+                <p className="text-sm md:text-base text-muted-foreground">
+                  Get 10X more confidence and power to advance in your career, negotiate better, 
+                  and achieve the professional success you deserve
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-card border-2 border-primary/20 hover:shadow-lg transition-all duration-300">
+              <CardContent className="p-6 md:p-8 text-center">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                  <Heart className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Relationships</h3>
+                <p className="text-sm md:text-base text-muted-foreground">
+                  Build stronger, healthier relationships with family, friends, and partners. 
+                  Learn to set boundaries and communicate with power
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-card border-2 border-primary/20 hover:shadow-lg transition-all duration-300">
+              <CardContent className="p-6 md:p-8 text-center">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                  <DollarSign className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Income Growth</h3>
+                <p className="text-sm md:text-base text-muted-foreground">
+                  Develop the mindset and strategies to increase your income, create new opportunities, 
+                  and build lasting financial security
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Program Details Section */}
+      <section className="py-12 md:py-20 bg-muted/30">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10 md:mb-16">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
+                Program <span className="gradient-text">Details</span>
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+              <Card className="bg-background">
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Calendar className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg md:text-xl font-bold mb-2">Duration & Format</h3>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        3-month intensive program with 12 weekly face-to-face group coaching sessions
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-background">
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg md:text-xl font-bold mb-2">Your Coach</h3>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        Direct coaching with Razie Ladyboss, empowerment expert for immigrant women
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-background">
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg md:text-xl font-bold mb-2">Group Coaching</h3>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        Small, intimate group setting for personalized attention and community support
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-background">
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Award className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg md:text-xl font-bold mb-2">For Immigrant Women</h3>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        Specifically designed to address unique challenges faced by immigrant women
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="mt-6 md:mt-8 bg-gradient-card border-2 border-primary/30">
+              <CardContent className="p-6 md:p-8">
+                <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                  What's Included
+                </h3>
+                <div className="grid sm:grid-cols-2 gap-3 md:gap-4">
+                  {[
+                    'Weekly live group coaching sessions',
+                    'Face-to-face interaction with Razie',
+                    'Personalized action plans',
+                    'Accountability and progress tracking',
+                    'Community support network',
+                    'Bonus resources and materials',
+                    'Lifetime access to recordings',
+                    'Certificate of completion'
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center gap-2 md:gap-3">
+                      <CheckCircle className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />
+                      <span className="text-sm md:text-base">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-12 md:py-20 bg-background">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-10 md:mb-16">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
+                Investment in Your <span className="gradient-text">Future</span>
+              </h2>
+            </div>
+
+            <Card className="bg-gradient-card border-4 border-primary shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-secondary text-white px-4 md:px-6 py-2 md:py-3 rounded-bl-2xl font-bold text-sm md:text-base">
+                SAVE $203
+              </div>
+              
+              <CardContent className="p-6 md:p-12">
+                <div className="text-center space-y-4 md:space-y-6">
+                  <div>
+                    <div className="text-base md:text-lg text-muted-foreground mb-2">Regular Price</div>
+                    <div className="text-3xl md:text-4xl font-bold text-muted-foreground line-through">$1,200</div>
+                  </div>
+
+                  <div>
+                    <div className="text-xl md:text-2xl text-primary font-semibold mb-2">Special Limited Offer</div>
+                    <div className="text-5xl md:text-7xl font-bold gradient-text mb-4">$997</div>
+                    <p className="text-sm md:text-base text-muted-foreground">Full program investment</p>
+                  </div>
+
+                  <div className="bg-primary/5 rounded-lg p-4 md:p-6 my-6 md:my-8">
+                    <div className="flex items-center justify-center gap-2 mb-3 md:mb-4">
+                      <Zap className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                      <h3 className="text-lg md:text-xl font-bold">How It Works</h3>
+                    </div>
+                    <div className="space-y-3 md:space-y-4 text-left max-w-2xl mx-auto">
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 md:w-8 md:h-8 bg-primary text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm md:text-base">
+                          1
+                        </div>
+                        <p className="text-sm md:text-base pt-1">
+                          <span className="font-semibold">Pay $100 deposit</span> to reserve your spot
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 md:w-8 md:h-8 bg-primary text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm md:text-base">
+                          2
+                        </div>
+                        <p className="text-sm md:text-base pt-1">
+                          <span className="font-semibold">Get interviewed by Razie Ladyboss</span> to ensure the program is the right fit for you
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 md:w-8 md:h-8 bg-primary text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm md:text-base">
+                          3
+                        </div>
+                        <p className="text-sm md:text-base pt-1">
+                          <span className="font-semibold">If accepted</span>, pay the remaining $897 and start your transformation journey
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button 
+                    size="lg"
+                    onClick={handlePaymentClick}
+                    className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white px-8 md:px-12 py-6 md:py-8 text-base md:text-xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 w-full sm:w-auto"
+                  >
+                    <DollarSign className="w-5 h-5 md:w-6 md:h-6 mr-2" />
+                    Pay $100 Deposit & Get Interview
+                  </Button>
+
+                  <p className="text-xs md:text-sm text-muted-foreground mt-4">
+                    Secure payment processing • Money-back guarantee if not accepted
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Why This Program Section */}
+      <section className="py-12 md:py-20 bg-muted/30">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10 md:mb-16">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
+                Why Choose <span className="gradient-text">This Program?</span>
+              </h2>
+            </div>
+
+            <div className="grid gap-6 md:gap-8">
+              {[
+                {
+                  icon: Star,
+                  title: 'Designed for Immigrant Women',
+                  description: 'Understand and overcome the unique challenges you face as an immigrant woman in a new country'
+                },
+                {
+                  icon: Users,
+                  title: 'Small Group, Big Impact',
+                  description: 'Intimate group setting ensures you get personalized attention while building a supportive community'
+                },
+                {
+                  icon: Video,
+                  title: 'Face-to-Face with Razie',
+                  description: 'Direct, personal interaction with an expert coach who truly understands your journey'
+                },
+                {
+                  icon: TrendingUp,
+                  title: '10X Transformation',
+                  description: 'Not just improvement - experience a complete 10X transformation in work, relationships, and income'
+                },
+                {
+                  icon: CheckCircle,
+                  title: 'Proven Results',
+                  description: 'Join hundreds of immigrant women who have already transformed their lives through this program'
+                }
+              ].map((item, index) => (
+                <Card key={index} className="bg-background hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-6 md:p-8 flex items-start gap-4 md:gap-6">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <item.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg md:text-xl font-bold mb-2">{item.title}</h3>
+                      <p className="text-sm md:text-base text-muted-foreground">{item.description}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-12 md:py-20 bg-gradient-hero text-white">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
+              Ready to Become 10X More Empowered?
+            </h2>
+            <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
+              Take the first step today. Reserve your spot with a $100 deposit and get your personal interview with Razie Ladyboss.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+              <Button 
+                size="lg"
+                onClick={handlePaymentClick}
+                className="bg-secondary hover:bg-secondary/90 text-white px-8 md:px-12 py-6 md:py-8 text-base md:text-xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 w-full sm:w-auto"
+              >
+                <DollarSign className="w-5 h-5 md:w-6 md:h-6 mr-2" />
+                Reserve Your Spot Now
+              </Button>
+            </div>
+            <p className="text-sm md:text-base text-white/70">
+              Limited spots available • Next cohort starts soon
+            </p>
+          </div>
+        </div>
+      </section>
+
       <Footer />
     </>
   );
