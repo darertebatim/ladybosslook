@@ -24,17 +24,30 @@ export default function PaymentSuccess() {
       const isTestMode = searchParams.get('test') === 'true';
       
       if (isTestMode) {
-        // Get program info if slug is provided
-        const program = programSlug ? getProgramBySlug(programSlug) : null;
-        const productName = program?.title || 'Courageous Character Course';
-        const amount = program?.priceAmount ? program.priceAmount * 100 : 4999;
+        // Static program mapping for test mode
+        const testProgramData: Record<string, { title: string; amount: number }> = {
+          'empowered-woman-coaching': {
+            title: 'Empowered Woman Coaching',
+            amount: 99700 // $997.00 in cents
+          },
+          'courageous-character': {
+            title: 'Courageous Character Course',
+            amount: 4999
+          },
+          'iqmoney-workshop': {
+            title: 'IQ Money Workshop',
+            amount: 9900
+          }
+        };
+        
+        const programData = (programSlug && testProgramData[programSlug]) || testProgramData['courageous-character'];
         
         // Show test data
         setPaymentVerified(true);
         setOrderDetails({
           id: 'test-order-123',
-          product_name: productName,
-          amount: amount,
+          product_name: programData.title,
+          amount: programData.amount,
           email: 'test@example.com',
           name: 'Sarah Johnson',
           phone: '+1 (555) 123-4567',
