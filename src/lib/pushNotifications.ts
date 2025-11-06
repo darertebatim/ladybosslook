@@ -55,15 +55,18 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
   
   // Web/PWA permissions
   if (!('Notification' in window)) {
-    console.error('This browser does not support notifications');
+    console.error('[Push] Web notifications not supported in this browser');
     return 'denied';
   }
 
   if (Notification.permission === 'granted') {
+    console.log('[Push] Web notification permission already granted');
     return 'granted';
   }
 
+  console.log('[Push] Requesting web notification permission');
   const permission = await Notification.requestPermission();
+  console.log('[Push] Web notification permission result:', permission);
   return permission;
 }
 

@@ -18,19 +18,22 @@ export function usePWAInstall() {
   const isIOS = isIOSDevice();
 
   useEffect(() => {
-    // Check if running as native app or PWA
-    const isNativeApp = Capacitor.isNativePlatform();
-    const isPWAStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    const checkInstalled = isNativeApp || isPWAStandalone;
-    
-    setIsInstalled(checkInstalled);
+    // Skip all PWA logic on native platforms
+    if (Capacitor.isNativePlatform()) {
+      setIsInstalled(true);
+      return;
+    }
 
-    // Track installation immediately if user is logged in and app is installed
-    if (checkInstalled && user?.id) {
+    // Check if running as PWA
+    const isPWAStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    setIsInstalled(isPWAStandalone);
+
+    // Track installation only for web/PWA (not native)
+    if (isPWAStandalone && user?.id) {
       console.log('[PWA] Detected app installation, tracking for user:', user.id);
       trackInstallation();
     }
-  }, [user?.id]); // Re-run when user changes
+  }, [user?.id]);
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -57,6 +60,11 @@ export function usePWAInstall() {
   }, [user?.id]);
 
   const trackInstallation = async () => {
+    // Never track on native platforms
+    if (Capacitor.isNativePlatform()) {
+      return;
+    }
+
     if (!user?.id) {
       console.log('[PWA] No user ID, skipping tracking');
       return;
