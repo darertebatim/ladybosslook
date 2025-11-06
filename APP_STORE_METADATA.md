@@ -3,7 +3,7 @@
 ## App Information
 
 **App Name:** Ladybosslook
-**Bundle ID:** app.lovable.9d54663c1af540669ceb1723206ae5f8  
+**Bundle ID:** com.ladybosslook.academy  
 **Category:** Education > Business  
 **Age Rating:** 4+ (No objectionable content)
 
