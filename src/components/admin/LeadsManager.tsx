@@ -5,8 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign } from 'lucide-react';
+import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 
 interface UserLead {
   profile: {
@@ -46,6 +56,9 @@ export function LeadsManager() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<UserLead | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const handleSearch = async () => {
@@ -147,6 +160,53 @@ export function LeadsManager() {
     }
   };
 
+  const handleChangePassword = async () => {
+    if (!searchResults?.profile?.id) return;
+
+    if (!newPassword || newPassword.length < 6) {
+      toast({
+        title: "Invalid password",
+        description: "Password must be at least 6 characters",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { data, error } = await supabase.functions.invoke('admin-change-password', {
+        body: {
+          userId: searchResults.profile.id,
+          newPassword
+        },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Password updated successfully"
+      });
+
+      setNewPassword('');
+      setIsDialogOpen(false);
+    } catch (error: any) {
+      console.error('Password change error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to change password",
+        variant: "destructive"
+      });
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -184,9 +244,58 @@ export function LeadsManager() {
             {searchResults.profile ? (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    User Profile
+                  <CardTitle className="text-lg flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      User Profile
+                    </div>
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Key className="h-4 w-4 mr-2" />
+                          Change Password
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Change User Password</DialogTitle>
+                          <DialogDescription>
+                            Enter a new password for {searchResults.profile.email}. The user will be able to sign in with this new password immediately.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="new-password">New Password</Label>
+                            <Input
+                              id="new-password"
+                              type="password"
+                              placeholder="Minimum 6 characters"
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              onKeyDown={(e) => e.key === 'Enter' && handleChangePassword()}
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setIsDialogOpen(false);
+                              setNewPassword('');
+                            }}
+                            disabled={isChangingPassword}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            onClick={handleChangePassword}
+                            disabled={isChangingPassword}
+                          >
+                            {isChangingPassword ? 'Updating...' : 'Update Password'}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
