@@ -1,46 +1,61 @@
 import { Capacitor } from '@capacitor/core';
 
 /**
- * ULTRA-ROBUST native platform detection
- * Works even when Capacitor reports "web" due to remote server URL
- * Checks multiple signals: Capacitor bridge, user agent, WebView context
+ * BULLETPROOF native platform detection
+ * Works EVEN IF Capacitor hasn't initialized yet
+ * Priority: iOS/Android signatures > Capacitor APIs
  */
 export const isDefinitelyNative = (): boolean => {
-  // Check 1: Capacitor bridge exists
-  const hasCapacitorBridge = typeof (window as any).Capacitor !== 'undefined';
-  
-  // Check 2: Standard Capacitor detection
-  const isNativePlatform = Capacitor.isNativePlatform();
-  const platform = Capacitor.getPlatform();
-  const isIOSOrAndroid = platform === 'ios' || platform === 'android';
-  
-  // Check 3: User agent detection (iOS WKWebView has "Mobile/" without "Safari/")
+  // PRIMARY CHECK: User agent signatures (works immediately, no Capacitor needed)
   const userAgent = navigator.userAgent;
-  const isIOSUserAgent = /iPhone|iPad|iPod/.test(userAgent) && /Mobile\//.test(userAgent) && !/Safari\//.test(userAgent);
-  const isAndroidUserAgent = /Android/.test(userAgent) && /wv/.test(userAgent);
   
-  // Check 4: Native-only APIs
-  const hasNativeAPIs = typeof (window as any).webkit !== 'undefined' || 
-                        typeof (window as any).Android !== 'undefined';
+  // iOS WKWebView: Has "Mobile/" but NO "Safari/" 
+  // Real Safari: Has BOTH "Mobile/" AND "Safari/"
+  const isIOSWebView = /iPhone|iPad|iPod/.test(userAgent) && 
+                       /Mobile\//.test(userAgent) && 
+                       !/Safari\//.test(userAgent);
   
-  // Result: Native if Capacitor exists AND (reports native OR has native user agent)
-  const result = hasCapacitorBridge && (isIOSOrAndroid || isIOSUserAgent || isAndroidUserAgent || hasNativeAPIs);
+  // Android WebView: Has "Android" and "wv"
+  const isAndroidWebView = /Android/.test(userAgent) && /wv/.test(userAgent);
+  
+  // SECONDARY CHECKS: Native APIs and Capacitor (if available)
+  const hasWebKit = typeof (window as any).webkit !== 'undefined';
+  const hasAndroidBridge = typeof (window as any).Android !== 'undefined';
+  const hasCapacitor = typeof (window as any).Capacitor !== 'undefined';
+  
+  // TERTIARY CHECK: Capacitor detection (fallback)
+  let capacitorSaysNative = false;
+  let capacitorPlatform = 'unknown';
+  try {
+    capacitorSaysNative = Capacitor.isNativePlatform();
+    capacitorPlatform = Capacitor.getPlatform();
+  } catch (e) {
+    // Capacitor not ready yet
+  }
+  
+  // RESULT: Native if ANY strong signal exists
+  const isNative = isIOSWebView || 
+                   isAndroidWebView || 
+                   hasWebKit || 
+                   hasAndroidBridge ||
+                   (hasCapacitor && capacitorSaysNative);
   
   console.log('[Platform Detection] 🔍', {
-    hasCapacitorBridge,
-    isNativePlatform,
-    platform,
-    isIOSOrAndroid,
-    isIOSUserAgent,
-    isAndroidUserAgent,
-    hasNativeAPIs,
-    userAgent,
-    '🎯 FINAL': result ? '📱 NATIVE' : '🌐 WEB'
+    '📱 User Agent': userAgent,
+    '🍎 isIOSWebView': isIOSWebView,
+    '🤖 isAndroidWebView': isAndroidWebView,
+    '⚡ hasCapacitor': hasCapacitor,
+    '🔌 capacitorSaysNative': capacitorSaysNative,
+    '📊 capacitorPlatform': capacitorPlatform,
+    '🎯 FINAL DECISION': isNative ? '📱 NATIVE' : '🌐 WEB'
   });
   
-  return result;
+  return isNative;
 };
 
 export const isNativeApp = () => isDefinitelyNative();
-export const isIOSApp = () => Capacitor.getPlatform() === 'ios' || /iPhone|iPad|iPod/.test(navigator.userAgent);
+export const isIOSApp = () => {
+  const userAgent = navigator.userAgent;
+  return /iPhone|iPad|iPod/.test(userAgent) && /Mobile\//.test(userAgent) && !/Safari\//.test(userAgent);
+};
 export const isWebApp = () => !isDefinitelyNative();

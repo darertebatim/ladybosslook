@@ -18,8 +18,13 @@ export function usePWAInstall() {
   const isIOS = isIOSDevice();
 
   useEffect(() => {
+    console.log('[usePWAInstall] 🚀 Hook mounted, checking platform...');
+    
     // CRITICAL: Use robust native detection
-    if (isDefinitelyNative()) {
+    const isNative = isDefinitelyNative();
+    console.log('[usePWAInstall] Platform check result:', isNative ? '📱 NATIVE' : '🌐 WEB');
+    
+    if (isNative) {
       console.log('[usePWAInstall] ✅ Native platform - ALL PWA logic skipped');
       setIsInstalled(true);
       return;
@@ -29,6 +34,7 @@ export function usePWAInstall() {
 
     // Check if running as PWA
     const isPWAStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    console.log('[usePWAInstall] PWA standalone mode:', isPWAStandalone);
     setIsInstalled(isPWAStandalone);
 
     // Track installation only for web/PWA (not native)
@@ -63,11 +69,15 @@ export function usePWAInstall() {
   }, [user?.id]);
 
   const trackInstallation = async () => {
+    console.log('[usePWAInstall] 🔒 trackInstallation called, running native check...');
+    
     // CRITICAL: Never track on native platforms
     if (isDefinitelyNative()) {
-      console.log('[usePWAInstall] ⛔ Blocked PWA tracking on native platform');
+      console.log('[usePWAInstall] ⛔ BLOCKED: PWA tracking prevented on native platform');
       return;
     }
+    
+    console.log('[usePWAInstall] ✅ Native check passed, proceeding with PWA tracking');
 
     if (!user?.id) {
       console.log('[PWA] No user ID, skipping tracking');
