@@ -10,6 +10,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { isDefinitelyNative } from '@/lib/platform';
 
 const AppLayout = () => {
+  // 🚨 NUCLEAR GUARD LAYER 1: Check global flag at component entry
+  const isNativeApp = (window as any).__IS_NATIVE_APP__ || (window as any).__PWA_DISABLED__;
+  
   const location = useLocation();
   const { user } = useAuth();
   const { isInstalled, isIOS } = usePWAInstall();
@@ -19,8 +22,9 @@ const AppLayout = () => {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
 
   useEffect(() => {
-    // CRITICAL: Don't show install prompt on native app
-    if (isDefinitelyNative()) {
+    // 🚨 NUCLEAR GUARD: Multiple checks
+    if (isNativeApp || isDefinitelyNative()) {
+      console.log('[AppLayout] 🔐 NUCLEAR GUARD: PWA prompts blocked');
       return;
     }
     
@@ -41,8 +45,9 @@ const AppLayout = () => {
 
   // Show notification popup when app is installed but notifications aren't enabled
   useEffect(() => {
-    // CRITICAL: Skip PWA prompts on native platforms
-    if (isDefinitelyNative()) {
+    // 🚨 NUCLEAR GUARD: Multiple checks
+    if (isNativeApp || isDefinitelyNative()) {
+      console.log('[AppLayout] 🔐 NUCLEAR GUARD: Notification prompts blocked');
       return;
     }
     

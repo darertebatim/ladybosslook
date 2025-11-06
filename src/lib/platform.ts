@@ -1,11 +1,23 @@
 import { Capacitor } from '@capacitor/core';
 
 /**
- * BULLETPROOF native platform detection
- * Works EVEN IF Capacitor hasn't initialized yet
- * Priority: iOS/Android signatures > Capacitor APIs
+ * 🚨 NUCLEAR GUARD: BULLETPROOF native platform detection
+ * LAYER 1: Check global flag set in main.tsx
+ * LAYER 2: User agent signatures (works immediately, no Capacitor needed)
+ * LAYER 3: Native APIs and Capacitor (if available)
  */
 export const isDefinitelyNative = (): boolean => {
+  // LAYER 1: Check global flag first (set in main.tsx before any imports)
+  if (typeof window !== 'undefined') {
+    if ((window as any).__IS_NATIVE_APP__ === true) {
+      console.log('[Platform] 🔐 NUCLEAR GUARD: Global flag confirms NATIVE');
+      return true;
+    }
+    if ((window as any).__PWA_DISABLED__ === true) {
+      console.log('[Platform] 🔐 NUCLEAR GUARD: PWA disabled flag confirms NATIVE');
+      return true;
+    }
+  }
   // PRIMARY CHECK: User agent signatures (works immediately, no Capacitor needed)
   const userAgent = navigator.userAgent;
   

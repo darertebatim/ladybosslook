@@ -4,6 +4,13 @@ const config: CapacitorConfig = {
   appId: 'com.ladybosslook.academy',
   appName: 'Ladybosslook',
   webDir: 'dist',
+  // 🚨 NUCLEAR GUARD: Ensure native platform is always detected
+  ios: {
+    contentInset: 'always',
+  },
+  android: {
+    allowMixedContent: false,
+  },
   // DEVELOPMENT ONLY: Uncomment for hot reload during development
   // server: {
   //   url: 'https://9d54663c-1af5-4066-9ceb-1723206ae5f8.lovableproject.com?forceHideBadge=true',

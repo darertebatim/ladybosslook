@@ -3,9 +3,15 @@ import { Capacitor } from '@capacitor/core';
 import { isDefinitelyNative } from './platform';
 
 export async function trackPWAInstallation(userId: string): Promise<{ success: boolean; error?: string }> {
-  // CRITICAL: Never track PWA installations on native platforms
+  // 🚨 NUCLEAR GUARD LAYER 1: Check global flag IMMEDIATELY
+  if ((window as any).__IS_NATIVE_APP__ || (window as any).__PWA_DISABLED__) {
+    console.log('[PWA Tracking] 🔐 NUCLEAR GUARD: Blocked by global flag');
+    return { success: false, error: 'Not applicable on native platform' };
+  }
+  
+  // LAYER 2: Use robust detection
   if (isDefinitelyNative() || Capacitor.isNativePlatform()) {
-    console.log('[PWA Tracking] Skipping - running on native platform');
+    console.log('[PWA Tracking] 🔐 NUCLEAR GUARD: Blocked by platform detection');
     return { success: false, error: 'Not applicable on native platform' };
   }
 
@@ -42,7 +48,11 @@ export async function trackPWAInstallation(userId: string): Promise<{ success: b
 }
 
 export function isPWAInstalled(): boolean {
-  // Never report as PWA on native platforms
+  // 🚨 NUCLEAR GUARD: Check global flag first
+  if ((window as any).__IS_NATIVE_APP__ || (window as any).__PWA_DISABLED__) {
+    return false;
+  }
+  
   if (isDefinitelyNative() || Capacitor.isNativePlatform()) {
     return false;
   }

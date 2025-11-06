@@ -12,6 +12,18 @@ const isIOSDevice = () => {
 };
 
 export function usePWAInstall() {
+  // 🚨 NUCLEAR GUARD LAYER 1: Check global flag IMMEDIATELY
+  if ((window as any).__IS_NATIVE_APP__ || (window as any).__PWA_DISABLED__) {
+    console.log('[usePWAInstall] 🔐 NUCLEAR GUARD: PWA hook blocked by global flag');
+    return {
+      deferredPrompt: null,
+      isInstalled: true,
+      isIOS: false,
+      handleInstallClick: async () => {},
+      handleCompleteSetup: async () => ({ success: false, error: 'Not available on native' }),
+    };
+  }
+
   const { user } = useAuth();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
