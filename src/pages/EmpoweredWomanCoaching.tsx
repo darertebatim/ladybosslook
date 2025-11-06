@@ -69,12 +69,12 @@ export default function EmpoweredWomanCoaching() {
       {/* Hero Section */}
       <section className="relative pt-20 md:pt-32 pb-12 md:pb-20 px-4 overflow-hidden bg-black">
         {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-black to-background/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/20 via-black to-background/50" />
         
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center animate-fade-in-up rtl font-farsi">
             {/* Badge */}
-            <Badge className="mb-4 md:mb-6 text-sm md:text-base px-4 md:px-6 py-1.5 md:py-2 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20">
+            <Badge className="mb-4 md:mb-6 text-sm md:text-base px-4 md:px-6 py-1.5 md:py-2 bg-purple-500/20 text-purple-200 border-purple-400/30 hover:bg-purple-500/30">
               <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 ml-2" />
               ویژه خانم‌های مهاجر
             </Badge>
@@ -85,7 +85,7 @@ export default function EmpoweredWomanCoaching() {
             </h1>
 
             {/* Subheadline */}
-            <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed px-4">
+            <p className="text-lg md:text-xl lg:text-2xl text-gray-200 mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed px-4">
               ۳ ماه قدرتمند ده‌برابر با راضیه لیدی‌باس
               <br />
               برای پیشرفت قدرتمند در کار، روابط و درآمد
@@ -93,22 +93,22 @@ export default function EmpoweredWomanCoaching() {
 
             {/* Stats */}
             <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-8 md:mb-10 px-2">
-              <div className="flex items-center gap-2 text-foreground text-sm md:text-base">
-                <Calendar className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+              <div className="flex items-center gap-2 text-white text-sm md:text-base">
+                <Calendar className="w-4 h-4 md:w-5 md:h-5 text-purple-400" />
                 <span className="font-semibold">۳ ماه</span>
               </div>
-              <div className="flex items-center gap-2 text-foreground text-sm md:text-base">
-                <Video className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+              <div className="flex items-center gap-2 text-white text-sm md:text-base">
+                <Video className="w-4 h-4 md:w-5 md:h-5 text-purple-400" />
                 <span className="font-semibold">۱۲ جلسه زنده</span>
               </div>
-              <div className="flex items-center gap-2 text-foreground text-sm md:text-base">
-                <Users className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+              <div className="flex items-center gap-2 text-white text-sm md:text-base">
+                <Users className="w-4 h-4 md:w-5 md:h-5 text-purple-400" />
                 <span className="font-semibold">کوچینگ گروهی</span>
               </div>
             </div>
 
             {/* Special Offer Banner */}
-            <div className="py-4 md:py-6 px-4 bg-gradient-to-r from-urgency via-urgency-light to-urgency rounded-2xl mb-6 md:mb-8 mx-2">
+            <div className="py-4 md:py-6 px-4 bg-gradient-to-r from-urgency via-urgency-light to-urgency rounded-2xl mb-6 md:mb-8 mx-2 shadow-lg">
               <div className="text-center">
                 <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 text-white">
                   <Gift className="w-6 h-6 md:w-8 md:h-8 animate-bounce" />
@@ -137,17 +137,17 @@ export default function EmpoweredWomanCoaching() {
             </div>
 
             {/* Trust Elements */}
-            <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-3 md:gap-6 text-xs md:text-sm text-muted-foreground px-4">
+            <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-3 md:gap-6 text-xs md:text-sm text-gray-300 px-4">
               <div className="flex items-center gap-2">
-                <Shield className="w-3.5 h-3.5 md:w-4 md:h-4 text-success" />
+                <Shield className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-400" />
                 <span>ضمانت ۳۰ روزه بازگشت وجه</span>
               </div>
               <div className="flex items-center gap-2">
-                <Star className="w-3.5 h-3.5 md:w-4 md:h-4 text-secondary" />
+                <Star className="w-3.5 h-3.5 md:w-4 md:h-4 text-yellow-400" />
                 <span>مربی معتبر با سابقه</span>
               </div>
               <div className="flex items-center gap-2">
-                <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
+                <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-purple-400" />
                 <span>محدودیت ظرفیت</span>
               </div>
             </div>
