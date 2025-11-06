@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { requestNotificationPermission, subscribeToPushNotifications } from '@/lib/pushNotifications';
 import { trackPWAInstallation } from '@/lib/pwaTracking';
 import { toast } from 'sonner';
-import { Capacitor } from '@capacitor/core';
+import { isDefinitelyNative } from '@/lib/platform';
 
 // Detect iOS devices
 const isIOSDevice = () => {
@@ -18,17 +18,14 @@ export function usePWAInstall() {
   const isIOS = isIOSDevice();
 
   useEffect(() => {
-    console.log('[usePWAInstall] Hook initialized');
-    console.log('[usePWAInstall] Capacitor.isNativePlatform():', Capacitor.isNativePlatform());
-    console.log('[usePWAInstall] Capacitor.getPlatform():', Capacitor.getPlatform());
-    console.log('[usePWAInstall] window.Capacitor:', typeof (window as any).Capacitor);
-    
-    // Skip all PWA logic on native platforms
-    if (Capacitor.isNativePlatform()) {
-      console.log('[usePWAInstall] Native platform detected - skipping all PWA logic');
+    // CRITICAL: Use robust native detection
+    if (isDefinitelyNative()) {
+      console.log('[usePWAInstall] ✅ Native platform - ALL PWA logic skipped');
       setIsInstalled(true);
       return;
     }
+    
+    console.log('[usePWAInstall] 🌐 Web platform - PWA features enabled');
 
     // Check if running as PWA
     const isPWAStandalone = window.matchMedia('(display-mode: standalone)').matches;
@@ -66,8 +63,9 @@ export function usePWAInstall() {
   }, [user?.id]);
 
   const trackInstallation = async () => {
-    // Never track on native platforms
-    if (Capacitor.isNativePlatform()) {
+    // CRITICAL: Never track on native platforms
+    if (isDefinitelyNative()) {
+      console.log('[usePWAInstall] ⛔ Blocked PWA tracking on native platform');
       return;
     }
 

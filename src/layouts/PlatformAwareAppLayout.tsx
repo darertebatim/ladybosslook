@@ -1,4 +1,3 @@
-import { Capacitor } from '@capacitor/core';
 import { isDefinitelyNative } from '@/lib/platform';
 import AppLayout from './AppLayout';
 import NativeAppLayout from './NativeAppLayout';
@@ -8,9 +7,9 @@ import NativeAppLayout from './NativeAppLayout';
  * This ensures PWA code never runs on native platforms
  */
 const PlatformAwareAppLayout = () => {
-  const isNative = isDefinitelyNative() || Capacitor.isNativePlatform();
+  const isNative = isDefinitelyNative();
   
-  console.log('[PlatformAwareAppLayout] Rendering:', isNative ? 'NativeAppLayout' : 'AppLayout');
+  console.log('[PlatformAwareAppLayout] 🎯', isNative ? '📱 Rendering NativeAppLayout' : '🌐 Rendering AppLayout');
   
   if (isNative) {
     return <NativeAppLayout />;
