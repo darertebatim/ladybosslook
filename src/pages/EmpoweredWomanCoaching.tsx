@@ -67,9 +67,9 @@ export default function EmpoweredWomanCoaching() {
       />
 
       {/* Hero Section */}
-      <section className="relative pt-20 md:pt-32 pb-12 md:pb-20 px-4 overflow-hidden">
+      <section className="relative pt-20 md:pt-32 pb-12 md:pb-20 px-4 overflow-hidden bg-black">
         {/* Background Gradient */}
-        <div className="absolute inset-0 gradient-hero opacity-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-black to-background/50" />
         
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center animate-fade-in-up rtl font-farsi">
