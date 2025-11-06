@@ -18,8 +18,14 @@ export function usePWAInstall() {
   const isIOS = isIOSDevice();
 
   useEffect(() => {
+    console.log('[usePWAInstall] Hook initialized');
+    console.log('[usePWAInstall] Capacitor.isNativePlatform():', Capacitor.isNativePlatform());
+    console.log('[usePWAInstall] Capacitor.getPlatform():', Capacitor.getPlatform());
+    console.log('[usePWAInstall] window.Capacitor:', typeof (window as any).Capacitor);
+    
     // Skip all PWA logic on native platforms
     if (Capacitor.isNativePlatform()) {
+      console.log('[usePWAInstall] Native platform detected - skipping all PWA logic');
       setIsInstalled(true);
       return;
     }

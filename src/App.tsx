@@ -8,7 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { isNativeApp } from "@/lib/platform";
 import { useEffect } from "react";
-import AppLayout from "@/layouts/AppLayout";
+import PlatformAwareAppLayout from "@/layouts/PlatformAwareAppLayout";
 import AppHome from "@/pages/app/AppHome";
 import AppCourses from "@/pages/app/AppCourses";
 import AppCourseDetail from "@/pages/app/AppCourseDetail";
@@ -128,7 +128,7 @@ const App = () => (
             
             {/* App Routes - PWA Experience */}
             <Route path="/app/install" element={<AppInstall />} />
-            <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+            <Route path="/app" element={<ProtectedRoute><PlatformAwareAppLayout /></ProtectedRoute>}>
               <Route index element={<Navigate to="/app/home" replace />} />
               <Route path="home" element={<AppHome />} />
               <Route path="courses" element={<AppCourses />} />
