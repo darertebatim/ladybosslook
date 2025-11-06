@@ -15,7 +15,21 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return outputArray;
 }
 
-export function checkPermissionStatus(): NotificationPermission {
+export async function checkPermissionStatus(): Promise<NotificationPermission> {
+  // Use native permissions on native platforms
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const result = await PushNotifications.checkPermissions();
+      if (result.receive === 'granted') return 'granted';
+      if (result.receive === 'denied') return 'denied';
+      return 'default';
+    } catch (error) {
+      console.error('[Push] Error checking native permissions:', error);
+      return 'default';
+    }
+  }
+  
+  // Web/PWA permissions
   if (!('Notification' in window)) {
     return 'denied';
   }
@@ -23,6 +37,23 @@ export function checkPermissionStatus(): NotificationPermission {
 }
 
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
+  // Use native permissions on native platforms
+  if (Capacitor.isNativePlatform()) {
+    try {
+      console.log('[Push] Requesting native permissions');
+      const result = await PushNotifications.requestPermissions();
+      console.log('[Push] Native permissions result:', result);
+      
+      if (result.receive === 'granted') return 'granted';
+      if (result.receive === 'denied') return 'denied';
+      return 'default';
+    } catch (error) {
+      console.error('[Push] Error requesting native permissions:', error);
+      return 'denied';
+    }
+  }
+  
+  // Web/PWA permissions
   if (!('Notification' in window)) {
     console.error('This browser does not support notifications');
     return 'denied';

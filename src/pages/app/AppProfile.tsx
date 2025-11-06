@@ -19,6 +19,7 @@ import {
   unsubscribeFromPushNotifications,
   checkPermissionStatus 
 } from '@/lib/pushNotifications';
+import { isNativeApp } from '@/lib/platform';
 
 const AppProfile = () => {
   const { user, signOut } = useAuth();
@@ -50,7 +51,12 @@ const AppProfile = () => {
 
   // Check notification permission status and subscription
   useEffect(() => {
-    setPermissionStatus(checkPermissionStatus());
+    const checkPermissions = async () => {
+      const status = await checkPermissionStatus();
+      setPermissionStatus(status);
+    };
+    
+    checkPermissions();
     
     // Check if user has an active push subscription
     const checkSubscription = async () => {
@@ -386,7 +392,10 @@ const AppProfile = () => {
                   <div>
                     <p className="font-medium text-destructive">Notifications blocked</p>
                     <p className="text-muted-foreground mt-1">
-                      Please enable notifications in your browser settings to receive updates.
+                      {isNativeApp() 
+                        ? 'Please enable notifications in your device settings (Settings > Ladybosslook > Notifications) to receive updates.'
+                        : 'Please enable notifications in your browser settings to receive updates.'
+                      }
                     </p>
                   </div>
                 </div>

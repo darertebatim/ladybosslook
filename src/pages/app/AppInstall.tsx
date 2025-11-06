@@ -14,9 +14,18 @@ const AppInstall = () => {
   const { user } = useAuth();
   const { deferredPrompt, isInstalled, isIOS, handleCompleteSetup } = usePWAInstall();
   const [isLoading, setIsLoading] = useState(false);
-  const [notificationPermission, setNotificationPermission] = useState(checkPermissionStatus());
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const isNotificationsEnabled = notificationPermission === 'granted';
+
+  // Check notification permission on mount
+  useEffect(() => {
+    const checkPermissions = async () => {
+      const status = await checkPermissionStatus();
+      setNotificationPermission(status);
+    };
+    checkPermissions();
+  }, []);
 
   // Show popup when iOS app gets installed and notifications aren't enabled
   useEffect(() => {
@@ -34,7 +43,8 @@ const AppInstall = () => {
     const result = await handleCompleteSetup();
     setIsLoading(false);
     if (result.success) {
-      setNotificationPermission(checkPermissionStatus());
+      const status = await checkPermissionStatus();
+      setNotificationPermission(status);
     }
   };
 

@@ -16,7 +16,7 @@ const AppLayout = () => {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [notificationPermission, setNotificationPermission] = useState(checkPermissionStatus());
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
 
   useEffect(() => {
     // Don't show install prompt if already running as native app
@@ -41,18 +41,25 @@ const AppLayout = () => {
 
   // Show notification popup when app is installed but notifications aren't enabled
   useEffect(() => {
-    const hasSeenNotificationPrompt = localStorage.getItem('hasSeenNotificationPrompt') === 'true';
-    const currentPermission = checkPermissionStatus();
-    setNotificationPermission(currentPermission);
-    
-    // Show popup if: app is installed, iOS device, notifications not granted, and haven't seen prompt
-    if (isInstalled && isIOS && currentPermission !== 'granted' && !hasSeenNotificationPrompt) {
-      const timer = setTimeout(() => {
-        setShowNotificationPopup(true);
-      }, 1500);
-      
-      return () => clearTimeout(timer);
+    // Skip PWA-specific prompts on native platforms
+    if (Capacitor.isNativePlatform()) {
+      return;
     }
+    
+    const checkAndShowPrompt = async () => {
+      const hasSeenNotificationPrompt = localStorage.getItem('hasSeenNotificationPrompt') === 'true';
+      const currentPermission = await checkPermissionStatus();
+      setNotificationPermission(currentPermission);
+      
+      // Show popup if: app is installed, iOS device, notifications not granted, and haven't seen prompt
+      if (isInstalled && isIOS && currentPermission !== 'granted' && !hasSeenNotificationPrompt) {
+        setTimeout(() => {
+          setShowNotificationPopup(true);
+        }, 1500);
+      }
+    };
+    
+    checkAndShowPrompt();
   }, [isInstalled, isIOS]);
 
   const handleEnableNotifications = async () => {
