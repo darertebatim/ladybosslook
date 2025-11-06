@@ -67,7 +67,7 @@ export default function Auth() {
           </CardDescription>
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mt-4">
             <p className="text-base font-semibold text-foreground text-center">
-              If you purchased a course, use your email as both username and password
+              For First Time, use your email as both username and password
             </p>
           </div>
         </CardHeader>
