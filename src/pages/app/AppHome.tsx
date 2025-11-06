@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -6,19 +5,14 @@ import { StatsCards } from '@/components/dashboard/StatsCards';
 import { Announcements } from '@/components/dashboard/Announcements';
 import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { SEOHead } from '@/components/SEOHead';
-import { trackPWAInstallation, isPWAInstalled } from '@/lib/pwaTracking';
 import { Button } from '@/components/ui/button';
 import { Send, Mail } from 'lucide-react';
 
 const AppHome = () => {
   const { user } = useAuth();
 
-  // Track PWA installation if detected
-  useEffect(() => {
-    if (user?.id && isPWAInstalled()) {
-      trackPWAInstallation(user.id);
-    }
-  }, [user?.id]);
+  // PWA tracking is now handled centrally in usePWAInstall hook
+  // Removed direct tracking call to prevent duplicate tracking on native platforms
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
