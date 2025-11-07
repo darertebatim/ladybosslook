@@ -21,9 +21,10 @@ export function PushNotificationSender() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [destinationUrl, setDestinationUrl] = useState('/app/home');
-  const [targetType, setTargetType] = useState<'all' | 'course'>('all');
+  const [targetType, setTargetType] = useState<'all' | 'course' | 'user'>('all');
   const [targetCourse, setTargetCourse] = useState('');
   const [targetRoundId, setTargetRoundId] = useState('all-rounds');
+  const [targetUserEmail, setTargetUserEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
@@ -84,6 +85,15 @@ export function PushNotificationSender() {
       return;
     }
 
+    if (targetType === 'user' && !targetUserEmail) {
+      toast({
+        title: 'Validation error',
+        description: 'User email is required',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const payload: any = {
@@ -98,6 +108,8 @@ export function PushNotificationSender() {
         if (targetRoundId && targetRoundId !== 'all-rounds') {
           payload.targetRoundId = targetRoundId;
         }
+      } else if (targetType === 'user' && targetUserEmail) {
+        payload.targetUserEmail = targetUserEmail;
       }
 
       const { data, error } = await supabase.functions.invoke('send-push-notification', {
@@ -118,6 +130,7 @@ export function PushNotificationSender() {
       setTargetType('all');
       setTargetCourse('');
       setTargetRoundId('all-rounds');
+      setTargetUserEmail('');
     } catch (error: any) {
       console.error('Error sending push notifications:', error);
       toast({
@@ -194,9 +207,26 @@ export function PushNotificationSender() {
             <SelectContent>
               <SelectItem value="all">All Students</SelectItem>
               <SelectItem value="course">Specific Course</SelectItem>
+              <SelectItem value="user">Specific User (Email)</SelectItem>
             </SelectContent>
           </Select>
         </div>
+
+        {targetType === 'user' && (
+          <div className="space-y-2">
+            <Label htmlFor="target-user-email">User Email</Label>
+            <Input
+              id="target-user-email"
+              type="email"
+              placeholder="user@example.com"
+              value={targetUserEmail}
+              onChange={(e) => setTargetUserEmail(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Enter the email address of the user to send the notification
+            </p>
+          </div>
+        )}
 
         {targetType === 'course' && (
           <div className="space-y-2">

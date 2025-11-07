@@ -10,6 +10,7 @@ const corsHeaders = {
 interface PushNotificationRequest {
   userIds?: string[];
   targetCourse?: string;
+  targetUserEmail?: string;
   title: string;
   body: string;
   icon?: string;
@@ -22,7 +23,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userIds, targetCourse, title, body, icon, url }: PushNotificationRequest = await req.json();
+    const { userIds, targetCourse, targetUserEmail, title, body, icon, url }: PushNotificationRequest = await req.json();
 
     if (!title || !body) {
       return new Response(
@@ -77,6 +78,22 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (userIds && userIds.length > 0) {
       query = query.in('user_id', userIds);
+    } else if (targetUserEmail) {
+      // Get user by email from profiles table
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', targetUserEmail)
+        .single();
+
+      if (profiles) {
+        query = query.eq('user_id', profiles.id);
+      } else {
+        return new Response(
+          JSON.stringify({ message: 'User not found with that email', sent: 0, failed: 0 }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }
+        );
+      }
     } else if (targetCourse) {
       // Get users enrolled in the target course
       const { data: enrollments } = await supabase
@@ -173,7 +190,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Log the push notification
-    const targetType = userIds?.length ? 'specific' : targetCourse ? 'course' : 'all';
+    const targetType = userIds?.length ? 'specific' : targetUserEmail ? 'user' : targetCourse ? 'course' : 'all';
     const { error: logError } = await supabase
       .from('push_notification_logs')
       .insert({
