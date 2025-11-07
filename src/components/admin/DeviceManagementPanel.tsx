@@ -26,31 +26,40 @@ export const DeviceManagementPanel = () => {
   const fetchDevices = async () => {
     setIsLoading(true);
     try {
-      // Fetch subscriptions with user profiles
-      const { data, error } = await supabase
+      // Fetch subscriptions
+      const { data: subscriptions, error: subsError } = await supabase
         .from('push_subscriptions')
-        .select(`
-          id,
-          user_id,
-          endpoint,
-          created_at,
-          profiles:user_id (
-            email,
-            full_name
-          )
-        `)
+        .select('id, user_id, endpoint, created_at')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (subsError) throw subsError;
 
-      const formattedDevices = data?.map((sub: any) => ({
-        id: sub.id,
-        user_id: sub.user_id,
-        endpoint: sub.endpoint,
-        created_at: sub.created_at,
-        user_email: sub.profiles?.email,
-        user_name: sub.profiles?.full_name,
-      })) || [];
+      // Get unique user IDs
+      const userIds = [...new Set(subscriptions?.map(s => s.user_id) || [])];
+
+      // Fetch profiles for these users
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email, full_name')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create a map of user profiles
+      const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+      // Combine subscriptions with profile data
+      const formattedDevices = subscriptions?.map((sub) => {
+        const profile = profilesMap.get(sub.user_id);
+        return {
+          id: sub.id,
+          user_id: sub.user_id,
+          endpoint: sub.endpoint,
+          created_at: sub.created_at,
+          user_email: profile?.email,
+          user_name: profile?.full_name,
+        };
+      }) || [];
 
       setDevices(formattedDevices);
     } catch (error: any) {
