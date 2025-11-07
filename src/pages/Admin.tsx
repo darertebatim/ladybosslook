@@ -18,6 +18,7 @@ import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
 import { AnnouncementsList } from '@/components/admin/AnnouncementsList';
 import { PushNotificationSender } from '@/components/admin/PushNotificationSender';
 import { PushNotificationsHistory } from '@/components/admin/PushNotificationsHistory';
+import { DeviceManagementPanel } from '@/components/admin/DeviceManagementPanel';
 import { VapidKeyGenerator } from '@/components/admin/VapidKeyGenerator';
 import { EmailLogsViewer } from '@/components/admin/EmailLogsViewer';
 import { PWAInstallStats } from '@/components/admin/PWAInstallStats';
@@ -372,6 +373,7 @@ const Admin = () => {
               <AnnouncementCreator />
               <AnnouncementsList />
               <PushNotificationSender />
+              <DeviceManagementPanel />
               <PushNotificationsHistory />
               <EmailLogsViewer />
             </TabsContent>
