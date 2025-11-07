@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key } from 'lucide-react';
+import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key, Edit2, Trash2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
@@ -17,6 +17,18 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface UserLead {
   profile: {
@@ -46,10 +58,19 @@ interface UserLead {
     course_name: string;
     status: string;
     enrolled_at: string;
+    round_id: string | null;
+    program_slug: string | null;
     program_rounds: {
       round_name: string;
     } | null;
   }>;
+}
+
+interface ProgramRound {
+  id: string;
+  round_name: string;
+  round_number: number;
+  status: string;
 }
 
 export function LeadsManager() {
@@ -59,6 +80,9 @@ export function LeadsManager() {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingEnrollment, setEditingEnrollment] = useState<string | null>(null);
+  const [availableRounds, setAvailableRounds] = useState<Record<string, ProgramRound[]>>({});
+  const [selectedRound, setSelectedRound] = useState<string>('');
   const { toast } = useToast();
 
   const handleSearch = async () => {
@@ -125,6 +149,25 @@ export function LeadsManager() {
           .eq('user_id', profile.id)
           .order('enrolled_at', { ascending: false });
         enrollments = enrollmentData || [];
+        
+        // Fetch available rounds for each unique program_slug
+        const uniqueSlugs = [...new Set(enrollments.map(e => e.program_slug).filter(Boolean))];
+        const roundsMap: Record<string, ProgramRound[]> = {};
+        
+        for (const slug of uniqueSlugs) {
+          const { data: rounds } = await supabase
+            .from('program_rounds')
+            .select('id, round_name, round_number, status')
+            .eq('program_slug', slug)
+            .in('status', ['active', 'upcoming'])
+            .order('round_number', { ascending: false });
+          
+          if (rounds) {
+            roundsMap[slug as string] = rounds;
+          }
+        }
+        
+        setAvailableRounds(roundsMap);
       }
 
       if (!profile && (!orders || orders.length === 0)) {
@@ -204,6 +247,59 @@ export function LeadsManager() {
       });
     } finally {
       setIsChangingPassword(false);
+    }
+  };
+
+  const handleUpdateRound = async (enrollmentId: string, newRoundId: string) => {
+    try {
+      const { error } = await supabase
+        .from('course_enrollments')
+        .update({ round_id: newRoundId })
+        .eq('id', enrollmentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Round updated successfully"
+      });
+
+      // Refresh search results
+      await handleSearch();
+      setEditingEnrollment(null);
+    } catch (error: any) {
+      console.error('Error updating round:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update round",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleUnenroll = async (enrollmentId: string, courseName: string) => {
+    try {
+      const { error } = await supabase
+        .from('course_enrollments')
+        .update({ status: 'inactive' })
+        .eq('id', enrollmentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `User unenrolled from ${courseName}`
+      });
+
+      // Refresh search results
+      await handleSearch();
+    } catch (error: any) {
+      console.error('Error unenrolling user:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to unenroll user",
+        variant: "destructive"
+      });
     }
   };
 
@@ -401,27 +497,116 @@ export function LeadsManager() {
                   searchResults.enrollments.map((enrollment) => (
                     <Card key={enrollment.id}>
                       <CardContent className="pt-4">
-                        <div className="flex justify-between items-start">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                              <p className="font-medium">{enrollment.course_name}</p>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-start">
+                            <div className="space-y-1 flex-1">
+                              <div className="flex items-center gap-2">
+                                <GraduationCap className="h-4 w-4 text-muted-foreground" />
+                                <p className="font-medium">{enrollment.course_name}</p>
+                              </div>
+                              
+                              {editingEnrollment === enrollment.id ? (
+                                <div className="flex items-center gap-2 mt-2">
+                                  <Select
+                                    value={selectedRound}
+                                    onValueChange={setSelectedRound}
+                                  >
+                                    <SelectTrigger className="w-[250px]">
+                                      <SelectValue placeholder="Select round..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {enrollment.program_slug && availableRounds[enrollment.program_slug]?.map((round) => (
+                                        <SelectItem key={round.id} value={round.id}>
+                                          {round.round_name} ({round.status})
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleUpdateRound(enrollment.id, selectedRound)}
+                                    disabled={!selectedRound}
+                                  >
+                                    Save
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      setEditingEnrollment(null);
+                                      setSelectedRound('');
+                                    }}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              ) : (
+                                <>
+                                  {enrollment.program_rounds && (
+                                    <p className="text-sm text-muted-foreground">
+                                      Round: {enrollment.program_rounds.round_name}
+                                    </p>
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                                    <p className="text-xs text-muted-foreground">
+                                      Enrolled: {new Date(enrollment.enrolled_at).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                </>
+                              )}
                             </div>
-                            {enrollment.program_rounds && (
-                              <p className="text-sm text-muted-foreground">
-                                Round: {enrollment.program_rounds.round_name}
-                              </p>
-                            )}
+                            
                             <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              <p className="text-xs text-muted-foreground">
-                                Enrolled: {new Date(enrollment.enrolled_at).toLocaleDateString()}
-                              </p>
+                              <Badge variant={enrollment.status === 'active' ? 'default' : 'secondary'}>
+                                {enrollment.status}
+                              </Badge>
                             </div>
                           </div>
-                          <Badge variant={enrollment.status === 'active' ? 'default' : 'secondary'}>
-                            {enrollment.status}
-                          </Badge>
+                          
+                          {enrollment.status === 'active' && editingEnrollment !== enrollment.id && (
+                            <div className="flex gap-2 pt-2 border-t">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setEditingEnrollment(enrollment.id);
+                                  setSelectedRound(enrollment.round_id || '');
+                                }}
+                                disabled={!enrollment.program_slug || !availableRounds[enrollment.program_slug]?.length}
+                              >
+                                <Edit2 className="h-3 w-3 mr-1" />
+                                Change Round
+                              </Button>
+                              
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button size="sm" variant="destructive">
+                                    <Trash2 className="h-3 w-3 mr-1" />
+                                    Unenroll
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Confirm Unenrollment</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to unenroll this user from {enrollment.course_name}? 
+                                      This will set their enrollment status to inactive.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleUnenroll(enrollment.id, enrollment.course_name)}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                      Unenroll
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
