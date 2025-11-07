@@ -25,6 +25,18 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { userIds, targetCourse, targetUserEmail, title, body, icon, url }: PushNotificationRequest = await req.json();
 
+    // Debug logging
+    console.log('🔔 Received push notification request:', {
+      hasUserIds: !!userIds,
+      userIdsLength: userIds?.length,
+      targetCourse,
+      targetUserEmail,
+      targetUserEmailTrimmed: targetUserEmail?.trim(),
+      title,
+      bodyLength: body?.length,
+      url,
+    });
+
     if (!title || !body) {
       return new Response(
         JSON.stringify({ error: 'Title and body are required' }),
@@ -77,18 +89,30 @@ const handler = async (req: Request): Promise<Response> => {
     let query = supabase.from('push_subscriptions').select('*');
 
     if (userIds && userIds.length > 0) {
+      console.log('📧 Filtering by userIds:', userIds);
       query = query.in('user_id', userIds);
     } else if (targetUserEmail) {
+      const trimmedEmail = targetUserEmail.trim().toLowerCase();
+      console.log('📧 Looking up user by email:', trimmedEmail);
+      
       // Get user by email from profiles table
-      const { data: profiles } = await supabase
+      const { data: profiles, error: profileError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('email', targetUserEmail)
+        .eq('email', trimmedEmail)
         .single();
+
+      console.log('📧 Profile lookup result:', { 
+        found: !!profiles, 
+        userId: profiles?.id,
+        error: profileError?.message 
+      });
 
       if (profiles) {
         query = query.eq('user_id', profiles.id);
+        console.log('📧 Filtering subscriptions for user:', profiles.id);
       } else {
+        console.error('❌ User not found with email:', trimmedEmail);
         return new Response(
           JSON.stringify({ message: 'User not found with that email', sent: 0, failed: 0 }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }

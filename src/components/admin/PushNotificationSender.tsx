@@ -85,13 +85,37 @@ export function PushNotificationSender() {
       return;
     }
 
-    if (targetType === 'user' && !targetUserEmail) {
+    if (targetType === 'course' && !targetCourse) {
       toast({
         title: 'Validation error',
-        description: 'User email is required',
+        description: 'Course selection is required',
         variant: 'destructive',
       });
       return;
+    }
+
+    if (targetType === 'user') {
+      const trimmedEmail = targetUserEmail.trim();
+      
+      if (!trimmedEmail) {
+        toast({
+          title: 'Validation error',
+          description: 'User email is required',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(trimmedEmail)) {
+        toast({
+          title: 'Validation error',
+          description: 'Please enter a valid email address',
+          variant: 'destructive',
+        });
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -109,8 +133,16 @@ export function PushNotificationSender() {
           payload.targetRoundId = targetRoundId;
         }
       } else if (targetType === 'user' && targetUserEmail) {
-        payload.targetUserEmail = targetUserEmail;
+        payload.targetUserEmail = targetUserEmail.trim();
       }
+
+      // Debug logging
+      console.log('🔔 Sending push notification with payload:', {
+        ...payload,
+        targetType,
+        hasTargetUserEmail: !!payload.targetUserEmail,
+        targetUserEmailValue: payload.targetUserEmail,
+      });
 
       const { data, error } = await supabase.functions.invoke('send-push-notification', {
         body: payload,
