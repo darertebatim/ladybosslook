@@ -14,7 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Trash2, Plus, Pencil, List, BookOpen } from "lucide-react";
+import { Loader2, Trash2, Plus, Pencil, List, BookOpen, Eye, EyeOff } from "lucide-react";
 import { PlaylistTracksManager } from "./PlaylistTracksManager";
 import { PlaylistSupplementsManager } from "./PlaylistSupplementsManager";
 import { usePrograms } from "@/hooks/usePrograms";
@@ -272,6 +272,26 @@ export const PlaylistManager = () => {
     },
   });
 
+  // Toggle hidden status mutation
+  const toggleHiddenMutation = useMutation({
+    mutationFn: async ({ id, isHidden }: { id: string; isHidden: boolean }) => {
+      const { error } = await supabase
+        .from('audio_playlists')
+        .update({ is_hidden: !isHidden })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Visibility updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['audio-playlists-with-count'] });
+      queryClient.invalidateQueries({ queryKey: ['audio-playlists'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update visibility');
+    },
+  });
+
   const resetCreateForm = () => {
     setCreateFormData({
       name: "",
@@ -387,7 +407,7 @@ export const PlaylistManager = () => {
           </TableHeader>
           <TableBody>
             {playlists?.map((playlist) => (
-              <TableRow key={playlist.id}>
+              <TableRow key={playlist.id} className={playlist.is_hidden ? "opacity-50" : ""}>
                 <TableCell className="font-medium">{playlist.name}</TableCell>
                 <TableCell className="max-w-xs truncate">
                   {playlist.description || <span className="text-muted-foreground">No description</span>}
@@ -398,14 +418,33 @@ export const PlaylistManager = () => {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  {playlist.is_free ? (
-                    <Badge variant="secondary">Free</Badge>
-                  ) : (
-                    <Badge>Premium</Badge>
-                  )}
+                  <div className="flex gap-2 flex-wrap">
+                    {playlist.is_free ? (
+                      <Badge variant="secondary">Free</Badge>
+                    ) : (
+                      <Badge>Premium</Badge>
+                    )}
+                    {playlist.is_hidden && (
+                      <Badge variant="outline" className="text-muted-foreground">
+                        Hidden
+                      </Badge>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => toggleHiddenMutation.mutate({ id: playlist.id, isHidden: playlist.is_hidden })}
+                      title={playlist.is_hidden ? "Show playlist" : "Hide playlist"}
+                    >
+                      {playlist.is_hidden ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"
