@@ -281,14 +281,14 @@ export function LeadsManager() {
     try {
       const { error } = await supabase
         .from('course_enrollments')
-        .update({ status: 'inactive' })
+        .delete()
         .eq('id', enrollmentId);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: `User unenrolled from ${courseName}`
+        description: `User removed from ${courseName}`
       });
 
       // Refresh search results
@@ -590,8 +590,8 @@ export function LeadsManager() {
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>Confirm Unenrollment</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      Are you sure you want to unenroll this user from {enrollment.course_name}? 
-                                      This will set their enrollment status to inactive.
+                                      Are you sure you want to remove this user from {enrollment.course_name}? 
+                                      This will permanently delete their enrollment record.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
