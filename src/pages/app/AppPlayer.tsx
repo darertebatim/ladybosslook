@@ -120,6 +120,7 @@ export default function AppPlayer() {
 
   const filterByCategory = (category: string) => {
     return playlists
+      ?.filter(p => !p.is_hidden) // Extra safety: filter hidden playlists client-side
       ?.filter(p => p.category === category)
       .filter(filterPlaylistBySearch)
       .filter(filterPlaylistByProgress) || [];
@@ -127,6 +128,7 @@ export default function AppPlayer() {
 
   const getAllPlaylists = () => {
     return playlists
+      ?.filter(p => !p.is_hidden) // Extra safety: filter hidden playlists client-side
       ?.filter(filterPlaylistBySearch)
       .filter(filterPlaylistByProgress) || [];
   };
