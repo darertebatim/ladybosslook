@@ -237,6 +237,13 @@ const AppProfile = () => {
     .join('')
     .toUpperCase() || user?.email?.[0].toUpperCase() || 'U';
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <div className="container max-w-4xl py-6 px-4">
       <SEOHead 
@@ -250,6 +257,55 @@ const AppProfile = () => {
           <p className="text-sm text-muted-foreground">
             Manage your account settings
           </p>
+        </div>
+
+        {/* Quick Navigation */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => scrollToSection('info-section')}
+            className="flex flex-col h-auto py-3 gap-1"
+          >
+            <User className="h-4 w-4" />
+            <span className="text-xs">Info</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => scrollToSection('support-section')}
+            className="flex flex-col h-auto py-3 gap-1"
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span className="text-xs">Support</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => scrollToSection('notifications-section')}
+            className="flex flex-col h-auto py-3 gap-1"
+          >
+            <Bell className="h-4 w-4" />
+            <span className="text-xs">Notifications</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => scrollToSection('password-section')}
+            className="flex flex-col h-auto py-3 gap-1"
+          >
+            <Lock className="h-4 w-4" />
+            <span className="text-xs">Password</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => scrollToSection('actions-section')}
+            className="flex flex-col h-auto py-3 gap-1 col-span-2 sm:col-span-1"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="text-xs">Sign Out</span>
+          </Button>
         </div>
 
         <Card>
@@ -266,7 +322,7 @@ const AppProfile = () => {
           </CardHeader>
         </Card>
 
-        <Card>
+        <Card id="info-section">
           <CardHeader>
             <CardTitle>Account Information</CardTitle>
           </CardHeader>
@@ -290,7 +346,7 @@ const AppProfile = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id="support-section">
           <CardHeader>
             <CardTitle>Contact & Support</CardTitle>
             <CardDescription>Send us a message on Telegram @ladybosslook</CardDescription>
@@ -347,7 +403,7 @@ const AppProfile = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id="notifications-section">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {permissionStatus === 'granted' ? (
@@ -404,7 +460,7 @@ const AppProfile = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id="password-section">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5" />
@@ -446,7 +502,7 @@ const AppProfile = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id="actions-section">
           <CardHeader>
             <CardTitle>Actions</CardTitle>
           </CardHeader>
