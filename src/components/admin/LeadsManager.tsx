@@ -564,34 +564,36 @@ export function LeadsManager() {
                             </div>
                           </div>
                           
-                          {enrollment.status === 'active' && editingEnrollment !== enrollment.id && (
+                          {editingEnrollment !== enrollment.id && (
                             <div className="flex gap-2 pt-2 border-t">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => {
-                                  setEditingEnrollment(enrollment.id);
-                                  setSelectedRound(enrollment.round_id || '');
-                                }}
-                                disabled={!enrollment.program_slug || !availableRounds[enrollment.program_slug]?.length}
-                              >
-                                <Edit2 className="h-3 w-3 mr-1" />
-                                Change Round
-                              </Button>
+                              {enrollment.status === 'active' && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setEditingEnrollment(enrollment.id);
+                                    setSelectedRound(enrollment.round_id || '');
+                                  }}
+                                  disabled={!enrollment.program_slug || !availableRounds[enrollment.program_slug]?.length}
+                                >
+                                  <Edit2 className="h-3 w-3 mr-1" />
+                                  Change Round
+                                </Button>
+                              )}
                               
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                   <Button size="sm" variant="destructive">
                                     <Trash2 className="h-3 w-3 mr-1" />
-                                    Unenroll
+                                    Delete
                                   </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle>Confirm Unenrollment</AlertDialogTitle>
+                                    <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      Are you sure you want to remove this user from {enrollment.course_name}? 
-                                      This will permanently delete their enrollment record.
+                                      Are you sure you want to permanently delete this enrollment from {enrollment.course_name}? 
+                                      This action cannot be undone.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
@@ -600,7 +602,7 @@ export function LeadsManager() {
                                       onClick={() => handleUnenroll(enrollment.id, enrollment.course_name)}
                                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                     >
-                                      Unenroll
+                                      Delete
                                     </AlertDialogAction>
                                   </AlertDialogFooter>
                                 </AlertDialogContent>
