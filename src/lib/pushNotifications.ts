@@ -80,28 +80,55 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
       
       const permResult = await PushNotifications.checkPermissions();
       if (permResult.receive === 'granted') {
+        // Create a promise that resolves when token is saved
+        const registrationPromise = new Promise<{ success: boolean; error?: string }>((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            reject(new Error('Registration timeout - token not received'));
+          }, 10000); // 10 second timeout
+
+          // Set up listener BEFORE registering
+          PushNotifications.addListener('registration', async (token) => {
+            clearTimeout(timeout);
+            console.log('[Push] Native token received:', token.value);
+            
+            try {
+              // Save native token to database
+              const { error } = await supabase.from('push_subscriptions').upsert({
+                user_id: userId,
+                endpoint: `native:${token.value}`,
+                p256dh_key: '',
+                auth_key: '',
+              }, {
+                onConflict: 'user_id,endpoint'
+              });
+              
+              if (error) {
+                console.error('[Push] Error saving native subscription:', error);
+                reject(new Error(`Database error: ${error.message}`));
+              } else {
+                console.log('[Push] Native subscription saved successfully!');
+                resolve({ success: true });
+              }
+            } catch (err: any) {
+              console.error('[Push] Error in registration listener:', err);
+              reject(err);
+            }
+          });
+
+          // Set up error listener
+          PushNotifications.addListener('registrationError', (error) => {
+            clearTimeout(timeout);
+            console.error('[Push] Registration error:', error);
+            reject(new Error(`Registration failed: ${error.error}`));
+          });
+        });
+
+        // Now trigger registration
+        console.log('[Push] Calling PushNotifications.register()...');
         await PushNotifications.register();
         
-        // Listen for registration
-        PushNotifications.addListener('registration', async (token) => {
-          console.log('[Push] Native token received:', token.value);
-          
-          // Save native token to database
-          const { error } = await supabase.from('push_subscriptions').upsert({
-            user_id: userId,
-            endpoint: `native:${token.value}`,
-            p256dh_key: '',
-            auth_key: '',
-          }, {
-            onConflict: 'user_id,endpoint'
-          });
-          
-          if (error) {
-            console.error('[Push] Error saving native subscription:', error);
-          }
-        });
-        
-        return { success: true };
+        // Wait for the token to be received and saved
+        return await registrationPromise;
       } else {
         throw new Error('Push notification permission not granted');
       }
