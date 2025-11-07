@@ -1,3 +1,4 @@
+// Force GitHub sync - Nuclear Guard verification
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
