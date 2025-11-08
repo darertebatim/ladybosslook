@@ -49,8 +49,10 @@ const AppProfile = () => {
     enabled: !!user?.id,
   });
 
-  // Check notification permission status and subscription
+  // Check notification permission status and subscription (only for web)
   useEffect(() => {
+    if (isNativeApp()) return;
+    
     const checkPermissions = async () => {
       const status = await checkPermissionStatus();
       setPermissionStatus(status);
