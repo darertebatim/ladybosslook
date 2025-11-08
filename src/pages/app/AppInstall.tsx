@@ -49,8 +49,10 @@ const AppInstall = () => {
     );
   }
 
-  // Check notification permission on mount
+  // Check notification permission on mount (only for web)
   useEffect(() => {
+    if (isNativeApp()) return;
+    
     const checkPermissions = async () => {
       const status = await checkPermissionStatus();
       setNotificationPermission(status);
@@ -60,6 +62,8 @@ const AppInstall = () => {
 
   // Show popup when iOS app gets installed and notifications aren't enabled
   useEffect(() => {
+    if (isNativeApp()) return;
+    
     if (isIOS && isInstalled && !isNotificationsEnabled) {
       setShowNotificationPopup(true);
     }

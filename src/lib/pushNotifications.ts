@@ -188,6 +188,12 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
 
 export async function unsubscribeFromPushNotifications(userId: string): Promise<{ success: boolean; error?: string }> {
   try {
+    // Don't try to unsubscribe on native platforms
+    if (Capacitor.isNativePlatform()) {
+      console.log('[Push] Skipping unsubscribe on native platform');
+      return { success: true };
+    }
+    
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.getSubscription();
 

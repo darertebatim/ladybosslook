@@ -22,6 +22,9 @@ import {
 import { isNativeApp } from '@/lib/platform';
 
 const AppProfile = () => {
+  // 🚨 Check global flag directly for native detection
+  const isNative = (window as any).__IS_NATIVE_APP__ || (window as any).__PWA_DISABLED__;
+  
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -51,7 +54,7 @@ const AppProfile = () => {
 
   // Check notification permission status and subscription (only for web)
   useEffect(() => {
-    if (isNativeApp()) return;
+    if (isNative) return;
     
     const checkPermissions = async () => {
       const status = await checkPermissionStatus();
@@ -80,7 +83,7 @@ const AppProfile = () => {
     };
     
     checkSubscription();
-  }, [user?.id]);
+  }, [user?.id, isNative]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -405,7 +408,7 @@ const AppProfile = () => {
           </CardContent>
         </Card>
 
-        {!isNativeApp() && (
+        {!isNative && (
           <Card id="notifications-section">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
