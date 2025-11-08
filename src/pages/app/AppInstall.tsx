@@ -9,6 +9,7 @@ import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications } from '@/lib/pushNotifications';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { isNativeApp } from '@/lib/platform';
 
 const AppInstall = () => {
   const { user } = useAuth();
@@ -17,6 +18,36 @@ const AppInstall = () => {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const isNotificationsEnabled = notificationPermission === 'granted';
+
+  // For native apps, show a simple message
+  if (isNativeApp()) {
+    return (
+      <div className="min-h-screen bg-background">
+        <SEOHead 
+          title="App Installed - LadyBoss Academy"
+          description="LadyBoss Academy app is ready to use"
+        />
+        <div className="container max-w-4xl py-12 px-4">
+          <div className="text-center mb-8">
+            <Smartphone className="h-16 w-16 mx-auto mb-4 text-primary" />
+            <h1 className="text-3xl font-bold mb-2">App Ready!</h1>
+            <p className="text-muted-foreground">
+              You're using the LadyBoss Academy native app
+            </p>
+          </div>
+          <Card>
+            <CardContent className="pt-6 text-center space-y-4">
+              <Check className="h-12 w-12 mx-auto mb-2 text-green-500" />
+              <h2 className="text-xl font-semibold">All Set!</h2>
+              <p className="text-muted-foreground">
+                The app is installed and ready to use with all features.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   // Check notification permission on mount
   useEffect(() => {

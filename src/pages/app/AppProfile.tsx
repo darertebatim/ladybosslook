@@ -403,62 +403,61 @@ const AppProfile = () => {
           </CardContent>
         </Card>
 
-        <Card id="notifications-section">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {permissionStatus === 'granted' ? (
-                <Check className="h-5 w-5 text-green-500" />
-              ) : permissionStatus === 'denied' ? (
-                <X className="h-5 w-5 text-destructive" />
-              ) : (
-                <Bell className="h-5 w-5" />
-              )}
-              Push Notifications
-            </CardTitle>
-            <CardDescription>
-              Status: {permissionStatus === 'granted' ? 'Enabled' : permissionStatus === 'denied' ? 'Blocked' : 'Not enabled'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="push-notifications">Enable push notifications</Label>
-                <p className="text-sm text-muted-foreground">
-                  Receive updates about announcements and courses
-                </p>
+        {!isNativeApp() && (
+          <Card id="notifications-section">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                {permissionStatus === 'granted' ? (
+                  <Check className="h-5 w-5 text-green-500" />
+                ) : permissionStatus === 'denied' ? (
+                  <X className="h-5 w-5 text-destructive" />
+                ) : (
+                  <Bell className="h-5 w-5" />
+                )}
+                Push Notifications
+              </CardTitle>
+              <CardDescription>
+                Status: {permissionStatus === 'granted' ? 'Enabled' : permissionStatus === 'denied' ? 'Blocked' : 'Not enabled'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="push-notifications">Enable push notifications</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive updates about announcements and courses
+                  </p>
+                </div>
+                <Switch
+                  id="push-notifications"
+                  checked={isSubscribed}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      handleEnableNotifications();
+                    } else {
+                      handleDisableNotifications();
+                    }
+                  }}
+                  disabled={isLoadingNotifications || permissionStatus === 'denied'}
+                />
               </div>
-              <Switch
-                id="push-notifications"
-                checked={isSubscribed}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    handleEnableNotifications();
-                  } else {
-                    handleDisableNotifications();
-                  }
-                }}
-                disabled={isLoadingNotifications || permissionStatus === 'denied'}
-              />
-            </div>
 
-            {permissionStatus === 'denied' && (
-              <div className="rounded-lg bg-destructive/10 p-4 text-sm">
-                <div className="flex items-start gap-2">
-                  <BellOff className="h-5 w-5 text-destructive mt-0.5" />
-                  <div>
-                    <p className="font-medium text-destructive">Notifications blocked</p>
-                    <p className="text-muted-foreground mt-1">
-                      {isNativeApp() 
-                        ? 'Please enable notifications in your device settings (Settings > Ladybosslook > Notifications) to receive updates.'
-                        : 'Please enable notifications in your browser settings to receive updates.'
-                      }
-                    </p>
+              {permissionStatus === 'denied' && (
+                <div className="rounded-lg bg-destructive/10 p-4 text-sm">
+                  <div className="flex items-start gap-2">
+                    <BellOff className="h-5 w-5 text-destructive mt-0.5" />
+                    <div>
+                      <p className="font-medium text-destructive">Notifications blocked</p>
+                      <p className="text-muted-foreground mt-1">
+                        Please enable notifications in your browser settings to receive updates.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         <Card id="password-section">
           <CardHeader>

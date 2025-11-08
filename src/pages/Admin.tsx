@@ -28,6 +28,7 @@ import { LeadsManager } from '@/components/admin/LeadsManager';
 import SecurityAuditLog from '@/components/SecurityAuditLog';
 import { usePrograms } from '@/hooks/usePrograms';
 import { AudioManager } from '@/components/admin/AudioManager';
+import { isNativeApp } from '@/lib/platform';
 
 interface CourseStats {
   course_name: string;
@@ -212,7 +213,7 @@ const Admin = () => {
                 </CardContent>
               </Card>
 
-              <PWAInstallStats />
+              {!isNativeApp() && <PWAInstallStats />}
             </TabsContent>
 
             {/* Tab 2: Users */}
@@ -372,9 +373,13 @@ const Admin = () => {
             <TabsContent value="communications" className="space-y-6">
               <AnnouncementCreator />
               <AnnouncementsList />
-              <PushNotificationSender />
-              <DeviceManagementPanel />
-              <PushNotificationsHistory />
+              {!isNativeApp() && (
+                <>
+                  <PushNotificationSender />
+                  <DeviceManagementPanel />
+                  <PushNotificationsHistory />
+                </>
+              )}
               <EmailLogsViewer />
             </TabsContent>
 
@@ -421,7 +426,7 @@ const Admin = () => {
                 </CardContent>
               </Card>
 
-              <VapidKeyGenerator />
+              {!isNativeApp() && <VapidKeyGenerator />}
               <SecurityAuditLog />
             </TabsContent>
           </Tabs>
