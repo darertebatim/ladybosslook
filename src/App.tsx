@@ -53,6 +53,8 @@ import Dashboard from "./pages/Dashboard";
 import CalendarRedirect from "./components/CalendarRedirect";
 import Redirect from "./components/Redirect";
 import SendTestEmail from "./pages/SendTestEmail";
+import AppSupport from "./pages/AppSupport";
+import AppMarketing from "./pages/AppMarketing";
 
 const queryClient = new QueryClient();
 
@@ -113,6 +115,8 @@ const App = () => (
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/refund-policy" element={<RefundPolicy />} />
             <Route path="/sms-terms" element={<SMSTerms />} />
+            <Route path="/appsupport" element={<AppSupport />} />
+            <Route path="/appmarketing" element={<AppMarketing />} />
             <Route path="/giveaway" element={<Giveaway />} />
             <Route path="/ewc" element={<EmpoweredWomanCoaching />} />
             <Route path="/ewcnow" element={<EmpoweredWomanCoaching />} />
