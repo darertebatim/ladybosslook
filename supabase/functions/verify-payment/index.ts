@@ -105,20 +105,36 @@ serve(async (req) => {
       if (signUpError) {
         // If user already exists, retrieve the existing user
         if (signUpError.message.includes('already been registered') || signUpError.message.includes('email_exists')) {
-          logStep('User already exists, retrieving existing account');
-          const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
+          logStep('User already exists, querying database for user ID');
           
-          if (listError) {
-            throw new Error(`Failed to retrieve existing user: ${listError.message}`);
-          }
+          // Query the profiles table to get the user_id by email
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('email', customerEmail)
+            .single();
           
-          const existingUser = users?.find(u => u.email?.toLowerCase() === customerEmail.toLowerCase());
-          
-          if (existingUser) {
-            userId = existingUser.id;
-            logStep('Found existing user account', { userId });
+          if (profileError || !profile) {
+            logStep('Profile not found, trying auth query', { profileError });
+            // If profile not found, the user might exist in auth but not profiles
+            // In this case, we'll need to list users but with email filter if possible
+            const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
+            
+            if (listError) {
+              throw new Error(`Failed to retrieve existing user: ${listError.message}`);
+            }
+            
+            const existingUser = users?.find(u => u.email?.toLowerCase() === customerEmail.toLowerCase());
+            
+            if (existingUser) {
+              userId = existingUser.id;
+              logStep('Found existing user in auth.users', { userId });
+            } else {
+              throw new Error('User exists but could not be found in database or auth');
+            }
           } else {
-            throw new Error('User exists but could not be found');
+            userId = profile.id;
+            logStep('Found existing user in profiles table', { userId });
           }
         } else {
           logStep('Error creating user account', signUpError);
