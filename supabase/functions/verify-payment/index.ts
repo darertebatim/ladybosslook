@@ -85,56 +85,65 @@ serve(async (req) => {
       const customerPhone = session.customer_details?.phone || (customer as any)?.phone;
       const billingCity = session.customer_details?.address?.city || (customer as any)?.address?.city || "";
 
-      // Check if user account already exists
-      logStep('Checking for existing user account', { email: customerEmail });
-      const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
+      // Try to create user account first, handle existing user gracefully
+      logStep('Attempting to create or retrieve user account', { email: customerEmail });
       
       let userId = null;
-      const existingUser = users?.find(u => u.email === customerEmail);
       
-      if (existingUser) {
-        logStep('Found existing user account', { userId: existingUser.id });
-        userId = existingUser.id;
-      } else {
-        // Create new user account with secure random password
-        logStep('Creating new user account');
-        
-        const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
+      // Try to create new user account with secure random password
+      const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
+        email: customerEmail,
+        password: generateSecurePassword(),
+        email_confirm: true,
+        user_metadata: {
+          full_name: customerName,
+          phone: customerPhone,
+          city: billingCity
+        }
+      });
+
+      if (signUpError) {
+        // If user already exists, retrieve the existing user
+        if (signUpError.message.includes('already been registered') || signUpError.message.includes('email_exists')) {
+          logStep('User already exists, retrieving existing account');
+          const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
+          
+          if (listError) {
+            throw new Error(`Failed to retrieve existing user: ${listError.message}`);
+          }
+          
+          const existingUser = users?.find(u => u.email?.toLowerCase() === customerEmail.toLowerCase());
+          
+          if (existingUser) {
+            userId = existingUser.id;
+            logStep('Found existing user account', { userId });
+          } else {
+            throw new Error('User exists but could not be found');
+          }
+        } else {
+          logStep('Error creating user account', signUpError);
+          throw new Error(`Failed to create user account: ${signUpError.message}`);
+        }
+      } else if (newUser.user) {
+        userId = newUser.user.id;
+        logStep('User account created', { userId });
+
+        // Send password reset email so user can set their own password
+        const { error: resetError } = await supabase.auth.admin.generateLink({
+          type: 'recovery',
           email: customerEmail,
-          password: generateSecurePassword(),
-          email_confirm: true,
-          user_metadata: {
-            full_name: customerName,
-            phone: customerPhone,
-            city: billingCity
+          options: {
+            redirectTo: `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovable.app') || ''}/dashboard`
           }
         });
 
-        if (signUpError) {
-          logStep('Error creating user account', signUpError);
-          // Critical: Don't proceed with order creation if user creation fails
-          throw new Error(`Failed to create user account: ${signUpError.message}`);
-        } else if (newUser.user) {
-          userId = newUser.user.id;
-          logStep('User account created', { userId });
-
-          // Send password reset email so user can set their own password
-          const { error: resetError } = await supabase.auth.admin.generateLink({
-            type: 'recovery',
-            email: customerEmail,
-            options: {
-              redirectTo: `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovable.app') || ''}/dashboard`
-            }
-          });
-
-          if (resetError) {
-            logStep('Error sending password reset email', resetError);
-          } else {
-            logStep('Password reset email sent');
-          }
+        if (resetError) {
+          logStep('Error sending password reset email', resetError);
         } else {
-          throw new Error('User creation failed - no user returned');
+          logStep('Password reset email sent');
         }
+      } else {
+        throw new Error('User creation failed - no user returned');
       }
       
       // Ensure userId is set before proceeding
