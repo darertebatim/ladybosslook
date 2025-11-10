@@ -1218,6 +1218,31 @@ export default function EmpoweredWomanCoaching() {
           </div>
         </div>
       </section>
+
+      {/* Sticky Payment Button */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border shadow-lg">
+        <div className="max-w-6xl mx-auto px-4 py-3 md:py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="text-center sm:text-right rtl font-farsi">
+              <p className="text-sm md:text-base font-bold text-foreground">
+                کوچینگ زن قوی - پیش‌پرداخت ۱۰۰ دلار
+              </p>
+              <p className="text-xs md:text-sm text-muted-foreground">
+                ۳ ماه تحول • ۱۲ جلسه زنده • ضمانت بازگشت وجه
+              </p>
+            </div>
+            <Button
+              size="lg"
+              onClick={handleDepositClick}
+              disabled={isLoading}
+              className="cta-button px-6 md:px-8 py-3 md:py-4 text-white font-bold shadow-bold hover:shadow-glow w-full sm:w-auto"
+            >
+              <Shield className="w-4 h-4 md:w-5 md:h-5 ml-2" />
+              {isLoading ? "در حال انتقال..." : "رزرو جایگاه"}
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
