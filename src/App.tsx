@@ -64,12 +64,7 @@ const NativeAppRedirect = () => {
   const location = useLocation();
   
   useEffect(() => {
-    if (isNativeApp()) {
-      // Redirect root to app home only
-      if (location.pathname === '/') {
-        navigate('/app/home', { replace: true });
-      }
-    }
+    // No automatic redirects for native apps
   }, [location.pathname, navigate]);
   
   return null;
