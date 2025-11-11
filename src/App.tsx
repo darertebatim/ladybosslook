@@ -65,17 +65,8 @@ const NativeAppRedirect = () => {
   
   useEffect(() => {
     if (isNativeApp()) {
-      // Redirect root to app home
+      // Redirect root to app home only
       if (location.pathname === '/') {
-        navigate('/app/home', { replace: true });
-      }
-      // Redirect any marketing pages to app
-      const marketingRoutes = ['/programs', '/about', '/landing', '/asac', '/video', 
-        '/expressassert', '/business-ideas', '/business-growth-accelerator', 
-        '/business-startup-accelerator', '/event-irvine', '/ccw', '/cc', '/ccpay',
-        '/giveaway', '/ewc', '/freelive', '/one', '/iqmoney', '/rathus'];
-      
-      if (marketingRoutes.includes(location.pathname)) {
         navigate('/app/home', { replace: true });
       }
     }
