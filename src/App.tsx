@@ -73,7 +73,7 @@ const NativeAppRedirect = () => {
       const marketingRoutes = ['/programs', '/about', '/landing', '/asac', '/video', 
         '/expressassert', '/business-ideas', '/business-growth-accelerator', 
         '/business-startup-accelerator', '/event-irvine', '/ccw', '/cc', '/ccpay',
-        '/giveaway', '/ewc', '/ewcnow', '/freelive', '/one', '/iqmoney', '/rathus'];
+        '/giveaway', '/ewc', '/freelive', '/one', '/iqmoney', '/rathus'];
       
       if (marketingRoutes.includes(location.pathname)) {
         navigate('/app/home', { replace: true });

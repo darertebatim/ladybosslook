@@ -21,6 +21,13 @@ export const isDefinitelyNative = (): boolean => {
   // PRIMARY CHECK: User agent signatures (works immediately, no Capacitor needed)
   const userAgent = navigator.userAgent;
   
+  // Exclude Telegram's in-app browser
+  const isTelegramBrowser = /Telegram/i.test(userAgent);
+  if (isTelegramBrowser) {
+    console.log('[Platform] 🚫 Telegram browser detected - treating as WEB');
+    return false;
+  }
+  
   // iOS WKWebView: Has "Mobile/" but NO "Safari/" 
   // Real Safari: Has BOTH "Mobile/" AND "Safari/"
   const isIOSWebView = /iPhone|iPad|iPod/.test(userAgent) && 
