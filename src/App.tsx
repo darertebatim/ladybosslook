@@ -90,29 +90,29 @@ const App = () => (
           <Route path="/video" element={<Video />} />
           <Route path="/expressassert" element={<ExpressAssert />} />
           <Route path="/business-ideas" element={<BusinessIdeas />} />
-            <Route path="/business-growth-accelerator" element={<BusinessGrowthAccelerator />} />
+          <Route path="/business-growth-accelerator" element={<BusinessGrowthAccelerator />} />
             <Route path="/business-startup-accelerator" element={<BusinessStartupAccelerator />} />
-            <Route path="/event-irvine" element={<EventIrvine />} />
-          <Route path="/ccw" element={<CourageousWorkshop />} />
-          <Route path="/cc" element={<CourageousCharacter />} />
-          <Route path="/ccpay" element={<CCPayDirect />} />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/checkout" element={<Checkout />} />
+            {!isNativeApp() && <Route path="/event-irvine" element={<EventIrvine />} />}
+          {!isNativeApp() && <Route path="/ccw" element={<CourageousWorkshop />} />}
+          {!isNativeApp() && <Route path="/cc" element={<CourageousCharacter />} />}
+          {!isNativeApp() && <Route path="/ccpay" element={<CCPayDirect />} />}
+          {!isNativeApp() && <Route path="/payment-success" element={<PaymentSuccess />} />}
+          {!isNativeApp() && <Route path="/checkout" element={<Checkout />} />}
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/refund-policy" element={<RefundPolicy />} />
             <Route path="/sms-terms" element={<SMSTerms />} />
             <Route path="/appsupport" element={<AppSupport />} />
             <Route path="/appmarketing" element={<AppMarketing />} />
             <Route path="/giveaway" element={<Giveaway />} />
-            <Route path="/ewc" element={<EmpoweredWomanCoaching />} />
-            <Route path="/ewcnow" element={<EmpoweredWomanCoaching />} />
+            {!isNativeApp() && <Route path="/ewc" element={<EmpoweredWomanCoaching />} />}
+            {!isNativeApp() && <Route path="/ewcnow" element={<EmpoweredWomanCoaching />} />}
             <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
             <Route path="/announcements/ccw" element={<CCWAnnouncements />} />
-            <Route path="/freelive" element={<FreeLive />} />
-            <Route path="/one" element={<One />} />
-            <Route path="/thankfreelive" element={<ThankFreeLive />} />
-            <Route path="/thankone" element={<ThankOne />} />
-            <Route path="/iqmoney" element={<IQMoneyWorkshop />} />
+            {!isNativeApp() && <Route path="/freelive" element={<FreeLive />} />}
+            {!isNativeApp() && <Route path="/one" element={<One />} />}
+            {!isNativeApp() && <Route path="/thankfreelive" element={<ThankFreeLive />} />}
+            {!isNativeApp() && <Route path="/thankone" element={<ThankOne />} />}
+            {!isNativeApp() && <Route path="/iqmoney" element={<IQMoneyWorkshop />} />}
             <Route path="/rathus" element={<RathusAssessment />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             
