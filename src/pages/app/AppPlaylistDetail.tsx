@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { SupplementViewer } from "@/components/app/SupplementViewer";
+import { isNativeApp } from "@/lib/platform";
 
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
@@ -286,7 +287,10 @@ export default function AppPlaylistDetail() {
           <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
             <Lock className="h-5 w-5 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              Enroll in {playlist.program_slug} to access this content
+              {isNativeApp() 
+                ? 'This content is not available in your subscription'
+                : `Enroll in ${playlist.program_slug} to access this content`
+              }
             </p>
           </div>
         )}

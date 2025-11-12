@@ -10,6 +10,7 @@ import { downloadICSFile } from '@/utils/calendar';
 import { format } from 'date-fns';
 import { toast } from "sonner";
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { isNativeApp } from '@/lib/platform';
 
 const AppCourseDetail = () => {
   const { slug } = useParams();
@@ -124,7 +125,10 @@ const AppCourseDetail = () => {
           <Card>
             <CardContent className="py-8">
               <p className="text-center text-muted-foreground">
-                You are not enrolled in this course.
+                {isNativeApp() 
+                  ? 'This course is not available in your subscription.'
+                  : 'You are not enrolled in this course.'
+                }
               </p>
             </CardContent>
           </Card>

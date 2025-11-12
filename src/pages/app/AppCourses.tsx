@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { BookOpen, Clock } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
+import { isNativeApp } from '@/lib/platform';
 
 const AppCourses = () => {
   const { user } = useAuth();
@@ -64,7 +65,12 @@ const AppCourses = () => {
           <Card>
             <CardContent className="pt-6 text-center">
               <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">No courses enrolled yet</p>
+              <p className="text-muted-foreground">
+                {isNativeApp() 
+                  ? 'No courses available'
+                  : 'No courses enrolled yet'
+                }
+              </p>
             </CardContent>
           </Card>
         ) : (
