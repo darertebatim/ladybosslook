@@ -15,10 +15,14 @@ const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect native app users to app home if authenticated
+  // Redirect native app users to appropriate page
   useEffect(() => {
-    if (isNativeApp() && user) {
-      navigate('/app/home', { replace: true });
+    if (isNativeApp()) {
+      if (user) {
+        navigate('/app/home', { replace: true });
+      } else {
+        navigate('/auth', { replace: true });
+      }
     }
   }, [user, navigate]);
 
