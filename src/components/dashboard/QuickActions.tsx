@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { isNativeApp } from "@/lib/platform";
 
 export function QuickActions() {
   const navigate = useNavigate();
@@ -31,43 +32,53 @@ export function QuickActions() {
     window.open(telegramUrl, '_blank');
   };
 
-  const actions = [
-    {
-      icon: BookOpen,
-      label: "Browse Courses",
-      description: "Explore all available programs",
-      action: () => navigate("/programs"),
-      color: "text-blue-600"
-    },
+  // Filter out purchase-related actions for native app (App Store compliance)
+  const allActions = [
     {
       icon: Music,
       label: "Audio Library",
       description: "Course supplement audios",
       action: () => navigate("/app/player"),
-      color: "text-pink-600"
-    },
-    {
-      icon: Calendar,
-      label: "Book Consultation",
-      description: "1-on-1 coaching session",
-      action: () => navigate("/one"),
-      color: "text-green-600"
+      color: "text-pink-600",
+      showInNative: true
     },
     {
       icon: Send,
       label: "Get Support",
       description: "Contact us on Telegram",
       action: handleContactSupport,
-      color: "text-purple-600"
+      color: "text-purple-600",
+      showInNative: true
+    },
+    {
+      icon: BookOpen,
+      label: "Browse Courses",
+      description: "Explore all available programs",
+      action: () => navigate("/programs"),
+      color: "text-blue-600",
+      showInNative: false // Hidden in native app - purchase page
+    },
+    {
+      icon: Calendar,
+      label: "Book Consultation",
+      description: "1-on-1 coaching session",
+      action: () => navigate("/one"),
+      color: "text-green-600",
+      showInNative: false // Hidden in native app - purchase page
     },
     {
       icon: GraduationCap,
       label: "My Events",
       description: "View upcoming events",
       action: () => navigate("/events"),
-      color: "text-orange-600"
+      color: "text-orange-600",
+      showInNative: false // Hidden in native app - may show purchase options
     }
   ];
+
+  const actions = isNativeApp() 
+    ? allActions.filter(action => action.showInNative)
+    : allActions;
 
   return (
     <Card>
