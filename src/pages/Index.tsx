@@ -6,8 +6,22 @@ import Testimonials from '@/components/sections/Testimonials';
 import CTA from '@/components/sections/CTA';
 import Footer from '@/components/sections/Footer';
 import { SEOHead } from '@/components/SEOHead';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { isNativeApp } from '@/lib/platform';
 
 const Index = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect native app users to app home if authenticated
+  useEffect(() => {
+    if (isNativeApp() && user) {
+      navigate('/app/home', { replace: true });
+    }
+  }, [user, navigate]);
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead />

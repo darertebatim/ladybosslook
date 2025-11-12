@@ -44,7 +44,7 @@ const AppProfile = () => {
       title: 'Signed out',
       description: 'You have been signed out successfully',
     });
-    navigate('/');
+    navigate('/auth');
   };
 
   const handlePasswordChange = async () => {
