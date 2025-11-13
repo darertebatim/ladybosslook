@@ -178,10 +178,18 @@ const One = () => {
                 کلاس قدرت دو زبانه
               </h2>
 
-              {/* Tagline */}
-              <p className="text-sm md:text-base text-[#E2E8F0] mb-3 leading-relaxed">
-                زبان تو، پل قدرتت است • نه دیوار ترسش
-              </p>
+              {/* Video */}
+              <div className="mb-4 max-w-2xl mx-auto">
+                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                  <iframe
+                    src="https://player.vimeo.com/video/1136585470?badge=0&autopause=0&player_id=0&app_id=58479"
+                    className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
+                    frameBorder="0"
+                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+                    title="Bilingual Power Class Preview"
+                  />
+                </div>
+              </div>
 
               {/* Value Prop - One Line */}
               <p className="text-xs md:text-sm text-[#94A3B8] mb-4 max-w-2xl mx-auto">
