@@ -84,7 +84,7 @@ export default function AutoEnrollmentManager() {
 
   const loadRules = async () => {
     const { data, error } = await supabase
-      .from('program_auto_enrollment')
+      .from('program_auto_enrollment' as any)
       .select(`
         id,
         program_slug,
@@ -103,7 +103,7 @@ export default function AutoEnrollmentManager() {
       return;
     }
 
-    setRules(data || []);
+    setRules((data as any) || []);
   };
 
   const handleAddRule = async () => {
@@ -119,11 +119,11 @@ export default function AutoEnrollmentManager() {
     setIsSaving(true);
     try {
       const { error } = await supabase
-        .from('program_auto_enrollment')
+        .from('program_auto_enrollment' as any)
         .upsert({
           program_slug: selectedProgram,
           round_id: selectedRound,
-        }, {
+        } as any, {
           onConflict: 'program_slug'
         });
 
@@ -152,7 +152,7 @@ export default function AutoEnrollmentManager() {
   const handleDeleteRule = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('program_auto_enrollment')
+        .from('program_auto_enrollment' as any)
         .delete()
         .eq('id', id);
 
