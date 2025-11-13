@@ -1,16 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { type Program, programImages } from '@/data/programs';
+import { isNativeApp } from '@/lib/platform';
 
 export const usePrograms = () => {
+  const isNative = isNativeApp();
+  
   // Fetch programs from database
   const { data: dbPrograms = [], isLoading, error } = useQuery({
-    queryKey: ['programs'],
+    queryKey: ['programs', isNative ? 'mobile' : 'web'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('program_catalog')
         .select('*')
         .eq('is_active', true)
+        .eq(isNative ? 'available_on_mobile' : 'available_on_web', true)
         .order('slug');
       
       if (error) throw error;

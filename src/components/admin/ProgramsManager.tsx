@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { GraduationCap, Plus, RefreshCw, Pencil, Trash2 } from 'lucide-react';
@@ -27,6 +28,10 @@ interface ProgramCatalog {
   features?: any;
   is_active: boolean;
   created_at: string;
+  available_on_web: boolean;
+  available_on_mobile: boolean;
+  ios_product_id?: string | null;
+  android_product_id?: string | null;
 }
 
 export function ProgramsManager() {
@@ -51,6 +56,10 @@ export function ProgramsManager() {
     description: '',
     is_active: true,
     audio_playlist_id: null as string | null,
+    available_on_web: true,
+    available_on_mobile: true,
+    ios_product_id: '',
+    android_product_id: '',
   });
 
   // Fetch playlists for dropdown
@@ -103,6 +112,10 @@ export function ProgramsManager() {
       description: '',
       is_active: true,
       audio_playlist_id: null,
+      available_on_web: true,
+      available_on_mobile: true,
+      ios_product_id: '',
+      android_product_id: '',
     });
     setEditingId(null);
     setShowForm(false);
@@ -164,6 +177,10 @@ export function ProgramsManager() {
       description: program.description || '',
       is_active: program.is_active,
       audio_playlist_id: (program as any).audio_playlist_id || null,
+      available_on_web: program.available_on_web,
+      available_on_mobile: program.available_on_mobile,
+      ios_product_id: program.ios_product_id || '',
+      android_product_id: program.android_product_id || '',
     });
     setEditingId(program.id);
     setShowForm(true);
@@ -479,6 +496,68 @@ export function ProgramsManager() {
                 <p className="text-xs text-muted-foreground">
                   Playlist button will appear on course detail page in the app
                 </p>
+              </div>
+
+              {/* Platform Availability Section */}
+              <div className="space-y-4 border-t pt-4">
+                <Label className="text-base font-semibold">Platform Availability</Label>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="available_on_web"
+                    checked={formData.available_on_web}
+                    onCheckedChange={(checked) => 
+                      setFormData({ ...formData, available_on_web: checked as boolean })
+                    }
+                  />
+                  <Label htmlFor="available_on_web" className="text-sm font-normal cursor-pointer">
+                    Available on Web (Stripe Payment)
+                  </Label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="available_on_mobile"
+                    checked={formData.available_on_mobile}
+                    onCheckedChange={(checked) => 
+                      setFormData({ ...formData, available_on_mobile: checked as boolean })
+                    }
+                  />
+                  <Label htmlFor="available_on_mobile" className="text-sm font-normal cursor-pointer">
+                    Available on Mobile App (In-App Purchase)
+                  </Label>
+                </div>
+
+                {/* Show IAP Product IDs only if mobile is enabled */}
+                {formData.available_on_mobile && (
+                  <div className="space-y-3 pl-6 border-l-2 border-primary/30">
+                    <div className="space-y-2">
+                      <Label htmlFor="ios_product_id">iOS Product ID</Label>
+                      <Input
+                        id="ios_product_id"
+                        placeholder="com.ladybosslook.audiobook.productname"
+                        value={formData.ios_product_id}
+                        onChange={(e) => setFormData({ ...formData, ios_product_id: e.target.value })}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Product ID from App Store Connect (must match exactly)
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="android_product_id">Android Product ID</Label>
+                      <Input
+                        id="android_product_id"
+                        placeholder="productname_audiobook"
+                        value={formData.android_product_id}
+                        onChange={(e) => setFormData({ ...formData, android_product_id: e.target.value })}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Product ID from Google Play Console (must match exactly)
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-2">
