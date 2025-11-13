@@ -98,11 +98,11 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
       
       <SEOHead title="Thank You - Payment Successful" description="Registration successful! Welcome to کلاس قدرت دو زبانه online class." />
       
-      <div className="thankone-page-green">
+      <div className="thankone-page-green font-farsi">
         {/* Success Banner */}
         <div className="py-3 md:py-4 text-center px-4" style={{ background: 'linear-gradient(135deg, hsl(var(--cta-primary)), hsl(var(--cta-primary-hover)))' }}>
-          <p className="font-bold text-base md:text-lg lg:text-xl text-white">🎉 پرداخت موفق - خوش آمدید!</p>
-          <p className="font-bold text-base md:text-lg lg:text-xl text-white">ثبت نام شما در کلاس قدرت دو زبانه تکمیل شد</p>
+          <p className="font-bold text-sm md:text-base lg:text-lg text-white">🎉 پرداخت موفق - خوش آمدید!</p>
+          <p className="font-bold text-sm md:text-base lg:text-lg text-white">ثبت نام شما در کلاس قدرت دو زبانه تکمیل شد</p>
         </div>
 
         {/* Main Content */}
@@ -112,59 +112,59 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
           
           <div className="container mx-auto px-4 py-3 md:py-12 relative z-10">
             {/* Header */}
-            <div className="text-center mb-4 md:mb-12">
-              <h1 className="text-3xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 leading-tight" style={{ color: 'hsl(var(--cta-primary))' }}>
+            <div className="text-center mb-4 md:mb-8">
+              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 leading-tight" style={{ color: 'hsl(var(--cta-primary))' }}>
                 این ویدیو را ببینید<br />تا ۱۰۰٪ آماده کلاس شوید
               </h1>
-              <p className="text-lg md:text-xl text-white/90 mb-6 md:mb-8 px-2 font-bold">
+              <p className="text-base md:text-lg text-white/90 mb-4 md:mb-6 px-2 font-bold">
                 همین الان ویدیوی پایین را ببینید تا آماده کلاس قدرت دو زبانه شوید!
               </p>
             </div>
 
             {/* Video Section */}
-            <div className="max-w-4xl mx-auto mb-4 md:mb-12">
-              <div className="backdrop-blur-sm rounded-xl md:rounded-2xl p-4 md:p-8 border" 
+            <div className="max-w-4xl mx-auto mb-6 md:mb-10">
+              <div className="backdrop-blur-sm rounded-xl p-3 md:p-6 border"
                    style={{ 
                      background: 'hsl(var(--card-bg) / 0.3)', 
                      borderColor: 'hsl(var(--cta-primary) / 0.2)' 
                    }}>
-                <div className="aspect-video rounded-lg md:rounded-xl mb-2 md:mb-4 flex items-center justify-center" 
+                <div className="aspect-video rounded-lg mb-3 md:mb-4 flex items-center justify-center" 
                      style={{ background: 'hsl(var(--bg-navy-dark))' }}>
                   {videoLink ? (
                     <iframe 
                       src={videoLink} 
-                      className="w-full h-full rounded-lg md:rounded-xl" 
+                      className="w-full h-full rounded-lg" 
                       allowFullScreen 
                       title="آمادگی کلاس" 
                     />
                   ) : (
                     <div className="text-center">
-                      <div className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4" 
+                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3" 
                            style={{ background: 'hsl(var(--cta-primary))' }}>
-                        <span className="text-2xl md:text-3xl">▶️</span>
+                        <span className="text-xl md:text-2xl">▶️</span>
                       </div>
-                      <p className="text-white text-sm md:text-base">ویدیو آمادگی کلاس</p>
-                      <p className="text-white/60 text-xs md:text-sm mt-1 md:mt-2">برای صدا کلیک کنید</p>
+                      <p className="text-white text-xs md:text-sm">ویدیو آمادگی کلاس</p>
+                      <p className="text-white/60 text-xs mt-1">برای صدا کلیک کنید</p>
                     </div>
                   )}
                 </div>
                 
                 {/* Welcome Message */}
-                <div className="text-center mb-3">
-                  <div className="backdrop-blur-sm border rounded-xl p-2 md:p-3" 
+                <div className="text-center mb-2 md:mb-3">
+                  <div className="backdrop-blur-sm border rounded-lg md:rounded-xl p-2 md:p-3" 
                        style={{ 
                          background: 'linear-gradient(135deg, hsl(var(--cta-primary) / 0.2), hsl(var(--cta-primary-hover) / 0.2))',
                          borderColor: 'hsl(var(--cta-primary) / 0.3)'
                        }}>
-                    <p className="text-lg md:text-xl font-bold" style={{ color: 'hsl(var(--cta-primary))' }}>
+                    <p className="text-sm md:text-lg font-bold" style={{ color: 'hsl(var(--cta-primary))' }}>
                       💎 شما جزء ۱۰۰ نفر اول هستید - تبریک! 💎
                     </p>
                   </div>
                 </div>
                 
                 {/* Arrow Down */}
-                <div className="text-center py-2">
-                  <div className="text-4xl animate-bounce">👇</div>
+                <div className="text-center py-1 md:py-2">
+                  <div className="text-2xl md:text-3xl animate-bounce">👇</div>
                 </div>
                 
                 {/* Telegram Contact Button */}
@@ -198,28 +198,28 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
 
             {/* Next Steps */}
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-center mb-6 md:mb-12" 
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-center mb-4 md:mb-8" 
                   style={{ color: 'hsl(var(--cta-primary))' }}>
                 مراحل بعدی
               </h2>
               
-              <div className="grid grid-cols-3 gap-4 md:gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
                 {/* Step 1 */}
                 <Card className="backdrop-blur-sm border" 
                       style={{ 
                         background: 'hsl(var(--card-bg) / 0.3)', 
                         borderColor: 'hsl(var(--cta-primary) / 0.2)' 
                       }}>
-                  <CardContent className="p-4 md:p-8 text-center">
-                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-6" 
+                  <CardContent className="p-4 md:p-6 text-center">
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4" 
                          style={{ background: 'hsl(var(--cta-primary))' }}>
-                      <span className="text-lg md:text-2xl">📧</span>
+                      <span className="text-xl md:text-2xl">📧</span>
                     </div>
-                    <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-4" 
+                    <h3 className="text-base md:text-lg font-bold mb-2 md:mb-3" 
                         style={{ color: 'hsl(var(--cta-primary))' }}>
                       ایمیل خود را چک کنید
                     </h3>
-                    <p className="text-sm md:text-base text-white/70">
+                    <p className="text-xs md:text-sm text-white/70">
                       به دنبال ایمیل تأیید با جزئیات کامل کلاس باشید
                     </p>
                   </CardContent>
@@ -231,16 +231,16 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                         background: 'hsl(var(--card-bg) / 0.3)', 
                         borderColor: 'hsl(var(--cta-primary) / 0.2)' 
                       }}>
-                  <CardContent className="p-4 md:p-8 text-center">
-                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-6" 
+                  <CardContent className="p-4 md:p-6 text-center">
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4" 
                          style={{ background: 'hsl(var(--cta-primary))' }}>
-                      <span className="text-lg md:text-2xl">💬</span>
+                      <span className="text-xl md:text-2xl">💬</span>
                     </div>
-                    <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-4" 
+                    <h3 className="text-base md:text-lg font-bold mb-2 md:mb-3" 
                         style={{ color: 'hsl(var(--cta-primary))' }}>
                       با رضیه تماس بگیرید
                     </h3>
-                    <p className="text-sm md:text-base text-white/70">
+                    <p className="text-xs md:text-sm text-white/70">
                       روی دکمه بالا کلیک کنید تا از طریق تلگرام تماس بگیرید
                     </p>
                   </CardContent>
@@ -252,16 +252,16 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                         background: 'hsl(var(--card-bg) / 0.3)', 
                         borderColor: 'hsl(var(--cta-primary) / 0.2)' 
                       }}>
-                  <CardContent className="p-4 md:p-8 text-center">
-                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-6" 
+                  <CardContent className="p-4 md:p-6 text-center">
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4" 
                          style={{ background: 'hsl(var(--cta-primary))' }}>
-                      <span className="text-lg md:text-2xl">📚</span>
+                      <span className="text-xl md:text-2xl">📚</span>
                     </div>
-                    <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-4" 
+                    <h3 className="text-base md:text-lg font-bold mb-2 md:mb-3" 
                         style={{ color: 'hsl(var(--cta-primary))' }}>
                       آماده کلاس شوید
                     </h3>
-                    <p className="text-sm md:text-base text-white/70">
+                    <p className="text-xs md:text-sm text-white/70">
                       جزئیات شروع کلاس از طریق ایمیل و تلگرام ارسال می‌شود
                     </p>
                   </CardContent>
@@ -270,27 +270,27 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
             </div>
 
             {/* Support Section */}
-            <div className="max-w-2xl mx-auto mt-8 md:mt-16 text-center">
-              <div className="backdrop-blur-sm border rounded-xl p-4 md:p-8" 
+            <div className="max-w-2xl mx-auto mt-6 md:mt-12 text-center pb-6 md:pb-8">
+              <div className="backdrop-blur-sm border rounded-lg md:rounded-xl p-4 md:p-6" 
                    style={{ 
                      background: 'hsl(var(--card-bg) / 0.2)', 
                      borderColor: 'hsl(var(--cta-primary) / 0.2)' 
                    }}>
-                <h3 className="text-lg md:text-2xl font-bold mb-2 md:mb-4" 
+                <h3 className="text-base md:text-xl font-bold mb-2 md:mb-3" 
                     style={{ color: 'hsl(var(--cta-primary))' }}>
                   پشتیبانی:
                 </h3>
-                <p className="text-white text-base md:text-lg">
+                <p className="text-white text-sm md:text-base">
                   📱 تلگرام: @ladybosslook
                 </p>
-                <p className="text-white text-base md:text-lg mt-2">
+                <p className="text-white text-sm md:text-base mt-2">
                   📧 ایمیل: support@ladybosslook.com
                 </p>
-                <p className="text-white/60 text-xs md:text-sm mt-1 md:mt-2">
+                <p className="text-white/60 text-xs mt-1 md:mt-2">
                   برای هرگونه سوال یا مشکل با ما تماس بگیرید
                 </p>
                 
-                <p className="text-white text-sm md:text-base mt-4 mb-3">
+                <p className="text-white text-xs md:text-sm mt-3 md:mt-4 mb-2 md:mb-3">
                   اگه تلگرام نداری ایمیل بزن
                 </p>
                 <Button 
@@ -300,7 +300,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                       : 'Hello, I just registered for the Bilingual Power Class!';
                     window.location.href = `mailto:support@ladybosslook.com?subject=Bilingual Power Class Registration&body=${encodeURIComponent(emailBody)}`;
                   }}
-                  className="w-full font-bold text-sm md:text-base px-4 md:px-6 py-3 md:py-4 h-auto rounded-lg shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                  className="w-full font-bold text-xs md:text-sm px-4 py-2.5 md:py-3 h-auto rounded-lg shadow-lg transition-all duration-300 hover:scale-[1.02]"
                   style={{
                     background: 'hsl(var(--card-bg))',
                     color: 'hsl(var(--cta-primary))',
