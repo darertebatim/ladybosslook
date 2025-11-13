@@ -179,12 +179,13 @@ export default function PaymentSuccess() {
             <div className="inline-flex items-center justify-center w-10 h-10 sm:w-16 sm:h-16 bg-green-100 rounded-full mb-2 sm:mb-4">
               <CheckCircle className="w-5 h-5 sm:w-8 sm:h-8 text-green-600" />
             </div>
-            <h1 className="text-xl sm:text-3xl font-bold text-primary mb-1 sm:mb-2">
-              Payment Successful!
-            </h1>
-            <p className="text-sm sm:text-lg text-muted-foreground">
-              Welcome to your transformation journey!
-            </p>
+            <div className="flex items-center justify-center gap-2 sm:gap-4">
+              <ArrowRight className="w-5 h-5 sm:w-7 sm:h-7 text-primary transform rotate-180" />
+              <h1 className="text-xl sm:text-3xl font-bold text-primary">
+                Payment Successful!
+              </h1>
+              <ArrowRight className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
+            </div>
           </div>
 
           {/* Order Details - Ultra Compact */}
