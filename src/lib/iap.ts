@@ -1,31 +1,20 @@
-// Using @awesome-cordova-plugins/in-app-purchase-2 (installed)
-// Note: This is a Cordova plugin wrapper, may have compatibility issues with Capacitor
+// IAP Implementation for iOS
+// Note: Currently using Stripe for payments. To enable native iOS IAP:
+// 1. Add a Capacitor IAP plugin (e.g., @revenuecat/purchases-capacitor)
+// 2. Configure products in App Store Connect
+// 3. Update this file to use the plugin
 import { isIOSApp } from './platform';
 
-// Safe fallback that won't freeze the app
-const SafeFallback = {
-  initialize: async () => Promise.resolve(),
-  getProducts: async () => Promise.resolve({ products: [] }),
-  purchase: async () => Promise.reject(new Error('IAP not available')),
+// Currently IAP is not available - using Stripe instead
+const InAppPurchase2 = {
+  initialize: async (_config: any) => Promise.resolve(),
+  getProducts: async (_config: any) => Promise.resolve({ products: [] }),
+  purchase: async (_config: any) => Promise.reject(new Error('IAP not configured - use Stripe')),
   restorePurchases: async () => Promise.resolve({ transactions: [] }),
-  finishTransaction: async () => Promise.resolve(),
+  finishTransaction: async (_config: any) => Promise.resolve(),
 };
 
-// Try to import plugin, fallback to safe implementation
-let InAppPurchase2: any = SafeFallback;
-let pluginAvailable = false;
-
-// Dynamic import attempt
-(async () => {
-  try {
-    const iapModule = await import('@awesome-cordova-plugins/in-app-purchase-2');
-    InAppPurchase2 = iapModule.InAppPurchase2;
-    pluginAvailable = true;
-    console.log('[IAP] Plugin loaded successfully');
-  } catch (error) {
-    console.warn('[IAP] Plugin not available, using safe fallback');
-  }
-})();
+const pluginAvailable = false;
 
 export interface IAPProduct {
   id: string;
@@ -93,7 +82,7 @@ class IAPService {
     try {
       await this.initialize();
 
-      const result = await InAppPurchase2.purchase({
+      const result: any = await InAppPurchase2.purchase({
         productIdentifier: productId,
       });
 
@@ -101,8 +90,8 @@ class IAPService {
 
       return {
         success: true,
-        transactionId: result.transactionId,
-        receipt: result.transactionReceipt,
+        transactionId: result?.transactionId,
+        receipt: result?.transactionReceipt,
       };
     } catch (error) {
       console.error('[IAP] Purchase failed:', error);
@@ -116,11 +105,11 @@ class IAPService {
     try {
       await this.initialize();
       
-      const { transactions } = await InAppPurchase2.restorePurchases();
+      const result: any = await InAppPurchase2.restorePurchases();
       
-      return transactions.map(t => t.productId);
+      return result?.transactions?.map((t: any) => t.productId) || [];
     } catch (error) {
-      console.error('Failed to restore purchases:', error);
+      console.error('[IAP] Failed to restore purchases:', error);
       return [];
     }
   }
