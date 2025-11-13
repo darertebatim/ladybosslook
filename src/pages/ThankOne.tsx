@@ -132,17 +132,17 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
           
           <div className="container mx-auto px-4 py-3 md:py-12 relative z-10">
             {/* Header */}
-            <div className="text-center mb-4 md:mb-8">
+            <div className="text-center mb-4 md:mb-8" dir="rtl">
               <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 leading-tight" style={{ color: 'hsl(var(--cta-primary))' }}>
-                یک قدم تا تکمیل ثبت نام!
+                اما هنوز ۲ قدم دیگر مانده !
               </h1>
               <p className="text-base md:text-xl text-white/90 mb-2 px-2 font-bold">
                 برای رسیدن به ۱۰۰٪ و تضمین جای خود:
               </p>
-              <p className="text-base md:text-lg text-white/90 mb-4 md:mb-6 px-2 font-bold">
-                ۱) این ویدیو را ببینید 🎥<br />
-                ۲) در تلگرام پیام بدهید 💬
-              </p>
+              <div className="text-base md:text-lg text-white/90 mb-4 md:mb-6 px-2 font-bold space-y-1">
+                <p>۱) این ویدیو را ببینید 🎥</p>
+                <p>۲) در تلگرام پیام بدهید 💬</p>
+              </div>
               <div className="inline-block px-4 py-2 rounded-lg" style={{ background: 'hsl(var(--cta-primary) / 0.2)', border: '2px solid hsl(var(--cta-primary))' }}>
                 <p className="text-sm md:text-base font-bold" style={{ color: 'hsl(var(--cta-primary))' }}>
                   ✨ با انجام این دو کار ساده، جای شما در کلاس قطعی می‌شود!
