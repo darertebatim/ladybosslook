@@ -145,7 +145,11 @@ const One = () => {
                   <Clock className="w-3.5 h-3.5 text-[#FF6B6B] animate-pulse flex-shrink-0" />
                   <span className="text-white font-bold text-xs">پیشنهاد محدود</span>
                 </div>
-                <CountdownTimer targetDate={new Date('2025-11-22T09:30:00-08:00')} />
+                <div className="inline-flex items-center gap-1 text-white font-bold" dir="ltr">
+                  <span className="bg-white/10 px-2 py-1 rounded text-sm md:text-base">
+                    Nov 22 • 9:30 AM PST
+                  </span>
+                </div>
                 <SpotCounter />
               </div>
             </div>
