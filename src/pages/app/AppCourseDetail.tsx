@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,6 +14,7 @@ import { isNativeApp } from '@/lib/platform';
 
 const AppCourseDetail = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
 
   // Fetch enrollment and round data
   const { data: enrollment, isLoading: enrollmentLoading } = useQuery({
@@ -57,7 +58,14 @@ const AppCourseDetail = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('program_catalog')
-        .select('*')
+        .select(`
+          *,
+          audio_playlists (
+            id,
+            name,
+            description
+          )
+        `)
         .eq('slug', slug)
         .single();
 
@@ -173,6 +181,31 @@ const AppCourseDetail = () => {
                   {round.important_message}
                 </AlertDescription>
               </Alert>
+            )}
+
+            {/* Course Playlist Card */}
+            {program?.audio_playlists && enrollment && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Music className="h-5 w-5" />
+                    Course Playlist
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {(program.audio_playlists as any).description || 'Audio content for this course'}
+                  </p>
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => navigate(`/app/player/playlist/${(program as any).audio_playlist_id}`)}
+                  >
+                    <Music className="h-5 w-5 mr-2" />
+                    Open Playlist: {(program.audio_playlists as any).name}
+                  </Button>
+                </CardContent>
+              </Card>
             )}
 
             <Card>
