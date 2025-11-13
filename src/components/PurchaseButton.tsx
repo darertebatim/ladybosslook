@@ -1,13 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { isIOSApp } from '@/lib/platform';
 import { useIAP } from '@/hooks/useIAP';
+import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 interface PurchaseButtonProps {
   programSlug: string;
   iosProductId?: string;
-  stripePaymentLink?: string;
   price: number;
   buttonText?: string;
   className?: string;
@@ -16,13 +17,13 @@ interface PurchaseButtonProps {
 export const PurchaseButton = ({
   programSlug,
   iosProductId,
-  stripePaymentLink,
   price,
   buttonText = 'Purchase Now',
   className,
 }: PurchaseButtonProps) => {
   const isNative = isIOSApp();
   const { purchase, purchasing } = useIAP(iosProductId ? [iosProductId] : []);
+  const [loading, setLoading] = useState(false);
 
   const handlePurchase = async () => {
     if (isNative && iosProductId) {
@@ -32,18 +33,30 @@ export const PurchaseButton = ({
         window.location.href = '/app/courses';
       }
     } else {
-      // Web Stripe Checkout - Direct to Stripe
-      if (!stripePaymentLink) {
-        toast.error('Payment link not configured for this program. Please contact support.');
-        return;
+      // Web Stripe Checkout - Create dynamic checkout session
+      setLoading(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('create-payment', {
+          body: { program: programSlug }
+        });
+
+        if (error) {
+          console.error('Payment creation error:', error);
+          toast.error('Failed to create payment session. Please try again.');
+          return;
+        }
+
+        if (data?.url) {
+          window.location.href = data.url;
+        } else {
+          toast.error('Failed to create payment session. Please try again.');
+        }
+      } catch (error) {
+        console.error('Payment error:', error);
+        toast.error('Failed to create payment session. Please try again.');
+      } finally {
+        setLoading(false);
       }
-      
-      // Add success and cancel URLs
-      const successUrl = encodeURIComponent(`${window.location.origin}/payment-success`);
-      const cancelUrl = encodeURIComponent(`${window.location.origin}/app/store`);
-      const fullLink = `${stripePaymentLink}?success_url=${successUrl}&cancel_url=${cancelUrl}`;
-      
-      window.location.href = fullLink;
     }
   };
 
@@ -54,11 +67,11 @@ export const PurchaseButton = ({
   return (
     <Button
       onClick={handlePurchase}
-      disabled={purchasing}
+      disabled={purchasing || loading}
       className={className}
       size="lg"
     >
-      {purchasing ? (
+      {(purchasing || loading) ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           Processing...
