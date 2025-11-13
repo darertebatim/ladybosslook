@@ -128,7 +128,7 @@ const AppStore = () => {
                     {!enrolled && (
                       <PurchaseButton
                         programSlug={program.slug}
-                        iosProductId={program.slug === 'courageous-character-course' ? 'com.ladybosslook.cc' : undefined}
+                        iosProductId={(program as any).ios_product_id || undefined}
                         price={program.priceAmount}
                         buttonText="Purchase"
                         className="flex-1"
