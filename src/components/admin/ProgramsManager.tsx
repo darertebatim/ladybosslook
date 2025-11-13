@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,6 +50,20 @@ export function ProgramsManager() {
     subscription_full_payment_discount: 0,
     description: '',
     is_active: true,
+    audio_playlist_id: null as string | null,
+  });
+
+  // Fetch playlists for dropdown
+  const { data: playlists } = useQuery({
+    queryKey: ['audio-playlists'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlists')
+        .select('id, name, program_slug')
+        .order('name');
+      if (error) throw error;
+      return data;
+    },
   });
 
   const fetchPrograms = async () => {
@@ -87,6 +102,7 @@ export function ProgramsManager() {
       subscription_full_payment_discount: 0,
       description: '',
       is_active: true,
+      audio_playlist_id: null,
     });
     setEditingId(null);
     setShowForm(false);
@@ -147,6 +163,7 @@ export function ProgramsManager() {
       subscription_full_payment_discount: program.subscription_full_payment_discount || 0,
       description: program.description || '',
       is_active: program.is_active,
+      audio_playlist_id: (program as any).audio_playlist_id || null,
     });
     setEditingId(program.id);
     setShowForm(true);
@@ -431,6 +448,37 @@ export function ProgramsManager() {
                   placeholder="Program description..."
                   rows={3}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="audio_playlist_id">Featured Playlist (Optional)</Label>
+                <Select 
+                  value={formData.audio_playlist_id || 'none'} 
+                  onValueChange={(value) => setFormData({ 
+                    ...formData, 
+                    audio_playlist_id: value === 'none' ? null : value 
+                  })}
+                >
+                  <SelectTrigger id="audio_playlist_id">
+                    <SelectValue placeholder="Select a playlist" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No Playlist</SelectItem>
+                    {playlists?.map((playlist) => (
+                      <SelectItem key={playlist.id} value={playlist.id}>
+                        🎧 {playlist.name}
+                        {playlist.program_slug && (
+                          <span className="text-xs text-muted-foreground ml-2">
+                            ({playlist.program_slug})
+                          </span>
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Playlist button will appear on course detail page in the app
+                </p>
               </div>
 
               <div className="flex gap-2">
