@@ -2,7 +2,8 @@
 import { isIOSApp } from './platform';
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 
-const REVENUECAT_API_KEY = 'sk_fQxRoFddATeFrxpkUOXOSgLIKUfUK';
+// Use PUBLIC key for iOS SDK (starts with 'test_' or 'appl_')
+const REVENUECAT_PUBLIC_KEY = 'test_KVPklNpuMtxERnmeuzcYwutfOPs';
 const pluginAvailable = true;
 
 export interface IAPProduct {
@@ -27,7 +28,7 @@ class IAPService {
     try {
       await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
       await Purchases.configure({
-        apiKey: REVENUECAT_API_KEY,
+        apiKey: REVENUECAT_PUBLIC_KEY,
         appUserID: undefined, // Will use RevenueCat anonymous ID
       });
       this.initialized = true;
