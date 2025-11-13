@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import PlatformAwareAppLayout from "@/layouts/PlatformAwareAppLayout";
 import AppHome from "@/pages/app/AppHome";
 import AppCourses from "@/pages/app/AppCourses";
+import AppStore from "@/pages/app/AppStore";
 import AppCourseDetail from "@/pages/app/AppCourseDetail";
 import AppProfile from "@/pages/app/AppProfile";
 import AppInstall from "@/pages/app/AppInstall";
@@ -122,6 +123,7 @@ const App = () => (
               <Route index element={<Navigate to="/app/home" replace />} />
               <Route path="home" element={<AppHome />} />
               <Route path="courses" element={<AppCourses />} />
+              <Route path="store" element={<AppStore />} />
               <Route path="course/:slug" element={<AppCourseDetail />} />
               <Route path="player" element={<AppPlayer />} />
               <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />

@@ -4,13 +4,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send } from 'lucide-react';
+import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { downloadICSFile } from '@/utils/calendar';
 import { format } from 'date-fns';
 import { toast } from "sonner";
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { isNativeApp } from '@/lib/platform';
+import { PurchaseButton } from '@/components/PurchaseButton';
+import { programImages } from '@/data/programs';
 
 const AppCourseDetail = () => {
   const { slug } = useParams();
@@ -130,16 +132,105 @@ const AppCourseDetail = () => {
             </CardContent>
           </Card>
         ) : !enrollment ? (
-          <Card>
-            <CardContent className="py-8">
-              <p className="text-center text-muted-foreground">
-                {isNativeApp() 
-                  ? 'This course is not available in your subscription.'
-                  : 'You are not enrolled in this course.'
-                }
-              </p>
-            </CardContent>
-          </Card>
+          /* Purchase Landing Page */
+          <div className="space-y-6">
+            {/* Back to Store Button */}
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/app/store')}
+              className="mb-2"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Store
+            </Button>
+
+            {/* Program Hero Image */}
+            {program && programImages[program.slug] && (
+              <Card className="overflow-hidden">
+                <div className="relative h-64 overflow-hidden">
+                  <img 
+                    src={programImages[program.slug]} 
+                    alt={program.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </Card>
+            )}
+
+            {/* Purchase Card */}
+            {program && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">{program.title}</CardTitle>
+                  {program.description && (
+                    <p className="text-muted-foreground mt-2">
+                      {program.description}
+                    </p>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* What's Included */}
+                  {program.features && Array.isArray(program.features) && program.features.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold text-lg mb-4">What's Included</h3>
+                      <div className="space-y-3">
+                        {program.features.map((feature: string, idx: number) => (
+                          <div key={idx} className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                            <span className="text-muted-foreground">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Price & Purchase */}
+                  <div className="border-t pt-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Investment</p>
+                        <p className="text-3xl font-bold">${(program.price_amount / 100).toFixed(0)}</p>
+                      </div>
+                    </div>
+
+                    <PurchaseButton
+                      programSlug={program.slug}
+                      iosProductId={program.slug === 'courageous-character-course' ? 'com.ladybosslook.cc' : undefined}
+                      stripeCheckoutUrl={`/checkout?program=${program.slug}`}
+                      price={program.price_amount / 100}
+                      buttonText="Enroll Now"
+                      className="w-full"
+                    />
+
+                    <p className="text-xs text-center text-muted-foreground mt-4">
+                      Secure checkout • Instant access after purchase
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Additional Info */}
+            {program && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Course Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Duration</p>
+                      <p className="font-semibold">{program.duration || 'Self-paced'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Format</p>
+                      <p className="font-semibold capitalize">{program.delivery_method || 'Online'}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         ) : (
           <>
             {round?.video_url && (() => {
