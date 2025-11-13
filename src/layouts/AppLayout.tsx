@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Bell, User, Loader2, Headphones } from 'lucide-react';
+import { Home, BookOpen, Bell, User, Loader2, Headphones, ShoppingBag } from 'lucide-react';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { InstallPromptDialog } from '@/components/InstallPromptDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -115,6 +115,7 @@ const AppLayout = () => {
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home' },
     { path: '/app/courses', icon: BookOpen, label: 'Courses' },
+    { path: '/app/store', icon: ShoppingBag, label: 'Store' },
     { path: '/app/player', icon: Headphones, label: 'Player' },
     { path: '/app/profile', icon: User, label: 'Profile' },
   ];
@@ -182,7 +183,7 @@ const AppLayout = () => {
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg">
-        <div className="grid grid-cols-4 h-20 safe-area-inset-bottom">
+        <div className="grid grid-cols-5 h-20 safe-area-inset-bottom">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
