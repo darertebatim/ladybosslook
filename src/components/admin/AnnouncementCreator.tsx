@@ -230,7 +230,7 @@ export function AnnouncementCreator() {
                 <SelectItem value="all">All Students</SelectItem>
                 {programs.map((program) => (
                   <SelectItem key={program.id} value={program.slug}>
-                    {program.title} • {program.type === 'course' ? '📚' : program.type === 'group-coaching' ? '👥' : program.type === '1o1-session' ? '💼' : program.type === 'webinar' ? '🎥' : '🎉'}
+                    {program.title} • {program.type === 'course' ? '📚' : program.type === 'group-coaching' ? '👥' : program.type === '1o1-session' ? '💼' : program.type === 'webinar' ? '🎥' : program.type === 'audiobook' ? '🎧' : '🎉'}
                   </SelectItem>
                 ))}
               </SelectContent>

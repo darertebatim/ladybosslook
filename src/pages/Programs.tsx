@@ -15,6 +15,7 @@ const Programs = () => {
   const oneOnOneSessions = getProgramsByType('1o1-session');
   const webinars = getProgramsByType('webinar');
   const events = getProgramsByType('event');
+  const audiobooks = getProgramsByType('audiobook');
 
   if (isLoading) {
     return (
@@ -271,6 +272,28 @@ const Programs = () => {
               </div>
               <div className="grid lg:grid-cols-3 gap-8">
                 {webinars.map(renderProgramCard)}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Audiobooks Section */}
+        {audiobooks.length > 0 && (
+          <section className="py-16 lg:py-24 bg-muted/50">
+            <div className="container mx-auto px-6">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <BookOpen className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h2 className="font-display text-3xl md:text-4xl font-bold">
+                    🎧 Audiobooks
+                  </h2>
+                  <p className="text-muted-foreground">Listen and learn on the go</p>
+                </div>
+              </div>
+              <div className="grid lg:grid-cols-3 gap-8">
+                {audiobooks.map(renderProgramCard)}
               </div>
             </div>
           </section>
