@@ -22,7 +22,7 @@ export const PurchaseButton = ({
   className,
 }: PurchaseButtonProps) => {
   const isNative = isIOSApp();
-  const { purchase, purchasing } = useIAP(iosProductId ? [iosProductId] : []);
+  const { purchase, purchasing, products } = useIAP(iosProductId ? [iosProductId] : []);
   const [loading, setLoading] = useState(false);
 
   const handlePurchase = async () => {
@@ -30,7 +30,12 @@ export const PurchaseButton = ({
       // iOS In-App Purchase
       const result = await purchase(iosProductId, programSlug);
       if (result.success) {
-        window.location.href = '/app/courses';
+        toast.success('Purchase successful! Redirecting...');
+        setTimeout(() => {
+          window.location.href = '/app/courses';
+        }, 1000);
+      } else {
+        toast.error('Purchase failed. Please contact support.');
       }
     } else {
       // Web Stripe Checkout - Create dynamic checkout session
@@ -60,8 +65,17 @@ export const PurchaseButton = ({
     }
   };
 
-  if (isNative && !iosProductId) {
-    return null;
+  // On iOS native, hide button if no product ID or products couldn't load
+  if (isNative && (!iosProductId || (products.length === 0 && !purchasing && !loading))) {
+    return (
+      <Button
+        disabled
+        className={className}
+        size="lg"
+      >
+        Not Available
+      </Button>
+    );
   }
 
   return (

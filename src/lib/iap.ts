@@ -1,24 +1,31 @@
-// IMPORTANT: This IAP plugin must be installed manually after exporting to GitHub
-// Run these commands in your local project:
-// 1. npm install @capacitor-community/in-app-purchases
-// 2. npx cap sync ios
-// 
-// For now, using placeholder until manual installation
-// import { InAppPurchase2 } from '@capacitor-community/in-app-purchases';
+// Using @awesome-cordova-plugins/in-app-purchase-2 (installed)
+// Note: This is a Cordova plugin wrapper, may have compatibility issues with Capacitor
 import { isIOSApp } from './platform';
 
-// Placeholder implementation - will work after manual plugin installation
-const InAppPurchase2 = {
-  initialize: async (_config: any) => {
-    console.warn('IAP plugin not installed. Run: npm install @capacitor-community/in-app-purchases');
-  },
-  getProducts: async (_config: any) => ({ products: [] as any[] }),
-  purchase: async (_config: any) => {
-    throw new Error('IAP plugin not installed. Please install @capacitor-community/in-app-purchases');
-  },
-  restorePurchases: async () => ({ transactions: [] as any[] }),
-  finishTransaction: async (_config: any) => {},
+// Safe fallback that won't freeze the app
+const SafeFallback = {
+  initialize: async () => Promise.resolve(),
+  getProducts: async () => Promise.resolve({ products: [] }),
+  purchase: async () => Promise.reject(new Error('IAP not available')),
+  restorePurchases: async () => Promise.resolve({ transactions: [] }),
+  finishTransaction: async () => Promise.resolve(),
 };
+
+// Try to import plugin, fallback to safe implementation
+let InAppPurchase2: any = SafeFallback;
+let pluginAvailable = false;
+
+// Dynamic import attempt
+(async () => {
+  try {
+    const iapModule = await import('@awesome-cordova-plugins/in-app-purchase-2');
+    InAppPurchase2 = iapModule.InAppPurchase2;
+    pluginAvailable = true;
+    console.log('[IAP] Plugin loaded successfully');
+  } catch (error) {
+    console.warn('[IAP] Plugin not available, using safe fallback');
+  }
+})();
 
 export interface IAPProduct {
   id: string;
@@ -33,21 +40,29 @@ class IAPService {
 
   async initialize(): Promise<void> {
     if (!isIOSApp() || this.initialized) return;
+    
+    if (!pluginAvailable) {
+      console.warn('[IAP] Plugin not available, skipping initialization');
+      return;
+    }
 
     try {
       await InAppPurchase2.initialize({
         enablePendingPurchases: true,
       });
       this.initialized = true;
-      console.log('IAP initialized successfully');
+      console.log('[IAP] Initialized successfully');
     } catch (error) {
-      console.error('Failed to initialize IAP:', error);
-      throw error;
+      console.error('[IAP] Failed to initialize:', error);
+      // Don't throw - fail gracefully
     }
   }
 
   async getProducts(productIds: string[]): Promise<IAPProduct[]> {
-    if (!isIOSApp()) return [];
+    if (!isIOSApp() || !pluginAvailable) {
+      console.warn('[IAP] Plugin not available for getProducts');
+      return [];
+    }
 
     try {
       await this.initialize();
@@ -56,7 +71,7 @@ class IAPService {
         productIdentifiers: productIds,
       });
 
-      return products.map(p => ({
+      return products.map((p: any) => ({
         id: p.id,
         title: p.title || '',
         description: p.description || '',
@@ -64,32 +79,33 @@ class IAPService {
         currency: p.currency || 'USD',
       }));
     } catch (error) {
-      console.error('Failed to get products:', error);
+      console.error('[IAP] Failed to get products:', error);
       return [];
     }
   }
 
   async purchase(productId: string): Promise<{ success: boolean; transactionId?: string; receipt?: string }> {
-    if (!isIOSApp()) {
+    if (!isIOSApp() || !pluginAvailable) {
+      console.error('[IAP] Plugin not available for purchase');
       return { success: false };
     }
 
     try {
       await this.initialize();
 
-      const { productIdentifier, transactionId, transactionReceipt } = await InAppPurchase2.purchase({
+      const result = await InAppPurchase2.purchase({
         productIdentifier: productId,
       });
 
-      console.log('Purchase successful:', { productIdentifier, transactionId });
+      console.log('[IAP] Purchase successful:', result);
 
       return {
         success: true,
-        transactionId,
-        receipt: transactionReceipt,
+        transactionId: result.transactionId,
+        receipt: result.transactionReceipt,
       };
     } catch (error) {
-      console.error('Purchase failed:', error);
+      console.error('[IAP] Purchase failed:', error);
       return { success: false };
     }
   }
