@@ -11,7 +11,7 @@ import SpotCounter from "@/components/SpotCounter";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import FAQSection from "@/components/FAQSection";
 import InstructorBio from "@/components/InstructorBio";
-import ExitIntentPopup from "@/components/ExitIntentPopup";
+
 import RecentRegistrations from "@/components/RecentRegistrations";
 import { SEOHead } from "@/components/SEOHead";
 import { simpleSubscriptionSchema } from '@/lib/validation';
@@ -126,7 +126,6 @@ const One = () => {
         description="یاد بگیرید چطور در هر زبانی با قدرت حرف بزنید. کلاس ویژه زنان ایرانی مهاجر - فقط $1"
       />
       <RecentRegistrations />
-      <ExitIntentPopup onRegisterClick={() => setShowRegistrationForm(true)} />
       
       <div className="one-page-green min-h-screen bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#1E293B] font-farsi">
         {/* Compact Hero Section */}
@@ -139,18 +138,25 @@ const One = () => {
 
           <div className="container mx-auto px-4 pt-3 relative z-10">
             {/* Ultra-Compact Urgency Banner */}
-            <div className="bg-gradient-to-r from-[#FF6B6B]/20 via-[#FF6B6B]/30 to-[#FF6B6B]/20 border border-[#FF6B6B] rounded-lg p-2 mb-3 backdrop-blur-sm">
-              <div className="flex items-center justify-center gap-3 flex-wrap text-center">
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-[#FF6B6B] animate-pulse flex-shrink-0" />
-                  <span className="text-white font-bold text-xs">پیشنهاد محدود</span>
-                </div>
-                <div className="inline-flex items-center gap-1 text-white font-bold" dir="ltr">
-                  <span className="bg-white/10 px-2 py-1 rounded text-sm md:text-base">
+            <div className="bg-gradient-to-r from-[#FF6B6B]/20 via-[#FF6B6B]/30 to-[#FF6B6B]/20 border border-[#FF6B6B] rounded-lg p-3 mb-3 backdrop-blur-sm">
+              <div className="flex flex-col items-center justify-center gap-2 text-center">
+                {/* First Row: PST Time */}
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-secondary" />
+                  <span className="text-white font-bold text-sm" dir="ltr">
                     Nov 22 • 9:30 AM PST
                   </span>
                 </div>
-                <SpotCounter />
+                {/* Second Row: Local Time */}
+                <div className="text-xs text-white/80" dir="ltr">
+                  Your time: {new Date('2025-11-22T09:30:00-08:00').toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                  })}
+                </div>
               </div>
             </div>
 
