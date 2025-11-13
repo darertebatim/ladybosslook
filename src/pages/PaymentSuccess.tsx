@@ -220,59 +220,34 @@ export default function PaymentSuccess() {
             </Card>
           )}
 
-          {/* Next Steps - Telegram Focus - Mobile Optimized */}
+          {/* Next Steps - Telegram Focus - Simplified Farsi Only */}
           <Card className="mb-3 sm:mb-8 border-primary bg-primary/5">
-            <CardHeader className="text-center pb-2 sm:pb-6">
-              <CardTitle className="flex items-center justify-center text-lg sm:text-2xl">
-                <ArrowRight className="mr-2 sm:mr-3 h-5 w-5 sm:h-8 sm:w-8 text-primary font-bold" />
-                What's Next? ❗️❗️
-                <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 sm:h-8 sm:w-8 text-red-600 font-bold transform rotate-90" />
+            <CardHeader className="text-center pb-3 sm:pb-4">
+              <CardTitle className="text-xl sm:text-3xl font-bold font-farsi" dir="rtl">
+                مرحله بعدی
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-center space-y-3 sm:space-y-6">
-              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-3 sm:p-6 rounded-lg border-2 border-primary/20">
-                <div className="space-y-2 sm:space-y-4">
-                  {/* English Text */}
-                  <div className="text-sm sm:text-lg font-semibold text-primary">
-                    {/* Mobile: 2 lines without arrows */}
-                    <div className="sm:hidden mb-1 leading-tight">
-                      <div className="font-bold text-center text-sm">Click the button below</div>
-                      <div className="font-bold text-center text-sm">and message our support on Telegram</div>
-                    </div>
-                    {/* Desktop: 1 line with arrows */}
-                    <div className="hidden sm:flex items-center justify-center mb-2">
-                      <ArrowRight className="mr-2 h-6 w-6 font-bold" />
-                      <span className="font-bold text-center">Click the button below and message our support on Telegram</span>
-                      <ArrowRight className="ml-2 h-6 w-6 font-bold" />
-                    </div>
-                    <p className="text-muted-foreground text-xs sm:text-base">
-                      Get your workshop access information and instructions immediately
-                    </p>
+            <CardContent className="text-center space-y-4 sm:space-y-6">
+              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-4 sm:p-6 rounded-lg border-2 border-primary/20">
+                <div className="space-y-3 sm:space-y-4">
+                  {/* Farsi Text Only */}
+                  <div className="text-base sm:text-xl font-bold text-primary font-farsi" dir="rtl">
+                    روی دکمه زیر کلیک کنید و به پشتیبانی تلگرام پیام بدهید
                   </div>
                   
-                  {/* Farsi Text */}
-                  <div className="text-sm sm:text-lg font-semibold text-primary" dir="rtl">
-                    <div className="flex items-center justify-center mb-1 sm:mb-2">
-                      <ArrowRight className="ml-1 sm:ml-2 h-4 w-4 sm:h-6 sm:w-6 font-bold" />
-                      <span className="font-bold text-center">همین حالا روی دکمه پایین بزنید و به تلگرام پشتیبان پیام بزنید</span>
-                      <ArrowRight className="mr-1 sm:mr-2 h-4 w-4 sm:h-6 sm:w-6 font-bold" />
-                    </div>
-                    <p className="text-muted-foreground text-xs sm:text-base">
-                      <span className="font-persian">از تلگرام اطلاعات ورود به دوره آموزشی را دریافت کنید</span>
-                    </p>
-                  </div>
+                  <p className="text-sm sm:text-base text-muted-foreground font-farsi" dir="rtl">
+                    اطلاعات ورود به دوره را از تلگرام دریافت کنید
+                  </p>
                   
-                  {/* Multiple Red Bold Arrows Pointing Down - Side by Side */}
-                  <div className="flex justify-center py-1 sm:py-2">
-                    <div className="animate-bounce flex items-center space-x-2">
-                      <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 font-bold transform rotate-90" />
-                      <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 font-bold transform rotate-90" />
-                      <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 font-bold transform rotate-90" />
+                  {/* Single Arrow Pointing Down */}
+                  <div className="flex justify-center py-2">
+                    <div className="animate-bounce">
+                      <ArrowRight className="h-8 w-8 sm:h-10 sm:w-10 text-primary font-bold transform rotate-90" />
                     </div>
                   </div>
                   
-                  {/* Telegram Button - Directly Under Arrow */}
-                  <div className="pt-1 sm:pt-2">
+                  {/* Telegram Button - Farsi */}
+                  <div className="pt-2">
                     <a 
                       href={createTelegramMessage()}
                       target="_blank" 
@@ -281,14 +256,14 @@ export default function PaymentSuccess() {
                     >
                       <Button 
                         size="lg" 
-                        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-lg py-3 sm:py-4 px-4 sm:px-6 animate-pulse"
+                        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-xl py-4 sm:py-6 px-6 sm:px-8 font-farsi font-bold"
                       >
-                        <MessageCircle className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                        Message Us on Telegram
+                        <MessageCircle className="ml-2 h-5 w-5 sm:h-6 sm:w-6" />
+                        پیام به پشتیبانی تلگرام
                       </Button>
                     </a>
-                    <p className="text-xs text-blue-700 mt-1 sm:mt-2">
-                      Your message is ready to send with all your details!
+                    <p className="text-xs sm:text-sm text-primary mt-2 sm:mt-3 font-farsi" dir="rtl">
+                      پیام شما با تمام اطلاعاتتان آماده ارسال است
                     </p>
                   </div>
                 </div>
