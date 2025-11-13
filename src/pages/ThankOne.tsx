@@ -204,7 +204,28 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
-                {/* Step 1 */}
+                {/* Step 1 - Contact Telegram */}
+                <Card className="backdrop-blur-sm border" 
+                      style={{ 
+                        background: 'hsl(var(--card-bg) / 0.3)', 
+                        borderColor: 'hsl(var(--cta-primary) / 0.2)' 
+                      }}>
+                  <CardContent className="p-4 md:p-6 text-center">
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4" 
+                         style={{ background: 'hsl(var(--cta-primary))' }}>
+                      <span className="text-xl md:text-2xl">💬</span>
+                    </div>
+                    <h3 className="text-base md:text-lg font-bold mb-2 md:mb-3" 
+                        style={{ color: 'hsl(var(--cta-primary))' }}>
+                      با پشتیبانی تلگرام تماس بگیرید
+                    </h3>
+                    <p className="text-xs md:text-sm text-white/70">
+                      برای دریافت لینک جلسه آنلاین
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Step 2 - Check Email */}
                 <Card className="backdrop-blur-sm border" 
                       style={{ 
                         background: 'hsl(var(--card-bg) / 0.3)', 
@@ -220,12 +241,12 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                       ایمیل خود را چک کنید
                     </h3>
                     <p className="text-xs md:text-sm text-white/70">
-                      به دنبال ایمیل تأیید با جزئیات کامل کلاس باشید
+                      برای دریافت جزئیات کامل کلاس
                     </p>
                   </CardContent>
                 </Card>
 
-                {/* Step 2 */}
+                {/* Step 3 - Set Alarm */}
                 <Card className="backdrop-blur-sm border" 
                       style={{ 
                         background: 'hsl(var(--card-bg) / 0.3)', 
@@ -234,35 +255,14 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                   <CardContent className="p-4 md:p-6 text-center">
                     <div className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4" 
                          style={{ background: 'hsl(var(--cta-primary))' }}>
-                      <span className="text-xl md:text-2xl">💬</span>
+                      <span className="text-xl md:text-2xl">⏰</span>
                     </div>
                     <h3 className="text-base md:text-lg font-bold mb-2 md:mb-3" 
                         style={{ color: 'hsl(var(--cta-primary))' }}>
-                      با رضیه تماس بگیرید
+                      یادآور بگذارید
                     </h3>
                     <p className="text-xs md:text-sm text-white/70">
-                      روی دکمه بالا کلیک کنید تا از طریق تلگرام تماس بگیرید
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* Step 3 */}
-                <Card className="backdrop-blur-sm border" 
-                      style={{ 
-                        background: 'hsl(var(--card-bg) / 0.3)', 
-                        borderColor: 'hsl(var(--cta-primary) / 0.2)' 
-                      }}>
-                  <CardContent className="p-4 md:p-6 text-center">
-                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4" 
-                         style={{ background: 'hsl(var(--cta-primary))' }}>
-                      <span className="text-xl md:text-2xl">📚</span>
-                    </div>
-                    <h3 className="text-base md:text-lg font-bold mb-2 md:mb-3" 
-                        style={{ color: 'hsl(var(--cta-primary))' }}>
-                      آماده کلاس شوید
-                    </h3>
-                    <p className="text-xs md:text-sm text-white/70">
-                      جزئیات شروع کلاس از طریق ایمیل و تلگرام ارسال می‌شود
+                      تا کلاس زنده را از دست ندهید
                     </p>
                   </CardContent>
                 </Card>
