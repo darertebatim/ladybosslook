@@ -27,7 +27,7 @@ import BusinessIdeas from "./pages/BusinessIdeas";
 import RathusAssessment from "./pages/RathusAssessment";
 import BusinessGrowthAccelerator from "./pages/BusinessGrowthAccelerator";
 import BusinessStartupAccelerator from "./pages/BusinessStartupAccelerator";
-import Checkout from "./pages/Checkout";
+
 import CourageousWorkshop from "./pages/CourageousWorkshop";
 import CourageousCharacter from "./pages/CourageousCharacter";
 import CCPayDirect from "./pages/CCPayDirect";
@@ -98,7 +98,6 @@ const App = () => (
           {!isNativeApp() && <Route path="/cc" element={<CourageousCharacter />} />}
           {!isNativeApp() && <Route path="/ccpay" element={<CCPayDirect />} />}
           {!isNativeApp() && <Route path="/payment-success" element={<PaymentSuccess />} />}
-          {!isNativeApp() && <Route path="/checkout" element={<Checkout />} />}
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/refund-policy" element={<RefundPolicy />} />
             <Route path="/sms-terms" element={<SMSTerms />} />
