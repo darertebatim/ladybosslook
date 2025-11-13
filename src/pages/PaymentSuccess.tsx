@@ -220,50 +220,50 @@ export default function PaymentSuccess() {
             </Card>
           )}
 
-          {/* Next Steps - Telegram Focus - Simplified Farsi Only */}
-          <Card className="mb-3 sm:mb-8 border-primary bg-primary/5">
-            <CardHeader className="text-center pb-3 sm:pb-4">
-              <CardTitle className="text-xl sm:text-3xl font-bold font-farsi" dir="rtl">
-                مرحله بعدی
+          {/* Next Steps - Telegram Focus - Compact & Urgent */}
+          <Card className="mb-3 sm:mb-6 border-primary bg-primary/5">
+            <CardHeader className="text-center pb-2 pt-3 sm:pt-6">
+              <CardTitle className="text-lg sm:text-2xl font-bold font-farsi" dir="rtl">
+                ⚠️ مهم: مرحله بعدی
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-center space-y-4 sm:space-y-6">
-              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-4 sm:p-6 rounded-lg border-2 border-primary/20">
-                <div className="space-y-3 sm:space-y-4">
-                  {/* Farsi Text Only */}
-                  <div className="text-base sm:text-xl font-bold text-primary font-farsi" dir="rtl">
-                    روی دکمه زیر کلیک کنید و به پشتیبانی تلگرام پیام بدهید
+            <CardContent className="text-center space-y-2 sm:space-y-3 py-3 sm:py-4">
+              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-3 sm:p-4 rounded-lg border-2 border-primary/30">
+                <div className="space-y-2 sm:space-y-3">
+                  {/* Urgent Call to Action */}
+                  <div className="text-base sm:text-xl font-bold text-primary font-farsi leading-tight" dir="rtl">
+                    🚨 همین الان روی دکمه زیر کلیک کنید
                   </div>
                   
-                  <p className="text-sm sm:text-base text-muted-foreground font-farsi" dir="rtl">
-                    اطلاعات ورود به دوره را از تلگرام دریافت کنید
+                  <p className="text-xs sm:text-sm text-foreground font-farsi font-semibold" dir="rtl">
+                    بدون پیام دادن به تلگرام، دسترسی به دوره ندارید!
                   </p>
                   
-                  {/* Single Arrow Pointing Down */}
-                  <div className="flex justify-center py-2">
+                  {/* Compact Arrow */}
+                  <div className="flex justify-center py-1">
                     <div className="animate-bounce">
-                      <ArrowRight className="h-8 w-8 sm:h-10 sm:w-10 text-primary font-bold transform rotate-90" />
+                      <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-primary transform rotate-90" />
                     </div>
                   </div>
                   
-                  {/* Telegram Button - Farsi */}
-                  <div className="pt-2">
+                  {/* Prominent Telegram Button */}
+                  <div>
                     <a 
                       href={createTelegramMessage()}
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="inline-block w-full sm:w-auto"
+                      className="inline-block w-full"
                     >
                       <Button 
                         size="lg" 
-                        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-xl py-4 sm:py-6 px-6 sm:px-8 font-farsi font-bold"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-xl py-5 sm:py-7 px-6 sm:px-8 font-farsi font-bold shadow-lg hover:shadow-xl transition-all"
                       >
                         <MessageCircle className="ml-2 h-5 w-5 sm:h-6 sm:w-6" />
-                        پیام به پشتیبانی تلگرام
+                        کلیک کنید - پیام به پشتیبانی
                       </Button>
                     </a>
-                    <p className="text-xs sm:text-sm text-primary mt-2 sm:mt-3 font-farsi" dir="rtl">
-                      پیام شما با تمام اطلاعاتتان آماده ارسال است
+                    <p className="text-xs sm:text-sm text-primary mt-2 font-farsi font-semibold" dir="rtl">
+                      ✅ پیام شما آماده است، فقط ارسال کنید
                     </p>
                   </div>
                 </div>
