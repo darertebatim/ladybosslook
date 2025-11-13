@@ -3,9 +3,10 @@ import { useSearchParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SEOHead } from "@/components/SEOHead";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { generateGoogleCalendarUrl, downloadICSFile } from "@/utils/calendar";
 
 const ThankOne = () => {
   const [searchParams] = useSearchParams();
@@ -80,6 +81,25 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
 من آماده شروع کلاس هستم! 🎉`;
     
     return `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
+  };
+
+  const handleAddToCalendar = (type: 'google' | 'ics') => {
+    const classEvent = {
+      title: 'کلاس قدرت دو زبانه - Bilingual Power Class',
+      description: `Join the Bilingual Power Class!\n\nMeeting Link: https://meet.google.com/xpu-mvcm-nhj\n\nYou will learn how to speak with power in any language.`,
+      startDate: new Date('2025-11-22T09:30:00-08:00'), // 9:30 AM PST
+      endDate: new Date('2025-11-22T11:00:00-08:00'), // 1.5 hours duration
+      location: 'https://meet.google.com/xpu-mvcm-nhj'
+    };
+
+    if (type === 'google') {
+      const url = generateGoogleCalendarUrl(classEvent);
+      window.open(url, '_blank');
+      toast.success('Opening Google Calendar...');
+    } else {
+      downloadICSFile(classEvent, 'bilingual-power-class.ics');
+      toast.success('Calendar file downloaded!');
+    }
   };
   return (
     <>
@@ -168,21 +188,53 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                 </div>
                 
                 {/* Telegram Contact Button */}
-                <div className="text-center">
+                <div className="text-center space-y-3">
                   {isLoading ? (
                     <div className="w-full h-14 rounded-lg animate-pulse" style={{ background: 'hsl(var(--card-bg))' }}></div>
                   ) : (
-                    <Button 
-                      onClick={() => window.open(createTelegramMessage(), '_blank')} 
-                      className="w-full font-bold text-sm md:text-lg px-4 md:px-8 py-4 md:py-5 h-auto rounded-lg md:rounded-xl shadow-lg transition-all duration-300 mb-3 md:mb-4 whitespace-normal leading-tight hover:scale-[1.02]"
-                      style={{
-                        background: 'linear-gradient(135deg, hsl(var(--cta-primary)), hsl(var(--cta-primary-hover)))',
-                        color: 'white'
-                      }}
-                    >
-                      <MessageCircle className="w-5 h-5 md:w-6 md:h-6 ml-2" />
-                      <span>تماس با ادمین از طریق تلگرام</span>
-                    </Button>
+                    <>
+                      <Button 
+                        onClick={() => window.open(createTelegramMessage(), '_blank')} 
+                        className="w-full font-bold text-sm md:text-lg px-4 md:px-8 py-4 md:py-5 h-auto rounded-lg md:rounded-xl shadow-lg transition-all duration-300 whitespace-normal leading-tight hover:scale-[1.02]"
+                        style={{
+                          background: 'linear-gradient(135deg, hsl(var(--cta-primary)), hsl(var(--cta-primary-hover)))',
+                          color: 'white'
+                        }}
+                      >
+                        <MessageCircle className="w-5 h-5 md:w-6 md:h-6 ml-2" />
+                        <span>تماس با ادمین از طریق تلگرام</span>
+                      </Button>
+                      
+                      {/* Add to Calendar Buttons */}
+                      <div className="flex flex-col md:flex-row gap-2">
+                        <Button 
+                          onClick={() => handleAddToCalendar('google')} 
+                          className="flex-1 font-bold text-xs md:text-sm px-3 py-3 h-auto rounded-lg transition-all duration-300 hover:scale-[1.02]"
+                          variant="outline"
+                          style={{
+                            borderColor: 'hsl(var(--cta-primary))',
+                            color: 'hsl(var(--cta-primary))',
+                            background: 'transparent'
+                          }}
+                        >
+                          <Calendar className="w-4 h-4 ml-2" />
+                          <span>اضافه به Google Calendar</span>
+                        </Button>
+                        <Button 
+                          onClick={() => handleAddToCalendar('ics')} 
+                          className="flex-1 font-bold text-xs md:text-sm px-3 py-3 h-auto rounded-lg transition-all duration-300 hover:scale-[1.02]"
+                          variant="outline"
+                          style={{
+                            borderColor: 'hsl(var(--cta-primary))',
+                            color: 'hsl(var(--cta-primary))',
+                            background: 'transparent'
+                          }}
+                        >
+                          <Calendar className="w-4 h-4 ml-2" />
+                          <span>دانلود فایل تقویم (Apple/Outlook)</span>
+                        </Button>
+                      </div>
+                    </>
                   )}
                   <p className="text-white/60 text-xs md:text-sm px-2">
                     برای دریافت اطلاعات کامل کلاس و پشتیبانی
