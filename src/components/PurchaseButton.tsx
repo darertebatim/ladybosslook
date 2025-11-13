@@ -1,13 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { isIOSApp } from '@/lib/platform';
 import { useIAP } from '@/hooks/useIAP';
-import { getStripePaymentLink } from '@/lib/stripeLinks';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface PurchaseButtonProps {
   programSlug: string;
   iosProductId?: string;
+  stripePaymentLink?: string;
   price: number;
   buttonText?: string;
   className?: string;
@@ -16,6 +16,7 @@ interface PurchaseButtonProps {
 export const PurchaseButton = ({
   programSlug,
   iosProductId,
+  stripePaymentLink,
   price,
   buttonText = 'Purchase Now',
   className,
@@ -28,24 +29,26 @@ export const PurchaseButton = ({
       // iOS In-App Purchase
       const result = await purchase(iosProductId, programSlug);
       if (result.success) {
-        // Redirect to success page or refresh enrollment
         window.location.href = '/app/courses';
       }
     } else {
       // Web Stripe Checkout - Direct to Stripe
-      const stripeLink = getStripePaymentLink(programSlug);
-      
-      if (!stripeLink) {
-        toast.error('Payment link not available for this program');
+      if (!stripePaymentLink) {
+        toast.error('Payment link not configured for this program. Please contact support.');
         return;
       }
       
-      window.location.href = stripeLink;
+      // Add success and cancel URLs
+      const successUrl = encodeURIComponent(`${window.location.origin}/payment-success`);
+      const cancelUrl = encodeURIComponent(`${window.location.origin}/app/store`);
+      const fullLink = `${stripePaymentLink}?success_url=${successUrl}&cancel_url=${cancelUrl}`;
+      
+      window.location.href = fullLink;
     }
   };
 
   if (isNative && !iosProductId) {
-    return null; // Hide button if no iOS product ID on mobile
+    return null;
   }
 
   return (

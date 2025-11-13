@@ -125,11 +125,11 @@ const AppStore = () => {
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
 
-                    {/* Purchase Button */}
                     {!enrolled && (
                       <PurchaseButton
                         programSlug={program.slug}
                         iosProductId={program.slug === 'courageous-character-course' ? 'com.ladybosslook.cc' : undefined}
+                        stripePaymentLink={(program as any).stripe_payment_link || undefined}
                         price={program.priceAmount}
                         buttonText="Purchase"
                         className="flex-1"
