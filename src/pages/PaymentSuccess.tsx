@@ -243,7 +243,7 @@ export default function PaymentSuccess() {
                   {/* Compact Arrow */}
                   <div className="flex justify-center py-1">
                     <div className="animate-bounce">
-                      <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-primary transform rotate-90" />
+                      <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 transform rotate-90" />
                     </div>
                   </div>
                   
@@ -257,7 +257,7 @@ export default function PaymentSuccess() {
                     >
                       <Button 
                         size="lg" 
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-xl py-5 sm:py-7 px-6 sm:px-8 font-farsi font-bold shadow-lg hover:shadow-xl transition-all"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-xl py-5 sm:py-7 px-6 sm:px-8 font-farsi font-bold shadow-lg hover:shadow-xl transition-all animate-pulse"
                       >
                         <MessageCircle className="ml-2 h-5 w-5 sm:h-6 sm:w-6" />
                         کلیک کنید - پیام به پشتیبانی
