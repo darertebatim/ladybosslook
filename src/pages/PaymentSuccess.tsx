@@ -180,11 +180,11 @@ export default function PaymentSuccess() {
               <CheckCircle className="w-5 h-5 sm:w-8 sm:h-8 text-green-600" />
             </div>
             <div className="flex items-center justify-center gap-2 sm:gap-4">
-              <ArrowRight className="w-5 h-5 sm:w-7 sm:h-7 text-primary transform rotate-180" />
+              <ArrowRight className="w-5 h-5 sm:w-7 sm:h-7 text-primary transform rotate-90" />
               <h1 className="text-xl sm:text-3xl font-bold text-primary">
                 Payment Successful!
               </h1>
-              <ArrowRight className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
+              <ArrowRight className="w-5 h-5 sm:w-7 sm:h-7 text-primary transform rotate-90" />
             </div>
           </div>
 
