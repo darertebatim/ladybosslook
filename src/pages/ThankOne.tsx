@@ -188,55 +188,23 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                 </div>
                 
                 {/* Telegram Contact Button */}
-                <div className="text-center space-y-3">
+                <div className="text-center">
                   {isLoading ? (
                     <div className="w-full h-14 rounded-lg animate-pulse" style={{ background: 'hsl(var(--card-bg))' }}></div>
                   ) : (
-                    <>
-                      <Button 
-                        onClick={() => window.open(createTelegramMessage(), '_blank')} 
-                        className="w-full font-bold text-sm md:text-lg px-4 md:px-8 py-4 md:py-5 h-auto rounded-lg md:rounded-xl shadow-lg transition-all duration-300 whitespace-normal leading-tight hover:scale-[1.02]"
-                        style={{
-                          background: 'linear-gradient(135deg, hsl(var(--cta-primary)), hsl(var(--cta-primary-hover)))',
-                          color: 'white'
-                        }}
-                      >
-                        <MessageCircle className="w-5 h-5 md:w-6 md:h-6 ml-2" />
-                        <span>تماس با ادمین از طریق تلگرام</span>
-                      </Button>
-                      
-                      {/* Add to Calendar Buttons */}
-                      <div className="flex flex-col md:flex-row gap-2">
-                        <Button 
-                          onClick={() => handleAddToCalendar('google')} 
-                          className="flex-1 font-bold text-xs md:text-sm px-3 py-3 h-auto rounded-lg transition-all duration-300 hover:scale-[1.02]"
-                          variant="outline"
-                          style={{
-                            borderColor: 'hsl(var(--cta-primary))',
-                            color: 'hsl(var(--cta-primary))',
-                            background: 'transparent'
-                          }}
-                        >
-                          <Calendar className="w-4 h-4 ml-2" />
-                          <span>اضافه به Google Calendar</span>
-                        </Button>
-                        <Button 
-                          onClick={() => handleAddToCalendar('ics')} 
-                          className="flex-1 font-bold text-xs md:text-sm px-3 py-3 h-auto rounded-lg transition-all duration-300 hover:scale-[1.02]"
-                          variant="outline"
-                          style={{
-                            borderColor: 'hsl(var(--cta-primary))',
-                            color: 'hsl(var(--cta-primary))',
-                            background: 'transparent'
-                          }}
-                        >
-                          <Calendar className="w-4 h-4 ml-2" />
-                          <span>دانلود فایل تقویم (Apple/Outlook)</span>
-                        </Button>
-                      </div>
-                    </>
+                    <Button 
+                      onClick={() => window.open(createTelegramMessage(), '_blank')} 
+                      className="w-full font-bold text-sm md:text-lg px-4 md:px-8 py-4 md:py-5 h-auto rounded-lg md:rounded-xl shadow-lg transition-all duration-300 whitespace-normal leading-tight hover:scale-[1.02]"
+                      style={{
+                        background: 'linear-gradient(135deg, hsl(var(--cta-primary)), hsl(var(--cta-primary-hover)))',
+                        color: 'white'
+                      }}
+                    >
+                      <MessageCircle className="w-5 h-5 md:w-6 md:h-6 ml-2" />
+                      <span>تماس با ادمین از طریق تلگرام</span>
+                    </Button>
                   )}
-                  <p className="text-white/60 text-xs md:text-sm px-2">
+                  <p className="text-white/60 text-xs md:text-sm px-2 mt-3">
                     برای دریافت اطلاعات کامل کلاس و پشتیبانی
                   </p>
                   
@@ -313,9 +281,37 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                         style={{ color: 'hsl(var(--cta-primary))' }}>
                       یادآور بگذارید
                     </h3>
-                    <p className="text-xs md:text-sm text-white/70">
+                    <p className="text-xs md:text-sm text-white/70 mb-3">
                       تا کلاس زنده را از دست ندهید
                     </p>
+                    
+                    {/* Add to Calendar Buttons */}
+                    <div className="flex flex-col gap-2 mt-4">
+                      <Button 
+                        onClick={() => handleAddToCalendar('google')} 
+                        className="w-full font-bold text-xs md:text-sm px-3 py-2.5 h-auto rounded-lg transition-all duration-300 hover:scale-[1.02]"
+                        style={{
+                          background: 'hsl(var(--cta-primary))',
+                          color: 'white'
+                        }}
+                      >
+                        <Calendar className="w-4 h-4 ml-2" />
+                        <span>Google Calendar</span>
+                      </Button>
+                      <Button 
+                        onClick={() => handleAddToCalendar('ics')} 
+                        className="w-full font-bold text-xs md:text-sm px-3 py-2.5 h-auto rounded-lg transition-all duration-300 hover:scale-[1.02]"
+                        variant="outline"
+                        style={{
+                          borderColor: 'hsl(var(--cta-primary))',
+                          color: 'hsl(var(--cta-primary))',
+                          background: 'transparent'
+                        }}
+                      >
+                        <Calendar className="w-4 h-4 ml-2" />
+                        <span>Apple/Outlook</span>
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
