@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -29,11 +30,6 @@ const sanitizeString = (input: string, maxLength: number = 255): string => {
   return input.trim().replace(/[<>'"\\]/g, '').substring(0, maxLength);
 };
 
-const validateProgram = (program: string): boolean => {
-  const validPrograms = ['courageous-character', 'business-coaching', 'money-literacy', 'business-startup', 'business-growth', 'iqmoney', 'empowered-ladyboss', 'ladyboss-vip', 'connection-literacy', 'instagram-growth', 'private-coaching', 'one-bilingual', 'empowered-woman-coaching'];
-  return validPrograms.includes(program);
-};
-
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-PAYMENT] ${step}${detailsStr}`);
@@ -52,6 +48,11 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
 
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
     // Initialize Stripe
     const stripe = new Stripe(stripeKey, {
       apiVersion: "2023-10-16",
@@ -69,13 +70,25 @@ serve(async (req) => {
       );
     }
     
-    // Validate program against whitelist
-    if (!validateProgram(program)) {
+    logStep("Request data validated", { program });
+
+    // Fetch program details from database
+    const { data: programData, error: programError } = await supabase
+      .from('program_catalog')
+      .select('slug, title, price_amount, description')
+      .eq('slug', program)
+      .eq('is_active', true)
+      .single();
+
+    if (programError || !programData) {
+      logStep("Program not found", { program, error: programError });
       return new Response(
-        JSON.stringify({ error: 'Invalid program selected' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Program not found or inactive' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    logStep("Program found", { title: programData.title, price: programData.price_amount });
     
     // Validate optional fields if provided (for future use)
     if (name && !validateName(name)) {
@@ -98,82 +111,20 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    
-    logStep("Request data validated", { program });
 
-    // Define program pricing (whitelist approach)
+    // Prepare pricing data from database
     const programPricing = {
-      "courageous-character": {
-        name: "Courageous Character Course",
-        amount: 9700, // $97 in cents
-        description: "Transform your mindset and build unshakeable confidence"
-      },
-      "business-coaching": {
-        name: "Business Coaching Program",
-        amount: 149700, // $1497 in cents
-        description: "12-week intensive business transformation program"
-      },
-      "money-literacy": {
-        name: "Money Literacy Program",
-        amount: 99700, // $997 in cents
-        description: "Master your finances and build wealth"
-      },
-      "iqmoney": {
-        name: "IQMoney - Income Growth Program",
-        amount: 199700, // $1997 in cents
-        description: "Master strategies to increase your income and earning potential"
-      },
-      "empowered-ladyboss": {
-        name: "Empowered Ladyboss Group Coaching",
-        amount: 99700, // $997 in cents
-        description: "3-month weekly group coaching sessions for ambitious women entrepreneurs"
-      },
-      "business-startup": {
-        name: "Business Startup Accelerator",
-        amount: 499700, // $4997 in cents
-        description: "3-month semi-private weekly sessions to launch your business"
-      },
-      "business-growth": {
-        name: "Business Growth Accelerator",
-        amount: 499700, // $4997 in cents
-        description: "3-month semi-private weekly sessions to scale your business"
-      },
-      "ladyboss-vip": {
-        name: "Ladyboss VIP Club",
-        amount: 499700, // $4997 in cents
-        description: "12-month exclusive weekly group coaching for elite women entrepreneurs"
-      },
-      "connection-literacy": {
-        name: "Connection Literacy for Ladyboss",
-        amount: 49700, // $497 in cents
-        description: "Master networking and relationship building to expand your influence"
-      },
-      "instagram-growth": {
-        name: "Instagram Fast Growth Course",
-        amount: 299700, // $2997 in cents
-        description: "3-month semi-private coaching to rapidly grow your Instagram presence"
-      },
-      "private-coaching": {
-        name: "1-Hour Private Session with Razie Ladyboss",
-        amount: 59700, // $597 in cents
-        description: "Exclusive one-on-one coaching session with Razie for personalized guidance"
-      },
-      "one-bilingual": {
-        name: "کلاس قدرت دو زبانه - Bilingual Power Class",
-        amount: 100, // $1 in cents
-        description: "Learn to speak with power in any language - special for Iranian immigrant women"
-      },
-      "empowered-woman-coaching": {
-        name: "Empowered Woman Coaching - Interview Deposit",
-        amount: 10000, // $100 in cents
-        description: "$100 deposit to reserve your spot and schedule interview with Razie Ladyboss"
+      [program]: {
+        name: programData.title,
+        amount: programData.price_amount,
+        description: programData.description || programData.title,
       }
     };
 
-    const selectedProgram = programPricing[program as keyof typeof programPricing];
+    const selectedProgram = programPricing[program];
     if (!selectedProgram) {
       return new Response(
-        JSON.stringify({ error: 'Invalid program selected' }),
+        JSON.stringify({ error: 'Program data not available' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
