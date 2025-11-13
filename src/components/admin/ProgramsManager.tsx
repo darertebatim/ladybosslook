@@ -303,6 +303,7 @@ export function ProgramsManager() {
                       <SelectItem value="1o1-session">1-on-1 Session</SelectItem>
                       <SelectItem value="webinar">Webinar</SelectItem>
                       <SelectItem value="event">Event</SelectItem>
+                      <SelectItem value="audiobook">🎧 Audiobook</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

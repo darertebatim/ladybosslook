@@ -24,7 +24,7 @@ export interface Program {
   limitedSpots?: string;
   popular: boolean;
   link: string;
-  type: 'course' | 'group-coaching' | '1o1-session' | 'event' | 'webinar';
+  type: 'course' | 'group-coaching' | '1o1-session' | 'event' | 'webinar' | 'audiobook';
   paymentType: 'one-time' | 'subscription' | 'free';
   isFree: boolean;
   subscriptionDuration?: string;
