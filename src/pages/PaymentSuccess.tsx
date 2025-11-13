@@ -286,9 +286,9 @@ export default function PaymentSuccess() {
 
           {/* Support Info - Mobile Compact */}
           <div className="text-center mt-4 sm:mt-8 p-3 sm:p-6 bg-muted/50 rounded-lg">
-            <h3 className="font-semibold mb-1 sm:mb-2 text-sm sm:text-base">Alternative Support</h3>
-            <p className="text-muted-foreground mb-2 sm:mb-4 text-xs sm:text-sm">
-              You can also reach us through email if needed.
+            <h3 className="font-semibold mb-1 sm:mb-2 text-sm sm:text-base font-farsi" dir="rtl">راه های دیگه پشتیبانی</h3>
+            <p className="text-muted-foreground mb-2 sm:mb-4 text-xs sm:text-sm font-farsi" dir="rtl">
+              اگه تلگرام نداری، میتونی از طریق ایمیل هم با ما در تماس باشی
             </p>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center mb-4">
               <a 
