@@ -129,7 +129,6 @@ const AppStore = () => {
                       <PurchaseButton
                         programSlug={program.slug}
                         iosProductId={program.slug === 'courageous-character-course' ? 'com.ladybosslook.cc' : undefined}
-                        stripePaymentLink={(program as any).stripe_payment_link || undefined}
                         price={program.priceAmount}
                         buttonText="Purchase"
                         className="flex-1"
