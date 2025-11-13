@@ -39,46 +39,44 @@ export const useIAP = (productIds: string[]) => {
     setPurchasing(true);
 
     try {
-      const result = await iapService.purchase(productId);
-
-      if (!result.success) {
-        throw new Error('Purchase failed');
-      }
-
-      // Verify receipt with backend
+      // Get user first
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         throw new Error('User not authenticated');
       }
 
-      const { data, error } = await supabase.functions.invoke('verify-iap-receipt', {
-        body: {
-          receipt: result.receipt,
-          transactionId: result.transactionId,
-          productId,
-          programSlug,
-          userId: user.id,
-        },
+      // Set user ID in RevenueCat
+      await iapService.setUserId(user.id);
+
+      // Make the purchase
+      const result = await iapService.purchase(productId);
+
+      if (!result.success) {
+        throw new Error(result.error || 'Purchase failed');
+      }
+
+      // RevenueCat handles receipt validation automatically
+      // Now create the enrollment in our database
+      const { error: enrollError } = await supabase
+        .from('course_enrollments')
+        .upsert({
+          user_id: user.id,
+          program_slug: programSlug,
+          status: 'active',
+        } as any);
+
+      if (enrollError) {
+        console.error('Enrollment error:', enrollError);
+        // Don't fail the purchase if enrollment fails - they still own it in RevenueCat
+      }
+
+      toast({
+        title: 'Purchase Successful',
+        description: 'You now have access to this content!',
       });
 
-      if (error) throw error;
-
-      if (data.verified) {
-        // Finish the transaction
-        if (result.transactionId) {
-          await iapService.finishTransaction(result.transactionId);
-        }
-
-        toast({
-          title: 'Purchase Successful',
-          description: 'You now have access to this content!',
-        });
-
-        return { success: true };
-      } else {
-        throw new Error('Receipt verification failed');
-      }
+      return { success: true };
     } catch (error: any) {
       console.error('Purchase error:', error);
       toast({
@@ -95,14 +93,20 @@ export const useIAP = (productIds: string[]) => {
   const restorePurchases = async () => {
     setLoading(true);
     try {
-      const productIds = await iapService.restorePurchases();
+      const customerInfo = await iapService.restorePurchases();
       
-      toast({
-        title: 'Purchases Restored',
-        description: `${productIds.length} purchase(s) restored`,
-      });
+      if (customerInfo) {
+        const entitlements = Object.keys(customerInfo.entitlements.active);
+        
+        toast({
+          title: 'Purchases Restored',
+          description: `${entitlements.length} purchase(s) restored`,
+        });
 
-      return productIds;
+        return entitlements;
+      }
+      
+      return [];
     } catch (error) {
       toast({
         title: 'Restore Failed',
