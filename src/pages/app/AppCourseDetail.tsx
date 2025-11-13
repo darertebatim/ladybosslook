@@ -61,15 +61,10 @@ const AppCourseDetail = () => {
       const { data, error } = await supabase
         .from('program_catalog')
         .select(`
-          *,
-          audio_playlists (
-            id,
-            name,
-            description
-          )
+          *
         `)
         .eq('slug', slug)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -195,7 +190,7 @@ const AppCourseDetail = () => {
 
                     <PurchaseButton
                       programSlug={program.slug}
-                      iosProductId={program.slug === 'courageous-character-course' ? 'com.ladybosslook.cc' : undefined}
+                      iosProductId={(program as any).ios_product_id || undefined}
                       stripeCheckoutUrl={`/checkout?program=${program.slug}`}
                       price={program.price_amount / 100}
                       buttonText="Enroll Now"
@@ -275,7 +270,7 @@ const AppCourseDetail = () => {
             )}
 
             {/* Course Playlist Card */}
-            {program?.audio_playlists && enrollment && (
+            {(program as any)?.audio_playlist_id && enrollment && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -285,7 +280,7 @@ const AppCourseDetail = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    {(program.audio_playlists as any).description || 'Audio content for this course'}
+                    Audio content for this course
                   </p>
                   <Button 
                     className="w-full" 
@@ -293,7 +288,7 @@ const AppCourseDetail = () => {
                     onClick={() => navigate(`/app/player/playlist/${(program as any).audio_playlist_id}`)}
                   >
                     <Music className="h-5 w-5 mr-2" />
-                    Open Playlist: {(program.audio_playlists as any).name}
+                    Open Audio Playlist
                   </Button>
                 </CardContent>
               </Card>
