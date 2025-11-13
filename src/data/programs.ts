@@ -31,6 +31,8 @@ export interface Program {
   subscriptionFullPaymentDiscount?: number;
   deliveryMethod?: string;
   stripe_payment_link?: string;
+  ios_product_id?: string;
+  android_product_id?: string;
 }
 
 // Image mapping for programs

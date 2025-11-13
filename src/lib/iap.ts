@@ -1,13 +1,21 @@
-// TODO: Install @capacitor-community/in-app-purchases manually
-// Run: npm install @capacitor-community/in-app-purchases
+// IMPORTANT: This IAP plugin must be installed manually after exporting to GitHub
+// Run these commands in your local project:
+// 1. npm install @capacitor-community/in-app-purchases
+// 2. npx cap sync ios
+// 
+// For now, using placeholder until manual installation
 // import { InAppPurchase2 } from '@capacitor-community/in-app-purchases';
 import { isIOSApp } from './platform';
 
-// Placeholder types until plugin is installed
+// Placeholder implementation - will work after manual plugin installation
 const InAppPurchase2 = {
-  initialize: async (_config: any) => {},
+  initialize: async (_config: any) => {
+    console.warn('IAP plugin not installed. Run: npm install @capacitor-community/in-app-purchases');
+  },
   getProducts: async (_config: any) => ({ products: [] as any[] }),
-  purchase: async (_config: any) => ({ productIdentifier: '', transactionId: '', transactionReceipt: '' }),
+  purchase: async (_config: any) => {
+    throw new Error('IAP plugin not installed. Please install @capacitor-community/in-app-purchases');
+  },
   restorePurchases: async () => ({ transactions: [] as any[] }),
   finishTransaction: async (_config: any) => {},
 };
