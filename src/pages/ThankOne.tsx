@@ -143,10 +143,8 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                 <p>۱) این ویدیو را ببینید 🎥</p>
                 <p>۲) در تلگرام پیام بدهید 💬</p>
               </div>
-              <div className="inline-block px-4 py-2 rounded-lg" style={{ background: 'hsl(var(--cta-primary) / 0.2)', border: '2px solid hsl(var(--cta-primary))' }}>
-                <p className="text-sm md:text-base font-bold" style={{ color: 'hsl(var(--cta-primary))' }}>
-                  ✨ با انجام این دو کار ساده، جای شما در کلاس قطعی می‌شود!
-                </p>
+              <div className="text-center py-2">
+                <div className="text-3xl md:text-4xl">👇👇👇</div>
               </div>
             </div>
 
