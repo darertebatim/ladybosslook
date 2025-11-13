@@ -243,23 +243,48 @@ serve(async (req) => {
         logStep('Order record created', { orderId: newOrder.id });
       }
 
-      // Auto-enroll user in course if program is empowered-woman-coaching
-      if (userId && programSlug === 'empowered-woman-coaching') {
-        logStep('Auto-enrolling user in Empowered Woman Coaching');
+      // Check for auto-enrollment rules
+      if (userId && programSlug) {
+        logStep('Checking for auto-enrollment rules', { programSlug });
         
-        const { error: enrollmentError } = await supabase
-          .from('course_enrollments')
-          .insert({
-            user_id: userId,
-            course_name: 'Empowered Woman Coaching',
-            program_slug: programSlug,
-            status: 'active'
-          });
+        const { data: autoEnrollRule, error: autoEnrollError } = await supabase
+          .from('program_auto_enrollment')
+          .select('round_id, program_rounds(round_name, program_slug)')
+          .eq('program_slug', programSlug)
+          .single();
 
-        if (enrollmentError) {
-          logStep('Error creating enrollment', enrollmentError);
+        if (!autoEnrollError && autoEnrollRule) {
+          logStep('Auto-enrollment rule found', { roundId: autoEnrollRule.round_id });
+          
+          // Get program details
+          const { data: programData } = await supabase
+            .from('program_catalog')
+            .select('title')
+            .eq('slug', programSlug)
+            .single();
+
+          const courseName = programData?.title || programSlug;
+          
+          const { error: enrollmentError } = await supabase
+            .from('course_enrollments')
+            .insert({
+              user_id: userId,
+              course_name: courseName,
+              program_slug: programSlug,
+              round_id: autoEnrollRule.round_id,
+              status: 'active'
+            });
+
+          if (enrollmentError) {
+            logStep('Error creating auto-enrollment', enrollmentError);
+          } else {
+            logStep('User auto-enrolled successfully', { 
+              programSlug, 
+              roundId: autoEnrollRule.round_id 
+            });
+          }
         } else {
-          logStep('User enrolled successfully');
+          logStep('No auto-enrollment rule found for this program');
         }
       }
 
