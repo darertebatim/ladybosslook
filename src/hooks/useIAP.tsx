@@ -39,21 +39,19 @@ export const useIAP = (productIds: string[]) => {
     setPurchasing(true);
 
     try {
-      // Get user first
+      const result = await iapService.purchase(productId);
+
+      if (!result.success) {
+        throw new Error('Purchase failed');
+      }
+
+      // Verify receipt with backend
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         throw new Error('User not authenticated');
       }
 
-      // Make the purchase
-      const result = await iapService.purchase(productId);
-
-      if (!result.success) {
-        throw new Error(result.error || 'Purchase failed');
-      }
-
-      // Verify receipt with our backend
       const { data, error } = await supabase.functions.invoke('verify-iap-receipt', {
         body: {
           receipt: result.receipt,
@@ -64,21 +62,23 @@ export const useIAP = (productIds: string[]) => {
         },
       });
 
-      if (error) {
-        console.error('Verification error:', error);
+      if (error) throw error;
+
+      if (data.verified) {
+        // Finish the transaction
+        if (result.transactionId) {
+          await iapService.finishTransaction(result.transactionId);
+        }
+
+        toast({
+          title: 'Purchase Successful',
+          description: 'You now have access to this content!',
+        });
+
+        return { success: true };
+      } else {
         throw new Error('Receipt verification failed');
       }
-
-      if (!data?.verified) {
-        throw new Error('Receipt verification failed');
-      }
-
-      toast({
-        title: 'Purchase Successful',
-        description: 'You now have access to this content!',
-      });
-
-      return { success: true };
     } catch (error: any) {
       console.error('Purchase error:', error);
       toast({
