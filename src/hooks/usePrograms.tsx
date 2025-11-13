@@ -12,15 +12,18 @@ export const usePrograms = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('program_catalog')
-        .select('*')
-        .eq('is_active', true)
-        .eq(isNative ? 'available_on_mobile' : 'available_on_web', true)
-        .order('slug');
+        .select('*') as any;
       
       if (error) throw error;
       
+      // Filter based on platform
+      const filteredData = (data || []).filter((program: any) => {
+        if (!program.is_active) return false;
+        return isNative ? program.available_on_mobile : program.available_on_web;
+      }).sort((a: any, b: any) => a.slug.localeCompare(b.slug));
+      
       // Map database records to Program type with images
-      return (data || []).map(dbProgram => ({
+      return filteredData.map((dbProgram: any) => ({
         title: dbProgram.title,
         slug: dbProgram.slug,
         description: dbProgram.description || '',

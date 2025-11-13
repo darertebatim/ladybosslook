@@ -84,7 +84,7 @@ export function ProgramsManager() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPrograms(data || []);
+      setPrograms((data || []) as any);
     } catch (error: any) {
       console.error('Error fetching programs:', error);
       toast({
