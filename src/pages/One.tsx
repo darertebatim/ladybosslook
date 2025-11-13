@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Lock, CheckCircle2, Clock, Users, Star, Sparkles, Brain, MessageCircle, Globe, Mic, Zap, Heart, Calendar } from "lucide-react";
+import { Shield, Lock, CheckCircle2, Clock, Users, Star, Sparkles, Brain, MessageCircle, Globe, Mic, Zap, Heart } from "lucide-react";
 import CountdownTimer from "@/components/CountdownTimer";
 import SpotCounter from "@/components/SpotCounter";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -24,19 +24,6 @@ const One = () => {
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
-
-  // Class time: November 22, 2025, 9:30 AM PST (UTC-8)
-  const getLocalClassTime = () => {
-    const classPSTDate = new Date('2025-11-22T09:30:00-08:00');
-    const options: Intl.DateTimeFormatOptions = {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      timeZoneName: 'short'
-    };
-    return classPSTDate.toLocaleString('en-US', options);
-  };
 
   useEffect(() => {
     if (typeof window !== 'undefined' && (window as any).fbq) {
@@ -158,10 +145,9 @@ const One = () => {
                   <Clock className="w-3.5 h-3.5 text-[#FF6B6B] animate-pulse flex-shrink-0" />
                   <span className="text-white font-bold text-xs">پیشنهاد محدود</span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 text-white font-bold" dir="ltr">
-                  <Calendar className="w-3.5 h-3.5 text-white flex-shrink-0" />
+                <div className="inline-flex items-center gap-1 text-white font-bold" dir="ltr">
                   <span className="bg-white/10 px-2 py-1 rounded text-sm md:text-base">
-                    {getLocalClassTime()}
+                    Nov 22 • 9:30 AM PST
                   </span>
                 </div>
                 <SpotCounter />
