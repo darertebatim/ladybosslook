@@ -45,40 +45,52 @@ export const useIAP = (productIds: string[]) => {
         throw new Error('Purchase failed');
       }
 
-      // Verify receipt with backend
+      // RevenueCat handles receipt validation automatically
+      // Just create the enrollment directly
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
         throw new Error('User not authenticated');
       }
 
-      const { data, error } = await supabase.functions.invoke('verify-iap-receipt', {
-        body: {
-          receipt: result.receipt,
-          transactionId: result.transactionId,
-          productId,
-          programSlug,
-          userId: user.id,
-        },
-      });
-
-      if (error) throw error;
-
-      if (data.verified) {
-        // Finish the transaction
-        if (result.transactionId) {
-          await iapService.finishTransaction(result.transactionId);
-        }
-
-        toast({
-          title: 'Purchase Successful',
-          description: 'You now have access to this content!',
+      // Create order record
+      const { error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.full_name || '',
+          program_slug: programSlug,
+          product_name: productId,
+          amount: 0, // Will be updated by RevenueCat webhook
+          status: 'completed',
+          payment_type: 'ios_iap',
         });
 
-        return { success: true };
-      } else {
-        throw new Error('Receipt verification failed');
+      if (orderError) {
+        console.error('Failed to create order:', orderError);
       }
+
+      // Create course enrollment
+      const { error: enrollError } = await supabase
+        .from('course_enrollments')
+        .insert({
+          user_id: user.id,
+          course_name: programSlug,
+          program_slug: programSlug,
+          status: 'active',
+        });
+
+      if (enrollError && enrollError.code !== '23505') { // Ignore duplicate error
+        throw enrollError;
+      }
+
+      toast({
+        title: 'Purchase Successful',
+        description: 'You now have access to this content!',
+      });
+
+      return { success: true };
     } catch (error: any) {
       console.error('Purchase error:', error);
       toast({

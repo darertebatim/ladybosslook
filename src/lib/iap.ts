@@ -1,20 +1,9 @@
-// IAP Implementation for iOS
-// Note: Currently using Stripe for payments. To enable native iOS IAP:
-// 1. Add a Capacitor IAP plugin (e.g., @revenuecat/purchases-capacitor)
-// 2. Configure products in App Store Connect
-// 3. Update this file to use the plugin
+// IAP Implementation for iOS using RevenueCat
 import { isIOSApp } from './platform';
+import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 
-// Currently IAP is not available - using Stripe instead
-const InAppPurchase2 = {
-  initialize: async (_config: any) => Promise.resolve(),
-  getProducts: async (_config: any) => Promise.resolve({ products: [] }),
-  purchase: async (_config: any) => Promise.reject(new Error('IAP not configured - use Stripe')),
-  restorePurchases: async () => Promise.resolve({ transactions: [] }),
-  finishTransaction: async (_config: any) => Promise.resolve(),
-};
-
-const pluginAvailable = false;
+const REVENUECAT_API_KEY = 'sk_fQxRoFddATeFrxpkUOXOSgLIKUfUK';
+const pluginAvailable = true;
 
 export interface IAPProduct {
   id: string;
@@ -36,13 +25,15 @@ class IAPService {
     }
 
     try {
-      await InAppPurchase2.initialize({
-        enablePendingPurchases: true,
+      await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
+      await Purchases.configure({
+        apiKey: REVENUECAT_API_KEY,
+        appUserID: undefined, // Will use RevenueCat anonymous ID
       });
       this.initialized = true;
-      console.log('[IAP] Initialized successfully');
+      console.log('[IAP] RevenueCat initialized successfully');
     } catch (error) {
-      console.error('[IAP] Failed to initialize:', error);
+      console.error('[IAP] Failed to initialize RevenueCat:', error);
       // Don't throw - fail gracefully
     }
   }
@@ -56,16 +47,23 @@ class IAPService {
     try {
       await this.initialize();
       
-      const { products } = await InAppPurchase2.getProducts({
-        productIdentifiers: productIds,
-      });
+      // Get offerings from RevenueCat (includes all products)
+      const offeringsResult = await Purchases.getOfferings();
+      
+      if (!offeringsResult.current) {
+        console.warn('[IAP] No current offering found');
+        return [];
+      }
 
-      return products.map((p: any) => ({
-        id: p.id,
-        title: p.title || '',
-        description: p.description || '',
-        price: p.price || '',
-        currency: p.currency || 'USD',
+      // Extract products from the current offering
+      const availablePackages = offeringsResult.current.availablePackages;
+      
+      return availablePackages.map((pkg: any) => ({
+        id: pkg.product.identifier,
+        title: pkg.product.title || '',
+        description: pkg.product.description || '',
+        price: pkg.product.priceString || '',
+        currency: pkg.product.currencyCode || 'USD',
       }));
     } catch (error) {
       console.error('[IAP] Failed to get products:', error);
@@ -82,19 +80,48 @@ class IAPService {
     try {
       await this.initialize();
 
-      const result: any = await InAppPurchase2.purchase({
-        productIdentifier: productId,
-      });
+      // Get offerings to find the package with this product ID
+      const offeringsResult = await Purchases.getOfferings();
+      const currentOffering = offeringsResult.current;
+      
+      if (!currentOffering) {
+        console.error('[IAP] No current offering found');
+        return { success: false };
+      }
 
-      console.log('[IAP] Purchase successful:', result);
+      // Find the package matching the product ID
+      const pkg = currentOffering.availablePackages.find(
+        (p: any) => p.product.identifier === productId
+      );
+
+      if (!pkg) {
+        console.error('[IAP] Product not found in offerings:', productId);
+        return { success: false };
+      }
+
+      // Make the purchase
+      const { customerInfo } = await Purchases.purchasePackage({ aPackage: pkg });
+      
+      console.log('[IAP] Purchase successful:', customerInfo);
+
+      // Extract transaction info
+      const latestTransaction = customerInfo.latestExpirationDate 
+        ? Object.keys(customerInfo.nonSubscriptionTransactions)[0]
+        : undefined;
 
       return {
         success: true,
-        transactionId: result?.transactionId,
-        receipt: result?.transactionReceipt,
+        transactionId: latestTransaction,
+        receipt: undefined, // RevenueCat handles receipt validation
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('[IAP] Purchase failed:', error);
+      
+      // Check if user cancelled
+      if (error.code === '1' || error.message?.includes('cancel')) {
+        return { success: false };
+      }
+      
       return { success: false };
     }
   }
@@ -105,23 +132,24 @@ class IAPService {
     try {
       await this.initialize();
       
-      const result: any = await InAppPurchase2.restorePurchases();
+      const { customerInfo } = await Purchases.restorePurchases();
       
-      return result?.transactions?.map((t: any) => t.productId) || [];
+      // Get all active entitlement identifiers
+      const activeEntitlements = Object.keys(customerInfo.entitlements.active);
+      
+      console.log('[IAP] Restored purchases:', activeEntitlements);
+      
+      return activeEntitlements;
     } catch (error) {
       console.error('[IAP] Failed to restore purchases:', error);
       return [];
     }
   }
 
-  async finishTransaction(transactionId: string): Promise<void> {
-    if (!isIOSApp()) return;
-
-    try {
-      await InAppPurchase2.finishTransaction({ transactionId });
-    } catch (error) {
-      console.error('Failed to finish transaction:', error);
-    }
+  async finishTransaction(_transactionId: string): Promise<void> {
+    // RevenueCat automatically finishes transactions
+    // No manual finishing needed
+    console.log('[IAP] Transaction finishing handled by RevenueCat');
   }
 }
 
