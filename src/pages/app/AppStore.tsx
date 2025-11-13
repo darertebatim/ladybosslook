@@ -130,7 +130,6 @@ const AppStore = () => {
                       <PurchaseButton
                         programSlug={program.slug}
                         iosProductId={program.slug === 'courageous-character-course' ? 'com.ladybosslook.cc' : undefined}
-                        stripeCheckoutUrl={`/checkout?program=${program.slug}`}
                         price={program.priceAmount}
                         buttonText="Purchase"
                         className="flex-1"
