@@ -46,9 +46,6 @@ export const useIAP = (productIds: string[]) => {
         throw new Error('User not authenticated');
       }
 
-      // Set user ID in RevenueCat
-      await iapService.setUserId(user.id);
-
       // Make the purchase
       const result = await iapService.purchase(productId);
 
@@ -56,19 +53,24 @@ export const useIAP = (productIds: string[]) => {
         throw new Error(result.error || 'Purchase failed');
       }
 
-      // RevenueCat handles receipt validation automatically
-      // Now create the enrollment in our database
-      const { error: enrollError } = await supabase
-        .from('course_enrollments')
-        .upsert({
-          user_id: user.id,
-          program_slug: programSlug,
-          status: 'active',
-        } as any);
+      // Verify receipt with our backend
+      const { data, error } = await supabase.functions.invoke('verify-iap-receipt', {
+        body: {
+          receipt: result.receipt,
+          transactionId: result.transactionId,
+          productId,
+          programSlug,
+          userId: user.id,
+        },
+      });
 
-      if (enrollError) {
-        console.error('Enrollment error:', enrollError);
-        // Don't fail the purchase if enrollment fails - they still own it in RevenueCat
+      if (error) {
+        console.error('Verification error:', error);
+        throw new Error('Receipt verification failed');
+      }
+
+      if (!data?.verified) {
+        throw new Error('Receipt verification failed');
       }
 
       toast({
@@ -93,20 +95,14 @@ export const useIAP = (productIds: string[]) => {
   const restorePurchases = async () => {
     setLoading(true);
     try {
-      const customerInfo = await iapService.restorePurchases();
+      const productIds = await iapService.restorePurchases();
       
-      if (customerInfo) {
-        const entitlements = Object.keys(customerInfo.entitlements.active);
-        
-        toast({
-          title: 'Purchases Restored',
-          description: `${entitlements.length} purchase(s) restored`,
-        });
+      toast({
+        title: 'Purchases Restored',
+        description: `${productIds.length} purchase(s) restored`,
+      });
 
-        return entitlements;
-      }
-      
-      return [];
+      return productIds;
     } catch (error) {
       toast({
         title: 'Restore Failed',

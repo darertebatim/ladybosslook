@@ -1,7 +1,12 @@
-// Native iOS In-App Purchase using RevenueCat
-// RevenueCat is a reliable IAP solution that handles receipt validation and cross-platform support
-import { Purchases, CustomerInfo, PurchasesStoreProduct } from '@revenuecat/purchases-capacitor';
+// Native iOS In-App Purchase using cordova-plugin-purchase
 import { isIOSApp } from './platform';
+
+// Global CdvPurchase from cordova-plugin-purchase
+declare global {
+  interface Window {
+    CdvPurchase: any;
+  }
+}
 
 export interface IAPProduct {
   id: string;
@@ -14,25 +19,46 @@ export interface IAPProduct {
 
 class IAPService {
   private initialized = false;
+  private store: any = null;
 
   async initialize(): Promise<void> {
     if (!isIOSApp() || this.initialized) return;
 
     try {
-      // Configure RevenueCat SDK
-      // You'll need to get an API key from https://app.revenuecat.com/
-      const apiKey = import.meta.env.VITE_REVENUECAT_API_KEY || 'REVENUECAT_API_KEY_PLACEHOLDER';
-      
-      await Purchases.configure({
-        apiKey: apiKey,
-      });
-      
+      // Wait for CdvPurchase to be available
+      if (!window.CdvPurchase) {
+        console.warn('[IAP] cordova-plugin-purchase not loaded yet');
+        return;
+      }
+
+      const { store, ProductType, Platform } = window.CdvPurchase;
+      this.store = store;
+
+      // Set verbosity for debugging
+      this.store.verbosity = this.store.DEBUG;
+
+      console.log('[IAP] Initialized with cordova-plugin-purchase');
       this.initialized = true;
-      console.log('[IAP] RevenueCat initialized successfully');
     } catch (error) {
       console.error('[IAP] Failed to initialize:', error);
       throw error;
     }
+  }
+
+  registerProducts(productIds: string[]): void {
+    if (!this.store || !isIOSApp()) return;
+
+    const { ProductType, Platform } = window.CdvPurchase;
+
+    productIds.forEach(productId => {
+      this.store.register({
+        type: ProductType.NON_CONSUMABLE,
+        id: productId,
+        platform: Platform.APPLE_APPSTORE,
+      });
+    });
+
+    console.log('[IAP] Products registered:', productIds);
   }
 
   async getProducts(productIds: string[]): Promise<IAPProduct[]> {
@@ -44,18 +70,34 @@ class IAPService {
     try {
       await this.initialize();
       
-      const { products } = await Purchases.getProducts({
-        productIdentifiers: productIds,
+      if (!this.store) {
+        console.warn('[IAP] Store not initialized');
+        return [];
+      }
+
+      // Register products
+      this.registerProducts(productIds);
+
+      // Initialize the store
+      await this.store.initialize([{ platform: window.CdvPurchase.Platform.APPLE_APPSTORE }]);
+
+      // Get products
+      const products: IAPProduct[] = [];
+      productIds.forEach(productId => {
+        const product = this.store.get(productId);
+        if (product) {
+          products.push({
+            id: product.id,
+            title: product.title || '',
+            description: product.description || '',
+            price: product.pricing?.priceMicros ? `$${(product.pricing.priceMicros / 1000000).toFixed(2)}` : '',
+            currency: product.pricing?.currency || 'USD',
+            priceAmount: product.pricing?.priceMicros ? product.pricing.priceMicros / 1000000 : 0,
+          });
+        }
       });
 
-      return products.map((p: PurchasesStoreProduct) => ({
-        id: p.identifier,
-        title: p.title,
-        description: p.description,
-        price: p.priceString,
-        currency: p.currencyCode,
-        priceAmount: p.price,
-      }));
+      return products;
     } catch (error) {
       console.error('[IAP] Failed to get products:', error);
       return [];
@@ -64,7 +106,8 @@ class IAPService {
 
   async purchase(productId: string): Promise<{ 
     success: boolean; 
-    customerInfo?: CustomerInfo;
+    receipt?: string;
+    transactionId?: string;
     error?: string;
   }> {
     if (!isIOSApp()) {
@@ -75,25 +118,79 @@ class IAPService {
     try {
       await this.initialize();
 
-      // First get the product
-      const { products } = await Purchases.getProducts({
-        productIdentifiers: [productId],
-      });
-
-      if (products.length === 0) {
-        throw new Error('Product not found');
+      if (!this.store) {
+        throw new Error('Store not initialized');
       }
 
-      const result = await Purchases.purchaseStoreProduct({
-        product: products[0]
+      return new Promise((resolve) => {
+        // Set up listeners
+        this.store.when().approved((transaction: any) => {
+          console.log('[IAP] Transaction approved:', transaction);
+          transaction.verify();
+        });
+
+        this.store.when().verified((receipt: any) => {
+          console.log('[IAP] Receipt verified:', receipt);
+          
+          // Extract receipt data
+          const receiptData = receipt.nativeData?.appStoreReceipt || receipt.nativeData?.transactionReceipt;
+          
+          resolve({
+            success: true,
+            receipt: receiptData,
+            transactionId: receipt.transactionId || receipt.id,
+          });
+
+          // Finish the transaction
+          receipt.finish();
+        });
+
+        this.store.when().unverified((receipt: any) => {
+          console.error('[IAP] Receipt not verified:', receipt);
+          resolve({ 
+            success: false, 
+            error: 'Receipt verification failed' 
+          });
+        });
+
+        this.store.error((error: any) => {
+          console.error('[IAP] Store error:', error);
+          if (error.code !== window.CdvPurchase.ErrorCode.PAYMENT_CANCELLED) {
+            resolve({ 
+              success: false, 
+              error: error.message 
+            });
+          }
+        });
+
+        // Order the product
+        const product = this.store.get(productId);
+        if (!product) {
+          resolve({ 
+            success: false, 
+            error: 'Product not found' 
+          });
+          return;
+        }
+
+        const offer = product.getOffer();
+        if (!offer) {
+          resolve({ 
+            success: false, 
+            error: 'No offer available' 
+          });
+          return;
+        }
+
+        offer.order()
+          .catch((error: any) => {
+            console.error('[IAP] Order failed:', error);
+            resolve({ 
+              success: false, 
+              error: error.message 
+            });
+          });
       });
-
-      console.log('[IAP] Purchase successful:', result);
-
-      return {
-        success: true,
-        customerInfo: result.customerInfo,
-      };
     } catch (error: any) {
       console.error('[IAP] Purchase failed:', error);
       return { 
@@ -103,45 +200,30 @@ class IAPService {
     }
   }
 
-  async restorePurchases(): Promise<CustomerInfo | null> {
-    if (!isIOSApp()) return null;
+  async restorePurchases(): Promise<string[]> {
+    if (!isIOSApp()) return [];
 
     try {
       await this.initialize();
       
-      const { customerInfo } = await Purchases.restorePurchases();
+      if (!this.store) {
+        return [];
+      }
+
+      await this.store.restorePurchases();
       
-      console.log('[IAP] Purchases restored:', customerInfo);
-      return customerInfo;
+      const ownedProducts: string[] = [];
+      this.store.products.forEach((product: any) => {
+        if (product.owned) {
+          ownedProducts.push(product.id);
+        }
+      });
+
+      console.log('[IAP] Purchases restored:', ownedProducts);
+      return ownedProducts;
     } catch (error) {
       console.error('[IAP] Failed to restore purchases:', error);
-      return null;
-    }
-  }
-
-  async getCustomerInfo(): Promise<CustomerInfo | null> {
-    if (!isIOSApp()) return null;
-
-    try {
-      await this.initialize();
-      
-      const { customerInfo } = await Purchases.getCustomerInfo();
-      return customerInfo;
-    } catch (error) {
-      console.error('[IAP] Failed to get customer info:', error);
-      return null;
-    }
-  }
-
-  async setUserId(userId: string): Promise<void> {
-    if (!isIOSApp()) return;
-
-    try {
-      await this.initialize();
-      await Purchases.logIn({ appUserID: userId });
-      console.log('[IAP] User ID set:', userId);
-    } catch (error) {
-      console.error('[IAP] Failed to set user ID:', error);
+      return [];
     }
   }
 }
