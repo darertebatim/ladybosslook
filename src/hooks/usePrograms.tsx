@@ -44,6 +44,7 @@ export const usePrograms = () => {
         subscriptionDuration: dbProgram.subscription_duration || undefined,
         subscriptionFullPaymentDiscount: dbProgram.subscription_full_payment_discount || undefined,
         deliveryMethod: dbProgram.delivery_method || undefined,
+        stripe_payment_link: dbProgram.stripe_payment_link || undefined,
       })) as Program[];
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes

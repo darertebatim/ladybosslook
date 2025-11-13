@@ -30,6 +30,7 @@ export interface Program {
   subscriptionDuration?: string;
   subscriptionFullPaymentDiscount?: number;
   deliveryMethod?: string;
+  stripe_payment_link?: string;
 }
 
 // Image mapping for programs
