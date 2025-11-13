@@ -119,10 +119,10 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
       <SEOHead title="Thank You - Payment Successful" description="Registration successful! Welcome to کلاس قدرت دو زبانه online class." />
       
       <div className="thankone-page-green font-farsi">
-        {/* Success Banner */}
-        <div className="py-3 md:py-4 text-center px-4" style={{ background: 'linear-gradient(135deg, hsl(var(--cta-primary)), hsl(var(--cta-primary-hover)))' }}>
-          <p className="font-bold text-sm md:text-base lg:text-lg text-white">🎉 پرداخت موفق - خوش آمدید!</p>
-          <p className="font-bold text-sm md:text-base lg:text-lg text-white">ثبت نام شما در کلاس قدرت دو زبانه تکمیل شد</p>
+        {/* Warning Banner */}
+        <div className="py-3 md:py-4 text-center px-4" style={{ background: 'linear-gradient(135deg, #dc2626, #b91c1c)' }}>
+          <p className="font-bold text-sm md:text-base lg:text-lg text-white">⚠️ توجه: ثبت نام شما هنوز تکمیل نشده!</p>
+          <p className="font-bold text-sm md:text-base lg:text-lg text-white">یک قدم دیگر باقی مانده - در غیر این صورت جای شما از دست می‌رود!</p>
         </div>
 
         {/* Main Content */}
@@ -133,12 +133,21 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
           <div className="container mx-auto px-4 py-3 md:py-12 relative z-10">
             {/* Header */}
             <div className="text-center mb-4 md:mb-8">
-              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 leading-tight" style={{ color: 'hsl(var(--cta-primary))' }}>
-                این ویدیو را ببینید<br />تا ۱۰۰٪ آماده کلاس شوید
+              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 leading-tight" style={{ color: '#dc2626' }}>
+                ⚠️ ثبت نام شما ناقص است!
               </h1>
-              <p className="text-base md:text-lg text-white/90 mb-4 md:mb-6 px-2 font-bold">
-                همین الان ویدیوی پایین را ببینید تا آماده کلاس قدرت دو زبانه شوید!
+              <p className="text-base md:text-xl text-white/90 mb-2 px-2 font-bold">
+                برای تکمیل ثبت نام و تضمین جای خود در کلاس:
               </p>
+              <p className="text-base md:text-lg text-white/90 mb-4 md:mb-6 px-2 font-bold">
+                ۱) این ویدیو را ببینید<br />
+                ۲) حتماً در تلگرام پیام بدهید
+              </p>
+              <div className="inline-block px-4 py-2 rounded-lg" style={{ background: 'rgba(220, 38, 38, 0.2)', border: '2px solid #dc2626' }}>
+                <p className="text-sm md:text-base text-white font-bold">
+                  ⏰ اگر این کارها را انجام ندهید، جای شما به فرد بعدی داده می‌شود!
+                </p>
+              </div>
             </div>
 
             {/* Video Section */}
@@ -169,15 +178,15 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                   )}
                 </div>
                 
-                {/* Welcome Message */}
+                {/* Urgent Message */}
                 <div className="text-center mb-2 md:mb-3">
                   <div className="backdrop-blur-sm border rounded-lg md:rounded-xl p-2 md:p-3" 
                        style={{ 
-                         background: 'linear-gradient(135deg, hsl(var(--cta-primary) / 0.2), hsl(var(--cta-primary-hover) / 0.2))',
-                         borderColor: 'hsl(var(--cta-primary) / 0.3)'
+                         background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.3), rgba(185, 28, 28, 0.3))',
+                         borderColor: '#dc2626'
                        }}>
-                    <p className="text-sm md:text-lg font-bold" style={{ color: 'hsl(var(--cta-primary))' }}>
-                      💎 شما جزء ۱۰۰ نفر اول هستید - تبریک! 💎
+                    <p className="text-sm md:text-lg font-bold text-white">
+                      ⚠️ بدون تماس با تلگرام، جای شما از دست می‌رود! ⚠️
                     </p>
                   </div>
                 </div>
@@ -201,11 +210,11 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                       }}
                     >
                       <MessageCircle className="w-5 h-5 md:w-6 md:h-6 ml-2" />
-                      <span>تماس با ادمین از طریق تلگرام</span>
+                      <span>🚨 همین الان به تلگرام پیام بدهید - اجباری است!</span>
                     </Button>
                   )}
-                  <p className="text-white/60 text-xs md:text-sm px-2 mt-3">
-                    برای دریافت اطلاعات کامل کلاس و پشتیبانی
+                  <p className="text-white text-xs md:text-sm px-2 mt-3 font-bold" style={{ color: '#fbbf24' }}>
+                    ⚠️ بدون این پیام، ثبت نام شما کامل نیست و جای شما به دیگری داده می‌شود
                   </p>
                   
                   {/* Arrow Up */}
@@ -219,8 +228,8 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
             {/* Next Steps */}
             <div className="max-w-4xl mx-auto">
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-center mb-4 md:mb-8" 
-                  style={{ color: 'hsl(var(--cta-primary))' }}>
-                مراحل بعدی
+                  style={{ color: '#dc2626' }}>
+                ⚠️ برای تکمیل ثبت نام، این کارها را فوراً انجام دهید!
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
@@ -236,11 +245,11 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                       <span className="text-xl md:text-2xl">💬</span>
                     </div>
                     <h3 className="text-base md:text-lg font-bold mb-2 md:mb-3" 
-                        style={{ color: 'hsl(var(--cta-primary))' }}>
-                      با پشتیبانی تلگرام تماس بگیرید
+                        style={{ color: '#dc2626' }}>
+                      🚨 حتماً به تلگرام پیام بدهید
                     </h3>
-                    <p className="text-xs md:text-sm text-white/70">
-                      برای دریافت لینک جلسه آنلاین
+                    <p className="text-xs md:text-sm text-white/90 font-bold">
+                      این قدم اجباری است! بدون این پیام، جای شما از دست می‌رود
                     </p>
                   </CardContent>
                 </Card>
