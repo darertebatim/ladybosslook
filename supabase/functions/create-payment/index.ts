@@ -153,10 +153,10 @@ serve(async (req) => {
         enabled: true
       },
       customer_creation: 'always',
-      success_url: program === 'one-bilingual' 
+      success_url: program === 'bilingual-power-class' 
         ? `${req.headers.get("origin")}/thankone?session_id={CHECKOUT_SESSION_ID}`
         : `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: program === 'one-bilingual'
+      cancel_url: program === 'bilingual-power-class'
         ? `${req.headers.get("origin")}/one`
         : `${req.headers.get("origin")}/programs`,
       payment_intent_data: {
