@@ -1,5 +1,5 @@
 // IAP Implementation for iOS using RevenueCat
-import { isIOSApp } from './platform';
+import { isIOSApp, isRealDevice } from './platform';
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 
 // Use PUBLIC key for iOS SDK (starts with 'test_' or 'appl_')
@@ -19,6 +19,13 @@ class IAPService {
 
   async initialize(): Promise<void> {
     if (!isIOSApp() || this.initialized) return;
+    
+    // Check if running on real device (not simulator)
+    const isReal = await isRealDevice();
+    if (!isReal) {
+      console.warn('[IAP] Simulator detected, skipping IAP initialization');
+      return;
+    }
     
     if (!pluginAvailable) {
       console.warn('[IAP] Plugin not available, skipping initialization');

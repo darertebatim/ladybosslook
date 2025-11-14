@@ -78,3 +78,17 @@ export const isIOSApp = () => {
   return /iPhone|iPad|iPod/.test(userAgent) && /Mobile\//.test(userAgent) && !/Safari\//.test(userAgent);
 };
 export const isWebApp = () => !isDefinitelyNative();
+
+export const isRealDevice = async (): Promise<boolean> => {
+  if (!isIOSApp()) return false;
+  
+  try {
+    const { Device } = await import('@capacitor/device');
+    const info = await Device.getInfo();
+    // isVirtual is true for simulators
+    return !info.isVirtual;
+  } catch (error) {
+    console.error('[Platform] Failed to check device type:', error);
+    return false;
+  }
+};
