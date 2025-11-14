@@ -55,6 +55,12 @@ class IAPService {
     try {
       await this.initialize();
       
+      // Check if initialized successfully (will be false on simulator or if init failed)
+      if (!this.initialized) {
+        console.warn('[IAP] SDK not initialized, skipping getProducts');
+        return [];
+      }
+      
       // Get offerings from RevenueCat (includes all products)
       const offeringsResult = await Purchases.getOfferings();
       
@@ -87,6 +93,12 @@ class IAPService {
 
     try {
       await this.initialize();
+
+      // Check if initialized successfully (will be false on simulator or if init failed)
+      if (!this.initialized) {
+        console.error('[IAP] SDK not initialized, cannot purchase');
+        return { success: false };
+      }
 
       // Get offerings to find the package with this product ID
       const offeringsResult = await Purchases.getOfferings();
