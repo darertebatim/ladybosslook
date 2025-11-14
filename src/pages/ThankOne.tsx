@@ -122,7 +122,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
         {/* Success Banner */}
         <div className="py-3 md:py-4 text-center px-4" style={{ background: 'linear-gradient(135deg, hsl(var(--cta-primary)), hsl(var(--cta-primary-hover)))' }}>
           <p className="font-bold text-sm md:text-base lg:text-lg text-white">🎉 تبریک! پرداخت موفق بود</p>
-          <p className="font-bold text-sm md:text-base lg:text-lg text-white">۵۰٪ تکمیل شد - بیایید آن را به ۱۰۰٪ برسانیم!</p>
+          <p className="font-bold text-sm md:text-base lg:text-lg text-white">هنوز نصف ثبت نام مانده !</p>
         </div>
 
         {/* Main Content */}
@@ -184,7 +184,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                          borderColor: 'hsl(var(--cta-primary) / 0.3)'
                        }}>
                     <p className="text-sm md:text-lg font-bold" style={{ color: 'hsl(var(--cta-primary))' }}>
-                      💎 شما جزء ۱۰۰ نفر اول هستید - فقط یک قدم مانده! 💎
+                      شما جزو ۱۰۰ نفر اول هستید اما ...
                     </p>
                   </div>
                 </div>
@@ -227,7 +227,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
             <div className="max-w-4xl mx-auto">
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-center mb-4 md:mb-8" 
                   style={{ color: 'hsl(var(--cta-primary))' }}>
-                قدم‌های بعدی برای رسیدن به ۱۰۰٪
+                سه قدمی بعدی برای ورود به وبینار
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
