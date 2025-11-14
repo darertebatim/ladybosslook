@@ -11,7 +11,7 @@ import { generateGoogleCalendarUrl, downloadICSFile } from "@/utils/calendar";
 const ThankOne = () => {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
-  const [videoLink] = useState('https://www.youtube.com/embed/ct9plBl6B0c');
+  const [videoLink] = useState('https://player.vimeo.com/video/1136974262');
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 

@@ -517,19 +517,57 @@ export type Database = {
         }
         Relationships: []
       }
+      program_auto_enrollment: {
+        Row: {
+          created_at: string
+          id: string
+          program_slug: string
+          round_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          program_slug: string
+          round_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          program_slug?: string
+          round_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_auto_enrollment_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       program_catalog: {
         Row: {
+          android_product_id: string | null
+          audio_playlist_id: string | null
+          available_on_mobile: boolean | null
+          available_on_web: boolean | null
           created_at: string | null
           delivery_method: string | null
           description: string | null
           duration: string | null
           features: Json | null
           id: string
+          ios_product_id: string | null
           is_active: boolean | null
           original_price: number | null
           payment_type: string
           price_amount: number
           slug: string
+          stripe_payment_link: string | null
           subscription_duration: string | null
           subscription_full_payment_discount: number | null
           title: string
@@ -537,17 +575,23 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          android_product_id?: string | null
+          audio_playlist_id?: string | null
+          available_on_mobile?: boolean | null
+          available_on_web?: boolean | null
           created_at?: string | null
           delivery_method?: string | null
           description?: string | null
           duration?: string | null
           features?: Json | null
           id?: string
+          ios_product_id?: string | null
           is_active?: boolean | null
           original_price?: number | null
           payment_type: string
           price_amount?: number
           slug: string
+          stripe_payment_link?: string | null
           subscription_duration?: string | null
           subscription_full_payment_discount?: number | null
           title: string
@@ -555,24 +599,38 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          android_product_id?: string | null
+          audio_playlist_id?: string | null
+          available_on_mobile?: boolean | null
+          available_on_web?: boolean | null
           created_at?: string | null
           delivery_method?: string | null
           description?: string | null
           duration?: string | null
           features?: Json | null
           id?: string
+          ios_product_id?: string | null
           is_active?: boolean | null
           original_price?: number | null
           payment_type?: string
           price_amount?: number
           slug?: string
+          stripe_payment_link?: string | null
           subscription_duration?: string | null
           subscription_full_payment_discount?: number | null
           title?: string
           type?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "program_catalog_audio_playlist_id_fkey"
+            columns: ["audio_playlist_id"]
+            isOneToOne: false
+            referencedRelation: "audio_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       program_rounds: {
         Row: {
