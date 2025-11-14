@@ -3,7 +3,7 @@ import { isIOSApp, isRealDevice } from './platform';
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 
 // Use PUBLIC key for iOS SDK (starts with 'test_' or 'appl_')
-const REVENUECAT_PUBLIC_KEY = 'test_KVPklNpuMtxERnmeuzcYwutfOPs';
+const REVENUECAT_PUBLIC_KEY = 'appl_FfoHuonnYUncpGWZBaIfXkvurVW';
 const pluginAvailable = true;
 
 export interface IAPProduct {
