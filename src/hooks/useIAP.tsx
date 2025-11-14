@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { iapService, IAPProduct } from '@/lib/iap';
-import { isIOSApp } from '@/lib/platform';
+import { isIOSApp, isRealDevice } from '@/lib/platform';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -18,6 +18,14 @@ export const useIAP = (productIds: string[]) => {
 
     const loadProducts = async () => {
       try {
+        // Check if running on real device (not simulator)
+        const realDevice = await isRealDevice();
+        if (!realDevice) {
+          console.log('[IAP] Simulator detected, skipping product load');
+          setLoading(false);
+          return;
+        }
+
         const fetchedProducts = await iapService.getProducts(productIds);
         setProducts(fetchedProducts);
       } catch (error) {
