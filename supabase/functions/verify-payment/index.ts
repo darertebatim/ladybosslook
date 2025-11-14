@@ -177,7 +177,7 @@ serve(async (req) => {
         
         // Map program slug to display name
         switch(programSlug) {
-          case 'one-bilingual':
+          case 'bilingual-power-class':
             programName = "Bilingual Power Class";
             break;
           case 'courageous-character':
@@ -308,7 +308,7 @@ serve(async (req) => {
             
             // Map program to Mailchimp tags
             switch(program) {
-              case 'one-bilingual':
+              case 'bilingual-power-class':
                 programName = "Bilingual Power Class";
                 tags = ["one", "one_bilingual", "paid_class"];
                 break;
