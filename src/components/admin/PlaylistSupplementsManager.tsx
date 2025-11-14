@@ -45,6 +45,7 @@ export const PlaylistSupplementsManager = ({
 }: PlaylistSupplementsManagerProps) => {
   const queryClient = useQueryClient();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     type: "video" as "video" | "pdf" | "link",
@@ -52,6 +53,37 @@ export const PlaylistSupplementsManager = ({
     description: "",
     sort_order: 0,
   });
+
+  // Handle PDF file upload
+  const handleFileUpload = async (file: File) => {
+    if (!file.type.includes('pdf')) {
+      toast.error('Please select a PDF file');
+      return;
+    }
+
+    setUploadingFile(true);
+    try {
+      const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+      const filePath = `supplements/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('documents')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('documents')
+        .getPublicUrl(filePath);
+
+      setFormData(prev => ({ ...prev, url: publicUrl }));
+      toast.success('PDF uploaded successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to upload PDF');
+    } finally {
+      setUploadingFile(false);
+    }
+  };
 
   // Fetch supplements
   const { data: supplements, isLoading } = useQuery({
@@ -267,14 +299,53 @@ export const PlaylistSupplementsManager = ({
 
             <div>
               <Label htmlFor="supplement_url">URL *</Label>
-              <Input
-                id="supplement_url"
-                type="url"
-                value={formData.url}
-                onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                required
-                placeholder="https://..."
-              />
+              {formData.type === 'pdf' ? (
+                <div className="space-y-3">
+                  <div className="border-2 border-dashed border-border rounded-lg p-4">
+                    <Input
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileUpload(file);
+                      }}
+                      disabled={uploadingFile}
+                      className="cursor-pointer"
+                    />
+                    {uploadingFile && (
+                      <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Uploading PDF...
+                      </p>
+                    )}
+                    {formData.url && !uploadingFile && (
+                      <p className="text-sm text-green-600 mt-2 flex items-center gap-2">
+                        ✓ PDF uploaded successfully
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Or paste URL directly:</Label>
+                    <Input
+                      id="supplement_url"
+                      type="url"
+                      value={formData.url}
+                      onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                      placeholder="https://..."
+                      disabled={uploadingFile}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <Input
+                  id="supplement_url"
+                  type="url"
+                  value={formData.url}
+                  onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                  required
+                  placeholder="https://..."
+                />
+              )}
             </div>
 
             <div>
