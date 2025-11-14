@@ -175,47 +175,14 @@ serve(async (req) => {
       if (paymentIntent && typeof paymentIntent === 'object' && 'metadata' in paymentIntent) {
         programSlug = (paymentIntent as any).metadata?.program || null;
         
-        // Map program slug to display name
-        switch(programSlug) {
-          case 'bilingual-power-class':
-            programName = "Bilingual Power Class";
-            break;
-          case 'courageous-character':
-            programName = "Courageous Character Course";
-            break;
-          case 'money-literacy':
-            programName = "Money Literacy Program";
-            break;
-          case 'iqmoney':
-            programName = "IQMoney Program";
-            break;
-          case 'empowered-ladyboss':
-            programName = "Empowered Ladyboss Coaching";
-            break;
-          case 'business-startup':
-            programName = "Business Startup Accelerator";
-            break;
-          case 'business-growth':
-            programName = "Business Growth Accelerator";
-            break;
-          case 'ladyboss-vip':
-            programName = "Ladyboss VIP Club";
-            break;
-          case 'connection-literacy':
-            programName = "Connection Literacy Program";
-            break;
-          case 'instagram-growth':
-            programName = "Instagram Growth Course";
-            break;
-          case 'private-coaching':
-            programName = "Private Coaching Session";
-            break;
-          case 'empowered-woman-coaching':
-            programName = "Empowered Woman Coaching";
-            break;
-          default:
-            programName = session.line_items?.data[0]?.description || 'Purchase';
-        }
+        // Get program name from database
+        const { data: programData } = await supabase
+          .from('program_catalog')
+          .select('mailchimp_program_name, title')
+          .eq('slug', programSlug)
+          .single();
+        
+        programName = programData?.mailchimp_program_name || programData?.title || session.line_items?.data[0]?.description || 'Purchase';
       }
       
       // Create order record with user_id and program info
@@ -306,59 +273,20 @@ serve(async (req) => {
           if (paymentIntent && typeof paymentIntent === 'object' && 'metadata' in paymentIntent) {
             const program = (paymentIntent as any).metadata?.program;
             
-            // Map program to Mailchimp tags
-            switch(program) {
-              case 'bilingual-power-class':
-                programName = "Bilingual Power Class";
-                tags = ["one", "one_bilingual", "paid_class"];
-                break;
-              case 'courageous-character':
-                programName = "Courageous Character Course";
-                tags = ["ccc"];
-                break;
-              case 'money-literacy':
-                programName = "Money Literacy Program";
-                tags = ["money_literacy"];
-                break;
-              case 'iqmoney':
-                programName = "IQMoney Program";
-                tags = ["iqmoney"];
-                break;
-              case 'empowered-ladyboss':
-                programName = "Empowered Ladyboss Coaching";
-                tags = ["ladyboss_coaching_program"];
-                break;
-              case 'business-startup':
-                programName = "Business Startup Accelerator";
-                tags = ["bsac"];
-                break;
-              case 'business-growth':
-                programName = "Business Growth Accelerator";
-                tags = ["bgac"];
-                break;
-              case 'ladyboss-vip':
-                programName = "Ladyboss VIP Club";
-                tags = ["vip_club"];
-                break;
-              case 'connection-literacy':
-                programName = "Connection Literacy Program";
-                tags = ["connection_literacy"];
-                break;
-              case 'instagram-growth':
-                programName = "Instagram Growth Course";
-                tags = ["instagram_course"];
-                break;
-              case 'private-coaching':
-                programName = "Private Coaching Session";
-                tags = ["private_session"];
-                break;
-              case 'empowered-woman-coaching':
-                programName = "Empowered Woman Coaching";
-                tags = ["ewc"];
-                break;
-              default:
-                programName = "General Purchase";
-                tags = ["paid_customer"];
+            // Get Mailchimp configuration from database
+            const { data: programConfig } = await supabase
+              .from('program_catalog')
+              .select('mailchimp_tags, mailchimp_program_name, title')
+              .eq('slug', program)
+              .single();
+            
+            if (programConfig) {
+              programName = programConfig.mailchimp_program_name || programConfig.title || "General Purchase";
+              tags = programConfig.mailchimp_tags || ["paid_customer"];
+            } else {
+              programName = "General Purchase";
+              tags = ["paid_customer"];
+              console.log(`Program ${program} not found in catalog, using default tags`);
             }
           }
           

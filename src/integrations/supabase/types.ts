@@ -563,6 +563,8 @@ export type Database = {
           id: string
           ios_product_id: string | null
           is_active: boolean | null
+          mailchimp_program_name: string | null
+          mailchimp_tags: Json | null
           original_price: number | null
           payment_type: string
           price_amount: number
@@ -587,6 +589,8 @@ export type Database = {
           id?: string
           ios_product_id?: string | null
           is_active?: boolean | null
+          mailchimp_program_name?: string | null
+          mailchimp_tags?: Json | null
           original_price?: number | null
           payment_type: string
           price_amount?: number
@@ -611,6 +615,8 @@ export type Database = {
           id?: string
           ios_product_id?: string | null
           is_active?: boolean | null
+          mailchimp_program_name?: string | null
+          mailchimp_tags?: Json | null
           original_price?: number | null
           payment_type?: string
           price_amount?: number
