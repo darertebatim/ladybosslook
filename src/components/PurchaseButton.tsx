@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button';
-import { isIOSApp } from '@/lib/platform';
+import { isIOSApp, isRealDevice } from '@/lib/platform';
 import { useIAP } from '@/hooks/useIAP';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface PurchaseButtonProps {
   programSlug: string;
@@ -22,13 +22,32 @@ export const PurchaseButton = ({
   className,
 }: PurchaseButtonProps) => {
   const isNative = isIOSApp();
-  const { purchase, purchasing, products } = useIAP(iosProductId ? [iosProductId] : []);
+  const [isReal, setIsReal] = useState(false);
+  const [checkingDevice, setCheckingDevice] = useState(true);
+  
+  // Check if running on real device (not simulator)
+  useEffect(() => {
+    const checkDevice = async () => {
+      const realDevice = await isRealDevice();
+      setIsReal(realDevice);
+      setCheckingDevice(false);
+    };
+    if (isNative) {
+      checkDevice();
+    } else {
+      setCheckingDevice(false);
+    }
+  }, [isNative]);
+  
+  // Only use IAP on real iOS devices
+  const shouldUseIAP = isNative && isReal && iosProductId;
+  const { purchase, purchasing, products } = useIAP(shouldUseIAP ? [iosProductId!] : []);
   const [loading, setLoading] = useState(false);
 
   const handlePurchase = async () => {
-    if (isNative && iosProductId) {
-      // iOS In-App Purchase
-      const result = await purchase(iosProductId, programSlug);
+    if (shouldUseIAP) {
+      // iOS In-App Purchase on real device
+      const result = await purchase(iosProductId!, programSlug);
       if (result.success) {
         toast.success('Purchase successful! Redirecting...');
         setTimeout(() => {
@@ -65,8 +84,33 @@ export const PurchaseButton = ({
     }
   };
 
-  // On iOS native, hide button if no product ID or products couldn't load
-  if (isNative && (!iosProductId || (products.length === 0 && !purchasing && !loading))) {
+  // On iOS simulator or when no product ID, show disabled button
+  if (checkingDevice) {
+    return (
+      <Button
+        disabled
+        className={className}
+        size="lg"
+      >
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        Loading...
+      </Button>
+    );
+  }
+
+  if (isNative && !isReal) {
+    return (
+      <Button
+        disabled
+        className={className}
+        size="lg"
+      >
+        Simulator - Use Real Device
+      </Button>
+    );
+  }
+
+  if (isNative && !iosProductId) {
     return (
       <Button
         disabled
