@@ -68,7 +68,7 @@ const One = () => {
       // Create payment session - Mailchimp will be called after successful payment
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke('create-payment', {
         body: {
-          program: 'one-bilingual',
+          program: 'bilingual-power-class',
           email: email.trim().toLowerCase(),
           name: name.trim()
         }
