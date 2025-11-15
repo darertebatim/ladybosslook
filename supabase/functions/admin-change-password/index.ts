@@ -13,23 +13,37 @@ serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Create client with ANON_KEY for user authentication verification
+    const supabaseAuth = createClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        global: { 
+          headers: { Authorization: req.headers.get('Authorization')! } 
+        },
+        auth: { persistSession: false }
+      }
+    );
 
     // Verify admin authentication
-    const authHeader = req.headers.get('Authorization')!;
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
 
     if (authError || !user) {
+      console.error('Auth error:', authError);
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    // Create service role client for admin operations
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
     // Check if user is admin
-    const { data: roleData, error: roleError } = await supabase
+    const { data: roleData, error: roleError } = await supabaseAdmin
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
@@ -60,7 +74,7 @@ serve(async (req) => {
     }
 
     // Update user password using service role
-    const { error: updateError } = await supabase.auth.admin.updateUserById(
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
       userId,
       { password: newPassword }
     );
@@ -74,7 +88,7 @@ serve(async (req) => {
     }
 
     // Log security event
-    await supabase.rpc('log_security_event', {
+    await supabaseAdmin.rpc('log_security_event', {
       p_action: 'admin_password_change',
       p_details: JSON.stringify({
         admin_id: user.id,
