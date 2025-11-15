@@ -33,7 +33,7 @@ LadyBoss Academy is an educational platform offering courses, audio content, and
 3. **Test Purchase Flow** → Select any product to see StoreKit purchase sheet (use App Store sandbox for testing)
 
 **Content Language:**
-Most content is bilingual (English/Farsi) as the app serves Persian-speaking women worldwide.
+All programs are taught in English. Do not mention any other languages or specific ethnic targeting in program descriptions to avoid review complications.
 
 **External Services:**
 - **Telegram (@ladybosslook)**: Student support communication (user-initiated only)
