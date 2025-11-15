@@ -8,6 +8,9 @@ import ladybossVipImage from '@/assets/ladyboss-vip-club.jpg';
 import connectionLiteracyImage from '@/assets/connection-literacy-program.jpg';
 import instagramGrowthImage from '@/assets/instagram-growth-course.jpg';
 import privateCoachingImage from '@/assets/private-coaching-session.jpg';
+import bilingualPowerImage from '@/assets/bilingual-power-program.jpg';
+import courageousProgramImage from '@/assets/courageous-program-hero.jpg';
+import readyEmpoweredImage from '@/assets/ready-empowered-hero.jpg';
 
 export interface Program {
   title: string;
@@ -46,8 +49,9 @@ export const programImages: Record<string, string> = {
   'instagram-growth-course': instagramGrowthImage,
   'private-coaching-session': privateCoachingImage,
   'connection-literacy-course': connectionLiteracyImage,
-  'courageous-character-course': courageousCharacterImage,
-  'bilingual-power-class': courageousCharacterImage,
+  'courageous-character-course': courageousProgramImage,
+  'bilingual-power-class': bilingualPowerImage,
+  'rte-eng': readyEmpoweredImage,
   'default': moneyLiteracyImage,
 };
 
