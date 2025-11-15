@@ -77,69 +77,94 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Admin ${user.id} creating enrollment for ${email} in ${courseName}`);
 
-    // Check if user already exists in profiles
-    const { data: existingProfile } = await supabase
-      .from('profiles')
-      .select('id, email')
-      .eq('email', email)
-      .single();
-
     let userId: string;
 
-    if (existingProfile) {
-      console.log(`User already exists: ${existingProfile.id}`);
-      userId = existingProfile.id;
-    } else {
-      // Check if auth user exists
-      const { data: { users: authUsers } } = await supabase.auth.admin.listUsers();
-      const existingAuthUser = authUsers.find(u => u.email?.toLowerCase() === email.toLowerCase());
+    // First check if auth user exists (this is the source of truth)
+    const { data: { users: authUsers } } = await supabase.auth.admin.listUsers();
+    const existingAuthUser = authUsers.find(u => u.email?.toLowerCase() === email.toLowerCase());
 
-      if (existingAuthUser) {
-        // Auth user exists but profile doesn't - use existing auth user ID
-        console.log(`Auth user exists but profile missing, using existing ID: ${existingAuthUser.id}`);
-        userId = existingAuthUser.id;
-      } else {
-        // Create new user with secure random password
-        console.log(`Creating new user: ${email}`);
-        const { data: userData, error: userError } = await supabase.auth.admin.createUser({
-          email: email,
-          email_confirm: true,
-          password: generateSecurePassword(),
-          user_metadata: {
-            full_name: fullName || ''
-          }
-        });
-
-        if (userError) {
-          console.error('Error creating user:', userError);
-          return new Response(
-            JSON.stringify({ error: `Failed to create user: ${userError.message}` }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-          );
-        }
-
-        if (!userData.user) {
-          return new Response(
-            JSON.stringify({ error: 'User creation failed' }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-          );
-        }
-
-        userId = userData.user.id;
-        console.log(`User created successfully: ${userId} with secure random password`);
+    if (existingAuthUser) {
+      // Auth user exists - use their ID
+      console.log(`Auth user exists: ${existingAuthUser.id}`);
+      userId = existingAuthUser.id;
+      
+      // Check if profile exists for this user
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', userId)
+        .single();
         
-        // Send password reset email so user can set their own password
-        const { error: resetError } = await supabase.auth.admin.generateLink({
-          type: 'recovery',
-          email: email,
-        });
+      if (!existingProfile) {
+        // Create missing profile
+        console.log(`Creating missing profile for auth user ${userId}`);
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            email: email,
+            full_name: fullName || null
+          });
 
-        if (resetError) {
-          console.error('Error sending password reset email:', resetError);
-        } else {
-          console.log('Password reset email sent to:', email);
+        if (profileError && !profileError.message.includes('duplicate')) {
+          console.error('Error creating profile:', profileError);
         }
       }
+    } else {
+      // No auth user exists - create new user
+      console.log(`Creating new user: ${email}`);
+      const { data: userData, error: userError } = await supabase.auth.admin.createUser({
+        email: email,
+        email_confirm: true,
+        password: generateSecurePassword(),
+        user_metadata: {
+          full_name: fullName || ''
+        }
+      });
+
+      if (userError) {
+        console.error('Error creating user:', userError);
+        return new Response(
+          JSON.stringify({ error: `Failed to create user: ${userError.message}` }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        );
+      }
+
+      if (!userData.user) {
+        return new Response(
+          JSON.stringify({ error: 'User creation failed' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        );
+      }
+
+      userId = userData.user.id;
+      console.log(`User created successfully: ${userId} with secure random password`);
+      
+      // Create profile for new user
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          email: email,
+          full_name: fullName || null
+        });
+
+      if (profileError && !profileError.message.includes('duplicate')) {
+        console.error('Error creating profile:', profileError);
+      }
+      
+      // Send password reset email so user can set their own password
+      const { error: resetError } = await supabase.auth.admin.generateLink({
+        type: 'recovery',
+        email: email,
+      });
+
+      if (resetError) {
+        console.error('Error sending password reset email:', resetError);
+      } else {
+        console.log('Password reset email sent to:', email);
+      }
+    }
     }
 
     // Check if enrollment already exists
