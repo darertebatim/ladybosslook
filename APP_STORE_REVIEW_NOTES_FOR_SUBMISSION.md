@@ -47,7 +47,22 @@ Three IAPs available via RevenueCat + StoreKit:
    - Next session: December 17, 2025
    - Includes downloadable class materials (PDF) and practice exercises (PDF)
 2. **Courageous Character Course** - $97.00 (iOS: com.ladybosslook.courageous_character)
+   - 21-day confidence building program
+   - 3 live classes (2 hours each) via Google Meet
+   - 6 hours of recorded training content
+   - Digital workbook with exercises
+   - 30-day support via Telegram group
 3. **Ready to Empowered Audiobook** - $9.99 (iOS: com.ladybosslook.ready_to_empowered_eng)
+   - 6+ hours of transformative audio content
+   - Personal empowerment strategies and frameworks
+   - Confidence-building exercises and affirmations
+   - Overcoming self-doubt and imposter syndrome
+   - Goal-setting and success mindset training
+   - Daily motivation and inspiration
+   - Lifetime access - listen anytime, anywhere
+   - Companion workbook with reflection exercises
+   - Bonus: Morning empowerment meditation (15 min)
+   - Bonus: Evening confidence affirmations (10 min)
 
 **Where to Find IAPs:**
 - Navigate to **Store tab** (bottom navigation)
