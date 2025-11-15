@@ -43,6 +43,9 @@ All programs are taught in English. Do not mention any other languages or specif
 **In-App Purchases:**
 Three IAPs available via RevenueCat + StoreKit:
 1. **Bilingual Power Class** - $1.00 (iOS: com.ladybosslook.bilingual_power)
+   - Live interactive class held monthly
+   - Next session: December 17, 2025
+   - Includes downloadable class materials (PDF) and practice exercises (PDF)
 2. **Courageous Character Course** - $97.00 (iOS: com.ladybosslook.courageous_character)
 3. **Ready to Empowered Audiobook** - $9.99 (iOS: com.ladybosslook.ready_to_empowered_eng)
 
