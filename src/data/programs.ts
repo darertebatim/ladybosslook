@@ -11,6 +11,8 @@ import privateCoachingImage from '@/assets/private-coaching-session.jpg';
 import bilingualPowerImage from '@/assets/bilingual-power-program.jpg';
 import courageousProgramImage from '@/assets/courageous-program-hero.jpg';
 import readyEmpoweredImage from '@/assets/ready-empowered-hero.jpg';
+import courageousCharacterHero from '/iap-promotional/courageous-character-course.jpg';
+import bilingualPowerHero from '/iap-promotional/bilingual-power-class.jpg';
 
 export interface Program {
   title: string;
@@ -49,8 +51,8 @@ export const programImages: Record<string, string> = {
   'instagram-growth-course': instagramGrowthImage,
   'private-coaching-session': privateCoachingImage,
   'connection-literacy-course': connectionLiteracyImage,
-  'courageous-character-course': courageousProgramImage,
-  'bilingual-power-class': bilingualPowerImage,
+  'courageous-character-course': courageousCharacterHero,
+  'bilingual-power-class': bilingualPowerHero,
   'rte-eng': readyEmpoweredImage,
   'default': moneyLiteracyImage,
 };
