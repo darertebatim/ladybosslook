@@ -53,6 +53,22 @@ const AppHome = () => {
     enabled: !!user?.id,
   });
 
+  const { data: hasActiveRounds } = useQuery({
+    queryKey: ['has-active-rounds', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .select('id')
+        .eq('user_id', user?.id)
+        .eq('status', 'active')
+        .not('round_id', 'is', null)
+        .limit(1);
+      if (error) throw error;
+      return data && data.length > 0;
+    },
+    enabled: !!user?.id,
+  });
+
   const { data: wallet } = useQuery({
     queryKey: ['user-wallet', user?.id],
     queryFn: async () => {
@@ -84,7 +100,7 @@ const AppHome = () => {
           enrolledCount={enrollments?.length || 0}
           creditsBalance={wallet?.credits_balance || 0}
         />
-        <ActiveRound />
+        {hasActiveRounds && <ActiveRound />}
         <Announcements />
         
         <div className="flex flex-col items-center gap-3">
