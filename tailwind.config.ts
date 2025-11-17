@@ -22,6 +22,7 @@ export default {
 				'persian': ['Vazirmatn', 'Inter', 'sans-serif'],
 				'farsi': ['Vazirmatn', 'sans-serif'],
 				'display': ['Playfair Display', 'serif'],
+				'elegant': ['Cormorant Garamond', 'serif'],
 				'body': ['Inter', 'sans-serif'],
 			},
 			colors: {
