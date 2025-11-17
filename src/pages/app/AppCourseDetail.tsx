@@ -292,113 +292,20 @@ const AppCourseDetail = () => {
               </Card>
             )}
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Quick Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {/* Add to Calendar - First Priority */}
-                {round?.first_session_date ? (
-                  <Button
-                    className="w-full justify-start"
-                    size="lg"
-                    onClick={handleAddToCalendar}
-                  >
-                    <Calendar className="h-5 w-5 mr-3" />
-                    <div className="flex-1 text-left">
-                      <div className="font-semibold">Add to Calendar</div>
-                      <div className="text-xs opacity-90">
-                        {format(new Date(round.first_session_date), 'EEEE, MMMM d, yyyy • h:mm a')}
-                      </div>
-                    </div>
-                  </Button>
-                ) : (
-                  <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
-                    <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Session schedule will be announced soon</p>
-                  </div>
-                )}
-
-                {/* Activate Support */}
-                <Button
-                  variant="outline"
-                  className="w-full justify-start border-blue-200 bg-blue-50/50 hover:bg-blue-100/50"
-                  size="lg"
-                  onClick={handleContactSupport}
-                >
-                  <Send className="h-5 w-5 mr-3 text-blue-600" />
-                  <div className="flex-1 text-left">
-                    <div className="font-semibold">Activate Support</div>
-                    <div className="text-xs opacity-70">@ladybosslook • Get help via Telegram</div>
-                  </div>
-                  <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
-                </Button>
-
-                {/* Audio Library */}
-                {round?.audio_playlist_id ? (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    size="lg"
-                    onClick={() => window.location.href = `/app/player/playlist/${round.audio_playlist_id}`}
-                  >
-                    <Music className="h-5 w-5 mr-3" />
-                    <div className="flex-1 text-left">
-                      <div className="font-semibold">Audio Library</div>
-                      <div className="text-xs opacity-70">Course supplement audios</div>
-                    </div>
-                    <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
-                  </Button>
-                ) : null}
-
-                {/* Join Live Session */}
-                {round?.google_meet_link ? (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    size="lg"
-                    onClick={() => window.location.href = round.google_meet_link!}
-                  >
-                    <Video className="h-5 w-5 mr-3" />
-                    <div className="flex-1 text-left">
-                      <div className="font-semibold">Join Live Session</div>
-                      <div className="text-xs opacity-70">Google Meet link</div>
-                    </div>
-                    <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
-                  </Button>
-                ) : (
-                  <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
-                    <Video className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Live session link will be shared soon</p>
-                  </div>
-                )}
-
-                {/* Access Course Files */}
-                {round?.google_drive_link ? (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    size="lg"
-                    onClick={() => window.location.href = round.google_drive_link!}
-                  >
-                    <FolderOpen className="h-5 w-5 mr-3" />
-                    <div className="flex-1 text-left">
-                      <div className="font-semibold">Access Course Files</div>
-                      <div className="text-xs opacity-70">Materials, slides, and resources</div>
-                    </div>
-                    <ExternalLink className="h-4 w-4 ml-2 opacity-70" />
-                  </Button>
-                ) : (
-                  <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
-                    <FolderOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Course materials will be shared soon</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            {/* Quick Actions - Only show if enrollment has a round */}
+            {round && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    Quick Actions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+...
+                </CardContent>
+              </Card>
+            )}
 
             <Card>
               <CardHeader>
