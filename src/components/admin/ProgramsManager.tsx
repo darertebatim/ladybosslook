@@ -30,6 +30,7 @@ interface ProgramCatalog {
   created_at: string;
   available_on_web: boolean;
   available_on_mobile: boolean;
+  is_free_on_ios?: boolean;
   ios_product_id?: string | null;
   android_product_id?: string | null;
 }
@@ -58,6 +59,7 @@ export function ProgramsManager() {
     audio_playlist_id: null as string | null,
     available_on_web: true,
     available_on_mobile: true,
+    is_free_on_ios: false,
     ios_product_id: '',
     android_product_id: '',
   });
@@ -114,6 +116,7 @@ export function ProgramsManager() {
       audio_playlist_id: null,
       available_on_web: true,
       available_on_mobile: true,
+      is_free_on_ios: false,
       ios_product_id: '',
       android_product_id: '',
     });
@@ -179,6 +182,7 @@ export function ProgramsManager() {
       audio_playlist_id: (program as any).audio_playlist_id || null,
       available_on_web: program.available_on_web,
       available_on_mobile: program.available_on_mobile,
+      is_free_on_ios: program.is_free_on_ios || false,
       ios_product_id: program.ios_product_id || '',
       android_product_id: program.android_product_id || '',
     });
@@ -524,12 +528,27 @@ export function ProgramsManager() {
                     }
                   />
                   <Label htmlFor="available_on_mobile" className="text-sm font-normal cursor-pointer">
-                    Available on Mobile App (In-App Purchase)
+                    Show in Mobile App
                   </Label>
                 </div>
 
-                {/* Show IAP Product IDs only if mobile is enabled */}
                 {formData.available_on_mobile && (
+                  <div className="flex items-center space-x-2 pl-6">
+                    <Checkbox 
+                      id="is_free_on_ios"
+                      checked={formData.is_free_on_ios}
+                      onCheckedChange={(checked) => 
+                        setFormData({ ...formData, is_free_on_ios: checked as boolean })
+                      }
+                    />
+                    <Label htmlFor="is_free_on_ios" className="text-sm font-normal cursor-pointer">
+                      Free on iOS (for App Store submission without IAP)
+                    </Label>
+                  </div>
+                )}
+
+                {/* Show IAP Product IDs only if mobile is enabled and NOT free on iOS */}
+                {formData.available_on_mobile && !formData.is_free_on_ios && (
                   <div className="space-y-3 pl-6 border-l-2 border-primary/30">
                     <div className="space-y-2">
                       <Label htmlFor="ios_product_id">iOS Product ID</Label>
