@@ -111,13 +111,11 @@ const Five = () => {
   return (
     <>
       <style>{`
-        .five-page-purple {
-          --secondary: 271 76% 53%;
-          --secondary-light: 271 70% 63%;
-          --secondary-dark: 271 80% 43%;
-          --cta-primary: 271 76% 53%;
-          --cta-primary-hover: 271 70% 63%;
-          --success: 271 76% 53%;
+        .five-page-simple {
+          --green: 142 76% 36%;
+          --green-light: 142 76% 96%;
+          --red: 0 84% 60%;
+          --red-light: 0 84% 96%;
         }
       `}</style>
       <SEOHead 
@@ -126,28 +124,22 @@ const Five = () => {
       />
       <RecentRegistrations />
       
-      <div className="five-page-purple min-h-screen bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#1E293B] font-farsi">
-        {/* Compact Hero Section */}
-        <div className="relative overflow-hidden pb-8">
-          {/* Animated Purple Glow */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 left-1/4 w-96 h-96 bg-secondary rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-secondary/60 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-          </div>
-
-          <div className="container mx-auto px-4 pt-3 relative z-10">
-            {/* Ultra-Compact Urgency Banner */}
-            <div className="bg-gradient-to-r from-[#FF6B6B]/20 via-[#FF6B6B]/30 to-[#FF6B6B]/20 border border-[#FF6B6B] rounded-lg p-3 mb-3 backdrop-blur-sm">
+      <div className="five-page-simple min-h-screen bg-white font-farsi">
+        {/* Hero Section */}
+        <div className="py-8">
+          <div className="container mx-auto px-4">
+            {/* Urgency Banner - Red */}
+            <div className="bg-[hsl(var(--red-light))] border-2 border-[hsl(var(--red))] rounded-lg p-4 mb-6 max-w-4xl mx-auto">
               <div className="flex flex-col items-center justify-center gap-2 text-center">
                 {/* First Row: PST Time */}
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-secondary" />
-                  <span className="text-white font-bold text-sm" dir="ltr">
+                  <Clock className="w-5 h-5 text-[hsl(var(--red))]" />
+                  <span className="text-black font-bold text-base" dir="ltr">
                     Nov 22 • 9:30 AM PST
                   </span>
                 </div>
                 {/* Second Row: Local Time */}
-                <div className="text-xs text-white/80" dir="ltr">
+                <div className="text-sm text-black/70" dir="ltr">
                   Your time: {new Date('2025-11-22T09:30:00-08:00').toLocaleString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -160,20 +152,20 @@ const Five = () => {
               </div>
             </div>
 
-            {/* Hero Content - Optimized Hierarchy */}
+            {/* Hero Content */}
             <div className="max-w-4xl mx-auto text-center">
-              {/* Pre-headline */}
-              <div className="inline-block bg-secondary/20 border border-secondary rounded-full px-3 py-1 mb-2">
-                <span className="text-secondary font-bold text-xs md:text-sm">💎 تسلط بر ارتباطات رهبری</span>
+              {/* Pre-headline - Green */}
+              <div className="inline-block bg-[hsl(var(--green-light))] border-2 border-[hsl(var(--green))] rounded-full px-4 py-2 mb-4">
+                <span className="text-[hsl(var(--green))] font-bold text-sm md:text-base">💎 تسلط بر ارتباطات رهبری</span>
               </div>
 
               {/* Main Headline */}
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-1.5 leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-3 leading-tight">
                 Five Languages of Power
               </h1>
               
               {/* Persian Title */}
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary mb-2 leading-tight">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[hsl(var(--green))] mb-6 leading-tight">
                 پنج زبان قدرت
               </h2>
 
@@ -410,21 +402,21 @@ const Five = () => {
           </div>
         </div>
 
-        {/* Cleaner Sticky Bottom CTA */}
-        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-secondary to-secondary-light border-t border-secondary-light/30 p-2 z-50 backdrop-blur-md shadow-[0_-5px_30px_rgba(139,92,246,0.3)]">
+        {/* Sticky Bottom CTA - Green */}
+        <div className="fixed bottom-0 left-0 right-0 bg-[hsl(var(--green))] border-t-2 border-black/10 p-3 z-50 shadow-lg">
           <div className="container mx-auto max-w-4xl">
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center justify-between gap-3">
               <div className="text-right flex-1">
-                <p className="text-white font-bold text-xs md:text-sm leading-tight">
+                <p className="text-white font-bold text-sm md:text-base leading-tight">
                   فقط $1 • 73 جا باقی
                 </p>
-                <p className="text-white/90 text-[10px] md:text-xs leading-tight">
+                <p className="text-white/90 text-xs md:text-sm leading-tight">
                   بعدش $100 می‌شود
                 </p>
               </div>
               <Button
                 onClick={() => setShowRegistrationForm(true)}
-                className="px-4 md:px-8 py-2.5 md:py-3 text-sm md:text-base font-bold bg-[#1E293B] hover:bg-[#0F172A] text-secondary rounded-lg shadow-lg transform active:scale-95 transition-all flex-shrink-0"
+                className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-bold bg-white hover:bg-white/90 text-[hsl(var(--green))] rounded-lg shadow-lg transform active:scale-95 transition-all flex-shrink-0"
               >
                 🚀 ثبت نام
               </Button>
