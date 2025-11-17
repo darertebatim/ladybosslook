@@ -41,7 +41,7 @@ const AppStore = () => {
   const freePrograms = programs.filter(p => 
     p.isFree || 
     p.priceAmount === 0 || 
-    (p as any).is_free_on_ios === true
+    p.is_free_on_ios === true
   );
 
   if (programsLoading) {
