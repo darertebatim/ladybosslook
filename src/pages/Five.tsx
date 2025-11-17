@@ -68,7 +68,7 @@ const Five = () => {
       // Create payment session - Mailchimp will be called after successful payment
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke('create-payment', {
         body: {
-          program: 'five-language-empowered-woman',
+          program: 'Five-Language',
           email: email.trim().toLowerCase(),
           name: name.trim()
         }
@@ -442,10 +442,10 @@ const Five = () => {
         <DialogContent className="sm:max-w-md bg-luxury-white border-4 border-secondary shadow-2xl">
           <DialogHeader className="text-center">
             <DialogTitle className="text-2xl md:text-3xl font-bold text-luxury-black mb-2 font-farsi">
-              💎 ثبت نام Bilingual Power Class !
+              💎 ثبت نام Five language of Empowered woman !
             </DialogTitle>
             <DialogDescription className="sr-only">
-              Register for the Bilingual Power Class for only $1
+              Register for the Five language of Empowered woman program
             </DialogDescription>
             <div className="bg-gradient-to-r from-secondary/20 via-secondary/30 to-secondary/20 border-2 border-secondary rounded-xl p-3 mb-2">
               <p className="text-secondary font-bold text-xl md:text-2xl">
