@@ -4,13 +4,15 @@ import { usePrograms } from '@/hooks/usePrograms';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PurchaseButton } from '@/components/PurchaseButton';
 import { SEOHead } from '@/components/SEOHead';
 import { ShoppingBag, CheckCircle2, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 const AppStore = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { programs, isLoading: programsLoading } = usePrograms();
 
   // Fetch user's enrollments
@@ -35,7 +37,8 @@ const AppStore = () => {
     return enrollments.some(e => e.program_slug === slug);
   };
 
-  const paidPrograms = programs.filter(p => !p.isFree);
+  // Filter to show only free programs
+  const freePrograms = programs.filter(p => p.isFree || p.priceAmount === 0);
 
   if (programsLoading) {
     return (
@@ -48,8 +51,8 @@ const AppStore = () => {
   return (
     <div className="container max-w-4xl py-6 px-4">
       <SEOHead 
-        title="Program Store - LadyBoss Academy"
-        description="Browse and purchase LadyBoss Academy programs"
+        title="Browse Courses - LadyBoss Academy"
+        description="Browse our free educational programs and courses"
       />
 
       <div className="space-y-6">
@@ -57,14 +60,23 @@ const AppStore = () => {
         <div className="flex items-center gap-3">
           <ShoppingBag className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold">Program Store</h1>
-            <p className="text-muted-foreground">Browse available programs and courses</p>
+            <h1 className="text-3xl font-bold">Browse Courses</h1>
+            <p className="text-muted-foreground">Explore our free educational programs</p>
           </div>
         </div>
 
         {/* Programs Grid */}
-        <div className="grid gap-6">
-          {paidPrograms.map((program) => {
+        {freePrograms.length === 0 ? (
+          <div className="text-center py-12">
+            <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+            <h2 className="text-xl font-semibold mb-2">No Courses Available</h2>
+            <p className="text-muted-foreground">
+              Check back later for new courses
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6">
+            {freePrograms.map((program) => {
             const enrolled = isEnrolled(program.slug);
             
             return (
@@ -125,22 +137,40 @@ const AppStore = () => {
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
 
-                    {!enrolled && (
-                      <PurchaseButton
-                        programSlug={program.slug}
-                        iosProductId={(program as any).ios_product_id || undefined}
-                        price={program.priceAmount}
-                        buttonText="Purchase"
-                        className="flex-1"
-                      />
-                    )}
-                    
-                    {enrolled && (
+                    {enrolled ? (
                       <Button
                         className="flex-1"
                         onClick={() => navigate(`/app/course/${program.slug}`)}
                       >
                         View Course
+                      </Button>
+                    ) : (
+                      <Button 
+                        className="flex-1"
+                        onClick={async () => {
+                          if (!user?.id) {
+                            toast.error('Please sign in to enroll');
+                            return;
+                          }
+                          // Create free enrollment
+                          const { error } = await supabase
+                            .from('course_enrollments')
+                            .insert({
+                              user_id: user.id,
+                              course_name: program.title,
+                              program_slug: program.slug,
+                              status: 'active'
+                            });
+                          
+                          if (error) {
+                            toast.error('Failed to enroll. Please try again.');
+                          } else {
+                            toast.success('Enrolled successfully!');
+                            setTimeout(() => navigate('/app/courses'), 1000);
+                          }
+                        }}
+                      >
+                        Enroll Free
                       </Button>
                     )}
                   </div>
@@ -149,14 +179,15 @@ const AppStore = () => {
             );
           })}
         </div>
+        )}
 
-        {paidPrograms.length === 0 && (
+        {freePrograms.length === 0 && (
           <Card>
             <CardContent className="py-12 text-center">
               <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No Programs Available</h3>
+              <h3 className="text-lg font-semibold mb-2">No Courses Available</h3>
               <p className="text-muted-foreground">
-                Check back later for new programs and courses.
+                Check back later for new free courses.
               </p>
             </CardContent>
           </Card>
