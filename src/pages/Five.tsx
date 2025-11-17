@@ -5,7 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { Shield, Lock, CheckCircle2, Clock, Users, Star, Sparkles, Brain, MessageCircle, Globe, Mic, Zap, Heart } from "lucide-react";
+import CountdownTimer from "@/components/CountdownTimer";
+import SpotCounter from "@/components/SpotCounter";
+import TestimonialsSection from "@/components/TestimonialsSection";
+import FAQSection from "@/components/FAQSection";
+import InstructorBio from "@/components/InstructorBio";
+
+import RecentRegistrations from "@/components/RecentRegistrations";
 import { SEOHead } from "@/components/SEOHead";
 import { simpleSubscriptionSchema } from '@/lib/validation';
 import { z } from 'zod';
@@ -23,7 +30,7 @@ const Five = () => {
       (window as any).fbq('track', 'PageView');
       (window as any).fbq('track', 'ViewContent', {
         content_type: 'paid_class',
-        content_name: 'Five Languages of Empowered Woman',
+        content_name: 'Bilingual Power Class',
         content_category: 'online_class',
         value: 100,
         currency: 'USD'
@@ -47,8 +54,8 @@ const Five = () => {
         });
         setValidationErrors(errors);
         toast({
-          title: "Error",
-          description: "Please fill out the form carefully",
+          title: "خطا",
+          description: "لطفا فرم را با دقت کامل کنید",
           variant: "destructive",
         });
         return;
@@ -58,9 +65,10 @@ const Five = () => {
     setIsSubmitting(true);
 
     try {
+      // Create payment session - Mailchimp will be called after successful payment
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke('create-payment', {
         body: {
-          program: 'five-languages',
+          program: 'bilingual-power-class',
           email: email.trim().toLowerCase(),
           name: name.trim()
         }
@@ -69,8 +77,8 @@ const Five = () => {
       if (paymentError) throw paymentError;
 
       if (typeof window !== 'undefined' && (window as any).fbq) {
-        (window as any).fbq('trackCustom', 'FiveLanguagesRegistration', {
-          content_name: 'Five Languages of Empowered Woman',
+        (window as any).fbq('trackCustom', 'BilingualClassRegistration', {
+          content_name: 'Bilingual Power Class',
           value: 1,
           currency: 'USD'
         });
@@ -84,8 +92,8 @@ const Five = () => {
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({
-        title: "Error",
-        description: "Something went wrong, please try again",
+        title: "خطا",
+        description: "مشکلی پیش آمد، لطفا دوباره تلاش کنید",
         variant: "destructive",
       });
     } finally {
@@ -93,239 +101,426 @@ const Five = () => {
     }
   };
 
-  const languages = [
-    { 
-      number: "01",
-      title: "Language of Self-Talk", 
-      desc: "Master your inner dialogue and transform limiting beliefs into empowering thoughts"
-    },
-    { 
-      number: "02",
-      title: "Language of Assertion", 
-      desc: "Express your needs confidently and set boundaries with grace and strength"
-    },
-    { 
-      number: "03",
-      title: "Language of Presence", 
-      desc: "Command attention through body language, voice tone, and authentic confidence"
-    },
-    { 
-      number: "04",
-      title: "Language of Influence", 
-      desc: "Create compelling narratives and build meaningful connections through strategic communication"
-    },
-    { 
-      number: "05",
-      title: "Language of Leadership", 
-      desc: "Inspire and guide others while maintaining your authentic voice and values"
-    }
+  const modules = [
+    { icon: Brain, title: "زبان درونی قدرت", desc: "طرز فکر، گفت‌وگو با خودت و بازنویسی روایت‌های منفی" },
+    { icon: MessageCircle, title: "زبان بیرونی قدرت", desc: "ساختار جملات قاطع، نه گفتن بدون گناه، حرف زدن با اعتماد‌به‌نفس" },
+    { icon: Globe, title: "زبان فرهنگی", desc: "تفاوت دو فرهنگ، آداب گفت‌وگو و assertiveness در محیط چندفرهنگی" },
+    { icon: Mic, title: "زبان حضور", desc: "تن صدای محکم و آرام، زبان بدن قدرتمند، حضور فیزیکی و ذهنی" },
+    { icon: Zap, title: "زبان تأثیر", desc: "storytelling، گفت‌وگوهای اعتمادساز، ساختن رابطه و فرصت با زبان" }
   ];
 
   return (
     <>
+      <style>{`
+        .one-page-green {
+          --secondary: 142 76% 45%;
+          --secondary-light: 142 70% 55%;
+          --secondary-dark: 142 80% 35%;
+          --cta-primary: 142 76% 45%;
+          --cta-primary-hover: 142 70% 55%;
+          --success: 142 76% 45%;
+        }
+      `}</style>
       <SEOHead 
-        title="Five Languages of Empowered Woman | Transform Your Communication"
-        description="Master the five essential languages every empowered woman needs to lead, influence, and thrive in any environment."
+        title="کلاس قدرت دو زبانه - کلاس آنلاین $1 | LadyBoss Academy"
+        description="یاد بگیرید چطور در هر زبانی با قدرت حرف بزنید. کلاس ویژه زنان ایرانی مهاجر - فقط $1"
       />
+      <RecentRegistrations />
       
-      <div className="min-h-screen bg-white">
-        {/* Hero Section */}
-        <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="max-w-4xl mx-auto text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 border border-luxury-charcoal/20 rounded-full">
-              <Sparkles className="w-4 h-4 text-luxury-accent" />
-              <span className="text-sm text-luxury-charcoal tracking-wide">EXCLUSIVE MASTERCLASS</span>
+      <div className="one-page-green min-h-screen bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#1E293B] font-farsi">
+        {/* Compact Hero Section */}
+        <div className="relative overflow-hidden pb-8">
+          {/* Animated Green Glow */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-10 left-1/4 w-96 h-96 bg-secondary rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-secondary/60 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          </div>
+
+          <div className="container mx-auto px-4 pt-3 relative z-10">
+            {/* Ultra-Compact Urgency Banner */}
+            <div className="bg-gradient-to-r from-[#FF6B6B]/20 via-[#FF6B6B]/30 to-[#FF6B6B]/20 border border-[#FF6B6B] rounded-lg p-3 mb-3 backdrop-blur-sm">
+              <div className="flex flex-col items-center justify-center gap-2 text-center">
+                {/* First Row: PST Time */}
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-secondary" />
+                  <span className="text-white font-bold text-sm" dir="ltr">
+                    Nov 22 • 9:30 AM PST
+                  </span>
+                </div>
+                {/* Second Row: Local Time */}
+                <div className="text-xs text-white/80" dir="ltr">
+                  Your time: {new Date('2025-11-22T09:30:00-08:00').toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                    timeZoneName: 'short'
+                  })}
+                </div>
+              </div>
             </div>
 
-            {/* Main Headline */}
-            <h1 className="font-elegant text-5xl md:text-7xl lg:text-8xl font-light text-luxury-black mb-6 leading-tight tracking-tight">
-              Five Languages of<br />
-              <span className="italic font-normal">Empowered Woman</span>
-            </h1>
-            
-            {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-luxury-charcoal/70 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Master the art of powerful communication and transform how you show up in every area of your life
-            </p>
+            {/* Hero Content - Optimized Hierarchy */}
+            <div className="max-w-4xl mx-auto text-center">
+              {/* Pre-headline */}
+              <div className="inline-block bg-secondary/20 border border-secondary rounded-full px-3 py-1 mb-2">
+                <span className="text-secondary font-bold text-xs md:text-sm">💎 ویژه زنان ایرانی مهاجر</span>
+              </div>
 
-            {/* CTA */}
-            <Button 
-              size="lg"
-              onClick={() => setShowRegistrationForm(true)}
-              className="bg-luxury-black hover:bg-luxury-charcoal text-white px-12 py-6 text-lg rounded-none transition-all duration-300 h-auto"
-            >
-              Reserve Your Spot
-            </Button>
-          </div>
-        </div>
+              {/* Main Headline */}
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-1.5 leading-tight">
+                Bilingual Power Class!
+              </h1>
+              
+              {/* Persian Title */}
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary mb-2 leading-tight">
+                کلاس قدرت دو زبانه
+              </h2>
 
-        {/* Divider */}
-        <div className="container mx-auto px-4">
-          <div className="border-t border-luxury-charcoal/10"></div>
-        </div>
+              {/* Video */}
+              <div className="mb-4 max-w-2xl mx-auto">
+                <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
+                  <iframe 
+                    src="https://player.vimeo.com/video/1136585470?badge=0&autopause=0&muted=0&player_id=0&app_id=58479" 
+                    frameBorder="0" 
+                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+                    referrerPolicy="strict-origin-when-cross-origin" 
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                    title="Bilingual Power Class"
+                    className="rounded-lg shadow-lg"
+                  />
+                </div>
+                <script src="https://player.vimeo.com/api/player.js"></script>
+              </div>
 
-        {/* Five Languages Section */}
-        <div className="container mx-auto px-4 py-20 md:py-32">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="font-elegant text-4xl md:text-5xl text-luxury-black text-center mb-20">
-              The Five Languages
-            </h2>
+              {/* Value Prop - One Line */}
+              <p className="text-xs md:text-sm text-[#94A3B8] mb-4 max-w-2xl mx-auto">
+                یاد بگیر <span className="text-secondary font-semibold">در هر زبانی خودت باشی</span> و 
+                با <span className="text-secondary font-semibold">اعتماد‌به‌نفس کامل</span> بدرخشی
+              </p>
 
-            <div className="space-y-16">
-              {languages.map((lang, index) => (
-                <div 
-                  key={index}
-                  className="group border-b border-luxury-charcoal/10 pb-12 last:border-b-0 hover:border-luxury-accent/30 transition-all duration-300"
-                >
-                  <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start">
-                    {/* Number */}
-                    <div className="font-elegant text-6xl md:text-7xl text-luxury-charcoal/20 group-hover:text-luxury-accent/40 transition-colors duration-300">
-                      {lang.number}
-                    </div>
-                    
-                    {/* Content */}
-                    <div className="flex-1 pt-2">
-                      <h3 className="font-elegant text-2xl md:text-3xl text-luxury-black mb-3">
-                        {lang.title}
-                      </h3>
-                      <p className="text-lg text-luxury-charcoal/70 leading-relaxed">
-                        {lang.desc}
-                      </p>
+              {/* Compact Price Box - Side by Side */}
+              <div className="bg-gradient-to-br from-secondary/20 to-secondary/10 backdrop-blur-md border-2 border-secondary rounded-xl p-3 md:p-4 mb-3 max-w-sm mx-auto">
+                <div className="flex items-center justify-center gap-4 mb-1.5">
+                  <span className="text-4xl md:text-5xl font-bold text-secondary">$1</span>
+                  <div className="text-right">
+                    <div className="text-[#94A3B8] line-through text-base md:text-lg">$100</div>
+                    <div className="bg-[#FF6B6B] text-white px-2 py-0.5 rounded-full text-[10px] font-bold">
+                      ۹۹٪ تخفیف
                     </div>
                   </div>
                 </div>
-              ))}
+                <p className="text-[#FF6B6B] font-bold text-xs">
+                  ⚠️ فقط ۱۰۰۰ نفر اول
+                </p>
+              </div>
+
+              {/* Primary CTA */}
+              <Button
+                onClick={() => setShowRegistrationForm(true)}
+                className="w-full md:w-auto px-8 md:px-12 py-4 md:py-5 text-base md:text-lg font-bold bg-gradient-to-r from-secondary to-secondary-light hover:brightness-110 text-white rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_40px_rgba(16,185,129,0.6)] transform hover:scale-105 transition-all duration-300 mb-2.5 animate-pulse"
+              >
+                🚀 ثبت نام فوری با $1
+              </Button>
+
+              {/* Trust Indicators - Inline */}
+              <div className="flex flex-wrap items-center justify-center gap-3 text-[#94A3B8] text-[10px]">
+                <div className="flex items-center gap-1">
+                  <Shield className="w-3 h-3 text-secondary" />
+                  <span>پرداخت امن</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Users className="w-3 h-3 text-secondary" />
+                  <span>264K+ زن</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Star className="w-3 h-3 text-secondary fill-secondary" />
+                  <span>4.9/5</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="container mx-auto px-4">
-          <div className="border-t border-luxury-charcoal/10"></div>
+        {/* Compact Problem Section */}
+        <div className="bg-white/5 backdrop-blur-sm py-8">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-4 text-center">
+                آیا این چالش‌ها را تجربه می‌کنی؟
+              </h2>
+              
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {[
+                  "😔 شنیده نمی‌شوی",
+                  "😰 از لهجه خجالت",
+                  "🤐 نمی‌دانی «نه» بگویی",
+                  "😞 دیده نمی‌شوی"
+                ].map((problem, index) => (
+                  <div 
+                    key={index}
+                    className="bg-white/5 border border-[#334155] rounded-lg p-2.5 text-[#E2E8F0] text-xs text-right"
+                  >
+                    {problem}
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-gradient-to-r from-secondary/20 via-secondary/25 to-secondary/20 border border-secondary rounded-lg p-4 text-center">
+                <p className="text-lg md:text-xl font-bold text-secondary mb-1.5">
+                  ✨ خبر خوب: قابل تغییر است!
+                </p>
+                <p className="text-[#E2E8F0] text-xs md:text-sm mb-3">
+                  با «کلاس قدرت دو زبانه»، زبان را به <span className="text-secondary font-bold">ابزار قدرت</span> تبدیل کن
+                </p>
+                <Button
+                  onClick={() => setShowRegistrationForm(true)}
+                  className="px-6 py-2.5 text-sm font-bold bg-secondary hover:brightness-110 text-white rounded-lg transform hover:scale-105 transition-all"
+                >
+                  ✅ می‌خواهم این تغییر را تجربه کنم
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* What You'll Gain Section */}
-        <div className="container mx-auto px-4 py-20 md:py-32">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-elegant text-4xl md:text-5xl text-luxury-black text-center mb-16">
-              What You'll Gain
-            </h2>
+        {/* Compact 5 Modules - Tight Grid Layout */}
+        <div className="py-6 bg-gradient-to-b from-transparent to-white/5">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-4">
+                <h2 className="text-xl md:text-2xl font-bold text-white mb-1.5">
+                  🌿 در کلاس قدرت دو زبانه چه یاد می‌گیری؟
+                </h2>
+                <p className="text-[#94A3B8] text-xs">
+                  5 زبان قدرت که زندگی‌ات را متحول می‌کند
+                </p>
+              </div>
 
-            <div className="grid md:grid-cols-2 gap-12">
-              {[
-                "Unshakeable confidence in any conversation",
-                "The ability to command respect naturally",
-                "Tools to express yourself with clarity and power",
-                "Skills to influence without manipulation",
-                "Authentic leadership presence",
-                "Freedom from self-doubt and overthinking"
-              ].map((benefit, index) => (
-                <div key={index} className="flex gap-4 items-start group">
-                  <CheckCircle2 className="w-6 h-6 text-luxury-accent mt-1 flex-shrink-0" />
-                  <p className="text-lg text-luxury-charcoal/80 group-hover:text-luxury-black transition-colors duration-300">
-                    {benefit}
+              {/* Ultra-Compact 2x3 Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
+                {modules.map((module, index) => {
+                  const Icon = module.icon;
+                  return (
+                    <div 
+                      key={index}
+                      className="bg-white/5 backdrop-blur-sm border border-secondary/20 rounded-lg p-2.5 hover:border-secondary transition-all group text-right"
+                    >
+                      <div className="flex items-start gap-1.5">
+                        <div className="bg-secondary rounded p-1.5 group-hover:scale-110 transition-transform flex-shrink-0">
+                          <Icon className="w-3 h-3 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-xs font-bold text-secondary mb-0.5 leading-tight">
+                            {module.title}
+                          </h3>
+                          <p className="text-[#94A3B8] text-[10px] leading-snug">
+                            {module.desc}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* CTA Card in 6th Grid Spot */}
+                <div className="bg-gradient-to-br from-secondary/25 to-secondary/15 border border-secondary rounded-lg p-2.5 flex flex-col items-center justify-center text-center hover:scale-105 transition-all cursor-pointer"
+                  onClick={() => setShowRegistrationForm(true)}
+                >
+                  <Sparkles className="w-6 h-6 text-secondary mb-1 animate-pulse" />
+                  <p className="text-secondary font-bold text-xs mb-0.5">
+                    همین الان
+                  </p>
+                  <p className="text-white/90 text-[10px]">
+                    فقط $1
                   </p>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="container mx-auto px-4">
-          <div className="border-t border-luxury-charcoal/10"></div>
+        {/* Social Proof - Compact */}
+        <div className="py-6">
+          <TestimonialsSection />
         </div>
 
-        {/* Final CTA Section */}
-        <div className="container mx-auto px-4 py-20 md:py-32">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="font-elegant text-4xl md:text-6xl text-luxury-black mb-8">
-              Transform Your Voice.<br />
-              <span className="italic">Transform Your Life.</span>
-            </h2>
-            
-            <p className="text-xl text-luxury-charcoal/70 mb-12">
-              Join us for this transformative experience
-            </p>
+        {/* Instructor - Compact */}
+        <InstructorBio />
 
-            <Button 
-              size="lg"
-              onClick={() => setShowRegistrationForm(true)}
-              className="bg-luxury-black hover:bg-luxury-charcoal text-white px-12 py-6 text-lg rounded-none transition-all duration-300 h-auto"
-            >
-              Reserve Your Spot Now
-            </Button>
+        {/* FAQ - Compact */}
+        <FAQSection />
+
+        {/* Final CTA - Compact & Powerful */}
+        <div className="bg-gradient-to-br from-secondary/20 via-secondary/15 to-transparent py-8">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-3">
+                ⏰ زمان تصمیم‌گیری رسیده
+              </h2>
+              
+              <div className="grid md:grid-cols-2 gap-2.5 mb-3">
+                {/* Take Action */}
+                <div className="bg-secondary/15 border border-secondary rounded-lg p-3">
+                  <div className="text-3xl mb-1">✅</div>
+                  <h3 className="text-base font-bold text-secondary mb-1">عمل کن</h3>
+                  <ul className="space-y-0.5 text-right text-[#E2E8F0] text-xs mb-1.5">
+                    <li>✨ 5 زبان قدرت</li>
+                    <li>💪 اعتماد‌به‌نفس کامل</li>
+                    <li>💰 فقط $1</li>
+                  </ul>
+                  <p className="text-secondary font-bold text-xs">
+                    = زندگی قدرتمندتر
+                  </p>
+                </div>
+
+                {/* Do Nothing */}
+                <div className="bg-white/5 border border-[#334155] rounded-lg p-3 opacity-70">
+                  <div className="text-3xl mb-1">❌</div>
+                  <h3 className="text-base font-bold text-white/70 mb-1">هیچ کاری نکن</h3>
+                  <ul className="space-y-0.5 text-right text-white/60 text-xs mb-1.5">
+                    <li>😔 شنیده نشوی</li>
+                    <li>😰 خجالت بکشی</li>
+                    <li>💸 بعداً $100</li>
+                  </ul>
+                  <p className="text-white/50 font-bold text-xs">
+                    = همان مشکلات
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-[#FF6B6B]/20 border border-[#FF6B6B] rounded-lg p-2.5 mb-3">
+                <p className="text-[#FF6B6B] font-bold text-sm mb-1.5">
+                  ⚠️ فقط چند جای خالی باقی!
+                </p>
+                <SpotCounter />
+              </div>
+
+              <Button
+                onClick={() => setShowRegistrationForm(true)}
+                className="w-full md:w-auto px-8 md:px-10 py-4 md:py-5 text-lg md:text-xl font-bold bg-gradient-to-r from-secondary to-secondary-light hover:brightness-110 text-white rounded-xl shadow-[0_0_40px_rgba(16,185,129,0.5)] transform hover:scale-105 transition-all mb-2.5"
+              >
+                🚀 بله! ثبت نام با $1
+              </Button>
+
+              <p className="text-[#94A3B8] text-xs">
+                ✓ پرداخت امن | ✓ ضمانت بازگشت وجه | ✓ دسترسی فوری
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-luxury-charcoal/10 py-12">
-          <div className="container mx-auto px-4 text-center">
-            <p className="text-sm text-luxury-charcoal/50">
-              © 2025 LadyBoss Academy. All rights reserved.
-            </p>
+        {/* Cleaner Sticky Bottom CTA */}
+        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-secondary to-secondary-light border-t border-secondary-light/30 p-2 z-50 backdrop-blur-md shadow-[0_-5px_30px_rgba(16,185,129,0.3)]">
+          <div className="container mx-auto max-w-4xl">
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-right flex-1">
+                <p className="text-white font-bold text-xs md:text-sm leading-tight">
+                  فقط $1 • 73 جا باقی
+                </p>
+                <p className="text-white/90 text-[10px] md:text-xs leading-tight">
+                  بعدش $100 می‌شود
+                </p>
+              </div>
+              <Button
+                onClick={() => setShowRegistrationForm(true)}
+                className="px-4 md:px-8 py-2.5 md:py-3 text-sm md:text-base font-bold bg-[#1E293B] hover:bg-[#0F172A] text-secondary rounded-lg shadow-lg transform active:scale-95 transition-all flex-shrink-0"
+              >
+                🚀 ثبت نام
+              </Button>
+            </div>
           </div>
         </div>
+
+        {/* Add padding at bottom to prevent content being hidden by sticky CTA */}
+        <div className="h-16"></div>
       </div>
 
-      {/* Registration Dialog */}
+      {/* Enhanced Registration Modal */}
       <Dialog open={showRegistrationForm} onOpenChange={setShowRegistrationForm}>
-        <DialogContent className="sm:max-w-md bg-white border-luxury-charcoal/10">
-          <DialogHeader>
-            <DialogTitle className="font-elegant text-3xl text-luxury-black text-center mb-2">
-              Reserve Your Spot
+        <DialogContent className="sm:max-w-md bg-luxury-white border-4 border-secondary shadow-2xl">
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-2xl md:text-3xl font-bold text-luxury-black mb-2 font-farsi">
+              💎 ثبت نام Bilingual Power Class !
             </DialogTitle>
-            <DialogDescription className="text-center text-luxury-charcoal/70">
-              Enter your details to secure your place
+            <DialogDescription className="sr-only">
+              Register for the Bilingual Power Class for only $1
             </DialogDescription>
+            <div className="bg-gradient-to-r from-secondary/20 via-secondary/30 to-secondary/20 border-2 border-secondary rounded-xl p-3 mb-2">
+              <p className="text-secondary font-bold text-xl md:text-2xl">
+                فقط $1
+              </p>
+              <p className="text-luxury-accent/70 font-farsi text-xs">
+                1000 نفر اول • قیمت اصلی: $100
+              </p>
+            </div>
           </DialogHeader>
-          
-          <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+
+          <form onSubmit={handleSubmit} className="space-y-4 mt-2">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-luxury-black">Full Name</Label>
+              <Label htmlFor="modal-name" className="text-left block text-luxury-black font-medium text-sm">
+                Your Name
+              </Label>
               <Input
-                id="name"
+                id="modal-name"
+                type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Your full name"
+                placeholder="Your Name"
                 required
-                className="border-luxury-charcoal/20 focus:border-luxury-black rounded-none"
+                className="text-left h-11 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
+                dir="ltr"
               />
               {validationErrors.name && (
-                <p className="text-sm text-destructive">{validationErrors.name}</p>
+                <p className="text-red-500 text-xs">{validationErrors.name}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-luxury-black">Email Address</Label>
+              <Label htmlFor="modal-email" className="text-left block text-luxury-black font-medium text-sm">
+                Your Email
+              </Label>
               <Input
-                id="email"
+                id="modal-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
+                placeholder="your.email@example.com"
                 required
-                className="border-luxury-charcoal/20 focus:border-luxury-black rounded-none"
+                className="text-left h-11 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
+                dir="ltr"
               />
               {validationErrors.email && (
-                <p className="text-sm text-destructive">{validationErrors.email}</p>
+                <p className="text-red-500 text-xs">{validationErrors.email}</p>
               )}
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
+              className="w-full h-12 text-lg font-bold bg-gradient-to-r from-secondary to-secondary-light hover:from-secondary-light hover:to-secondary text-luxury-white font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow border-2 border-secondary-light"
               disabled={isSubmitting}
-              className="w-full bg-luxury-black hover:bg-luxury-charcoal text-white py-6 rounded-none h-auto"
             >
-              {isSubmitting ? "Processing..." : "Complete Registration"}
+              {isSubmitting ? 'در حال ارسال...' : '✅ پرداخت $1'}
             </Button>
-
-            <div className="flex items-center justify-center gap-2 text-xs text-luxury-charcoal/50">
-              <CheckCircle2 className="w-3 h-3" />
-              <span>Secure Payment</span>
-            </div>
           </form>
+
+          <div className="mt-3">
+            <div className="flex items-center justify-center gap-4 text-luxury-accent/70 text-[10px]">
+              <div className="flex items-center gap-1">
+                <Shield className="w-3 h-3 text-secondary" />
+                <span>امن</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Lock className="w-3 h-3 text-secondary" />
+                <span>SSL</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-secondary" />
+                <span>ضمانت</span>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </>
