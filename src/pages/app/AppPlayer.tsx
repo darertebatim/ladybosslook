@@ -6,6 +6,7 @@ import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { isNativeApp } from "@/lib/platform";
 
 export default function AppPlayer() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -82,6 +83,19 @@ export default function AppPlayer() {
     },
   });
 
+  // Fetch programs to check mobile availability
+  const { data: programs } = useQuery({
+    queryKey: ['programs-mobile-check'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_catalog')
+        .select('slug, available_on_mobile');
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const getPlaylistStats = (playlistId: string) => {
     const items = playlistItems?.filter(item => item.playlist_id === playlistId) || [];
     const trackCount = items.length;
@@ -103,6 +117,20 @@ export default function AppPlayer() {
     return !enrollments?.includes(playlist.program_slug);
   };
 
+  const isPlaylistAvailableOnMobile = (playlist: any) => {
+    // If no program_slug, it's a standalone free playlist - show it
+    if (!playlist.program_slug) return true;
+    
+    // If in native app, check if the associated program is available on mobile
+    if (isNativeApp()) {
+      const program = programs?.find(p => p.slug === playlist.program_slug);
+      return program?.available_on_mobile !== false;
+    }
+    
+    // On web, show all playlists
+    return true;
+  };
+
   const filterPlaylistByProgress = (playlist: any) => {
     const stats = getPlaylistStats(playlist.id);
     const progress = stats.trackCount > 0 ? (stats.completedTracks / stats.trackCount) * 100 : 0;
@@ -121,6 +149,7 @@ export default function AppPlayer() {
   const filterByCategory = (category: string) => {
     return playlists
       ?.filter(p => !p.is_hidden) // Extra safety: filter hidden playlists client-side
+      ?.filter(isPlaylistAvailableOnMobile)
       ?.filter(p => p.category === category)
       .filter(filterPlaylistBySearch)
       .filter(filterPlaylistByProgress) || [];
@@ -129,6 +158,7 @@ export default function AppPlayer() {
   const getAllPlaylists = () => {
     return playlists
       ?.filter(p => !p.is_hidden) // Extra safety: filter hidden playlists client-side
+      ?.filter(isPlaylistAvailableOnMobile)
       ?.filter(filterPlaylistBySearch)
       .filter(filterPlaylistByProgress) || [];
   };
@@ -186,7 +216,7 @@ export default function AppPlayer() {
   const continueListening = playlists?.filter(playlist => {
     const stats = getPlaylistStats(playlist.id);
     const progress = stats.trackCount > 0 ? (stats.completedTracks / stats.trackCount) * 100 : 0;
-    return progress > 0 && progress < 100 && !isPlaylistLocked(playlist);
+    return progress > 0 && progress < 100 && !isPlaylistLocked(playlist) && isPlaylistAvailableOnMobile(playlist);
   }).sort((a, b) => {
     // Sort by most recently played
     const itemsA = playlistItems?.filter(i => i.playlist_id === a.id) || [];
