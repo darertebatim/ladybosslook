@@ -11,12 +11,16 @@ import { format } from 'date-fns';
 import { toast } from "sonner";
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { isNativeApp } from '@/lib/platform';
-import { PurchaseButton } from '@/components/PurchaseButton';
 import { programImages } from '@/data/programs';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
+import { Loader2 } from 'lucide-react';
 
 const AppCourseDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   // Fetch enrollment and round data
   const { data: enrollment, isLoading: enrollmentLoading } = useQuery({
@@ -100,6 +104,32 @@ const AppCourseDetail = () => {
     window.open(telegramUrl, '_blank');
   };
 
+  // Free enrollment mutation
+  const enrollMutation = useMutation({
+    mutationFn: async () => {
+      if (!user?.id || !program) throw new Error('Missing required data');
+      
+      const { error } = await supabase
+        .from('course_enrollments')
+        .insert({
+          user_id: user.id,
+          course_name: program.title,
+          program_slug: program.slug,
+          status: 'active'
+        });
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Enrolled successfully!');
+      queryClient.invalidateQueries({ queryKey: ['course-enrollment', slug] });
+    },
+    onError: (error) => {
+      console.error('Enrollment error:', error);
+      toast.error('Failed to enroll. Please try again.');
+    }
+  });
+
   return (
     <div className="container max-w-4xl py-6 px-4">
       <SEOHead 
@@ -180,24 +210,38 @@ const AppCourseDetail = () => {
                     </div>
                   )}
 
-                  {/* Price & Purchase */}
+                  {/* Free Enrollment */}
                   <div className="border-t pt-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Investment</p>
-                        <p className="text-3xl font-bold">${(program.price_amount / 100).toFixed(0)}</p>
-                      </div>
-                    </div>
-
-                    <PurchaseButton
-                      programSlug={program.slug}
-                      price={program.price_amount / 100}
-                      buttonText="Enroll Now"
-                      className="w-full"
-                    />
+                    {enrollment ? (
+                      <Button 
+                        size="lg" 
+                        className="w-full" 
+                        variant="secondary"
+                        disabled
+                      >
+                        <CheckCircle2 className="mr-2 h-5 w-5" />
+                        Enrolled
+                      </Button>
+                    ) : (
+                      <Button 
+                        size="lg" 
+                        className="w-full"
+                        onClick={() => enrollMutation.mutate()}
+                        disabled={enrollMutation.isPending}
+                      >
+                        {enrollMutation.isPending ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Enrolling...
+                          </>
+                        ) : (
+                          'Enroll Free'
+                        )}
+                      </Button>
+                    )}
 
                     <p className="text-xs text-center text-muted-foreground mt-4">
-                      Secure checkout • Instant access after purchase
+                      Free enrollment • Instant access
                     </p>
                   </div>
                 </CardContent>
