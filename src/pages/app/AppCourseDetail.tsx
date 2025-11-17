@@ -158,9 +158,10 @@ const AppCourseDetail = () => {
                 <CardHeader>
                   <CardTitle className="text-2xl">{program.title}</CardTitle>
                   {program.description && (
-                    <p className="text-muted-foreground mt-2">
-                      {program.description}
-                    </p>
+                    <div 
+                      className="text-muted-foreground mt-2 whitespace-pre-wrap leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: program.description }}
+                    />
                   )}
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -278,7 +279,7 @@ const AppCourseDetail = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Audio content for this course
+                    Content for this course
                   </p>
                   <Button 
                     className="w-full" 
@@ -286,7 +287,7 @@ const AppCourseDetail = () => {
                     onClick={() => navigate(`/app/player/playlist/${(program as any).audio_playlist_id}`)}
                   >
                     <Music className="h-5 w-5 mr-2" />
-                    Open Audio Playlist
+                    Open Playlist
                   </Button>
                 </CardContent>
               </Card>
@@ -316,7 +317,10 @@ const AppCourseDetail = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {program?.description && (
-                  <p className="text-muted-foreground">{program.description}</p>
+                  <div 
+                    className="text-muted-foreground whitespace-pre-wrap leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: program.description }}
+                  />
                 )}
                 {round && (
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t">
