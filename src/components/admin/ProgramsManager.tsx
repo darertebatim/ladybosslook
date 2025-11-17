@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { GraduationCap, Plus, RefreshCw, Pencil, Trash2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { RichTextEditor } from './RichTextEditor';
 
 interface ProgramCatalog {
   id: string;
@@ -462,12 +463,10 @@ export function ProgramsManager() {
 
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
+                <RichTextEditor
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Program description..."
-                  rows={3}
+                  onChange={(value) => setFormData({ ...formData, description: value })}
+                  placeholder="Program description... Use the toolbar to format text with bold, lists, headers, etc."
                 />
               </div>
 
