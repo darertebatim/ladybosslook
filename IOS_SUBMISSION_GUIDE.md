@@ -3,9 +3,9 @@
 ## Quick Reference
 
 **App Name:** Ladybosslook  
-**Bundle ID:** app.lovable.9d54663c1af540669ceb1723206ae5f8  
+**Bundle ID:** com.ladybosslook.academy  
 **Developer:** Ladybosslook LLC  
-**App Type:** Reader/Player App (authenticated content only)  
+**App Type:** Free Educational App (no in-app purchases)  
 **Current Status:** Ready for iOS submission  
 **Target:** Apple App Store
 
@@ -23,7 +23,7 @@
 - ✅ Privacy policy page at `/privacy`
 - ✅ Refund policy page at `/refund-policy`
 - ✅ SMS terms page at `/sms-terms`
-- ✅ Stripe payment integration (opens in Safari)
+- ✅ Free enrollment system (no payment integration needed)
 - ✅ Push notifications infrastructure
 - ✅ PWA install prompts hidden in native app
 - ✅ App store metadata prepared with correct branding
@@ -45,7 +45,6 @@
 2. **Set Up App Store Connect**
    - Go to https://appstoreconnect.apple.com
    - Complete tax forms (required for free apps too)
-   - Set up banking info (if accepting payments)
    - Add team members if needed
 
 3. **Create App Listing**
@@ -53,7 +52,7 @@
    - Platform: iOS
    - Name: Ladybosslook
    - Primary Language: English (U.S.)
-   - Bundle ID: app.lovable.9d54663c1af540669ceb1723206ae5f8
+   - Bundle ID: com.ladybosslook.academy
    - SKU: ladybosslook-001 (or any unique identifier)
 
 **⏱️ Estimated Time: 1-3 days (waiting for approval)**
@@ -103,7 +102,7 @@ npx cap open ios
 2. Go to "Signing & Capabilities" tab
 3. Check "Automatically manage signing"
 4. Select your Team (your Apple Developer account)
-5. Verify Bundle Identifier: `app.lovable.9d54663c1af540669ceb1723206ae5f8`
+5. Verify Bundle Identifier: `com.ladybosslook.academy`
 
 #### B. App Icons
 1. Open `App/App/Assets.xcassets/AppIcon.appiconset/`
@@ -172,10 +171,10 @@ npx cap run ios
 - [ ] Admin route `/admin` is not accessible in native app
 - [ ] Login/signup works
 - [ ] Course browsing loads correctly
+- [ ] Free enrollment works ("Enroll Free" button)
 - [ ] Audio playback works
 - [ ] Push notification permission prompt appears
-- [ ] Stripe checkout opens in Safari
-- [ ] Return from Safari after payment works
+- [ ] Telegram support link opens correctly
 - [ ] Offline mode works (enable airplane mode, test audio)
 - [ ] Profile page loads
 - [ ] All navigation works within `/app` routes
@@ -188,17 +187,19 @@ npx cap run ios
 
 **CRITICAL: Apple reviewers need working credentials**
 
-1. Create a test account in Supabase: `reviewer@ladybosslook.com`
-2. Enroll this account in sample courses
-3. Ensure it has access to:
-   - At least 2-3 complete courses
-   - Audio library access
-   - All main features visible in the app
-4. Test the login yourself before submitting
+**Two Test Accounts Needed:**
 
-**Write down credentials (you'll need these):**
+**Account 1 - Pre-Enrolled User (shows enrolled content):**
 - Email: `reviewer@ladybosslook.com`
-- Password: `ReviewAccess2025!` (or your chosen password)
+- Password: `ReviewTest2025!`
+- Has free courses pre-enrolled
+- Shows course content, audio playlists
+
+**Account 2 - New User (tests enrollment flow):**
+- Email: `reviewer2@ladybosslook.com`
+- Password: `ReviewAccess2025!`
+- No enrollments
+- For testing "Enroll Free" button flow
 
 **⏱️ Estimated Time: 30 minutes**
 
@@ -344,14 +345,14 @@ npx cap run ios
    - ✅ Check "Sign-in required"
 
 3. **Notes**
-   - Copy the reviewer notes from `APP_STORE_METADATA.md`
+   - Copy the reviewer notes from `APP_STORE_REVIEW_NOTES_FOR_SUBMISSION.md`
    - Key points:
-     - **This is a reader/player app** for enrolled users to access educational content
-     - App shows authenticated content only (no marketing pages)
+     - **Free educational app** - no purchases required
+     - All courses available for free enrollment via "Enroll Free" button
      - Educational platform for women entrepreneurs
      - Push notifications for course updates and motivational content
-     - Stripe payment opens in Safari per Apple guidelines (Guideline 3.1.1)
-     - Demo account has full access to test all features
+     - Two test accounts provided (one pre-enrolled, one for testing enrollment)
+     - Telegram support available at @ladybosslook
 
 #### E. App Privacy (Privacy Nutrition Labels)
 
@@ -392,7 +393,7 @@ For each data type, specify:
 - [ ] App Review notes complete
 - [ ] Privacy Nutrition Labels filled
 - [ ] All links in app tested
-- [ ] Test payment flow working
+- [ ] Test free enrollment flow working
 
 **Submit:**
 1. Click "Submit for Review" (blue button, top-right)
@@ -437,11 +438,11 @@ For each data type, specify:
 - ✅ Fix all crashes before submitting
 
 ### 2. **Guideline 3.1.1 - In-App Purchase**
-**Why:** External payment not clearly communicated  
+**Why:** Offering paid digital content without IAP  
 **Prevention:**
-- ✅ Your app already handles this correctly (opens Safari)
-- ✅ Mention in reviewer notes that Stripe opens in Safari
-- ✅ Ensure smooth return to app after payment
+- ✅ Your app is completely free (no purchases required)
+- ✅ All courses available for free enrollment
+- ✅ No payment integration in the app
 
 ### 3. **Guideline 5.1.1 - Data Collection and Storage**
 **Why:** Privacy policy incomplete or not accessible  
@@ -547,10 +548,11 @@ npx cap sync ios
 - Test on real device (not simulator)
 - Check token registration in your database
 
-### Stripe Checkout Not Opening
-- Verify Browser plugin installed
-- Check Safari is default browser
-- Test on real device
+### Free Enrollment Not Working
+- Verify user is signed in
+- Check course is marked as free on iOS in admin
+- Test with both demo accounts
+- Check database enrollment records
 
 ### Can't Upload to App Store
 - Verify Apple Developer account active
