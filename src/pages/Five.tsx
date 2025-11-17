@@ -170,7 +170,7 @@ const Five = () => {
 
               {/* Main Headline */}
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-1.5 leading-tight">
-                Bilingual Power Class!
+                Five language of Empowered woman
               </h1>
               
               {/* Persian Title */}
