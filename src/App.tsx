@@ -35,6 +35,7 @@ import EventIrvine from "./pages/EventIrvine";
 import ExpressAssert from "./pages/ExpressAssert";
 import FreeLive from "./pages/FreeLive";
 import One from "./pages/One";
+import Five from "./pages/Five";
 import Giveaway from "./pages/Giveaway";
 import IQMoneyWorkshop from "./pages/IQMoneyWorkshop";
 import Index from "./pages/Index";
@@ -110,6 +111,7 @@ const App = () => (
             <Route path="/announcements/ccw" element={<CCWAnnouncements />} />
             {!isNativeApp() && <Route path="/freelive" element={<FreeLive />} />}
             {!isNativeApp() && <Route path="/one" element={<One />} />}
+            {!isNativeApp() && <Route path="/five" element={<Five />} />}
             {!isNativeApp() && <Route path="/thankfreelive" element={<ThankFreeLive />} />}
             {!isNativeApp() && <Route path="/thankone" element={<ThankOne />} />}
             {!isNativeApp() && <Route path="/iqmoney" element={<IQMoneyWorkshop />} />}
