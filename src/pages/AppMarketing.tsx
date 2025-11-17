@@ -7,18 +7,18 @@ const AppMarketing = () => {
   const features = [
     {
       icon: BookOpen,
-      title: "Expert-Led Courses",
-      description: "Access transformative courses designed specifically for women's personal and professional growth"
+      title: "Free Courses",
+      description: "Enroll in transformative courses at no cost—personal and professional development content for women"
     },
     {
       icon: Headphones,
-      title: "Audio Learning",
-      description: "Listen to empowering content anywhere with our comprehensive audio library"
+      title: "Audio Content",
+      description: "Listen to empowering audiobooks and podcasts anywhere with background playback support"
     },
     {
       icon: Users,
-      title: "Supportive Community",
-      description: "Connect with like-minded women on their journey to empowerment"
+      title: "Instant Access",
+      description: "Sign up and start learning immediately—no payment required, no subscriptions"
     },
     {
       icon: Award,
@@ -50,10 +50,10 @@ const AppMarketing = () => {
           <div className="container mx-auto px-4 py-16 md:py-24">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-                Empower Your Journey
+                Free Educational Courses for Women
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground mb-8">
-                Unlock your potential with expert-led courses designed for women's growth and success
+                Access free empowerment courses, audiobooks, and personal development content designed for your growth
               </p>
               <Button size="lg" asChild>
                 <a href="https://ladybosslook.com">
@@ -123,10 +123,10 @@ const AppMarketing = () => {
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-              Ready to Transform Your Life?
+              Start Your Free Learning Journey Today
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Join thousands of women who have already started their empowerment journey
+              Join women worldwide accessing free educational content for personal growth and empowerment
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
