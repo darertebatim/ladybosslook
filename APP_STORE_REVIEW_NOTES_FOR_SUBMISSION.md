@@ -54,12 +54,9 @@ All courses include:
 
 **External Services (User-Initiated Only):**
 - **Telegram (@ladybosslook):** Optional student support communication channel (users must choose to contact)
-- **Google Meet links:** Live webinar session links included in some course materials (optional attendance)
-- **Calendar downloads:** ICS files allowing users to add course events to their personal calendar (user-initiated action)
 
 **Permissions Requested:**
 - **Push Notifications:** Course updates and announcements (user must explicitly opt-in during first launch)
-- **Calendar Access:** Only requested when user explicitly taps "Add to Calendar" button
 
 **Privacy & Data:**
 - User data stored securely via Supabase backend
