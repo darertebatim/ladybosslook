@@ -37,8 +37,12 @@ const AppStore = () => {
     return enrollments.some(e => e.program_slug === slug);
   };
 
-  // Filter to show only free programs
-  const freePrograms = programs.filter(p => p.isFree || p.priceAmount === 0);
+  // Filter to show only free programs or programs marked free on iOS
+  const freePrograms = programs.filter(p => 
+    p.isFree || 
+    p.priceAmount === 0 || 
+    (p as any).is_free_on_ios === true
+  );
 
   if (programsLoading) {
     return (
