@@ -28,7 +28,6 @@ import RathusAssessment from "./pages/RathusAssessment";
 import BusinessGrowthAccelerator from "./pages/BusinessGrowthAccelerator";
 import BusinessStartupAccelerator from "./pages/BusinessStartupAccelerator";
 
-import CourageousWorkshop from "./pages/CourageousWorkshop";
 import CourageousCharacter from "./pages/CourageousCharacter";
 import CCPayDirect from "./pages/CCPayDirect";
 import EventIrvine from "./pages/EventIrvine";
@@ -40,7 +39,6 @@ import IQMoneyWorkshop from "./pages/IQMoneyWorkshop";
 import Index from "./pages/Index";
 import LadybossAnnouncements from "./pages/LadybossAnnouncements";
 import CCWAnnouncements from "./pages/CCWAnnouncements";
-import EmpoweredWomanCoaching from "./pages/EmpoweredWomanCoaching";
 import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -93,8 +91,7 @@ const App = () => (
           <Route path="/business-ideas" element={<BusinessIdeas />} />
           <Route path="/business-growth-accelerator" element={<BusinessGrowthAccelerator />} />
             <Route path="/business-startup-accelerator" element={<BusinessStartupAccelerator />} />
-            {!isNativeApp() && <Route path="/event-irvine" element={<EventIrvine />} />}
-          {!isNativeApp() && <Route path="/ccw" element={<CourageousWorkshop />} />}
+          {!isNativeApp() && <Route path="/event-irvine" element={<EventIrvine />} />}
           {!isNativeApp() && <Route path="/cc" element={<CourageousCharacter />} />}
           {!isNativeApp() && <Route path="/ccpay" element={<CCPayDirect />} />}
           {!isNativeApp() && <Route path="/payment-success" element={<PaymentSuccess />} />}
@@ -104,8 +101,6 @@ const App = () => (
             <Route path="/appsupport" element={<AppSupport />} />
             <Route path="/appmarketing" element={<AppMarketing />} />
             <Route path="/giveaway" element={<Giveaway />} />
-            {!isNativeApp() && <Route path="/ewc" element={<EmpoweredWomanCoaching />} />}
-            {!isNativeApp() && <Route path="/ewcnow" element={<EmpoweredWomanCoaching />} />}
             <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
             <Route path="/announcements/ccw" element={<CCWAnnouncements />} />
             {!isNativeApp() && <Route path="/freelive" element={<FreeLive />} />}
