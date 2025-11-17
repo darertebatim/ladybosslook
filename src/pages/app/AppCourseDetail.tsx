@@ -190,7 +190,6 @@ const AppCourseDetail = () => {
 
                     <PurchaseButton
                       programSlug={program.slug}
-                      iosProductId={(program as any).ios_product_id || undefined}
                       price={program.price_amount / 100}
                       buttonText="Enroll Now"
                       className="w-full"
