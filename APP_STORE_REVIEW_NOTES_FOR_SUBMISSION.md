@@ -7,38 +7,24 @@
 **App Overview:**
 LadyBoss Academy is a free educational platform offering personal and professional development courses and audio content for women. All courses are available for free enrollment.
 
-**Test Accounts:**
-
-**Account 1 - Pre-Enrolled User (View Course Content):**
+**Test Account:**
 - Email: reviewer@ladybosslook.com
 - Password: ReviewAccess2025!
-- Purpose: This account has courses already enrolled. Use it to explore course content, audio playlists, and all features without needing to enroll.
-
-**Account 2 - New User (Test Free Enrollment Flow):**
-- Email: reviewer2@ladybosslook.com
-- Password: ReviewAccess2025!
-- Purpose: This account has NO enrolled courses. Use it to test the free enrollment process from browsing to accessing content.
+- Purpose: This account has courses already enrolled. Use it to explore course content, audio playlists, and all features. You can also test free enrollment by browsing and enrolling in additional courses.
 
 **Key Features to Test:**
 
-**With Account 1 (reviewer@ladybosslook.com - Pre-Enrolled):**
 1. **Sign in** → Access dashboard with enrolled courses displayed
-2. **Courses tab** → View enrolled courses with materials and playlists
-3. **Audio Player tab** → Browse and play audio playlists (supports background playback)
-4. **Course Details** → Tap any enrolled course to view:
+2. **Browse tab** → View all available free courses and test enrolling in additional courses
+3. **Courses tab** → View enrolled courses with materials and playlists
+4. **Audio Player tab** → Browse and play audio playlists (supports background playback)
+5. **Course Details** → Tap any enrolled course to view:
    - Course materials (downloadable PDFs)
    - Audio playlists (if available)
    - Course announcements
    - Support contact options
-5. **Profile tab** → View user information and logout
-
-**With Account 2 (reviewer2@ladybosslook.com - Test Free Enrollment):**
-1. **Sign in** → Access dashboard (no enrolled courses initially)
-2. **Browse tab** → View all available free courses
-3. **Select a course** → Tap any course card to view details
-4. **Tap "Enroll Free"** → Course enrolls instantly (no payment required)
-5. **Navigate to Courses tab** → See newly enrolled course appear
-6. **Access content** → Tap the course to access materials, playlists, and resources
+6. **Enroll Free** → From Browse tab, tap any course and use "Enroll Free" button (instant enrollment, no payment)
+7. **Profile tab** → View user information and logout
 
 **Content & Materials:**
 All courses include:
@@ -80,6 +66,7 @@ All program content is delivered in English.
 - All courses can be enrolled in at no cost
 - No payment processing or subscription systems are present in the app
 - Users simply sign up, browse courses, and enroll for free
+- The test account already has courses enrolled, but reviewers can also test the enrollment flow by enrolling in additional courses from the Browse tab
 
 Thank you for reviewing LadyBoss Academy!
 
