@@ -191,7 +191,7 @@ npx cap run ios
 
 **Account 1 - Pre-Enrolled User (shows enrolled content):**
 - Email: `reviewer@ladybosslook.com`
-- Password: `ReviewTest2025!`
+- Password: `ReviewAccess2025!`
 - Has free courses pre-enrolled
 - Shows course content, audio playlists
 

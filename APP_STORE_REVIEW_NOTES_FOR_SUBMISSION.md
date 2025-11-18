@@ -11,7 +11,7 @@ LadyBoss Academy is a free educational platform offering personal and profession
 
 **Account 1 - Pre-Enrolled User (View Course Content):**
 - Email: reviewer@ladybosslook.com
-- Password: ReviewTest2025!
+- Password: ReviewAccess2025!
 - Purpose: This account has courses already enrolled. Use it to explore course content, audio playlists, and all features without needing to enroll.
 
 **Account 2 - New User (Test Free Enrollment Flow):**
@@ -47,10 +47,9 @@ All courses include:
 - **Course Updates:** Announcements and important information
 - **Support Access:** Direct contact options for student support
 
-**Available Courses (Free Enrollment):**
+**Available Content (Free Access):**
 1. **Ready to Empowered (English)** - Personal empowerment audiobook with exercises and reflection materials
-2. **Bilingual Power Class** - Communication skills development with live session materials
-3. **Courageous Character Course** - Confidence building program with comprehensive workbook
+2. **LBPodcast (English)** - Educational podcast series on personal and professional development topics
 
 **External Services (User-Initiated Only):**
 - **Telegram (@ladybosslook):** Optional student support communication channel (users must choose to contact)
