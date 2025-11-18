@@ -63,7 +63,7 @@ export function WelcomeSection() {
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/app/audio-player')}>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/app/player')}>
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center gap-3">
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
