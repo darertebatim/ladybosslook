@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { StatsCards } from '@/components/dashboard/StatsCards';
 import { Announcements } from '@/components/dashboard/Announcements';
 import { ActiveRound } from '@/components/dashboard/ActiveRound';
+import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
 import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
 import { Send, Mail } from 'lucide-react';
@@ -96,12 +97,18 @@ const AppHome = () => {
           <p className="text-sm text-muted-foreground">{user?.email}</p>
         </div>
 
-        <StatsCards 
-          enrolledCount={enrollments?.length || 0}
-          creditsBalance={wallet?.credits_balance || 0}
-        />
-        {hasActiveRounds && <ActiveRound />}
-        <Announcements />
+        {enrollments?.length === 0 ? (
+          <WelcomeSection />
+        ) : (
+          <>
+            <StatsCards 
+              enrolledCount={enrollments?.length || 0}
+              creditsBalance={wallet?.credits_balance || 0}
+            />
+            {hasActiveRounds && <ActiveRound />}
+            <Announcements />
+          </>
+        )}
         
         <div className="flex flex-col items-center gap-3">
           <Button
