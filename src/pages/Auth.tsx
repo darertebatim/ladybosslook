@@ -65,11 +65,6 @@ export default function Auth() {
               : 'Enter your information to create an account'
             }
           </CardDescription>
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mt-4">
-            <p className="text-base font-semibold text-foreground text-center">
-              For First Time, use your email as both username and password
-            </p>
-          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
