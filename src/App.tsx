@@ -124,7 +124,7 @@ const App = () => (
               <Route index element={<Navigate to="/app/home" replace />} />
               <Route path="home" element={<AppHome />} />
               <Route path="courses" element={<AppCourses />} />
-              <Route path="store" element={<AppStore />} />
+              <Route path="browse" element={<AppStore />} />
               <Route path="course/:slug" element={<AppCourseDetail />} />
               <Route path="player" element={<AppPlayer />} />
               <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />

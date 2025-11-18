@@ -11,7 +11,7 @@ const NativeAppLayout = () => {
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home' },
     { path: '/app/courses', icon: BookOpen, label: 'Courses' },
-    { path: '/app/store', icon: ShoppingBag, label: 'Browse' },
+    { path: '/app/browse', icon: ShoppingBag, label: 'Browse' },
     { path: '/app/player', icon: Headphones, label: 'Player' },
     { path: '/app/profile', icon: User, label: 'Profile' },
   ];
