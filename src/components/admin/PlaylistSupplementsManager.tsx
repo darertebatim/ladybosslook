@@ -279,26 +279,31 @@ export const PlaylistSupplementsManager = ({
                 <TableBody>
                   {supplements.map((supplement, index) => (
                     <TableRow key={supplement.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleMoveUp(index)}
-                            disabled={index === 0 || reorderMutation.isPending}
-                          >
-                            <ArrowUp className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleMoveDown(index)}
-                            disabled={index === supplements.length - 1 || reorderMutation.isPending}
-                          >
-                            <ArrowDown className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="min-w-[2rem] justify-center">
+                        {index + 1}
+                      </Badge>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleMoveUp(index)}
+                          disabled={index === 0 || reorderMutation.isPending}
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleMoveDown(index)}
+                          disabled={index === supplements.length - 1 || reorderMutation.isPending}
+                        >
+                          <ArrowDown className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </TableCell>
                       <TableCell>
                         <Badge className={getTypeBadge(supplement.type)}>
                           {getTypeIcon(supplement.type)}
