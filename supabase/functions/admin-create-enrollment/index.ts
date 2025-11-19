@@ -153,7 +153,6 @@ const handler = async (req: Request): Promise<Response> => {
         console.error('Error creating profile:', profileError);
       }
     }
-    }
 
     // Check if enrollment already exists
     const { data: existingEnrollment } = await supabase
