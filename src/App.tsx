@@ -14,7 +14,7 @@ import AppCourses from "@/pages/app/AppCourses";
 import AppStore from "@/pages/app/AppStore";
 import AppCourseDetail from "@/pages/app/AppCourseDetail";
 import AppProfile from "@/pages/app/AppProfile";
-import AppInstall from "@/pages/app/AppInstall";
+
 import AppPlayer from "@/pages/app/AppPlayer";
 import AppPlaylistDetail from "@/pages/app/AppPlaylistDetail";
 import AppAudioPlayer from "@/pages/app/AppAudioPlayer";
@@ -118,8 +118,7 @@ const App = () => (
             <Route path="/rathus" element={<RathusAssessment />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             
-            {/* App Routes - PWA Experience */}
-            <Route path="/app/install" element={<AppInstall />} />
+            {/* App Routes */}
             <Route path="/app" element={<ProtectedRoute><PlatformAwareAppLayout /></ProtectedRoute>}>
               <Route index element={<Navigate to="/app/home" replace />} />
               <Route path="home" element={<AppHome />} />
