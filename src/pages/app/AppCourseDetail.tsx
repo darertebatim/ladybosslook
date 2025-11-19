@@ -360,6 +360,19 @@ const AppCourseDetail = () => {
                     </Button>
                   )}
 
+                  {/* Round Audio Playlist */}
+                  {round.audio_playlist_id && (
+                    <Button 
+                      variant="default" 
+                      size="lg" 
+                      className="w-full"
+                      onClick={() => navigate(`/app/player/playlist/${round.audio_playlist_id}`)}
+                    >
+                      <Music className="h-5 w-5 mr-2" />
+                      Round Playlist
+                    </Button>
+                  )}
+
                   {/* Contact Telegram Support */}
                   {round.whatsapp_support_number && (
                     <Button 
