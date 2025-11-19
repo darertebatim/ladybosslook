@@ -13,8 +13,8 @@ export const isDefinitelyNative = (): boolean => {
       console.log('[Platform] 🔐 NUCLEAR GUARD: Global flag confirms NATIVE');
       return true;
     }
-    if ((window as any).__PWA_DISABLED__ === true) {
-      console.log('[Platform] 🔐 NUCLEAR GUARD: PWA disabled flag confirms NATIVE');
+    if ((window as any).__NATIVE_DISABLED__ === true) {
+      console.log('[Platform] 🔐 NUCLEAR GUARD: Native disabled flag set');
       return true;
     }
   }

@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
-import webPush from 'npm:web-push@3.6.7';
 import { create } from 'https://deno.land/x/djwt@v3.0.2/mod.ts';
 
 const corsHeaders = {
@@ -241,102 +240,59 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const vapidPublicKey = Deno.env.get('VAPID_PUBLIC_KEY');
-    const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY');
-
-    if (!vapidPublicKey || !vapidPrivateKey) {
-      console.error('VAPID keys not configured');
-      return new Response(
-        JSON.stringify({ error: 'VAPID keys not configured' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      );
-    }
-
-    // Configure web-push with VAPID details
-    webPush.setVapidDetails(
-      'mailto:noreply@lovable.app',
-      vapidPublicKey,
-      vapidPrivateKey
-    );
+    console.log(`📊 Found ${subscriptions.length} native iOS subscriptions to notify`);
 
     let successCount = 0;
     let failedCount = 0;
     const failedSubscriptions: string[] = [];
 
-    const payload = JSON.stringify({
-      title,
-      body,
-      icon: icon || '/pwa-192x192.png',
-      url: url || '/app/home',
-    });
-
-    // Send push notifications
+    // Send push notifications to native iOS devices only
     for (const subscription of subscriptions) {
       try {
-        // Check if it's a native iOS token
-        if (subscription.endpoint.startsWith('native:')) {
-          const nativeToken = subscription.endpoint.replace('native:', '');
-          console.log(`📱 Detected native iOS token for user ${subscription.user_id}`);
-          
-          const response = await sendToApns(nativeToken, {
-            title,
-            body,
-            url: url || '/app/home',
-          });
-          
-          if (response.ok) {
-            successCount++;
-            console.log(`✅ Native push sent to user ${subscription.user_id}`);
-          } else {
-            const errorBody = await response.text();
-            console.error(`❌ APNs error (${response.status}):`, errorBody);
-            
-            // Mark invalid tokens for deletion (410 = Unregistered, 400 = BadDeviceToken)
-            if (response.status === 410 || response.status === 400) {
-              failedSubscriptions.push(subscription.id);
-              console.log(`Marking native subscription ${subscription.id} for deletion`);
-            }
-            
-            throw new Error(`APNs error: ${response.status} - ${errorBody}`);
-          }
-        } else {
-          // Web push for PWA users
-          const pushSubscription = {
-            endpoint: subscription.endpoint,
-            keys: {
-              p256dh: subscription.p256dh_key,
-              auth: subscription.auth_key,
-            },
-          };
-
-          await webPush.sendNotification(pushSubscription, payload);
+        // Extract native iOS token
+        const token = subscription.endpoint.replace('native:', '');
+        console.log(`📱 Sending to native iOS device for user ${subscription.user_id}`);
+        
+        const response = await sendToApns(token, {
+          title,
+          body,
+          url: url || '/app/home',
+        });
+        
+        if (response.ok) {
           successCount++;
-          console.log(`✅ Web push sent to user ${subscription.user_id}`);
+          console.log(`✅ Push notification sent successfully to user ${subscription.user_id}`);
+        } else {
+          const errorBody = await response.text();
+          console.error(`❌ APNs error (${response.status}):`, errorBody);
+          
+          // Mark invalid tokens for deletion (410 = Unregistered, 400 = BadDeviceToken)
+          if (response.status === 410 || response.status === 400) {
+            failedSubscriptions.push(subscription.id);
+            console.log(`Marking subscription ${subscription.id} for deletion (invalid token)`);
+          }
+          
+          failedCount++;
         }
       } catch (error: any) {
         failedCount++;
         
-        // Only add to failed subscriptions if not already added
         if (!failedSubscriptions.includes(subscription.id)) {
           failedSubscriptions.push(subscription.id);
         }
         
         console.error(`Error sending push notification to user ${subscription.user_id}:`, error.message);
-        
-        // If subscription is invalid (410 or 404), mark for deletion
-        if (error.statusCode === 410 || error.statusCode === 404) {
-          console.log(`Marking subscription ${subscription.id} for deletion (status: ${error.statusCode})`);
-        }
       }
     }
 
     // Remove failed subscriptions from database
     if (failedSubscriptions.length > 0) {
+      console.log(`🗑️ Removing ${failedSubscriptions.length} invalid subscriptions`);
       await supabase
         .from('push_subscriptions')
         .delete()
         .in('id', failedSubscriptions);
-      console.log(`Removed ${failedSubscriptions.length} invalid subscriptions`);
+      console.log(`✅ Removed ${failedSubscriptions.length} invalid subscriptions`);
     }
 
     // Log the push notification

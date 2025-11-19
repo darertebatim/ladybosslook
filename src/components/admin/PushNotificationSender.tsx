@@ -123,7 +123,6 @@ export function PushNotificationSender() {
       const payload: any = {
         title,
         body: message,
-        icon: '/pwa-192x192.png',
         url: destinationUrl,
       };
 

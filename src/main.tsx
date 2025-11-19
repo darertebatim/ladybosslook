@@ -22,16 +22,16 @@ try {
 
 const IS_NATIVE_PLATFORM = isIOSWebView || isAndroidWebView || hasWebKit || hasAndroidBridge || capacitorSaysNative;
 
-// Set global flag that all PWA code will check
+// Set global flag for platform detection
 (window as any).__IS_NATIVE_APP__ = IS_NATIVE_PLATFORM;
-(window as any).__PWA_DISABLED__ = IS_NATIVE_PLATFORM;
+(window as any).__NATIVE_DISABLED__ = IS_NATIVE_PLATFORM;
 
 console.log('[Main] 🔐 NUCLEAR GUARD ACTIVATED');
 console.log('[Main] Platform:', IS_NATIVE_PLATFORM ? '📱 NATIVE' : '🌐 WEB');
 console.log('[Main] User Agent:', userAgent);
 console.log('[Main] Global flags set:', {
   __IS_NATIVE_APP__: (window as any).__IS_NATIVE_APP__,
-  __PWA_DISABLED__: (window as any).__PWA_DISABLED__
+  __NATIVE_DISABLED__: (window as any).__NATIVE_DISABLED__
 });
 
 // Initialize Capacitor native features
