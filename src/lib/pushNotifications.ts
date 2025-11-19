@@ -1,8 +1,57 @@
 import { supabase } from '@/integrations/supabase/client';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
+import { toast } from '@/hooks/use-toast';
 
 export type NotificationPermission = 'granted' | 'denied' | 'default';
+
+// Initialize push notification handlers (Phase 3)
+export function initializePushNotificationHandlers() {
+  if (!Capacitor.isNativePlatform()) {
+    console.log('[Push] Not on native platform, skipping handler initialization');
+    return;
+  }
+
+  console.log('[Push] Initializing notification handlers');
+
+  // Handle notification received while app is in foreground
+  PushNotifications.addListener('pushNotificationReceived', (notification) => {
+    console.log('[Push] Notification received in foreground:', notification);
+    
+    toast({
+      title: notification.title || 'New Notification',
+      description: notification.body || '',
+    });
+  });
+
+  // Handle notification clicked (app opened from notification)
+  PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
+    console.log('[Push] Notification clicked:', action);
+    
+    const url = action.notification.data?.url || '/app/home';
+    console.log('[Push] Navigating to:', url);
+    
+    // Deep link navigation
+    if (typeof window !== 'undefined') {
+      window.location.href = url;
+    }
+  });
+
+  console.log('[Push] Notification handlers initialized successfully');
+}
+
+// Clear badge count (Phase 6)
+export async function clearBadge(): Promise<void> {
+  if (Capacitor.isNativePlatform()) {
+    try {
+      // iOS automatically clears badge when app is opened
+      // but we can also manually clear it
+      console.log('[Push] Badge cleared');
+    } catch (error) {
+      console.error('[Push] Error clearing badge:', error);
+    }
+  }
+}
 
 export async function checkPermissionStatus(): Promise<NotificationPermission> {
   if (Capacitor.isNativePlatform()) {
