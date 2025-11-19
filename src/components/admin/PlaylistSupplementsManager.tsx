@@ -146,18 +146,24 @@ export const PlaylistSupplementsManager = ({
     },
   });
 
-  // Reorder supplement mutation
+  // Reorder supplement mutation - updates all items with new sequential order
   const reorderMutation = useMutation({
-    mutationFn: async ({ id, newSortOrder }: { id: string; newSortOrder: number }) => {
-      const { error } = await supabase
-        .from('playlist_supplements')
-        .update({ sort_order: newSortOrder })
-        .eq('id', id);
+    mutationFn: async (reorderedItems: Array<{ id: string; sort_order: number }>) => {
+      // Update all items in parallel
+      const updates = reorderedItems.map(item =>
+        supabase
+          .from('playlist_supplements')
+          .update({ sort_order: item.sort_order })
+          .eq('id', item.id)
+      );
 
+      const results = await Promise.all(updates);
+      const error = results.find(r => r.error)?.error;
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['playlist-supplements', playlistId] });
+      toast.success('Order updated');
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to reorder supplement');
@@ -167,21 +173,33 @@ export const PlaylistSupplementsManager = ({
   const handleMoveUp = (index: number) => {
     if (!supplements || index === 0) return;
     
-    const current = supplements[index];
-    const previous = supplements[index - 1];
+    // Create new array with swapped items
+    const newOrder = [...supplements];
+    [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
     
-    reorderMutation.mutate({ id: current.id, newSortOrder: previous.sort_order });
-    reorderMutation.mutate({ id: previous.id, newSortOrder: current.sort_order });
+    // Reassign sequential sort_order values
+    const updates = newOrder.map((item, idx) => ({
+      id: item.id,
+      sort_order: idx
+    }));
+    
+    reorderMutation.mutate(updates);
   };
 
   const handleMoveDown = (index: number) => {
     if (!supplements || index === supplements.length - 1) return;
     
-    const current = supplements[index];
-    const next = supplements[index + 1];
+    // Create new array with swapped items
+    const newOrder = [...supplements];
+    [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
     
-    reorderMutation.mutate({ id: current.id, newSortOrder: next.sort_order });
-    reorderMutation.mutate({ id: next.id, newSortOrder: current.sort_order });
+    // Reassign sequential sort_order values
+    const updates = newOrder.map((item, idx) => ({
+      id: item.id,
+      sort_order: idx
+    }));
+    
+    reorderMutation.mutate(updates);
   };
 
   const resetForm = () => {
