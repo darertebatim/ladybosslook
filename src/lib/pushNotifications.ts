@@ -62,7 +62,7 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
             .from('push_subscriptions')
             .upsert({
               user_id: userId,
-              endpoint: token.value,
+              endpoint: `native:${token.value}`,
               p256dh_key: 'native-ios',
               auth_key: 'native-ios',
             }, {
