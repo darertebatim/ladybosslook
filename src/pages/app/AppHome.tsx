@@ -12,8 +12,7 @@ import { Send, Mail } from 'lucide-react';
 const AppHome = () => {
   const { user } = useAuth();
 
-  // PWA tracking is now handled centrally in usePWAInstall hook
-  // Removed direct tracking call to prevent duplicate tracking on native platforms
+  // User tracking handled by authentication system
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],

@@ -2,8 +2,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, BookOpen, User, Headphones, ShoppingBag } from 'lucide-react';
 
 /**
- * Native app layout - NO PWA code, NO install prompts, NO notification popups
- * This is a clean layout specifically for iOS/Android native apps
+ * Native app layout - Clean layout specifically for iOS/Android native apps
  */
 const NativeAppLayout = () => {
   const location = useLocation();

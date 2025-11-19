@@ -90,7 +90,7 @@ export const DeviceManagementPanel = () => {
     return {
       type: 'web',
       icon: Monitor,
-      label: 'Web/PWA',
+      label: 'Web Browser',
       color: 'bg-green-500',
     };
   };
@@ -113,7 +113,6 @@ export const DeviceManagementPanel = () => {
           targetUserEmail: userEmail,
           title: '🧪 Test Notification',
           body: 'This is a test notification to verify your device registration.',
-          icon: '/pwa-192x192.png',
           url: '/app/home',
         },
       });
@@ -200,7 +199,7 @@ export const DeviceManagementPanel = () => {
           </div>
           <div className="p-4 border rounded-lg">
             <div className="text-2xl font-bold text-green-600">{webDeviceCount}</div>
-            <div className="text-sm text-muted-foreground">Web/PWA</div>
+            <div className="text-sm text-muted-foreground">Web Browser</div>
           </div>
         </div>
 
