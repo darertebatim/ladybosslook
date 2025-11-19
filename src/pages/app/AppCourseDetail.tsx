@@ -347,7 +347,57 @@ const AppCourseDetail = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-...
+                  {/* Add to Calendar */}
+                  {round.first_session_date && (
+                    <Button 
+                      variant="default" 
+                      size="lg" 
+                      className="w-full"
+                      onClick={handleAddToCalendar}
+                    >
+                      <Calendar className="h-5 w-5 mr-2" />
+                      Add to Calendar
+                    </Button>
+                  )}
+
+                  {/* Contact Telegram Support */}
+                  {round.whatsapp_support_number && (
+                    <Button 
+                      variant="default" 
+                      size="lg" 
+                      className="w-full bg-[#0088cc] hover:bg-[#0088cc]/90"
+                      onClick={handleContactSupport}
+                    >
+                      <MessageCircle className="h-5 w-5 mr-2" />
+                      Contact Telegram Support
+                    </Button>
+                  )}
+
+                  {/* Join Google Meet - Web only */}
+                  {!isNativeApp() && round.google_meet_link && (
+                    <Button 
+                      variant="secondary" 
+                      size="lg" 
+                      className="w-full"
+                      onClick={() => window.open(round.google_meet_link!, '_blank')}
+                    >
+                      <Video className="h-5 w-5 mr-2" />
+                      Join Google Meet
+                    </Button>
+                  )}
+
+                  {/* Access Google Drive - Web only */}
+                  {!isNativeApp() && round.google_drive_link && (
+                    <Button 
+                      variant="outline" 
+                      size="lg" 
+                      className="w-full"
+                      onClick={() => window.open(round.google_drive_link!, '_blank')}
+                    >
+                      <FolderOpen className="h-5 w-5 mr-2" />
+                      Access Google Drive
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             )}
