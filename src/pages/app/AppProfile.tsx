@@ -7,11 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send } from 'lucide-react';
+import { LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications, unsubscribeFromPushNotifications } from '@/lib/pushNotifications';
+import { Capacitor } from '@capacitor/core';
 
 const AppProfile = () => {
   const { user, signOut } = useAuth();
@@ -22,6 +24,20 @@ const AppProfile = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [contactSubject, setContactSubject] = useState('');
   const [contactMessage, setContactMessage] = useState('');
+  const [notificationPermission, setNotificationPermission] = useState<'granted' | 'denied' | 'default'>('default');
+  const [isEnablingNotifications, setIsEnablingNotifications] = useState(false);
+  const isNative = Capacitor.isNativePlatform();
+
+  // Check notification permission on mount (Phase 4)
+  useEffect(() => {
+    const checkPermission = async () => {
+      if (isNative) {
+        const status = await checkPermissionStatus();
+        setNotificationPermission(status);
+      }
+    };
+    checkPermission();
+  }, [isNative]);
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -115,6 +131,75 @@ const AppProfile = () => {
     }
   };
 
+  // Enable notifications (Phase 4)
+  const handleEnableNotifications = async () => {
+    setIsEnablingNotifications(true);
+    try {
+      const permission = await requestNotificationPermission();
+      
+      if (permission === 'granted') {
+        const result = await subscribeToPushNotifications(user?.id || '');
+        
+        if (result.success) {
+          setNotificationPermission('granted');
+          toast({
+            title: 'Notifications Enabled',
+            description: 'You will now receive push notifications',
+          });
+        } else {
+          toast({
+            title: 'Error',
+            description: result.error || 'Failed to enable notifications',
+            variant: 'destructive',
+          });
+        }
+      } else {
+        toast({
+          title: 'Permission Denied',
+          description: 'Please enable notifications in your device settings',
+          variant: 'destructive',
+        });
+      }
+    } catch (error: any) {
+      console.error('Enable notifications error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to enable notifications',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsEnablingNotifications(false);
+    }
+  };
+
+  // Disable notifications (Phase 4)
+  const handleDisableNotifications = async () => {
+    try {
+      const result = await unsubscribeFromPushNotifications(user?.id || '');
+      
+      if (result.success) {
+        setNotificationPermission('default');
+        toast({
+          title: 'Notifications Disabled',
+          description: 'You will no longer receive push notifications',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: result.error || 'Failed to disable notifications',
+          variant: 'destructive',
+        });
+      }
+    } catch (error: any) {
+      console.error('Disable notifications error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to disable notifications',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className="container max-w-4xl py-6 px-4">
       <SEOHead 
@@ -159,6 +244,17 @@ const AppProfile = () => {
             <Lock className="h-4 w-4" />
             <span className="text-xs">Password</span>
           </Button>
+          {isNative && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => scrollToSection('notifications-section')}
+              className="flex flex-col h-auto py-3 gap-1"
+            >
+              <Bell className="h-4 w-4" />
+              <span className="text-xs">Notifications</span>
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
@@ -264,6 +360,48 @@ const AppProfile = () => {
             </Button>
           </CardContent>
         </Card>
+
+        {isNative && (
+          <Card id="notifications-section">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Push Notifications
+              </CardTitle>
+              <CardDescription>Manage your notification preferences</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {notificationPermission === 'granted' && (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Notifications Enabled</p>
+                    <p className="text-sm text-muted-foreground">
+                      You'll receive course updates and reminders
+                    </p>
+                  </div>
+                  <Button variant="outline" onClick={handleDisableNotifications}>
+                    Disable
+                  </Button>
+                </div>
+              )}
+              {notificationPermission !== 'granted' && (
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Enable notifications to receive course updates, new content alerts, and reminders.
+                  </p>
+                  <Button 
+                    onClick={handleEnableNotifications} 
+                    className="w-full"
+                    disabled={isEnablingNotifications}
+                  >
+                    <Bell className="mr-2 h-4 w-4" />
+                    {isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         <Card id="password-section">
           <CardHeader>

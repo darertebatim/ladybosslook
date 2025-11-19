@@ -28,6 +28,10 @@ export function PushNotificationSender() {
   const [isLoading, setIsLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
+  
+  // Phase 7: Character limits
+  const TITLE_LIMIT = 50;
+  const MESSAGE_LIMIT = 200;
 
   // Fetch rounds for the selected course
   const { data: rounds } = useQuery({
@@ -302,9 +306,19 @@ export function PushNotificationSender() {
 
         <div className="rounded-lg bg-muted p-4">
           <h4 className="font-medium mb-2">Preview</h4>
-          <div className="space-y-1">
-            <p className="font-semibold text-sm">{title || 'Notification title'}</p>
-            <p className="text-sm text-muted-foreground">{message || 'Notification message'}</p>
+          <div className="space-y-1 max-w-sm">
+            <div className="flex items-start gap-2">
+              <Bell className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm truncate">{title || 'Notification Title'}</p>
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {message || 'Notification message will appear here'}
+                </p>
+                {destinationUrl && destinationUrl !== '/app/home' && (
+                  <p className="text-xs text-muted-foreground mt-1">→ {destinationUrl}</p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

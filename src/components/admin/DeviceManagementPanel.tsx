@@ -26,10 +26,11 @@ export const DeviceManagementPanel = () => {
   const fetchDevices = async () => {
     setIsLoading(true);
     try {
-      // Fetch subscriptions
+      // Phase 7: Fetch only native iOS subscriptions
       const { data: subscriptions, error: subsError } = await supabase
         .from('push_subscriptions')
         .select('id, user_id, endpoint, created_at')
+        .like('endpoint', 'native:%')
         .order('created_at', { ascending: false });
 
       if (subsError) throw subsError;

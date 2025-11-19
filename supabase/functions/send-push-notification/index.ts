@@ -15,6 +15,7 @@ interface PushNotificationRequest {
   body: string;
   icon?: string;
   url?: string;
+  badge?: number; // Phase 6: Custom badge count
 }
 
 // Helper function to convert PEM format to ArrayBuffer
@@ -62,7 +63,7 @@ async function generateApnsJwt(authKey: string, keyId: string, teamId: string): 
 }
 
 // Send push notification to iOS via APNs
-async function sendToApns(token: string, payload: { title: string; body: string; url: string }): Promise<Response> {
+async function sendToApns(token: string, payload: { title: string; body: string; url: string; badge?: number }): Promise<Response> {
   const authKey = Deno.env.get('APNS_AUTH_KEY');
   const keyId = Deno.env.get('APNS_KEY_ID');
   const teamId = Deno.env.get('APNS_TEAM_ID');
@@ -99,7 +100,7 @@ async function sendToApns(token: string, payload: { title: string; body: string;
           body: payload.body,
         },
         sound: 'default',
-        badge: 1,
+        badge: payload.badge || 1, // Phase 6: Allow custom badge
       },
       url: payload.url,
     }),
@@ -114,7 +115,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userIds, targetCourse, targetUserEmail, title, body, icon, url }: PushNotificationRequest = await req.json();
+    const { userIds, targetCourse, targetUserEmail, title, body, icon, url, badge }: PushNotificationRequest = await req.json();
 
     // Debug logging
     console.log('🔔 Received push notification request:', {
@@ -257,6 +258,7 @@ const handler = async (req: Request): Promise<Response> => {
           title,
           body,
           url: url || '/app/home',
+          badge, // Phase 6: Pass custom badge
         });
         
         if (response.ok) {

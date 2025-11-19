@@ -6,6 +6,7 @@ import './index.css'
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
+import { initializePushNotificationHandlers, clearBadge } from './lib/pushNotifications';
 
 // 🚨 NUCLEAR GUARD: Detect native platform IMMEDIATELY before anything else runs
 const userAgent = navigator.userAgent;
@@ -41,6 +42,12 @@ if (IS_NATIVE_PLATFORM) {
   console.log('[Main] Capacitor object exists:', typeof (window as any).Capacitor !== 'undefined');
   StatusBar.setStyle({ style: Style.Dark }).catch(console.error);
   SplashScreen.hide().catch(console.error);
+  
+  // Initialize push notification handlers (Phase 3)
+  initializePushNotificationHandlers();
+  
+  // Clear badge when app opens (Phase 6)
+  clearBadge();
 } else {
   console.log('[Main] 🌐 Web platform detected');
 }
