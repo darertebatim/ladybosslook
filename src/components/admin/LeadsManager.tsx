@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key, Edit2, Trash2 } from 'lucide-react';
+import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key, Edit2, Trash2, UserPlus } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
@@ -29,6 +29,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { usePrograms } from '@/hooks/usePrograms';
+import { useQuery } from '@tanstack/react-query';
 
 interface UserLead {
   profile: {
@@ -83,7 +85,34 @@ export function LeadsManager() {
   const [editingEnrollment, setEditingEnrollment] = useState<string | null>(null);
   const [availableRounds, setAvailableRounds] = useState<Record<string, ProgramRound[]>>({});
   const [selectedRound, setSelectedRound] = useState<string>('');
+  const [isEnrollDialogOpen, setIsEnrollDialogOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState('');
+  const [selectedEnrollRound, setSelectedEnrollRound] = useState('');
+  const [isEnrolling, setIsEnrolling] = useState(false);
   const { toast } = useToast();
+  const { programs, isLoading: programsLoading } = usePrograms();
+
+  // Fetch available rounds for selected course
+  const { data: enrollRounds } = useQuery({
+    queryKey: ['enroll-course-rounds', selectedCourse],
+    queryFn: async () => {
+      if (!selectedCourse) return [];
+      
+      const selectedProgram = programs.find(p => p.title === selectedCourse);
+      if (!selectedProgram) return [];
+
+      const { data, error } = await supabase
+        .from('program_rounds')
+        .select('*')
+        .eq('program_slug', selectedProgram.slug)
+        .in('status', ['upcoming', 'active'])
+        .order('round_number', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!selectedCourse && programs.length > 0,
+  });
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
@@ -250,6 +279,55 @@ export function LeadsManager() {
     }
   };
 
+  const handleEnrollUser = async () => {
+    if (!searchResults?.profile?.email || !selectedCourse) {
+      toast({
+        title: 'Missing Information',
+        description: 'Please select a course',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsEnrolling(true);
+    try {
+      const selectedProgram = programs.find(p => p.title === selectedCourse);
+      
+      const { data, error } = await supabase.functions.invoke('admin-create-enrollment', {
+        body: {
+          email: searchResults.profile.email,
+          courseName: selectedCourse,
+          programSlug: selectedProgram?.slug,
+          roundId: selectedEnrollRound || null,
+          fullName: searchResults.profile.full_name || null,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success!',
+        description: data.message || 'User enrolled successfully',
+      });
+
+      setIsEnrollDialogOpen(false);
+      setSelectedCourse('');
+      setSelectedEnrollRound('');
+      
+      // Refresh search results to show new enrollment
+      handleSearch();
+    } catch (error: any) {
+      console.error('Error enrolling user:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to enroll user',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsEnrolling(false);
+    }
+  };
+
   const handleUpdateRound = async (enrollmentId: string, newRoundId: string) => {
     try {
       const { error } = await supabase
@@ -345,53 +423,134 @@ export function LeadsManager() {
                       <User className="h-4 w-4" />
                       User Profile
                     </div>
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Key className="h-4 w-4 mr-2" />
-                          Change Password
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Change User Password</DialogTitle>
-                          <DialogDescription>
-                            Enter a new password for {searchResults.profile.email}. The user will be able to sign in with this new password immediately.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="new-password">New Password</Label>
-                            <Input
-                              id="new-password"
-                              type="password"
-                              placeholder="Minimum 6 characters"
-                              value={newPassword}
-                              onChange={(e) => setNewPassword(e.target.value)}
-                              onKeyDown={(e) => e.key === 'Enter' && handleChangePassword()}
-                            />
+                    <div className="flex gap-2">
+                      <Dialog open={isEnrollDialogOpen} onOpenChange={setIsEnrollDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <UserPlus className="h-4 w-4 mr-2" />
+                            Enroll in Course
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Enroll User in Course</DialogTitle>
+                            <DialogDescription>
+                              Enroll {searchResults.profile.email} in a course and optional round
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="enroll-course">Select Course *</Label>
+                              <Select
+                                value={selectedCourse}
+                                onValueChange={setSelectedCourse}
+                                disabled={isEnrolling || programsLoading}
+                              >
+                                <SelectTrigger id="enroll-course">
+                                  <SelectValue placeholder="Choose a course..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {programs.map((program) => (
+                                    <SelectItem key={program.slug} value={program.title}>
+                                      {program.title}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {selectedCourse && enrollRounds && enrollRounds.length > 0 && (
+                              <div className="space-y-2">
+                                <Label htmlFor="enroll-round">Select Round (Optional)</Label>
+                                <Select
+                                  value={selectedEnrollRound}
+                                  onValueChange={setSelectedEnrollRound}
+                                  disabled={isEnrolling}
+                                >
+                                  <SelectTrigger id="enroll-round">
+                                    <SelectValue placeholder="Choose a round..." />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {enrollRounds.map((round) => (
+                                      <SelectItem key={round.id} value={round.id}>
+                                        {round.round_name} (Round {round.round_number}) - {round.status}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            )}
                           </div>
-                        </div>
-                        <DialogFooter>
-                          <Button
-                            variant="outline"
-                            onClick={() => {
-                              setIsDialogOpen(false);
-                              setNewPassword('');
-                            }}
-                            disabled={isChangingPassword}
-                          >
-                            Cancel
+                          <DialogFooter>
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setIsEnrollDialogOpen(false);
+                                setSelectedCourse('');
+                                setSelectedEnrollRound('');
+                              }}
+                              disabled={isEnrolling}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={handleEnrollUser}
+                              disabled={isEnrolling || !selectedCourse}
+                            >
+                              {isEnrolling ? 'Enrolling...' : 'Enroll User'}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                      
+                      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <Key className="h-4 w-4 mr-2" />
+                            Change Password
                           </Button>
-                          <Button
-                            onClick={handleChangePassword}
-                            disabled={isChangingPassword}
-                          >
-                            {isChangingPassword ? 'Updating...' : 'Update Password'}
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Change User Password</DialogTitle>
+                            <DialogDescription>
+                              Enter a new password for {searchResults.profile.email}. The user will be able to sign in with this new password immediately.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="new-password">New Password</Label>
+                              <Input
+                                id="new-password"
+                                type="password"
+                                placeholder="Minimum 6 characters"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleChangePassword()}
+                              />
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setIsDialogOpen(false);
+                                setNewPassword('');
+                              }}
+                              disabled={isChangingPassword}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={handleChangePassword}
+                              disabled={isChangingPassword}
+                            >
+                              {isChangingPassword ? 'Updating...' : 'Update Password'}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
