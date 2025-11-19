@@ -28,7 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Trash2, FileText, Video, Link as LinkIcon } from "lucide-react";
+import { Loader2, Plus, Trash2, FileText, Video, Link as LinkIcon, ArrowUp, ArrowDown } from "lucide-react";
 
 interface PlaylistSupplementsManagerProps {
   playlistId: string;
@@ -146,6 +146,44 @@ export const PlaylistSupplementsManager = ({
     },
   });
 
+  // Reorder supplement mutation
+  const reorderMutation = useMutation({
+    mutationFn: async ({ id, newSortOrder }: { id: string; newSortOrder: number }) => {
+      const { error } = await supabase
+        .from('playlist_supplements')
+        .update({ sort_order: newSortOrder })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['playlist-supplements', playlistId] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to reorder supplement');
+    },
+  });
+
+  const handleMoveUp = (index: number) => {
+    if (!supplements || index === 0) return;
+    
+    const current = supplements[index];
+    const previous = supplements[index - 1];
+    
+    reorderMutation.mutate({ id: current.id, newSortOrder: previous.sort_order });
+    reorderMutation.mutate({ id: previous.id, newSortOrder: current.sort_order });
+  };
+
+  const handleMoveDown = (index: number) => {
+    if (!supplements || index === supplements.length - 1) return;
+    
+    const current = supplements[index];
+    const next = supplements[index + 1];
+    
+    reorderMutation.mutate({ id: current.id, newSortOrder: next.sort_order });
+    reorderMutation.mutate({ id: next.id, newSortOrder: current.sort_order });
+  };
+
   const resetForm = () => {
     setFormData({
       title: "",
@@ -213,6 +251,7 @@ export const PlaylistSupplementsManager = ({
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-[120px]">Order</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>URL</TableHead>
@@ -220,8 +259,28 @@ export const PlaylistSupplementsManager = ({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {supplements.map((supplement) => (
+                  {supplements.map((supplement, index) => (
                     <TableRow key={supplement.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleMoveUp(index)}
+                            disabled={index === 0 || reorderMutation.isPending}
+                          >
+                            <ArrowUp className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleMoveDown(index)}
+                            disabled={index === supplements.length - 1 || reorderMutation.isPending}
+                          >
+                            <ArrowDown className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <Badge className={getTypeBadge(supplement.type)}>
                           {getTypeIcon(supplement.type)}
