@@ -79,12 +79,113 @@ const handler = async (req: Request): Promise<Response> => {
 
     let userId: string;
 
-    // First check if auth user exists (this is the source of truth)
+    // Try to find existing user by email
+    // We'll attempt to list users with email filter to be more efficient
     const { data: { users: authUsers } } = await supabase.auth.admin.listUsers();
-    const existingAuthUser = authUsers.find(u => u.email?.toLowerCase() === email.toLowerCase());
+    let existingAuthUser = authUsers.find(u => u.email?.toLowerCase() === email.toLowerCase());
 
-    if (existingAuthUser) {
-      // Auth user exists - use their ID
+    // If not found in the limited list, try to create user and handle duplicate error
+    if (!existingAuthUser) {
+      console.log(`Attempting to create or find user: ${email}`);
+      const { data: userData, error: userError } = await supabase.auth.admin.createUser({
+        email: email,
+        email_confirm: true,
+        password: email,
+        user_metadata: {
+          full_name: fullName || ''
+        }
+      });
+
+      if (userError) {
+        // Check if error is because user already exists
+        if (userError.message.includes('already been registered')) {
+          console.log(`User already exists, looking up by email: ${email}`);
+          // User exists but wasn't in our initial list - need to find them
+          // List more users or search through pages
+          let page = 1;
+          let found = false;
+          const perPage = 1000;
+          
+          while (!found && page <= 10) { // Limit to 10 pages max (10,000 users)
+            const { data: { users: pageUsers } } = await supabase.auth.admin.listUsers({
+              page,
+              perPage
+            });
+            
+            existingAuthUser = pageUsers.find(u => u.email?.toLowerCase() === email.toLowerCase());
+            if (existingAuthUser) {
+              found = true;
+              userId = existingAuthUser.id;
+              console.log(`Found existing user on page ${page}: ${userId}`);
+            } else if (pageUsers.length < perPage) {
+              // No more users to check
+              break;
+            }
+            page++;
+          }
+          
+          if (!found) {
+            return new Response(
+              JSON.stringify({ error: `User exists but could not be found: ${email}` }),
+              { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+            );
+          }
+          
+          // Check if profile exists for this user
+          const { data: existingProfile } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', userId)
+            .single();
+            
+          if (!existingProfile) {
+            // Create missing profile
+            console.log(`Creating missing profile for auth user ${userId}`);
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .insert({
+                id: userId,
+                email: email,
+                full_name: fullName || null
+              });
+
+            if (profileError && !profileError.message.includes('duplicate')) {
+              console.error('Error creating profile:', profileError);
+            }
+          }
+        } else {
+          // Different error - return it
+          console.error('Error creating user:', userError);
+          return new Response(
+            JSON.stringify({ error: `Failed to create user: ${userError.message}` }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+          );
+        }
+      } else if (userData.user) {
+        // User created successfully
+        userId = userData.user.id;
+        console.log(`User created successfully: ${userId} with email as password`);
+        
+        // Create profile for new user
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            email: email,
+            full_name: fullName || null
+          });
+
+        if (profileError && !profileError.message.includes('duplicate')) {
+          console.error('Error creating profile:', profileError);
+        }
+      } else {
+        return new Response(
+          JSON.stringify({ error: 'User creation failed' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        );
+      }
+    } else {
+      // User found in initial list
       console.log(`Auth user exists: ${existingAuthUser.id}`);
       userId = existingAuthUser.id;
       
@@ -109,48 +210,6 @@ const handler = async (req: Request): Promise<Response> => {
         if (profileError && !profileError.message.includes('duplicate')) {
           console.error('Error creating profile:', profileError);
         }
-      }
-    } else {
-      // No auth user exists - create new user
-      console.log(`Creating new user: ${email}`);
-      const { data: userData, error: userError } = await supabase.auth.admin.createUser({
-        email: email,
-        email_confirm: true,
-        password: email,
-        user_metadata: {
-          full_name: fullName || ''
-        }
-      });
-
-      if (userError) {
-        console.error('Error creating user:', userError);
-        return new Response(
-          JSON.stringify({ error: `Failed to create user: ${userError.message}` }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-        );
-      }
-
-      if (!userData.user) {
-        return new Response(
-          JSON.stringify({ error: 'User creation failed' }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-        );
-      }
-
-      userId = userData.user.id;
-      console.log(`User created successfully: ${userId} with email as password`);
-      
-      // Create profile for new user
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: userId,
-          email: email,
-          full_name: fullName || null
-        });
-
-      if (profileError && !profileError.message.includes('duplicate')) {
-        console.error('Error creating profile:', profileError);
       }
     }
 
