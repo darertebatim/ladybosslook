@@ -789,30 +789,6 @@ export type Database = {
         }
         Relationships: []
       }
-      pwa_installations: {
-        Row: {
-          id: string
-          installed_at: string
-          platform: string | null
-          user_agent: string | null
-          user_id: string
-        }
-        Insert: {
-          id?: string
-          installed_at?: string
-          platform?: string | null
-          user_agent?: string | null
-          user_id: string
-        }
-        Update: {
-          id?: string
-          installed_at?: string
-          platform?: string | null
-          user_agent?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       security_audit_log: {
         Row: {
           action: string

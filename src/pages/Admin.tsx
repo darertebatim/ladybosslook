@@ -19,9 +19,7 @@ import { AnnouncementsList } from '@/components/admin/AnnouncementsList';
 import { PushNotificationSender } from '@/components/admin/PushNotificationSender';
 import { PushNotificationsHistory } from '@/components/admin/PushNotificationsHistory';
 import { DeviceManagementPanel } from '@/components/admin/DeviceManagementPanel';
-import { VapidKeyGenerator } from '@/components/admin/VapidKeyGenerator';
 import { EmailLogsViewer } from '@/components/admin/EmailLogsViewer';
-import { PWAInstallStats } from '@/components/admin/PWAInstallStats';
 import { ProgramsManager } from '@/components/admin/ProgramsManager';
 import { ProgramRoundsManager } from '@/components/admin/ProgramRoundsManager';
 import { LeadsManager } from '@/components/admin/LeadsManager';
@@ -214,7 +212,7 @@ const Admin = () => {
                 </CardContent>
               </Card>
 
-              {!isNativeApp() && <PWAInstallStats />}
+              
             </TabsContent>
 
             {/* Tab 2: Users */}
@@ -431,7 +429,7 @@ const Admin = () => {
                 </CardContent>
               </Card>
 
-              {!isNativeApp() && <VapidKeyGenerator />}
+              
               <SecurityAuditLog />
             </TabsContent>
           </Tabs>

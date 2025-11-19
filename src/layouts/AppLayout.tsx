@@ -1,53 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Bell, User, Loader2, Headphones, ShoppingBag } from 'lucide-react';
-import { usePWAInstall } from '@/hooks/usePWAInstall';
-import { InstallPromptDialog } from '@/components/InstallPromptDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications } from '@/lib/pushNotifications';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
-import { isDefinitelyNative } from '@/lib/platform';
+import { Capacitor } from '@capacitor/core';
 
 const AppLayout = () => {
-  // 🚨 NUCLEAR GUARD LAYER 1: Check global flag at component entry
-  const isNativeApp = (window as any).__IS_NATIVE_APP__ || (window as any).__PWA_DISABLED__;
-  
   const location = useLocation();
   const { user } = useAuth();
-  const { isInstalled, isIOS } = usePWAInstall();
-  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
 
+  // Only show notification prompt on native iOS
   useEffect(() => {
-    // 🚨 NUCLEAR GUARD: Multiple checks
-    if (isNativeApp || isDefinitelyNative()) {
-      console.log('[AppLayout] 🔐 NUCLEAR GUARD: PWA prompts blocked');
-      return;
-    }
-    
-    // Check if we should show the install prompt
-    const hasSeenPrompt = localStorage.getItem('hideInstallPrompt') === 'true';
-    const isInstallPage = location.pathname === '/app/install';
-    
-    // Show prompt if: not installed, haven't seen it, and not on install page
-    if (!isInstalled && !hasSeenPrompt && !isInstallPage) {
-      // Small delay to let the page load first
-      const timer = setTimeout(() => {
-        setShowInstallPrompt(true);
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isInstalled, location.pathname]);
-
-  // Show notification popup when app is installed but notifications aren't enabled
-  useEffect(() => {
-    // 🚨 NUCLEAR GUARD: Multiple checks
-    if (isNativeApp || isDefinitelyNative()) {
-      console.log('[AppLayout] 🔐 NUCLEAR GUARD: Notification prompts blocked');
+    if (!Capacitor.isNativePlatform()) {
       return;
     }
     
@@ -56,8 +25,8 @@ const AppLayout = () => {
       const currentPermission = await checkPermissionStatus();
       setNotificationPermission(currentPermission);
       
-      // Show popup if: app is installed, iOS device, notifications not granted, and haven't seen prompt
-      if (isInstalled && isIOS && currentPermission !== 'granted' && !hasSeenNotificationPrompt) {
+      // Show popup if: native iOS, notifications not granted, and haven't seen prompt
+      if (currentPermission !== 'granted' && !hasSeenNotificationPrompt) {
         setTimeout(() => {
           setShowNotificationPopup(true);
         }, 1500);
@@ -65,7 +34,7 @@ const AppLayout = () => {
     };
     
     checkAndShowPrompt();
-  }, [isInstalled, isIOS]);
+  }, []);
 
   const handleEnableNotifications = async () => {
     if (!user?.id) {
@@ -121,91 +90,73 @@ const AppLayout = () => {
   ];
 
   return (
-    <>
-      <InstallPromptDialog 
-        open={showInstallPrompt} 
-        onOpenChange={setShowInstallPrompt}
-      />
-
-      <AlertDialog open={showNotificationPopup} onOpenChange={handleDismissNotificationPopup}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-primary" />
-              Enable Notifications?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              Stay updated with course announcements, new content, and important updates. 
-              You can change this anytime in your device settings.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-            <button 
-              onClick={handleNeverAsk}
-              className="text-sm text-muted-foreground hover:text-foreground underline"
-            >
-              Don't ask again
-            </button>
-            <div className="flex gap-2 flex-1 justify-end">
-              <AlertDialogCancel onClick={handleDismissNotificationPopup}>
-                Maybe Later
-              </AlertDialogCancel>
-              <AlertDialogAction onClick={handleEnableNotifications} disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Enabling...
-                  </>
-                ) : (
-                  <>
-                    <Bell className="mr-2 h-4 w-4" />
-                    Enable Now
-                  </>
-                )}
-              </AlertDialogAction>
-            </div>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      
-      <div className="flex flex-col h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center px-4">
-          <h1 className="text-lg font-semibold">LadyBoss Academy</h1>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto pb-20">
-        <Outlet />
-      </main>
+    <div className="min-h-screen bg-background pb-16">
+      <Outlet />
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg">
-        <div className="grid grid-cols-5 h-20 safe-area-inset-bottom">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            const Icon = item.icon;
+      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
+        <div className="flex justify-around items-center h-16 max-w-screen-xl mx-auto px-4">
+          {navItems.map(({ path, icon: Icon, label }) => {
+            const isActive = location.pathname === path || 
+              (path === '/app/player' && location.pathname.startsWith('/app/player'));
+            
             return (
               <Link
-                key={item.path}
-                to={item.path}
-                className={`flex flex-col items-center justify-center gap-1.5 transition-colors min-h-[48px] ${
-                  isActive
-                    ? 'text-primary'
+                key={path}
+                to={path}
+                className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+                  isActive 
+                    ? 'text-primary' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Icon className={`h-6 w-6 ${isActive ? 'fill-current' : ''}`} />
-                <span className="text-xs font-medium">{item.label}</span>
+                <Icon className="h-6 w-6 mb-1" />
+                <span className="text-xs font-medium">{label}</span>
               </Link>
             );
           })}
         </div>
       </nav>
+
+      {/* Native Notification Prompt */}
+      <AlertDialog open={showNotificationPopup} onOpenChange={setShowNotificationPopup}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex justify-center mb-4">
+              <div className="rounded-full bg-primary/10 p-3">
+                <Bell className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <AlertDialogTitle className="text-center">Enable Push Notifications</AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              Stay updated with new courses, announcements, and important updates from LadyBoss Academy.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-3 sm:flex-col">
+            <AlertDialogAction 
+              onClick={handleEnableNotifications}
+              disabled={isLoading}
+              className="w-full"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Enabling...
+                </>
+              ) : (
+                'Enable Notifications'
+              )}
+            </AlertDialogAction>
+            <AlertDialogCancel 
+              onClick={handleNeverAsk}
+              className="w-full m-0"
+            >
+              Not Now
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
-    </>
   );
 };
 
