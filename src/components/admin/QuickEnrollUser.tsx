@@ -173,7 +173,7 @@ export const QuickEnrollUser = () => {
         </Button>
 
         <p className="text-xs text-muted-foreground">
-          * Password will be set to email address
+          * User can log in immediately with email as both username and password
         </p>
       </CardContent>
     </Card>
