@@ -90,10 +90,10 @@ serve(async (req) => {
       
       let userId = null;
       
-      // Try to create new user account with secure random password
+      // Try to create new user account with email as password
       const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
         email: customerEmail,
-        password: generateSecurePassword(),
+        password: customerEmail,
         email_confirm: true,
         user_metadata: {
           full_name: customerName,
@@ -142,22 +142,7 @@ serve(async (req) => {
         }
       } else if (newUser.user) {
         userId = newUser.user.id;
-        logStep('User account created', { userId });
-
-        // Send password reset email so user can set their own password
-        const { error: resetError } = await supabase.auth.admin.generateLink({
-          type: 'recovery',
-          email: customerEmail,
-          options: {
-            redirectTo: `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovable.app') || ''}/dashboard`
-          }
-        });
-
-        if (resetError) {
-          logStep('Error sending password reset email', resetError);
-        } else {
-          logStep('Password reset email sent');
-        }
+        logStep('User account created with email as password', { userId });
       } else {
         throw new Error('User creation failed - no user returned');
       }

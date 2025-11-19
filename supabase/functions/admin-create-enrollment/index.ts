@@ -116,7 +116,7 @@ const handler = async (req: Request): Promise<Response> => {
       const { data: userData, error: userError } = await supabase.auth.admin.createUser({
         email: email,
         email_confirm: true,
-        password: generateSecurePassword(),
+        password: email,
         user_metadata: {
           full_name: fullName || ''
         }
@@ -138,7 +138,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       userId = userData.user.id;
-      console.log(`User created successfully: ${userId} with secure random password`);
+      console.log(`User created successfully: ${userId} with email as password`);
       
       // Create profile for new user
       const { error: profileError } = await supabase
@@ -151,18 +151,6 @@ const handler = async (req: Request): Promise<Response> => {
 
       if (profileError && !profileError.message.includes('duplicate')) {
         console.error('Error creating profile:', profileError);
-      }
-      
-      // Send password reset email so user can set their own password
-      const { error: resetError } = await supabase.auth.admin.generateLink({
-        type: 'recovery',
-        email: email,
-      });
-
-      if (resetError) {
-        console.error('Error sending password reset email:', resetError);
-      } else {
-        console.log('Password reset email sent to:', email);
       }
     }
     }
