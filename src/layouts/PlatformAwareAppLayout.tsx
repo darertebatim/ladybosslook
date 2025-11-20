@@ -7,10 +7,11 @@ import NativeAppLayout from './NativeAppLayout';
  */
 const PlatformAwareAppLayout = () => {
   const isNative = isNativeApp();
+  const devNative = new URLSearchParams(window.location.search).get('devNative') === 'true';
   
-  console.log('[PlatformAwareAppLayout] 🎯', isNative ? '📱 Rendering NativeAppLayout' : '🌐 Rendering AppLayout');
+  console.log('[PlatformAwareAppLayout] 🎯', isNative ? '📱 Rendering NativeAppLayout' : '🌐 Rendering AppLayout', devNative ? '(Dev Preview Mode)' : '');
   
-  if (isNative) {
+  if (isNative || devNative) {
     return <NativeAppLayout />;
   }
   
