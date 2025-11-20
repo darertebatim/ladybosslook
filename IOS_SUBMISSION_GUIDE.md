@@ -583,9 +583,12 @@ npx cap sync ios
 - [ ] Apple Developer account enrolled ($99 paid)
 - [ ] App created in App Store Connect
 - [ ] Production build created (server config commented out)
-- [ ] Tested on real iOS device
+- [ ] **AppDelegate.swift contains APNs bridge methods** (see [PUSH_NOTIFICATIONS_SETUP.md](./PUSH_NOTIFICATIONS_SETUP.md))
+- [ ] **APNS_ENVIRONMENT changed to `production`** (from `development`)
+- [ ] Push notifications tested on real iOS device
+- [ ] Tested on real iOS device (all features)
 - [ ] Demo account created and verified
-- [ ] Screenshots captured (3 size sets)
+- [ ] Screenshots captured (iPhone 11 Pro Max 6.5")
 - [ ] App description written
 - [ ] Privacy policy URL working
 - [ ] Support email monitored

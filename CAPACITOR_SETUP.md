@@ -243,6 +243,29 @@ npx cap sync
 - Verify VAPID keys in environment
 - Check console logs for token registration
 
+## 🚨 CRITICAL: Push Notifications Setup
+
+⚠️ **If you plan to use push notifications, there is a required manual step that is NOT handled by `npx cap add ios`.**
+
+Capacitor's PushNotifications plugin requires two native iOS methods in `AppDelegate.swift` to bridge APNs tokens/errors from native code to JavaScript. Without these methods, push notification registration will timeout and fail.
+
+**You MUST manually add these methods to `ios/App/App/AppDelegate.swift`:**
+
+```swift
+func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    NotificationCenter.default.post(name: .capacitorDidRegisterForRemoteNotifications, object: deviceToken)
+}
+
+func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+    NotificationCenter.default.post(name: .capacitorDidFailToRegisterForRemoteNotifications, object: error)
+}
+```
+
+📚 **See complete instructions**: [PUSH_NOTIFICATIONS_SETUP.md](./PUSH_NOTIFICATIONS_SETUP.md)  
+📋 **Full template**: [IOS_APPDELEGATE_TEMPLATE.md](./IOS_APPDELEGATE_TEMPLATE.md)
+
+**Important**: If you ever delete the `ios/` folder and run `npx cap add ios` again, you will need to re-add these methods.
+
 ## 📱 App Store Requirements
 
 ### iOS Screenshots Required
