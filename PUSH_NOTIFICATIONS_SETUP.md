@@ -156,6 +156,43 @@ If you ever delete the `ios/` folder and run `npx cap add ios` again, you **MUST
 
 ⚠️ **Remember**: Change `APNS_ENVIRONMENT` from `development` to `production` before App Store submission.
 
+## 🎯 Notification Handlers (Phases 2-3)
+
+The app now handles notifications in all states:
+
+### Foreground (App is open and visible)
+- Displays an in-app toast notification
+- Shows "View" button if notification has a URL
+- Clicking "View" navigates to the specific content
+- **How it works**: Uses `pushNotificationReceived` event listener
+
+### Background (App is in background)
+- Notification appears in iOS notification center
+- Tapping notification opens app and navigates to content
+- **How it works**: Uses `pushNotificationActionPerformed` event listener
+
+### Closed (App is completely closed)
+- Notification appears in iOS notification center
+- Tapping notification launches app and navigates to content
+- **How it works**: Same as background, Capacitor handles app launch
+
+### Deep Linking
+- Notifications can include a `url` or `destination_url` in their data payload
+- App automatically navigates to the specified URL when notification is tapped
+- Supports any app route (e.g., `/app/courses`, `/app/profile`, `/app/playlist/abc123`)
+- If no URL provided, defaults to `/app/home`
+
+**Example notification payload:**
+```json
+{
+  "title": "New Course Available",
+  "body": "Check out Bilingual Power Class",
+  "data": {
+    "url": "/app/course/bilingual-power-class"
+  }
+}
+```
+
 ## 📝 Database Schema
 
 Push notification tokens are stored in `push_subscriptions` table:
@@ -179,8 +216,11 @@ You'll know push notifications are working when:
 - ✅ `[Push] ✅ Token saved successfully` appears in logs
 - ✅ Token appears in `push_subscriptions` table with `native:` prefix
 - ✅ Admin can send test notifications from admin panel
-- ✅ Notifications arrive on device when app is backgrounded/closed
-- ✅ Notification click opens app (deep linking)
+- ✅ **Foreground**: Notifications show toast with "View" button when app is open
+- ✅ **Background**: Tapping notification opens app and navigates to content
+- ✅ **Closed**: Tapping notification launches app and navigates to content  
+- ✅ **Deep Linking**: URLs in notification data correctly navigate to specific content
+- ✅ Notification badge updates correctly
 
 ## 📚 Additional Resources
 

@@ -1,43 +1,110 @@
 import { supabase } from '@/integrations/supabase/client';
-import { PushNotifications } from '@capacitor/push-notifications';
+import { PushNotifications, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
-import { toast } from '@/hooks/use-toast';
+import { toast as shadcnToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export type NotificationPermission = 'granted' | 'denied' | 'default';
 
-// Initialize push notification handlers (Phase 3)
+// Navigation callback for deep linking
+let navigationCallback: ((url: string) => void) | null = null;
+
+// Register navigation callback from React Router
+export function registerNavigationCallback(callback: (url: string) => void) {
+  navigationCallback = callback;
+  console.log('[Push] ✅ Navigation callback registered');
+}
+
+// Helper function to handle deep linking
+function handleDeepLink(url: string) {
+  console.log('[Push] 🔗 Handling deep link:', url);
+  
+  if (navigationCallback) {
+    console.log('[Push] Using navigation callback');
+    navigationCallback(url);
+  } else {
+    console.log('[Push] No navigation callback, using window.location');
+    // Fallback to direct navigation
+    window.location.href = url;
+  }
+}
+
+// Initialize push notification handlers (Phases 2-3: All app states + Deep linking)
 export function initializePushNotificationHandlers() {
   if (!Capacitor.isNativePlatform()) {
     console.log('[Push] Not on native platform, skipping handler initialization');
     return;
   }
 
-  console.log('[Push] Initializing notification handlers');
+  console.log('[Push] 🚀 Initializing notification handlers for ALL states (foreground, background, closed)');
 
-  // Handle notification received while app is in foreground
-  PushNotifications.addListener('pushNotificationReceived', (notification) => {
-    console.log('[Push] Notification received in foreground:', notification);
+  // ========================================
+  // FOREGROUND: When app is open and active
+  // ========================================
+  PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
+    console.log('[Push] 📱 FOREGROUND notification received:', {
+      title: notification.title,
+      body: notification.body,
+      data: notification.data,
+      id: notification.id,
+    });
     
-    toast({
-      title: notification.title || 'New Notification',
+    // Show in-app toast with action button if URL provided
+    toast(notification.title || 'New Notification', {
       description: notification.body || '',
+      duration: 5000,
+      action: (notification.data?.url || notification.data?.destination_url) ? {
+        label: 'View',
+        onClick: () => {
+          const url = (notification.data?.url || notification.data?.destination_url) as string;
+          console.log('[Push] Toast action clicked, navigating to:', url);
+          handleDeepLink(url);
+        },
+      } : undefined,
     });
   });
 
-  // Handle notification clicked (app opened from notification)
-  PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
-    console.log('[Push] Notification clicked:', action);
+  // ========================================
+  // BACKGROUND/CLOSED: When notification is tapped
+  // ========================================
+  PushNotifications.addListener('pushNotificationActionPerformed', (action: ActionPerformed) => {
+    console.log('[Push] 🔔 Notification ACTION performed (background/closed):', {
+      actionId: action.actionId,
+      inputValue: action.inputValue,
+      notification: {
+        id: action.notification.id,
+        title: action.notification.title,
+        body: action.notification.body,
+        data: action.notification.data,
+      },
+    });
     
-    const url = action.notification.data?.url || '/app/home';
-    console.log('[Push] Navigating to:', url);
+    const data = action.notification.data;
     
-    // Deep link navigation
-    if (typeof window !== 'undefined') {
-      window.location.href = url;
+    // Extract URL from data (check multiple possible keys)
+    const destinationUrl = (data?.url || data?.destination_url) as string | undefined;
+    
+    if (destinationUrl) {
+      console.log('[Push] 🎯 Deep linking to:', destinationUrl);
+      
+      // Small delay to ensure app is fully loaded
+      setTimeout(() => {
+        handleDeepLink(destinationUrl);
+      }, 500);
+    } else {
+      console.log('[Push] ℹ️ No deep link URL found in notification data, navigating to home');
+      
+      // Navigate to home if no specific URL
+      setTimeout(() => {
+        handleDeepLink('/app/home');
+      }, 500);
     }
   });
 
-  console.log('[Push] Notification handlers initialized successfully');
+  console.log('[Push] ✅ Notification handlers initialized successfully');
+  console.log('[Push] ✓ Foreground handler: Shows toast with action button');
+  console.log('[Push] ✓ Background/Closed handler: Deep links to content');
+  console.log('[Push] ✓ Deep linking: Ready for navigation');
 }
 
 // Clear badge count (Phase 6)
