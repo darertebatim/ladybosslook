@@ -7,6 +7,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { isNativeApp } from "@/lib/platform";
+import { registerNavigationCallback } from "@/lib/pushNotifications";
 import { useEffect } from "react";
 import PlatformAwareAppLayout from "@/layouts/PlatformAwareAppLayout";
 import AppHome from "@/pages/app/AppHome";
@@ -60,14 +61,21 @@ import AppMarketing from "./pages/AppMarketing";
 
 const queryClient = new QueryClient();
 
-// Native App Router - Redirects to /app routes
+// Native App Router - Registers deep linking navigation callback
 const NativeAppRedirect = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
   useEffect(() => {
-    // No automatic redirects for native apps
-  }, [location.pathname, navigate]);
+    // Register navigation callback for push notification deep linking
+    if (isNativeApp()) {
+      console.log('[App] Registering navigation callback for push notifications');
+      registerNavigationCallback((url: string) => {
+        console.log('[App] Navigation callback triggered, navigating to:', url);
+        navigate(url);
+      });
+    }
+  }, [navigate]);
   
   return null;
 };

@@ -35,10 +35,14 @@ Implement a robust native iOS push notification system to keep users engaged wit
 - ✅ Edge function handles both `native:TOKEN` and raw token formats
 
 #### Phase 3: Notification Handlers ✅ COMPLETED
-- ✅ Added `pushNotificationReceived` listener (shows in-app toast)
-- ✅ Added `pushNotificationActionPerformed` listener (deep linking)
-- ✅ Initialized handlers in `main.tsx` on app launch
+- ✅ **Foreground handler**: Shows toast with "View" action button when app is open
+- ✅ **Background handler**: Notification appears in notification center, taps navigate to content
+- ✅ **Closed handler**: Same as background, launches app and navigates to content
+- ✅ **Deep linking**: Supports `url` and `destination_url` in notification data
+- ✅ Registered navigation callback with React Router for smooth deep linking
+- ✅ Initialized handlers in AppLayout on app launch
 - ✅ Badge clearing on app open
+- ✅ Comprehensive logging for all notification events
 
 #### Phase 4: User Notification Settings ✅ COMPLETED
 - ✅ Added notification settings section in Profile page
