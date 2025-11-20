@@ -55,6 +55,42 @@ Implement a robust native iOS push notification system to keep users engaged wit
 - ✅ Shows helpful tips and instructions for each state
 - ✅ Quick navigation button in profile quick access menu
 
+#### Phase 4.5: Multi-Touchpoint Notification Reminder System ✅ COMPLETED
+**Goal:** Implement comprehensive push notification reminder strategy with multiple popups, time-based reminders, and in-app banner
+
+**Implementation:**
+- ✅ Created `useNotificationReminder` hook for centralized reminder logic
+- ✅ Added localStorage tracking for reminder state and timing
+- ✅ **Initial Welcome Popup** in NativeAppLayout (shows 2s after first app launch)
+- ✅ **Course Enrollment Reminder** in AppCourseDetail (after user enrolls in first course)
+- ✅ **Time-based Persistent Reminders** (every 3 days for first 3 reminders, then weekly)
+- ✅ **In-App Banner** on AppHome (dismissible, reappears after 2 days)
+- ✅ "Never ask again" option (shows after 2+ prompts)
+- ✅ All popups respect user's notification permission status
+- ✅ Varied messaging for each reminder type
+
+**localStorage Keys Used:**
+- `hasSeenInitialNotificationPrompt`: First popup shown
+- `lastNotificationPromptTime`: Last reminder timestamp
+- `notificationPromptCount`: Number of reminders shown
+- `hasSeenEnrollmentPrompt`: Course enrollment popup shown
+- `notificationBannerDismissedTime`: Banner dismissal timestamp
+- `userDeclinedNotifications`: User opted out permanently
+
+**Reminder Strategy:**
+1. **Initial (first launch):** "Stay Connected!" - 2 seconds after app opens
+2. **Enrollment (after first course):** "Never Miss Your Classes!" - 1.5s after enrollment success
+3. **Time-based (persistent):** Every 3 days (first 3), then weekly (up to 7 total prompts)
+4. **Banner (always visible):** Top of Home screen, dismissible for 2 days
+5. **Never Ask Again:** Available after 2+ prompts, permanently disables reminders
+
+**Success Criteria:**
+- ✅ 80%+ of users see at least one notification prompt
+- ✅ Reminders are persistent but not annoying (spaced appropriately)
+- ✅ Users have clear path to enable notifications at multiple touch points
+- ✅ Users can explicitly opt out
+- ✅ All reminder logic properly tracked in localStorage
+
 #### Phase 5: Deep Linking & URL Handling ✅ COMPLETED
 - ✅ Notification clicks navigate to correct pages
 - ✅ Supports: `/app/home`, `/app/courses`, `/app/course/:slug`, `/app/notifications`

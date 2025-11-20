@@ -220,6 +220,73 @@ The app now handles notifications in all states:
 }
 ```
 
+## 🔔 Multi-Touchpoint Notification Reminder System
+
+The app implements a comprehensive reminder strategy to encourage users to enable push notifications without being annoying.
+
+### Reminder Touchpoints
+
+#### 1. Initial Welcome Popup (NativeAppLayout)
+- **When**: 2 seconds after first app launch
+- **Title**: "Stay Connected!"
+- **Message**: "Get notified about new courses, class reminders, and important updates"
+- **Buttons**: "Enable Notifications" / "Maybe Later"
+- **Tracking**: `hasSeenInitialNotificationPrompt`
+
+#### 2. Course Enrollment Reminder (AppCourseDetail)
+- **When**: 1.5 seconds after user enrolls in their first course
+- **Title**: "Never Miss Your Classes!"
+- **Message**: "You just enrolled! Enable notifications so you never miss class reminders"
+- **Buttons**: "Enable Now" / "Not Now"
+- **Tracking**: `hasSeenEnrollmentPrompt`
+
+#### 3. Time-Based Persistent Reminders (NativeAppLayout)
+- **When**: 
+  - First 3 reminders: Every 3 days
+  - Subsequent reminders: Weekly
+  - Stops after 7 total prompts (4 weeks)
+- **Title**: "Don't Miss Out!"
+- **Message**: Varies to avoid repetition
+- **Tracking**: `lastNotificationPromptTime`, `notificationPromptCount`
+
+#### 4. In-App Banner (AppHome)
+- **When**: Always visible unless:
+  - Notifications are enabled
+  - User dismissed within last 2 days
+  - User clicked "Never ask again"
+- **Style**: Alert at top of Home screen
+- **Message**: "🔔 Enable notifications to get course reminders"
+- **Buttons**: "Enable" / "Dismiss (X)"
+- **Tracking**: `notificationBannerDismissedTime`
+
+### localStorage Keys
+
+```typescript
+// Tracking keys used by reminder system
+'hasSeenInitialNotificationPrompt': 'true'    // Initial popup shown
+'lastNotificationPromptTime': timestamp       // Last reminder time
+'notificationPromptCount': number             // Total reminders shown
+'hasSeenEnrollmentPrompt': 'true'            // Enrollment popup shown
+'notificationBannerDismissedTime': timestamp  // Banner dismissed time
+'userDeclinedNotifications': 'true'           // User explicitly opted out
+```
+
+### User Opt-Out
+
+Users can permanently disable reminders by:
+1. Clicking "Don't ask again" button (available after 2+ prompts)
+2. This sets `userDeclinedNotifications` to `true`
+3. All future reminders will be suppressed
+4. User can still enable notifications via Profile settings
+
+### Implementation
+
+The system is implemented in:
+- **Hook**: `src/hooks/useNotificationReminder.tsx` - Central logic
+- **NativeAppLayout**: Initial and time-based popups
+- **AppHome**: In-app banner
+- **AppCourseDetail**: Enrollment reminder
+
 ## 📝 Database Schema
 
 Push notification tokens are stored in `push_subscriptions` table:

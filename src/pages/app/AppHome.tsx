@@ -7,14 +7,34 @@ import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
 import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
-import { Send, Mail } from 'lucide-react';
+import { Send, Mail, Bell, X } from 'lucide-react';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
+import { shouldShowNotificationBanner, dismissNotificationBanner } from '@/hooks/useNotificationReminder';
+import { subscribeToPushNotifications } from '@/lib/pushNotifications';
+import { isNativeApp } from '@/lib/platform';
+import { toast } from 'sonner';
+import { useState, useEffect } from 'react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const AppHome = () => {
   const { user } = useAuth();
+  const [showBanner, setShowBanner] = useState(false);
+  const [isEnablingBanner, setIsEnablingBanner] = useState(false);
   
   // Track app installation (first open)
   useAppInstallTracking();
+
+  // Check if we should show notification banner
+  useEffect(() => {
+    if (!isNativeApp()) return;
+    
+    const checkBanner = async () => {
+      const shouldShow = await shouldShowNotificationBanner();
+      setShowBanner(shouldShow);
+    };
+    
+    checkBanner();
+  }, []);
 
   // User tracking handled by authentication system
 
@@ -87,6 +107,37 @@ const AppHome = () => {
     enabled: !!user?.id,
   });
 
+  const handleEnableBannerNotifications = async () => {
+    if (!user?.id) {
+      toast.error('Please sign in to enable notifications');
+      return;
+    }
+
+    setIsEnablingBanner(true);
+    try {
+      const result = await subscribeToPushNotifications(user.id);
+      
+      if (result.success) {
+        toast.success('Push notifications enabled!');
+        setShowBanner(false);
+        dismissNotificationBanner();
+      } else {
+        toast.error(result.error || 'Failed to enable notifications');
+      }
+    } catch (error) {
+      console.error('Error enabling notifications:', error);
+      toast.error('An error occurred');
+    } finally {
+      setIsEnablingBanner(false);
+    }
+  };
+
+  const handleDismissBanner = () => {
+    setShowBanner(false);
+    dismissNotificationBanner();
+    toast('You can enable notifications anytime in Profile settings');
+  };
+
   return (
     <div className="container max-w-7xl py-6 px-4">
       <SEOHead 
@@ -95,6 +146,39 @@ const AppHome = () => {
       />
       
       <div className="space-y-6">
+        {/* Notification Banner */}
+        {showBanner && (
+          <Alert className="border-primary/50 bg-primary/5">
+            <div className="flex items-start gap-3">
+              <Bell className="h-5 w-5 text-primary mt-0.5" />
+              <div className="flex-1">
+                <AlertDescription className="text-sm font-medium text-foreground mb-2">
+                  Enable notifications to get course reminders
+                </AlertDescription>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleEnableBannerNotifications}
+                    disabled={isEnablingBanner}
+                    className="h-8 px-3 text-xs"
+                  >
+                    {isEnablingBanner ? 'Enabling...' : 'Enable'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleDismissBanner}
+                    disabled={isEnablingBanner}
+                    className="h-8 px-2 text-xs"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Alert>
+        )}
+
         <div>
           <h1 className="text-2xl font-bold mb-1">Welcome back!</h1>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
