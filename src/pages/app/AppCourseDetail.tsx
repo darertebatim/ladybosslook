@@ -15,12 +15,19 @@ import { programImages } from '@/data/programs';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
+import { shouldShowEnrollmentReminder } from '@/hooks/useNotificationReminder';
+import { subscribeToPushNotifications, checkPermissionStatus } from '@/lib/pushNotifications';
+import { useState as reactUseState, useEffect as reactUseEffect } from 'react';
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Bell } from 'lucide-react';
 
 const AppCourseDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [showEnrollmentReminder, setShowEnrollmentReminder] = reactUseState(false);
+  const [isEnablingEnrollment, setIsEnablingEnrollment] = reactUseState(false);
 
   // Fetch enrollment and round data
   const { data: enrollment, isLoading: enrollmentLoading } = useQuery({
@@ -120,9 +127,17 @@ const AppCourseDetail = () => {
       
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success('Enrolled successfully!');
       queryClient.invalidateQueries({ queryKey: ['course-enrollment', slug] });
+      
+      // Show enrollment reminder popup if appropriate
+      const shouldShow = await shouldShowEnrollmentReminder();
+      if (shouldShow && isNativeApp()) {
+        setTimeout(() => {
+          setShowEnrollmentReminder(true);
+        }, 1500); // Show after success toast
+      }
     },
     onError: (error) => {
       console.error('Enrollment error:', error);
@@ -448,6 +463,62 @@ const AppCourseDetail = () => {
           </>
         )}
       </div>
+
+      {/* Enrollment Reminder Popup */}
+      <AlertDialog open={showEnrollmentReminder} onOpenChange={setShowEnrollmentReminder}>
+        <AlertDialogContent className="max-w-[90%] sm:max-w-md">
+          <AlertDialogHeader>
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <Bell className="h-8 w-8 text-primary" />
+            </div>
+            <AlertDialogTitle className="text-center text-xl">
+              Never Miss Your Classes!
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-base">
+              You just enrolled! Enable notifications so you never miss class reminders
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button
+              onClick={async () => {
+                if (!user?.id) return;
+                setIsEnablingEnrollment(true);
+                try {
+                  const result = await subscribeToPushNotifications(user.id);
+                  if (result.success) {
+                    toast.success('Push notifications enabled!');
+                    localStorage.setItem('hasSeenEnrollmentPrompt', 'true');
+                    setShowEnrollmentReminder(false);
+                  } else {
+                    toast.error(result.error || 'Failed to enable notifications');
+                  }
+                } catch (error) {
+                  console.error('Error:', error);
+                  toast.error('An error occurred');
+                } finally {
+                  setIsEnablingEnrollment(false);
+                }
+              }}
+              disabled={isEnablingEnrollment}
+              className="w-full"
+              size="lg"
+            >
+              {isEnablingEnrollment ? 'Enabling...' : 'Enable Now'}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                localStorage.setItem('hasSeenEnrollmentPrompt', 'true');
+                setShowEnrollmentReminder(false);
+              }}
+              disabled={isEnablingEnrollment}
+              className="w-full"
+            >
+              Not Now
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
