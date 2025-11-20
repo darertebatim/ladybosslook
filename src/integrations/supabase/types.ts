@@ -58,6 +58,36 @@ export type Database = {
           },
         ]
       }
+      app_installations: {
+        Row: {
+          app_version: string | null
+          created_at: string
+          device_id: string
+          id: string
+          installed_at: string
+          platform: string
+          user_id: string | null
+        }
+        Insert: {
+          app_version?: string | null
+          created_at?: string
+          device_id: string
+          id?: string
+          installed_at?: string
+          platform?: string
+          user_id?: string | null
+        }
+        Update: {
+          app_version?: string | null
+          created_at?: string
+          device_id?: string
+          id?: string
+          installed_at?: string
+          platform?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       audio_content: {
         Row: {
           category: Database["public"]["Enums"]["audio_category"]

@@ -40,11 +40,18 @@ interface DeviceStats {
   lastRegistration: string | null;
 }
 
+interface InstallStats {
+  totalInstalls: number;
+  recentInstalls: number;
+  lastInstall: string | null;
+}
+
 const Admin = () => {
   const { programs } = usePrograms();
   const navigate = useNavigate();
   const [courseStats, setCourseStats] = useState<CourseStats[]>([]);
   const [deviceStats, setDeviceStats] = useState<DeviceStats>({ totalDevices: 0, recentDevices: 0, lastRegistration: null });
+  const [installStats, setInstallStats] = useState<InstallStats>({ totalInstalls: 0, recentInstalls: 0, lastInstall: null });
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -61,6 +68,42 @@ const Admin = () => {
         title: "Error",
         description: "Failed to sign out",
         variant: "destructive"
+      });
+    }
+  };
+
+  const fetchInstallStats = async () => {
+    try {
+      // Fetch all app installations
+      const { data: installs, error } = await supabase
+        .from('app_installations')
+        .select('installed_at, platform');
+
+      if (error) throw error;
+
+      const totalInstalls = installs?.length || 0;
+      
+      // Count installs in the last 7 days
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
+      const recentInstalls = installs?.filter(install => 
+        new Date(install.installed_at) > sevenDaysAgo
+      ).length || 0;
+
+      // Get most recent install
+      const sortedInstalls = installs?.sort((a, b) => 
+        new Date(b.installed_at).getTime() - new Date(a.installed_at).getTime()
+      );
+      const lastInstall = sortedInstalls?.[0]?.installed_at || null;
+
+      setInstallStats({ totalInstalls, recentInstalls, lastInstall });
+    } catch (error: any) {
+      console.error('Error fetching install stats:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch installation statistics",
+        variant: "destructive",
       });
     }
   };
@@ -140,8 +183,8 @@ const Admin = () => {
 
       setCourseStats(statsArray.sort((a, b) => b.student_count - a.student_count));
       
-      // Also fetch device stats
-      await fetchDeviceStats();
+      // Also fetch device and install stats
+      await Promise.all([fetchDeviceStats(), fetchInstallStats()]);
     } catch (error: any) {
       console.error('Error fetching course stats:', error);
       toast({
@@ -259,12 +302,43 @@ const Admin = () => {
                 </CardContent>
               </Card>
 
-              {/* Native App Device Stats */}
+              {/* App Store Downloads (First Opens) */}
               <Card>
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <Smartphone className="h-5 w-5" />
-                    <CardTitle>Native App Installations</CardTitle>
+                    <CardTitle>App Store Downloads</CardTitle>
+                  </div>
+                  <CardDescription>First app opens tracked (closest proxy to actual downloads)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-2xl font-bold">{installStats.totalInstalls}</span>
+                      <span className="text-sm text-muted-foreground">Total Downloads</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-2xl font-bold text-primary">{installStats.recentInstalls}</span>
+                      <span className="text-sm text-muted-foreground">Last 7 Days</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-sm font-medium">
+                        {installStats.lastInstall 
+                          ? new Date(installStats.lastInstall).toLocaleDateString()
+                          : 'No downloads yet'}
+                      </span>
+                      <span className="text-sm text-muted-foreground">Last Download</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Push Notification Devices */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="h-5 w-5" />
+                    <CardTitle>Push Notification Devices</CardTitle>
                   </div>
                   <CardDescription>iOS devices with push notifications enabled</CardDescription>
                 </CardHeader>
