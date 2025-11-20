@@ -97,7 +97,11 @@ Implement a robust native iOS push notification system to keep users engaged wit
 
 #### Phase 6: Badge Count Management ✅ COMPLETED
 - ✅ Custom badge parameter in edge function
-- ✅ Badge clearing on app open
+- ✅ Badge clearing on app open (via `initializePushNotificationHandlers`)
+- ✅ Badge clearing when notification is tapped (background/closed)
+- ✅ Badge clearing when user taps "View" in foreground toast
+- ✅ `clearBadge()` function using `removeAllDeliveredNotifications()`
+- ✅ `getBadgeCount()` function to retrieve current count
 - ✅ Default badge count: 1
 
 #### Phase 7: Admin Panel Enhancements ✅ COMPLETED

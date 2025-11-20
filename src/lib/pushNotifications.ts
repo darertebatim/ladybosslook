@@ -38,6 +38,9 @@ export function initializePushNotificationHandlers() {
 
   console.log('[Push] 🚀 Initializing notification handlers for ALL states (foreground, background, closed)');
 
+  // Phase 5: Clear badge when app opens
+  clearBadge();
+
   // ========================================
   // FOREGROUND: When app is open and active
   // ========================================
@@ -49,6 +52,9 @@ export function initializePushNotificationHandlers() {
       id: notification.id,
     });
     
+    // Phase 5: Badge count is managed by iOS automatically for foreground notifications
+    // iOS doesn't increment badge for foreground notifications, so no action needed
+    
     // Show in-app toast with action button if URL provided
     toast(notification.title || 'New Notification', {
       description: notification.body || '',
@@ -59,6 +65,8 @@ export function initializePushNotificationHandlers() {
           const url = (notification.data?.url || notification.data?.destination_url) as string;
           console.log('[Push] Toast action clicked, navigating to:', url);
           handleDeepLink(url);
+          // Phase 5: Clear badge when user interacts with notification
+          clearBadge();
         },
       } : undefined,
     });
@@ -78,6 +86,9 @@ export function initializePushNotificationHandlers() {
         data: action.notification.data,
       },
     });
+    
+    // Phase 5: Clear badge when notification is tapped
+    clearBadge();
     
     const data = action.notification.data;
     
@@ -105,19 +116,37 @@ export function initializePushNotificationHandlers() {
   console.log('[Push] ✓ Foreground handler: Shows toast with action button');
   console.log('[Push] ✓ Background/Closed handler: Deep links to content');
   console.log('[Push] ✓ Deep linking: Ready for navigation');
+  console.log('[Push] ✓ Badge management: Auto-clear on app open and notification tap');
 }
 
-// Clear badge count (Phase 6)
+// Phase 5: Clear badge count
 export async function clearBadge(): Promise<void> {
   if (Capacitor.isNativePlatform()) {
     try {
-      // iOS automatically clears badge when app is opened
-      // but we can also manually clear it
-      console.log('[Push] Badge cleared');
+      // Remove all delivered notifications from notification center
+      // This also clears the badge count on iOS
+      await PushNotifications.removeAllDeliveredNotifications();
+      console.log('[Push] 🔔 Badge cleared and notification center cleared');
     } catch (error) {
-      console.error('[Push] Error clearing badge:', error);
+      console.error('[Push] ❌ Error clearing badge:', error);
     }
   }
+}
+
+// Phase 5: Get current badge count (iOS only)
+export async function getBadgeCount(): Promise<number> {
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const result = await PushNotifications.getDeliveredNotifications();
+      const count = result.notifications.length;
+      console.log('[Push] 🔔 Current badge count:', count);
+      return count;
+    } catch (error) {
+      console.error('[Push] ❌ Error getting badge count:', error);
+      return 0;
+    }
+  }
+  return 0;
 }
 
 export async function checkPermissionStatus(): Promise<NotificationPermission> {
