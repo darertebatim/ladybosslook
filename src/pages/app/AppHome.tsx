@@ -8,9 +8,13 @@ import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
 import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
 import { Send, Mail } from 'lucide-react';
+import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
 
 const AppHome = () => {
   const { user } = useAuth();
+  
+  // Track app installation (first open)
+  useAppInstallTracking();
 
   // User tracking handled by authentication system
 
