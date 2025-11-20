@@ -146,6 +146,33 @@ If you ever delete the `ios/` folder and run `npx cap add ios` again, you **MUST
 3. Notifications disabled in iOS Settings → Check Settings → [Your App] → Notifications
 4. App in foreground without foreground handler → Notifications only show when app is backgrounded
 
+### ⚠️ Important: Initial Notification Permission Popup
+
+The app includes an **automatic notification permission popup** that appears on first launch (native iOS only):
+
+**When it appears:**
+- Shows 1.5 seconds after app loads
+- Only appears if notifications are not yet granted
+- Only shows once (stored in localStorage)
+
+**User options:**
+- "Enable Notifications" → Requests permission and subscribes
+- "Not Now" → Dismisses popup (can enable later in Profile)
+- "Never Ask Again" → Never shows popup again
+
+**To manually enable later:**
+- Go to Profile → Notifications section
+- Tap "Enable Notifications"
+
+**If permission is denied:**
+- User must go to iOS Settings → LadyBoss Academy → Notifications
+- Toggle "Allow Notifications" to ON
+- Return to app and tap "Re-register" in Profile
+
+**Location:** Implemented in `src/layouts/AppLayout.tsx`
+
+---
+
 ## 📊 Environment Configuration
 
 | Build Type | APNS_ENVIRONMENT | Use Case |

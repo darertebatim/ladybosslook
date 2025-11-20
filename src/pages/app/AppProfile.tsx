@@ -26,18 +26,39 @@ const AppProfile = () => {
   const [contactMessage, setContactMessage] = useState('');
   const [notificationPermission, setNotificationPermission] = useState<'granted' | 'denied' | 'default'>('default');
   const [isEnablingNotifications, setIsEnablingNotifications] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<'checking' | 'active' | 'none'>('checking');
   const isNative = isNativeApp();
 
-  // Check notification permission on mount (Phase 4)
+  // Check notification permission and subscription status on mount
   useEffect(() => {
-    const checkPermission = async () => {
-      if (isNative) {
+    const checkStatus = async () => {
+      if (isNative && user?.id) {
+        // Check permission
         const status = await checkPermissionStatus();
         setNotificationPermission(status);
+
+        // Check if user has active subscription in database
+        const { data, error } = await supabase
+          .from('push_subscriptions')
+          .select('id, endpoint, created_at')
+          .eq('user_id', user.id)
+          .like('endpoint', 'native:%')
+          .limit(1);
+
+        if (error) {
+          console.error('[Profile] Error checking subscription:', error);
+          setSubscriptionStatus('none');
+        } else if (data && data.length > 0) {
+          console.log('[Profile] Active subscription found:', data[0]);
+          setSubscriptionStatus('active');
+        } else {
+          console.log('[Profile] No active subscription found');
+          setSubscriptionStatus('none');
+        }
       }
     };
-    checkPermission();
-  }, [isNative]);
+    checkStatus();
+  }, [isNative, user?.id]);
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -131,7 +152,7 @@ const AppProfile = () => {
     }
   };
 
-  // Enable notifications (Phase 4)
+  // Enable notifications - Updated to refresh subscription status
   const handleEnableNotifications = async () => {
     setIsEnablingNotifications(true);
     try {
@@ -142,6 +163,7 @@ const AppProfile = () => {
         
         if (result.success) {
           setNotificationPermission('granted');
+          setSubscriptionStatus('active');
           toast({
             title: 'Notifications Enabled',
             description: 'You will now receive push notifications',
@@ -156,7 +178,7 @@ const AppProfile = () => {
       } else {
         toast({
           title: 'Permission Denied',
-          description: 'Please enable notifications in your device settings',
+          description: 'Please enable notifications in Settings > LadyBoss Academy > Notifications',
           variant: 'destructive',
         });
       }
@@ -172,13 +194,14 @@ const AppProfile = () => {
     }
   };
 
-  // Disable notifications (Phase 4)
+  // Disable notifications - Updated to refresh subscription status
   const handleDisableNotifications = async () => {
     try {
       const result = await unsubscribeFromPushNotifications(user?.id || '');
       
       if (result.success) {
         setNotificationPermission('default');
+        setSubscriptionStatus('none');
         toast({
           title: 'Notifications Disabled',
           description: 'You will no longer receive push notifications',
@@ -368,35 +391,104 @@ const AppProfile = () => {
                 <Bell className="h-5 w-5" />
                 Push Notifications
               </CardTitle>
-              <CardDescription>Manage your notification preferences</CardDescription>
+              <CardDescription>
+                Manage your notification preferences and stay updated
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              {notificationPermission === 'granted' && (
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Notifications Enabled</p>
+            <CardContent className="space-y-4">
+              {/* Status Badge */}
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <div className={`h-2 w-2 rounded-full ${
+                    notificationPermission === 'granted' && subscriptionStatus === 'active' 
+                      ? 'bg-green-500' 
+                      : notificationPermission === 'denied'
+                      ? 'bg-red-500'
+                      : 'bg-yellow-500'
+                  }`} />
+                  <span className="text-sm font-medium">
+                    {subscriptionStatus === 'checking' 
+                      ? 'Checking status...'
+                      : notificationPermission === 'granted' && subscriptionStatus === 'active'
+                      ? 'Active'
+                      : notificationPermission === 'denied'
+                      ? 'Denied'
+                      : 'Not Enabled'}
+                  </span>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {notificationPermission === 'granted' && subscriptionStatus === 'active' 
+                    ? 'Receiving notifications'
+                    : notificationPermission === 'denied'
+                    ? 'Permission denied'
+                    : 'No notifications'}
+                </span>
+              </div>
+
+              {/* Enabled State */}
+              {notificationPermission === 'granted' && subscriptionStatus === 'active' && (
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">✅ Notifications Enabled</p>
                     <p className="text-sm text-muted-foreground">
-                      You'll receive course updates and reminders
+                      You'll receive course updates, reminders, and announcements
                     </p>
                   </div>
-                  <Button variant="outline" onClick={handleDisableNotifications}>
-                    Disable
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={handleDisableNotifications}
+                      className="flex-1"
+                    >
+                      Disable
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleEnableNotifications}
+                      disabled={isEnablingNotifications}
+                      className="flex-1"
+                    >
+                      {isEnablingNotifications ? 'Re-registering...' : 'Re-register'}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    💡 Use "Re-register" if you're not receiving notifications
+                  </p>
                 </div>
               )}
+
+              {/* Not Enabled State */}
               {notificationPermission !== 'granted' && (
                 <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    Enable notifications to receive course updates, new content alerts, and reminders.
-                  </p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">
+                      {notificationPermission === 'denied' 
+                        ? '⚠️ Permission Denied' 
+                        : '🔔 Enable Notifications'}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {notificationPermission === 'denied'
+                        ? 'Notifications are disabled. Enable them in Settings > LadyBoss Academy > Notifications'
+                        : 'Get notified about new courses, content updates, and important announcements'}
+                    </p>
+                  </div>
                   <Button 
                     onClick={handleEnableNotifications} 
                     className="w-full"
-                    disabled={isEnablingNotifications}
+                    disabled={isEnablingNotifications || notificationPermission === 'denied'}
                   >
                     <Bell className="mr-2 h-4 w-4" />
-                    {isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
+                    {isEnablingNotifications 
+                      ? 'Enabling...' 
+                      : notificationPermission === 'denied'
+                      ? 'Open Settings to Enable'
+                      : 'Enable Notifications'}
                   </Button>
+                  {notificationPermission === 'denied' && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      Tap your Settings app → LadyBoss Academy → Notifications → Allow Notifications
+                    </p>
+                  )}
                 </div>
               )}
             </CardContent>

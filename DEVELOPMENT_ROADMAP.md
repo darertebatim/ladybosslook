@@ -45,10 +45,15 @@ Implement a robust native iOS push notification system to keep users engaged wit
 - ✅ Comprehensive logging for all notification events
 
 #### Phase 4: User Notification Settings ✅ COMPLETED
-- ✅ Added notification settings section in Profile page
+- ✅ Added comprehensive notification settings section in Profile page
+- ✅ Shows real-time subscription status (Active/Not Enabled/Denied)
+- ✅ Status indicator badge with color coding (green/yellow/red)
 - ✅ Enable/disable notifications toggle
-- ✅ Shows current notification status
-- ✅ Quick navigation to notification settings
+- ✅ Re-register button for troubleshooting delivery issues
+- ✅ Checks push_subscriptions table for active native tokens
+- ✅ Provides guidance for enabling notifications in device settings
+- ✅ Shows helpful tips and instructions for each state
+- ✅ Quick navigation button in profile quick access menu
 
 #### Phase 5: Deep Linking & URL Handling ✅ COMPLETED
 - ✅ Notification clicks navigate to correct pages
