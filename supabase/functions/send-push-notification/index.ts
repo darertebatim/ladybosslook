@@ -16,6 +16,7 @@ interface PushNotificationRequest {
   icon?: string;
   url?: string;
   badge?: number; // Phase 6: Custom badge count
+  environment?: 'development' | 'production'; // Environment override
 }
 
 // Helper function to convert PEM format to ArrayBuffer
@@ -63,12 +64,12 @@ async function generateApnsJwt(authKey: string, keyId: string, teamId: string): 
 }
 
 // Send push notification to iOS via APNs
-async function sendToApns(token: string, payload: { title: string; body: string; url: string; badge?: number }): Promise<Response> {
+async function sendToApns(token: string, payload: { title: string; body: string; url: string; badge?: number }, environmentOverride?: 'development' | 'production'): Promise<Response> {
   const authKey = Deno.env.get('APNS_AUTH_KEY');
   const keyId = Deno.env.get('APNS_KEY_ID');
   const teamId = Deno.env.get('APNS_TEAM_ID');
   const topic = Deno.env.get('APNS_TOPIC') || 'com.ladybosslook.academy';
-  const environment = Deno.env.get('APNS_ENVIRONMENT') || 'production'; // 'sandbox' or 'production'
+  const environment = environmentOverride || Deno.env.get('APNS_ENVIRONMENT') || 'production'; // Use override or default
   
   if (!authKey || !keyId || !teamId) {
     throw new Error('APNs credentials not configured');
@@ -78,7 +79,7 @@ async function sendToApns(token: string, payload: { title: string; body: string;
   const jwt = await generateApnsJwt(authKey, keyId, teamId);
   
   // Use sandbox or production APNs URL based on environment
-  const apnsUrl = environment === 'sandbox'
+  const apnsUrl = (environment === 'sandbox' || environment === 'development')
     ? `https://api.sandbox.push.apple.com/3/device/${token}`
     : `https://api.push.apple.com/3/device/${token}`;
   
@@ -115,7 +116,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userIds, targetCourse, targetUserEmail, title, body, icon, url, badge }: PushNotificationRequest = await req.json();
+    const { userIds, targetCourse, targetUserEmail, title, body, icon, url, badge, environment }: PushNotificationRequest = await req.json();
 
     // Debug logging
     console.log('🔔 Received push notification request:', {
@@ -259,7 +260,7 @@ const handler = async (req: Request): Promise<Response> => {
           body,
           url: url || '/app/home',
           badge, // Phase 6: Pass custom badge
-        });
+        }, environment); // Pass environment override
         
         if (response.ok) {
           successCount++;

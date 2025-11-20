@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, Send } from 'lucide-react';
+import { Bell, Send, Beaker, Radio } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
 interface Program {
@@ -17,7 +17,11 @@ interface Program {
   slug: string;
 }
 
-export function PushNotificationSender() {
+interface NotificationFormProps {
+  environment: 'development' | 'production';
+}
+
+function NotificationForm({ environment }: NotificationFormProps) {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [destinationUrl, setDestinationUrl] = useState('/app/home');
@@ -29,7 +33,7 @@ export function PushNotificationSender() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
   
-  // Phase 7: Character limits
+  // Character limits
   const TITLE_LIMIT = 50;
   const MESSAGE_LIMIT = 200;
 
@@ -128,24 +132,17 @@ export function PushNotificationSender() {
         title,
         body: message,
         url: destinationUrl,
+        environment, // Pass environment to edge function
       };
 
-      if (targetType === 'course' && targetCourse) {
+      if (targetType === 'course') {
         payload.targetCourse = targetCourse;
         if (targetRoundId && targetRoundId !== 'all-rounds') {
           payload.targetRoundId = targetRoundId;
         }
-      } else if (targetType === 'user' && targetUserEmail) {
+      } else if (targetType === 'user') {
         payload.targetUserEmail = targetUserEmail.trim();
       }
-
-      // Debug logging
-      console.log('🔔 Sending push notification with payload:', {
-        ...payload,
-        targetType,
-        hasTargetUserEmail: !!payload.targetUserEmail,
-        targetUserEmailValue: payload.targetUserEmail,
-      });
 
       const { data, error } = await supabase.functions.invoke('send-push-notification', {
         body: payload,
@@ -153,9 +150,10 @@ export function PushNotificationSender() {
 
       if (error) throw error;
 
+      const envLabel = environment === 'development' ? 'Test' : 'Production';
       toast({
-        title: 'Notifications sent',
-        description: `Successfully sent to ${data.sent} users. ${data.failed} failed.`,
+        title: `${envLabel} notification sent!`,
+        description: `Sent to ${data.sent} device(s), failed: ${data.failed}`,
       });
 
       // Reset form
@@ -167,10 +165,10 @@ export function PushNotificationSender() {
       setTargetRoundId('all-rounds');
       setTargetUserEmail('');
     } catch (error: any) {
-      console.error('Error sending push notifications:', error);
+      console.error('Error sending push notification:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to send push notifications',
+        description: error.message || 'Failed to send push notification',
         variant: 'destructive',
       });
     } finally {
@@ -178,155 +176,202 @@ export function PushNotificationSender() {
     }
   };
 
+  const isDevelopment = environment === 'development';
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="h-5 w-5" />
-          Send Push Notification
-        </CardTitle>
-        <CardDescription>
-          Send push notifications to students' mobile devices
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="notification-title">Title</Label>
-          <Input
-            id="notification-title"
-            placeholder="Notification title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            maxLength={50}
-          />
-          <p className="text-xs text-muted-foreground">{title.length}/50 characters</p>
-        </div>
+    <div className="space-y-6">
+      {/* Title Input */}
+      <div>
+        <Label htmlFor={`title-${environment}`}>Title</Label>
+        <Input
+          id={`title-${environment}`}
+          value={title}
+          onChange={(e) => setTitle(e.target.value.slice(0, TITLE_LIMIT))}
+          placeholder="Notification title"
+          maxLength={TITLE_LIMIT}
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          {title.length}/{TITLE_LIMIT} characters
+        </p>
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="notification-message">Message</Label>
-          <Textarea
-            id="notification-message"
-            placeholder="Notification message"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            rows={4}
-            maxLength={200}
-          />
-          <p className="text-xs text-muted-foreground">{message.length}/200 characters</p>
-        </div>
+      {/* Message Textarea */}
+      <div>
+        <Label htmlFor={`message-${environment}`}>Message</Label>
+        <Textarea
+          id={`message-${environment}`}
+          value={message}
+          onChange={(e) => setMessage(e.target.value.slice(0, MESSAGE_LIMIT))}
+          placeholder="Notification message"
+          maxLength={MESSAGE_LIMIT}
+          rows={3}
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          {message.length}/{MESSAGE_LIMIT} characters
+        </p>
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="destination-url">Destination (app page)</Label>
-          <Select value={destinationUrl} onValueChange={setDestinationUrl}>
-            <SelectTrigger id="destination-url">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="/app/home">Home</SelectItem>
-              <SelectItem value="/app/courses">Courses</SelectItem>
-              <SelectItem value="/app/notifications">Notifications</SelectItem>
-              <SelectItem value="/app/profile">Profile</SelectItem>
-            </SelectContent>
-          </Select>
-          <p className="text-xs text-muted-foreground">
-            Page to open when user clicks the notification
-          </p>
-        </div>
+      {/* Destination URL */}
+      <div>
+        <Label htmlFor={`url-${environment}`}>Destination URL (optional)</Label>
+        <Input
+          id={`url-${environment}`}
+          value={destinationUrl}
+          onChange={(e) => setDestinationUrl(e.target.value)}
+          placeholder="/app/home"
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          Where users go when they tap the notification
+        </p>
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="target-type">Target Audience</Label>
-          <Select value={targetType} onValueChange={(value: any) => setTargetType(value)}>
-            <SelectTrigger id="target-type">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Students</SelectItem>
-              <SelectItem value="course">Specific Course</SelectItem>
-              <SelectItem value="user">Specific User (Email)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      {/* Target Audience Selection */}
+      <div>
+        <Label htmlFor={`target-${environment}`}>Target Audience</Label>
+        <Select value={targetType} onValueChange={(value: any) => setTargetType(value)}>
+          <SelectTrigger id={`target-${environment}`}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Users</SelectItem>
+            <SelectItem value="course">Course Enrollees</SelectItem>
+            <SelectItem value="user">Specific User (by email)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-        {targetType === 'user' && (
-          <div className="space-y-2">
-            <Label htmlFor="target-user-email">User Email</Label>
-            <Input
-              id="target-user-email"
-              type="email"
-              placeholder="user@example.com"
-              value={targetUserEmail}
-              onChange={(e) => setTargetUserEmail(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">
-              Enter the email address of the user to send the notification
-            </p>
-          </div>
-        )}
-
-        {targetType === 'course' && (
-          <div className="space-y-2">
-            <Label htmlFor="target-course">Select Program</Label>
+      {/* Course Selection */}
+      {targetType === 'course' && (
+        <>
+          <div>
+            <Label htmlFor={`course-${environment}`}>Course</Label>
             <Select value={targetCourse} onValueChange={setTargetCourse}>
-              <SelectTrigger id="target-course">
-                <SelectValue placeholder="Choose a program" />
+              <SelectTrigger id={`course-${environment}`}>
+                <SelectValue placeholder="Select a course" />
               </SelectTrigger>
               <SelectContent>
                 {programs.map((program) => (
                   <SelectItem key={program.id} value={program.slug}>
-                    {program.title} • {program.type === 'course' ? '📚' : program.type === 'group-coaching' ? '👥' : program.type === '1o1-session' ? '💼' : program.type === 'webinar' ? '🎥' : '🎉'}
+                    {program.title} ({program.type})
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-        )}
 
-        {targetCourse && rounds && rounds.length > 0 && (
-          <div className="space-y-2">
-            <Label htmlFor="targetRound">Target Round (Optional)</Label>
-            <Select 
-              value={targetRoundId} 
-              onValueChange={setTargetRoundId}
-              key={targetCourse}
-            >
-              <SelectTrigger id="targetRound">
-                <SelectValue placeholder="All rounds" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all-rounds">All Rounds</SelectItem>
-                {rounds.map((round: any) => (
-                  <SelectItem key={round.id} value={round.id}>
-                    {round.round_name} (Round #{round.round_number})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-
-        <div className="rounded-lg bg-muted p-4">
-          <h4 className="font-medium mb-2">Preview</h4>
-          <div className="space-y-1 max-w-sm">
-            <div className="flex items-start gap-2">
-              <Bell className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm truncate">{title || 'Notification Title'}</p>
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {message || 'Notification message will appear here'}
-                </p>
-                {destinationUrl && destinationUrl !== '/app/home' && (
-                  <p className="text-xs text-muted-foreground mt-1">→ {destinationUrl}</p>
-                )}
-              </div>
+          {/* Round Selection */}
+          {targetCourse && rounds && rounds.length > 0 && (
+            <div>
+              <Label htmlFor={`round-${environment}`}>Round (optional)</Label>
+              <Select value={targetRoundId} onValueChange={setTargetRoundId}>
+                <SelectTrigger id={`round-${environment}`}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all-rounds">All Rounds</SelectItem>
+                  {rounds.map((round) => (
+                    <SelectItem key={round.id} value={round.id}>
+                      Round #{round.round_number}: {round.round_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+          )}
+        </>
+      )}
+
+      {/* User Email Input */}
+      {targetType === 'user' && (
+        <div>
+          <Label htmlFor={`email-${environment}`}>User Email</Label>
+          <Input
+            id={`email-${environment}`}
+            type="email"
+            value={targetUserEmail}
+            onChange={(e) => setTargetUserEmail(e.target.value)}
+            placeholder="user@example.com"
+          />
+        </div>
+      )}
+
+      {/* Preview */}
+      <div className="rounded-lg border border-border bg-muted/50 p-4">
+        <div className="flex items-start gap-3">
+          <div className="rounded-full bg-primary p-2">
+            <Bell className="h-4 w-4 text-primary-foreground" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm text-foreground">
+              {title || 'Notification Title'}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {message || 'Notification message will appear here'}
+            </p>
+            {destinationUrl && (
+              <p className="text-xs text-muted-foreground mt-2">
+                → {destinationUrl}
+              </p>
+            )}
           </div>
         </div>
+      </div>
 
-        <Button onClick={handleSend} disabled={isLoading || !title || !message} className="w-full">
-          <Send className="mr-2 h-4 w-4" />
-          {isLoading ? 'Sending...' : 'Send Push Notification'}
-        </Button>
-      </CardContent>
-    </Card>
+      {/* Send Button */}
+      <Button 
+        onClick={handleSend} 
+        disabled={isLoading || !title || !message}
+        className="w-full"
+        variant={isDevelopment ? "outline" : "default"}
+      >
+        <Send className="mr-2 h-4 w-4" />
+        {isLoading 
+          ? 'Sending...' 
+          : isDevelopment 
+            ? 'Send Test Notification' 
+            : 'Send Production Notification'
+        }
+      </Button>
+    </div>
+  );
+}
+
+export function PushNotificationSender() {
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      {/* Test/Development Card */}
+      <Card className="border-amber-500/50 bg-amber-500/5">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Beaker className="h-5 w-5 text-amber-500" />
+            <CardTitle>Test Push Notifications</CardTitle>
+          </div>
+          <CardDescription>
+            Send test notifications to development/sandbox APNs environment.
+            Use this for testing with Xcode builds and TestFlight.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <NotificationForm environment="development" />
+        </CardContent>
+      </Card>
+
+      {/* Production Card */}
+      <Card className="border-primary/50 bg-primary/5">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Radio className="h-5 w-5 text-primary" />
+            <CardTitle>Production Push Notifications</CardTitle>
+          </div>
+          <CardDescription>
+            Send notifications to real users on production APNs environment.
+            Use this only for App Store builds.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <NotificationForm environment="production" />
+        </CardContent>
+      </Card>
+    </div>
   );
 }
