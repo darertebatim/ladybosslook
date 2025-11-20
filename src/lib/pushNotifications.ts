@@ -91,20 +91,32 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
     return { success: false, error: 'Not supported on this platform' };
   }
 
+  if (!userId) {
+    console.error('[Push] Missing user ID');
+    return { success: false, error: 'Missing user ID' };
+  }
+
   try {
-    console.log('[Push] Registering for native push notifications');
-    
-    await PushNotifications.register();
+    console.log('[Push] Starting push notification registration for user:', userId);
     
     return new Promise((resolve) => {
+      let handled = false;
+      
       const timeout = setTimeout(() => {
-        console.log('[Push] Registration timeout');
-        resolve({ success: false, error: 'Registration timeout' });
-      }, 10000);
+        if (handled) return;
+        handled = true;
+        console.log('[Push] Registration timeout after 25 seconds');
+        resolve({ success: false, error: 'Registration timeout - check APNs configuration' });
+      }, 25000);
 
+      console.log('[Push] Attaching registration listeners...');
+      
       PushNotifications.addListener('registration', async (token) => {
+        if (handled) return;
+        handled = true;
         clearTimeout(timeout);
-        console.log('[Push] Registration success, token:', token.value);
+        
+        console.log('[Push] ✅ Registration success! Token received:', token.value.substring(0, 20) + '...');
         
         try {
           const { error } = await supabase
@@ -119,26 +131,33 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
             });
 
           if (error) {
-            console.error('[Push] Error saving token:', error);
+            console.error('[Push] ❌ Error saving token to database:', error);
             resolve({ success: false, error: error.message });
           } else {
-            console.log('[Push] Token saved successfully');
+            console.log('[Push] ✅ Token saved successfully to database');
             resolve({ success: true });
           }
         } catch (error: any) {
-          console.error('[Push] Error in registration handler:', error);
+          console.error('[Push] ❌ Error in registration handler:', error);
           resolve({ success: false, error: error.message });
         }
       });
 
       PushNotifications.addListener('registrationError', (error) => {
+        if (handled) return;
+        handled = true;
         clearTimeout(timeout);
-        console.error('[Push] Registration error:', error);
+        
+        console.error('[Push] ❌ Registration error from APNs:', error.error);
         resolve({ success: false, error: error.error });
       });
+
+      console.log('[Push] Listeners attached, calling PushNotifications.register()...');
+      PushNotifications.register();
+      console.log('[Push] Register() called, waiting for APNs response...');
     });
   } catch (error: any) {
-    console.error('[Push] Unexpected error:', error);
+    console.error('[Push] ❌ Unexpected error:', error);
     return { success: false, error: error.message || 'Failed to subscribe' };
   }
 }
