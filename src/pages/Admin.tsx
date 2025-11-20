@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, GraduationCap, LayoutDashboard, UserCog, Send, Shield, LogOut, Search, Users, UserPlus, Music } from 'lucide-react';
+import { RefreshCw, GraduationCap, LayoutDashboard, UserCog, Send, Shield, LogOut, Search, Users, UserPlus, Music, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
 import { QuickEnrollUser } from '@/components/admin/QuickEnrollUser';
@@ -34,10 +34,17 @@ interface CourseStats {
   student_count: number;
 }
 
+interface DeviceStats {
+  totalDevices: number;
+  recentDevices: number;
+  lastRegistration: string | null;
+}
+
 const Admin = () => {
   const { programs } = usePrograms();
   const navigate = useNavigate();
   const [courseStats, setCourseStats] = useState<CourseStats[]>([]);
+  const [deviceStats, setDeviceStats] = useState<DeviceStats>({ totalDevices: 0, recentDevices: 0, lastRegistration: null });
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -54,6 +61,43 @@ const Admin = () => {
         title: "Error",
         description: "Failed to sign out",
         variant: "destructive"
+      });
+    }
+  };
+
+  const fetchDeviceStats = async () => {
+    try {
+      // Fetch all native iOS subscriptions
+      const { data: subscriptions, error } = await supabase
+        .from('push_subscriptions')
+        .select('endpoint, created_at')
+        .like('endpoint', 'native:%');
+
+      if (error) throw error;
+
+      const totalDevices = subscriptions?.length || 0;
+      
+      // Count devices registered in the last 7 days
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
+      const recentDevices = subscriptions?.filter(sub => 
+        new Date(sub.created_at) > sevenDaysAgo
+      ).length || 0;
+
+      // Get most recent registration
+      const sortedSubs = subscriptions?.sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      const lastRegistration = sortedSubs?.[0]?.created_at || null;
+
+      setDeviceStats({ totalDevices, recentDevices, lastRegistration });
+    } catch (error: any) {
+      console.error('Error fetching device stats:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch device statistics",
+        variant: "destructive",
       });
     }
   };
@@ -95,6 +139,9 @@ const Admin = () => {
       }));
 
       setCourseStats(statsArray.sort((a, b) => b.student_count - a.student_count));
+      
+      // Also fetch device stats
+      await fetchDeviceStats();
     } catch (error: any) {
       console.error('Error fetching course stats:', error);
       toast({
@@ -209,6 +256,37 @@ const Admin = () => {
                       No enrollments yet
                     </div>
                   )}
+                </CardContent>
+              </Card>
+
+              {/* Native App Device Stats */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="h-5 w-5" />
+                    <CardTitle>Native App Installations</CardTitle>
+                  </div>
+                  <CardDescription>iOS devices with push notifications enabled</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-2xl font-bold">{deviceStats.totalDevices}</span>
+                      <span className="text-sm text-muted-foreground">Total Devices</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-2xl font-bold text-primary">{deviceStats.recentDevices}</span>
+                      <span className="text-sm text-muted-foreground">Last 7 Days</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-sm font-medium">
+                        {deviceStats.lastRegistration 
+                          ? new Date(deviceStats.lastRegistration).toLocaleDateString()
+                          : 'No registrations yet'}
+                      </span>
+                      <span className="text-sm text-muted-foreground">Last Registration</span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
