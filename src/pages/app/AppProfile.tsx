@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
 import { useState, useEffect } from 'react';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications, unsubscribeFromPushNotifications } from '@/lib/pushNotifications';
-import { Capacitor } from '@capacitor/core';
+import { isNativeApp } from '@/lib/platform';
 
 const AppProfile = () => {
   const { user, signOut } = useAuth();
@@ -26,7 +26,7 @@ const AppProfile = () => {
   const [contactMessage, setContactMessage] = useState('');
   const [notificationPermission, setNotificationPermission] = useState<'granted' | 'denied' | 'default'>('default');
   const [isEnablingNotifications, setIsEnablingNotifications] = useState(false);
-  const isNative = Capacitor.isNativePlatform();
+  const isNative = isNativeApp();
 
   // Check notification permission on mount (Phase 4)
   useEffect(() => {

@@ -2,8 +2,15 @@ import { Capacitor } from '@capacitor/core';
 
 /**
  * Simplified platform detection using Capacitor's built-in APIs
+ * Supports ?devNative=true URL parameter for previewing native layout in browser
  */
 export const isNativeApp = (): boolean => {
+  // Check for dev preview flag
+  if (typeof window !== 'undefined') {
+    const devNative = new URLSearchParams(window.location.search).get('devNative') === 'true';
+    if (devNative) return true;
+  }
+  
   return Capacitor.isNativePlatform();
 };
 
