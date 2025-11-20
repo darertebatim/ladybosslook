@@ -111,6 +111,7 @@ function attachRegistrationListeners() {
 
 export async function subscribeToPushNotifications(userId: string): Promise<{ success: boolean; error?: string }> {
   if (!Capacitor.isNativePlatform()) {
+    console.log('[Push] Not a native platform, skipping subscribe');
     return { success: false, error: 'Not supported on this platform' };
   }
 
@@ -120,71 +121,79 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
   }
 
   if (isRegistering) {
-    console.log('[Push] Registration already in progress');
+    console.log('[Push] Registration already in progress, ignoring new request');
     return { success: false, error: 'Registration already in progress' };
   }
 
   try {
     isRegistering = true;
     console.log('[Push] Starting registration for user:', userId);
-    
-    // Attach listeners once globally
-    attachRegistrationListeners();
-    
+
+    // Attach only per-attempt listeners to avoid any hidden complexity
+    let handled = false;
+
     return new Promise(async (resolve) => {
       const timeout = setTimeout(() => {
+        if (handled) return;
+        handled = true;
         isRegistering = false;
-        console.log('[Push] ❌ Timeout after 15s');
+        console.log('[Push] ❌ Timeout after 15s (no registration / error event received)');
         resolve({ success: false, error: 'Registration timeout' });
       }, 15000);
 
-      // Single-use listeners for this specific registration attempt
       const onSuccess = await PushNotifications.addListener('registration', async (token) => {
+        if (handled) return;
+        handled = true;
         clearTimeout(timeout);
         onSuccess.remove();
         onError.remove();
-        
-        console.log('[Push] Got token, saving to database...');
-        
-        // Save to database
+
+        console.log('[Push] ✅ Token received from APNs:', token.value.substring(0, 20) + '...');
+        console.log('[Push] Saving token to database...');
+
         const { error } = await supabase
           .from('push_subscriptions')
-          .upsert({
-            user_id: userId,
-            endpoint: `native:${token.value}`,
-            p256dh_key: 'native-ios',
-            auth_key: 'native-ios',
-          }, {
-            onConflict: 'user_id,endpoint'
-          });
+          .upsert(
+            {
+              user_id: userId,
+              endpoint: `native:${token.value}`,
+              p256dh_key: 'native-ios',
+              auth_key: 'native-ios',
+            },
+            {
+              onConflict: 'user_id,endpoint',
+            }
+          );
 
         isRegistering = false;
 
         if (error) {
-          console.error('[Push] ❌ Database error:', error);
+          console.error('[Push] ❌ Database error while saving token:', error);
           resolve({ success: false, error: 'Failed to save token' });
         } else {
-          console.log('[Push] ✅ Success!');
+          console.log('[Push] ✅ Token saved successfully');
           resolve({ success: true });
         }
       });
 
       const onError = await PushNotifications.addListener('registrationError', (error) => {
+        if (handled) return;
+        handled = true;
         clearTimeout(timeout);
         onSuccess.remove();
         onError.remove();
         isRegistering = false;
-        
-        console.error('[Push] ❌ APNs rejected:', error.error);
-        resolve({ success: false, error: error.error });
+
+        console.error('[Push] ❌ APNs registration error:', error.error ?? error);
+        resolve({ success: false, error: error.error || 'APNs registration failed' });
       });
 
-      console.log('[Push] Calling register()...');
+      console.log('[Push] Calling PushNotifications.register()');
       PushNotifications.register();
     });
   } catch (error: any) {
     isRegistering = false;
-    console.error('[Push] ❌ Exception:', error);
+    console.error('[Push] ❌ Exception during subscribeToPushNotifications:', error);
     return { success: false, error: error.message || 'Failed to subscribe' };
   }
 }
