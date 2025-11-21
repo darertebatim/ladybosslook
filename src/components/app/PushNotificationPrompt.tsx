@@ -9,7 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { subscribeToPushNotifications } from '@/lib/pushNotifications';
+import { subscribeToPushNotifications, requestNotificationPermission } from '@/lib/pushNotifications';
 import { toast } from 'sonner';
 
 interface PushNotificationPromptProps {
@@ -24,17 +24,24 @@ export function PushNotificationPrompt({ userId, open, onClose }: PushNotificati
   const handleEnable = async () => {
     setIsEnabling(true);
     try {
-      const result = await subscribeToPushNotifications(userId);
+      // CRITICAL: Request permission FIRST (same as Profile page)
+      const permission = await requestNotificationPermission();
       
-      if (result.success) {
-        toast.success('Notifications enabled!');
-        onClose();
-      } else if (result.error === 'Permission denied') {
-        toast.error('Permission denied. Open Settings to enable notifications.');
-      } else if (result.error === 'Registration timeout') {
-        toast.error('Could not connect. Please try again from Profile settings.');
+      if (permission === 'granted') {
+        const result = await subscribeToPushNotifications(userId);
+        
+        if (result.success) {
+          toast.success('Notifications enabled!');
+          onClose();
+        } else if (result.error === 'Permission denied') {
+          toast.error('Permission denied. Open Settings to enable notifications.');
+        } else if (result.error === 'Registration timeout') {
+          toast.error('Could not connect. Please try again from Profile settings.');
+        } else {
+          toast.error(result.error || 'Failed to enable notifications');
+        }
       } else {
-        toast.error(result.error || 'Failed to enable notifications');
+        toast.error('Please enable notifications in iOS Settings.');
       }
     } catch (error) {
       console.error('[PushPrompt] Error:', error);
