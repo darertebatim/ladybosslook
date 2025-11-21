@@ -7,6 +7,9 @@
 **App Overview:**
 LadyBoss Academy is a free educational platform offering personal and professional development courses and audio content for women. All courses are available for free enrollment.
 
+**Version 1.0.4 - NEW: Push Notifications**
+This update introduces native push notifications to keep students informed about course updates, new content, and important announcements. Users receive a permission prompt on first launch and can manage notification preferences in their Profile settings.
+
 **Test Account:**
 - Email: reviewer@ladybosslook.com
 - Password: ReviewAccess2025!
@@ -14,17 +17,23 @@ LadyBoss Academy is a free educational platform offering personal and profession
 
 **Key Features to Test:**
 
-1. **Sign in** → Access dashboard with enrolled courses displayed
-2. **Browse tab** → View all available free courses and test enrolling in additional courses
-3. **Courses tab** → View enrolled courses with materials and playlists
-4. **Audio Player tab** → Browse and play audio playlists (supports background playback)
-5. **Course Details** → Tap any enrolled course to view:
+1. **Push Notifications (NEW)** → On first app launch, you'll see a notification permission prompt. Grant permission to test:
+   - Notification permission dialog
+   - Profile page → Push Notifications section shows enabled status
+   - Home page notification reminder banner (if notifications disabled)
+   - Users can enable/disable notifications in Profile settings
+
+2. **Sign in** → Access dashboard with enrolled courses displayed
+3. **Browse tab** → View all available free courses and test enrolling in additional courses
+4. **Courses tab** → View enrolled courses with materials and playlists
+5. **Audio Player tab** → Browse and play audio playlists (supports background playback)
+6. **Course Details** → Tap any enrolled course to view:
    - Course materials (downloadable PDFs)
    - Audio playlists (if available)
    - Course announcements
    - Support contact options
-6. **Enroll Free** → From Browse tab, tap any course and use "Enroll Free" button (instant enrollment, no payment)
-7. **Profile tab** → View user information and logout
+7. **Enroll Free** → From Browse tab, tap any course and use "Enroll Free" button (instant enrollment, no payment)
+8. **Profile tab** → View user information, manage push notifications, and logout
 
 **Content & Materials:**
 All courses include:
@@ -41,7 +50,11 @@ All courses include:
 - **Telegram (@ladybosslook):** Optional student support communication channel (users must choose to contact)
 
 **Permissions Requested:**
-- **Push Notifications:** Course updates and announcements (user must explicitly opt-in during first launch)
+- **Push Notifications (NEW in v1.0.4):** Course updates and announcements
+  - Users see permission prompt on first app launch
+  - Users can manage notification preferences in Profile → Push Notifications
+  - Notifications deliver course updates, new content alerts, and important announcements
+  - Fully native iOS implementation using APNs (Apple Push Notification service)
 
 **Privacy & Data:**
 - User data stored securely via Supabase backend
@@ -67,6 +80,7 @@ All program content is delivered in English.
 - No payment processing or subscription systems are present in the app
 - Users simply sign up, browse courses, and enroll for free
 - The test account already has courses enrolled, but reviewers can also test the enrollment flow by enrolling in additional courses from the Browse tab
+- **Version 1.0.4 Update:** Added native push notifications for course updates and announcements - please test the permission prompt on first launch and notification settings in Profile
 
 Thank you for reviewing LadyBoss Academy!
 
