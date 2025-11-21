@@ -110,32 +110,92 @@ Implement a robust native iOS push notification system to keep users engaged wit
 - ✅ Enhanced preview with bell icon and destination URL
 - ✅ Character counters for title and message
 
-#### Phase 8: Testing & Validation ⏳ REQUIRED
-**Manual Testing Checklist:**
-- [ ] Registration Flow
-  - [ ] Fresh install shows notification prompt
-  - [ ] Accepting prompt subscribes successfully
-  - [ ] Token saved with `native:` prefix
-  - [ ] Declining prompt stores preference
-- [ ] Sending Notifications
-  - [ ] Send to all users works
-  - [ ] Send to specific course works
-  - [ ] Send to specific user (by email) works
-  - [ ] Send to specific round works
-- [ ] Receiving Notifications
-  - [ ] App closed: notification shows, clicking opens app
-  - [ ] App in background: notification shows
-  - [ ] App in foreground: toast shows notification
-  - [ ] Deep linking navigates correctly
-- [ ] User Settings
-  - [ ] Enable notifications from profile works
-  - [ ] Disable notifications removes subscription
-  - [ ] Status displays correctly
-- [ ] Admin Panel
-  - [ ] Device list shows only native iOS devices
-  - [ ] Test notification sends successfully
-  - [ ] History logs accurate
-  - [ ] All targeting options work
+#### Phase 8: Comprehensive Testing (Real iOS Device) 🔄 IN PROGRESS
+
+**Testing Checklist:**
+
+##### 1. Registration & Setup Tests
+- [ ] Fresh install: Delete app, reinstall from Xcode, verify token registration succeeds
+- [ ] Permission prompt: Accept notifications, verify permission status is "granted"
+- [ ] Token saved: Check push_subscriptions table has new entry with "native:" prefix
+- [ ] Admin panel: Verify user appears in target selection dropdown
+
+##### 2. Foreground Notification Tests (App Open & Visible)
+- [ ] Send test notification from Admin Panel → Development card
+- [ ] Verify toast appears with title and message
+- [ ] Verify "View" button appears (if URL provided)
+- [ ] Click "View" button, verify navigation to correct page
+- [ ] Verify badge does NOT increment (iOS doesn't badge foreground notifications)
+
+##### 3. Background Notification Tests (App in Background)
+- [ ] Background the app (swipe up to home screen)
+- [ ] Send test notification from Admin Panel
+- [ ] Verify notification appears in iOS notification center
+- [ ] Tap notification, verify app opens
+- [ ] Verify app navigates to correct destination URL
+- [ ] Verify badge clears after tapping notification
+
+##### 4. Closed Notification Tests (App Completely Closed)
+- [ ] Force quit the app (swipe up in app switcher)
+- [ ] Send test notification from Admin Panel
+- [ ] Verify notification appears in iOS notification center
+- [ ] Tap notification, verify app launches
+- [ ] Verify app navigates to correct destination URL
+- [ ] Verify badge clears after tapping notification
+
+##### 5. Badge Count Tests
+- [ ] Close app completely
+- [ ] Send 3 notifications from Admin Panel
+- [ ] Verify badge shows "3" on app icon
+- [ ] Open app (don't tap notification), verify badge clears to 0
+- [ ] Verify notification center is cleared
+
+##### 6. Deep Linking Tests
+- [ ] Send notification with destination_url: "/app/courses"
+- [ ] Tap notification (from background), verify navigates to courses page
+- [ ] Send notification with destination_url: "/app/profile"
+- [ ] Tap notification (from closed), verify navigates to profile page
+- [ ] Send notification with NO url, verify defaults to /app/home
+
+##### 7. Target Audience Tests
+- [ ] Admin sends to "All Users", verify all enrolled users receive notification
+- [ ] Admin sends to specific course (e.g., "Ready to Empowered"), verify only enrolled users receive
+- [ ] Admin sends to specific round, verify only round enrollees receive
+
+##### 8. User Settings Tests
+- [ ] Go to Profile → Notifications section
+- [ ] Verify current permission status displays correctly
+- [ ] If denied in iOS Settings, verify "Open Settings" button appears
+- [ ] Toggle notifications off, verify unsubscribe works
+- [ ] Toggle notifications on, verify re-registration works
+
+##### 9. Multi-Popup Reminder System Tests
+- [ ] Fresh install: Verify Initial Welcome Popup appears after 2s
+- [ ] Dismiss with "Maybe Later", verify popup doesn't reappear
+- [ ] Enroll in first course, verify Enrollment Reminder appears after 1.5s
+- [ ] Wait 3 days (or simulate via localStorage manipulation), verify Time-Based Reminder appears
+- [ ] Check Home screen for In-App Banner, verify it appears if notifications disabled
+
+##### 10. Admin Panel Tests
+- [ ] Development card: Send test notification, verify delivery
+- [ ] Production card: Verify it exists and is properly labeled (DON'T send from production yet)
+- [ ] Verify target selection dropdown shows enrolled users
+- [ ] Verify course/round filtering works correctly
+- [ ] Check Push Notification History, verify logs are created
+
+##### 11. Edge Cases & Error Handling
+- [ ] Deny notification permission, verify app handles gracefully
+- [ ] Send notification with very long title/message, verify truncation works
+- [ ] Send notification with invalid URL, verify fallback to /app/home
+- [ ] Background app for 24+ hours, send notification, verify still works
+- [ ] Turn off WiFi/cellular, send notification, verify queues and delivers when reconnected
+
+##### 12. Production Readiness Checks
+- [ ] Verify APNS_ENVIRONMENT is set to "development" for current testing
+- [ ] Document when to switch to "production" (before App Store release)
+- [ ] Verify no console errors in notification flow
+- [ ] Verify 90%+ delivery success rate in testing
+- [ ] Verify all documentation is up to date
 
 #### Phase 9: Documentation & Monitoring ⏳ PENDING
 - [ ] Update `IOS_SUBMISSION_GUIDE.md`
