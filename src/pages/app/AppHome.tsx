@@ -23,24 +23,45 @@ const AppHome = () => {
   // Track app installation (first open)
   useAppInstallTracking();
 
-  // Check notification status for banner
+  // Check notification status for banner (permission AND database subscription)
   useEffect(() => {
     const checkNotificationStatus = async () => {
-      if (!Capacitor.isNativePlatform()) return;
+      if (!Capacitor.isNativePlatform() || !user?.id) return;
       
+      // Check permission
       const permission = await checkPermissionStatus();
-      if (permission !== 'granted') {
+      
+      // Check database subscription
+      const { data } = await supabase
+        .from('push_subscriptions')
+        .select('id')
+        .eq('user_id', user.id)
+        .like('endpoint', 'native:%')
+        .maybeSingle();
+      
+      const hasSubscription = !!data;
+      
+      // Show banner if either permission not granted OR no subscription in DB
+      if (permission !== 'granted' || !hasSubscription) {
         const dismissed = localStorage.getItem('notificationBannerDismissed');
         if (dismissed) {
           const daysSince = (Date.now() - parseInt(dismissed)) / (1000 * 60 * 60 * 24);
           if (daysSince < 3) return;
         }
         setShowNotificationBanner(true);
+      } else {
+        setShowNotificationBanner(false);
       }
     };
 
     checkNotificationStatus();
-  }, []);
+    
+    // Re-check when window gains focus (user returns to app)
+    const handleFocus = () => checkNotificationStatus();
+    window.addEventListener('focus', handleFocus);
+    
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [user?.id]);
 
   // User tracking handled by authentication system
 
