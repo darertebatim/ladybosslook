@@ -456,8 +456,28 @@ const AppProfile = () => {
                   </p>
                 </div>
               )}
+              
+              {/* Disabled State (permission granted but subscription removed) */}
+              {notificationPermission === 'granted' && subscriptionStatus === 'none' && (
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">🟡 Not Enabled</p>
+                    <p className="text-sm text-muted-foreground">
+                      No notifications
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={handleEnableNotifications} 
+                    className="w-full"
+                    disabled={isEnablingNotifications}
+                  >
+                    <Bell className="mr-2 h-4 w-4" />
+                    {isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
+                  </Button>
+                </div>
+              )}
 
-              {/* Not Enabled State */}
+              {/* Not Enabled State (no permission) */}
               {notificationPermission !== 'granted' && (
                 <div className="space-y-4">
                   <div className="space-y-2">
