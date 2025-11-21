@@ -83,13 +83,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: redirectUrl
       }
     });
+    
+    // Check if user already exists (Supabase returns success but with identities array populated)
+    if (!error && data.user && data.user.identities && data.user.identities.length === 0) {
+      return { error: { message: 'This email is already registered. Please sign in instead.' } as any };
+    }
+    
     return { error };
   };
 
