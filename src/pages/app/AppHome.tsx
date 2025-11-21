@@ -7,46 +7,14 @@ import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
 import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
-import { Send, Mail, Bell, X } from 'lucide-react';
+import { Send, Mail } from 'lucide-react';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
-import { shouldShowNotificationBanner, dismissNotificationBanner, useNotificationReminder } from '@/hooks/useNotificationReminder';
-import { subscribeToPushNotifications } from '@/lib/pushNotifications';
-import { isNativeApp } from '@/lib/platform';
-import { toast } from 'sonner';
-import { useState, useEffect } from 'react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 const AppHome = () => {
   const { user } = useAuth();
-  const [showBanner, setShowBanner] = useState(false);
-  const [isEnablingBanner, setIsEnablingBanner] = useState(false);
-  const [isEnablingPopup, setIsEnablingPopup] = useState(false);
   
   // Track app installation (first open)
   useAppInstallTracking();
-  
-  // Notification reminder system
-  const {
-    reminderState,
-    markInitialPromptSeen,
-    markEnrollmentPromptSeen,
-    markTimedPromptSeen,
-    markUserDeclined,
-    dismissPopup,
-  } = useNotificationReminder();
-
-  // Check if we should show notification banner
-  useEffect(() => {
-    if (!isNativeApp()) return;
-    
-    const checkBanner = async () => {
-      const shouldShow = await shouldShowNotificationBanner();
-      setShowBanner(shouldShow);
-    };
-    
-    checkBanner();
-  }, []);
 
   // User tracking handled by authentication system
 
@@ -74,53 +42,6 @@ const AppHome = () => {
     const subject = 'Support Request';
     const body = `Hi! I need support.\n\nName: ${profile?.full_name || 'N/A'}\nEmail: ${profile?.email || user?.email || 'N/A'}\nPhone: ${profile?.phone || 'N/A'}\nCity: ${profile?.city || 'N/A'}`;
     window.location.href = `mailto:support@ladybosslook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
-  
-  // Handle popup notification enable
-  const handleEnableNotificationsPopup = async () => {
-    if (!user?.id) return;
-    
-    setIsEnablingPopup(true);
-    try {
-      await subscribeToPushNotifications(user.id);
-      toast.success('Notifications enabled successfully!');
-      
-      // Mark appropriate prompt as seen
-      if (reminderState.popupType === 'initial') {
-        markInitialPromptSeen();
-      } else if (reminderState.popupType === 'enrollment') {
-        markEnrollmentPromptSeen();
-      } else if (reminderState.popupType === 'timed') {
-        markTimedPromptSeen();
-      }
-      
-      dismissPopup();
-    } catch (error: any) {
-      console.error('Failed to enable notifications:', error);
-      toast.error(error.message || 'Failed to enable notifications');
-    } finally {
-      setIsEnablingPopup(false);
-    }
-  };
-  
-  // Handle popup dismiss
-  const handleDismissPopup = () => {
-    // Mark appropriate prompt as seen
-    if (reminderState.popupType === 'initial') {
-      markInitialPromptSeen();
-    } else if (reminderState.popupType === 'enrollment') {
-      markEnrollmentPromptSeen();
-    } else if (reminderState.popupType === 'timed') {
-      markTimedPromptSeen();
-    }
-    
-    dismissPopup();
-  };
-  
-  // Handle never ask again
-  const handleNeverAskAgain = () => {
-    markUserDeclined();
-    dismissPopup();
   };
 
   const { data: enrollments } = useQuery({
@@ -166,37 +87,6 @@ const AppHome = () => {
     enabled: !!user?.id,
   });
 
-  const handleEnableBannerNotifications = async () => {
-    if (!user?.id) {
-      toast.error('Please sign in to enable notifications');
-      return;
-    }
-
-    setIsEnablingBanner(true);
-    try {
-      const result = await subscribeToPushNotifications(user.id);
-      
-      if (result.success) {
-        toast.success('Push notifications enabled!');
-        setShowBanner(false);
-        dismissNotificationBanner();
-      } else {
-        toast.error(result.error || 'Failed to enable notifications');
-      }
-    } catch (error) {
-      console.error('Error enabling notifications:', error);
-      toast.error('An error occurred');
-    } finally {
-      setIsEnablingBanner(false);
-    }
-  };
-
-  const handleDismissBanner = () => {
-    setShowBanner(false);
-    dismissNotificationBanner();
-    toast('You can enable notifications anytime in Profile settings');
-  };
-
   return (
     <div className="container max-w-7xl py-6 px-4">
       <SEOHead 
@@ -205,39 +95,6 @@ const AppHome = () => {
       />
       
       <div className="space-y-6">
-        {/* Notification Banner - DISABLED: Manage notifications from Profile only */}
-        {/* {showBanner && (
-          <Alert className="border-primary/50 bg-primary/5">
-            <div className="flex items-start gap-3">
-              <Bell className="h-5 w-5 text-primary mt-0.5" />
-              <div className="flex-1">
-                <AlertDescription className="text-sm font-medium text-foreground mb-2">
-                  Enable notifications to get course reminders
-                </AlertDescription>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={handleEnableBannerNotifications}
-                    disabled={isEnablingBanner}
-                    className="h-8 px-3 text-xs"
-                  >
-                    {isEnablingBanner ? 'Enabling...' : 'Enable'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={handleDismissBanner}
-                    disabled={isEnablingBanner}
-                    className="h-8 px-2 text-xs"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </Alert>
-        )} */}
-
         <div>
           <h1 className="text-2xl font-bold mb-1">Welcome back!</h1>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
@@ -277,46 +134,6 @@ const AppHome = () => {
           </Button>
         </div>
       </div>
-      
-      {/* Notification Reminder Popup - DISABLED: Manage notifications from Profile only */}
-      {/* <AlertDialog open={reminderState.shouldShowPopup && isNativeApp()}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-primary" />
-              Enable Push Notifications
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {reminderState.popupMessage}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col sm:flex-col gap-2">
-            <AlertDialogAction
-              onClick={handleEnableNotificationsPopup}
-              disabled={isEnablingPopup}
-              className="w-full"
-            >
-              {isEnablingPopup ? 'Enabling...' : 'Enable Notifications'}
-            </AlertDialogAction>
-            <AlertDialogCancel
-              onClick={handleDismissPopup}
-              disabled={isEnablingPopup}
-              className="w-full m-0"
-            >
-              Maybe Later
-            </AlertDialogCancel>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleNeverAskAgain}
-              disabled={isEnablingPopup}
-              className="w-full text-xs text-muted-foreground"
-            >
-              Never ask again
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog> */}
     </div>
   );
 };
