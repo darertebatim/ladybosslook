@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +19,7 @@ const AppProfile = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -152,7 +153,7 @@ const AppProfile = () => {
     }
   };
 
-  // Enable notifications - Updated to refresh subscription status
+  // Enable notifications - Updated to refresh subscription status and provide better feedback
   const handleEnableNotifications = async () => {
     setIsEnablingNotifications(true);
     try {
@@ -163,17 +164,42 @@ const AppProfile = () => {
         
         if (result.success) {
           setNotificationPermission('granted');
-          setSubscriptionStatus('active');
-          toast({
-            title: 'Notifications Enabled',
-            description: 'You will now receive push notifications',
-          });
+          // Check if already enabled vs newly enabled
+          if (subscriptionStatus === 'active') {
+            toast({
+              title: 'Already Enabled',
+              description: 'Notifications are already enabled',
+            });
+          } else {
+            setSubscriptionStatus('active');
+            toast({
+              title: 'Notifications Enabled',
+              description: 'You will now receive push notifications',
+            });
+          }
+          // Refetch subscription status
+          queryClient.invalidateQueries({ queryKey: ['push-subscription', user?.id] });
         } else {
-          toast({
-            title: 'Error',
-            description: result.error || 'Failed to enable notifications',
-            variant: 'destructive',
-          });
+          // Specific error handling
+          if (result.error === 'Permission denied') {
+            toast({
+              title: 'Permission Denied',
+              description: 'Please open iOS Settings > LadyBoss Academy > Notifications to enable.',
+              variant: 'destructive',
+            });
+          } else if (result.error === 'Registration timeout') {
+            toast({
+              title: 'Connection Issue',
+              description: 'Could not connect to Apple\'s notification service. Please try again from this screen.',
+              variant: 'destructive',
+            });
+          } else {
+            toast({
+              title: 'Error',
+              description: result.error || 'Failed to enable notifications',
+              variant: 'destructive',
+            });
+          }
         }
       } else {
         toast({
