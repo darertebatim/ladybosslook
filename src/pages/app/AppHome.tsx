@@ -9,20 +9,32 @@ import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
 import { Send, Mail, Bell, X } from 'lucide-react';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
-import { shouldShowNotificationBanner, dismissNotificationBanner } from '@/hooks/useNotificationReminder';
+import { shouldShowNotificationBanner, dismissNotificationBanner, useNotificationReminder } from '@/hooks/useNotificationReminder';
 import { subscribeToPushNotifications } from '@/lib/pushNotifications';
 import { isNativeApp } from '@/lib/platform';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 const AppHome = () => {
   const { user } = useAuth();
   const [showBanner, setShowBanner] = useState(false);
   const [isEnablingBanner, setIsEnablingBanner] = useState(false);
+  const [isEnablingPopup, setIsEnablingPopup] = useState(false);
   
   // Track app installation (first open)
   useAppInstallTracking();
+  
+  // Notification reminder system
+  const {
+    reminderState,
+    markInitialPromptSeen,
+    markEnrollmentPromptSeen,
+    markTimedPromptSeen,
+    markUserDeclined,
+    dismissPopup,
+  } = useNotificationReminder();
 
   // Check if we should show notification banner
   useEffect(() => {
@@ -62,6 +74,53 @@ const AppHome = () => {
     const subject = 'Support Request';
     const body = `Hi! I need support.\n\nName: ${profile?.full_name || 'N/A'}\nEmail: ${profile?.email || user?.email || 'N/A'}\nPhone: ${profile?.phone || 'N/A'}\nCity: ${profile?.city || 'N/A'}`;
     window.location.href = `mailto:support@ladybosslook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+  
+  // Handle popup notification enable
+  const handleEnableNotificationsPopup = async () => {
+    if (!user?.id) return;
+    
+    setIsEnablingPopup(true);
+    try {
+      await subscribeToPushNotifications(user.id);
+      toast.success('Notifications enabled successfully!');
+      
+      // Mark appropriate prompt as seen
+      if (reminderState.popupType === 'initial') {
+        markInitialPromptSeen();
+      } else if (reminderState.popupType === 'enrollment') {
+        markEnrollmentPromptSeen();
+      } else if (reminderState.popupType === 'timed') {
+        markTimedPromptSeen();
+      }
+      
+      dismissPopup();
+    } catch (error: any) {
+      console.error('Failed to enable notifications:', error);
+      toast.error(error.message || 'Failed to enable notifications');
+    } finally {
+      setIsEnablingPopup(false);
+    }
+  };
+  
+  // Handle popup dismiss
+  const handleDismissPopup = () => {
+    // Mark appropriate prompt as seen
+    if (reminderState.popupType === 'initial') {
+      markInitialPromptSeen();
+    } else if (reminderState.popupType === 'enrollment') {
+      markEnrollmentPromptSeen();
+    } else if (reminderState.popupType === 'timed') {
+      markTimedPromptSeen();
+    }
+    
+    dismissPopup();
+  };
+  
+  // Handle never ask again
+  const handleNeverAskAgain = () => {
+    markUserDeclined();
+    dismissPopup();
   };
 
   const { data: enrollments } = useQuery({
@@ -218,6 +277,46 @@ const AppHome = () => {
           </Button>
         </div>
       </div>
+      
+      {/* Notification Reminder Popup */}
+      <AlertDialog open={reminderState.shouldShowPopup && isNativeApp()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5 text-primary" />
+              Enable Push Notifications
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {reminderState.popupMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-col gap-2">
+            <AlertDialogAction
+              onClick={handleEnableNotificationsPopup}
+              disabled={isEnablingPopup}
+              className="w-full"
+            >
+              {isEnablingPopup ? 'Enabling...' : 'Enable Notifications'}
+            </AlertDialogAction>
+            <AlertDialogCancel
+              onClick={handleDismissPopup}
+              disabled={isEnablingPopup}
+              className="w-full m-0"
+            >
+              Maybe Later
+            </AlertDialogCancel>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleNeverAskAgain}
+              disabled={isEnablingPopup}
+              className="w-full text-xs text-muted-foreground"
+            >
+              Never ask again
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
