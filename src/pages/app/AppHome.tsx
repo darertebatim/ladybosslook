@@ -205,8 +205,8 @@ const AppHome = () => {
       />
       
       <div className="space-y-6">
-        {/* Notification Banner */}
-        {showBanner && (
+        {/* Notification Banner - DISABLED: Manage notifications from Profile only */}
+        {/* {showBanner && (
           <Alert className="border-primary/50 bg-primary/5">
             <div className="flex items-start gap-3">
               <Bell className="h-5 w-5 text-primary mt-0.5" />
@@ -236,7 +236,7 @@ const AppHome = () => {
               </div>
             </div>
           </Alert>
-        )}
+        )} */}
 
         <div>
           <h1 className="text-2xl font-bold mb-1">Welcome back!</h1>
@@ -278,8 +278,8 @@ const AppHome = () => {
         </div>
       </div>
       
-      {/* Notification Reminder Popup */}
-      <AlertDialog open={reminderState.shouldShowPopup && isNativeApp()}>
+      {/* Notification Reminder Popup - DISABLED: Manage notifications from Profile only */}
+      {/* <AlertDialog open={reminderState.shouldShowPopup && isNativeApp()}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
@@ -316,7 +316,7 @@ const AppHome = () => {
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
     </div>
   );
 };

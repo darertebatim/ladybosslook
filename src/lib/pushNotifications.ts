@@ -224,6 +224,29 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
   try {
     isRegistering = true;
     console.log('[Push] Starting registration for user:', userId);
+    
+    // Check if user already has an active native subscription
+    const { data: existingSub, error: subError } = await supabase
+      .from('push_subscriptions')
+      .select('id, endpoint')
+      .eq('user_id', userId)
+      .maybeSingle();
+    
+    if (existingSub && existingSub.endpoint?.startsWith('native:')) {
+      console.log('[Push] ✅ Existing native subscription found, skipping APNs register()');
+      isRegistering = false;
+      return { success: true };
+    }
+    
+    // Check permission status before attempting registration
+    const permission = await checkPermissionStatus();
+    console.log('[Push] Current permission before register:', permission);
+    
+    if (permission === 'denied') {
+      console.log('[Push] ❌ Permission denied, cannot register');
+      isRegistering = false;
+      return { success: false, error: 'Permission denied' };
+    }
 
     // Attach only per-attempt listeners to avoid any hidden complexity
     let handled = false;

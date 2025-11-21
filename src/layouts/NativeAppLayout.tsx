@@ -131,8 +131,8 @@ const NativeAppLayout = () => {
       </nav>
     </div>
 
-    {/* Notification Reminder Popup */}
-    <AlertDialog open={reminderState.shouldShowPopup} onOpenChange={(open) => !open && dismissPopup()}>
+    {/* Notification Reminder Popup - DISABLED: Manage notifications from Profile only */}
+    {/* <AlertDialog open={reminderState.shouldShowPopup} onOpenChange={(open) => !open && dismissPopup()}>
       <AlertDialogContent className="max-w-[90%] sm:max-w-md">
         <AlertDialogHeader>
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
@@ -174,7 +174,7 @@ const NativeAppLayout = () => {
           )}
         </AlertDialogFooter>
       </AlertDialogContent>
-    </AlertDialog>
+    </AlertDialog> */}
   </>
   );
 };
