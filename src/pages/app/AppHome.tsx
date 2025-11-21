@@ -7,14 +7,40 @@ import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
 import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
-import { Send, Mail } from 'lucide-react';
+import { Send, Mail, Bell, ArrowRight } from 'lucide-react';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
+import { useState, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { checkPermissionStatus } from '@/lib/pushNotifications';
+import { useNavigate } from 'react-router-dom';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const AppHome = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [showNotificationBanner, setShowNotificationBanner] = useState(false);
   
   // Track app installation (first open)
   useAppInstallTracking();
+
+  // Check notification status for banner
+  useEffect(() => {
+    const checkNotificationStatus = async () => {
+      if (!Capacitor.isNativePlatform()) return;
+      
+      const permission = await checkPermissionStatus();
+      if (permission !== 'granted') {
+        const dismissed = localStorage.getItem('notificationBannerDismissed');
+        if (dismissed) {
+          const daysSince = (Date.now() - parseInt(dismissed)) / (1000 * 60 * 60 * 24);
+          if (daysSince < 3) return;
+        }
+        setShowNotificationBanner(true);
+      }
+    };
+
+    checkNotificationStatus();
+  }, []);
 
   // User tracking handled by authentication system
 
@@ -95,6 +121,23 @@ const AppHome = () => {
       />
       
       <div className="space-y-6">
+        {showNotificationBanner && (
+          <Alert className="border-primary/50 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors" onClick={() => navigate('/app/profile')}>
+            <div className="flex items-center gap-3">
+              <Bell className="h-5 w-5 text-primary" />
+              <div className="flex-1">
+                <AlertDescription className="text-sm font-medium text-foreground">
+                  Enable notifications to get course reminders
+                </AlertDescription>
+              </div>
+              <Button size="sm" variant="ghost" className="gap-2">
+                Go to Settings
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </Alert>
+        )}
+
         <div>
           <h1 className="text-2xl font-bold mb-1">Welcome back!</h1>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
