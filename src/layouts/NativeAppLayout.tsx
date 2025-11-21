@@ -1,13 +1,10 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, BookOpen, User, Headphones, ShoppingBag } from 'lucide-react';
-import { useNotificationReminder } from '@/hooks/useNotificationReminder';
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import { Bell } from 'lucide-react';
-import { useState } from 'react';
-import { subscribeToPushNotifications } from '@/lib/pushNotifications';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
+import { useState, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { checkPermissionStatus } from '@/lib/pushNotifications';
+import { PushNotificationPrompt } from '@/components/app/PushNotificationPrompt';
 
 /**
  * Native app layout - Clean layout specifically for iOS/Android native apps
@@ -15,15 +12,29 @@ import { toast } from 'sonner';
 const NativeAppLayout = () => {
   const location = useLocation();
   const { user } = useAuth();
-  const { 
-    reminderState, 
-    markInitialPromptSeen, 
-    markTimedPromptSeen, 
-    markUserDeclined, 
-    dismissPopup 
-  } = useNotificationReminder();
-  
-  const [isEnabling, setIsEnabling] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(false);
+
+  useEffect(() => {
+    const checkPrompt = async () => {
+      if (!Capacitor.isNativePlatform() || !user?.id) return;
+
+      // Check if already enabled
+      const permission = await checkPermissionStatus();
+      if (permission === 'granted') return;
+
+      // Check if dismissed recently (within 3 days)
+      const dismissed = localStorage.getItem('pushNotificationPromptDismissed');
+      if (dismissed) {
+        const daysSince = (Date.now() - parseInt(dismissed)) / (1000 * 60 * 60 * 24);
+        if (daysSince < 3) return;
+      }
+
+      // Show prompt after 2 seconds
+      setTimeout(() => setShowPrompt(true), 2000);
+    };
+
+    checkPrompt();
+  }, [user?.id]);
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home' },
@@ -32,64 +43,6 @@ const NativeAppLayout = () => {
     { path: '/app/player', icon: Headphones, label: 'Player' },
     { path: '/app/profile', icon: User, label: 'Profile' },
   ];
-
-  const handleEnableNotifications = async () => {
-    if (!user?.id) {
-      toast.error('Please sign in to enable notifications');
-      return;
-    }
-
-    setIsEnabling(true);
-    try {
-      const result = await subscribeToPushNotifications(user.id);
-      
-      if (result.success) {
-        toast.success('Push notifications enabled successfully!');
-        
-        // Mark appropriate prompt as seen based on type
-        if (reminderState.popupType === 'initial') {
-          markInitialPromptSeen();
-        } else if (reminderState.popupType === 'timed') {
-          markTimedPromptSeen();
-        }
-        
-        dismissPopup();
-      } else {
-        toast.error(result.error || 'Failed to enable notifications');
-      }
-    } catch (error) {
-      console.error('Error enabling notifications:', error);
-      toast.error('An error occurred while enabling notifications');
-    } finally {
-      setIsEnabling(false);
-    }
-  };
-
-  const handleMaybeLater = () => {
-    if (reminderState.popupType === 'initial') {
-      markInitialPromptSeen();
-    } else if (reminderState.popupType === 'timed') {
-      markTimedPromptSeen();
-    }
-    dismissPopup();
-  };
-
-  const handleNeverAsk = () => {
-    markUserDeclined();
-    dismissPopup();
-    toast('You can always enable notifications in your Profile settings');
-  };
-
-  const getPopupTitle = () => {
-    switch (reminderState.popupType) {
-      case 'initial':
-        return 'Stay Connected!';
-      case 'timed':
-        return 'Don\'t Miss Out!';
-      default:
-        return 'Enable Notifications';
-    }
-  };
 
   return (
     <>
@@ -131,50 +84,13 @@ const NativeAppLayout = () => {
       </nav>
     </div>
 
-    {/* Notification Reminder Popup - DISABLED: Manage notifications from Profile only */}
-    {/* <AlertDialog open={reminderState.shouldShowPopup} onOpenChange={(open) => !open && dismissPopup()}>
-      <AlertDialogContent className="max-w-[90%] sm:max-w-md">
-        <AlertDialogHeader>
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-            <Bell className="h-8 w-8 text-primary" />
-          </div>
-          <AlertDialogTitle className="text-center text-xl">
-            {getPopupTitle()}
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-center text-base">
-            {reminderState.popupMessage}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
-          <Button
-            onClick={handleEnableNotifications}
-            disabled={isEnabling}
-            className="w-full"
-            size="lg"
-          >
-            {isEnabling ? 'Enabling...' : 'Enable Notifications'}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleMaybeLater}
-            disabled={isEnabling}
-            className="w-full"
-          >
-            Maybe Later
-          </Button>
-          {reminderState.promptCount >= 2 && (
-            <Button
-              variant="ghost"
-              onClick={handleNeverAsk}
-              disabled={isEnabling}
-              className="w-full text-xs text-muted-foreground hover:text-foreground"
-            >
-              Don't ask again
-            </Button>
-          )}
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog> */}
+    {user && (
+      <PushNotificationPrompt 
+        userId={user.id}
+        open={showPrompt}
+        onClose={() => setShowPrompt(false)}
+      />
+    )}
   </>
   );
 };
