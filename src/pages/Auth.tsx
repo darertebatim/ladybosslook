@@ -33,7 +33,7 @@ export default function Auth() {
     try {
       if (isForgotPassword) {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth`,
+          redirectTo: 'https://ladybosslook.com/auth',
         });
 
         if (error) {
