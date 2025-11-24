@@ -89,6 +89,7 @@ export function LeadsManager() {
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedEnrollRound, setSelectedEnrollRound] = useState('');
   const [isEnrolling, setIsEnrolling] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   const { programs, isLoading: programsLoading } = usePrograms();
 
@@ -381,6 +382,44 @@ export function LeadsManager() {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!searchResults?.profile?.id) return;
+
+    setIsDeleting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { error } = await supabase.functions.invoke('admin-delete-user', {
+        body: {
+          userId: searchResults.profile.id
+        },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "User deleted successfully"
+      });
+
+      // Clear search results
+      setSearchResults(null);
+      setSearchQuery('');
+    } catch (error: any) {
+      console.error('Delete user error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete user",
+        variant: "destructive"
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -550,6 +589,34 @@ export function LeadsManager() {
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="sm" disabled={isDeleting}>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete User
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete the user account for <strong>{searchResults.profile.email}</strong>.
+                              This action cannot be undone. All associated data including enrollments, orders, and profile information will be removed.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleDeleteUser}
+                              disabled={isDeleting}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              {isDeleting ? 'Deleting...' : 'Delete User'}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </CardTitle>
                 </CardHeader>
