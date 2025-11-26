@@ -49,6 +49,7 @@ export const StripePaymentsViewer = () => {
 
   useEffect(() => {
     backfillMissingOrders();
+  }, []);
 
   useEffect(() => {
     filterOrders();
