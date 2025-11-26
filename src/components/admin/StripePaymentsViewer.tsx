@@ -49,8 +49,10 @@ export const StripePaymentsViewer = () => {
 
   useEffect(() => {
     backfillMissingOrders();
-  }, []);
 
+  useEffect(() => {
+    filterOrders();
+  }, [searchTerm, startDate, endDate, selectedProgram, orders]);
 
   const fetchOrders = async () => {
     try {
