@@ -137,6 +137,26 @@ export const StripePaymentsViewer = () => {
 
       if (programError) throw programError;
 
+      // Look up user by email if user_id is missing
+      let finalUserId = userId;
+      if (!finalUserId) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', userEmail)
+          .maybeSingle();
+
+        if (!profileError && profile) {
+          finalUserId = profile.id;
+          
+          // Update the order to link the user_id
+          await supabase
+            .from('orders')
+            .update({ user_id: finalUserId })
+            .eq('id', orderId);
+        }
+      }
+
       // Update the order with the program
       const { error: updateError } = await supabase
         .from('orders')
@@ -149,11 +169,11 @@ export const StripePaymentsViewer = () => {
       if (updateError) throw updateError;
 
       // If user_id exists, enroll them in the course
-      if (userId) {
+      if (finalUserId) {
         const { error: enrollError } = await supabase
           .from('course_enrollments')
           .insert({
-            user_id: userId,
+            user_id: finalUserId,
             course_name: program.title,
             program_slug: programSlug,
             status: 'active'
@@ -164,7 +184,7 @@ export const StripePaymentsViewer = () => {
         }
       }
 
-      toast.success(`Product assigned${userId ? ' and user enrolled' : ''}`);
+      toast.success(`Product assigned${finalUserId ? ' and user enrolled' : ''}`);
       fetchOrders(); // Refresh the list
     } catch (error: any) {
       console.error('Error assigning product:', error);
