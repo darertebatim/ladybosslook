@@ -226,6 +226,64 @@ export const StripePaymentsViewer = () => {
 
   return (
     <div className="space-y-6">
+      {/* Filters Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Analytics Filters</CardTitle>
+          <CardDescription>Filter payments by date range and program to view specific analytics</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Program</label>
+              <Select value={selectedProgram} onValueChange={setSelectedProgram}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Programs" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Programs</SelectItem>
+                  {programs.map((program) => (
+                    <SelectItem key={program.slug} value={program.slug}>
+                      {program.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Start Date</label>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">End Date</label>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+            {(startDate || endDate || selectedProgram !== 'all') && (
+              <div className="flex items-end">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setStartDate('');
+                    setEndDate('');
+                    setSelectedProgram('all');
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Summary Stats */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
@@ -285,33 +343,6 @@ export const StripePaymentsViewer = () => {
                   className="pl-10"
                 />
               </div>
-              <Select value={selectedProgram} onValueChange={setSelectedProgram}>
-                <SelectTrigger className="md:w-56">
-                  <SelectValue placeholder="Filter by program" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Programs</SelectItem>
-                  {programs.map((program) => (
-                    <SelectItem key={program.slug} value={program.slug}>
-                      {program.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input
-                type="date"
-                placeholder="Start date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="md:w-48"
-              />
-              <Input
-                type="date"
-                placeholder="End date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="md:w-48"
-              />
             </div>
             <div className="flex gap-2">
               <Button onClick={exportToCSV} disabled={filteredOrders.length === 0}>
