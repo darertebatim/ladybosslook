@@ -10,6 +10,7 @@ import { isNativeApp } from "@/lib/platform";
 import { registerNavigationCallback } from "@/lib/pushNotifications";
 import { useEffect } from "react";
 import PlatformAwareAppLayout from "@/layouts/PlatformAwareAppLayout";
+import { AdminLayout } from "@/layouts/AdminLayout";
 import AppHome from "@/pages/app/AppHome";
 import AppCourses from "@/pages/app/AppCourses";
 import AppStore from "@/pages/app/AppStore";
@@ -21,7 +22,14 @@ import AppPlaylistDetail from "@/pages/app/AppPlaylistDetail";
 import AppAudioPlayer from "@/pages/app/AppAudioPlayer";
 import Programs from "./pages/Programs";
 import About from "./pages/About";
-import Admin from "./pages/Admin";
+import Overview from "./pages/admin/Overview";
+import Users from "./pages/admin/Users";
+import Enrollment from "./pages/admin/Enrollment";
+import Audio from "./pages/admin/Audio";
+import Communications from "./pages/admin/Communications";
+import ProgramsAdmin from "./pages/admin/Programs";
+import Payments from "./pages/admin/Payments";
+import System from "./pages/admin/System";
 import AssertLanding from "./pages/AssertLanding";
 import Auth from "./pages/Auth";
 import BusinessIdeas from "./pages/BusinessIdeas";
@@ -96,7 +104,21 @@ const App = () => (
             <Route path="/landing" element={<Landing />} />
             <Route path="/asac" element={<AssertLanding />} />
             <Route path="/auth" element={<Auth />} />
-            {!isNativeApp() && <Route path="/admin" element={<Admin />} />}
+            
+            {/* Admin Routes */}
+            {!isNativeApp() && (
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<Overview />} />
+                <Route path="users" element={<Users />} />
+                <Route path="enrollment" element={<Enrollment />} />
+                <Route path="audio" element={<Audio />} />
+                <Route path="communications" element={<Communications />} />
+                <Route path="programs" element={<ProgramsAdmin />} />
+                <Route path="payments" element={<Payments />} />
+                <Route path="system" element={<System />} />
+              </Route>
+            )}
+            
           <Route path="/video" element={<Video />} />
           <Route path="/expressassert" element={<ExpressAssert />} />
           <Route path="/business-ideas" element={<BusinessIdeas />} />
