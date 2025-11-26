@@ -144,7 +144,7 @@ serve(async (req) => {
               billing_country: billingCountry,
               amount,
               currency,
-              status: isRefunded ? 'refunded' : 'completed',
+              status: isRefunded ? 'refunded' : 'paid',
               product_name: productName,
               program_slug: programSlug,
               payment_type: session.mode,
