@@ -170,6 +170,11 @@ serve(async (req) => {
         programName = programData?.mailchimp_program_name || programData?.title || session.line_items?.data[0]?.description || 'Purchase';
       }
       
+      // Extract billing address from Stripe session
+      const billingCity = session.customer_details?.address?.city || null;
+      const billingState = session.customer_details?.address?.state || null;
+      const billingCountry = session.customer_details?.address?.country || null;
+
       // Create order record with user_id and program info
       const { data: newOrder, error: orderError } = await supabase
         .from('orders')
@@ -183,7 +188,10 @@ serve(async (req) => {
           currency: session.currency || 'usd',
           status: 'paid',
           product_name: programName,
-          program_slug: programSlug
+          program_slug: programSlug,
+          billing_city: billingCity,
+          billing_state: billingState,
+          billing_country: billingCountry
         })
         .select()
         .single();
