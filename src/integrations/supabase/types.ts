@@ -431,6 +431,9 @@ export type Database = {
           phone: string | null
           product_name: string
           program_slug: string | null
+          refund_amount: number | null
+          refunded: boolean | null
+          refunded_at: string | null
           status: string | null
           stripe_session_id: string | null
           updated_at: string
@@ -450,6 +453,9 @@ export type Database = {
           phone?: string | null
           product_name: string
           program_slug?: string | null
+          refund_amount?: number | null
+          refunded?: boolean | null
+          refunded_at?: string | null
           status?: string | null
           stripe_session_id?: string | null
           updated_at?: string
@@ -469,6 +475,9 @@ export type Database = {
           phone?: string | null
           product_name?: string
           program_slug?: string | null
+          refund_amount?: number | null
+          refunded?: boolean | null
+          refunded_at?: string | null
           status?: string | null
           stripe_session_id?: string | null
           updated_at?: string

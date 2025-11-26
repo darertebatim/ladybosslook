@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Download, Search, DollarSign, CreditCard, TrendingUp } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Download, Search, DollarSign, CreditCard, TrendingUp, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -23,6 +24,10 @@ interface Order {
   billing_state: string | null;
   billing_country: string | null;
   stripe_session_id: string | null;
+  program_slug: string | null;
+  refunded: boolean;
+  refunded_at: string | null;
+  refund_amount: number | null;
 }
 
 export const StripePaymentsViewer = () => {
@@ -32,14 +37,18 @@ export const StripePaymentsViewer = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [selectedProgram, setSelectedProgram] = useState<string>('all');
+  const [programs, setPrograms] = useState<Array<{ slug: string; title: string }>>([]);
+  const [syncingRefunds, setSyncingRefunds] = useState(false);
 
   useEffect(() => {
     fetchOrders();
+    fetchPrograms();
   }, []);
 
   useEffect(() => {
     filterOrders();
-  }, [searchTerm, startDate, endDate, orders]);
+  }, [searchTerm, startDate, endDate, selectedProgram, orders]);
 
   const fetchOrders = async () => {
     try {
@@ -58,6 +67,20 @@ export const StripePaymentsViewer = () => {
     }
   };
 
+  const fetchPrograms = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('program_catalog')
+        .select('slug, title')
+        .order('title');
+
+      if (error) throw error;
+      setPrograms(data || []);
+    } catch (error) {
+      console.error('Error fetching programs:', error);
+    }
+  };
+
   const filterOrders = () => {
     let filtered = [...orders];
 
@@ -69,6 +92,11 @@ export const StripePaymentsViewer = () => {
         order.name.toLowerCase().includes(term) ||
         (order.phone && order.phone.toLowerCase().includes(term))
       );
+    }
+
+    // Program filter
+    if (selectedProgram !== 'all') {
+      filtered = filtered.filter(order => order.program_slug === selectedProgram);
     }
 
     // Date range filter
@@ -84,6 +112,25 @@ export const StripePaymentsViewer = () => {
     }
 
     setFilteredOrders(filtered);
+  };
+
+  const syncRefunds = async () => {
+    setSyncingRefunds(true);
+    try {
+      toast.info('Syncing refunds from Stripe...');
+      
+      const { data, error } = await supabase.functions.invoke('sync-stripe-refunds');
+
+      if (error) throw error;
+
+      toast.success(`Synced ${data.refundsProcessed} refunds from Stripe`);
+      fetchOrders(); // Refresh the list
+    } catch (error: any) {
+      console.error('Error syncing refunds:', error);
+      toast.error(error.message || 'Failed to sync refunds');
+    } finally {
+      setSyncingRefunds(false);
+    }
   };
 
   const exportToCSV = () => {
@@ -130,7 +177,9 @@ export const StripePaymentsViewer = () => {
   };
 
   const totalRevenue = filteredOrders.reduce((sum, order) => sum + order.amount, 0);
-  const completedPayments = filteredOrders.filter(o => o.status === 'completed').length;
+  const totalRefunded = filteredOrders.reduce((sum, order) => sum + (order.refund_amount || 0), 0);
+  const completedPayments = filteredOrders.filter(o => !o.refunded).length;
+  const refundedPayments = filteredOrders.filter(o => o.refunded).length;
 
   if (loading) {
     return <div className="p-8 text-center">Loading payments...</div>;
@@ -153,12 +202,15 @@ export const StripePaymentsViewer = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed Payments</CardTitle>
+            <CardTitle className="text-sm font-medium">Payment Status</CardTitle>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{completedPayments}</div>
-            <p className="text-xs text-muted-foreground">Successfully processed</p>
+            <p className="text-xs text-muted-foreground">Completed • {refundedPayments} Refunded</p>
+            {totalRefunded > 0 && (
+              <p className="text-xs text-destructive mt-1">-${(totalRefunded / 100).toFixed(2)} refunded</p>
+            )}
           </CardContent>
         </Card>
 
@@ -183,34 +235,55 @@ export const StripePaymentsViewer = () => {
           <CardDescription>View and export all payment transactions</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by email, name, or phone..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={selectedProgram} onValueChange={setSelectedProgram}>
+                <SelectTrigger className="md:w-56">
+                  <SelectValue placeholder="Filter by program" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Programs</SelectItem>
+                  {programs.map((program) => (
+                    <SelectItem key={program.slug} value={program.slug}>
+                      {program.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Input
-                placeholder="Search by email, name, or phone..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                type="date"
+                placeholder="Start date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="md:w-48"
+              />
+              <Input
+                type="date"
+                placeholder="End date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="md:w-48"
               />
             </div>
-            <Input
-              type="date"
-              placeholder="Start date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="md:w-48"
-            />
-            <Input
-              type="date"
-              placeholder="End date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="md:w-48"
-            />
-            <Button onClick={exportToCSV} disabled={filteredOrders.length === 0}>
-              <Download className="mr-2 h-4 w-4" />
-              Export CSV
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={syncRefunds} disabled={syncingRefunds} variant="outline">
+                <RefreshCw className={`mr-2 h-4 w-4 ${syncingRefunds ? 'animate-spin' : ''}`} />
+                Sync Refunds
+              </Button>
+              <Button onClick={exportToCSV} disabled={filteredOrders.length === 0}>
+                <Download className="mr-2 h-4 w-4" />
+                Export CSV
+              </Button>
+            </div>
           </div>
 
           {/* Payments Table */}
@@ -267,9 +340,20 @@ export const StripePaymentsViewer = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={order.status === 'completed' ? 'default' : 'secondary'}>
-                          {order.status}
-                        </Badge>
+                        {order.refunded ? (
+                          <div className="space-y-1">
+                            <Badge variant="destructive">Refunded</Badge>
+                            {order.refunded_at && (
+                              <div className="text-xs text-muted-foreground">
+                                {format(new Date(order.refunded_at), 'MMM dd, yyyy')}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <Badge variant={order.status === 'completed' || order.status === 'paid' ? 'default' : 'secondary'}>
+                            {order.status}
+                          </Badge>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
