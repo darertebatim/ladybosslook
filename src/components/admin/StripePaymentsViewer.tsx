@@ -128,6 +128,8 @@ export const StripePaymentsViewer = () => {
 
   const assignProduct = async (orderId: string, programSlug: string, userEmail: string, userId: string | null) => {
     try {
+      console.log('Starting product assignment:', { orderId, programSlug, userEmail, userId });
+      
       // Get the program details
       const { data: program, error: programError } = await supabase
         .from('program_catalog')
@@ -136,24 +138,39 @@ export const StripePaymentsViewer = () => {
         .single();
 
       if (programError) throw programError;
+      console.log('Program found:', program);
 
       // Look up user by email if user_id is missing
       let finalUserId = userId;
       if (!finalUserId) {
+        console.log('Looking up user by email:', userEmail);
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('id')
           .eq('email', userEmail)
           .maybeSingle();
 
-        if (!profileError && profile) {
+        if (profileError) {
+          console.error('Error looking up user:', profileError);
+        }
+
+        if (profile) {
           finalUserId = profile.id;
+          console.log('User found:', finalUserId);
           
           // Update the order to link the user_id
-          await supabase
+          const { error: linkError } = await supabase
             .from('orders')
             .update({ user_id: finalUserId })
             .eq('id', orderId);
+          
+          if (linkError) {
+            console.error('Error linking user to order:', linkError);
+          } else {
+            console.log('Order linked to user');
+          }
+        } else {
+          console.log('No user found with email:', userEmail);
         }
       }
 
@@ -167,24 +184,36 @@ export const StripePaymentsViewer = () => {
         .eq('id', orderId);
 
       if (updateError) throw updateError;
+      console.log('Order updated with product');
 
       // If user_id exists, enroll them in the course
       if (finalUserId) {
-        const { error: enrollError } = await supabase
+        console.log('Creating enrollment for user:', finalUserId);
+        const { data: enrollData, error: enrollError } = await supabase
           .from('course_enrollments')
           .insert({
             user_id: finalUserId,
             course_name: program.title,
             program_slug: programSlug,
             status: 'active'
-          });
+          })
+          .select();
 
-        if (enrollError && !enrollError.message.includes('duplicate')) {
-          throw enrollError;
+        if (enrollError) {
+          console.error('Enrollment error:', enrollError);
+          if (!enrollError.message.includes('duplicate')) {
+            throw enrollError;
+          } else {
+            console.log('User already enrolled (duplicate)');
+          }
+        } else {
+          console.log('Enrollment created:', enrollData);
         }
+      } else {
+        console.log('No user ID found - skipping enrollment');
       }
 
-      toast.success(`Product assigned${finalUserId ? ' and user enrolled' : ''}`);
+      toast.success(`Product assigned${finalUserId ? ' and user enrolled' : ' (no user account found)'}`);
       fetchOrders(); // Refresh the list
     } catch (error: any) {
       console.error('Error assigning product:', error);
