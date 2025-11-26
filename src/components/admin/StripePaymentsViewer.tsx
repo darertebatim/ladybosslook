@@ -40,6 +40,7 @@ export const StripePaymentsViewer = () => {
   const [selectedProgram, setSelectedProgram] = useState<string>('all');
   const [programs, setPrograms] = useState<Array<{ slug: string; title: string }>>([]);
   const [syncingRefunds, setSyncingRefunds] = useState(false);
+  const [backfillingLocations, setBackfillingLocations] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -130,6 +131,25 @@ export const StripePaymentsViewer = () => {
       toast.error(error.message || 'Failed to sync refunds');
     } finally {
       setSyncingRefunds(false);
+    }
+  };
+
+  const backfillLocations = async () => {
+    setBackfillingLocations(true);
+    try {
+      toast.info('Backfilling location data from Stripe...');
+      
+      const { data, error } = await supabase.functions.invoke('backfill-locations');
+
+      if (error) throw error;
+
+      toast.success(`Updated ${data.updated} orders with location data`);
+      fetchOrders(); // Refresh the list
+    } catch (error: any) {
+      console.error('Error backfilling locations:', error);
+      toast.error(error.message || 'Failed to backfill locations');
+    } finally {
+      setBackfillingLocations(false);
     }
   };
 
@@ -278,6 +298,10 @@ export const StripePaymentsViewer = () => {
               <Button onClick={syncRefunds} disabled={syncingRefunds} variant="outline">
                 <RefreshCw className={`mr-2 h-4 w-4 ${syncingRefunds ? 'animate-spin' : ''}`} />
                 Sync Refunds
+              </Button>
+              <Button onClick={backfillLocations} disabled={backfillingLocations} variant="outline">
+                <RefreshCw className={`mr-2 h-4 w-4 ${backfillingLocations ? 'animate-spin' : ''}`} />
+                Backfill Locations
               </Button>
               <Button onClick={exportToCSV} disabled={filteredOrders.length === 0}>
                 <Download className="mr-2 h-4 w-4" />
