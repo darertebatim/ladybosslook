@@ -96,37 +96,57 @@ serve(async (req) => {
 
         // Check if order exists in database
         if (existingSessionIds.has(sessionId)) {
-          // Order exists - check if we need to update refund status
+          // Order exists - check if we need to update refund status OR location data
           const { data: existingOrder } = await supabase
             .from('orders')
-            .select('id, refunded, user_id, program_slug')
+            .select('id, refunded, user_id, program_slug, billing_city')
             .eq('stripe_session_id', sessionId)
             .single();
 
-          if (existingOrder && !existingOrder.refunded && isRefunded) {
-            // Update to refunded
-            const { error: updateError } = await supabase
-              .from('orders')
-              .update({
-                refunded: true,
-                refunded_at: refundedAt,
-                refund_amount: refundAmount,
-                status: 'refunded'
-              })
-              .eq('id', existingOrder.id);
+          if (existingOrder) {
+            const updates: any = {};
+            let needsUpdate = false;
 
-            if (!updateError) {
-              paymentsUpdated++;
-              refundsProcessed++;
-              console.log(`Updated order ${existingOrder.id} to refunded status`);
+            // Check if needs refund update
+            if (!existingOrder.refunded && isRefunded) {
+              updates.refunded = true;
+              updates.refunded_at = refundedAt;
+              updates.refund_amount = refundAmount;
+              updates.status = 'refunded';
+              needsUpdate = true;
+            }
 
-              // Remove enrollment if applicable
-              if (existingOrder.user_id && existingOrder.program_slug) {
-                await supabase
-                  .from('course_enrollments')
-                  .delete()
-                  .eq('user_id', existingOrder.user_id)
-                  .eq('program_slug', existingOrder.program_slug);
+            // Check if needs location update
+            if (!existingOrder.billing_city && billingCity) {
+              updates.billing_city = billingCity;
+              updates.billing_state = billingState;
+              updates.billing_country = billingCountry;
+              needsUpdate = true;
+            }
+
+            if (needsUpdate) {
+              const { error: updateError } = await supabase
+                .from('orders')
+                .update(updates)
+                .eq('id', existingOrder.id);
+
+              if (!updateError) {
+                paymentsUpdated++;
+                if (isRefunded) {
+                  refundsProcessed++;
+                  console.log(`Updated order ${existingOrder.id} to refunded status`);
+
+                  // Remove enrollment if applicable
+                  if (existingOrder.user_id && existingOrder.program_slug) {
+                    await supabase
+                      .from('course_enrollments')
+                      .delete()
+                      .eq('user_id', existingOrder.user_id)
+                      .eq('program_slug', existingOrder.program_slug);
+                  }
+                } else {
+                  console.log(`Updated order ${existingOrder.id} with location data`);
+                }
               }
             }
           }
