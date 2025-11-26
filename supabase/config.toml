@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.fix-order-slugs]
 verify_jwt = false
+
+[functions.fix-ewc-enrollments]
+verify_jwt = false
