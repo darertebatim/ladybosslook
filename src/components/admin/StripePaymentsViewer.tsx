@@ -206,6 +206,19 @@ export const StripePaymentsViewer = () => {
           created_at: '2025-08-26T17:01:00Z'
         },
         {
+          email: 'ramakiphonex2021@gmail.com',
+          name: 'Rama',
+          amount: 2900,
+          currency: 'usd',
+          status: 'completed',
+          product_name: 'Unknown Product',
+          stripe_session_id: 'pi_3S0WxWBs0EUaud0p1pRnOD1k',
+          created_at: '2025-08-26T16:37:00Z',
+          refunded: true,
+          refunded_at: '2025-09-03T00:23:47Z',
+          refund_amount: 2900
+        },
+        {
           email: 'dmorshedi@icloud.com',
           name: 'D Morshedi',
           amount: 2900,
@@ -401,7 +414,7 @@ export const StripePaymentsViewer = () => {
                 disabled={importing}
                 variant="outline"
               >
-                {importing ? 'Importing...' : 'Import August Orders (6)'}
+                {importing ? 'Importing...' : 'Import August Orders (7)'}
               </Button>
               <Button onClick={exportToCSV} disabled={filteredOrders.length === 0}>
                 <Download className="mr-2 h-4 w-4" />
