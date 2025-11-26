@@ -45,59 +45,7 @@ export const StripePaymentsViewer = () => {
   useEffect(() => {
     fetchOrders();
     fetchPrograms();
-    backfillMissingEnrollments();
   }, []);
-
-  const backfillMissingEnrollments = async () => {
-    try {
-      console.log('Checking for orders with assigned products but missing enrollments...');
-      
-      // Get all orders that have program_slug assigned and user_id
-      const { data: assignedOrders, error: ordersError } = await supabase
-        .from('orders')
-        .select('id, user_id, program_slug, product_name, email')
-        .not('program_slug', 'is', null)
-        .not('user_id', 'is', null);
-
-      if (ordersError) throw ordersError;
-      if (!assignedOrders || assignedOrders.length === 0) return;
-
-      console.log('Found assigned orders:', assignedOrders.length);
-
-      // For each order, check if enrollment exists
-      for (const order of assignedOrders) {
-        const { data: existingEnrollment } = await supabase
-          .from('course_enrollments')
-          .select('id')
-          .eq('user_id', order.user_id)
-          .eq('program_slug', order.program_slug)
-          .maybeSingle();
-
-        if (!existingEnrollment) {
-          console.log('Creating missing enrollment for:', order.email, order.product_name);
-          
-          const { error: enrollError } = await supabase
-            .from('course_enrollments')
-            .insert({
-              user_id: order.user_id,
-              course_name: order.product_name,
-              program_slug: order.program_slug,
-              status: 'active'
-            });
-
-          if (enrollError && !enrollError.message.includes('duplicate')) {
-            console.error('Error creating enrollment:', enrollError);
-          } else {
-            console.log('✓ Enrollment created');
-          }
-        }
-      }
-
-      console.log('Backfill complete');
-    } catch (error) {
-      console.error('Error backfilling enrollments:', error);
-    }
-  };
 
   useEffect(() => {
     filterOrders();
@@ -180,8 +128,6 @@ export const StripePaymentsViewer = () => {
 
   const assignProduct = async (orderId: string, programSlug: string, userEmail: string, userId: string | null) => {
     try {
-      console.log('Starting product assignment:', { orderId, programSlug, userEmail, userId });
-      
       // Get the program details
       const { data: program, error: programError } = await supabase
         .from('program_catalog')
@@ -190,39 +136,24 @@ export const StripePaymentsViewer = () => {
         .single();
 
       if (programError) throw programError;
-      console.log('Program found:', program);
 
       // Look up user by email if user_id is missing
       let finalUserId = userId;
       if (!finalUserId) {
-        console.log('Looking up user by email:', userEmail);
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile } = await supabase
           .from('profiles')
           .select('id')
           .eq('email', userEmail)
           .maybeSingle();
 
-        if (profileError) {
-          console.error('Error looking up user:', profileError);
-        }
-
         if (profile) {
           finalUserId = profile.id;
-          console.log('User found:', finalUserId);
           
           // Update the order to link the user_id
-          const { error: linkError } = await supabase
+          await supabase
             .from('orders')
             .update({ user_id: finalUserId })
             .eq('id', orderId);
-          
-          if (linkError) {
-            console.error('Error linking user to order:', linkError);
-          } else {
-            console.log('Order linked to user');
-          }
-        } else {
-          console.log('No user found with email:', userEmail);
         }
       }
 
@@ -236,33 +167,21 @@ export const StripePaymentsViewer = () => {
         .eq('id', orderId);
 
       if (updateError) throw updateError;
-      console.log('Order updated with product');
 
       // If user_id exists, enroll them in the course
       if (finalUserId) {
-        console.log('Creating enrollment for user:', finalUserId);
-        const { data: enrollData, error: enrollError } = await supabase
+        const { error: enrollError } = await supabase
           .from('course_enrollments')
           .insert({
             user_id: finalUserId,
             course_name: program.title,
             program_slug: programSlug,
             status: 'active'
-          })
-          .select();
+          });
 
-        if (enrollError) {
-          console.error('Enrollment error:', enrollError);
-          if (!enrollError.message.includes('duplicate')) {
-            throw enrollError;
-          } else {
-            console.log('User already enrolled (duplicate)');
-          }
-        } else {
-          console.log('Enrollment created:', enrollData);
+        if (enrollError && !enrollError.message.includes('duplicate')) {
+          throw enrollError;
         }
-      } else {
-        console.log('No user ID found - skipping enrollment');
       }
 
       toast.success(`Product assigned${finalUserId ? ' and user enrolled' : ' (no user account found)'}`);
