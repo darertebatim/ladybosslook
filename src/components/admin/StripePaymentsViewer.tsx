@@ -48,12 +48,9 @@ export const StripePaymentsViewer = () => {
   }, []);
 
   useEffect(() => {
-    backfillMissingOrders();
-  }, []);
-
-  useEffect(() => {
     filterOrders();
   }, [searchTerm, startDate, endDate, selectedProgram, orders]);
+
 
   const fetchOrders = async () => {
     try {
@@ -172,154 +169,6 @@ export const StripePaymentsViewer = () => {
     } catch (error: any) {
       console.error('Error assigning product:', error);
       toast.error(error.message || 'Failed to assign product');
-    }
-  };
-
-  const backfillMissingOrders = async () => {
-    try {
-      const candidates = [
-        // August 2025 - 6 paid + 1 refunded (all $29)
-        {
-          email: 'roya.doost@icloud.com',
-          name: 'Roya Doost',
-          amount: 2900,
-          currency: 'usd',
-          status: 'completed',
-          product_name: 'Unknown Product',
-          stripe_session_id: 'manual_pi_3S19X1_aug28_1',
-          created_at: '2025-08-28T10:23:00Z',
-          refunded: false,
-          refunded_at: null,
-          refund_amount: null,
-        },
-        {
-          email: 'yalda.momeni92@gmail.com',
-          name: 'Yalda Momeni',
-          amount: 2900,
-          currency: 'usd',
-          status: 'completed',
-          product_name: 'Unknown Product',
-          stripe_session_id: 'manual_pi_3S0uG1_aug27_1',
-          created_at: '2025-08-27T18:04:00Z',
-          refunded: false,
-          refunded_at: null,
-          refund_amount: null,
-        },
-        {
-          email: 'ava.karami24@gmail.com',
-          name: 'Ava Karami',
-          amount: 2900,
-          currency: 'usd',
-          status: 'completed',
-          product_name: 'Unknown Product',
-          stripe_session_id: 'manual_pi_3S0Wo6_aug26_1',
-          created_at: '2025-08-26T17:01:00Z',
-          refunded: false,
-          refunded_at: null,
-          refund_amount: null,
-        },
-        {
-          email: 'ramakiphonex2021@gmail.com',
-          name: 'Rama',
-          amount: 2900,
-          currency: 'usd',
-          status: 'completed',
-          product_name: 'Unknown Product',
-          stripe_session_id: 'manual_pi_3S0WxW_aug26_refunded',
-          created_at: '2025-08-26T16:37:00Z',
-          refunded: true,
-          refunded_at: '2025-09-03T00:23:47Z',
-          refund_amount: 2900,
-        },
-        {
-          email: 'dmorshedi@icloud.com',
-          name: 'D Morshedi',
-          amount: 2900,
-          currency: 'usd',
-          status: 'completed',
-          product_name: 'Unknown Product',
-          stripe_session_id: 'manual_pi_3S0WMm_aug26_2',
-          created_at: '2025-08-26T15:29:00Z',
-          refunded: false,
-          refunded_at: null,
-          refund_amount: null,
-        },
-        {
-          email: 'nahid_talebi45@yahoo.com',
-          name: 'Nahid Talebi',
-          amount: 2900,
-          currency: 'usd',
-          status: 'completed',
-          product_name: 'Unknown Product',
-          stripe_session_id: 'manual_pi_3S0CK1_aug25_1',
-          created_at: '2025-08-25T19:09:00Z',
-          refunded: false,
-          refunded_at: null,
-          refund_amount: null,
-        },
-        {
-          email: 'razie8254@gmail.com',
-          name: 'Razie',
-          amount: 2900,
-          currency: 'usd',
-          status: 'completed',
-          product_name: 'Unknown Product',
-          stripe_session_id: 'manual_pi_3S02k1_aug25_2',
-          created_at: '2025-08-25T08:55:00Z',
-          refunded: false,
-          refunded_at: null,
-          refund_amount: null,
-        },
-        // September 22, 2025 - $250 payment that was missing
-        {
-          email: 'kh08.mohammad@gmail.com',
-          name: 'Unknown',
-          amount: 25000,
-          currency: 'usd',
-          status: 'completed',
-          product_name: 'Unknown Product',
-          stripe_session_id: 'manual_ch_3S9yV1_Sept22_250',
-          created_at: '2025-09-22T01:26:19Z',
-          refunded: false,
-          refunded_at: null,
-          refund_amount: null,
-        },
-      ];
-
-      const stripeIds = candidates
-        .map((o) => o.stripe_session_id)
-        .filter((id): id is string => Boolean(id));
-
-      if (stripeIds.length === 0) return;
-
-      const { data: existing, error: existingError } = await supabase
-        .from('orders')
-        .select('stripe_session_id')
-        .in('stripe_session_id', stripeIds);
-
-      if (existingError) {
-        console.error('Error checking existing historical orders:', existingError);
-        return;
-      }
-
-      const existingIds = new Set((existing || []).map((o: any) => o.stripe_session_id));
-
-      const toInsert = candidates.filter((o) => !existingIds.has(o.stripe_session_id));
-
-      if (toInsert.length === 0) {
-        return;
-      }
-
-      const { error: insertError } = await supabase.from('orders').insert(toInsert);
-
-      if (insertError) {
-        console.error('Error backfilling historical orders:', insertError);
-        return;
-      }
-
-      fetchOrders();
-    } catch (error) {
-      console.error('Unexpected error during historical backfill:', error);
     }
   };
 
