@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Download, Search, DollarSign, CreditCard, TrendingUp, RefreshCw } from 'lucide-react';
+import { Download, Search, DollarSign, CreditCard, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -39,8 +39,6 @@ export const StripePaymentsViewer = () => {
   const [endDate, setEndDate] = useState('');
   const [selectedProgram, setSelectedProgram] = useState<string>('all');
   const [programs, setPrograms] = useState<Array<{ slug: string; title: string }>>([]);
-  const [syncingRefunds, setSyncingRefunds] = useState(false);
-  const [backfillingLocations, setBackfillingLocations] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -113,44 +111,6 @@ export const StripePaymentsViewer = () => {
     }
 
     setFilteredOrders(filtered);
-  };
-
-  const syncRefunds = async () => {
-    setSyncingRefunds(true);
-    try {
-      toast.info('Syncing refunds from Stripe...');
-      
-      const { data, error } = await supabase.functions.invoke('sync-stripe-refunds');
-
-      if (error) throw error;
-
-      toast.success(`Synced ${data.refundsProcessed} refunds from Stripe`);
-      fetchOrders(); // Refresh the list
-    } catch (error: any) {
-      console.error('Error syncing refunds:', error);
-      toast.error(error.message || 'Failed to sync refunds');
-    } finally {
-      setSyncingRefunds(false);
-    }
-  };
-
-  const backfillLocations = async () => {
-    setBackfillingLocations(true);
-    try {
-      toast.info('Backfilling location data from Stripe...');
-      
-      const { data, error } = await supabase.functions.invoke('backfill-locations');
-
-      if (error) throw error;
-
-      toast.success(`Updated ${data.updated} orders with location data`);
-      fetchOrders(); // Refresh the list
-    } catch (error: any) {
-      console.error('Error backfilling locations:', error);
-      toast.error(error.message || 'Failed to backfill locations');
-    } finally {
-      setBackfillingLocations(false);
-    }
   };
 
   const exportToCSV = () => {
@@ -295,14 +255,6 @@ export const StripePaymentsViewer = () => {
               />
             </div>
             <div className="flex gap-2">
-              <Button onClick={syncRefunds} disabled={syncingRefunds} variant="outline">
-                <RefreshCw className={`mr-2 h-4 w-4 ${syncingRefunds ? 'animate-spin' : ''}`} />
-                Sync Refunds
-              </Button>
-              <Button onClick={backfillLocations} disabled={backfillingLocations} variant="outline">
-                <RefreshCw className={`mr-2 h-4 w-4 ${backfillingLocations ? 'animate-spin' : ''}`} />
-                Backfill Locations
-              </Button>
               <Button onClick={exportToCSV} disabled={filteredOrders.length === 0}>
                 <Download className="mr-2 h-4 w-4" />
                 Export CSV
