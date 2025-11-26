@@ -38,3 +38,9 @@ verify_jwt = true
 
 [functions.stripe-webhook]
 verify_jwt = false
+
+[functions.fix-missing-enrollments]
+verify_jwt = false
+
+[functions.fix-order-slugs]
+verify_jwt = false
