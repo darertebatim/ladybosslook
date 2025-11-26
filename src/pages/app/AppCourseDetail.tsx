@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
-import { downloadICSFile } from '@/utils/calendar';
+import { downloadICSFile, generateICSFile } from '@/utils/calendar';
 import { format } from 'date-fns';
 import { toast } from "sonner";
+import { Share } from '@capacitor/share';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { isNativeApp } from '@/lib/platform';
 import { programImages } from '@/data/programs';
@@ -84,7 +86,7 @@ const AppCourseDetail = () => {
 
   const round = enrollment?.program_rounds;
 
-  const handleAddToCalendar = () => {
+  const handleAddToCalendar = async () => {
     if (!round?.first_session_date || !program) return;
 
     const event = {
@@ -98,8 +100,37 @@ const AppCourseDetail = () => {
       location: round.google_meet_link || undefined,
     };
 
-    downloadICSFile(event, `${program.title.replace(/\s+/g, '-')}.ics`);
-    toast.success('Calendar event downloaded!');
+    // Native iOS: Use Share API to let user add to calendar
+    if (isNativeApp()) {
+      try {
+        const icsContent = generateICSFile(event);
+        const fileName = `${program.title.replace(/\s+/g, '-')}.ics`;
+        
+        // Write file to temporary directory
+        const result = await Filesystem.writeFile({
+          path: fileName,
+          data: icsContent,
+          directory: Directory.Cache,
+        });
+
+        // Share the file - iOS will show "Add to Calendar" option
+        await Share.share({
+          title: 'Add to Calendar',
+          text: `${event.title}`,
+          url: result.uri,
+          dialogTitle: 'Add Event to Calendar'
+        });
+        
+        toast.success('Select Calendar app to add event');
+      } catch (error) {
+        console.error('Error sharing calendar event:', error);
+        toast.error('Failed to open calendar');
+      }
+    } else {
+      // Web: Download ICS file
+      downloadICSFile(event, `${program.title.replace(/\s+/g, '-')}.ics`);
+      toast.success('Calendar event downloaded!');
+    }
   };
 
   const handleContactSupport = () => {
