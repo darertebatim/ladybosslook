@@ -45,7 +45,59 @@ export const StripePaymentsViewer = () => {
   useEffect(() => {
     fetchOrders();
     fetchPrograms();
+    backfillMissingEnrollments();
   }, []);
+
+  const backfillMissingEnrollments = async () => {
+    try {
+      console.log('Checking for orders with assigned products but missing enrollments...');
+      
+      // Get all orders that have program_slug assigned and user_id
+      const { data: assignedOrders, error: ordersError } = await supabase
+        .from('orders')
+        .select('id, user_id, program_slug, product_name, email')
+        .not('program_slug', 'is', null)
+        .not('user_id', 'is', null);
+
+      if (ordersError) throw ordersError;
+      if (!assignedOrders || assignedOrders.length === 0) return;
+
+      console.log('Found assigned orders:', assignedOrders.length);
+
+      // For each order, check if enrollment exists
+      for (const order of assignedOrders) {
+        const { data: existingEnrollment } = await supabase
+          .from('course_enrollments')
+          .select('id')
+          .eq('user_id', order.user_id)
+          .eq('program_slug', order.program_slug)
+          .maybeSingle();
+
+        if (!existingEnrollment) {
+          console.log('Creating missing enrollment for:', order.email, order.product_name);
+          
+          const { error: enrollError } = await supabase
+            .from('course_enrollments')
+            .insert({
+              user_id: order.user_id,
+              course_name: order.product_name,
+              program_slug: order.program_slug,
+              status: 'active'
+            });
+
+          if (enrollError && !enrollError.message.includes('duplicate')) {
+            console.error('Error creating enrollment:', enrollError);
+          } else {
+            console.log('✓ Enrollment created');
+          }
+        }
+      }
+
+      console.log('Backfill complete');
+    } catch (error) {
+      console.error('Error backfilling enrollments:', error);
+    }
+  };
 
   useEffect(() => {
     filterOrders();
