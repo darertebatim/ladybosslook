@@ -35,6 +35,7 @@ export const StripePaymentsViewer = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -167,6 +168,89 @@ export const StripePaymentsViewer = () => {
     } catch (error: any) {
       console.error('Error assigning product:', error);
       toast.error(error.message || 'Failed to assign product');
+    }
+  };
+
+  const importAugustOrders = async () => {
+    setImporting(true);
+    try {
+      const ordersToInsert = [
+        {
+          email: 'roya.doost@icloud.com',
+          name: 'Roya Doost',
+          amount: 2900,
+          currency: 'usd',
+          status: 'completed',
+          product_name: 'Unknown Product',
+          stripe_session_id: 'pi_3S19X1Bs0EUaud0p0LYzcsZd',
+          created_at: '2025-08-28T10:23:00Z'
+        },
+        {
+          email: 'yalda.momeni92@gmail.com',
+          name: 'Yalda Momeni',
+          amount: 2900,
+          currency: 'usd',
+          status: 'completed',
+          product_name: 'Unknown Product',
+          stripe_session_id: 'pi_3S0uG1Bs0EUaud0p2yY0S3Sd',
+          created_at: '2025-08-27T18:04:00Z'
+        },
+        {
+          email: 'ava.karami24@gmail.com',
+          name: 'Ava Karami',
+          amount: 2900,
+          currency: 'usd',
+          status: 'completed',
+          product_name: 'Unknown Product',
+          stripe_session_id: 'pi_3S0Wo6Bs0EUaud0p1ZhkYF2e',
+          created_at: '2025-08-26T17:01:00Z'
+        },
+        {
+          email: 'dmorshedi@icloud.com',
+          name: 'D Morshedi',
+          amount: 2900,
+          currency: 'usd',
+          status: 'completed',
+          product_name: 'Unknown Product',
+          stripe_session_id: 'pi_3S0WMmBs0EUaud0p02GCRc7r',
+          created_at: '2025-08-26T15:29:00Z'
+        },
+        {
+          email: 'nahid_talebi45@yahoo.com',
+          name: 'Nahid Talebi',
+          amount: 2900,
+          currency: 'usd',
+          status: 'completed',
+          product_name: 'Unknown Product',
+          stripe_session_id: 'pi_3S0CK1Bs0EUaud0p2i3Pnhid',
+          created_at: '2025-08-25T19:09:00Z'
+        },
+        {
+          email: 'razie8254@gmail.com',
+          name: 'Razie',
+          amount: 2900,
+          currency: 'usd',
+          status: 'completed',
+          product_name: 'Unknown Product',
+          stripe_session_id: 'pi_3S02k1Bs0EUaud0p1QcEd0e1',
+          created_at: '2025-08-25T08:55:00Z'
+        }
+      ];
+
+      const { data, error } = await supabase
+        .from('orders')
+        .insert(ordersToInsert)
+        .select();
+
+      if (error) throw error;
+
+      toast.success(`Imported ${data.length} August orders`);
+      fetchOrders();
+    } catch (error: any) {
+      console.error('Error importing orders:', error);
+      toast.error(error.message || 'Failed to import orders');
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -312,6 +396,13 @@ export const StripePaymentsViewer = () => {
               />
             </div>
             <div className="flex gap-2">
+              <Button 
+                onClick={importAugustOrders} 
+                disabled={importing}
+                variant="outline"
+              >
+                {importing ? 'Importing...' : 'Import August Orders (6)'}
+              </Button>
               <Button onClick={exportToCSV} disabled={filteredOrders.length === 0}>
                 <Download className="mr-2 h-4 w-4" />
                 Export CSV
