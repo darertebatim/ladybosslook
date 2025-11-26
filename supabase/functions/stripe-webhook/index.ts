@@ -41,7 +41,7 @@ serve(async (req) => {
     let event: Stripe.Event;
     try {
       if (webhookSecret) {
-        event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+        event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
       } else {
         // For testing without signature verification
         event = JSON.parse(body);
