@@ -28,6 +28,7 @@ interface Order {
   refunded: boolean;
   refunded_at: string | null;
   refund_amount: number | null;
+  user_id: string | null;
 }
 
 export const StripePaymentsViewer = () => {
@@ -86,11 +87,21 @@ export const StripePaymentsViewer = () => {
     // Search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(order =>
-        order.email.toLowerCase().includes(term) ||
-        order.name.toLowerCase().includes(term) ||
-        (order.phone && order.phone.toLowerCase().includes(term))
-      );
+      const numericTerm = parseFloat(searchTerm);
+      
+      filtered = filtered.filter(order => {
+        // Search in text fields
+        const textMatch = 
+          order.email.toLowerCase().includes(term) ||
+          order.name.toLowerCase().includes(term) ||
+          (order.phone && order.phone.toLowerCase().includes(term));
+        
+        // Search in amount (compare as dollars)
+        const amountMatch = !isNaN(numericTerm) && 
+          (order.amount / 100).toFixed(2).includes(searchTerm);
+        
+        return textMatch || amountMatch;
+      });
     }
 
     // Program filter
@@ -111,6 +122,52 @@ export const StripePaymentsViewer = () => {
     }
 
     setFilteredOrders(filtered);
+  };
+
+  const assignProduct = async (orderId: string, programSlug: string, userEmail: string, userId: string | null) => {
+    try {
+      // Get the program details
+      const { data: program, error: programError } = await supabase
+        .from('program_catalog')
+        .select('title')
+        .eq('slug', programSlug)
+        .single();
+
+      if (programError) throw programError;
+
+      // Update the order with the program
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({
+          program_slug: programSlug,
+          product_name: program.title
+        })
+        .eq('id', orderId);
+
+      if (updateError) throw updateError;
+
+      // If user_id exists, enroll them in the course
+      if (userId) {
+        const { error: enrollError } = await supabase
+          .from('course_enrollments')
+          .insert({
+            user_id: userId,
+            course_name: program.title,
+            program_slug: programSlug,
+            status: 'active'
+          });
+
+        if (enrollError && !enrollError.message.includes('duplicate')) {
+          throw enrollError;
+        }
+      }
+
+      toast.success(`Product assigned${userId ? ' and user enrolled' : ''}`);
+      fetchOrders(); // Refresh the list
+    } catch (error: any) {
+      console.error('Error assigning product:', error);
+      toast.error(error.message || 'Failed to assign product');
+    }
   };
 
   const exportToCSV = () => {
@@ -220,7 +277,7 @@ export const StripePaymentsViewer = () => {
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by email, name, or phone..."
+                  placeholder="Search by email, name, phone, or amount..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -285,54 +342,80 @@ export const StripePaymentsViewer = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredOrders.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium">
-                        {format(new Date(order.created_at), 'MMM dd, yyyy')}
-                        <div className="text-xs text-muted-foreground">
-                          {format(new Date(order.created_at), 'HH:mm')}
-                        </div>
-                      </TableCell>
-                      <TableCell>{order.name}</TableCell>
-                      <TableCell className="text-sm">{order.email}</TableCell>
-                      <TableCell className="text-sm">{order.phone || '-'}</TableCell>
-                      <TableCell className="max-w-[200px] truncate">{order.product_name}</TableCell>
-                      <TableCell className="text-sm">
-                        {order.billing_city && (
-                          <div>
-                            {order.billing_city}
-                            {order.billing_state && `, ${order.billing_state}`}
-                            {order.billing_country && (
-                              <div className="text-xs text-muted-foreground">{order.billing_country}</div>
-                            )}
+                  filteredOrders.map((order) => {
+                    const isUnknownProduct = order.product_name === 'Unknown Product';
+                    
+                    return (
+                      <TableRow 
+                        key={order.id}
+                        className={isUnknownProduct ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}
+                      >
+                        <TableCell className="font-medium">
+                          {format(new Date(order.created_at), 'MMM dd, yyyy')}
+                          <div className="text-xs text-muted-foreground">
+                            {format(new Date(order.created_at), 'HH:mm')}
                           </div>
-                        )}
-                        {!order.billing_city && '-'}
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        ${(order.amount / 100).toFixed(2)}
-                        <div className="text-xs text-muted-foreground uppercase">
-                          {order.currency}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {order.refunded ? (
-                          <div className="space-y-1">
-                            <Badge variant="destructive">Refunded</Badge>
-                            {order.refunded_at && (
-                              <div className="text-xs text-muted-foreground">
-                                {format(new Date(order.refunded_at), 'MMM dd, yyyy')}
-                              </div>
-                            )}
+                        </TableCell>
+                        <TableCell>{order.name}</TableCell>
+                        <TableCell className="text-sm">{order.email}</TableCell>
+                        <TableCell className="text-sm">{order.phone || '-'}</TableCell>
+                        <TableCell className="max-w-[200px]">
+                          {isUnknownProduct ? (
+                            <Select 
+                              onValueChange={(slug) => assignProduct(order.id, slug, order.email, order.user_id)}
+                            >
+                              <SelectTrigger className="w-full bg-yellow-100 dark:bg-yellow-900/30 border-yellow-400">
+                                <SelectValue placeholder="Unknown Product" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {programs.map((program) => (
+                                  <SelectItem key={program.slug} value={program.slug}>
+                                    {program.title}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <span className="truncate">{order.product_name}</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {order.billing_city && (
+                            <div>
+                              {order.billing_city}
+                              {order.billing_state && `, ${order.billing_state}`}
+                              {order.billing_country && (
+                                <div className="text-xs text-muted-foreground">{order.billing_country}</div>
+                              )}
+                            </div>
+                          )}
+                          {!order.billing_city && '-'}
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          ${(order.amount / 100).toFixed(2)}
+                          <div className="text-xs text-muted-foreground uppercase">
+                            {order.currency}
                           </div>
-                        ) : (
-                          <Badge variant={order.status === 'completed' || order.status === 'paid' ? 'default' : 'secondary'}>
-                            {order.status}
-                          </Badge>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
+                        </TableCell>
+                        <TableCell>
+                          {order.refunded ? (
+                            <div className="space-y-1">
+                              <Badge variant="destructive">Refunded</Badge>
+                              {order.refunded_at && (
+                                <div className="text-xs text-muted-foreground">
+                                  {format(new Date(order.refunded_at), 'MMM dd, yyyy')}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <Badge variant={order.status === 'completed' || order.status === 'paid' ? 'default' : 'secondary'}>
+                              {order.status}
+                            </Badge>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>
