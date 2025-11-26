@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, GraduationCap, LayoutDashboard, UserCog, Send, Shield, LogOut, Search, Users, UserPlus, Music, Smartphone } from 'lucide-react';
+import { RefreshCw, GraduationCap, LayoutDashboard, UserCog, Send, Shield, LogOut, Search, Users, UserPlus, Music, Smartphone, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { SEOHead } from '@/components/SEOHead';
 import { QuickEnrollUser } from '@/components/admin/QuickEnrollUser';
@@ -25,6 +25,7 @@ import { ProgramRoundsManager } from '@/components/admin/ProgramRoundsManager';
 import { LeadsManager } from '@/components/admin/LeadsManager';
 import AutoEnrollmentManager from '@/components/admin/AutoEnrollmentManager';
 import SecurityAuditLog from '@/components/SecurityAuditLog';
+import { StripePaymentsViewer } from '@/components/admin/StripePaymentsViewer';
 import { usePrograms } from '@/hooks/usePrograms';
 import { AudioManager } from '@/components/admin/AudioManager';
 import { isNativeApp } from '@/lib/platform';
@@ -243,7 +244,7 @@ const Admin = () => {
           </div>
 
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-7 mb-6">
+            <TabsList className="grid w-full grid-cols-8 mb-6">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4" />
                 <span className="hidden sm:inline">Overview</span>
@@ -267,6 +268,10 @@ const Admin = () => {
               <TabsTrigger value="programs" className="flex items-center gap-2">
                 <UserCog className="h-4 w-4" />
                 <span className="hidden sm:inline">Programs</span>
+              </TabsTrigger>
+              <TabsTrigger value="payments" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                <span className="hidden sm:inline">Payments</span>
               </TabsTrigger>
               <TabsTrigger value="system" className="flex items-center gap-2">
                 <Shield className="h-4 w-4" />
@@ -554,7 +559,12 @@ const Admin = () => {
               </Tabs>
             </TabsContent>
 
-            {/* Tab 7: System & Security */}
+            {/* Tab 7: Payments */}
+            <TabsContent value="payments" className="space-y-6">
+              <StripePaymentsViewer />
+            </TabsContent>
+
+            {/* Tab 8: System & Security */}
             <TabsContent value="system" className="space-y-6">
               <Card>
                 <CardHeader>
