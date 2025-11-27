@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Download, Search, DollarSign, CreditCard, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { format, startOfMonth, endOfMonth, subMonths, startOfYear } from 'date-fns';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 interface Order {
   id: string;
@@ -260,6 +261,57 @@ export const StripePaymentsViewer = () => {
   const completedPayments = filteredOrders.filter(o => !o.refunded).length;
   const refundedPayments = filteredOrders.filter(o => o.refunded).length;
 
+  // Generate chart data - group by month
+  const chartData = useMemo(() => {
+    const monthlyData: Record<string, { revenue: number; count: number }> = {};
+    
+    filteredOrders.forEach(order => {
+      const monthKey = format(new Date(order.created_at), 'MMM yyyy');
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = { revenue: 0, count: 0 };
+      }
+      monthlyData[monthKey].revenue += order.amount / 100;
+      monthlyData[monthKey].count += 1;
+    });
+
+    return Object.entries(monthlyData)
+      .map(([month, data]) => ({
+        month,
+        revenue: data.revenue,
+        count: data.count
+      }))
+      .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
+  }, [filteredOrders]);
+
+  const setDatePreset = (preset: string) => {
+    const now = new Date();
+    let start: Date, end: Date;
+
+    switch (preset) {
+      case 'this-month':
+        start = startOfMonth(now);
+        end = endOfMonth(now);
+        break;
+      case 'last-month':
+        start = startOfMonth(subMonths(now, 1));
+        end = endOfMonth(subMonths(now, 1));
+        break;
+      case 'last-3-months':
+        start = startOfMonth(subMonths(now, 2));
+        end = endOfMonth(now);
+        break;
+      case 'this-year':
+        start = startOfYear(now);
+        end = now;
+        break;
+      default:
+        return;
+    }
+
+    setStartDate(format(start, 'yyyy-MM-dd'));
+    setEndDate(format(end, 'yyyy-MM-dd'));
+  };
+
   if (loading) {
     return <div className="p-8 text-center">Loading payments...</div>;
   }
@@ -272,7 +324,7 @@ export const StripePaymentsViewer = () => {
           <CardTitle>Analytics Filters</CardTitle>
           <CardDescription>Filter payments by date range and program to view specific analytics</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <label className="text-sm font-medium mb-2 block">Program</label>
@@ -321,6 +373,40 @@ export const StripePaymentsViewer = () => {
               </div>
             )}
           </div>
+          
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" onClick={() => setDatePreset('this-month')}>
+              This Month
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setDatePreset('last-month')}>
+              Last Month
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setDatePreset('last-3-months')}>
+              Last 3 Months
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setDatePreset('this-year')}>
+              This Year
+            </Button>
+          </div>
+
+          {chartData.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-sm font-medium mb-4">Revenue by Month</h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis dataKey="month" className="text-xs" />
+                  <YAxis className="text-xs" />
+                  <Tooltip 
+                    formatter={(value: number) => `$${value.toFixed(2)}`}
+                    contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
+                  />
+                  <Legend />
+                  <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Revenue ($)" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </CardContent>
       </Card>
 
