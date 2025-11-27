@@ -148,8 +148,28 @@ export const StripePaymentsViewer = () => {
 
         if (profile) {
           finalUserId = profile.id;
+        } else {
+          // Create user account if they don't exist (using admin-create-enrollment edge function)
+          const { data: createResult, error: createError } = await supabase.functions.invoke(
+            'admin-create-enrollment',
+            {
+              body: {
+                email: userEmail,
+                courseName: program.title,
+                programSlug: programSlug
+              }
+            }
+          );
+
+          if (createError) throw createError;
           
-          // Update the order to link the user_id
+          if (createResult?.userId) {
+            finalUserId = createResult.userId;
+          }
+        }
+        
+        // Update the order to link the user_id
+        if (finalUserId) {
           await supabase
             .from('orders')
             .update({ user_id: finalUserId })

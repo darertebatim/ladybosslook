@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.fix-ewc-enrollments]
 verify_jwt = false
+
+[functions.create-profiles]
+verify_jwt = false
