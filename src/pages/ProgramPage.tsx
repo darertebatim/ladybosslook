@@ -29,12 +29,53 @@ const ProgramPage = () => {
   const [program, setProgram] = useState<ProgramData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [isPaymentRedirect, setIsPaymentRedirect] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProgram = async () => {
       if (!slug) {
         setNotFound(true);
         setLoading(false);
+        return;
+      }
+
+      // Check if this is a payment redirect (slug ends with "pay")
+      if (slug.endsWith('pay')) {
+        console.log('[ProgramPage] Detected payment redirect:', slug);
+        setIsPaymentRedirect(true);
+        
+        // Extract actual slug by removing 'pay' suffix
+        const actualSlug = slug.slice(0, -3);
+        console.log('[ProgramPage] Extracted slug for payment:', actualSlug);
+        
+        try {
+          const { data, error } = await supabase.functions.invoke('create-payment', {
+            body: {
+              program: actualSlug
+            }
+          });
+
+          if (error) {
+            console.error('[ProgramPage] Payment creation error:', error);
+            setPaymentError('Error creating payment. Please try again.');
+            setLoading(false);
+            return;
+          }
+
+          if (data?.url) {
+            console.log('[ProgramPage] Redirecting to Stripe:', data.url);
+            window.location.href = data.url;
+          } else {
+            setPaymentError('Error creating payment. Please try again.');
+            setLoading(false);
+          }
+        } catch (error) {
+          console.error('[ProgramPage] Payment error:', error);
+          setPaymentError('Error creating payment. Please try again.');
+          setLoading(false);
+        }
+        
         return;
       }
 
@@ -91,10 +132,24 @@ const ProgramPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center px-4">
+        <div className="bg-card p-8 rounded-lg shadow-lg text-center">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
+          {isPaymentRedirect ? (
+            <>
+              <p className="text-xl font-semibold">Redirecting to secure checkout...</p>
+              <p className="text-sm text-muted-foreground mt-2">Please wait a moment</p>
+            </>
+          ) : (
+            <p className="text-xl font-semibold">Loading program...</p>
+          )}
+        </div>
       </div>
     );
+  }
+
+  if (paymentError) {
+    return <Navigate to="/404" replace />;
   }
 
   if (notFound || !program) {
