@@ -32,10 +32,31 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function EmpoweredWomanCoaching() {
   const [isLoading, setIsLoading] = useState(false);
+  const [programData, setProgramData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProgramData = async () => {
+      const { data } = await supabase
+        .from('program_catalog')
+        .select('original_price, price_amount, deposit_price, payment_type')
+        .eq('slug', 'empowered-woman-coaching')
+        .single();
+      
+      if (data) {
+        setProgramData(data);
+      }
+    };
+    
+    fetchProgramData();
+  }, []);
+
+  const formatPrice = (cents: number) => {
+    return `$${(cents / 100).toFixed(0)}`;
+  };
 
   const handleDepositClick = async () => {
     setIsLoading(true);
@@ -113,10 +134,26 @@ export default function EmpoweredWomanCoaching() {
                 <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 text-white">
                   <Gift className="w-6 h-6 md:w-8 md:h-8 animate-bounce" />
                   <div>
-                    <p className="text-lg md:text-2xl lg:text-3xl font-bold mb-0.5 md:mb-1">
-                      پیشنهاد ویژه: از <span className="line-through opacity-75">۱۲۰۰$</span> به <span className="text-2xl md:text-4xl">۹۹۷$</span>
-                    </p>
-                    <p className="text-sm md:text-lg opacity-90">صرفه‌جویی ۲۰۳ دلار - فقط برای افراد واجد شرایط</p>
+                    {programData && (
+                      <>
+                        <p className="text-lg md:text-2xl lg:text-3xl font-bold mb-0.5 md:mb-1">
+                          پیشنهاد ویژه: از <span className="line-through opacity-75">{formatPrice(programData.original_price)}</span> به <span className="text-2xl md:text-4xl">{formatPrice(programData.price_amount)}</span>
+                        </p>
+                        {programData.payment_type === 'deposit' && programData.deposit_price && (
+                          <p className="text-sm md:text-lg opacity-90">
+                            فقط {formatPrice(programData.deposit_price)} پیش‌پرداخت - بقیه با لینک پرداخت استرایپ
+                          </p>
+                        )}
+                      </>
+                    )}
+                    {!programData && (
+                      <>
+                        <p className="text-lg md:text-2xl lg:text-3xl font-bold mb-0.5 md:mb-1">
+                          پیشنهاد ویژه: از <span className="line-through opacity-75">۱۲۰۰$</span> به <span className="text-2xl md:text-4xl">۹۹۷$</span>
+                        </p>
+                        <p className="text-sm md:text-lg opacity-90">صرفه‌جویی ۲۰۳ دلار - فقط برای افراد واجد شرایط</p>
+                      </>
+                    )}
                   </div>
                   <Gift className="w-6 h-6 md:w-8 md:h-8 animate-bounce" />
                 </div>
@@ -132,7 +169,12 @@ export default function EmpoweredWomanCoaching() {
                 className="cta-button text-base md:text-lg px-8 md:px-10 py-5 md:py-7 text-white font-bold shadow-bold hover:shadow-glow w-full sm:w-auto"
               >
                 <Shield className="w-4 h-4 md:w-5 md:h-5 ml-2" />
-                {isLoading ? "در حال انتقال به پرداخت..." : "رزرو با پیش‌پرداخت ۱۰۰ دلار"}
+                {isLoading 
+                  ? "در حال انتقال به پرداخت..." 
+                  : programData?.payment_type === 'deposit' && programData?.deposit_price
+                    ? `رزرو با پیش‌پرداخت ${formatPrice(programData.deposit_price)}`
+                    : "رزرو با پیش‌پرداخت ۱۰۰ دلار"
+                }
               </Button>
             </div>
 
