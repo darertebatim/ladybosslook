@@ -60,7 +60,7 @@ serve(async (req) => {
 
     // Parse and validate request data
     const requestBody = await req.json();
-    const { program, name, email, phone, use_deposit } = requestBody;
+    const { program, name, email, phone } = requestBody;
     
     // Validate required program field
     if (!program || typeof program !== 'string') {
@@ -75,7 +75,7 @@ serve(async (req) => {
     // Fetch program details from database
     const { data: programData, error: programError } = await supabase
       .from('program_catalog')
-      .select('slug, title, price_amount, deposit_price, description')
+      .select('slug, title, price_amount, description')
       .eq('slug', program)
       .eq('is_active', true)
       .single();
@@ -88,29 +88,7 @@ serve(async (req) => {
       );
     }
 
-    // Determine which price to use
-    const useDeposit = use_deposit === true;
-    let amount = useDeposit && programData.deposit_price 
-      ? programData.deposit_price 
-      : programData.price_amount;
-
-    // Temporary safety: ensure Empowered Woman Coaching deposit is $100 if not set in DB
-    if (useDeposit && program === 'empowered-woman-coaching' && !programData.deposit_price) {
-      logStep("INFO: Overriding Empowered Woman Coaching deposit to $100 (10000 cents)");
-      amount = 10000;
-    }
-    
-    if (useDeposit && !programData.deposit_price && program !== 'empowered-woman-coaching') {
-      logStep("WARN: use_deposit requested but deposit_price is null, falling back to price_amount");
-    }
-    
-    logStep("Program found", { 
-      title: programData.title, 
-      price: programData.price_amount,
-      deposit_price: programData.deposit_price,
-      use_deposit: useDeposit,
-      amount_to_charge: amount
-    });
+    logStep("Program found", { title: programData.title, price: programData.price_amount });
     
     // Validate optional fields if provided (for future use)
     if (name && !validateName(name)) {
@@ -138,7 +116,7 @@ serve(async (req) => {
     const programPricing = {
       [program]: {
         name: programData.title,
-        amount: amount,
+        amount: programData.price_amount,
         description: programData.description || programData.title,
       }
     };

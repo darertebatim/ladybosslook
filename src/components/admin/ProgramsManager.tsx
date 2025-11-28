@@ -21,7 +21,6 @@ interface ProgramCatalog {
   type: string;
   payment_type: string;
   price_amount: number;
-  deposit_price?: number | null;
   original_price?: number | null;
   duration?: string | null;
   delivery_method?: string | null;
@@ -51,7 +50,6 @@ export function ProgramsManager() {
     type: 'course',
     payment_type: 'one-time',
     price_amount: 0,
-    deposit_price: 0,
     original_price: 0,
     duration: '',
     delivery_method: 'on-demand',
@@ -109,7 +107,6 @@ export function ProgramsManager() {
       type: 'course',
       payment_type: 'one-time',
       price_amount: 0,
-      deposit_price: 0,
       original_price: 0,
       duration: '',
       delivery_method: 'on-demand',
@@ -132,23 +129,11 @@ export function ProgramsManager() {
     e.preventDefault();
 
     try {
-      // Prepare data for save - convert 0 to null for deposit_price
-      const dataToSave = {
-        ...formData,
-        deposit_price: formData.deposit_price > 0 ? formData.deposit_price : null,
-        original_price: formData.original_price > 0 ? formData.original_price : null,
-        audio_playlist_id: formData.audio_playlist_id || null,
-      };
-
-      console.log('[ProgramsManager] Saving program', { editingId, dataToSave });
-
       if (editingId) {
         const { error } = await supabase
           .from('program_catalog')
-          .update(dataToSave)
+          .update(formData)
           .eq('id', editingId);
-
-        console.log('[ProgramsManager] Update result', { error });
 
         if (error) throw error;
 
@@ -159,9 +144,7 @@ export function ProgramsManager() {
       } else {
         const { error } = await supabase
           .from('program_catalog')
-          .insert([dataToSave]);
-
-        console.log('[ProgramsManager] Insert result', { error });
+          .insert([formData]);
 
         if (error) throw error;
 
@@ -190,7 +173,6 @@ export function ProgramsManager() {
       type: program.type,
       payment_type: program.payment_type,
       price_amount: program.price_amount,
-      deposit_price: program.deposit_price || 0,
       original_price: program.original_price || 0,
       duration: program.duration || '',
       delivery_method: program.delivery_method || 'on-demand',
@@ -446,20 +428,6 @@ export function ProgramsManager() {
                   />
                   <p className="text-xs text-muted-foreground">
                     Sale: ${(formData.price_amount / 100).toFixed(2)}
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="deposit_price">Deposit Price ($)</Label>
-                  <Input
-                    id="deposit_price"
-                    type="number"
-                    value={formData.deposit_price / 100}
-                    onChange={(e) => setFormData({ ...formData, deposit_price: Math.round(parseFloat(e.target.value || '0') * 100) })}
-                    placeholder="e.g., 100"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Deposit: ${(formData.deposit_price / 100).toFixed(2)} • Leave empty if no deposit option. Used by landing pages like /ewcnow
                   </p>
                 </div>
 
