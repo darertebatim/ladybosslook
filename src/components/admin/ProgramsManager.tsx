@@ -132,10 +132,18 @@ export function ProgramsManager() {
     e.preventDefault();
 
     try {
+      // Prepare data for save - convert 0 to null for deposit_price
+      const dataToSave = {
+        ...formData,
+        deposit_price: formData.deposit_price > 0 ? formData.deposit_price : null,
+        original_price: formData.original_price > 0 ? formData.original_price : null,
+        audio_playlist_id: formData.audio_playlist_id || null,
+      };
+
       if (editingId) {
         const { error } = await supabase
           .from('program_catalog')
-          .update(formData)
+          .update(dataToSave)
           .eq('id', editingId);
 
         if (error) throw error;
@@ -147,7 +155,7 @@ export function ProgramsManager() {
       } else {
         const { error } = await supabase
           .from('program_catalog')
-          .insert([formData]);
+          .insert([dataToSave]);
 
         if (error) throw error;
 
