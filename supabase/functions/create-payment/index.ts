@@ -90,11 +90,17 @@ serve(async (req) => {
 
     // Determine which price to use
     const useDeposit = use_deposit === true;
-    const amount = useDeposit && programData.deposit_price 
+    let amount = useDeposit && programData.deposit_price 
       ? programData.deposit_price 
       : programData.price_amount;
+
+    // Temporary safety: ensure Empowered Woman Coaching deposit is $100 if not set in DB
+    if (useDeposit && program === 'empowered-woman-coaching' && !programData.deposit_price) {
+      logStep("INFO: Overriding Empowered Woman Coaching deposit to $100 (10000 cents)");
+      amount = 10000;
+    }
     
-    if (useDeposit && !programData.deposit_price) {
+    if (useDeposit && !programData.deposit_price && program !== 'empowered-woman-coaching') {
       logStep("WARN: use_deposit requested but deposit_price is null, falling back to price_amount");
     }
     
