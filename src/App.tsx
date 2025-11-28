@@ -40,6 +40,7 @@ import BusinessStartupAccelerator from "./pages/BusinessStartupAccelerator";
 import CourageousWorkshop from "./pages/CourageousWorkshop";
 import CourageousCharacter from "./pages/CourageousCharacter";
 import CCPayDirect from "./pages/CCPayDirect";
+import EWCPayDirect from "./pages/EWCPayDirect";
 import EventIrvine from "./pages/EventIrvine";
 import ExpressAssert from "./pages/ExpressAssert";
 import FreeLive from "./pages/FreeLive";
@@ -137,6 +138,7 @@ const App = () => (
             <Route path="/giveaway" element={<Giveaway />} />
             {!isNativeApp() && <Route path="/ewc" element={<EmpoweredWomanCoaching />} />}
             {!isNativeApp() && <Route path="/ewcnow" element={<EmpoweredWomanCoaching />} />}
+            {!isNativeApp() && <Route path="/ewcpaydirect" element={<EWCPayDirect />} />}
             <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
             <Route path="/announcements/ccw" element={<CCWAnnouncements />} />
             {!isNativeApp() && <Route path="/freelive" element={<FreeLive />} />}

@@ -655,12 +655,8 @@ export function ProgramsManager() {
                           <>
                             <span>•</span>
                             <span className="text-orange-600 font-semibold">Deposit: ${((program as any).deposit_price / 100).toFixed(2)}</span>
-                          </>
-                        )}
-                        {program.subscription_full_payment_discount > 0 && (
-                          <>
                             <span>•</span>
-                            <span>Full payment: ${(program.subscription_full_payment_discount / 100).toFixed(2)}</span>
+                            <span>Remaining: ${((program.price_amount - (program as any).deposit_price) / 100).toFixed(2)}</span>
                           </>
                         )}
                       </div>
