@@ -14,13 +14,17 @@ interface PaymentFormProps {
   programName: string;
   price: number;
   description: string;
+  isDeposit?: boolean;
+  fullPrice?: number;
 }
 
 export const PaymentForm: React.FC<PaymentFormProps> = ({ 
   program, 
   programName, 
   price, 
-  description 
+  description,
+  isDeposit = false,
+  fullPrice
 }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -123,10 +127,29 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
           {description}
         </CardDescription>
         <div className="mt-4">
-          <span className="text-4xl font-bold text-primary">
-            {formatPrice(price)}
-          </span>
-          <span className="text-sm text-muted-foreground ml-2">one-time payment</span>
+          {isDeposit && fullPrice ? (
+            <>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <span className="text-2xl text-muted-foreground line-through">
+                  {formatPrice(fullPrice)}
+                </span>
+              </div>
+              <span className="text-4xl font-bold text-orange-600">
+                {formatPrice(price)}
+              </span>
+              <span className="text-sm text-orange-600 font-semibold ml-2">deposit payment</span>
+              <p className="text-xs text-muted-foreground mt-2">
+                Pay {formatPrice(price)} now. Remaining {formatPrice(fullPrice - price)} via Stripe payment link
+              </p>
+            </>
+          ) : (
+            <>
+              <span className="text-4xl font-bold text-primary">
+                {formatPrice(price)}
+              </span>
+              <span className="text-sm text-muted-foreground ml-2">one-time payment</span>
+            </>
+          )}
         </div>
       </CardHeader>
       
@@ -214,7 +237,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
               ) : (
                 <>
                   <CreditCard className="mr-2 h-5 w-5" />
-                  Secure Checkout
+                  {isDeposit ? 'Pay Deposit Now' : 'Secure Checkout'}
                 </>
               )}
             </Button>
