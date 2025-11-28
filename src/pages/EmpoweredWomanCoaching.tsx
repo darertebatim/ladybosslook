@@ -41,7 +41,10 @@ export default function EmpoweredWomanCoaching() {
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-payment", {
-        body: { program: "empowered-woman-coaching" },
+        body: { 
+          program: "empowered-woman-coaching",
+          use_deposit: true 
+        },
       });
 
       if (error) throw error;

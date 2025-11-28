@@ -60,7 +60,7 @@ serve(async (req) => {
 
     // Parse and validate request data
     const requestBody = await req.json();
-    const { program, name, email, phone } = requestBody;
+    const { program, name, email, phone, use_deposit } = requestBody;
     
     // Validate required program field
     if (!program || typeof program !== 'string') {
@@ -75,7 +75,7 @@ serve(async (req) => {
     // Fetch program details from database
     const { data: programData, error: programError } = await supabase
       .from('program_catalog')
-      .select('slug, title, price_amount, description')
+      .select('slug, title, price_amount, deposit_price, description')
       .eq('slug', program)
       .eq('is_active', true)
       .single();
@@ -88,7 +88,23 @@ serve(async (req) => {
       );
     }
 
-    logStep("Program found", { title: programData.title, price: programData.price_amount });
+    // Determine which price to use
+    const useDeposit = use_deposit === true;
+    const amount = useDeposit && programData.deposit_price 
+      ? programData.deposit_price 
+      : programData.price_amount;
+    
+    if (useDeposit && !programData.deposit_price) {
+      logStep("WARN: use_deposit requested but deposit_price is null, falling back to price_amount");
+    }
+    
+    logStep("Program found", { 
+      title: programData.title, 
+      price: programData.price_amount,
+      deposit_price: programData.deposit_price,
+      use_deposit: useDeposit,
+      amount_to_charge: amount
+    });
     
     // Validate optional fields if provided (for future use)
     if (name && !validateName(name)) {
@@ -116,7 +132,7 @@ serve(async (req) => {
     const programPricing = {
       [program]: {
         name: programData.title,
-        amount: programData.price_amount,
+        amount: amount,
         description: programData.description || programData.title,
       }
     };
