@@ -222,7 +222,7 @@ export function ProgramsManager() {
   };
 
   const copyProductPageLink = (slug: string) => {
-    const link = `${window.location.origin}/${slug}`;
+    const link = `https://ladybosslook.com/${slug}`;
     navigator.clipboard.writeText(link);
     toast({
       title: 'Copied!',
@@ -231,7 +231,7 @@ export function ProgramsManager() {
   };
 
   const copyPaymentLink = (slug: string) => {
-    const link = `${window.location.origin}/${slug}pay`;
+    const link = `https://ladybosslook.com/${slug}pay`;
     navigator.clipboard.writeText(link);
     toast({
       title: 'Copied!',
