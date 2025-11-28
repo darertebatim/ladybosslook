@@ -39,8 +39,8 @@ import BusinessStartupAccelerator from "./pages/BusinessStartupAccelerator";
 
 import CourageousWorkshop from "./pages/CourageousWorkshop";
 import CourageousCharacter from "./pages/CourageousCharacter";
-import CCPayDirect from "./pages/CCPayDirect";
-import EWCPayDirect from "./pages/EWCPayDirect";
+import ProgramPage from "./pages/ProgramPage";
+import ProgramPayDirect from "./pages/ProgramPayDirect";
 import EventIrvine from "./pages/EventIrvine";
 import ExpressAssert from "./pages/ExpressAssert";
 import FreeLive from "./pages/FreeLive";
@@ -128,7 +128,6 @@ const App = () => (
             {!isNativeApp() && <Route path="/event-irvine" element={<EventIrvine />} />}
           {!isNativeApp() && <Route path="/ccw" element={<CourageousWorkshop />} />}
           {!isNativeApp() && <Route path="/cc" element={<CourageousCharacter />} />}
-          {!isNativeApp() && <Route path="/ccpay" element={<CCPayDirect />} />}
           {!isNativeApp() && <Route path="/payment-success" element={<PaymentSuccess />} />}
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/refund-policy" element={<RefundPolicy />} />
@@ -138,7 +137,6 @@ const App = () => (
             <Route path="/giveaway" element={<Giveaway />} />
             {!isNativeApp() && <Route path="/ewc" element={<EmpoweredWomanCoaching />} />}
             {!isNativeApp() && <Route path="/ewcnow" element={<EmpoweredWomanCoaching />} />}
-            {!isNativeApp() && <Route path="/ewcpaydirect" element={<EWCPayDirect />} />}
             <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
             <Route path="/announcements/ccw" element={<CCWAnnouncements />} />
             {!isNativeApp() && <Route path="/freelive" element={<FreeLive />} />}
@@ -167,6 +165,11 @@ const App = () => (
             <Route path="/send-test-email" element={<SendTestEmail />} />
             <Route path="/firststepbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/RightsnboundariesLadybossgift.pdf" />} />
             <Route path="/fnpbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/fnpbonus.pdf" />} />
+            
+            {/* Dynamic program routes - must be before catch-all */}
+            {!isNativeApp() && <Route path="/:slugpay" element={<ProgramPayDirect />} />}
+            {!isNativeApp() && <Route path="/:slug" element={<ProgramPage />} />}
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
