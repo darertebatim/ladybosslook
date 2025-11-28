@@ -38,47 +38,47 @@ const ProgramPage = () => {
         return;
       }
 
-      // First check if program exists at all
-      const { data: anyProgram } = await supabase
-        .from('program_catalog')
-        .select('slug, is_active, available_on_web')
-        .eq('slug', slug)
-        .single();
+      console.log('[ProgramPage] Fetching program with slug:', slug);
 
-      // If program doesn't exist or isn't configured for web
-      if (!anyProgram) {
-        console.log('Program not found:', slug);
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
-
-      if (!anyProgram.available_on_web) {
-        console.log('Program not available on web:', slug);
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
-
-      if (!anyProgram.is_active) {
-        console.log('Program not active:', slug);
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
-
-      // Fetch full program data
+      // Fetch program data with case-insensitive slug matching
       const { data, error } = await supabase
         .from('program_catalog')
         .select('*')
-        .eq('slug', slug)
-        .single();
+        .ilike('slug', slug)
+        .maybeSingle();
 
-      if (error || !data) {
+      console.log('[ProgramPage] Query result:', { data, error });
+
+      if (error) {
+        console.error('[ProgramPage] Error fetching program:', error);
         setNotFound(true);
-      } else {
-        setProgram(data as ProgramData);
+        setLoading(false);
+        return;
       }
+
+      if (!data) {
+        console.log('[ProgramPage] No program found with slug:', slug);
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+
+      if (!data.available_on_web) {
+        console.log('[ProgramPage] Program not available on web:', slug);
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+
+      if (!data.is_active) {
+        console.log('[ProgramPage] Program not active:', slug);
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+
+      console.log('[ProgramPage] Program loaded successfully:', data.title);
+      setProgram(data as ProgramData);
       setLoading(false);
     };
 
