@@ -605,6 +605,7 @@ export type Database = {
           available_on_web: boolean | null
           created_at: string | null
           delivery_method: string | null
+          deposit_price: number | null
           description: string | null
           duration: string | null
           features: Json | null
@@ -632,6 +633,7 @@ export type Database = {
           available_on_web?: boolean | null
           created_at?: string | null
           delivery_method?: string | null
+          deposit_price?: number | null
           description?: string | null
           duration?: string | null
           features?: Json | null
@@ -659,6 +661,7 @@ export type Database = {
           available_on_web?: boolean | null
           created_at?: string | null
           delivery_method?: string | null
+          deposit_price?: number | null
           description?: string | null
           duration?: string | null
           features?: Json | null
