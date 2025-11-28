@@ -39,8 +39,7 @@ import BusinessStartupAccelerator from "./pages/BusinessStartupAccelerator";
 
 import CourageousWorkshop from "./pages/CourageousWorkshop";
 import CourageousCharacter from "./pages/CourageousCharacter";
-import ProgramPage from "./pages/ProgramPage";
-import ProgramPayDirect from "./pages/ProgramPayDirect";
+import DynamicProgramRoute from "./pages/DynamicProgramRoute";
 import EventIrvine from "./pages/EventIrvine";
 import ExpressAssert from "./pages/ExpressAssert";
 import FreeLive from "./pages/FreeLive";
@@ -166,9 +165,8 @@ const App = () => (
             <Route path="/firststepbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/RightsnboundariesLadybossgift.pdf" />} />
             <Route path="/fnpbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/fnpbonus.pdf" />} />
             
-            {/* Dynamic program routes - must be before catch-all */}
-            {!isNativeApp() && <Route path="/:slugpay" element={<ProgramPayDirect />} />}
-            {!isNativeApp() && <Route path="/:slug" element={<ProgramPage />} />}
+            {/* Dynamic program route - handles both /{slug} and /{slug}pay */}
+            {!isNativeApp() && <Route path="/:slug" element={<DynamicProgramRoute />} />}
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
