@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { GraduationCap, Plus, RefreshCw, Pencil, Trash2 } from 'lucide-react';
+import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { RichTextEditor } from './RichTextEditor';
 
@@ -219,6 +219,24 @@ export function ProgramsManager() {
     } finally {
       setDeleteId(null);
     }
+  };
+
+  const copyProductPageLink = (slug: string) => {
+    const link = `${window.location.origin}/${slug}`;
+    navigator.clipboard.writeText(link);
+    toast({
+      title: 'Copied!',
+      description: 'Product page link copied to clipboard',
+    });
+  };
+
+  const copyPaymentLink = (slug: string) => {
+    const link = `${window.location.origin}/${slug}pay`;
+    navigator.clipboard.writeText(link);
+    toast({
+      title: 'Copied!',
+      description: 'Payment link copied to clipboard',
+    });
   };
 
   useEffect(() => {
@@ -663,6 +681,22 @@ export function ProgramsManager() {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => copyProductPageLink(program.slug)}
+                      title="Copy Product Page Link"
+                    >
+                      <Link2 className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => copyPaymentLink(program.slug)}
+                      title="Copy Payment Link"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
                     <Button variant="ghost" size="sm" onClick={() => handleEdit(program)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
