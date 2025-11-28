@@ -140,11 +140,15 @@ export function ProgramsManager() {
         audio_playlist_id: formData.audio_playlist_id || null,
       };
 
+      console.log('[ProgramsManager] Saving program', { editingId, dataToSave });
+
       if (editingId) {
         const { error } = await supabase
           .from('program_catalog')
           .update(dataToSave)
           .eq('id', editingId);
+
+        console.log('[ProgramsManager] Update result', { error });
 
         if (error) throw error;
 
@@ -156,6 +160,8 @@ export function ProgramsManager() {
         const { error } = await supabase
           .from('program_catalog')
           .insert([dataToSave]);
+
+        console.log('[ProgramsManager] Insert result', { error });
 
         if (error) throw error;
 
