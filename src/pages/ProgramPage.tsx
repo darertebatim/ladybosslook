@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Check, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Navigation from '@/components/ui/navigation';
 import Footer from '@/components/sections/Footer';
 import { SEOHead } from '@/components/SEOHead';
-import NotFound from './NotFound';
 
 interface ProgramData {
   id: string;
@@ -71,7 +70,7 @@ const ProgramPage = () => {
   }
 
   if (notFound || !program) {
-    return <NotFound />;
+    return <Navigate to="/404" replace />;
   }
 
   const isDeposit = program.payment_type === 'deposit';
