@@ -75,7 +75,7 @@ serve(async (req) => {
     // Fetch program details from database
     const { data: programData, error: programError } = await supabase
       .from('program_catalog')
-      .select('slug, title, price_amount, description')
+      .select('slug, title, price_amount, description, payment_type, deposit_price')
       .eq('slug', program)
       .eq('is_active', true)
       .single();
@@ -113,11 +113,19 @@ serve(async (req) => {
     }
 
     // Prepare pricing data from database
+    // Use deposit_price if payment_type is 'deposit', otherwise use price_amount
+    const isDeposit = programData.payment_type === 'deposit';
+    const chargeAmount = isDeposit && programData.deposit_price 
+      ? programData.deposit_price 
+      : programData.price_amount;
+    
     const programPricing = {
       [program]: {
-        name: programData.title,
-        amount: programData.price_amount,
-        description: programData.description || programData.title,
+        name: isDeposit ? `${programData.title} (Deposit)` : programData.title,
+        amount: chargeAmount,
+        description: isDeposit 
+          ? `Deposit payment for ${programData.title}. Remaining balance to be paid separately.`
+          : (programData.description || programData.title),
       }
     };
 
@@ -163,6 +171,8 @@ serve(async (req) => {
         setup_future_usage: 'off_session', // Save payment method for future charges
         metadata: {
           program: program,
+          payment_type: programData.payment_type,
+          is_deposit: isDeposit ? 'true' : 'false',
         },
       },
     });

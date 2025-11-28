@@ -51,6 +51,7 @@ export function ProgramsManager() {
     payment_type: 'one-time',
     price_amount: 0,
     original_price: 0,
+    deposit_price: 0,
     duration: '',
     delivery_method: 'on-demand',
     subscription_duration: '',
@@ -108,6 +109,7 @@ export function ProgramsManager() {
       payment_type: 'one-time',
       price_amount: 0,
       original_price: 0,
+      deposit_price: 0,
       duration: '',
       delivery_method: 'on-demand',
       subscription_duration: '',
@@ -174,6 +176,7 @@ export function ProgramsManager() {
       payment_type: program.payment_type,
       price_amount: program.price_amount,
       original_price: program.original_price || 0,
+      deposit_price: (program as any).deposit_price || 0,
       duration: program.duration || '',
       delivery_method: program.delivery_method || 'on-demand',
       subscription_duration: (program as any).subscription_duration || '',
@@ -397,6 +400,7 @@ export function ProgramsManager() {
                     <SelectContent>
                       <SelectItem value="one-time">One-Time</SelectItem>
                       <SelectItem value="subscription">Subscription</SelectItem>
+                      <SelectItem value="deposit">Deposit (Partial Payment)</SelectItem>
                       <SelectItem value="free">Free</SelectItem>
                     </SelectContent>
                   </Select>
@@ -430,6 +434,23 @@ export function ProgramsManager() {
                     Sale: ${(formData.price_amount / 100).toFixed(2)}
                   </p>
                 </div>
+
+                {formData.payment_type === 'deposit' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="deposit_price">Deposit Amount ($)</Label>
+                    <Input
+                      id="deposit_price"
+                      type="number"
+                      value={formData.deposit_price / 100}
+                      onChange={(e) => setFormData({ ...formData, deposit_price: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                      placeholder="e.g., 100"
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Deposit: ${(formData.deposit_price / 100).toFixed(2)} (Customer pays this now, rest via Stripe payment link)
+                    </p>
+                  </div>
+                )}
 
                 {formData.payment_type === 'subscription' && (
                   <div className="space-y-2">
@@ -630,6 +651,12 @@ export function ProgramsManager() {
                         <span className="font-semibold text-primary">${(program.price_amount / 100).toFixed(2)}</span>
                         <span>•</span>
                         <span>{program.payment_type}</span>
+                        {(program as any).deposit_price > 0 && program.payment_type === 'deposit' && (
+                          <>
+                            <span>•</span>
+                            <span className="text-orange-600 font-semibold">Deposit: ${((program as any).deposit_price / 100).toFixed(2)}</span>
+                          </>
+                        )}
                         {program.subscription_full_payment_discount > 0 && (
                           <>
                             <span>•</span>
