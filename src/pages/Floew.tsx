@@ -53,16 +53,6 @@ const Floew = () => {
               🇺🇸 💵 پرداخت ۱ دلار (خارج ایران)
             </Button>
           </a>
-          
-          {/* Urgency Message */}
-          <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-lg p-4 text-center mt-2">
-            <p className="text-white font-bold text-lg">
-              ⏰ فقط تا پایان امشب! ⏰
-            </p>
-            <p className="text-white/90 text-sm mt-1">
-              این پیشنهاد ویژه به زودی به پایان می‌رسد
-            </p>
-          </div>
         </div>
       </div>
     </div>
