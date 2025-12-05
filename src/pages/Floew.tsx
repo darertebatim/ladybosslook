@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Mail } from "lucide-react";
 import fiveLanguagePoster from "@/assets/five-language-poster.png";
 
 const Floew = () => {
@@ -56,7 +56,7 @@ const Floew = () => {
         </div>
         
         {/* Telegram Support */}
-        <div className="text-center pt-4">
+        <div className="text-center pt-4 space-y-2">
           <a 
             href="https://t.me/lbpool_admin" 
             target="_blank" 
@@ -66,6 +66,15 @@ const Floew = () => {
             <MessageCircle className="h-4 w-4" />
             ادمین پشتیبان در تلگرام: @lbpool_admin
           </a>
+          <div>
+            <a 
+              href="mailto:support@ladybosslook.com"
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
+            >
+              <Mail className="h-4 w-4" />
+              ایمیل پشتیبان: support@ladybosslook.com
+            </a>
+          </div>
         </div>
       </div>
     </div>
