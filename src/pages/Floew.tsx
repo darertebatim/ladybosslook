@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CreditCard, Banknote } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import fiveLanguagePoster from "@/assets/five-language-poster.png";
 
 const Floew = () => {
@@ -61,8 +61,9 @@ const Floew = () => {
             href="https://t.me/lbpool_admin" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground transition-colors text-sm"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
           >
+            <MessageCircle className="h-4 w-4" />
             ادمین پشتیبان در تلگرام: @lbpool_admin
           </a>
         </div>
