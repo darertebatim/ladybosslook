@@ -54,6 +54,18 @@ const Floew = () => {
             </Button>
           </a>
         </div>
+        
+        {/* Telegram Support */}
+        <div className="text-center pt-4">
+          <a 
+            href="https://t.me/lbpool_admin" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-foreground transition-colors text-sm"
+          >
+            ادمین پشتیبان در تلگرام: @lbpool_admin
+          </a>
+        </div>
       </div>
     </div>
   );
