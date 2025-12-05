@@ -33,15 +33,17 @@ const Floew = () => {
           >
             <Button 
               size="lg" 
-              className="w-full text-lg py-6 bg-green-600 hover:bg-green-700 text-white"
+              className="w-full text-xl py-8 bg-green-600 hover:bg-green-700 text-white font-bold shadow-lg"
             >
               🇮🇷 پرداخت ۹۹.۰۰۰ تومان (داخل ایران)
             </Button>
           </a>
           
-          <p className="text-sm text-muted-foreground text-center py-2">
-            عزیزان مهاجر خارج از ایران (ساکنین امریکا، کانادا، اروپا و ...) وارد لینک پایین شوید
-          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+            <p className="text-base text-blue-800 font-medium">
+              👇 عزیزان مهاجر خارج از ایران (ساکنین امریکا، کانادا، اروپا و ...) وارد لینک پایین شوید 👇
+            </p>
+          </div>
           
           <a href="/Five-Languagepay" className="block w-full">
             <Button 
