@@ -16,7 +16,7 @@ const Floew = () => {
         {/* Title */}
         <div className="text-center space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-            چالش ۵ زبان قدرت لیدی‌باس
+            چالش ۵ زبان قدرت
           </h1>
           <p className="text-lg text-amber-500 font-semibold">
             ده شب با راضیه لیدی‌باس
