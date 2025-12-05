@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CreditCard, MessageCircle } from "lucide-react";
+import { CreditCard, Banknote } from "lucide-react";
 import fiveLanguagePoster from "@/assets/five-language-poster.png";
 
 const Floew = () => {
@@ -14,16 +14,21 @@ const Floew = () => {
         />
         
         {/* Title */}
-        <h1 className="text-2xl md:text-3xl font-bold text-center text-foreground">
-          چالش ۵ زبان قدرت لیدی‌باس
-        </h1>
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+            چالش ۵ زبان قدرت لیدی‌باس
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            به جای ۱۰۰ دلار فقط با ۱ دلار
+          </p>
+        </div>
         
         {/* Buttons */}
         <div className="space-y-4">
           <a href="/Five-Languagepay" className="block w-full">
             <Button 
               size="lg" 
-              className="w-full text-lg py-6 bg-primary hover:bg-primary/90"
+              className="w-full text-lg py-6 bg-green-600 hover:bg-green-700 text-white"
             >
               <CreditCard className="ml-2 h-5 w-5" />
               پرداخت ۱ دلار (خارج ایران)
@@ -31,17 +36,16 @@ const Floew = () => {
           </a>
           
           <a 
-            href="https://t.me/lbpool_admin" 
+            href="https://ladybossnew.com/pziran" 
             target="_blank" 
             rel="noopener noreferrer"
             className="block w-full"
           >
             <Button 
               size="lg" 
-              variant="secondary"
-              className="w-full text-lg py-6"
+              className="w-full text-lg py-6 bg-green-600 hover:bg-green-700 text-white"
             >
-              <MessageCircle className="ml-2 h-5 w-5" />
+              <Banknote className="ml-2 h-5 w-5" />
               پرداخت ۹۹.۰۰۰ تومان (داخل ایران)
             </Button>
           </a>
