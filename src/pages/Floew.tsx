@@ -47,7 +47,7 @@ const Floew = () => {
           <a href="/Five-Languagepay" className="block w-full">
             <Button 
               size="lg" 
-              className="w-full text-lg py-6 bg-green-600 hover:bg-green-700 text-white"
+              className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white"
             >
               <CreditCard className="ml-2 h-5 w-5" />
               پرداخت ۱ دلار (خارج ایران)
