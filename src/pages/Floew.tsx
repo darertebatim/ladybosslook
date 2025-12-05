@@ -4,7 +4,7 @@ import fiveLanguagePoster from "@/assets/five-language-poster.png";
 
 const Floew = () => {
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4" dir="rtl">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4" dir="rtl" style={{ fontFamily: "'Vazirmatn', sans-serif" }}>
       <div className="max-w-lg w-full space-y-6">
         {/* Poster */}
         <img 
@@ -15,7 +15,7 @@ const Floew = () => {
         
         {/* Title */}
         <h1 className="text-2xl md:text-3xl font-bold text-center text-foreground">
-          ۵ زبان زن توانمند
+          چالش ۵ زبان قدرت لیدی‌باس
         </h1>
         
         {/* Buttons */}
