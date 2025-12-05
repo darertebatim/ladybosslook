@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CreditCard, Banknote } from "lucide-react";
+import { DollarSign } from "lucide-react";
 import fiveLanguagePoster from "@/assets/five-language-poster.png";
 
 const Floew = () => {
@@ -35,7 +35,8 @@ const Floew = () => {
               size="lg" 
               className="w-full text-lg py-6 bg-green-600 hover:bg-green-700 text-white"
             >
-              <Banknote className="ml-2 h-5 w-5" />
+              <span className="ml-2">🇮🇷</span>
+              <span className="ml-1 font-bold">﷼</span>
               پرداخت ۹۹.۰۰۰ تومان (داخل ایران)
             </Button>
           </a>
@@ -49,7 +50,8 @@ const Floew = () => {
               size="lg" 
               className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white"
             >
-              <CreditCard className="ml-2 h-5 w-5" />
+              <span className="ml-2">🌍</span>
+              <DollarSign className="ml-1 h-5 w-5" />
               پرداخت ۱ دلار (خارج ایران)
             </Button>
           </a>
