@@ -35,8 +35,7 @@ const Floew = () => {
               size="lg" 
               className="w-full text-lg py-6 bg-green-600 hover:bg-green-700 text-white"
             >
-              <Banknote className="ml-2 h-5 w-5" />
-              پرداخت ۹۹.۰۰۰ تومان (داخل ایران)
+              🇮🇷 پرداخت ۹۹.۰۰۰ تومان (داخل ایران)
             </Button>
           </a>
           
@@ -49,8 +48,7 @@ const Floew = () => {
               size="lg" 
               className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white"
             >
-              <CreditCard className="ml-2 h-5 w-5" />
-              پرداخت ۱ دلار (خارج ایران)
+              🇺🇸 💵 پرداخت ۱ دلار (خارج ایران)
             </Button>
           </a>
         </div>
