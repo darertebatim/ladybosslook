@@ -18,8 +18,8 @@ const Floew = () => {
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             چالش ۵ زبان قدرت لیدی‌باس
           </h1>
-          <p className="text-lg text-muted-foreground">
-            به جای ۱۰۰ دلار فقط با ۱ دلار
+          <p className="text-lg text-amber-500 font-semibold">
+            ده شب با راضیه لیدی‌باس
           </p>
         </div>
         
