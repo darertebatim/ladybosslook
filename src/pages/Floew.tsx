@@ -25,16 +25,6 @@ const Floew = () => {
         
         {/* Buttons */}
         <div className="space-y-4">
-          <a href="/Five-Languagepay" className="block w-full">
-            <Button 
-              size="lg" 
-              className="w-full text-lg py-6 bg-green-600 hover:bg-green-700 text-white"
-            >
-              <CreditCard className="ml-2 h-5 w-5" />
-              پرداخت ۱ دلار (خارج ایران)
-            </Button>
-          </a>
-          
           <a 
             href="https://ladybossnew.com/pziran" 
             target="_blank" 
@@ -47,6 +37,16 @@ const Floew = () => {
             >
               <Banknote className="ml-2 h-5 w-5" />
               پرداخت ۹۹.۰۰۰ تومان (داخل ایران)
+            </Button>
+          </a>
+          
+          <a href="/Five-Languagepay" className="block w-full">
+            <Button 
+              size="lg" 
+              className="w-full text-lg py-6 bg-green-600 hover:bg-green-700 text-white"
+            >
+              <CreditCard className="ml-2 h-5 w-5" />
+              پرداخت ۱ دلار (خارج ایران)
             </Button>
           </a>
         </div>
