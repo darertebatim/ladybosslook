@@ -40,6 +40,10 @@ const Floew = () => {
             </Button>
           </a>
           
+          <p className="text-sm text-muted-foreground text-center py-2">
+            عزیزان مهاجر خارج از ایران (ساکنین امریکا، کانادا، اروپا و ...) وارد لینک پایین شوید
+          </p>
+          
           <a href="/Five-Languagepay" className="block w-full">
             <Button 
               size="lg" 
