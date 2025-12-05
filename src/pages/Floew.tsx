@@ -26,7 +26,7 @@ const Floew = () => {
               className="w-full text-lg py-6 bg-primary hover:bg-primary/90"
             >
               <CreditCard className="ml-2 h-5 w-5" />
-              پرداخت دلاری (خارج از ایران)
+              پرداخت ۱ دلار (خارج ایران)
             </Button>
           </a>
           
@@ -42,7 +42,7 @@ const Floew = () => {
               className="w-full text-lg py-6"
             >
               <MessageCircle className="ml-2 h-5 w-5" />
-              پرداخت تومانی (داخل ایران)
+              پرداخت ۹۹.۰۰۰ تومان (داخل ایران)
             </Button>
           </a>
         </div>
