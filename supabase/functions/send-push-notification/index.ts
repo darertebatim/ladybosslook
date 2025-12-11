@@ -63,27 +63,20 @@ async function generateApnsJwt(authKey: string, keyId: string, teamId: string): 
   }
 }
 
-// Send push notification to iOS via APNs
-async function sendToApns(token: string, payload: { title: string; body: string; url: string; badge?: number }, environmentOverride?: 'development' | 'production'): Promise<Response> {
-  const authKey = Deno.env.get('APNS_AUTH_KEY');
-  const keyId = Deno.env.get('APNS_KEY_ID');
-  const teamId = Deno.env.get('APNS_TEAM_ID');
-  const topic = Deno.env.get('APNS_TOPIC') || 'com.ladybosslook.academy';
-  const environment = environmentOverride || Deno.env.get('APNS_ENVIRONMENT') || 'production'; // Use override or default
-  
-  if (!authKey || !keyId || !teamId) {
-    throw new Error('APNs credentials not configured');
-  }
-  
-  // Generate JWT token for authentication
-  const jwt = await generateApnsJwt(authKey, keyId, teamId);
-  
+// Send push notification to iOS via APNs (JWT passed in to avoid rate limits)
+async function sendToApns(
+  deviceToken: string, 
+  payload: { title: string; body: string; url: string; badge?: number }, 
+  jwt: string,
+  topic: string,
+  environment: 'development' | 'production'
+): Promise<Response> {
   // Use sandbox or production APNs URL based on environment
   const apnsUrl = (environment === 'sandbox' || environment === 'development')
-    ? `https://api.sandbox.push.apple.com/3/device/${token}`
-    : `https://api.push.apple.com/3/device/${token}`;
+    ? `https://api.sandbox.push.apple.com/3/device/${deviceToken}`
+    : `https://api.push.apple.com/3/device/${deviceToken}`;
   
-  console.log(`📱 Sending to APNs (${environment}):`, token.substring(0, 20) + '...');
+  console.log(`📱 Sending to APNs (${environment}):`, deviceToken.substring(0, 20) + '...');
   
   const response = await fetch(apnsUrl, {
     method: 'POST',
@@ -101,7 +94,7 @@ async function sendToApns(token: string, payload: { title: string; body: string;
           body: payload.body,
         },
         sound: 'default',
-        badge: payload.badge || 1, // Phase 6: Allow custom badge
+        badge: payload.badge || 1,
       },
       url: payload.url,
     }),
@@ -244,6 +237,24 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`📊 Found ${subscriptions.length} native iOS subscriptions to notify`);
 
+    // Generate APNs JWT once before the loop to avoid rate limits
+    const authKey = Deno.env.get('APNS_AUTH_KEY');
+    const keyId = Deno.env.get('APNS_KEY_ID');
+    const teamId = Deno.env.get('APNS_TEAM_ID');
+    const topic = Deno.env.get('APNS_TOPIC') || 'com.ladybosslook.academy';
+    const apnsEnvironment = environment || Deno.env.get('APNS_ENVIRONMENT') || 'production';
+
+    if (!authKey || !keyId || !teamId) {
+      return new Response(
+        JSON.stringify({ error: 'APNs credentials not configured' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      );
+    }
+
+    console.log('🔑 Generating APNs JWT token (once for all notifications)...');
+    const apnsJwt = await generateApnsJwt(authKey, keyId, teamId);
+    console.log('✅ APNs JWT generated successfully');
+
     let successCount = 0;
     let failedCount = 0;
     const failedSubscriptions: string[] = [];
@@ -252,15 +263,21 @@ const handler = async (req: Request): Promise<Response> => {
     for (const subscription of subscriptions) {
       try {
         // Extract native iOS token
-        const token = subscription.endpoint.replace('native:', '');
+        const deviceToken = subscription.endpoint.replace('native:', '');
         console.log(`📱 Sending to native iOS device for user ${subscription.user_id}`);
         
-        const response = await sendToApns(token, {
-          title,
-          body,
-          url: url || '/app/home',
-          badge, // Phase 6: Pass custom badge
-        }, environment); // Pass environment override
+        const response = await sendToApns(
+          deviceToken,
+          {
+            title,
+            body,
+            url: url || '/app/home',
+            badge,
+          },
+          apnsJwt,
+          topic,
+          apnsEnvironment as 'development' | 'production'
+        );
         
         if (response.ok) {
           successCount++;
