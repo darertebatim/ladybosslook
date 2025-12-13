@@ -603,6 +603,10 @@ export type Database = {
           audio_playlist_id: string | null
           available_on_mobile: boolean | null
           available_on_web: boolean | null
+          balance_full_discount: number | null
+          balance_full_price: number | null
+          balance_monthly_count: number | null
+          balance_monthly_price: number | null
           created_at: string | null
           delivery_method: string | null
           deposit_price: number | null
@@ -633,6 +637,10 @@ export type Database = {
           audio_playlist_id?: string | null
           available_on_mobile?: boolean | null
           available_on_web?: boolean | null
+          balance_full_discount?: number | null
+          balance_full_price?: number | null
+          balance_monthly_count?: number | null
+          balance_monthly_price?: number | null
           created_at?: string | null
           delivery_method?: string | null
           deposit_price?: number | null
@@ -663,6 +671,10 @@ export type Database = {
           audio_playlist_id?: string | null
           available_on_mobile?: boolean | null
           available_on_web?: boolean | null
+          balance_full_discount?: number | null
+          balance_full_price?: number | null
+          balance_monthly_count?: number | null
+          balance_monthly_price?: number | null
           created_at?: string | null
           delivery_method?: string | null
           deposit_price?: number | null

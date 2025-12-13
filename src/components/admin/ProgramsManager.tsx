@@ -66,6 +66,11 @@ export function ProgramsManager() {
     is_free_on_ios: false,
     ios_product_id: '',
     android_product_id: '',
+    // Balance payment fields for deposit-type programs
+    balance_full_price: 0,
+    balance_monthly_price: 0,
+    balance_monthly_count: 0,
+    balance_full_discount: 0,
   });
 
   // Fetch playlists for dropdown
@@ -126,6 +131,10 @@ export function ProgramsManager() {
       is_free_on_ios: false,
       ios_product_id: '',
       android_product_id: '',
+      balance_full_price: 0,
+      balance_monthly_price: 0,
+      balance_monthly_count: 0,
+      balance_full_discount: 0,
     });
     setEditingId(null);
     setShowForm(false);
@@ -195,6 +204,10 @@ export function ProgramsManager() {
       is_free_on_ios: program.is_free_on_ios || false,
       ios_product_id: program.ios_product_id || '',
       android_product_id: program.android_product_id || '',
+      balance_full_price: (program as any).balance_full_price || 0,
+      balance_monthly_price: (program as any).balance_monthly_price || 0,
+      balance_monthly_count: (program as any).balance_monthly_count || 0,
+      balance_full_discount: (program as any).balance_full_discount || 0,
     });
     setEditingId(program.id);
     setShowForm(true);
@@ -481,20 +494,100 @@ export function ProgramsManager() {
                 </div>
 
                 {formData.payment_type === 'deposit' && (
-                  <div className="space-y-2">
-                    <Label htmlFor="deposit_price">Deposit Amount ($)</Label>
-                    <Input
-                      id="deposit_price"
-                      type="number"
-                      value={formData.deposit_price / 100}
-                      onChange={(e) => setFormData({ ...formData, deposit_price: Math.round(parseFloat(e.target.value || '0') * 100) })}
-                      placeholder="e.g., 100"
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Deposit: ${(formData.deposit_price / 100).toFixed(2)} (Customer pays this now, rest via Stripe payment link)
-                    </p>
-                  </div>
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="deposit_price">Deposit Amount ($)</Label>
+                      <Input
+                        id="deposit_price"
+                        type="number"
+                        value={formData.deposit_price / 100}
+                        onChange={(e) => setFormData({ ...formData, deposit_price: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                        placeholder="e.g., 100"
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Deposit: ${(formData.deposit_price / 100).toFixed(2)} (Customer pays this now)
+                      </p>
+                    </div>
+
+                    {/* Balance Payment Options Section */}
+                    <div className="col-span-2 space-y-4 border-t pt-4 mt-2">
+                      <Label className="text-base font-semibold">💳 Balance Payment Options</Label>
+                      <p className="text-xs text-muted-foreground -mt-2">
+                        Configure how customers can pay the remaining balance after deposit
+                      </p>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="balance_full_price">One-Time Balance ($)</Label>
+                          <Input
+                            id="balance_full_price"
+                            type="number"
+                            value={formData.balance_full_price / 100}
+                            onChange={(e) => setFormData({ ...formData, balance_full_price: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                            placeholder="e.g., 747"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Full balance if paid at once: ${(formData.balance_full_price / 100).toFixed(2)}
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="balance_full_discount">Discount for Full Payment ($)</Label>
+                          <Input
+                            id="balance_full_discount"
+                            type="number"
+                            value={formData.balance_full_discount / 100}
+                            onChange={(e) => setFormData({ ...formData, balance_full_discount: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                            placeholder="e.g., 150"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Savings: ${(formData.balance_full_discount / 100).toFixed(2)}
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="balance_monthly_price">Monthly Payment ($)</Label>
+                          <Input
+                            id="balance_monthly_price"
+                            type="number"
+                            value={formData.balance_monthly_price / 100}
+                            onChange={(e) => setFormData({ ...formData, balance_monthly_price: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                            placeholder="e.g., 299"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Per month: ${(formData.balance_monthly_price / 100).toFixed(2)}
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="balance_monthly_count">Number of Monthly Payments</Label>
+                          <Select 
+                            value={String(formData.balance_monthly_count || 0)} 
+                            onValueChange={(value) => setFormData({ ...formData, balance_monthly_count: parseInt(value) })}
+                          >
+                            <SelectTrigger id="balance_monthly_count">
+                              <SelectValue placeholder="Select count" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="0">Not applicable</SelectItem>
+                              <SelectItem value="2">2 months</SelectItem>
+                              <SelectItem value="3">3 months</SelectItem>
+                              <SelectItem value="4">4 months</SelectItem>
+                              <SelectItem value="6">6 months</SelectItem>
+                              <SelectItem value="9">9 months</SelectItem>
+                              <SelectItem value="12">12 months</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {formData.balance_monthly_count > 0 && (
+                            <p className="text-xs text-muted-foreground">
+                              Total: ${((formData.balance_monthly_price / 100) * formData.balance_monthly_count).toFixed(2)} ({formData.balance_monthly_count} × ${(formData.balance_monthly_price / 100).toFixed(2)})
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </>
                 )}
 
                 {formData.payment_type === 'subscription' && (
