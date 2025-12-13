@@ -52,6 +52,7 @@ import Index from "./pages/Index";
 import LadybossAnnouncements from "./pages/LadybossAnnouncements";
 import CCWAnnouncements from "./pages/CCWAnnouncements";
 import EmpoweredWomanCoaching from "./pages/EmpoweredWomanCoaching";
+import EWCBalance from "./pages/EWCBalance";
 import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -137,6 +138,7 @@ const App = () => (
             <Route path="/giveaway" element={<Giveaway />} />
             {!isNativeApp() && <Route path="/ewc" element={<EmpoweredWomanCoaching />} />}
             {!isNativeApp() && <Route path="/ewcnow" element={<EmpoweredWomanCoaching />} />}
+            {!isNativeApp() && <Route path="/ewc-balance" element={<EWCBalance />} />}
             <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
             <Route path="/announcements/ccw" element={<CCWAnnouncements />} />
             {!isNativeApp() && <Route path="/freelive" element={<FreeLive />} />}
