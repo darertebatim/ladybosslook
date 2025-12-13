@@ -12,7 +12,7 @@ const EWPlus = () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { program: 'ewplus' }
+        body: { program: 'ewpluscoaching' }
       });
 
       if (error) throw error;
