@@ -179,6 +179,32 @@ serve(async (req) => {
       }
     }
 
+    // Handle customer.subscription.created (set auto-cancellation if configured)
+    if (event.type === 'customer.subscription.created') {
+      const subscription = event.data.object as Stripe.Subscription;
+      
+      console.log('Subscription created:', subscription.id);
+
+      const autoCancelMonths = subscription.metadata?.auto_cancel_after_months;
+      
+      if (autoCancelMonths && parseInt(autoCancelMonths) > 0) {
+        const months = parseInt(autoCancelMonths);
+        // Calculate cancel_at timestamp (months from now)
+        const cancelAt = Math.floor(Date.now() / 1000) + (months * 30 * 24 * 60 * 60);
+        
+        console.log('Setting auto-cancellation for subscription:', subscription.id, 'Cancel at:', new Date(cancelAt * 1000).toISOString());
+
+        try {
+          await stripe.subscriptions.update(subscription.id, {
+            cancel_at: cancelAt,
+          });
+          console.log('Auto-cancellation set successfully for subscription:', subscription.id);
+        } catch (err) {
+          console.error('Error setting auto-cancellation:', err.message);
+        }
+      }
+    }
+
     // Handle customer.subscription.deleted (subscription cancelled or ended)
     if (event.type === 'customer.subscription.deleted') {
       const subscription = event.data.object as Stripe.Subscription;
