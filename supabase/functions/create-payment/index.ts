@@ -182,30 +182,22 @@ serve(async (req) => {
 
       logStep("Stripe price created for subscription", { priceId: price.id });
 
-      // Build subscription data with cancel_at if interval_count is set
+      // Build subscription data
+      // Note: cancel_at is not supported in Checkout Session subscription_data
+      // Auto-cancellation must be handled via webhook after subscription creation
       const subscriptionData: Stripe.Checkout.SessionCreateParams.SubscriptionData = {
         metadata: {
           program: program,
           payment_type: programData.payment_type,
           product_name: productName,
+          auto_cancel_after_months: programData.subscription_interval_count?.toString() || '',
         },
       };
 
-      // Auto-cancel after N billing periods
       if (programData.subscription_interval_count) {
-        const intervalDays: Record<string, number> = {
-          'day': 1,
-          'week': 7,
-          'month': 30,
-          'year': 365,
-        };
-        const daysPerInterval = intervalDays[programData.subscription_interval || 'month'] || 30;
-        const totalDays = daysPerInterval * programData.subscription_interval_count;
-        const cancelAt = Math.floor(Date.now() / 1000) + (totalDays * 24 * 60 * 60);
-        subscriptionData.cancel_at = cancelAt;
-        logStep("Subscription will auto-cancel", { 
+        logStep("Subscription configured for auto-cancel", { 
           intervalCount: programData.subscription_interval_count,
-          cancelAt: new Date(cancelAt * 1000).toISOString()
+          note: "Will be set via webhook after subscription creation"
         });
       }
 
