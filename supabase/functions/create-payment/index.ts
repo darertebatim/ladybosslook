@@ -210,7 +210,6 @@ serve(async (req) => {
         phone_number_collection: {
           enabled: true
         },
-        customer_creation: 'always',
         success_url: successUrl,
         cancel_url: cancelUrl,
         subscription_data: subscriptionData,
