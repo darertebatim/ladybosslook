@@ -8,7 +8,7 @@ const EWCBalance = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 font-[Vazirmatn]" dir="rtl">
       <div className="container mx-auto px-4 py-12 max-w-2xl">
         {/* Header */}
         <div className="text-center mb-10">
@@ -68,10 +68,10 @@ const EWCBalance = () => {
               </div>
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-foreground mb-1">
-                  پرداخت اقساطی
+                  پرداخت ماهیانه
                 </h3>
                 <p className="text-muted-foreground text-sm mb-3">
-                  ۳ قسط ماهانه
+                  ۳ پرداخت ماهانه
                 </p>
                 <div className="flex items-baseline gap-2 mb-4">
                   <span className="text-2xl font-bold text-foreground">$299</span>
@@ -81,10 +81,10 @@ const EWCBalance = () => {
                 <Button 
                   onClick={() => handlePayment('https://buy.stripe.com/28EbJ03Vv2L0fbx0T79Ve05')}
                   variant="outline"
-                  className="w-full py-6 text-lg font-medium"
+                  className="w-full py-6 text-lg font-medium font-[Vazirmatn]"
                 >
                   <Calendar className="ml-2 h-5 w-5" />
-                  پرداخت اقساطی
+                  پرداخت ماهیانه
                 </Button>
               </div>
             </div>
