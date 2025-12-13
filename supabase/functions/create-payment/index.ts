@@ -60,7 +60,7 @@ serve(async (req) => {
 
     // Parse and validate request data
     const requestBody = await req.json();
-    const { program, name, email, phone } = requestBody;
+    const { program, paymentOption, name, email, phone } = requestBody;
     
     // Validate required program field
     if (!program || typeof program !== 'string') {
@@ -70,12 +70,12 @@ serve(async (req) => {
       );
     }
     
-    logStep("Request data validated", { program });
+    logStep("Request data validated", { program, paymentOption });
 
     // Fetch program details from database
     const { data: programData, error: programError } = await supabase
       .from('program_catalog')
-      .select('slug, title, price_amount, description, payment_type, deposit_price, subscription_interval, subscription_interval_count')
+      .select('slug, title, price_amount, description, payment_type, deposit_price, subscription_interval, subscription_interval_count, subscription_full_payment_price')
       .eq('slug', program)
       .eq('is_active', true)
       .single();
@@ -113,7 +113,12 @@ serve(async (req) => {
     }
 
     // Determine payment mode and pricing
-    const isSubscription = programData.payment_type === 'subscription';
+    // Check if subscription program with full payment option selected
+    const isFullPaymentForSubscription = programData.payment_type === 'subscription' && 
+      paymentOption === 'full' && 
+      programData.subscription_full_payment_price;
+    
+    const isSubscription = programData.payment_type === 'subscription' && !isFullPaymentForSubscription;
     const isDeposit = programData.payment_type === 'deposit';
     
     // Calculate charge amount
@@ -121,7 +126,12 @@ serve(async (req) => {
     let productName: string;
     let productDescription: string;
     
-    if (isDeposit && programData.deposit_price) {
+    if (isFullPaymentForSubscription) {
+      // One-time full payment for a subscription program
+      chargeAmount = programData.subscription_full_payment_price!;
+      productName = `${programData.title} (Full Payment)`;
+      productDescription = `One-time full payment for ${programData.title}`;
+    } else if (isDeposit && programData.deposit_price) {
       chargeAmount = programData.deposit_price;
       productName = `${programData.title} (Deposit)`;
       productDescription = `Deposit payment for ${programData.title}. Remaining balance to be paid separately.`;
@@ -133,7 +143,8 @@ serve(async (req) => {
 
     logStep("Payment configuration", { 
       isSubscription, 
-      isDeposit, 
+      isDeposit,
+      isFullPaymentForSubscription,
       chargeAmount, 
       interval: programData.subscription_interval,
       intervalCount: programData.subscription_interval_count 
