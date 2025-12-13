@@ -56,11 +56,11 @@ serve(async (req) => {
 
     console.log('Webhook event received:', event.type);
 
-    // Handle checkout.session.completed
+    // Handle checkout.session.completed (for both one-time and subscription initial payments)
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       
-      console.log('Processing checkout session:', session.id);
+      console.log('Processing checkout session:', session.id, 'Mode:', session.mode);
 
       // Get customer details
       const customerEmail = session.customer_details?.email || session.customer_email;
@@ -76,9 +76,10 @@ serve(async (req) => {
       const amount = session.amount_total || 0;
       const currency = session.currency || 'usd';
       
-      // Get product name from metadata or line items
+      // Get product name and program slug from metadata
       let productName = session.metadata?.product_name || 'Unknown Product';
-      const programSlug = session.metadata?.program_slug || null;
+      const programSlug = session.metadata?.program_slug || session.metadata?.program || null;
+      const paymentType = session.metadata?.payment_type || session.mode;
       
       // Check if order already exists
       const { data: existingOrder } = await supabase
@@ -111,7 +112,7 @@ serve(async (req) => {
           status: 'completed',
           product_name: productName,
           program_slug: programSlug,
-          payment_type: session.mode,
+          payment_type: paymentType,
         });
 
       if (orderError) {
@@ -120,6 +121,104 @@ serve(async (req) => {
       }
 
       console.log('Order created successfully for session:', session.id);
+    }
+
+    // Handle invoice.paid (for recurring subscription payments)
+    if (event.type === 'invoice.paid') {
+      const invoice = event.data.object as Stripe.Invoice;
+      
+      // Skip the first invoice (already handled by checkout.session.completed)
+      if (invoice.billing_reason === 'subscription_create') {
+        console.log('Skipping initial subscription invoice, already handled by checkout.session.completed');
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      console.log('Processing recurring invoice:', invoice.id, 'Reason:', invoice.billing_reason);
+
+      const customerEmail = invoice.customer_email || '';
+      const customerName = invoice.customer_name || '';
+      const amount = invoice.amount_paid || 0;
+      const currency = invoice.currency || 'usd';
+
+      // Get subscription metadata
+      let programSlug: string | null = null;
+      let productName = 'Subscription Payment';
+
+      if (invoice.subscription) {
+        const subscriptionId = typeof invoice.subscription === 'string' 
+          ? invoice.subscription 
+          : invoice.subscription.id;
+        
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        programSlug = subscription.metadata?.program || null;
+        productName = subscription.metadata?.product_name || 'Subscription Payment';
+      }
+
+      // Create order record for recurring payment
+      const { error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          stripe_session_id: invoice.id, // Use invoice ID for recurring payments
+          email: customerEmail,
+          name: customerName,
+          amount,
+          currency,
+          status: 'completed',
+          product_name: `${productName} (Recurring)`,
+          program_slug: programSlug,
+          payment_type: 'subscription_recurring',
+        });
+
+      if (orderError) {
+        console.error('Error creating recurring order:', orderError);
+      } else {
+        console.log('Recurring order created for invoice:', invoice.id);
+      }
+    }
+
+    // Handle customer.subscription.deleted (subscription cancelled or ended)
+    if (event.type === 'customer.subscription.deleted') {
+      const subscription = event.data.object as Stripe.Subscription;
+      
+      console.log('Subscription ended:', subscription.id, 'Status:', subscription.status);
+
+      const programSlug = subscription.metadata?.program || null;
+      
+      if (programSlug) {
+        // Get customer email from Stripe
+        const customerId = typeof subscription.customer === 'string' 
+          ? subscription.customer 
+          : subscription.customer.id;
+        
+        const customer = await stripe.customers.retrieve(customerId);
+        const customerEmail = (customer as Stripe.Customer).email;
+
+        if (customerEmail) {
+          // Find user by email and remove enrollment
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('email', customerEmail)
+            .single();
+
+          if (profile) {
+            const { error: enrollmentError } = await supabase
+              .from('course_enrollments')
+              .update({ status: 'cancelled' })
+              .eq('user_id', profile.id)
+              .eq('program_slug', programSlug);
+
+            if (enrollmentError) {
+              console.error('Error updating enrollment status:', enrollmentError);
+            } else {
+              console.log('Enrollment marked as cancelled for user:', profile.id, 'program:', programSlug);
+            }
+          }
+        }
+      }
     }
 
     // Handle charge.refunded

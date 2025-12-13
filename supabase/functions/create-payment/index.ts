@@ -75,7 +75,7 @@ serve(async (req) => {
     // Fetch program details from database
     const { data: programData, error: programError } = await supabase
       .from('program_catalog')
-      .select('slug, title, price_amount, description, payment_type, deposit_price')
+      .select('slug, title, price_amount, description, payment_type, deposit_price, subscription_interval, subscription_interval_count')
       .eq('slug', program)
       .eq('is_active', true)
       .single();
@@ -88,7 +88,7 @@ serve(async (req) => {
       );
     }
 
-    logStep("Program found", { title: programData.title, price: programData.price_amount });
+    logStep("Program found", { title: programData.title, price: programData.price_amount, paymentType: programData.payment_type });
     
     // Validate optional fields if provided (for future use)
     if (name && !validateName(name)) {
@@ -112,74 +112,163 @@ serve(async (req) => {
       );
     }
 
-    // Prepare pricing data from database
-    // Use deposit_price if payment_type is 'deposit', otherwise use price_amount
+    // Determine payment mode and pricing
+    const isSubscription = programData.payment_type === 'subscription';
     const isDeposit = programData.payment_type === 'deposit';
-    const chargeAmount = isDeposit && programData.deposit_price 
-      ? programData.deposit_price 
-      : programData.price_amount;
     
-    const programPricing = {
-      [program]: {
-        name: isDeposit ? `${programData.title} (Deposit)` : programData.title,
-        amount: chargeAmount,
-        description: isDeposit 
-          ? `Deposit payment for ${programData.title}. Remaining balance to be paid separately.`
-          : (programData.description || programData.title),
-      }
-    };
-
-    const selectedProgram = programPricing[program];
-    if (!selectedProgram) {
-      return new Response(
-        JSON.stringify({ error: 'Program data not available' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Calculate charge amount
+    let chargeAmount: number;
+    let productName: string;
+    let productDescription: string;
+    
+    if (isDeposit && programData.deposit_price) {
+      chargeAmount = programData.deposit_price;
+      productName = `${programData.title} (Deposit)`;
+      productDescription = `Deposit payment for ${programData.title}. Remaining balance to be paid separately.`;
+    } else {
+      chargeAmount = programData.price_amount;
+      productName = programData.title;
+      productDescription = programData.description || programData.title;
     }
 
-    logStep("Program selected", selectedProgram);
+    logStep("Payment configuration", { 
+      isSubscription, 
+      isDeposit, 
+      chargeAmount, 
+      interval: programData.subscription_interval,
+      intervalCount: programData.subscription_interval_count 
+    });
 
-    // Create checkout session - let Stripe collect all customer data
-    const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: { 
-              name: selectedProgram.name,
-              description: selectedProgram.description,
-            },
-            unit_amount: selectedProgram.amount,
-          },
-          quantity: 1,
+    // Build success/cancel URLs
+    const origin = req.headers.get("origin") || 'https://ladybosslook.com';
+    const successUrl = program === 'bilingual-power-class' 
+      ? `${origin}/thankone?session_id={CHECKOUT_SESSION_ID}`
+      : `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = program === 'bilingual-power-class'
+      ? `${origin}/one`
+      : `${origin}/programs`;
+
+    let session: Stripe.Checkout.Session;
+
+    if (isSubscription) {
+      // Create subscription checkout session
+      logStep("Creating subscription checkout session");
+      
+      // Create a price for the subscription
+      const price = await stripe.prices.create({
+        unit_amount: chargeAmount,
+        currency: 'usd',
+        recurring: {
+          interval: (programData.subscription_interval as 'day' | 'week' | 'month' | 'year') || 'month',
         },
-      ],
-      mode: "payment",
-      payment_method_types: ['card'], // Restrict to card payments only
-      billing_address_collection: 'required',
-      phone_number_collection: {
-        enabled: true
-      },
-      customer_creation: 'always',
-      success_url: program === 'bilingual-power-class' 
-        ? `${req.headers.get("origin")}/thankone?session_id={CHECKOUT_SESSION_ID}`
-        : `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: program === 'bilingual-power-class'
-        ? `${req.headers.get("origin")}/one`
-        : `${req.headers.get("origin")}/programs`,
-      payment_intent_data: {
-        setup_future_usage: 'off_session', // Save payment method for future charges
+        product_data: {
+          name: productName,
+          metadata: {
+            program_slug: program,
+          },
+        },
+      });
+
+      logStep("Stripe price created for subscription", { priceId: price.id });
+
+      // Build subscription data with cancel_at if interval_count is set
+      const subscriptionData: Stripe.Checkout.SessionCreateParams.SubscriptionData = {
         metadata: {
           program: program,
           payment_type: programData.payment_type,
-          is_deposit: isDeposit ? 'true' : 'false',
+          product_name: productName,
         },
-      },
-    });
+      };
 
-    logStep("Stripe checkout session created", { sessionId: session.id });
+      // Auto-cancel after N billing periods
+      if (programData.subscription_interval_count) {
+        const intervalDays: Record<string, number> = {
+          'day': 1,
+          'week': 7,
+          'month': 30,
+          'year': 365,
+        };
+        const daysPerInterval = intervalDays[programData.subscription_interval || 'month'] || 30;
+        const totalDays = daysPerInterval * programData.subscription_interval_count;
+        const cancelAt = Math.floor(Date.now() / 1000) + (totalDays * 24 * 60 * 60);
+        subscriptionData.cancel_at = cancelAt;
+        logStep("Subscription will auto-cancel", { 
+          intervalCount: programData.subscription_interval_count,
+          cancelAt: new Date(cancelAt * 1000).toISOString()
+        });
+      }
 
-    // Return session URL directly - no pre-payment database records needed
+      session = await stripe.checkout.sessions.create({
+        line_items: [
+          {
+            price: price.id,
+            quantity: 1,
+          },
+        ],
+        mode: "subscription",
+        billing_address_collection: 'required',
+        phone_number_collection: {
+          enabled: true
+        },
+        customer_creation: 'always',
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        subscription_data: subscriptionData,
+        metadata: {
+          program: program,
+          payment_type: programData.payment_type,
+          product_name: productName,
+        },
+      });
+
+    } else {
+      // Create one-time payment checkout session
+      logStep("Creating one-time payment checkout session");
+      
+      session = await stripe.checkout.sessions.create({
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: { 
+                name: productName,
+                description: productDescription,
+              },
+              unit_amount: chargeAmount,
+            },
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        payment_method_types: ['card'],
+        billing_address_collection: 'required',
+        phone_number_collection: {
+          enabled: true
+        },
+        customer_creation: 'always',
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        payment_intent_data: {
+          setup_future_usage: 'off_session',
+          metadata: {
+            program: program,
+            payment_type: programData.payment_type,
+            is_deposit: isDeposit ? 'true' : 'false',
+            product_name: productName,
+          },
+        },
+        metadata: {
+          program: program,
+          program_slug: program,
+          payment_type: programData.payment_type,
+          product_name: productName,
+        },
+      });
+    }
+
+    logStep("Stripe checkout session created", { sessionId: session.id, mode: session.mode });
+
+    // Return session URL directly
     return new Response(JSON.stringify({ 
       url: session.url,
       sessionId: session.id
