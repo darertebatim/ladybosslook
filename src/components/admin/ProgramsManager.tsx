@@ -25,6 +25,7 @@ interface ProgramCatalog {
   duration?: string | null;
   delivery_method?: string | null;
   subscription_full_payment_discount?: number | null;
+  subscription_full_payment_price?: number | null;
   description?: string | null;
   features?: any;
   is_active: boolean;
@@ -57,6 +58,7 @@ export function ProgramsManager() {
     subscription_duration: '',
     subscription_interval: 'month' as string,
     subscription_interval_count: 1 as number,
+    subscription_full_payment_price: 0,
     subscription_full_payment_discount: 0,
     description: '',
     is_active: true,
@@ -122,6 +124,7 @@ export function ProgramsManager() {
       subscription_duration: '',
       subscription_interval: 'month',
       subscription_interval_count: 1,
+      subscription_full_payment_price: 0,
       subscription_full_payment_discount: 0,
       description: '',
       is_active: true,
@@ -195,6 +198,7 @@ export function ProgramsManager() {
       subscription_duration: (program as any).subscription_duration || '',
       subscription_interval: (program as any).subscription_interval || 'month',
       subscription_interval_count: (program as any).subscription_interval_count || 1,
+      subscription_full_payment_price: (program as any).subscription_full_payment_price || 0,
       subscription_full_payment_discount: program.subscription_full_payment_discount || 0,
       description: program.description || '',
       is_active: program.is_active,
@@ -591,19 +595,34 @@ export function ProgramsManager() {
                 )}
 
                 {formData.payment_type === 'subscription' && (
-                  <div className="space-y-2">
-                    <Label htmlFor="subscription_discount">Full Payment Amount ($)</Label>
-                    <Input
-                      id="subscription_discount"
-                      type="number"
-                      value={formData.subscription_full_payment_discount / 100}
-                      onChange={(e) => setFormData({ ...formData, subscription_full_payment_discount: Math.round(parseFloat(e.target.value || '0') * 100) })}
-                      placeholder="e.g., 800 for $800 total"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Total amount if paying for entire subscription upfront: ${(formData.subscription_full_payment_discount / 100).toFixed(2)}
-                    </p>
-                  </div>
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="subscription_full_price">One-Time Full Payment ($)</Label>
+                      <Input
+                        id="subscription_full_price"
+                        type="number"
+                        value={formData.subscription_full_payment_price / 100}
+                        onChange={(e) => setFormData({ ...formData, subscription_full_payment_price: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                        placeholder="e.g., 1194"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Full: ${(formData.subscription_full_payment_price / 100).toFixed(2)} (pay once instead of monthly)
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="subscription_discount">Savings Amount ($)</Label>
+                      <Input
+                        id="subscription_discount"
+                        type="number"
+                        value={formData.subscription_full_payment_discount / 100}
+                        onChange={(e) => setFormData({ ...formData, subscription_full_payment_discount: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                        placeholder="e.g., 597"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Savings: ${(formData.subscription_full_payment_discount / 100).toFixed(2)} off monthly total
+                      </p>
+                    </div>
+                  </>
                 )}
 
                 <div className="space-y-2">

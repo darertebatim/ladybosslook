@@ -626,6 +626,7 @@ export type Database = {
           stripe_payment_link: string | null
           subscription_duration: string | null
           subscription_full_payment_discount: number | null
+          subscription_full_payment_price: number | null
           subscription_interval: string | null
           subscription_interval_count: number | null
           title: string
@@ -660,6 +661,7 @@ export type Database = {
           stripe_payment_link?: string | null
           subscription_duration?: string | null
           subscription_full_payment_discount?: number | null
+          subscription_full_payment_price?: number | null
           subscription_interval?: string | null
           subscription_interval_count?: number | null
           title: string
@@ -694,6 +696,7 @@ export type Database = {
           stripe_payment_link?: string | null
           subscription_duration?: string | null
           subscription_full_payment_discount?: number | null
+          subscription_full_payment_price?: number | null
           subscription_interval?: string | null
           subscription_interval_count?: number | null
           title?: string
