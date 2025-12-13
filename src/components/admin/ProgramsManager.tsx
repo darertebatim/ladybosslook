@@ -55,6 +55,8 @@ export function ProgramsManager() {
     duration: '',
     delivery_method: 'on-demand',
     subscription_duration: '',
+    subscription_interval: 'month' as string,
+    subscription_interval_count: 1 as number,
     subscription_full_payment_discount: 0,
     description: '',
     is_active: true,
@@ -113,6 +115,8 @@ export function ProgramsManager() {
       duration: '',
       delivery_method: 'on-demand',
       subscription_duration: '',
+      subscription_interval: 'month',
+      subscription_interval_count: 1,
       subscription_full_payment_discount: 0,
       description: '',
       is_active: true,
@@ -180,6 +184,8 @@ export function ProgramsManager() {
       duration: program.duration || '',
       delivery_method: program.delivery_method || 'on-demand',
       subscription_duration: (program as any).subscription_duration || '',
+      subscription_interval: (program as any).subscription_interval || 'month',
+      subscription_interval_count: (program as any).subscription_interval_count || 1,
       subscription_full_payment_discount: program.subscription_full_payment_discount || 0,
       description: program.description || '',
       is_active: program.is_active,
@@ -392,21 +398,42 @@ export function ProgramsManager() {
                 </div>
 
                 {formData.payment_type === 'subscription' && (
-                  <div className="space-y-2">
-                    <Label htmlFor="subscription_duration">Subscription Duration</Label>
-                    <Select value={formData.subscription_duration} onValueChange={(value) => setFormData({ ...formData, subscription_duration: value })}>
-                      <SelectTrigger id="subscription_duration">
-                        <SelectValue placeholder="Select duration" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1-month">1 Month</SelectItem>
-                        <SelectItem value="3-months">3 Months</SelectItem>
-                        <SelectItem value="6-months">6 Months</SelectItem>
-                        <SelectItem value="9-months">9 Months</SelectItem>
-                        <SelectItem value="12-months">12 Months</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="subscription_interval">Billing Interval</Label>
+                      <Select value={formData.subscription_interval} onValueChange={(value) => setFormData({ ...formData, subscription_interval: value })}>
+                        <SelectTrigger id="subscription_interval">
+                          <SelectValue placeholder="Select interval" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="week">Weekly</SelectItem>
+                          <SelectItem value="month">Monthly</SelectItem>
+                          <SelectItem value="year">Yearly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="subscription_interval_count">Number of Payments (Auto-Cancel After)</Label>
+                      <Select 
+                        value={String(formData.subscription_interval_count)} 
+                        onValueChange={(value) => setFormData({ ...formData, subscription_interval_count: parseInt(value) })}
+                      >
+                        <SelectTrigger id="subscription_interval_count">
+                          <SelectValue placeholder="Select count" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">1</SelectItem>
+                          <SelectItem value="3">3</SelectItem>
+                          <SelectItem value="6">6</SelectItem>
+                          <SelectItem value="9">9</SelectItem>
+                          <SelectItem value="12">12</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">
+                        Subscription auto-cancels after {formData.subscription_interval_count} {formData.subscription_interval}(s)
+                      </p>
+                    </div>
+                  </>
                 )}
 
                 <div className="space-y-2">
