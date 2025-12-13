@@ -3,13 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Check, MessageCircle, Sparkles, Calendar, Users } from "lucide-react";
+import { Loader2, Check, MessageCircle, Sparkles, Calendar, Users, Gift } from "lucide-react";
 
 const EWPlus = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMonthly, setIsLoadingMonthly] = useState(false);
+  const [isLoadingFull, setIsLoadingFull] = useState(false);
 
-  const handlePayment = async () => {
-    setIsLoading(true);
+  const handleMonthlyPayment = async () => {
+    setIsLoadingMonthly(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: { program: 'ewpluscoaching' }
@@ -23,7 +24,26 @@ const EWPlus = () => {
       console.error('Payment error:', error);
       toast.error('خطا در اتصال به درگاه پرداخت');
     } finally {
-      setIsLoading(false);
+      setIsLoadingMonthly(false);
+    }
+  };
+
+  const handleFullPayment = async () => {
+    setIsLoadingFull(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: { program: 'ewpluscoaching-full' }
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error('خطا در اتصال به درگاه پرداخت');
+    } finally {
+      setIsLoadingFull(false);
     }
   };
 
@@ -70,12 +90,12 @@ const EWPlus = () => {
           </ul>
         </Card>
 
-        {/* Pricing Card */}
-        <Card className="p-6 mb-8 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+        {/* Monthly Payment Card (Primary) */}
+        <Card className="p-6 mb-4 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Calendar className="h-5 w-5 text-primary" />
-              <span className="text-muted-foreground">۹ ماه عضویت</span>
+              <span className="text-muted-foreground font-medium">پرداخت ماهانه</span>
             </div>
             
             {/* Savings highlight */}
@@ -91,16 +111,16 @@ const EWPlus = () => {
             </div>
             
             <p className="text-sm text-muted-foreground mb-6">
-              مجموع: $۱,۷۹۱ برای ۹ ماه (صرفه‌جویی $۹۰۰)
+              ۹ ماه × $۱۹۹ = مجموع $۱,۷۹۱
             </p>
 
             <Button
-              onClick={handlePayment}
-              disabled={isLoading}
+              onClick={handleMonthlyPayment}
+              disabled={isLoadingMonthly}
               size="lg"
               className="w-full py-6 text-lg font-bold"
             >
-              {isLoading ? (
+              {isLoadingMonthly ? (
                 <>
                   <Loader2 className="ml-2 h-5 w-5 animate-spin" />
                   در حال اتصال...
@@ -113,6 +133,55 @@ const EWPlus = () => {
             <p className="text-xs text-muted-foreground mt-3">
               اشتراک پس از ۹ ماه به‌صورت خودکار متوقف می‌شود
             </p>
+          </div>
+        </Card>
+
+        {/* Divider */}
+        <div className="flex items-center gap-4 my-6">
+          <div className="flex-1 h-px bg-border"></div>
+          <span className="text-muted-foreground text-sm font-medium">یا</span>
+          <div className="flex-1 h-px bg-border"></div>
+        </div>
+
+        {/* One-Time Full Payment Card (Secondary) */}
+        <Card className="p-6 mb-8 border border-border/50 bg-card/30">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Gift className="h-5 w-5 text-orange-500" />
+              <span className="text-muted-foreground font-medium">پرداخت یکجا</span>
+            </div>
+            
+            {/* Free months highlight */}
+            <div className="inline-flex items-center gap-2 bg-orange-500/10 text-orange-600 px-4 py-2 rounded-full text-sm font-medium mb-4">
+              🎁 ۳ ماه رایگان!
+            </div>
+
+            {/* Price comparison */}
+            <div className="flex items-baseline justify-center gap-3 mb-2">
+              <span className="text-xl text-muted-foreground line-through">$1,791</span>
+              <span className="text-3xl font-bold text-orange-600">$1,194</span>
+            </div>
+            
+            <p className="text-sm text-green-600 font-medium mb-6">
+              صرفه‌جویی $۵۹۷
+            </p>
+
+            <Button
+              onClick={handleFullPayment}
+              disabled={isLoadingFull}
+              variant="outline"
+              size="lg"
+              className="w-full py-6 text-lg font-bold border-orange-500/30 hover:bg-orange-500/10"
+            >
+              {isLoadingFull ? (
+                <>
+                  <Loader2 className="ml-2 h-5 w-5 animate-spin" />
+                  در حال اتصال...
+                </>
+              ) : (
+                "پرداخت یکجا"
+              )}
+            </Button>
           </div>
         </Card>
 
