@@ -26,8 +26,8 @@ const Floew = () => {
         {/* Buttons */}
         <div className="space-y-4">
           <a 
-            href="https://ladybossnew.com/pziran" 
-            target="_blank" 
+            href="https://ladybossnew.com/5chiran" 
+            target="_blank"
             rel="noopener noreferrer"
             className="block w-full"
           >
