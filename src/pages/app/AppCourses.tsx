@@ -4,13 +4,25 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
-import { BookOpen, Clock } from 'lucide-react';
+import { BookOpen, Clock, Sparkles } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { isNativeApp } from '@/lib/platform';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
+import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 
 const AppCourses = () => {
   const { user } = useAuth();
+  
+  // Get unseen content - wrap in try/catch in case provider is missing
+  let unseenEnrollments = new Set<string>();
+  let markEnrollmentViewed: ((id: string) => Promise<void>) | null = null;
+  try {
+    const unseenContent = useUnseenContentContext();
+    unseenEnrollments = unseenContent.unseenEnrollments;
+    markEnrollmentViewed = unseenContent.markEnrollmentViewed;
+  } catch {
+    // Provider not available, ignore
+  }
 
   const { data: enrollments, isLoading } = useQuery({
     queryKey: ['course-enrollments', user?.id],
@@ -80,16 +92,33 @@ const AppCourses = () => {
             </Card>
           ) : (
             <div className="space-y-4">
-              {enrollments?.map((enrollment) => (
+              {enrollments?.map((enrollment) => {
+                const isUnseen = unseenEnrollments.has(enrollment.id);
+                
+                return (
                 <Link
                   key={enrollment.id}
                   to={`/app/course/${enrollment.program_slug || 'course'}`}
+                  onClick={() => {
+                    // Mark as viewed when clicked
+                    if (isUnseen && markEnrollmentViewed) {
+                      markEnrollmentViewed(enrollment.id);
+                    }
+                  }}
                 >
-                  <Card className="hover:border-primary transition-colors">
+                  <Card className={`transition-colors active:scale-[0.98] ${isUnseen ? 'border-primary border-2' : 'border'}`}>
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-lg">{enrollment.course_name}</CardTitle>
+                          <div className="flex items-center gap-2">
+                            <CardTitle className="text-lg">{enrollment.course_name}</CardTitle>
+                            {isUnseen && (
+                              <Badge variant="default" className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 h-auto">
+                                <Sparkles className="h-3 w-3 mr-0.5" />
+                                New
+                              </Badge>
+                            )}
+                          </div>
                           <CardDescription className="mt-2 space-y-1">
                             {enrollment.program_rounds && (
                               <div className="flex items-center gap-1.5">
@@ -117,7 +146,8 @@ const AppCourses = () => {
                     </CardHeader>
                   </Card>
                 </Link>
-              ))}
+              );
+              })}
             </div>
           )}
         </div>

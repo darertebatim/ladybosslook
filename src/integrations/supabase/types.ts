@@ -1095,6 +1095,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_content_views: {
+        Row: {
+          content_id: string
+          content_type: string
+          content_updated_at: string | null
+          created_at: string
+          id: string
+          last_viewed_at: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          content_updated_at?: string | null
+          created_at?: string
+          id?: string
+          last_viewed_at?: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          content_updated_at?: string | null
+          created_at?: string
+          id?: string
+          last_viewed_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

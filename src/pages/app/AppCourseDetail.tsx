@@ -21,6 +21,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { shouldShowEnrollmentReminder } from '@/hooks/useNotificationReminder';
 import { subscribeToPushNotifications, checkPermissionStatus } from '@/lib/pushNotifications';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 
 const AppCourseDetail = () => {
   const { slug } = useParams();
@@ -32,8 +33,17 @@ const AppCourseDetail = () => {
   const [isSyncingAllSessions, setIsSyncingAllSessions] = useState(false);
   const [hasNewSessions, setHasNewSessions] = useState(false);
   const [addingSessionId, setAddingSessionId] = useState<string | null>(null);
-
-  // Fetch enrollment and round data
+  
+  // Get unseen content functions for view tracking
+  let markEnrollmentViewed: ((id: string) => Promise<void>) | null = null;
+  let markRoundViewed: ((id: string) => Promise<void>) | null = null;
+  try {
+    const unseenContent = useUnseenContentContext();
+    markEnrollmentViewed = unseenContent.markEnrollmentViewed;
+    markRoundViewed = unseenContent.markRoundViewed;
+  } catch {
+    // Provider not available, ignore
+  }
   const { data: enrollment, isLoading: enrollmentLoading } = useQuery({
     queryKey: ['course-enrollment', slug],
     queryFn: async () => {
@@ -51,6 +61,16 @@ const AppCourseDetail = () => {
       return data;
     },
   });
+
+  // Track view when enrollment data loads
+  useEffect(() => {
+    if (enrollment?.id && markEnrollmentViewed) {
+      markEnrollmentViewed(enrollment.id);
+    }
+    if (enrollment?.program_rounds?.id && markRoundViewed) {
+      markRoundViewed(enrollment.program_rounds.id);
+    }
+  }, [enrollment?.id, enrollment?.program_rounds?.id, markEnrollmentViewed, markRoundViewed]);
 
   // Fetch user profile for WhatsApp message
   const { data: profile } = useQuery({

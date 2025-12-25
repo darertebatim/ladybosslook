@@ -7,8 +7,8 @@ import { checkPermissionStatus } from '@/lib/pushNotifications';
 import { PushNotificationPrompt } from '@/components/app/PushNotificationPrompt';
 import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { useChatNotifications } from '@/hooks/useChatNotifications';
+import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-
 /**
  * Native app layout - Clean layout specifically for iOS/Android native apps
  */
@@ -44,9 +44,18 @@ const NativeAppLayout = () => {
     checkPrompt();
   }, [user?.id]);
 
+  // Get unseen content - wrap in try/catch in case provider is missing
+  let hasUnseenCourses = false;
+  try {
+    const unseenContent = useUnseenContentContext();
+    hasUnseenCourses = unseenContent.hasUnseenCourses;
+  } catch {
+    // Provider not available, ignore
+  }
+
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home' },
-    { path: '/app/courses', icon: BookOpen, label: 'Courses' },
+    { path: '/app/courses', icon: BookOpen, label: 'Courses', showBadge: hasUnseenCourses },
     { path: '/app/browse', icon: ShoppingBag, label: 'Browse' },
     { path: '/app/player', icon: Headphones, label: 'Player' },
     { path: '/app/support-chat', icon: MessageCircle, label: 'Chat' },
@@ -69,7 +78,8 @@ const NativeAppLayout = () => {
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               const Icon = item.icon;
-              const showBadge = item.path === '/app/support-chat' && unreadCount > 0;
+              const showChatBadge = item.path === '/app/support-chat' && unreadCount > 0;
+              const showBadge = showChatBadge || item.showBadge;
               return (
                 <Link
                   key={item.path}
@@ -82,10 +92,13 @@ const NativeAppLayout = () => {
                 >
                   <div className="relative">
                     <Icon className={`h-6 w-6 ${isActive ? 'fill-current' : ''}`} />
-                    {showBadge && (
+                    {showChatBadge && (
                       <span className="absolute -top-1 -right-2 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
+                    )}
+                    {item.showBadge && !showChatBadge && (
+                      <span className="absolute -top-0.5 -right-0.5 bg-primary w-2.5 h-2.5 rounded-full" />
                     )}
                   </div>
                   <span className="text-xs font-medium">{item.label}</span>
@@ -140,4 +153,11 @@ const NativeAppLayout = () => {
   );
 };
 
-export default NativeAppLayout;
+// Wrap with provider
+const NativeAppLayoutWithProvider = () => (
+  <UnseenContentProvider>
+    <NativeAppLayout />
+  </UnseenContentProvider>
+);
+
+export default NativeAppLayoutWithProvider;
