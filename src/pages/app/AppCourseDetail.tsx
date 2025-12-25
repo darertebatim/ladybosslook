@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { downloadICSFile, generateICSFile } from '@/utils/calendar';
+import { addEventToCalendar, isCalendarAvailable } from '@/lib/calendarIntegration';
 import { format } from 'date-fns';
 import { toast } from "sonner";
 import { Share } from '@capacitor/share';
@@ -100,31 +101,41 @@ const AppCourseDetail = () => {
       location: round.google_meet_link || undefined,
     };
 
-    // Native iOS: Use Share API to let user add to calendar
-    if (isNativeApp()) {
+    // Native iOS/Android: Use native calendar integration
+    if (isNativeApp() && isCalendarAvailable()) {
       try {
-        const icsContent = generateICSFile(event);
-        const fileName = `${program.title.replace(/\s+/g, '-')}.ics`;
-        
-        // Write file to temporary directory
-        const result = await Filesystem.writeFile({
-          path: fileName,
-          data: icsContent,
-          directory: Directory.Cache,
+        const result = await addEventToCalendar({
+          ...event,
+          reminderMinutes: 60, // 1 hour reminder
         });
+        
+        if (result.success) {
+          toast.success('Session added to your calendar!');
+        } else if (result.error === 'Calendar permission denied') {
+          toast.error('Please allow calendar access in Settings');
+        } else {
+          // Fallback to share sheet if native calendar fails
+          const icsContent = generateICSFile(event);
+          const fileName = `${program.title.replace(/\s+/g, '-')}.ics`;
+          
+          const fileResult = await Filesystem.writeFile({
+            path: fileName,
+            data: icsContent,
+            directory: Directory.Cache,
+          });
 
-        // Share the file - iOS will show "Add to Calendar" option
-        await Share.share({
-          title: 'Add to Calendar',
-          text: `${event.title}`,
-          url: result.uri,
-          dialogTitle: 'Add Event to Calendar'
-        });
-        
-        toast.success('Select Calendar app to add event');
+          await Share.share({
+            title: 'Add to Calendar',
+            text: `${event.title}`,
+            url: fileResult.uri,
+            dialogTitle: 'Add Event to Calendar'
+          });
+          
+          toast.success('Select Calendar app to add event');
+        }
       } catch (error) {
-        console.error('Error sharing calendar event:', error);
-        toast.error('Failed to open calendar');
+        console.error('Error adding calendar event:', error);
+        toast.error('Failed to add to calendar');
       }
     } else {
       // Web: Download ICS file
