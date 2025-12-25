@@ -182,9 +182,9 @@ export function ActiveRound() {
                 </CardContent>
                 
                 {/* Clear CTA footer to indicate tappability */}
-                <div className="mt-3 bg-primary/10 px-4 py-3 flex items-center justify-between">
-                  <span className="text-sm font-medium text-primary">View Schedule & Materials</span>
-                  <ArrowRight className="h-4 w-4 text-primary" />
+                <div className="mt-3 bg-foreground px-4 py-3 flex items-center justify-between">
+                  <span className="text-sm font-medium text-background">View Schedule & Materials</span>
+                  <ArrowRight className="h-4 w-4 text-background" />
                 </div>
               </Card>
             </Link>
