@@ -878,6 +878,8 @@ export type Database = {
           round_number: number
           start_date: string
           status: string
+          support_link_label: string | null
+          support_link_url: string | null
           updated_at: string
           video_url: string | null
           whatsapp_support_number: string | null
@@ -898,6 +900,8 @@ export type Database = {
           round_number: number
           start_date: string
           status?: string
+          support_link_label?: string | null
+          support_link_url?: string | null
           updated_at?: string
           video_url?: string | null
           whatsapp_support_number?: string | null
@@ -918,6 +922,8 @@ export type Database = {
           round_number?: number
           start_date?: string
           status?: string
+          support_link_label?: string | null
+          support_link_url?: string | null
           updated_at?: string
           video_url?: string | null
           whatsapp_support_number?: string | null
