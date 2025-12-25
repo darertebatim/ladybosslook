@@ -336,3 +336,91 @@ export async function unsubscribeFromPushNotifications(userId: string): Promise<
     return { success: false, error: error.message || 'Failed to unsubscribe' };
   }
 }
+
+// Get registration status - useful for UI states
+export async function getRegistrationStatus(): Promise<{
+  isRegistered: boolean;
+  permission: NotificationPermission;
+  deviceCount: number;
+}> {
+  if (!Capacitor.isNativePlatform()) {
+    return { isRegistered: false, permission: 'denied', deviceCount: 0 };
+  }
+
+  const permission = await checkPermissionStatus();
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { isRegistered: false, permission, deviceCount: 0 };
+  }
+
+  const { data: subscriptions } = await supabase
+    .from('push_subscriptions')
+    .select('id')
+    .eq('user_id', user.id);
+
+  const deviceCount = subscriptions?.length || 0;
+  const isRegistered = deviceCount > 0;
+
+  console.log('[Push] Registration status:', { isRegistered, permission, deviceCount });
+  return { isRegistered, permission, deviceCount };
+}
+
+// Refresh device token on app startup - ensures tokens stay valid
+export async function refreshDeviceToken(userId: string): Promise<void> {
+  if (!Capacitor.isNativePlatform()) {
+    return;
+  }
+
+  const permission = await checkPermissionStatus();
+  if (permission !== 'granted') {
+    console.log('[Push] Permission not granted, skipping token refresh');
+    return;
+  }
+
+  console.log('[Push] 🔄 Refreshing device token on app startup...');
+
+  try {
+    // Re-register to get fresh token from APNs
+    const result = await new Promise<{ success: boolean; token?: string }>((resolve) => {
+      const timeout = setTimeout(() => {
+        resolve({ success: false });
+      }, 10000);
+
+      PushNotifications.addListener('registration', async (token) => {
+        clearTimeout(timeout);
+        resolve({ success: true, token: token.value });
+      });
+
+      PushNotifications.addListener('registrationError', () => {
+        clearTimeout(timeout);
+        resolve({ success: false });
+      });
+
+      PushNotifications.register();
+    });
+
+    if (result.success && result.token) {
+      // Upsert the token (will update if exists, insert if new)
+      const { error } = await supabase
+        .from('push_subscriptions')
+        .upsert(
+          {
+            user_id: userId,
+            endpoint: `native:${result.token}`,
+            p256dh_key: 'native-ios',
+            auth_key: 'native-ios',
+          },
+          { onConflict: 'user_id,endpoint' }
+        );
+
+      if (error) {
+        console.error('[Push] ❌ Failed to refresh token in database:', error);
+      } else {
+        console.log('[Push] ✅ Device token refreshed successfully');
+      }
+    }
+  } catch (error) {
+    console.error('[Push] ❌ Error refreshing device token:', error);
+  }
+}

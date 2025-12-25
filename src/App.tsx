@@ -7,8 +7,10 @@ import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { isNativeApp } from "@/lib/platform";
-import { registerNavigationCallback } from "@/lib/pushNotifications";
+import { registerNavigationCallback, refreshDeviceToken, initializePushNotificationHandlers, clearBadge } from "@/lib/pushNotifications";
 import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Capacitor } from "@capacitor/core";
 import PlatformAwareAppLayout from "@/layouts/PlatformAwareAppLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import AppHome from "@/pages/app/AppHome";
@@ -74,7 +76,7 @@ import AppMarketing from "./pages/AppMarketing";
 
 const queryClient = new QueryClient();
 
-// Native App Router - Registers deep linking navigation callback
+// Native App Router - Registers deep linking navigation callback and refreshes tokens
 const NativeAppRedirect = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -87,6 +89,22 @@ const NativeAppRedirect = () => {
         console.log('[App] Navigation callback triggered, navigating to:', url);
         navigate(url);
       });
+
+      // Initialize push notification handlers once
+      initializePushNotificationHandlers();
+      
+      // Clear badge on app open
+      clearBadge();
+      
+      // Refresh device token on app startup
+      const refreshToken = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          console.log('[App] Refreshing push notification token for user:', user.id);
+          await refreshDeviceToken(user.id);
+        }
+      };
+      refreshToken();
     }
   }, [navigate]);
   
