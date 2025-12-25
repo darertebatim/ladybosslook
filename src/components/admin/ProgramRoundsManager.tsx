@@ -60,7 +60,8 @@ interface RoundFormData {
   first_session_duration: string;
   first_session_timezone: string;
   important_message: string;
-  whatsapp_support_number: string;
+  support_link_url: string;
+  support_link_label: string;
   audio_playlist_id: string;
   video_url: string;
 }
@@ -83,7 +84,8 @@ export const ProgramRoundsManager = () => {
     first_session_duration: "90",
     first_session_timezone: "America/New_York",
     important_message: "",
-    whatsapp_support_number: "",
+    support_link_url: "",
+    support_link_label: "",
     audio_playlist_id: "none",
     video_url: "",
   });
@@ -159,7 +161,8 @@ export const ProgramRoundsManager = () => {
         first_session_date: firstSessionISO,
         first_session_duration: data.first_session_duration ? parseInt(data.first_session_duration) : 90,
         important_message: data.important_message || null,
-        whatsapp_support_number: data.whatsapp_support_number || null,
+        support_link_url: data.support_link_url || null,
+        support_link_label: data.support_link_label || null,
         audio_playlist_id: data.audio_playlist_id === "none" ? null : data.audio_playlist_id || null,
         video_url: data.video_url || null,
       };
@@ -220,7 +223,8 @@ export const ProgramRoundsManager = () => {
       first_session_duration: "90",
       first_session_timezone: "America/New_York",
       important_message: "",
-      whatsapp_support_number: "",
+      support_link_url: "",
+      support_link_label: "",
       audio_playlist_id: "none",
       video_url: "",
     });
@@ -259,7 +263,8 @@ export const ProgramRoundsManager = () => {
       first_session_duration: round.first_session_duration?.toString() || "90",
       first_session_timezone: defaultTimezone,
       important_message: round.important_message || "",
-      whatsapp_support_number: round.whatsapp_support_number || "",
+      support_link_url: (round as any).support_link_url || "",
+      support_link_label: (round as any).support_link_label || "",
       audio_playlist_id: round.audio_playlist_id || "none",
       video_url: round.video_url || "",
     });
@@ -515,16 +520,30 @@ export const ProgramRoundsManager = () => {
               />
             </div>
 
-            <div className="space-y-2 mt-4">
-              <Label htmlFor="whatsapp_support_number">WhatsApp Support Number</Label>
+            <div className="space-y-2">
+              <Label htmlFor="support_link_url">Support Link URL (Optional)</Label>
               <Input
-                id="whatsapp_support_number"
-                type="tel"
-                value={formData.whatsapp_support_number}
-                onChange={(e) => setFormData({ ...formData, whatsapp_support_number: e.target.value })}
-                placeholder="e.g., +1234567890"
+                id="support_link_url"
+                type="url"
+                value={formData.support_link_url}
+                onChange={(e) => setFormData({ ...formData, support_link_url: e.target.value })}
+                placeholder="e.g., https://t.me/username or https://wa.me/1234567890"
               />
-              <p className="text-xs text-muted-foreground">Include country code (e.g., +1 for US)</p>
+              <p className="text-xs text-muted-foreground">
+                Telegram: https://t.me/username • WhatsApp: https://wa.me/1234567890
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="support_link_label">Support Button Label (Optional)</Label>
+              <Input
+                id="support_link_label"
+                type="text"
+                value={formData.support_link_label}
+                onChange={(e) => setFormData({ ...formData, support_link_label: e.target.value })}
+                placeholder="e.g., Contact Telegram Support"
+              />
+              <p className="text-xs text-muted-foreground">The text shown on the support button</p>
             </div>
 
             <div className="space-y-2 mt-4">

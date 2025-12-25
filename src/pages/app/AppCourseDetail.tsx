@@ -305,12 +305,9 @@ const AppCourseDetail = () => {
   };
 
   const handleContactSupport = () => {
-    if (!profile || !program) return;
-
-    const message = `Hi! I need support with my enrollment.\n\ni want activate my support\n\nName: ${profile.full_name || 'N/A'}\nEmail: ${profile.email}\nPhone: ${profile.phone || 'N/A'}\nCity: ${profile.city || 'N/A'}\nCourse: ${program.title}\nRound: ${round?.round_name || 'N/A'}`;
-    
-    const telegramUrl = `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
-    window.open(telegramUrl, '_blank');
+    // Open the customizable support link from the round
+    const supportUrl = (round as any)?.support_link_url || 'https://t.me/ladybosslook';
+    window.open(supportUrl, '_blank');
   };
 
   // Add single session to calendar
@@ -709,8 +706,8 @@ const AppCourseDetail = () => {
                     </Button>
                   )}
 
-                  {/* Contact Telegram Support */}
-                  {round.whatsapp_support_number && (
+                  {/* Contact Support - Customizable link */}
+                  {(round as any).support_link_url && (
                     <Button 
                       variant="default" 
                       size="lg" 
@@ -718,7 +715,7 @@ const AppCourseDetail = () => {
                       onClick={handleContactSupport}
                     >
                       <MessageCircle className="h-5 w-5 mr-2" />
-                      Contact Telegram Support
+                      {(round as any).support_link_label || 'Contact Support'}
                     </Button>
                   )}
 
