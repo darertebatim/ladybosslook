@@ -120,7 +120,16 @@ export default function PaymentSuccess() {
   };
 
   const createTelegramMessage = () => {
-    if (!orderDetails) return '';
+    // Always return a valid Telegram URL, even without order details
+    const baseUrl = 'https://t.me/ladybosslook';
+    
+    if (!orderDetails) {
+      // Fallback message when order details aren't available
+      const fallbackMessage = encodeURIComponent(
+        `Hello! I just completed my payment and need access to my course.\n\nPlease send me the workshop details and next steps. Thank you!`
+      );
+      return `${baseUrl}?text=${fallbackMessage}`;
+    }
     
     const workshop = getWorkshopDisplayName(orderDetails.product_name);
     const message = encodeURIComponent(
@@ -132,7 +141,7 @@ export default function PaymentSuccess() {
       `Amount Paid: ${formatPrice(orderDetails.amount)}\n\n` +
       `Please send me the workshop details and next steps. Thank you!`
     );
-    return `https://t.me/ladybosslook?text=${message}`;
+    return `${baseUrl}?text=${message}`;
   };
 
   if (isLoading) {
