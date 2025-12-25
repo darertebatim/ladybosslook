@@ -220,9 +220,9 @@ export default function AppPlaylistDetail() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header with safe area + visual padding */}
+      {/* Fixed Header with safe area + visual padding */}
       <div 
-        className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b"
+        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="pt-6 pb-3 px-4">
@@ -232,6 +232,9 @@ export default function AppPlaylistDetail() {
           </Button>
         </div>
       </div>
+
+      {/* Header spacer */}
+      <div style={{ height: 'calc(76px + env(safe-area-inset-top, 0px))' }} />
 
       {/* Playlist Info */}
       <div className="p-4 space-y-4">

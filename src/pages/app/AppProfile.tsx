@@ -256,18 +256,19 @@ const AppProfile = () => {
         description="Your profile settings"
       />
       
-      {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border pt-safe">
-        <div className="flex items-center h-14 px-4">
-          <div>
-            <h1 className="font-semibold text-lg">Profile</h1>
-            <p className="text-xs text-muted-foreground">Manage your account</p>
-          </div>
+      {/* Fixed Header with safe area */}
+      <header 
+        className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="pt-6 pb-3 px-4">
+          <h1 className="font-semibold text-lg">Profile</h1>
+          <p className="text-xs text-muted-foreground">Manage your account</p>
         </div>
       </header>
       
       {/* Header spacer */}
-      <div className="h-14 pt-safe" />
+      <div style={{ height: 'calc(76px + env(safe-area-inset-top, 0px))' }} />
       
       <div className="container max-w-4xl py-4 px-4">
       <div className="space-y-6">

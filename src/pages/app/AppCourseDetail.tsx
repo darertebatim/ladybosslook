@@ -177,27 +177,42 @@ const AppCourseDetail = () => {
   });
 
   return (
-    <div 
-      className="container max-w-4xl py-6 px-4"
-      style={{ paddingTop: 'calc(24px + env(safe-area-inset-top, 0px))' }}
-    >
-      <SEOHead 
-        title={`${program?.title || 'Course'} Details - LadyBoss Academy`}
-        description="Course details and materials"
-      />
-      
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <BookOpen className="h-8 w-8 text-primary" />
-          <div>
-            <h1 className="text-2xl font-bold">{program?.title || 'Course Details'}</h1>
+    <>
+      {/* Fixed Header with safe area */}
+      <div 
+        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="pt-6 pb-3 px-4 flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate(-1)}
+            className="shrink-0"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div className="min-w-0">
+            <h1 className="font-semibold text-lg truncate">{program?.title || 'Course Details'}</h1>
             {round && (
-              <p className="text-sm text-muted-foreground">
-                {round.round_name} • Round #{round.round_number}
+              <p className="text-xs text-muted-foreground truncate">
+                {round.round_name}
               </p>
             )}
           </div>
         </div>
+      </div>
+
+      {/* Header spacer */}
+      <div style={{ height: 'calc(76px + env(safe-area-inset-top, 0px))' }} />
+
+      <div className="container max-w-4xl py-4 px-4">
+        <SEOHead 
+          title={`${program?.title || 'Course'} Details - LadyBoss Academy`}
+          description="Course details and materials"
+        />
+        
+        <div className="space-y-6">
 
         {enrollmentLoading ? (
           <Card>
@@ -496,6 +511,7 @@ const AppCourseDetail = () => {
             </Card>
           </>
         )}
+        </div>
       </div>
 
       {/* Enrollment Reminder Popup */}
@@ -553,7 +569,7 @@ const AppCourseDetail = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 };
 
