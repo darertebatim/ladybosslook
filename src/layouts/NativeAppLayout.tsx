@@ -12,12 +12,13 @@ import { useChatNotifications } from '@/hooks/useChatNotifications';
  * Native app layout - Clean layout specifically for iOS/Android native apps
  */
 const NativeAppLayout = () => {
+  // All hooks must be called unconditionally at the top
   const location = useLocation();
   const { user } = useAuth();
-  const { unreadCount } = useUnreadChat();
   const [showPrompt, setShowPrompt] = useState(false);
   
-  // Enable in-app chat notifications
+  // Custom hooks after useState declarations
+  const { unreadCount } = useUnreadChat();
   useChatNotifications();
 
   useEffect(() => {

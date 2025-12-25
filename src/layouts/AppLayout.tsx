@@ -10,14 +10,15 @@ import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { useChatNotifications } from '@/hooks/useChatNotifications';
 
 const AppLayout = () => {
+  // All hooks must be called unconditionally at the top
   const location = useLocation();
   const { user } = useAuth();
-  const { unreadCount } = useUnreadChat();
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   
-  // Enable in-app chat notifications
+  // Custom hooks after useState declarations
+  const { unreadCount } = useUnreadChat();
   useChatNotifications();
 
   // Only show notification prompt on native iOS
