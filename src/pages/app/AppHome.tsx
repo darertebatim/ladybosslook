@@ -7,7 +7,7 @@ import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
 import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
-import { Send, Mail, Bell, ArrowRight } from 'lucide-react';
+import { Send, Mail, Bell, ArrowRight, User } from 'lucide-react';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
 import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
@@ -159,9 +159,19 @@ const AppHome = () => {
           </Alert>
         )}
 
-        <div>
-          <h1 className="text-2xl font-bold mb-1">Welcome back!</h1>
-          <p className="text-sm text-muted-foreground">{user?.email}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold mb-1">Welcome back!</h1>
+            <p className="text-sm text-muted-foreground">{user?.email}</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/app/profile')}
+            className="rounded-full"
+          >
+            <User className="h-6 w-6" />
+          </Button>
         </div>
 
         {enrollments?.length === 0 ? (
