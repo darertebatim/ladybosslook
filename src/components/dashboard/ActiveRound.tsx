@@ -93,8 +93,8 @@ export function ActiveRound() {
 
           return (
             <Link key={enrollment.id} to={`/app/course/${enrollment.program_slug}`}>
-              <Card className="hover:border-primary transition-all hover:shadow-md">
-                <CardContent className="p-4">
+              <Card className="hover:border-primary transition-all hover:shadow-md overflow-hidden">
+                <CardContent className="p-4 pb-0">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
@@ -133,10 +133,6 @@ export function ActiveRound() {
                         )}
                       </div>
                     </div>
-                    
-                    <Button size="icon" variant="ghost" className="shrink-0">
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
                   </div>
 
                   {round.video_url && (() => {
@@ -184,6 +180,12 @@ export function ActiveRound() {
                     </div>
                   )}
                 </CardContent>
+                
+                {/* Clear CTA footer to indicate tappability */}
+                <div className="mt-3 bg-primary/10 px-4 py-3 flex items-center justify-between">
+                  <span className="text-sm font-medium text-primary">View Schedule & Materials</span>
+                  <ArrowRight className="h-4 w-4 text-primary" />
+                </div>
               </Card>
             </Link>
           );
