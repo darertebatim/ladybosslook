@@ -7,7 +7,7 @@ import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
 import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Bell, ArrowRight, User } from 'lucide-react';
+import { MessageCircle, Bell, ArrowRight, User, Send, Mail } from 'lucide-react';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
 import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
@@ -77,6 +77,18 @@ const AppHome = () => {
     },
     enabled: !!user?.id,
   });
+
+  const handleContactSupport = () => {
+    const message = `Hi! I need support.\n\nName: ${profile?.full_name || 'N/A'}\nEmail: ${profile?.email || user?.email || 'N/A'}\nPhone: ${profile?.phone || 'N/A'}\nCity: ${profile?.city || 'N/A'}`;
+    const telegramUrl = `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
+    window.open(telegramUrl, '_blank');
+  };
+
+  const handleEmailSupport = () => {
+    const subject = 'Support Request';
+    const body = `Hi! I need support.\n\nName: ${profile?.full_name || 'N/A'}\nEmail: ${profile?.email || user?.email || 'N/A'}\nPhone: ${profile?.phone || 'N/A'}\nCity: ${profile?.city || 'N/A'}`;
+    window.location.href = `mailto:support@ladybosslook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
 
 
   const { data: enrollments } = useQuery({
@@ -193,6 +205,27 @@ const AppHome = () => {
             </>
           )}
           
+          {/* External Support Options */}
+          <div className="flex flex-col items-center gap-3">
+            <Button
+              size="lg"
+              onClick={handleContactSupport}
+              className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
+            >
+              <Send className="mr-2 h-5 w-5" />
+              Contact Support on Telegram
+            </Button>
+            
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={handleEmailSupport}
+              className="w-full sm:w-auto"
+            >
+              <Mail className="mr-2 h-5 w-5" />
+              Email Support (if no Telegram)
+            </Button>
+          </div>
         </div>
       </div>
     </>
