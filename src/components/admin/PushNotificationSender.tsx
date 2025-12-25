@@ -21,10 +21,22 @@ interface NotificationFormProps {
   environment: 'development' | 'production';
 }
 
+// Common in-app link options
+const IN_APP_LINKS = [
+  { value: '/app/home', label: 'Home' },
+  { value: '/app/courses', label: 'My Courses' },
+  { value: '/app/browse', label: 'Browse Store' },
+  { value: '/app/player', label: 'Audio Player' },
+  { value: '/app/support-chat', label: 'Support Chat' },
+  { value: '/app/profile', label: 'Profile' },
+  { value: 'custom', label: '✏️ Custom URL...' },
+];
+
 function NotificationForm({ environment }: NotificationFormProps) {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
-  const [destinationUrl, setDestinationUrl] = useState('/app/home');
+  const [linkType, setLinkType] = useState('/app/home');
+  const [customUrl, setCustomUrl] = useState('');
   const [targetType, setTargetType] = useState<'all' | 'course' | 'user'>('all');
   const [targetCourse, setTargetCourse] = useState('');
   const [targetRoundId, setTargetRoundId] = useState('all-rounds');
@@ -36,6 +48,9 @@ function NotificationForm({ environment }: NotificationFormProps) {
   // Character limits
   const TITLE_LIMIT = 50;
   const MESSAGE_LIMIT = 200;
+
+  // Compute the actual destination URL
+  const destinationUrl = linkType === 'custom' ? customUrl : linkType;
 
   // Fetch rounds for the selected course
   const { data: rounds } = useQuery({
@@ -159,7 +174,8 @@ function NotificationForm({ environment }: NotificationFormProps) {
       // Reset form
       setTitle('');
       setMessage('');
-      setDestinationUrl('/app/home');
+      setLinkType('/app/home');
+      setCustomUrl('');
       setTargetType('all');
       setTargetCourse('');
       setTargetRoundId('all-rounds');
@@ -211,16 +227,46 @@ function NotificationForm({ environment }: NotificationFormProps) {
         </p>
       </div>
 
-      {/* Destination URL */}
-      <div>
-        <Label htmlFor={`url-${environment}`}>Destination URL (optional)</Label>
-        <Input
-          id={`url-${environment}`}
-          value={destinationUrl}
-          onChange={(e) => setDestinationUrl(e.target.value)}
-          placeholder="/app/home"
-        />
-        <p className="text-xs text-muted-foreground mt-1">
+      {/* Destination Link */}
+      <div className="space-y-2">
+        <Label htmlFor={`link-${environment}`}>Destination Link</Label>
+        <Select value={linkType} onValueChange={setLinkType}>
+          <SelectTrigger id={`link-${environment}`}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {IN_APP_LINKS.map((link) => (
+              <SelectItem key={link.value} value={link.value}>
+                {link.label}
+              </SelectItem>
+            ))}
+            {/* Dynamic course links based on programs */}
+            {programs.length > 0 && (
+              <>
+                <SelectItem value="divider" disabled className="text-xs text-muted-foreground">
+                  ── Course Pages ──
+                </SelectItem>
+                {programs.map((program) => (
+                  <SelectItem key={program.slug} value={`/app/course/${program.slug}`}>
+                    📚 {program.title}
+                  </SelectItem>
+                ))}
+              </>
+            )}
+          </SelectContent>
+        </Select>
+        
+        {/* Custom URL input */}
+        {linkType === 'custom' && (
+          <Input
+            value={customUrl}
+            onChange={(e) => setCustomUrl(e.target.value)}
+            placeholder="/app/course/my-course or https://..."
+            className="mt-2"
+          />
+        )}
+        
+        <p className="text-xs text-muted-foreground">
           Where users go when they tap the notification
         </p>
       </div>
