@@ -564,6 +564,60 @@ export type Database = {
         }
         Relationships: []
       }
+      home_banners: {
+        Row: {
+          background_color: string | null
+          button_text: string | null
+          button_url: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          ends_at: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          priority: number | null
+          starts_at: string | null
+          title: string
+          updated_at: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          background_color?: string | null
+          button_text?: string | null
+          button_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          priority?: number | null
+          starts_at?: string | null
+          title: string
+          updated_at?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          background_color?: string | null
+          button_text?: string | null
+          button_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          priority?: number | null
+          starts_at?: string | null
+          title?: string
+          updated_at?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           amount: number
