@@ -87,6 +87,25 @@ const AppCourseDetail = () => {
 
   const round = enrollment?.program_rounds;
 
+  // Fetch sessions for this round from the database
+  const { data: dbSessions } = useQuery({
+    queryKey: ['program-sessions', round?.id],
+    queryFn: async () => {
+      if (!round?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('program_sessions')
+        .select('*')
+        .eq('round_id', round.id)
+        .eq('status', 'scheduled')
+        .order('session_number', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!round?.id,
+  });
+
   const handleAddToCalendar = async () => {
     if (!round?.first_session_date || !program) return;
 
@@ -144,13 +163,28 @@ const AppCourseDetail = () => {
     }
   };
 
-  // Generate all session events for the course (weekly sessions from start to end date)
+  // Generate all session events for the course - use DB sessions if available, otherwise fallback to weekly generation
   const generateAllSessionEvents = (): CalendarEvent[] => {
-    if (!round?.start_date || !program) return [];
+    if (!program) return [];
+    
+    // If we have real sessions from the database, use those
+    if (dbSessions && dbSessions.length > 0) {
+      return dbSessions.map(session => ({
+        title: session.title,
+        description: session.description || `Session ${session.session_number} of ${program.title}`,
+        startDate: new Date(session.session_date),
+        endDate: new Date(new Date(session.session_date).getTime() + (session.duration_minutes || 90) * 60000),
+        location: session.meeting_link || round?.google_meet_link || undefined,
+        reminderMinutes: 60,
+      }));
+    }
+    
+    // Fallback: generate weekly sessions from start to end date
+    if (!round?.start_date) return [];
     
     const events: CalendarEvent[] = [];
     const startDate = new Date(round.start_date);
-    const endDate = round.end_date ? new Date(round.end_date) : addWeeks(startDate, 8); // Default 8 weeks
+    const endDate = round.end_date ? new Date(round.end_date) : addWeeks(startDate, 8);
     const sessionDuration = round.first_session_duration || 90;
     
     let sessionNumber = 1;
