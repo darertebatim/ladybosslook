@@ -322,8 +322,8 @@ export default function AppSupportChat() {
           className="flex-1 overflow-y-auto overscroll-contain"
           style={{
             paddingBottom: keyboardHeight > 0 
-              ? `calc(80px + ${keyboardHeight}px)` 
-              : 'calc(140px + env(safe-area-inset-bottom))'
+              ? `calc(72px + ${keyboardHeight}px)` 
+              : '132px'
           }}
         >
           <div className="p-4">
@@ -362,13 +362,13 @@ export default function AppSupportChat() {
           style={{
             bottom: keyboardHeight > 0 
               ? keyboardHeight 
-              : 'calc(72px + env(safe-area-inset-bottom))',
-            paddingBottom: '12px',
+              : '72px',
+            paddingBottom: '4px',
             transition: 'bottom 0.15s ease-out',
             willChange: 'bottom'
           }}
         >
-          <div className="py-3 px-4">
+          <div className="py-2 px-4">
             <ChatInput 
               onSend={handleSendMessage} 
               disabled={sending || conversation?.status === 'resolved'}
