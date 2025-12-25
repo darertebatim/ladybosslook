@@ -5,7 +5,7 @@ import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
 import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Bell, ArrowRight, User, Send, Mail } from 'lucide-react';
+import { MessageCircle, Bell, ArrowRight, User, Send, Mail, Sparkles, BookOpen } from 'lucide-react';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
 import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
@@ -17,6 +17,7 @@ import { CompletionCelebration } from '@/components/app/CompletionCelebration';
 import { useCompletedRoundCelebration } from '@/hooks/useCompletedRoundCelebration';
 import { HomeSkeleton } from '@/components/app/skeletons';
 import { supabase } from '@/integrations/supabase/client';
+import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 
 const AppHome = () => {
   const { user } = useAuth();
@@ -25,6 +26,17 @@ const AppHome = () => {
   
   // Use centralized data hook with parallel fetching
   const { profile, enrollments, wallet, hasActiveRounds, isLoading } = useHomeData();
+  
+  // Get unseen content for new course notification
+  let hasUnseenCourses = false;
+  let unseenCount = 0;
+  try {
+    const unseenContent = useUnseenContentContext();
+    hasUnseenCourses = unseenContent.hasUnseenCourses;
+    unseenCount = unseenContent.unseenEnrollments.size;
+  } catch {
+    // Provider not available, ignore
+  }
   
   // Celebration for completed rounds
   const { celebrationData, closeCelebration, showCelebration } = useCompletedRoundCelebration();
@@ -153,6 +165,27 @@ const AppHome = () => {
                   Go to Settings
                   <ArrowRight className="h-4 w-4" />
                 </Button>
+              </div>
+            </Alert>
+          )}
+
+          {/* New Courses Banner */}
+          {hasUnseenCourses && (
+            <Alert 
+              className="border-primary bg-primary/10 cursor-pointer hover:bg-primary/15 transition-colors" 
+              onClick={() => navigate('/app/courses')}
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="h-4 w-4 text-primary-foreground" />
+                </div>
+                <div className="flex-1">
+                  <AlertDescription className="text-sm font-semibold text-foreground">
+                    You have {unseenCount} new course{unseenCount > 1 ? 's' : ''}!
+                  </AlertDescription>
+                  <p className="text-xs text-muted-foreground">Tap to view your courses</p>
+                </div>
+                <BookOpen className="h-5 w-5 text-primary" />
               </div>
             </Alert>
           )}
