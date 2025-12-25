@@ -220,9 +220,12 @@ export default function AppPlaylistDetail() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b">
-        <div className="p-4">
+      {/* Header with safe area + visual padding */}
+      <div 
+        className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="pt-6 pb-3 px-4">
           <Button variant="ghost" size="sm" onClick={() => navigate('/app/player')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Library

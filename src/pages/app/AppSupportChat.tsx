@@ -294,12 +294,12 @@ export default function AppSupportChat() {
       />
       
       <div className="fixed inset-0 bg-background flex flex-col">
-        {/* Fixed Header with safe area */}
+        {/* Fixed Header with safe area + visual padding */}
         <header 
           className="bg-background border-b border-border z-50 shrink-0"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="flex items-center gap-3 h-14 px-4">
+          <div className="flex items-center gap-3 pt-6 pb-3 px-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
