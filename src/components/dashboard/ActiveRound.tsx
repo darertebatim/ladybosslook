@@ -4,12 +4,28 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { GraduationCap, Calendar, Users, ExternalLink, ArrowRight } from 'lucide-react';
+import { GraduationCap, Calendar, Users, ExternalLink, ArrowRight, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
+import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 
 export function ActiveRound() {
   const { user } = useAuth();
+  
+  // Get unseen content - wrap in try/catch in case provider is missing
+  let unseenEnrollments = new Set<string>();
+  let unseenRounds = new Set<string>();
+  let markEnrollmentViewed: ((id: string) => Promise<void>) | null = null;
+  let markRoundViewed: ((id: string) => Promise<void>) | null = null;
+  try {
+    const unseenContent = useUnseenContentContext();
+    unseenEnrollments = unseenContent.unseenEnrollments;
+    unseenRounds = unseenContent.unseenRounds;
+    markEnrollmentViewed = unseenContent.markEnrollmentViewed;
+    markRoundViewed = unseenContent.markRoundViewed;
+  } catch {
+    // Provider not available, ignore
+  }
 
   const { data: activeEnrollments, isLoading } = useQuery({
     queryKey: ['active-enrollments', user?.id],
@@ -90,18 +106,39 @@ export function ActiveRound() {
 
           const isUpcoming = round.status === 'upcoming';
           const isActive = round.status === 'active';
+          const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
+          const isRoundUnseen = unseenRounds.has(round.id);
+          const hasNotification = isEnrollmentUnseen || isRoundUnseen;
 
           return (
-            <Link key={enrollment.id} to={`/app/course/${enrollment.program_slug}`}>
-              <Card className="border border-border shadow-sm active:scale-[0.98] transition-transform overflow-hidden">
+            <Link 
+              key={enrollment.id} 
+              to={`/app/course/${enrollment.program_slug}`}
+              onClick={() => {
+                // Mark as viewed when clicked
+                if (isEnrollmentUnseen && markEnrollmentViewed) {
+                  markEnrollmentViewed(enrollment.id);
+                }
+                if (isRoundUnseen && markRoundViewed) {
+                  markRoundViewed(round.id);
+                }
+              }}
+            >
+              <Card className={`shadow-sm active:scale-[0.98] transition-transform overflow-hidden ${hasNotification ? 'border-primary border-2' : 'border border-border'}`}>
                 <CardContent className="p-4 pb-0">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="font-semibold truncate">{enrollment.course_name}</h3>
+                        {hasNotification && (
+                          <Badge variant="default" className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 h-auto shrink-0">
+                            <Sparkles className="h-3 w-3 mr-0.5" />
+                            New
+                          </Badge>
+                        )}
                         <Badge 
                           variant={isActive ? 'default' : 'secondary'}
-                          className={isActive ? 'bg-green-500' : ''}
+                          className={`shrink-0 ${isActive ? 'bg-green-500' : ''}`}
                         >
                           {round.status}
                         </Badge>
