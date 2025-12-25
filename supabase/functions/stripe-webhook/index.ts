@@ -7,6 +7,120 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 };
 
+// Helper to find or create user by email
+async function findOrCreateUser(supabase: any, email: string, name: string): Promise<string | null> {
+  console.log('Finding or creating user for email:', email);
+  
+  // First, check if user exists in profiles
+  const { data: existingProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', email.toLowerCase())
+    .single();
+
+  if (existingProfile) {
+    console.log('Found existing user in profiles:', existingProfile.id);
+    return existingProfile.id;
+  }
+
+  // Try to create user in auth
+  const tempPassword = crypto.randomUUID();
+  const { data: authData, error: createError } = await supabase.auth.admin.createUser({
+    email: email.toLowerCase(),
+    password: tempPassword,
+    email_confirm: true,
+    user_metadata: { full_name: name }
+  });
+
+  if (createError) {
+    // User might already exist in auth but not in profiles
+    if (createError.message?.includes('already been registered') || createError.message?.includes('already exists')) {
+      console.log('User exists in auth, looking up by email...');
+      
+      // Search through auth users to find the one with this email
+      let page = 1;
+      const perPage = 1000;
+      
+      while (true) {
+        const { data: { users }, error: listError } = await supabase.auth.admin.listUsers({
+          page,
+          perPage,
+        });
+
+        if (listError || !users || users.length === 0) {
+          console.error('Could not find user in auth:', listError);
+          break;
+        }
+
+        const foundUser = users.find((u: any) => u.email?.toLowerCase() === email.toLowerCase());
+        if (foundUser) {
+          console.log('Found existing user on page', page, ':', foundUser.id);
+          return foundUser.id;
+        }
+
+        if (users.length < perPage) break;
+        page++;
+      }
+      
+      return null;
+    }
+    
+    console.error('Error creating user:', createError);
+    return null;
+  }
+
+  console.log('Created new user:', authData.user.id);
+  return authData.user.id;
+}
+
+// Helper to apply auto-enrollment rules
+async function applyAutoEnrollment(supabase: any, userId: string, programSlug: string, courseName: string): Promise<void> {
+  console.log('Checking auto-enrollment for program:', programSlug, 'user:', userId);
+  
+  // Get auto-enrollment rule for this program
+  const { data: autoEnrollRule } = await supabase
+    .from('program_auto_enrollment')
+    .select('round_id')
+    .eq('program_slug', programSlug)
+    .single();
+
+  // Check if enrollment already exists
+  const { data: existingEnrollment } = await supabase
+    .from('course_enrollments')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('program_slug', programSlug)
+    .single();
+
+  if (existingEnrollment) {
+    console.log('Enrollment already exists for user:', userId, 'program:', programSlug);
+    return;
+  }
+
+  // Create enrollment
+  const enrollmentData: any = {
+    user_id: userId,
+    course_name: courseName,
+    program_slug: programSlug,
+    status: 'active',
+  };
+
+  if (autoEnrollRule) {
+    enrollmentData.round_id = autoEnrollRule.round_id;
+    console.log('Using auto-enrollment round:', autoEnrollRule.round_id);
+  }
+
+  const { error: enrollmentError } = await supabase
+    .from('course_enrollments')
+    .insert(enrollmentData);
+
+  if (enrollmentError) {
+    console.error('Error creating enrollment:', enrollmentError);
+  } else {
+    console.log('Enrollment created successfully for user:', userId, 'program:', programSlug);
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -81,6 +195,8 @@ serve(async (req) => {
       const programSlug = session.metadata?.program_slug || session.metadata?.program || null;
       const paymentType = session.metadata?.payment_type || session.mode;
       
+      console.log('Customer email:', customerEmail, 'Product:', productName, 'Program slug:', programSlug);
+      
       // Check if order already exists
       const { data: existingOrder } = await supabase
         .from('orders')
@@ -96,7 +212,14 @@ serve(async (req) => {
         });
       }
 
-      // Create order record
+      // Find or create user
+      let userId: string | null = null;
+      if (customerEmail) {
+        userId = await findOrCreateUser(supabase, customerEmail, customerName);
+        console.log('User ID for order:', userId);
+      }
+
+      // Create order record with user_id
       const { error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -113,6 +236,7 @@ serve(async (req) => {
           product_name: productName,
           program_slug: programSlug,
           payment_type: paymentType,
+          user_id: userId, // Now linking user to order
         });
 
       if (orderError) {
@@ -120,7 +244,14 @@ serve(async (req) => {
         throw orderError;
       }
 
-      console.log('Order created successfully for session:', session.id);
+      console.log('Order created successfully for session:', session.id, 'user_id:', userId);
+
+      // Apply auto-enrollment if we have a user and program
+      if (userId && programSlug) {
+        await applyAutoEnrollment(supabase, userId, programSlug, productName);
+      } else {
+        console.log('Skipping auto-enrollment: userId=', userId, 'programSlug=', programSlug);
+      }
     }
 
     // Handle invoice.paid (for recurring subscription payments)
@@ -157,6 +288,12 @@ serve(async (req) => {
         productName = subscription.metadata?.product_name || 'Subscription Payment';
       }
 
+      // Find user by email
+      let userId: string | null = null;
+      if (customerEmail) {
+        userId = await findOrCreateUser(supabase, customerEmail, customerName);
+      }
+
       // Create order record for recurring payment
       const { error: orderError } = await supabase
         .from('orders')
@@ -170,12 +307,13 @@ serve(async (req) => {
           product_name: `${productName} (Recurring)`,
           program_slug: programSlug,
           payment_type: 'subscription_recurring',
+          user_id: userId,
         });
 
       if (orderError) {
         console.error('Error creating recurring order:', orderError);
       } else {
-        console.log('Recurring order created for invoice:', invoice.id);
+        console.log('Recurring order created for invoice:', invoice.id, 'user_id:', userId);
       }
     }
 
