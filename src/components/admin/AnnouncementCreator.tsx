@@ -18,6 +18,18 @@ interface Program {
   slug: string;
 }
 
+// Common in-app link options
+const IN_APP_LINKS = [
+  { value: '', label: 'No link' },
+  { value: '/app/home', label: '🏠 Home' },
+  { value: '/app/courses', label: '📚 My Courses' },
+  { value: '/app/browse', label: '🛍️ Browse Store' },
+  { value: '/app/player', label: '🎧 Audio Player' },
+  { value: '/app/support-chat', label: '💬 Support Chat' },
+  { value: '/app/profile', label: '👤 Profile' },
+  { value: 'custom', label: '✏️ Custom URL...' },
+];
+
 export function AnnouncementCreator() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -25,12 +37,16 @@ export function AnnouncementCreator() {
   const [targetRoundId, setTargetRoundId] = useState<string>('all');
   const [sendPush, setSendPush] = useState(true);
   const [sendEmail, setSendEmail] = useState(false);
-  const [linkUrl, setLinkUrl] = useState('');
+  const [linkType, setLinkType] = useState('');
+  const [customLinkUrl, setCustomLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
   const [loading, setLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Compute actual link URL
+  const linkUrl = linkType === 'custom' ? customLinkUrl : linkType;
 
   // Fetch rounds for the selected course
   const { data: rounds } = useQuery({
@@ -81,11 +97,11 @@ export function AnnouncementCreator() {
       return;
     }
 
-    // Validate link URL if provided
-    if (linkUrl.trim() && !linkUrl.match(/^https?:\/\/.+/)) {
+    // Validate custom link URL if provided
+    if (linkType === 'custom' && customLinkUrl.trim() && !customLinkUrl.match(/^(https?:\/\/|\/app\/).+/)) {
       toast({
         title: "Error",
-        description: "Please enter a valid URL starting with http:// or https://",
+        description: "Please enter a valid URL (https://... or /app/...)",
         variant: "destructive",
       });
       return;
@@ -147,7 +163,8 @@ export function AnnouncementCreator() {
       setTargetRoundId('all');
       setSendPush(true);
       setSendEmail(false);
-      setLinkUrl('');
+      setLinkType('');
+      setCustomLinkUrl('');
       setLinkText('');
       
     } catch (error: any) {
@@ -202,12 +219,42 @@ export function AnnouncementCreator() {
           </Label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">Button URL</Label>
-              <Input
-                placeholder="https://example.com/page"
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-              />
+              <Label className="text-xs text-muted-foreground">Destination</Label>
+              <Select value={linkType} onValueChange={setLinkType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select destination..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {IN_APP_LINKS.map((link) => (
+                    <SelectItem key={link.value || 'none'} value={link.value}>
+                      {link.label}
+                    </SelectItem>
+                  ))}
+                  {/* Dynamic course links */}
+                  {programs.length > 0 && (
+                    <>
+                      <SelectItem value="divider" disabled className="text-xs text-muted-foreground">
+                        ── Course Pages ──
+                      </SelectItem>
+                      {programs.map((program) => (
+                        <SelectItem key={program.slug} value={`/app/course/${program.slug}`}>
+                          📚 {program.title}
+                        </SelectItem>
+                      ))}
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+              
+              {/* Custom URL input */}
+              {linkType === 'custom' && (
+                <Input
+                  value={customLinkUrl}
+                  onChange={(e) => setCustomLinkUrl(e.target.value)}
+                  placeholder="/app/player/playlist/123 or https://..."
+                  className="mt-2"
+                />
+              )}
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">Button Text</Label>
@@ -215,12 +262,15 @@ export function AnnouncementCreator() {
                 placeholder="View Details"
                 value={linkText}
                 onChange={(e) => setLinkText(e.target.value)}
+                disabled={!linkType}
               />
             </div>
           </div>
-          <p className="text-xs text-muted-foreground">
-            If provided, a clickable button will appear in the chat message
-          </p>
+          {linkUrl && (
+            <p className="text-xs text-muted-foreground">
+              → {linkUrl}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
