@@ -74,7 +74,16 @@ import SendTestEmail from "./pages/SendTestEmail";
 import AppSupport from "./pages/AppSupport";
 import AppMarketing from "./pages/AppMarketing";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 2 * 60 * 1000, // 2 minutes - data considered fresh
+      gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache
+      retry: 1, // Only retry once on failure
+      refetchOnWindowFocus: false, // Don't refetch on tab focus
+    },
+  },
+});
 
 // Native App Router - Registers deep linking navigation callback and refreshes tokens
 const NativeAppRedirect = () => {
