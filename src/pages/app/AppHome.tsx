@@ -28,15 +28,8 @@ const AppHome = () => {
   const { profile, enrollments, wallet, hasActiveRounds, isLoading } = useHomeData();
   
   // Get unseen content for new course notification
-  let hasUnseenCourses = false;
-  let unseenCount = 0;
-  try {
-    const unseenContent = useUnseenContentContext();
-    hasUnseenCourses = unseenContent.hasUnseenCourses;
-    unseenCount = unseenContent.unseenEnrollments.size;
-  } catch {
-    // Provider not available, ignore
-  }
+  const { hasUnseenCourses, unseenEnrollments } = useUnseenContentContext();
+  const unseenCount = unseenEnrollments.size;
   
   // Celebration for completed rounds
   const { celebrationData, closeCelebration, showCelebration } = useCompletedRoundCelebration();
