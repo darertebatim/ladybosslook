@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
+import { Resend } from "npm:resend@2.0.0";
 import { create } from 'https://deno.land/x/djwt@v3.0.2/mod.ts';
 
 const corsHeaders = {
@@ -15,6 +16,8 @@ interface BroadcastRequest {
   targetRoundId?: string;
   sendPush: boolean;
   sendEmail: boolean;
+  linkUrl?: string;
+  linkText?: string;
 }
 
 // Helper function to convert PEM format to ArrayBuffer
@@ -83,15 +86,53 @@ async function sendToApns(
   });
 }
 
+// Generate email HTML
+function generateEmailHtml(title: string, content: string, linkUrl?: string, linkText?: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+          .message { background: white; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #667eea; }
+          .button { display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 20px; font-weight: 600; }
+          .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin: 0;">📢 ${title}</h1>
+          </div>
+          <div class="content">
+            <div class="message">
+              ${content.replace(/\n/g, '<br>')}
+            </div>
+            ${linkUrl ? `<a href="${linkUrl}" class="button">${linkText || 'View Details'}</a>` : ''}
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Ladybosslook Academy. All rights reserved.</p>
+              <p><a href="https://ladybosslook.com" style="color: #667eea; text-decoration: none;">ladybosslook.com</a></p>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { title, content, targetType, targetCourse, targetRoundId, sendPush, sendEmail }: BroadcastRequest = await req.json();
+    const { title, content, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, linkText }: BroadcastRequest = await req.json();
 
-    console.log('📢 Broadcast request:', { title, targetType, targetCourse, targetRoundId, sendPush, sendEmail });
+    console.log('📢 Broadcast request:', { title, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl });
 
     if (!title || !content) {
       return new Response(
@@ -151,6 +192,8 @@ const handler = async (req: Request): Promise<Response> => {
         created_by: user.id,
         send_push: sendPush,
         send_email: sendEmail,
+        link_url: linkUrl || null,
+        link_text: linkText || 'View Details',
       })
       .select()
       .single();
@@ -166,13 +209,11 @@ const handler = async (req: Request): Promise<Response> => {
     let targetUserIds: string[] = [];
 
     if (targetType === 'all') {
-      // Get all users with profiles (they are registered)
       const { data: profiles } = await supabase
         .from('profiles')
         .select('id');
       targetUserIds = profiles?.map(p => p.id) || [];
     } else if (targetType === 'round' && targetRoundId) {
-      // Get users enrolled in specific round
       const { data: enrollments } = await supabase
         .from('course_enrollments')
         .select('user_id')
@@ -180,7 +221,6 @@ const handler = async (req: Request): Promise<Response> => {
         .eq('status', 'active');
       targetUserIds = [...new Set(enrollments?.map(e => e.user_id) || [])];
     } else if (targetType === 'course' && targetCourse) {
-      // Get users enrolled in course
       const { data: enrollments } = await supabase
         .from('course_enrollments')
         .select('user_id')
@@ -198,19 +238,25 @@ const handler = async (req: Request): Promise<Response> => {
           broadcastId: broadcast.id,
           messagesSent: 0,
           pushSent: 0,
+          emailsSent: 0,
           message: 'No target users found'
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
     }
 
-    // Step 3: For each user, get or create conversation and insert broadcast message
+    // Step 3: Build chat message content with link button indicator
+    let chatContent = `📢 **${title}**\n\n${content}`;
+    if (linkUrl) {
+      chatContent += `\n\n🔗 LINK_BUTTON:${linkUrl}:${linkText || 'View Details'}`;
+    }
+
+    // Step 4: For each user, get or create conversation and insert broadcast message
     let messagesSent = 0;
     const conversationsToNotify: { conversationId: string; userId: string }[] = [];
 
     for (const userId of targetUserIds) {
       try {
-        // Get existing conversation or create new one
         let { data: conversation } = await supabase
           .from('chat_conversations')
           .select('id')
@@ -220,7 +266,6 @@ const handler = async (req: Request): Promise<Response> => {
           .maybeSingle();
 
         if (!conversation) {
-          // Create new conversation for this user
           const { data: newConv, error: convError } = await supabase
             .from('chat_conversations')
             .insert({ user_id: userId, status: 'open' })
@@ -234,14 +279,13 @@ const handler = async (req: Request): Promise<Response> => {
           conversation = newConv;
         }
 
-        // Insert broadcast message into their conversation
         const { error: msgError } = await supabase
           .from('chat_messages')
           .insert({
             conversation_id: conversation.id,
             sender_id: user.id,
             sender_type: 'admin',
-            content: `📢 **${title}**\n\n${content}`,
+            content: chatContent,
             is_broadcast: true,
             broadcast_id: broadcast.id,
           });
@@ -251,11 +295,10 @@ const handler = async (req: Request): Promise<Response> => {
           continue;
         }
 
-        // Update conversation unread count
         await supabase
           .from('chat_conversations')
           .update({ 
-            unread_count_user: supabase.rpc ? 1 : 1, // Increment
+            unread_count_user: 1,
             last_message_at: new Date().toISOString()
           })
           .eq('id', conversation.id);
@@ -269,7 +312,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`✅ Messages sent to ${messagesSent} users`);
 
-    // Step 4: Send push notifications if enabled
+    // Step 5: Send push notifications if enabled
     let pushSent = 0;
     if (sendPush && conversationsToNotify.length > 0) {
       const authKey = Deno.env.get('APNS_AUTH_KEY');
@@ -283,7 +326,6 @@ const handler = async (req: Request): Promise<Response> => {
           console.log('🔔 Generating APNs JWT...');
           const apnsJwt = await generateApnsJwt(authKey, keyId, teamId);
 
-          // Get push subscriptions for target users
           const { data: subscriptions } = await supabase
             .from('push_subscriptions')
             .select('*')
@@ -319,7 +361,6 @@ const handler = async (req: Request): Promise<Response> => {
             }
           }
 
-          // Clean up invalid subscriptions
           if (failedSubscriptions.length > 0) {
             await supabase
               .from('push_subscriptions')
@@ -331,6 +372,48 @@ const handler = async (req: Request): Promise<Response> => {
         } catch (err) {
           console.error('❌ Error sending push notifications:', err);
         }
+      }
+    }
+
+    // Step 6: Send emails if enabled
+    let emailsSent = 0;
+    if (sendEmail && conversationsToNotify.length > 0) {
+      const resendApiKey = Deno.env.get('RESEND_API_KEY');
+      
+      if (resendApiKey) {
+        console.log('📧 Sending emails...');
+        const resend = new Resend(resendApiKey);
+
+        // Get user emails
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .in('id', conversationsToNotify.map(c => c.userId))
+          .not('email', 'is', null);
+
+        const emailHtml = generateEmailHtml(title, content, linkUrl, linkText);
+
+        for (const profile of profiles || []) {
+          try {
+            const result = await resend.emails.send({
+              from: "Support Ladyboss <support@ladybosslook.com>",
+              to: [profile.email],
+              subject: `📢 ${title}`,
+              html: emailHtml,
+            });
+
+            if (result.data?.id) {
+              emailsSent++;
+              console.log(`✅ Email sent to ${profile.email}`);
+            }
+          } catch (err) {
+            console.error(`❌ Email error for ${profile.email}:`, err);
+          }
+        }
+
+        console.log(`✅ Emails sent: ${emailsSent}`);
+      } else {
+        console.log('⚠️ RESEND_API_KEY not configured, skipping emails');
       }
     }
 
@@ -346,6 +429,7 @@ const handler = async (req: Request): Promise<Response> => {
         broadcastId: broadcast.id,
         messagesSent,
         pushSent,
+        emailsSent,
         targetUsers: targetUserIds.length,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }

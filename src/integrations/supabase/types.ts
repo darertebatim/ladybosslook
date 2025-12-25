@@ -274,6 +274,8 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           id: string
+          link_text: string | null
+          link_url: string | null
           send_email: boolean | null
           send_push: boolean | null
           sent_count: number | null
@@ -287,6 +289,8 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           id?: string
+          link_text?: string | null
+          link_url?: string | null
           send_email?: boolean | null
           send_push?: boolean | null
           sent_count?: number | null
@@ -300,6 +304,8 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           id?: string
+          link_text?: string | null
+          link_url?: string | null
           send_email?: boolean | null
           send_push?: boolean | null
           sent_count?: number | null
