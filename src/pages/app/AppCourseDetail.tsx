@@ -31,6 +31,7 @@ const AppCourseDetail = () => {
   const [showEnrollmentReminder, setShowEnrollmentReminder] = reactUseState(false);
   const [isEnablingEnrollment, setIsEnablingEnrollment] = reactUseState(false);
   const [isSyncingAllSessions, setIsSyncingAllSessions] = reactUseState(false);
+  const [hasNewSessions, setHasNewSessions] = reactUseState(false);
 
   // Fetch enrollment and round data
   const { data: enrollment, isLoading: enrollmentLoading } = useQuery({
@@ -105,6 +106,32 @@ const AppCourseDetail = () => {
     },
     enabled: !!round?.id,
   });
+
+  // Check if there are new sessions since last sync
+  reactUseEffect(() => {
+    if (!round?.id || !dbSessions || dbSessions.length === 0) {
+      setHasNewSessions(false);
+      return;
+    }
+    
+    const lastSyncKey = `lastCalendarSync_${round.id}`;
+    const lastSyncTime = localStorage.getItem(lastSyncKey);
+    
+    if (!lastSyncTime) {
+      // Never synced - show banner if there are sessions
+      setHasNewSessions(true);
+      return;
+    }
+    
+    // Check if any session was created after last sync
+    const lastSync = new Date(lastSyncTime);
+    const hasNewer = dbSessions.some(session => {
+      const createdAt = new Date((session as any).created_at || session.session_date);
+      return createdAt > lastSync;
+    });
+    
+    setHasNewSessions(hasNewer);
+  }, [round?.id, dbSessions]);
 
   const handleAddToCalendar = async () => {
     if (!round?.first_session_date || !program) return;
@@ -224,6 +251,10 @@ const AppCourseDetail = () => {
         
         if (result.success) {
           toast.success(`Added ${result.addedCount} sessions to your calendar!`);
+          // Save sync timestamp
+          const lastSyncKey = `lastCalendarSync_${round.id}`;
+          localStorage.setItem(lastSyncKey, new Date().toISOString());
+          setHasNewSessions(false);
         } else if (result.error === 'Calendar permission denied') {
           toast.error('Please allow calendar access in Settings');
         } else {
@@ -248,6 +279,10 @@ const AppCourseDetail = () => {
       // For web, just download first session
       downloadICSFile(icsEvents[0], `${program.title.replace(/\s+/g, '-')}-sessions.ics`);
       toast.success('Calendar file downloaded!');
+      // Save sync timestamp for web too
+      const lastSyncKey = `lastCalendarSync_${round.id}`;
+      localStorage.setItem(lastSyncKey, new Date().toISOString());
+      setHasNewSessions(false);
     }
   };
 
@@ -511,6 +546,34 @@ const AppCourseDetail = () => {
                 <Info className="h-4 w-4" />
                 <AlertDescription className="text-sm leading-relaxed whitespace-pre-wrap">
                   {round.important_message}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* New Sessions Available Banner */}
+            {hasNewSessions && round && (
+              <Alert className="border-amber-500/50 bg-amber-50 dark:bg-amber-950/30">
+                <CalendarPlus className="h-4 w-4 text-amber-600" />
+                <AlertDescription className="flex items-center justify-between gap-4">
+                  <span className="text-sm text-amber-800 dark:text-amber-200">
+                    New sessions available! Sync to your calendar.
+                  </span>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    className="shrink-0 border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-200 dark:hover:bg-amber-900"
+                    onClick={handleSyncAllSessions}
+                    disabled={isSyncingAllSessions}
+                  >
+                    {isSyncingAllSessions ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <CalendarPlus className="h-4 w-4 mr-1" />
+                        Sync
+                      </>
+                    )}
+                  </Button>
                 </AlertDescription>
               </Alert>
             )}

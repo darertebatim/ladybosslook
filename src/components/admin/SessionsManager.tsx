@@ -60,6 +60,7 @@ interface SessionsManagerProps {
   roundId: string;
   roundName: string;
   programTitle: string;
+  programSlug: string;
   defaultMeetLink?: string;
   startDate?: string;
   endDate?: string;
@@ -70,6 +71,7 @@ export const SessionsManager = ({
   roundId,
   roundName,
   programTitle,
+  programSlug,
   defaultMeetLink,
   startDate,
   endDate,
@@ -140,10 +142,14 @@ export const SessionsManager = ({
         if (error) throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["program-sessions", roundId] });
       toast.success(editingId ? "Session updated" : "Session created");
       resetForm();
+      // Send push notification for new sessions (not edits)
+      if (!editingId) {
+        await sendNewSessionsNotification(1);
+      }
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -167,6 +173,26 @@ export const SessionsManager = ({
       toast.error(error.message);
     },
   });
+
+  // Send push notification to enrolled users
+  const sendNewSessionsNotification = async (sessionCount: number) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      await supabase.functions.invoke('send-push-notification', {
+        body: {
+          title: '📅 New Sessions Added',
+          message: `${sessionCount} new session${sessionCount > 1 ? 's' : ''} added to ${programTitle}. Sync your calendar!`,
+          targetRoundId: roundId,
+          destinationUrl: `/app/course/${programSlug}`,
+        },
+      });
+      toast.success('Push notification sent to enrolled users');
+    } catch (error) {
+      console.error('Failed to send push notification:', error);
+    }
+  };
 
   // Generate sessions mutation
   const generateMutation = useMutation({
@@ -204,9 +230,11 @@ export const SessionsManager = ({
 
       return sessionsToCreate.length;
     },
-    onSuccess: (count) => {
+    onSuccess: async (count) => {
       queryClient.invalidateQueries({ queryKey: ["program-sessions", roundId] });
       toast.success(`Generated ${count} sessions`);
+      // Send push notification to enrolled users
+      await sendNewSessionsNotification(count);
     },
     onError: (error: Error) => {
       toast.error(error.message);
