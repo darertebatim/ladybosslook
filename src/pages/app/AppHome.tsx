@@ -15,11 +15,16 @@ import { checkPermissionStatus } from '@/lib/pushNotifications';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
+import { CompletionCelebration } from '@/components/app/CompletionCelebration';
+import { useCompletedRoundCelebration } from '@/hooks/useCompletedRoundCelebration';
 
 const AppHome = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showNotificationBanner, setShowNotificationBanner] = useState(false);
+  
+  // Celebration for completed rounds
+  const { celebrationData, closeCelebration, showCelebration } = useCompletedRoundCelebration();
   
   // Track app installation (first open)
   useAppInstallTracking();
@@ -141,7 +146,15 @@ const AppHome = () => {
         description="Your LadyBoss Academy dashboard"
       />
       
-      <AppHeader 
+      {/* Completion Celebration Modal */}
+      <CompletionCelebration
+        isOpen={showCelebration}
+        onClose={closeCelebration}
+        courseName={celebrationData?.courseName || ''}
+        roundName={celebrationData?.roundName || ''}
+      />
+      
+      <AppHeader
         title="Welcome back!" 
         subtitle={user?.email}
         rightAction={
