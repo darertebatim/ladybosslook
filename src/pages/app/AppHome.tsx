@@ -14,6 +14,7 @@ import { Capacitor } from '@capacitor/core';
 import { checkPermissionStatus } from '@/lib/pushNotifications';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
 
 const AppHome = () => {
   const { user } = useAuth();
@@ -62,8 +63,6 @@ const AppHome = () => {
     
     return () => window.removeEventListener('focus', handleFocus);
   }, [user?.id]);
-
-  // User tracking handled by authentication system
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -135,35 +134,16 @@ const AppHome = () => {
   });
 
   return (
-    <div className="container max-w-7xl py-6 px-4">
+    <>
       <SEOHead 
         title="Dashboard - LadyBoss Academy"
         description="Your LadyBoss Academy dashboard"
       />
       
-      <div className="space-y-6">
-        {showNotificationBanner && (
-          <Alert className="border-primary/50 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors" onClick={() => navigate('/app/profile')}>
-            <div className="flex items-center gap-3">
-              <Bell className="h-5 w-5 text-primary" />
-              <div className="flex-1">
-                <AlertDescription className="text-sm font-medium text-foreground">
-                  Enable notifications to get course reminders
-                </AlertDescription>
-              </div>
-              <Button size="sm" variant="ghost" className="gap-2">
-                Go to Settings
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </Alert>
-        )}
-
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold mb-1">Welcome back!</h1>
-            <p className="text-sm text-muted-foreground">{user?.email}</p>
-          </div>
+      <AppHeader 
+        title="Welcome back!" 
+        subtitle={user?.email}
+        rightAction={
           <Button
             variant="ghost"
             size="icon"
@@ -172,43 +152,65 @@ const AppHome = () => {
           >
             <User className="h-6 w-6" />
           </Button>
-        </div>
+        }
+      />
+      <AppHeaderSpacer />
+      
+      <div className="container max-w-7xl py-4 px-4">
+        <div className="space-y-6">
+          {showNotificationBanner && (
+            <Alert className="border-primary/50 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors" onClick={() => navigate('/app/profile')}>
+              <div className="flex items-center gap-3">
+                <Bell className="h-5 w-5 text-primary" />
+                <div className="flex-1">
+                  <AlertDescription className="text-sm font-medium text-foreground">
+                    Enable notifications to get course reminders
+                  </AlertDescription>
+                </div>
+                <Button size="sm" variant="ghost" className="gap-2">
+                  Go to Settings
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </Alert>
+          )}
 
-        {enrollments?.length === 0 ? (
-          <WelcomeSection />
-        ) : (
-          <>
-            <StatsCards 
-              enrolledCount={enrollments?.length || 0}
-              creditsBalance={wallet?.credits_balance || 0}
-            />
-            {hasActiveRounds && <ActiveRound />}
-            <Announcements />
-          </>
-        )}
-        
-        <div className="flex flex-col items-center gap-3">
-          <Button
-            size="lg"
-            onClick={handleContactSupport}
-            className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
-          >
-            <Send className="mr-2 h-5 w-5" />
-            Contact Support on Telegram
-          </Button>
+          {enrollments?.length === 0 ? (
+            <WelcomeSection />
+          ) : (
+            <>
+              <StatsCards 
+                enrolledCount={enrollments?.length || 0}
+                creditsBalance={wallet?.credits_balance || 0}
+              />
+              {hasActiveRounds && <ActiveRound />}
+              <Announcements />
+            </>
+          )}
           
-          <Button
-            size="lg"
-            variant="outline"
-            onClick={handleEmailSupport}
-            className="w-full sm:w-auto"
-          >
-            <Mail className="mr-2 h-5 w-5" />
-            Email Support (if no Telegram)
-          </Button>
+          <div className="flex flex-col items-center gap-3">
+            <Button
+              size="lg"
+              onClick={handleContactSupport}
+              className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
+            >
+              <Send className="mr-2 h-5 w-5" />
+              Contact Support on Telegram
+            </Button>
+            
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={handleEmailSupport}
+              className="w-full sm:w-auto"
+            >
+              <Mail className="mr-2 h-5 w-5" />
+              Email Support (if no Telegram)
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

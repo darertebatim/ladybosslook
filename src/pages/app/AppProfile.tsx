@@ -250,19 +250,27 @@ const AppProfile = () => {
   };
 
   return (
-    <div className="container max-w-4xl py-6 px-4">
+    <>
       <SEOHead 
         title="Profile - LadyBoss Academy"
         description="Your profile settings"
       />
       
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold mb-1">Profile</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage your account settings
-          </p>
+      {/* Fixed Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border pt-safe">
+        <div className="flex items-center h-14 px-4">
+          <div>
+            <h1 className="font-semibold text-lg">Profile</h1>
+            <p className="text-xs text-muted-foreground">Manage your account</p>
+          </div>
         </div>
+      </header>
+      
+      {/* Header spacer */}
+      <div className="h-14 pt-safe" />
+      
+      <div className="container max-w-4xl py-4 px-4">
+      <div className="space-y-6">
 
         {/* Quick Navigation */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -599,7 +607,8 @@ const AppProfile = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

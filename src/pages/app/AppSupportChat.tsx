@@ -38,6 +38,46 @@ export default function AppSupportChat() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  // Keyboard detection using visualViewport API
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+
+    let lastKeyboardHeight = 0;
+
+    const handleResize = () => {
+      const keyboardH = Math.max(0, window.innerHeight - viewport.height);
+      
+      if (Math.abs(keyboardH - lastKeyboardHeight) > 10) {
+        lastKeyboardHeight = keyboardH;
+        setKeyboardHeight(keyboardH);
+
+        // Scroll to bottom when keyboard opens
+        if (keyboardH > 0) {
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 50);
+        }
+      }
+    };
+
+    // Prevent iOS Safari viewport shift
+    const handleScroll = () => {
+      if (viewport.offsetTop !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+
+    viewport.addEventListener('resize', handleResize);
+    viewport.addEventListener('scroll', handleScroll);
+
+    return () => {
+      viewport.removeEventListener('resize', handleResize);
+      viewport.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Fetch or create conversation
   useEffect(() => {
@@ -236,7 +276,7 @@ export default function AppSupportChat() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center min-h-[100dvh]">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -249,26 +289,31 @@ export default function AppSupportChat() {
         description="Chat with our support team"
       />
       
-      <div className="flex flex-col h-full bg-background">
-        {/* Header */}
-        <div className="flex items-center gap-3 p-4 border-b bg-background sticky top-0 z-10">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex items-center gap-2">
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <MessageCircle className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="font-semibold">Support Chat</h1>
-              <p className="text-xs text-muted-foreground">
-                {conversation?.status === 'resolved' ? 'Resolved' : 'We typically reply within a few hours'}
-              </p>
+      <div className="flex flex-col h-[100dvh] bg-background">
+        {/* Fixed Header with safe area */}
+        <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border pt-safe">
+          <div className="flex items-center gap-3 h-14 px-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-2">
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <MessageCircle className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h1 className="font-semibold">Support Chat</h1>
+                <p className="text-xs text-muted-foreground">
+                  {conversation?.status === 'resolved' ? 'Resolved' : 'We typically reply within a few hours'}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </header>
 
-        {/* Messages */}
+        {/* Header spacer */}
+        <div className="h-14 pt-safe shrink-0" />
+
+        {/* Messages area - scrollable */}
         <div className="flex-1 overflow-y-auto p-4">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center px-4">
@@ -298,15 +343,27 @@ export default function AppSupportChat() {
           )}
         </div>
 
-        {/* Input */}
-        <ChatInput 
-          onSend={handleSendMessage} 
-          disabled={sending || conversation?.status === 'resolved'}
-          uploading={uploading}
-          placeholder={conversation?.status === 'resolved' 
-            ? "This conversation is resolved" 
-            : "Type a message..."}
-        />
+        {/* Fixed Input Area that moves with keyboard */}
+        <div 
+          className="fixed left-0 right-0 bg-background border-t border-border z-40"
+          style={{
+            bottom: keyboardHeight > 0 
+              ? keyboardHeight 
+              : 'calc(72px + env(safe-area-inset-bottom))',
+            paddingBottom: keyboardHeight > 0 ? '12px' : '12px',
+            transition: 'bottom 0.15s ease-out',
+            willChange: 'bottom'
+          }}
+        >
+          <ChatInput 
+            onSend={handleSendMessage} 
+            disabled={sending || conversation?.status === 'resolved'}
+            uploading={uploading}
+            placeholder={conversation?.status === 'resolved' 
+              ? "This conversation is resolved" 
+              : "Type a message..."}
+          />
+        </div>
       </div>
     </>
   );

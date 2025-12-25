@@ -90,11 +90,14 @@ const AppLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-16">
-      <Outlet />
+    <div className="min-h-[100dvh] bg-background flex flex-col">
+      {/* Main content area */}
+      <main className="flex-1 pb-20">
+        <Outlet />
+      </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
+      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 pb-safe">
         <div className="flex justify-around items-center h-16 max-w-screen-xl mx-auto px-4">
           {navItems.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path || 
