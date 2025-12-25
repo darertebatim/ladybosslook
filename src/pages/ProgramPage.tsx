@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import Navigation from '@/components/ui/navigation';
 import Footer from '@/components/sections/Footer';
 import { SEOHead } from '@/components/SEOHead';
+import DOMPurify from 'dompurify';
 
 interface ProgramData {
   id: string;
@@ -247,7 +248,7 @@ const ProgramPage = () => {
                   <div className="bg-card border rounded-2xl p-8 md:p-12 shadow-sm">
                     <div 
                       className="prose prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none"
-                      dangerouslySetInnerHTML={{ __html: program.description }}
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(program.description) }}
                     />
                   </div>
                 </div>

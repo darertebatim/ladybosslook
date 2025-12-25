@@ -22,6 +22,7 @@ import { shouldShowEnrollmentReminder } from '@/hooks/useNotificationReminder';
 import { subscribeToPushNotifications, checkPermissionStatus } from '@/lib/pushNotifications';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
+import DOMPurify from 'dompurify';
 
 const AppCourseDetail = () => {
   const { slug } = useParams();
@@ -505,7 +506,7 @@ const AppCourseDetail = () => {
                   {program.description && (
                     <div 
                       className="text-muted-foreground mt-2 whitespace-pre-wrap leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: program.description }}
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(program.description) }}
                     />
                   )}
                 </CardHeader>
@@ -878,7 +879,7 @@ const AppCourseDetail = () => {
                 {program?.description && (
                   <div 
                     className="text-muted-foreground whitespace-pre-wrap leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: program.description }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(program.description) }}
                   />
                 )}
                 {round && (
