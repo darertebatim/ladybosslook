@@ -22,11 +22,12 @@ export function AppHeader({
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 pt-safe ${
+      className={`fixed top-0 left-0 right-0 z-50 ${
         transparent 
           ? 'bg-background/80 backdrop-blur-lg' 
           : 'bg-background border-b border-border'
       }`}
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       <div className="flex items-center justify-between h-14 px-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -57,7 +58,13 @@ export function AppHeader({
   );
 }
 
-// Spacer to offset content below fixed header
+// Spacer to offset content below fixed header (56px header + safe area)
 export function AppHeaderSpacer() {
-  return <div className="h-14 pt-safe" />;
+  return (
+    <div 
+      style={{ 
+        height: 'calc(56px + env(safe-area-inset-top, 0px))' 
+      }} 
+    />
+  );
 }
