@@ -684,7 +684,7 @@ const AppCourseDetail = () => {
                   )}
 
                   {/* Sync All Sessions to Calendar - Only show if there are multiple sessions */}
-                  {dbSessions.length > 1 && (
+                  {dbSessions && dbSessions.length > 1 && (
                     <Button 
                       variant="secondary" 
                       size="lg" 
