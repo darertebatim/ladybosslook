@@ -96,12 +96,12 @@ const AppLayout = () => {
         <Outlet />
       </main>
 
-      {/* Bottom Navigation - 72px height + safe area */}
+      {/* Bottom Navigation - pt-2 pb-4 + safe area */}
       <nav 
-        className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 pt-2 pb-4"
+        style={{ paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))' }}
       >
-        <div className="flex justify-around items-center h-[72px] max-w-screen-xl mx-auto px-4 py-1">
+        <div className="flex justify-around items-center max-w-screen-xl mx-auto px-4">
           {navItems.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path || 
               (path === '/app/player' && location.pathname.startsWith('/app/player'));
@@ -110,7 +110,7 @@ const AppLayout = () => {
               <Link
                 key={path}
                 to={path}
-                className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+                className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
                   isActive 
                     ? 'text-primary' 
                     : 'text-muted-foreground hover:text-foreground'
