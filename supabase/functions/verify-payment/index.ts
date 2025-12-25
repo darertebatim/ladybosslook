@@ -170,8 +170,7 @@ serve(async (req) => {
         programName = programData?.mailchimp_program_name || programData?.title || session.line_items?.data[0]?.description || 'Purchase';
       }
       
-      // Extract billing address from Stripe session
-      const billingCity = session.customer_details?.address?.city || null;
+      // Extract billing address from Stripe session (billingCity already declared at line 86)
       const billingState = session.customer_details?.address?.state || null;
       const billingCountry = session.customer_details?.address?.country || null;
 
@@ -252,14 +251,9 @@ serve(async (req) => {
       if (orderDetails) {
         logStep('Attempting Mailchimp subscription with workshop details');
         try {
-          // Extract city from billing address if available
-          const billingCity = session.customer_details?.address?.city || 
-                             (customer as any)?.address?.city || 
-                             "";
-          
-          // Get program from payment intent metadata
-          const paymentIntent = session.payment_intent;
-          let programName = "Unknown Program";
+          // billingCity already declared at line 86, reuse it
+          // programName and paymentIntent already declared earlier, use different variable names
+          let mailchimpProgramName = "Unknown Program";
           let tags: string[] = [];
           
           // Extract program metadata from payment intent
@@ -274,10 +268,10 @@ serve(async (req) => {
               .single();
             
             if (programConfig) {
-              programName = programConfig.mailchimp_program_name || programConfig.title || "General Purchase";
+              mailchimpProgramName = programConfig.mailchimp_program_name || programConfig.title || "General Purchase";
               tags = programConfig.mailchimp_tags || ["paid_customer"];
             } else {
-              programName = "General Purchase";
+              mailchimpProgramName = "General Purchase";
               tags = ["paid_customer"];
               console.log(`Program ${program} not found in catalog, using default tags`);
             }
@@ -290,7 +284,7 @@ serve(async (req) => {
               city: billingCity,
               phone: orderDetails.phone || "",
               source: "workshop_purchase",
-              workshop_name: programName,
+              workshop_name: mailchimpProgramName,
               purchase_amount: orderDetails.amount,
               purchase_date: new Date().toISOString(),
               payment_status: "paid",
