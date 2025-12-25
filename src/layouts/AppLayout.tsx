@@ -19,7 +19,7 @@ const AppLayout = () => {
   
   // Custom hooks after useState declarations
   const { unreadCount } = useUnreadChat();
-  useChatNotifications();
+  const { showUnreadPopup, unreadMessageCount, dismissPopup, goToChat } = useChatNotifications();
 
   // Only show notification prompt on native iOS
   useEffect(() => {
@@ -173,6 +173,33 @@ const AppLayout = () => {
               className="w-full m-0"
             >
               Not Now
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Unread Messages Popup */}
+      <AlertDialog open={showUnreadPopup} onOpenChange={dismissPopup}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex justify-center mb-4">
+              <div className="rounded-full bg-primary/10 p-3">
+                <MessageCircle className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <AlertDialogTitle className="text-center">
+              You have {unreadMessageCount} unread message{unreadMessageCount > 1 ? 's' : ''}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              Support has replied to your conversation. Tap below to view.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-3 sm:flex-col">
+            <AlertDialogAction onClick={goToChat} className="w-full">
+              View Messages
+            </AlertDialogAction>
+            <AlertDialogCancel onClick={dismissPopup} className="w-full m-0">
+              Later
             </AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
