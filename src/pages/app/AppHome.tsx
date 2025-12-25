@@ -2,12 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { StatsCards } from '@/components/dashboard/StatsCards';
-import { Announcements } from '@/components/dashboard/Announcements';
+
 import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
 import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
-import { Send, Mail, Bell, ArrowRight, User } from 'lucide-react';
+import { MessageCircle, Bell, ArrowRight, User } from 'lucide-react';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
 import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
@@ -78,17 +78,6 @@ const AppHome = () => {
     enabled: !!user?.id,
   });
 
-  const handleContactSupport = () => {
-    const message = `Hi! I need support.\n\nName: ${profile?.full_name || 'N/A'}\nEmail: ${profile?.email || user?.email || 'N/A'}\nPhone: ${profile?.phone || 'N/A'}\nCity: ${profile?.city || 'N/A'}`;
-    const telegramUrl = `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
-    window.open(telegramUrl, '_blank');
-  };
-
-  const handleEmailSupport = () => {
-    const subject = 'Support Request';
-    const body = `Hi! I need support.\n\nName: ${profile?.full_name || 'N/A'}\nEmail: ${profile?.email || user?.email || 'N/A'}\nPhone: ${profile?.phone || 'N/A'}\nCity: ${profile?.city || 'N/A'}`;
-    window.location.href = `mailto:support@ladybosslook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
 
   const { data: enrollments } = useQuery({
     queryKey: ['course-enrollments', user?.id],
@@ -184,30 +173,26 @@ const AppHome = () => {
                 creditsBalance={wallet?.credits_balance || 0}
               />
               {hasActiveRounds && <ActiveRound />}
-              <Announcements />
+              
+              {/* In-App Chat Banner */}
+              <div 
+                onClick={() => navigate('/app/support')}
+                className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-xl p-4 cursor-pointer hover:from-primary/15 hover:to-primary/10 transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <MessageCircle className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground">Need Help?</h3>
+                    <p className="text-sm text-muted-foreground">Chat with our support team</p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-primary" />
+                </div>
+              </div>
             </>
           )}
           
-          <div className="flex flex-col items-center gap-3">
-            <Button
-              size="lg"
-              onClick={handleContactSupport}
-              className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
-            >
-              <Send className="mr-2 h-5 w-5" />
-              Contact Support on Telegram
-            </Button>
-            
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={handleEmailSupport}
-              className="w-full sm:w-auto"
-            >
-              <Mail className="mr-2 h-5 w-5" />
-              Email Support (if no Telegram)
-            </Button>
-          </div>
         </div>
       </div>
     </>
