@@ -683,8 +683,8 @@ const AppCourseDetail = () => {
                     </Button>
                   )}
 
-                  {/* Sync All Sessions to Calendar */}
-                  {round.start_date && (
+                  {/* Sync All Sessions to Calendar - Only show if there are multiple sessions */}
+                  {dbSessions.length > 1 && (
                     <Button 
                       variant="secondary" 
                       size="lg" 
