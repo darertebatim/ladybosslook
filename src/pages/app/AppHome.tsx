@@ -145,12 +145,12 @@ const AppHome = () => {
         subtitle={user?.email}
         rightAction={
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             onClick={() => navigate('/app/profile')}
-            className="rounded-full"
+            className="rounded-full h-10 w-10 border-2"
           >
-            <User className="h-6 w-6" />
+            <User className="h-5 w-5" />
           </Button>
         }
       />
