@@ -93,7 +93,7 @@ export function ActiveRound() {
 
           return (
             <Link key={enrollment.id} to={`/app/course/${enrollment.program_slug}`}>
-              <Card className="hover:border-primary transition-all hover:shadow-md overflow-hidden">
+              <Card className="border border-border/60 shadow-sm hover:border-primary transition-all hover:shadow-md overflow-hidden">
                 <CardContent className="p-4 pb-0">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
