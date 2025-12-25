@@ -268,6 +268,56 @@ export type Database = {
           },
         ]
       }
+      broadcast_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          send_email: boolean | null
+          send_push: boolean | null
+          sent_count: number | null
+          target_course: string | null
+          target_round_id: string | null
+          target_type: string | null
+          title: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          send_email?: boolean | null
+          send_push?: boolean | null
+          sent_count?: number | null
+          target_course?: string | null
+          target_round_id?: string | null
+          target_type?: string | null
+          title?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          send_email?: boolean | null
+          send_push?: boolean | null
+          sent_count?: number | null
+          target_course?: string | null
+          target_round_id?: string | null
+          target_type?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broadcast_messages_target_round_id_fkey"
+            columns: ["target_round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_conversations: {
         Row: {
           created_at: string
@@ -310,10 +360,12 @@ export type Database = {
           attachment_size: number | null
           attachment_type: string | null
           attachment_url: string | null
+          broadcast_id: string | null
           content: string
           conversation_id: string
           created_at: string
           id: string
+          is_broadcast: boolean | null
           is_read: boolean
           sender_id: string
           sender_type: string
@@ -323,10 +375,12 @@ export type Database = {
           attachment_size?: number | null
           attachment_type?: string | null
           attachment_url?: string | null
+          broadcast_id?: string | null
           content: string
           conversation_id: string
           created_at?: string
           id?: string
+          is_broadcast?: boolean | null
           is_read?: boolean
           sender_id: string
           sender_type: string
@@ -336,10 +390,12 @@ export type Database = {
           attachment_size?: number | null
           attachment_type?: string | null
           attachment_url?: string | null
+          broadcast_id?: string | null
           content?: string
           conversation_id?: string
           created_at?: string
           id?: string
+          is_broadcast?: boolean | null
           is_read?: boolean
           sender_id?: string
           sender_type?: string

@@ -20,6 +20,7 @@ interface Message {
   attachment_url: string | null;
   attachment_name: string | null;
   attachment_type: string | null;
+  is_broadcast?: boolean;
 }
 
 interface Conversation {
@@ -320,6 +321,7 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
                   attachmentUrl={msg.attachment_url}
                   attachmentName={msg.attachment_name}
                   attachmentType={msg.attachment_type}
+                  isBroadcast={msg.is_broadcast}
                 />
               ))}
               <div ref={messagesEndRef} />
