@@ -10,13 +10,16 @@ const corsHeaders = {
 interface PushNotificationRequest {
   userIds?: string[];
   targetCourse?: string;
+  targetRoundId?: string;
   targetUserEmail?: string;
   title: string;
-  body: string;
+  message?: string; // Alias for body
+  body?: string;
   icon?: string;
   url?: string;
-  badge?: number; // Phase 6: Custom badge count
-  environment?: 'development' | 'production'; // Environment override
+  destinationUrl?: string; // Alias for url
+  badge?: number;
+  environment?: 'development' | 'production';
 }
 
 // Helper function to convert PEM format to ArrayBuffer
@@ -109,13 +112,17 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userIds, targetCourse, targetUserEmail, title, body, icon, url, badge, environment }: PushNotificationRequest = await req.json();
+    const requestBody: PushNotificationRequest = await req.json();
+    const { userIds, targetCourse, targetRoundId, targetUserEmail, title, icon, badge, environment } = requestBody;
+    const body = requestBody.body || requestBody.message || '';
+    const url = requestBody.url || requestBody.destinationUrl || '';
 
     // Debug logging
     console.log('🔔 Received push notification request:', {
       hasUserIds: !!userIds,
       userIdsLength: userIds?.length,
       targetCourse,
+      targetRoundId,
       targetUserEmail,
       targetUserEmailTrimmed: targetUserEmail?.trim(),
       title,
@@ -125,7 +132,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (!title || !body) {
       return new Response(
-        JSON.stringify({ error: 'Title and body are required' }),
+        JSON.stringify({ error: 'Title and body/message are required' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       );
     }
@@ -203,6 +210,21 @@ const handler = async (req: Request): Promise<Response> => {
           JSON.stringify({ message: 'User not found with that email', sent: 0, failed: 0 }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }
         );
+      }
+    } else if (targetRoundId) {
+      // Get users enrolled in the specific round
+      console.log('📧 Looking up users enrolled in round:', targetRoundId);
+      const { data: enrollments } = await supabase
+        .from('course_enrollments')
+        .select('user_id')
+        .eq('round_id', targetRoundId);
+
+      if (enrollments && enrollments.length > 0) {
+        const enrolledUserIds = enrollments.map(e => e.user_id);
+        console.log('📧 Found enrolled users:', enrolledUserIds.length);
+        query = query.in('user_id', enrolledUserIds);
+      } else {
+        console.log('📧 No enrolled users found for round');
       }
     } else if (targetCourse) {
       // Get users enrolled in the target course

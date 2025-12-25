@@ -288,6 +288,7 @@ export const ProgramRoundsManager = () => {
         roundId={managingSessionsRound.id}
         roundName={managingSessionsRound.round_name}
         programTitle={programTitle}
+        programSlug={managingSessionsRound.program_slug}
         defaultMeetLink={managingSessionsRound.google_meet_link || undefined}
         startDate={managingSessionsRound.start_date}
         endDate={managingSessionsRound.end_date || undefined}
