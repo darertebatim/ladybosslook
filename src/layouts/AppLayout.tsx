@@ -180,25 +180,25 @@ const AppLayout = () => {
 
       {/* Unread Messages Popup */}
       <AlertDialog open={showUnreadPopup} onOpenChange={dismissPopup}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <div className="flex justify-center mb-4">
-              <div className="rounded-full bg-primary/10 p-3">
-                <MessageCircle className="h-8 w-8 text-primary" />
+        <AlertDialogContent className="max-w-md mx-4 p-8">
+          <AlertDialogHeader className="space-y-4">
+            <div className="flex justify-center mb-2">
+              <div className="rounded-full bg-primary/10 p-5">
+                <MessageCircle className="h-12 w-12 text-primary" />
               </div>
             </div>
-            <AlertDialogTitle className="text-center">
+            <AlertDialogTitle className="text-center text-xl">
               You have {unreadMessageCount} unread message{unreadMessageCount > 1 ? 's' : ''}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-center">
+            <AlertDialogDescription className="text-center text-base px-4">
               Support has replied to your conversation. Tap below to view.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col gap-3 sm:flex-col">
-            <AlertDialogAction onClick={goToChat} className="w-full">
+          <AlertDialogFooter className="flex-col gap-3 sm:flex-col mt-6">
+            <AlertDialogAction onClick={goToChat} className="w-full h-12 text-base font-semibold">
               View Messages
             </AlertDialogAction>
-            <AlertDialogCancel onClick={dismissPopup} className="w-full m-0">
+            <AlertDialogCancel onClick={dismissPopup} className="w-full h-12 m-0 text-base">
               Later
             </AlertDialogCancel>
           </AlertDialogFooter>
