@@ -7,9 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
-import { Megaphone, Bell, Mail, MessageCircle } from 'lucide-react';
+import { Megaphone, Bell, Mail, MessageCircle, Link as LinkIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface Program {
   id: string;
@@ -25,9 +25,12 @@ export function AnnouncementCreator() {
   const [targetRoundId, setTargetRoundId] = useState<string>('all');
   const [sendPush, setSendPush] = useState(true);
   const [sendEmail, setSendEmail] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkText, setLinkText] = useState('');
   const [loading, setLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Fetch rounds for the selected course
   const { data: rounds } = useQuery({
@@ -78,6 +81,16 @@ export function AnnouncementCreator() {
       return;
     }
 
+    // Validate link URL if provided
+    if (linkUrl.trim() && !linkUrl.match(/^https?:\/\/.+/)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid URL starting with http:// or https://",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     
     try {
@@ -101,6 +114,8 @@ export function AnnouncementCreator() {
           targetRoundId: targetRoundId !== 'all' ? targetRoundId : undefined,
           sendPush,
           sendEmail,
+          linkUrl: linkUrl.trim() || undefined,
+          linkText: linkText.trim() || undefined,
         }
       });
 
@@ -111,12 +126,19 @@ export function AnnouncementCreator() {
 
       console.log('✅ Broadcast sent:', data);
 
-      const { messagesSent, pushSent, targetUsers } = data;
+      const { messagesSent, pushSent, emailsSent } = data;
+      
+      let description = `Message delivered to ${messagesSent} users`;
+      if (sendPush && pushSent > 0) description += `, ${pushSent} push notifications`;
+      if (sendEmail && emailsSent > 0) description += `, ${emailsSent} emails`;
       
       toast({
         title: "🎉 Broadcast Sent!",
-        description: `Message delivered to ${messagesSent} users${sendPush ? `, ${pushSent} push notifications sent` : ''}`
+        description
       });
+
+      // Refresh broadcast history
+      queryClient.invalidateQueries({ queryKey: ['broadcast-history'] });
 
       // Reset form
       setTitle('');
@@ -125,6 +147,8 @@ export function AnnouncementCreator() {
       setTargetRoundId('all');
       setSendPush(true);
       setSendEmail(false);
+      setLinkUrl('');
+      setLinkText('');
       
     } catch (error: any) {
       console.error('❌ Error sending broadcast:', error);
@@ -168,6 +192,35 @@ export function AnnouncementCreator() {
             onChange={(e) => setMessage(e.target.value)}
             rows={4}
           />
+        </div>
+
+        {/* Link Button Section */}
+        <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+          <Label className="text-sm font-medium flex items-center gap-2">
+            <LinkIcon className="h-4 w-4" />
+            Add Button Link (Optional)
+          </Label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Button URL</Label>
+              <Input
+                placeholder="https://example.com/page"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Button Text</Label>
+              <Input
+                placeholder="View Details"
+                value={linkText}
+                onChange={(e) => setLinkText(e.target.value)}
+              />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            If provided, a clickable button will appear in the chat message
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -232,16 +285,16 @@ export function AnnouncementCreator() {
               <Mail className="h-4 w-4 text-muted-foreground" />
               <div>
                 <p className="text-sm font-medium">Email Notification</p>
-                <p className="text-xs text-muted-foreground">Also send via email (coming soon)</p>
+                <p className="text-xs text-muted-foreground">Also send via email</p>
               </div>
             </div>
-            <Switch checked={sendEmail} onCheckedChange={setSendEmail} disabled />
+            <Switch checked={sendEmail} onCheckedChange={setSendEmail} />
           </div>
         </div>
 
         <Button onClick={handleSubmit} disabled={loading} className="w-full">
           <Megaphone className="mr-2 h-4 w-4" />
-          {loading ? 'Sending...' : 'Send Broadcast to Chat'}
+          {loading ? 'Sending...' : 'Send Broadcast'}
         </Button>
       </CardContent>
     </Card>

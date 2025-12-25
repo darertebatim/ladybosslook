@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Megaphone, Users, Bell, Mail, Loader2 } from 'lucide-react';
+import { Megaphone, Users, Bell, Mail, Loader2, Link as LinkIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 
@@ -14,6 +14,8 @@ interface Broadcast {
   sent_count: number;
   send_push: boolean;
   send_email: boolean;
+  link_url: string | null;
+  link_text: string | null;
   created_at: string;
 }
 
@@ -102,6 +104,12 @@ export function BroadcastHistory() {
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Mail className="h-3 w-3" />
                           Email
+                        </div>
+                      )}
+                      {broadcast.link_url && (
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <LinkIcon className="h-3 w-3" />
+                          Link
                         </div>
                       )}
                     </div>

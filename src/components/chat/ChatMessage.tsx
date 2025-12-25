@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { FileText, Download, ExternalLink } from "lucide-react";
+import { FileText, Download, ExternalLink, Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ChatMessageProps {
@@ -41,6 +41,28 @@ function linkifyText(text: string) {
   });
 }
 
+// Parse message content for link buttons
+function parseMessageContent(content: string): { text: string; linkUrl?: string; linkText?: string } {
+  const linkButtonMatch = content.match(/🔗 LINK_BUTTON:(.+):(.+)$/);
+  
+  if (linkButtonMatch) {
+    const text = content.replace(/\n\n🔗 LINK_BUTTON:.+:.+$/, '');
+    return {
+      text,
+      linkUrl: linkButtonMatch[1],
+      linkText: linkButtonMatch[2]
+    };
+  }
+  
+  return { text: content };
+}
+
+// Format broadcast message (remove markdown-style bold)
+function formatBroadcastText(text: string) {
+  // Replace **text** with just text (we'll style it differently)
+  return text.replace(/\*\*(.+?)\*\*/g, '$1');
+}
+
 export function ChatMessage({
   content, 
   senderType, 
@@ -53,10 +75,18 @@ export function ChatMessage({
   isBroadcast
 }: ChatMessageProps) {
   const isImage = attachmentType?.startsWith('image/');
+  const { text, linkUrl, linkText } = parseMessageContent(content);
+  const displayText = isBroadcast ? formatBroadcastText(text) : text;
 
   const handleDownload = () => {
     if (attachmentUrl) {
       window.open(attachmentUrl, '_blank');
+    }
+  };
+
+  const handleLinkClick = () => {
+    if (linkUrl) {
+      window.open(linkUrl, '_blank');
     }
   };
 
@@ -75,10 +105,12 @@ export function ChatMessage({
         {/* Broadcast indicator */}
         {isBroadcast && !isCurrentUser && (
           <div className="px-4 pt-2 flex items-center gap-1.5 text-xs text-primary font-medium">
-            <span>📢</span>
+            <Megaphone className="h-3 w-3" />
             <span>Broadcast</span>
           </div>
         )}
+
+        {/* Image Attachment */}
         {attachmentUrl && isImage && (
           <div className="relative">
             <img 
@@ -127,9 +159,24 @@ export function ChatMessage({
         )}
 
         {/* Text Content */}
-        {content && (
+        {displayText && (
           <div className="px-4 py-2.5">
-            <p className="text-sm whitespace-pre-wrap break-words">{linkifyText(content)}</p>
+            <p className="text-sm whitespace-pre-wrap break-words">{linkifyText(displayText)}</p>
+          </div>
+        )}
+
+        {/* Link Button */}
+        {linkUrl && (
+          <div className="px-4 pb-3">
+            <Button
+              variant={isCurrentUser ? "secondary" : "default"}
+              size="sm"
+              className="w-full"
+              onClick={handleLinkClick}
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              {linkText || 'View Details'}
+            </Button>
           </div>
         )}
 
