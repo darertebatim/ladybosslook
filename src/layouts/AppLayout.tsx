@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Bell, User, Loader2, Headphones, ShoppingBag } from 'lucide-react';
+import { Home, BookOpen, Bell, Loader2, Headphones, ShoppingBag, MessageCircle } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications } from '@/lib/pushNotifications';
 import { toast } from 'sonner';
@@ -86,7 +86,7 @@ const AppLayout = () => {
     { path: '/app/courses', icon: BookOpen, label: 'Courses' },
     { path: '/app/browse', icon: ShoppingBag, label: 'Browse' },
     { path: '/app/player', icon: Headphones, label: 'Player' },
-    { path: '/app/profile', icon: User, label: 'Profile' },
+    { path: '/app/support-chat', icon: MessageCircle, label: 'Chat' },
   ];
 
   return (
