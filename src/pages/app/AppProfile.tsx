@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell } from 'lucide-react';
 import { checkCalendarPermission, requestCalendarPermission, isCalendarAvailable } from '@/lib/calendarIntegration';
@@ -31,6 +32,9 @@ const AppProfile = () => {
   const [subscriptionStatus, setSubscriptionStatus] = useState<'checking' | 'active' | 'none'>('checking');
   const [calendarPermission, setCalendarPermission] = useState<'granted' | 'denied' | 'prompt'>('prompt');
   const [isRequestingCalendar, setIsRequestingCalendar] = useState(false);
+  const [autoSyncCalendar, setAutoSyncCalendar] = useState(() => {
+    return localStorage.getItem('autoSyncCalendar') === 'true';
+  });
   const isNative = isNativeApp();
 
   // Check notification permission and subscription status on mount
@@ -99,6 +103,34 @@ const AppProfile = () => {
     } finally {
       setIsRequestingCalendar(false);
     }
+  };
+
+  // Handle auto-sync toggle
+  const handleAutoSyncToggle = async (enabled: boolean) => {
+    if (enabled && calendarPermission !== 'granted') {
+      // Request permission first
+      const result = await requestCalendarPermission();
+      setCalendarPermission(result);
+      
+      if (result !== 'granted') {
+        toast({
+          title: 'Permission Required',
+          description: 'Calendar access is needed to auto-sync sessions',
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+    
+    setAutoSyncCalendar(enabled);
+    localStorage.setItem('autoSyncCalendar', enabled.toString());
+    
+    toast({
+      title: enabled ? 'Auto-Sync Enabled' : 'Auto-Sync Disabled',
+      description: enabled 
+        ? 'Course sessions will be added to calendar on enrollment'
+        : 'Sessions won\'t be auto-added on enrollment',
+    });
   };
 
   const { data: profile } = useQuery({
@@ -643,11 +675,27 @@ const AppProfile = () => {
 
               {/* Enabled State */}
               {calendarPermission === 'granted' && (
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">✅ Calendar Access Enabled</p>
-                  <p className="text-sm text-muted-foreground">
-                    When you tap "Add to Calendar" in a course, sessions will be added directly to your iOS Calendar with reminders.
-                  </p>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">✅ Calendar Access Enabled</p>
+                    <p className="text-sm text-muted-foreground">
+                      When you tap "Add to Calendar" in a course, sessions will be added directly to your iOS Calendar with reminders.
+                    </p>
+                  </div>
+                  
+                  {/* Auto-sync toggle */}
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="space-y-0.5">
+                      <p className="text-sm font-medium">Auto-Sync on Enrollment</p>
+                      <p className="text-xs text-muted-foreground">
+                        Automatically add all sessions when you enroll
+                      </p>
+                    </div>
+                    <Switch
+                      checked={autoSyncCalendar}
+                      onCheckedChange={handleAutoSyncToggle}
+                    />
+                  </div>
                 </div>
               )}
 
