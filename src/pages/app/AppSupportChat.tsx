@@ -16,6 +16,9 @@ interface Message {
   sender_type: 'user' | 'admin';
   is_read: boolean;
   created_at: string;
+  attachment_url: string | null;
+  attachment_name: string | null;
+  attachment_type: string | null;
 }
 
 interface Conversation {
@@ -34,6 +37,7 @@ export default function AppSupportChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   // Fetch or create conversation
   useEffect(() => {
@@ -41,7 +45,6 @@ export default function AppSupportChat() {
     
     const fetchConversation = async () => {
       try {
-        // First try to get existing conversation
         const { data: existing, error: fetchError } = await supabase
           .from('chat_conversations')
           .select('*')
@@ -55,7 +58,6 @@ export default function AppSupportChat() {
         if (existing) {
           setConversation(existing as Conversation);
           await fetchMessages(existing.id);
-          // Mark user messages as read
           await supabase
             .from('chat_conversations')
             .update({ unread_count_user: 0 })
@@ -76,7 +78,6 @@ export default function AppSupportChat() {
     fetchConversation();
   }, [user]);
 
-  // Fetch messages
   const fetchMessages = async (conversationId: string) => {
     const { data, error } = await supabase
       .from('chat_messages')
@@ -105,7 +106,6 @@ export default function AppSupportChat() {
         (payload) => {
           const newMessage = payload.new as Message;
           setMessages(prev => [...prev, newMessage]);
-          // Mark as read if from admin
           if (newMessage.sender_type === 'admin') {
             supabase
               .from('chat_conversations')
@@ -126,9 +126,53 @@ export default function AppSupportChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = async (content: string) => {
+  const uploadAttachment = async (file: File): Promise<string | null> => {
+    if (!user) return null;
+    
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from('chat-attachments')
+      .upload(fileName, file);
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      throw uploadError;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('chat-attachments')
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
+
+  const sendNotification = async (conversationId: string, messageContent: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token || !user) return;
+
+      await supabase.functions.invoke('send-chat-notification', {
+        body: {
+          conversationId,
+          messageContent,
+          senderType: 'user',
+          senderId: user.id
+        }
+      });
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+  };
+
+  const handleSendMessage = async (
+    content: string, 
+    attachment?: { file: File; name: string; type: string; size: number }
+  ) => {
     if (!user) return;
     setSending(true);
+    setUploading(!!attachment);
 
     try {
       let conversationId = conversation?.id;
@@ -149,19 +193,33 @@ export default function AppSupportChat() {
         conversationId = newConv.id;
       }
 
+      // Upload attachment if present
+      let attachmentUrl: string | null = null;
+      if (attachment) {
+        attachmentUrl = await uploadAttachment(attachment.file);
+      }
+
       // Send message
+      const messageContent = content || (attachment ? `Sent an attachment: ${attachment.name}` : '');
+      
       const { error: msgError } = await supabase
         .from('chat_messages')
         .insert({
           conversation_id: conversationId,
           sender_id: user.id,
           sender_type: 'user',
-          content
+          content: messageContent,
+          attachment_url: attachmentUrl,
+          attachment_name: attachment?.name || null,
+          attachment_type: attachment?.type || null,
+          attachment_size: attachment?.size || null
         });
 
       if (msgError) throw msgError;
 
-      // Refetch messages to ensure sync
+      // Send push notification to admins
+      await sendNotification(conversationId, messageContent);
+
       await fetchMessages(conversationId);
     } catch (error: any) {
       console.error('Error sending message:', error);
@@ -172,6 +230,7 @@ export default function AppSupportChat() {
       });
     } finally {
       setSending(false);
+      setUploading(false);
     }
   };
 
@@ -229,6 +288,9 @@ export default function AppSupportChat() {
                   createdAt={msg.created_at}
                   isRead={msg.is_read}
                   isCurrentUser={msg.sender_type === 'user'}
+                  attachmentUrl={msg.attachment_url}
+                  attachmentName={msg.attachment_name}
+                  attachmentType={msg.attachment_type}
                 />
               ))}
               <div ref={messagesEndRef} />
@@ -240,6 +302,7 @@ export default function AppSupportChat() {
         <ChatInput 
           onSend={handleSendMessage} 
           disabled={sending || conversation?.status === 'resolved'}
+          uploading={uploading}
           placeholder={conversation?.status === 'resolved' 
             ? "This conversation is resolved" 
             : "Type a message..."}
