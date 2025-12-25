@@ -1,7 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Paperclip, X, Loader2, FileText, Image as ImageIcon } from "lucide-react";
+import { Send, Paperclip, X, Loader2, FileText, Image as ImageIcon, Mic, Square } from "lucide-react";
 
 interface Attachment {
   file: File;
@@ -19,14 +19,32 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = [
   'image/jpeg', 'image/png', 'image/gif', 'image/webp',
   'application/pdf', 'text/plain',
-  'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'audio/webm', 'audio/mp4', 'audio/mpeg', 'audio/ogg'
 ];
 
 export function ChatInput({ onSend, disabled, placeholder = "Type a message...", uploading }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [attachment, setAttachment] = useState<Attachment | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+      }
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.stop();
+      }
+    };
+  }, []);
 
   const handleSend = () => {
     if ((message.trim() || attachment) && !disabled && !uploading) {
@@ -64,7 +82,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
     }
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      setError("File type not supported. Allowed: images, PDF, text, Word docs");
+      setError("File type not supported. Allowed: images, PDF, text, Word docs, audio");
       return;
     }
 
@@ -92,8 +110,96 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
     setError(null);
   };
 
+  const startRecording = async () => {
+    try {
+      setError(null);
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4'
+      });
+      
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { 
+          type: mediaRecorder.mimeType 
+        });
+        
+        const extension = mediaRecorder.mimeType.includes('webm') ? 'webm' : 'm4a';
+        const audioFile = new File([audioBlob], `voice-message.${extension}`, { 
+          type: mediaRecorder.mimeType 
+        });
+
+        setAttachment({ file: audioFile });
+        
+        // Stop all tracks
+        stream.getTracks().forEach(track => track.stop());
+        
+        // Clear interval
+        if (recordingIntervalRef.current) {
+          clearInterval(recordingIntervalRef.current);
+          recordingIntervalRef.current = null;
+        }
+        setRecordingDuration(0);
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      
+      // Start duration counter
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingDuration(prev => prev + 1);
+      }, 1000);
+
+    } catch (err) {
+      console.error('Error accessing microphone:', err);
+      setError("Could not access microphone. Please allow microphone permission.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const cancelRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.ondataavailable = null;
+      mediaRecorderRef.current.onstop = null;
+      if (mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.stop();
+      }
+    }
+    
+    if (recordingIntervalRef.current) {
+      clearInterval(recordingIntervalRef.current);
+      recordingIntervalRef.current = null;
+    }
+    
+    setIsRecording(false);
+    setRecordingDuration(0);
+    audioChunksRef.current = [];
+  };
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const getFileIcon = (type: string) => {
     if (type.startsWith('image/')) return <ImageIcon className="h-4 w-4" />;
+    if (type.startsWith('audio/')) return <Mic className="h-4 w-4" />;
     return <FileText className="h-4 w-4" />;
   };
 
@@ -105,8 +211,37 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
 
   return (
     <div className="border-t bg-background">
+      {/* Recording UI */}
+      {isRecording && (
+        <div className="px-4 pt-3">
+          <div className="flex items-center gap-3 p-3 bg-destructive/10 rounded-lg">
+            <div className="h-3 w-3 rounded-full bg-destructive animate-pulse" />
+            <span className="text-sm font-medium text-destructive">
+              Recording {formatDuration(recordingDuration)}
+            </span>
+            <div className="flex-1" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={cancelRecording}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={stopRecording}
+              className="gap-1"
+            >
+              <Square className="h-3 w-3 fill-current" />
+              Stop
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Attachment Preview */}
-      {attachment && (
+      {attachment && !isRecording && (
         <div className="px-4 pt-3">
           <div className="flex items-center gap-2 p-2 bg-muted rounded-lg max-w-xs">
             {attachment.preview ? (
@@ -158,9 +293,24 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           size="icon"
           className="shrink-0"
           onClick={() => fileInputRef.current?.click()}
-          disabled={disabled || uploading || !!attachment}
+          disabled={disabled || uploading || !!attachment || isRecording}
         >
           <Paperclip className="h-5 w-5" />
+        </Button>
+
+        {/* Microphone Button */}
+        <Button
+          variant={isRecording ? "destructive" : "ghost"}
+          size="icon"
+          className="shrink-0"
+          onClick={isRecording ? stopRecording : startRecording}
+          disabled={disabled || uploading || !!attachment}
+        >
+          {isRecording ? (
+            <Square className="h-4 w-4 fill-current" />
+          ) : (
+            <Mic className="h-5 w-5" />
+          )}
         </Button>
 
         <Textarea
@@ -168,14 +318,14 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          disabled={disabled || uploading}
+          disabled={disabled || uploading || isRecording}
           className="min-h-[44px] max-h-32 resize-none"
           rows={1}
         />
         
         <Button 
           onClick={handleSend} 
-          disabled={disabled || uploading || (!message.trim() && !attachment)}
+          disabled={disabled || uploading || isRecording || (!message.trim() && !attachment)}
           size="icon"
           className="shrink-0"
         >
