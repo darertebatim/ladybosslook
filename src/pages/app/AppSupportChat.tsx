@@ -282,6 +282,10 @@ export default function AppSupportChat() {
     );
   }
 
+  // Header height: 56px + safe-area-inset-top
+  // Tab bar height: 72px + safe-area-inset-bottom
+  // Input height: ~68px
+
   return (
     <>
       <SEOHead 
@@ -289,9 +293,12 @@ export default function AppSupportChat() {
         description="Chat with our support team"
       />
       
-      <div className="flex flex-col h-[100dvh] bg-background">
+      <div className="fixed inset-0 bg-background flex flex-col">
         {/* Fixed Header with safe area */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border pt-safe">
+        <header 
+          className="bg-background border-b border-border z-50 shrink-0"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
           <div className="flex items-center gap-3 h-14 px-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-5 w-5" />
@@ -310,37 +317,43 @@ export default function AppSupportChat() {
           </div>
         </header>
 
-        {/* Header spacer */}
-        <div className="h-14 pt-safe shrink-0" />
-
-        {/* Messages area - scrollable */}
-        <div className="flex-1 overflow-y-auto p-4">
-          {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center px-4">
-              <MessageCircle className="h-12 w-12 text-muted-foreground/30 mb-4" />
-              <h2 className="font-medium text-lg mb-1">Start a conversation</h2>
-              <p className="text-sm text-muted-foreground max-w-xs">
-                Send us a message and we'll get back to you as soon as possible
-              </p>
-            </div>
-          ) : (
-            <>
-              {messages.map((msg) => (
-                <ChatMessage
-                  key={msg.id}
-                  content={msg.content}
-                  senderType={msg.sender_type}
-                  createdAt={msg.created_at}
-                  isRead={msg.is_read}
-                  isCurrentUser={msg.sender_type === 'user'}
-                  attachmentUrl={msg.attachment_url}
-                  attachmentName={msg.attachment_name}
-                  attachmentType={msg.attachment_type}
-                />
-              ))}
-              <div ref={messagesEndRef} />
-            </>
-          )}
+        {/* Messages area - positioned between header and input */}
+        <div 
+          className="flex-1 overflow-y-auto overscroll-contain"
+          style={{
+            paddingBottom: keyboardHeight > 0 
+              ? `calc(80px + ${keyboardHeight}px)` 
+              : 'calc(140px + env(safe-area-inset-bottom))'
+          }}
+        >
+          <div className="p-4">
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
+                <MessageCircle className="h-12 w-12 text-muted-foreground/30 mb-4" />
+                <h2 className="font-medium text-lg mb-1">Start a conversation</h2>
+                <p className="text-sm text-muted-foreground max-w-xs">
+                  Send us a message and we'll get back to you as soon as possible
+                </p>
+              </div>
+            ) : (
+              <>
+                {messages.map((msg) => (
+                  <ChatMessage
+                    key={msg.id}
+                    content={msg.content}
+                    senderType={msg.sender_type}
+                    createdAt={msg.created_at}
+                    isRead={msg.is_read}
+                    isCurrentUser={msg.sender_type === 'user'}
+                    attachmentUrl={msg.attachment_url}
+                    attachmentName={msg.attachment_name}
+                    attachmentType={msg.attachment_type}
+                  />
+                ))}
+                <div ref={messagesEndRef} />
+              </>
+            )}
+          </div>
         </div>
 
         {/* Fixed Input Area that moves with keyboard */}
@@ -350,19 +363,21 @@ export default function AppSupportChat() {
             bottom: keyboardHeight > 0 
               ? keyboardHeight 
               : 'calc(72px + env(safe-area-inset-bottom))',
-            paddingBottom: keyboardHeight > 0 ? '12px' : '12px',
+            paddingBottom: '12px',
             transition: 'bottom 0.15s ease-out',
             willChange: 'bottom'
           }}
         >
-          <ChatInput 
-            onSend={handleSendMessage} 
-            disabled={sending || conversation?.status === 'resolved'}
-            uploading={uploading}
-            placeholder={conversation?.status === 'resolved' 
-              ? "This conversation is resolved" 
-              : "Type a message..."}
-          />
+          <div className="py-3 px-4">
+            <ChatInput 
+              onSend={handleSendMessage} 
+              disabled={sending || conversation?.status === 'resolved'}
+              uploading={uploading}
+              placeholder={conversation?.status === 'resolved' 
+                ? "This conversation is resolved" 
+                : "Type a message..."}
+            />
+          </div>
         </div>
       </div>
     </>

@@ -91,14 +91,17 @@ const AppLayout = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col">
-      {/* Main content area */}
-      <main className="flex-1 pb-20">
+      {/* Main content area - pb-28 for tab bar clearance (72px + safe area) */}
+      <main className="flex-1 pb-28">
         <Outlet />
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 pb-safe">
-        <div className="flex justify-around items-center h-16 max-w-screen-xl mx-auto px-4">
+      {/* Bottom Navigation - 72px height + safe area */}
+      <nav 
+        className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
+        <div className="flex justify-around items-center h-[72px] max-w-screen-xl mx-auto px-4 py-1">
           {navItems.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path || 
               (path === '/app/player' && location.pathname.startsWith('/app/player'));
