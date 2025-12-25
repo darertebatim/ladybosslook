@@ -8,8 +8,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { Capacitor } from '@capacitor/core';
 import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { useChatNotifications } from '@/hooks/useChatNotifications';
+import { UnseenContentProvider } from '@/contexts/UnseenContentContext';
 
-const AppLayout = () => {
+const AppLayoutContent = () => {
   // All hooks must be called unconditionally at the top
   const location = useLocation();
   const { user } = useAuth();
@@ -211,6 +212,14 @@ const AppLayout = () => {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+};
+
+const AppLayout = () => {
+  return (
+    <UnseenContentProvider>
+      <AppLayoutContent />
+    </UnseenContentProvider>
   );
 };
 
