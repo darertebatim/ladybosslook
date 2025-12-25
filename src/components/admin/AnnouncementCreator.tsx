@@ -20,7 +20,7 @@ interface Program {
 
 // Common in-app link options
 const IN_APP_LINKS = [
-  { value: '', label: 'No link' },
+  { value: 'none', label: 'No link' },
   { value: '/app/home', label: '🏠 Home' },
   { value: '/app/courses', label: '📚 My Courses' },
   { value: '/app/browse', label: '🛍️ Browse Store' },
@@ -37,7 +37,7 @@ export function AnnouncementCreator() {
   const [targetRoundId, setTargetRoundId] = useState<string>('all');
   const [sendPush, setSendPush] = useState(true);
   const [sendEmail, setSendEmail] = useState(false);
-  const [linkType, setLinkType] = useState('');
+  const [linkType, setLinkType] = useState('none');
   const [customLinkUrl, setCustomLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,8 +45,8 @@ export function AnnouncementCreator() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Compute actual link URL
-  const linkUrl = linkType === 'custom' ? customLinkUrl : linkType;
+  // Compute actual link URL (empty if 'none' selected)
+  const linkUrl = linkType === 'none' ? '' : (linkType === 'custom' ? customLinkUrl : linkType);
 
   // Fetch rounds for the selected course
   const { data: rounds } = useQuery({
@@ -163,7 +163,7 @@ export function AnnouncementCreator() {
       setTargetRoundId('all');
       setSendPush(true);
       setSendEmail(false);
-      setLinkType('');
+      setLinkType('none');
       setCustomLinkUrl('');
       setLinkText('');
       
@@ -262,7 +262,7 @@ export function AnnouncementCreator() {
                 placeholder="View Details"
                 value={linkText}
                 onChange={(e) => setLinkText(e.target.value)}
-                disabled={!linkType}
+                disabled={linkType === 'none'}
               />
             </div>
           </div>
