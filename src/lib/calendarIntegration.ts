@@ -129,7 +129,14 @@ export async function addMultipleEventsToCalendar(
 
 /**
  * Check if calendar integration is available (native iOS/Android only)
+ * Also respects ?devNative=true for preview purposes
  */
 export function isCalendarAvailable(): boolean {
+  // Check for dev preview flag
+  if (typeof window !== 'undefined') {
+    const devNative = new URLSearchParams(window.location.search).get('devNative') === 'true';
+    if (devNative) return true;
+  }
+  
   return Capacitor.isNativePlatform();
 }
