@@ -18,6 +18,7 @@ import { useCompletedRoundCelebration } from '@/hooks/useCompletedRoundCelebrati
 import { HomeSkeleton } from '@/components/app/skeletons';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
+import { HomeBanner } from '@/components/app/HomeBanner';
 
 const AppHome = () => {
   const { user } = useAuth();
@@ -145,6 +146,9 @@ const AppHome = () => {
       
       <div className="container max-w-7xl py-4 px-4">
         <div className="space-y-6">
+          {/* Admin Banners - shown first */}
+          <HomeBanner />
+          
           {showNotificationBanner && (
             <Alert className="border-primary/50 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors" onClick={() => navigate('/app/profile')}>
               <div className="flex items-center gap-3">
