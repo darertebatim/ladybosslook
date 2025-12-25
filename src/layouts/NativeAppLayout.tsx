@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, BookOpen, User, Headphones, MessageCircle } from 'lucide-react';
+import { Home, BookOpen, User, Headphones, ShoppingBag } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
@@ -39,8 +39,8 @@ const NativeAppLayout = () => {
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home' },
     { path: '/app/courses', icon: BookOpen, label: 'Courses' },
+    { path: '/app/browse', icon: ShoppingBag, label: 'Browse' },
     { path: '/app/player', icon: Headphones, label: 'Player' },
-    { path: '/app/support-chat', icon: MessageCircle, label: 'Chat' },
     { path: '/app/profile', icon: User, label: 'Profile' },
   ];
 
