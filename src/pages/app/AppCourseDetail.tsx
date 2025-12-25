@@ -177,7 +177,10 @@ const AppCourseDetail = () => {
   });
 
   return (
-    <div className="container max-w-4xl py-6 px-4">
+    <div 
+      className="container max-w-4xl py-6 px-4"
+      style={{ paddingTop: 'calc(24px + env(safe-area-inset-top, 0px))' }}
+    >
       <SEOHead 
         title={`${program?.title || 'Course'} Details - LadyBoss Academy`}
         description="Course details and materials"

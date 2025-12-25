@@ -237,12 +237,12 @@ export default function AppPlayer() {
 
   return (
     <div className="min-h-[100dvh] bg-background pb-28">
-      {/* Fixed Header with safe area */}
+      {/* Fixed Header with safe area + visual padding */}
       <div 
         className="fixed top-0 left-0 right-0 z-10 bg-background/80 backdrop-blur-lg border-b"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="p-4 space-y-4">
+        <div className="pt-6 pb-3 px-4 space-y-4">
           <div>
             <h1 className="text-2xl font-bold">Audio Library</h1>
             <p className="text-sm text-muted-foreground">Listen and learn on the go</p>
@@ -268,8 +268,8 @@ export default function AppPlayer() {
         </div>
       </div>
 
-      {/* Header spacer - matches fixed header height (~180px + safe area) */}
-      <div style={{ height: 'calc(180px + env(safe-area-inset-top, 0px))' }} />
+      {/* Header spacer - matches fixed header height (~200px + safe area) */}
+      <div style={{ height: 'calc(200px + env(safe-area-inset-top, 0px))' }} />
 
       <div className="p-4 space-y-6">
         {/* Continue Learning Section */}
