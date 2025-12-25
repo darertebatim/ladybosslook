@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { GraduationCap, Calendar, Users, ExternalLink, ArrowRight, Sparkles } from 'lucide-react';
+import { GraduationCap, Calendar, Users, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
@@ -89,145 +89,209 @@ export function ActiveRound() {
     );
   }
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <GraduationCap className="h-5 w-5 text-primary" />
-          Your Active Rounds
-        </h2>
-        <Badge variant="secondary">{activeEnrollments.length}</Badge>
-      </div>
+  // Separate active/upcoming from completed rounds
+  const activeRounds = activeEnrollments.filter(e => e.program_rounds?.status !== 'completed');
+  const completedRounds = activeEnrollments.filter(e => e.program_rounds?.status === 'completed');
 
-      <div className="flex flex-col gap-8">
-        {activeEnrollments.map((enrollment) => {
-          const round = enrollment.program_rounds;
-          if (!round) return null;
+  const RoundCard = ({ enrollment, isCompleted = false }: { enrollment: typeof activeEnrollments[0], isCompleted?: boolean }) => {
+    const round = enrollment.program_rounds;
+    if (!round) return null;
 
-          const isUpcoming = round.status === 'upcoming';
-          const isActive = round.status === 'active';
-          const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
-          const isRoundUnseen = unseenRounds.has(round.id);
-          const hasNotification = isEnrollmentUnseen || isRoundUnseen;
+    const isUpcoming = round.status === 'upcoming';
+    const isActive = round.status === 'active';
+    const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
+    const isRoundUnseen = unseenRounds.has(round.id);
+    const hasNotification = isEnrollmentUnseen || isRoundUnseen;
 
-          return (
-            <Link 
-              key={enrollment.id} 
-              to={`/app/course/${enrollment.program_slug}`}
-              onClick={() => {
-                // Mark as viewed when clicked
-                if (isEnrollmentUnseen && markEnrollmentViewed) {
-                  markEnrollmentViewed(enrollment.id);
-                }
-                if (isRoundUnseen && markRoundViewed) {
-                  markRoundViewed(round.id);
-                }
-              }}
-            >
-              <Card className={`shadow-sm active:scale-[0.98] transition-transform overflow-hidden ${hasNotification ? 'border-primary border-2' : 'border border-border'}`}>
-                <CardContent className="p-4 pb-0">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold truncate">{enrollment.course_name}</h3>
-                        {hasNotification && (
-                          <Badge variant="default" className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 h-auto shrink-0">
-                            <Sparkles className="h-3 w-3 mr-0.5" />
-                            New
-                          </Badge>
-                        )}
-                        <Badge 
-                          variant={isActive ? 'default' : 'secondary'}
-                          className={`shrink-0 ${isActive ? 'bg-green-500' : ''}`}
-                        >
-                          {round.status}
-                        </Badge>
-                      </div>
-                      
-                      <div className="space-y-1.5 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                          <Users className="h-3.5 w-3.5" />
-                          <span className="font-medium">{round.round_name}</span>
-                        </div>
-                        
-                        {round.first_session_date && (
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-3.5 w-3.5" />
-                            <span>
-                              {isUpcoming ? 'Starts ' : 'Next session: '}
-                              {format(new Date(round.first_session_date), 'MMM d, yyyy • h:mm a')}
-                            </span>
-                          </div>
-                        )}
-                        
-                        {round.start_date && (
-                          <div className="flex items-center gap-2 text-xs">
-                            <span>
-                              {format(new Date(round.start_date), 'MMM d')}
-                              {round.end_date && ` - ${format(new Date(round.end_date), 'MMM d, yyyy')}`}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+    return (
+      <Link 
+        key={enrollment.id} 
+        to={`/app/course/${enrollment.program_slug}`}
+        onClick={() => {
+          if (isEnrollmentUnseen && markEnrollmentViewed) {
+            markEnrollmentViewed(enrollment.id);
+          }
+          if (isRoundUnseen && markRoundViewed) {
+            markRoundViewed(round.id);
+          }
+        }}
+      >
+        <Card className={`shadow-sm active:scale-[0.98] transition-transform overflow-hidden ${
+          isCompleted 
+            ? 'border border-border opacity-75' 
+            : hasNotification 
+              ? 'border-primary border-2' 
+              : 'border border-border'
+        }`}>
+          <CardContent className="p-4 pb-0">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <h3 className={`font-semibold truncate ${isCompleted ? 'text-muted-foreground' : ''}`}>
+                    {enrollment.course_name}
+                  </h3>
+                  {hasNotification && !isCompleted && (
+                    <Badge variant="default" className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 h-auto shrink-0">
+                      <Sparkles className="h-3 w-3 mr-0.5" />
+                      New
+                    </Badge>
+                  )}
+                  {isCompleted ? (
+                    <Badge variant="secondary" className="bg-muted text-muted-foreground shrink-0">
+                      <CheckCircle2 className="h-3 w-3 mr-1" />
+                      Completed
+                    </Badge>
+                  ) : (
+                    <Badge 
+                      variant={isActive ? 'default' : 'secondary'}
+                      className={`shrink-0 ${isActive ? 'bg-green-500' : ''}`}
+                    >
+                      {round.status}
+                    </Badge>
+                  )}
+                </div>
+                
+                <div className="space-y-1.5 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-3.5 w-3.5" />
+                    <span className="font-medium">{round.round_name}</span>
                   </div>
-
-                  {round.video_url && (() => {
-                    // Extract video ID for thumbnail - use hqdefault for better reliability
-                    let thumbnailUrl = '';
-                    
-                    if (round.video_url.includes('youtube.com/watch')) {
-                      const videoId = round.video_url.split('v=')[1]?.split('&')[0];
-                      thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-                    } else if (round.video_url.includes('youtu.be/')) {
-                      const videoId = round.video_url.split('youtu.be/')[1]?.split('?')[0];
-                      thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-                    } else if (round.video_url.includes('vimeo.com/')) {
-                      const videoId = round.video_url.split('vimeo.com/')[1]?.split('?')[0].replace('video/', '');
-                      thumbnailUrl = `https://vumbnail.com/${videoId}.jpg`;
-                    }
-                    
-                    return (
-                      <div className="mt-3 relative aspect-video rounded-md overflow-hidden bg-muted group">
-                        {thumbnailUrl && (
-                          <img 
-                            src={thumbnailUrl} 
-                            alt="Video preview" 
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              // Hide broken image, show fallback UI instead
-                              e.currentTarget.style.display = 'none';
-                            }}
-                          />
-                        )}
-                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
-                          <div className="w-16 h-16 rounded-full bg-background/90 flex items-center justify-center">
-                            <div className="w-0 h-0 border-l-[16px] border-l-primary border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent ml-1" />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {round.important_message && (
-                    <div className="mt-3 p-2 bg-primary/5 rounded-md border border-primary/20">
-                      <p className="text-xs text-foreground line-clamp-2">
-                        {round.important_message}
-                      </p>
+                  
+                  {!isCompleted && round.first_session_date && (
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-3.5 w-3.5" />
+                      <span>
+                        {isUpcoming ? 'Starts ' : 'Next session: '}
+                        {format(new Date(round.first_session_date), 'MMM d, yyyy • h:mm a')}
+                      </span>
                     </div>
                   )}
-                </CardContent>
-                
-                {/* Clear CTA footer to indicate tappability */}
-                <div className="mt-3 bg-foreground px-4 py-3 flex items-center justify-between">
-                  <span className="text-sm font-medium text-background">View Schedule & Materials</span>
-                  <ArrowRight className="h-4 w-4 text-background" />
+                  
+                  {round.start_date && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <span>
+                        {format(new Date(round.start_date), 'MMM d')}
+                        {round.end_date && ` - ${format(new Date(round.end_date), 'MMM d, yyyy')}`}
+                      </span>
+                    </div>
+                  )}
                 </div>
-              </Card>
-            </Link>
-          );
-        })}
-      </div>
+              </div>
+            </div>
+
+            {!isCompleted && round.video_url && (() => {
+              let thumbnailUrl = '';
+              
+              if (round.video_url.includes('youtube.com/watch')) {
+                const videoId = round.video_url.split('v=')[1]?.split('&')[0];
+                thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+              } else if (round.video_url.includes('youtu.be/')) {
+                const videoId = round.video_url.split('youtu.be/')[1]?.split('?')[0];
+                thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+              } else if (round.video_url.includes('vimeo.com/')) {
+                const videoId = round.video_url.split('vimeo.com/')[1]?.split('?')[0].replace('video/', '');
+                thumbnailUrl = `https://vumbnail.com/${videoId}.jpg`;
+              }
+              
+              return (
+                <div className="mt-3 relative aspect-video rounded-md overflow-hidden bg-muted group">
+                  {thumbnailUrl && (
+                    <img 
+                      src={thumbnailUrl} 
+                      alt="Video preview" 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
+                    <div className="w-16 h-16 rounded-full bg-background/90 flex items-center justify-center">
+                      <div className="w-0 h-0 border-l-[16px] border-l-primary border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent ml-1" />
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {!isCompleted && round.important_message && (
+              <div className="mt-3 p-2 bg-primary/5 rounded-md border border-primary/20">
+                <p className="text-xs text-foreground line-clamp-2">
+                  {round.important_message}
+                </p>
+              </div>
+            )}
+          </CardContent>
+          
+          <div className={`mt-3 px-4 py-3 flex items-center justify-between ${
+            isCompleted ? 'bg-muted' : 'bg-foreground'
+          }`}>
+            <span className={`text-sm font-medium ${isCompleted ? 'text-muted-foreground' : 'text-background'}`}>
+              {isCompleted ? 'View Materials' : 'View Schedule & Materials'}
+            </span>
+            <ArrowRight className={`h-4 w-4 ${isCompleted ? 'text-muted-foreground' : 'text-background'}`} />
+          </div>
+        </Card>
+      </Link>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Active Rounds Section */}
+      {activeRounds.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <GraduationCap className="h-5 w-5 text-primary" />
+              Your Active Rounds
+            </h2>
+            <Badge variant="secondary">{activeRounds.length}</Badge>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {activeRounds.map((enrollment) => (
+              <RoundCard key={enrollment.id} enrollment={enrollment} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Completed Rounds Section */}
+      {completedRounds.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-muted-foreground">
+              <CheckCircle2 className="h-5 w-5" />
+              Completed Rounds
+            </h2>
+            <Badge variant="outline" className="text-muted-foreground">{completedRounds.length}</Badge>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {completedRounds.map((enrollment) => (
+              <RoundCard key={enrollment.id} enrollment={enrollment} isCompleted />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Empty state if no active rounds but has completed */}
+      {activeRounds.length === 0 && completedRounds.length > 0 && (
+        <Card className="mb-4">
+          <CardContent className="py-6">
+            <div className="text-center">
+              <GraduationCap className="h-10 w-10 mx-auto mb-2 text-muted-foreground opacity-50" />
+              <p className="text-sm text-muted-foreground">No active rounds right now</p>
+              <Link to="/app/courses">
+                <Button className="mt-3" variant="outline" size="sm">
+                  Browse New Courses
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
