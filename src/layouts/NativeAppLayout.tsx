@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { checkPermissionStatus } from '@/lib/pushNotifications';
 import { PushNotificationPrompt } from '@/components/app/PushNotificationPrompt';
+import { useUnreadChat } from '@/hooks/useUnreadChat';
+import { useChatNotifications } from '@/hooks/useChatNotifications';
 
 /**
  * Native app layout - Clean layout specifically for iOS/Android native apps
@@ -12,7 +14,11 @@ import { PushNotificationPrompt } from '@/components/app/PushNotificationPrompt'
 const NativeAppLayout = () => {
   const location = useLocation();
   const { user } = useAuth();
+  const { unreadCount } = useUnreadChat();
   const [showPrompt, setShowPrompt] = useState(false);
+  
+  // Enable in-app chat notifications
+  useChatNotifications();
 
   useEffect(() => {
     const checkPrompt = async () => {
@@ -61,6 +67,7 @@ const NativeAppLayout = () => {
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               const Icon = item.icon;
+              const showBadge = item.path === '/app/support-chat' && unreadCount > 0;
               return (
                 <Link
                   key={item.path}
@@ -71,7 +78,14 @@ const NativeAppLayout = () => {
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  <Icon className={`h-6 w-6 ${isActive ? 'fill-current' : ''}`} />
+                  <div className="relative">
+                    <Icon className={`h-6 w-6 ${isActive ? 'fill-current' : ''}`} />
+                    {showBadge && (
+                      <span className="absolute -top-1 -right-2 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </div>
                   <span className="text-xs font-medium">{item.label}</span>
                 </Link>
               );

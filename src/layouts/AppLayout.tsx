@@ -6,13 +6,19 @@ import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNo
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { Capacitor } from '@capacitor/core';
+import { useUnreadChat } from '@/hooks/useUnreadChat';
+import { useChatNotifications } from '@/hooks/useChatNotifications';
 
 const AppLayout = () => {
   const location = useLocation();
   const { user } = useAuth();
+  const { unreadCount } = useUnreadChat();
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
+  
+  // Enable in-app chat notifications
+  useChatNotifications();
 
   // Only show notification prompt on native iOS
   useEffect(() => {
@@ -105,18 +111,26 @@ const AppLayout = () => {
           {navItems.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path || 
               (path === '/app/player' && location.pathname.startsWith('/app/player'));
+            const showBadge = path === '/app/support-chat' && unreadCount > 0;
             
             return (
               <Link
                 key={path}
                 to={path}
-                className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
+                className={`relative flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
                   isActive 
                     ? 'text-primary' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Icon className="h-6 w-6 mb-1" />
+                <div className="relative">
+                  <Icon className="h-6 w-6 mb-1" />
+                  {showBadge && (
+                    <span className="absolute -top-1 -right-2 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </div>
                 <span className="text-xs font-medium">{label}</span>
               </Link>
             );
