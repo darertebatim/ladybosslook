@@ -313,9 +313,12 @@ export default function AppAudioPlayer() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <div className="p-4">
-        {/* Header with breadcrumb */}
-        <div className="flex items-center gap-2 mb-6">
+      {/* Fixed Header with safe area */}
+      <div 
+        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="pt-6 pb-3 px-4 flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
@@ -339,6 +342,12 @@ export default function AppAudioPlayer() {
                   </Badge>
                 </div>
               )}
+            </div>
+          )}
+
+          {!playlistInfo && (
+            <div className="flex-1 min-w-0">
+              <h1 className="font-semibold text-lg truncate">Now Playing</h1>
             </div>
           )}
 
@@ -384,7 +393,12 @@ export default function AppAudioPlayer() {
             </Sheet>
           )}
         </div>
+      </div>
 
+      {/* Header spacer */}
+      <div style={{ height: 'calc(76px + env(safe-area-inset-top, 0px))' }} />
+
+      <div className="p-4">
         <div className="max-w-md mx-auto space-y-6">
           {/* Cover Art */}
           <div className="aspect-square rounded-lg overflow-hidden shadow-2xl">
