@@ -5,6 +5,7 @@ import { PushNotificationSender } from '@/components/admin/PushNotificationSende
 import { PushNotificationsHistory } from '@/components/admin/PushNotificationsHistory';
 import { EmailLogsViewer } from '@/components/admin/EmailLogsViewer';
 import { HomeBannerManager } from '@/components/admin/HomeBannerManager';
+import { FiveLanguageEmailSender } from '@/components/admin/FiveLanguageEmailSender';
 
 export default function Communications() {
   return (
@@ -36,7 +37,8 @@ export default function Communications() {
           <HomeBannerManager />
         </TabsContent>
 
-        <TabsContent value="emails">
+        <TabsContent value="emails" className="space-y-6">
+          <FiveLanguageEmailSender />
           <EmailLogsViewer />
         </TabsContent>
       </Tabs>
