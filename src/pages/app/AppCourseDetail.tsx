@@ -1,10 +1,11 @@
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft, CalendarPlus, Loader2 } from 'lucide-react';
+import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft, CalendarPlus, Loader2, Bell } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { downloadICSFile, generateICSFile } from '@/utils/calendar';
 import { addEventToCalendar, addMultipleEventsToCalendar, isCalendarAvailable, CalendarEvent } from '@/lib/calendarIntegration';
@@ -19,19 +20,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { shouldShowEnrollmentReminder } from '@/hooks/useNotificationReminder';
 import { subscribeToPushNotifications, checkPermissionStatus } from '@/lib/pushNotifications';
-import { useState as reactUseState, useEffect as reactUseEffect } from 'react';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Bell } from 'lucide-react';
 
 const AppCourseDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [showEnrollmentReminder, setShowEnrollmentReminder] = reactUseState(false);
-  const [isEnablingEnrollment, setIsEnablingEnrollment] = reactUseState(false);
-  const [isSyncingAllSessions, setIsSyncingAllSessions] = reactUseState(false);
-  const [hasNewSessions, setHasNewSessions] = reactUseState(false);
+  const [showEnrollmentReminder, setShowEnrollmentReminder] = useState(false);
+  const [isEnablingEnrollment, setIsEnablingEnrollment] = useState(false);
+  const [isSyncingAllSessions, setIsSyncingAllSessions] = useState(false);
+  const [hasNewSessions, setHasNewSessions] = useState(false);
 
   // Fetch enrollment and round data
   const { data: enrollment, isLoading: enrollmentLoading } = useQuery({
@@ -108,7 +107,7 @@ const AppCourseDetail = () => {
   });
 
   // Check if there are new sessions since last sync
-  reactUseEffect(() => {
+  useEffect(() => {
     if (!round?.id || !dbSessions || dbSessions.length === 0) {
       setHasNewSessions(false);
       return;
