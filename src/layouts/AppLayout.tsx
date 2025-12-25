@@ -178,27 +178,33 @@ const AppLayout = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Unread Messages Popup */}
+      {/* Unread Messages Popup - iOS Style */}
       <AlertDialog open={showUnreadPopup} onOpenChange={dismissPopup}>
-        <AlertDialogContent className="max-w-md mx-4 p-8">
-          <AlertDialogHeader className="space-y-4">
-            <div className="flex justify-center mb-2">
-              <div className="rounded-full bg-primary/10 p-5">
-                <MessageCircle className="h-12 w-12 text-primary" />
+        <AlertDialogContent className="max-w-[280px] p-0 rounded-2xl border border-border/50 shadow-xl overflow-hidden">
+          <AlertDialogHeader className="pt-5 pb-4 px-4">
+            <div className="flex justify-center mb-3">
+              <div className="rounded-full bg-primary/10 p-3">
+                <MessageCircle className="h-6 w-6 text-primary" />
               </div>
             </div>
-            <AlertDialogTitle className="text-center text-xl">
-              You have {unreadMessageCount} unread message{unreadMessageCount > 1 ? 's' : ''}
+            <AlertDialogTitle className="text-center text-[17px] font-semibold leading-tight">
+              {unreadMessageCount} New Message{unreadMessageCount > 1 ? 's' : ''}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-base px-4">
-              Support has replied to your conversation. Tap below to view.
+            <AlertDialogDescription className="text-center text-[13px] text-muted-foreground mt-1">
+              Support has replied to you
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col gap-3 sm:flex-col mt-6">
-            <AlertDialogAction onClick={goToChat} className="w-full h-12 text-base font-semibold">
-              View Messages
+          <AlertDialogFooter className="flex-col gap-0 sm:flex-col p-0 border-t border-border/50">
+            <AlertDialogAction 
+              onClick={goToChat} 
+              className="w-full h-11 rounded-none border-0 bg-transparent text-primary hover:bg-muted/50 text-[17px] font-normal"
+            >
+              View
             </AlertDialogAction>
-            <AlertDialogCancel onClick={dismissPopup} className="w-full h-12 m-0 text-base">
+            <AlertDialogCancel 
+              onClick={dismissPopup} 
+              className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent hover:bg-muted/50 text-[17px] font-normal text-muted-foreground"
+            >
               Later
             </AlertDialogCancel>
           </AlertDialogFooter>
