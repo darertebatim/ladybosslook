@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.send-broadcast-message]
 verify_jwt = true
+
+[functions.send-five-language-confirmation]
+verify_jwt = true
