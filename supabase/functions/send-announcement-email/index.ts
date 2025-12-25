@@ -128,7 +128,7 @@ const handler = async (req: Request): Promise<Response> => {
       const { data: enrollments, error: enrollError } = await supabase
         .from('course_enrollments')
         .select('user_id')
-        .eq('course_name', targetCourse)
+        .eq('program_slug', targetCourse)
         .eq('status', 'active');
       
       if (enrollError) {
