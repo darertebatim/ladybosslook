@@ -20,6 +20,7 @@ import AppProfile from "@/pages/app/AppProfile";
 import AppPlayer from "@/pages/app/AppPlayer";
 import AppPlaylistDetail from "@/pages/app/AppPlaylistDetail";
 import AppAudioPlayer from "@/pages/app/AppAudioPlayer";
+import AppSupportChat from "@/pages/app/AppSupportChat";
 import Programs from "./pages/Programs";
 import About from "./pages/About";
 import Overview from "./pages/admin/Overview";
@@ -30,6 +31,7 @@ import Communications from "./pages/admin/Communications";
 import ProgramsAdmin from "./pages/admin/Programs";
 import Payments from "./pages/admin/Payments";
 import System from "./pages/admin/System";
+import Support from "./pages/admin/Support";
 import AssertLanding from "./pages/AssertLanding";
 import Auth from "./pages/Auth";
 import BusinessIdeas from "./pages/BusinessIdeas";
@@ -118,6 +120,7 @@ const App = () => (
                 <Route path="communications" element={<Communications />} />
                 <Route path="programs" element={<ProgramsAdmin />} />
                 <Route path="payments" element={<Payments />} />
+                <Route path="support" element={<Support />} />
                 <Route path="system" element={<System />} />
               </Route>
             )}
@@ -163,6 +166,7 @@ const App = () => (
               <Route path="player" element={<AppPlayer />} />
               <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />
               <Route path="player/:audioId" element={<AppAudioPlayer />} />
+              <Route path="support-chat" element={<AppSupportChat />} />
               <Route path="profile" element={<AppProfile />} />
             </Route>
             

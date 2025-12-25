@@ -2,8 +2,11 @@ import { Mail, MessageCircle, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SEOHead } from "@/components/SEOHead";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const AppSupport = () => {
+  const { user } = useAuth();
   return (
     <>
       <SEOHead 
@@ -122,10 +125,19 @@ const AppSupport = () => {
                 </CardContent>
               </Card>
 
-              <div className="text-center pt-8">
-                <Button asChild size="lg">
+              <div className="text-center pt-8 space-y-3">
+                {user && (
+                  <Button asChild size="lg" className="w-full max-w-xs">
+                    <Link to="/app/support-chat">
+                      <MessageCircle className="mr-2 h-5 w-5" />
+                      Chat with Support
+                    </Link>
+                  </Button>
+                )}
+                <Button asChild size="lg" variant={user ? "outline" : "default"} className="w-full max-w-xs">
                   <a href="mailto:support@ladybosslook.com">
-                    Contact Support
+                    <Mail className="mr-2 h-5 w-5" />
+                    Email Support
                   </a>
                 </Button>
               </div>
