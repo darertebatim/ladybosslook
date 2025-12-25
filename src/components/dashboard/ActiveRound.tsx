@@ -83,7 +83,7 @@ export function ActiveRound() {
         <Badge variant="secondary">{activeEnrollments.length}</Badge>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-5">
         {activeEnrollments.map((enrollment) => {
           const round = enrollment.program_rounds;
           if (!round) return null;
