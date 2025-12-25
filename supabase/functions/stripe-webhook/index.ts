@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
@@ -9,7 +9,7 @@ const corsHeaders = {
 
 // Helper to find or create user by email
 async function findOrCreateUser(supabase: any, email: string, name: string): Promise<string | null> {
-  console.log('Finding or creating user for email:', email);
+  console.log('[WEBHOOK] Finding or creating user for email:', email);
   
   // First, check if user exists in profiles
   const { data: existingProfile } = await supabase
@@ -19,7 +19,7 @@ async function findOrCreateUser(supabase: any, email: string, name: string): Pro
     .single();
 
   if (existingProfile) {
-    console.log('Found existing user in profiles:', existingProfile.id);
+    console.log('[WEBHOOK] Found existing user in profiles:', existingProfile.id);
     return existingProfile.id;
   }
 
@@ -35,7 +35,7 @@ async function findOrCreateUser(supabase: any, email: string, name: string): Pro
   if (createError) {
     // User might already exist in auth but not in profiles
     if (createError.message?.includes('already been registered') || createError.message?.includes('already exists')) {
-      console.log('User exists in auth, looking up by email...');
+      console.log('[WEBHOOK] User exists in auth, looking up by email...');
       
       // Search through auth users to find the one with this email
       let page = 1;
@@ -48,13 +48,13 @@ async function findOrCreateUser(supabase: any, email: string, name: string): Pro
         });
 
         if (listError || !users || users.length === 0) {
-          console.error('Could not find user in auth:', listError);
+          console.error('[WEBHOOK] Could not find user in auth:', listError);
           break;
         }
 
         const foundUser = users.find((u: any) => u.email?.toLowerCase() === email.toLowerCase());
         if (foundUser) {
-          console.log('Found existing user on page', page, ':', foundUser.id);
+          console.log('[WEBHOOK] Found existing user on page', page, ':', foundUser.id);
           return foundUser.id;
         }
 
@@ -65,17 +65,17 @@ async function findOrCreateUser(supabase: any, email: string, name: string): Pro
       return null;
     }
     
-    console.error('Error creating user:', createError);
+    console.error('[WEBHOOK] Error creating user:', createError);
     return null;
   }
 
-  console.log('Created new user:', authData.user.id);
+  console.log('[WEBHOOK] Created new user:', authData.user.id);
   return authData.user.id;
 }
 
 // Helper to apply auto-enrollment rules
 async function applyAutoEnrollment(supabase: any, userId: string, programSlug: string, courseName: string): Promise<void> {
-  console.log('Checking auto-enrollment for program:', programSlug, 'user:', userId);
+  console.log('[WEBHOOK] Checking auto-enrollment for program:', programSlug, 'user:', userId);
   
   // Get auto-enrollment rule for this program
   const { data: autoEnrollRule } = await supabase
@@ -93,7 +93,7 @@ async function applyAutoEnrollment(supabase: any, userId: string, programSlug: s
     .single();
 
   if (existingEnrollment) {
-    console.log('Enrollment already exists for user:', userId, 'program:', programSlug);
+    console.log('[WEBHOOK] Enrollment already exists for user:', userId, 'program:', programSlug);
     return;
   }
 
@@ -107,7 +107,7 @@ async function applyAutoEnrollment(supabase: any, userId: string, programSlug: s
 
   if (autoEnrollRule) {
     enrollmentData.round_id = autoEnrollRule.round_id;
-    console.log('Using auto-enrollment round:', autoEnrollRule.round_id);
+    console.log('[WEBHOOK] Using auto-enrollment round:', autoEnrollRule.round_id);
   }
 
   const { error: enrollmentError } = await supabase
@@ -115,9 +115,57 @@ async function applyAutoEnrollment(supabase: any, userId: string, programSlug: s
     .insert(enrollmentData);
 
   if (enrollmentError) {
-    console.error('Error creating enrollment:', enrollmentError);
+    console.error('[WEBHOOK] Error creating enrollment:', enrollmentError);
   } else {
-    console.log('Enrollment created successfully for user:', userId, 'program:', programSlug);
+    console.log('[WEBHOOK] Enrollment created successfully for user:', userId, 'program:', programSlug);
+  }
+}
+
+// Helper to trigger Mailchimp subscription
+async function triggerMailchimpSubscription(supabase: any, orderData: any, programSlug: string | null): Promise<void> {
+  console.log('[WEBHOOK] Triggering Mailchimp subscription for:', orderData.email);
+  
+  try {
+    let mailchimpProgramName = "General Purchase";
+    let tags: string[] = ["paid_customer"];
+    
+    if (programSlug) {
+      const { data: programConfig } = await supabase
+        .from('program_catalog')
+        .select('mailchimp_tags, mailchimp_program_name, title')
+        .eq('slug', programSlug)
+        .single();
+      
+      if (programConfig) {
+        mailchimpProgramName = programConfig.mailchimp_program_name || programConfig.title || "General Purchase";
+        tags = programConfig.mailchimp_tags || ["paid_customer"];
+      }
+    }
+    
+    const { error } = await supabase.functions.invoke('mailchimp-subscribe', {
+      body: {
+        email: orderData.email,
+        name: orderData.name,
+        city: orderData.billing_city || "",
+        phone: orderData.phone || "",
+        source: "webhook_purchase",
+        workshop_name: mailchimpProgramName,
+        purchase_amount: orderData.amount,
+        purchase_date: new Date().toISOString(),
+        payment_status: "paid",
+        tags: tags,
+        session_id: orderData.stripe_session_id
+      }
+    });
+
+    if (error) {
+      console.error('[WEBHOOK] Mailchimp subscription error:', error);
+    } else {
+      console.log('[WEBHOOK] Mailchimp subscription triggered successfully');
+    }
+  } catch (mailchimpError) {
+    console.error('[WEBHOOK] Mailchimp subscription failed:', mailchimpError);
+    // Don't fail the webhook if Mailchimp fails
   }
 }
 
@@ -128,6 +176,8 @@ serve(async (req) => {
   }
 
   try {
+    console.log('[WEBHOOK] Function started');
+    
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -161,20 +211,20 @@ serve(async (req) => {
         event = JSON.parse(body);
       }
     } catch (err) {
-      console.error('Webhook signature verification failed:', err.message);
+      console.error('[WEBHOOK] Signature verification failed:', err.message);
       return new Response(JSON.stringify({ error: 'Invalid signature' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    console.log('Webhook event received:', event.type);
+    console.log('[WEBHOOK] Event received:', event.type);
 
     // Handle checkout.session.completed (for both one-time and subscription initial payments)
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       
-      console.log('Processing checkout session:', session.id, 'Mode:', session.mode);
+      console.log('[WEBHOOK] Processing checkout session:', session.id, 'Mode:', session.mode);
 
       // Get customer details
       const customerEmail = session.customer_details?.email || session.customer_email;
@@ -195,7 +245,7 @@ serve(async (req) => {
       const programSlug = session.metadata?.program_slug || session.metadata?.program || null;
       const paymentType = session.metadata?.payment_type || session.mode;
       
-      console.log('Customer email:', customerEmail, 'Product:', productName, 'Program slug:', programSlug);
+      console.log('[WEBHOOK] Customer email:', customerEmail, 'Product:', productName, 'Program slug:', programSlug);
       
       // Check if order already exists
       const { data: existingOrder } = await supabase
@@ -205,7 +255,7 @@ serve(async (req) => {
         .single();
 
       if (existingOrder) {
-        console.log('Order already exists for session:', session.id);
+        console.log('[WEBHOOK] Order already exists for session:', session.id);
         return new Response(JSON.stringify({ received: true, message: 'Order already exists' }), {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -216,41 +266,48 @@ serve(async (req) => {
       let userId: string | null = null;
       if (customerEmail) {
         userId = await findOrCreateUser(supabase, customerEmail, customerName);
-        console.log('User ID for order:', userId);
+        console.log('[WEBHOOK] User ID for order:', userId);
       }
 
       // Create order record with user_id
+      const orderData = {
+        stripe_session_id: session.id,
+        email: customerEmail,
+        name: customerName,
+        phone: customerPhone,
+        billing_city: billingCity,
+        billing_state: billingState,
+        billing_country: billingCountry,
+        amount,
+        currency,
+        status: 'completed',
+        product_name: productName,
+        program_slug: programSlug,
+        payment_type: paymentType,
+        user_id: userId,
+      };
+
       const { error: orderError } = await supabase
         .from('orders')
-        .insert({
-          stripe_session_id: session.id,
-          email: customerEmail,
-          name: customerName,
-          phone: customerPhone,
-          billing_city: billingCity,
-          billing_state: billingState,
-          billing_country: billingCountry,
-          amount,
-          currency,
-          status: 'completed',
-          product_name: productName,
-          program_slug: programSlug,
-          payment_type: paymentType,
-          user_id: userId, // Now linking user to order
-        });
+        .insert(orderData);
 
       if (orderError) {
-        console.error('Error creating order:', orderError);
+        console.error('[WEBHOOK] Error creating order:', orderError);
         throw orderError;
       }
 
-      console.log('Order created successfully for session:', session.id, 'user_id:', userId);
+      console.log('[WEBHOOK] Order created successfully for session:', session.id, 'user_id:', userId);
 
       // Apply auto-enrollment if we have a user and program
       if (userId && programSlug) {
         await applyAutoEnrollment(supabase, userId, programSlug, productName);
       } else {
-        console.log('Skipping auto-enrollment: userId=', userId, 'programSlug=', programSlug);
+        console.log('[WEBHOOK] Skipping auto-enrollment: userId=', userId, 'programSlug=', programSlug);
+      }
+
+      // Trigger Mailchimp subscription
+      if (customerEmail) {
+        await triggerMailchimpSubscription(supabase, { ...orderData, email: customerEmail }, programSlug);
       }
     }
 
@@ -260,14 +317,14 @@ serve(async (req) => {
       
       // Skip the first invoice (already handled by checkout.session.completed)
       if (invoice.billing_reason === 'subscription_create') {
-        console.log('Skipping initial subscription invoice, already handled by checkout.session.completed');
+        console.log('[WEBHOOK] Skipping initial subscription invoice, already handled by checkout.session.completed');
         return new Response(JSON.stringify({ received: true }), {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
 
-      console.log('Processing recurring invoice:', invoice.id, 'Reason:', invoice.billing_reason);
+      console.log('[WEBHOOK] Processing recurring invoice:', invoice.id, 'Reason:', invoice.billing_reason);
 
       const customerEmail = invoice.customer_email || '';
       const customerName = invoice.customer_name || '';
@@ -311,9 +368,9 @@ serve(async (req) => {
         });
 
       if (orderError) {
-        console.error('Error creating recurring order:', orderError);
+        console.error('[WEBHOOK] Error creating recurring order:', orderError);
       } else {
-        console.log('Recurring order created for invoice:', invoice.id, 'user_id:', userId);
+        console.log('[WEBHOOK] Recurring order created for invoice:', invoice.id, 'user_id:', userId);
       }
     }
 
@@ -321,7 +378,7 @@ serve(async (req) => {
     if (event.type === 'customer.subscription.created') {
       const subscription = event.data.object as Stripe.Subscription;
       
-      console.log('Subscription created:', subscription.id);
+      console.log('[WEBHOOK] Subscription created:', subscription.id);
 
       const autoCancelMonths = subscription.metadata?.auto_cancel_after_months;
       
@@ -330,15 +387,15 @@ serve(async (req) => {
         // Calculate cancel_at timestamp (months from now)
         const cancelAt = Math.floor(Date.now() / 1000) + (months * 30 * 24 * 60 * 60);
         
-        console.log('Setting auto-cancellation for subscription:', subscription.id, 'Cancel at:', new Date(cancelAt * 1000).toISOString());
+        console.log('[WEBHOOK] Setting auto-cancellation for subscription:', subscription.id, 'Cancel at:', new Date(cancelAt * 1000).toISOString());
 
         try {
           await stripe.subscriptions.update(subscription.id, {
             cancel_at: cancelAt,
           });
-          console.log('Auto-cancellation set successfully for subscription:', subscription.id);
+          console.log('[WEBHOOK] Auto-cancellation set successfully for subscription:', subscription.id);
         } catch (err) {
-          console.error('Error setting auto-cancellation:', err.message);
+          console.error('[WEBHOOK] Error setting auto-cancellation:', err.message);
         }
       }
     }
@@ -347,7 +404,7 @@ serve(async (req) => {
     if (event.type === 'customer.subscription.deleted') {
       const subscription = event.data.object as Stripe.Subscription;
       
-      console.log('Subscription ended:', subscription.id, 'Status:', subscription.status);
+      console.log('[WEBHOOK] Subscription ended:', subscription.id, 'Status:', subscription.status);
 
       const programSlug = subscription.metadata?.program || null;
       
@@ -376,9 +433,9 @@ serve(async (req) => {
               .eq('program_slug', programSlug);
 
             if (enrollmentError) {
-              console.error('Error updating enrollment status:', enrollmentError);
+              console.error('[WEBHOOK] Error updating enrollment status:', enrollmentError);
             } else {
-              console.log('Enrollment marked as cancelled for user:', profile.id, 'program:', programSlug);
+              console.log('[WEBHOOK] Enrollment marked as cancelled for user:', profile.id, 'program:', programSlug);
             }
           }
         }
@@ -389,7 +446,7 @@ serve(async (req) => {
     if (event.type === 'charge.refunded') {
       const charge = event.data.object as Stripe.Charge;
       
-      console.log('Processing refund for charge:', charge.id);
+      console.log('[WEBHOOK] Processing refund for charge:', charge.id);
 
       // Get the payment intent
       const paymentIntentId = typeof charge.payment_intent === 'string' 
@@ -397,7 +454,7 @@ serve(async (req) => {
         : charge.payment_intent?.id;
 
       if (!paymentIntentId) {
-        console.log('No payment intent found for charge:', charge.id);
+        console.log('[WEBHOOK] No payment intent found for charge:', charge.id);
         return new Response(JSON.stringify({ received: true }), {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -411,7 +468,7 @@ serve(async (req) => {
       });
 
       if (sessions.data.length === 0) {
-        console.log('No session found for payment intent:', paymentIntentId);
+        console.log('[WEBHOOK] No session found for payment intent:', paymentIntentId);
         return new Response(JSON.stringify({ received: true }), {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -428,7 +485,7 @@ serve(async (req) => {
         .single();
 
       if (!order) {
-        console.log('No order found for session:', sessionId);
+        console.log('[WEBHOOK] No order found for session:', sessionId);
         return new Response(JSON.stringify({ received: true }), {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -447,7 +504,7 @@ serve(async (req) => {
         .eq('id', order.id);
 
       if (updateError) {
-        console.error('Error updating order:', updateError);
+        console.error('[WEBHOOK] Error updating order:', updateError);
         throw updateError;
       }
 
@@ -460,13 +517,13 @@ serve(async (req) => {
           .eq('program_slug', order.program_slug);
 
         if (enrollmentError) {
-          console.error('Error removing enrollment:', enrollmentError);
+          console.error('[WEBHOOK] Error removing enrollment:', enrollmentError);
         } else {
-          console.log('Enrollment removed for user:', order.user_id);
+          console.log('[WEBHOOK] Enrollment removed for user:', order.user_id);
         }
       }
 
-      console.log('Refund processed successfully for order:', order.id);
+      console.log('[WEBHOOK] Refund processed successfully for order:', order.id);
     }
 
     return new Response(JSON.stringify({ received: true }), {
@@ -475,7 +532,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Webhook error:', error);
+    console.error('[WEBHOOK] Error:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
