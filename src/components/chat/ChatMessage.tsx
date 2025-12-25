@@ -12,6 +12,7 @@ interface ChatMessageProps {
   attachmentUrl?: string | null;
   attachmentName?: string | null;
   attachmentType?: string | null;
+  isBroadcast?: boolean;
 }
 
 // Function to make URLs clickable
@@ -48,7 +49,8 @@ export function ChatMessage({
   isCurrentUser,
   attachmentUrl,
   attachmentName,
-  attachmentType
+  attachmentType,
+  isBroadcast
 }: ChatMessageProps) {
   const isImage = attachmentType?.startsWith('image/');
 
@@ -67,9 +69,16 @@ export function ChatMessage({
         "max-w-[80%] rounded-2xl overflow-hidden",
         isCurrentUser 
           ? "bg-primary text-primary-foreground rounded-br-sm" 
-          : "bg-muted text-foreground rounded-bl-sm"
+          : "bg-muted text-foreground rounded-bl-sm",
+        isBroadcast && !isCurrentUser && "border-2 border-primary/30"
       )}>
-        {/* Image Attachment */}
+        {/* Broadcast indicator */}
+        {isBroadcast && !isCurrentUser && (
+          <div className="px-4 pt-2 flex items-center gap-1.5 text-xs text-primary font-medium">
+            <span>📢</span>
+            <span>Broadcast</span>
+          </div>
+        )}
         {attachmentUrl && isImage && (
           <div className="relative">
             <img 

@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
-import { Megaphone } from 'lucide-react';
+import { Megaphone, Bell, Mail, MessageCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 
@@ -22,8 +23,8 @@ export function AnnouncementCreator() {
   const [message, setMessage] = useState('');
   const [targetCourse, setTargetCourse] = useState<string>('all');
   const [targetRoundId, setTargetRoundId] = useState<string>('all');
-  const [badge, setBadge] = useState('General');
-  const [type, setType] = useState('general');
+  const [sendPush, setSendPush] = useState(true);
+  const [sendEmail, setSendEmail] = useState(false);
   const [loading, setLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
@@ -78,115 +79,62 @@ export function AnnouncementCreator() {
     }
 
     setLoading(true);
-    let announcementData: any = null;
     
     try {
-      // Step 1: Create announcement
-      console.log('📝 Creating announcement...');
-      const { data, error } = await supabase
-        .from('announcements')
-        .insert({
+      console.log('📢 Sending broadcast message...');
+      
+      // Determine target type
+      let targetType: 'all' | 'course' | 'round' = 'all';
+      if (targetRoundId !== 'all' && targetRoundId) {
+        targetType = 'round';
+      } else if (targetCourse !== 'all') {
+        targetType = 'course';
+      }
+
+      // Call the broadcast edge function
+      const { data, error } = await supabase.functions.invoke('send-broadcast-message', {
+        body: {
           title: title.trim(),
-          message: message.trim(),
-          target_course: targetCourse === 'all' ? null : targetCourse,
-          target_round_id: (targetRoundId === 'all' || !targetRoundId) ? null : targetRoundId,
-          badge: badge,
-          type: type,
-          created_by: (await supabase.auth.getUser()).data.user?.id
-        })
-        .select()
-        .single();
+          content: message.trim(),
+          targetType,
+          targetCourse: targetCourse !== 'all' ? targetCourse : undefined,
+          targetRoundId: targetRoundId !== 'all' ? targetRoundId : undefined,
+          sendPush,
+          sendEmail,
+        }
+      });
 
       if (error) {
-        console.error('❌ Announcement creation failed:', error);
+        console.error('❌ Broadcast error:', error);
         throw error;
       }
-      
-      announcementData = data;
-      console.log('✅ Announcement created:', announcementData.id);
 
-      // Step 2: Send email notifications
-      const emailPayload = {
-        announcementId: announcementData.id,
-        title: title.trim(),
-        message: message.trim(),
-        targetCourse: targetCourse === 'all' ? undefined : targetCourse,
-        badge: badge,
-      };
-      
-      console.log('📧 Invoking send-announcement-email function with:', emailPayload);
-      console.log('⏰ Starting email send at:', new Date().toISOString());
-      
-      // Set a timeout for the function call
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Email function timeout after 30 seconds')), 30000)
-      );
-      
-      const emailPromise = supabase.functions.invoke('send-announcement-email', {
-        body: emailPayload
-      });
-      
-      const { data: emailData, error: emailError } = await Promise.race([
-        emailPromise,
-        timeoutPromise
-      ]) as any;
+      console.log('✅ Broadcast sent:', data);
 
-      console.log('📬 Email function completed at:', new Date().toISOString());
-      console.log('📊 Email function response:', { 
-        data: emailData, 
-        error: emailError,
-        hasData: !!emailData,
-        hasError: !!emailError
+      const { messagesSent, pushSent, targetUsers } = data;
+      
+      toast({
+        title: "🎉 Broadcast Sent!",
+        description: `Message delivered to ${messagesSent} users${sendPush ? `, ${pushSent} push notifications sent` : ''}`
       });
 
-      if (emailError) {
-        console.error('❌ Email notification error:', {
-          message: emailError.message,
-          status: emailError.status,
-          statusText: emailError.statusText,
-          full: emailError
-        });
-        
-        toast({
-          title: "⚠️ Partial Success",
-          description: `Announcement created but emails failed to send: ${emailError.message}. Check logs for details.`,
-          variant: "default",
-        });
-      } else {
-        const emailCount = emailData?.stats?.successful || 0;
-        const failedCount = emailData?.stats?.failed || 0;
-        
-        console.log(`✅ Emails sent: ${emailCount} successful, ${failedCount} failed`);
-        
-        toast({
-          title: "🎉 Success!",
-          description: `Announcement sent! Emails delivered: ${emailCount}${failedCount > 0 ? `, ${failedCount} failed` : ''}`,
-        });
-      }
-
-      // Reset form on success
+      // Reset form
       setTitle('');
       setMessage('');
       setTargetCourse('all');
       setTargetRoundId('all');
-      setBadge('General');
-      setType('general');
+      setSendPush(true);
+      setSendEmail(false);
       
     } catch (error: any) {
-      console.error('❌ Error in announcement flow:', {
-        message: error.message,
-        stack: error.stack,
-        full: error
-      });
-      
+      console.error('❌ Error sending broadcast:', error);
       toast({
         title: "Error",
-        description: `Failed: ${error.message}. ${announcementData ? 'Announcement was created but emails may not have sent.' : 'Announcement was not created.'}`,
+        description: error.message || "Failed to send broadcast",
         variant: "destructive",
       });
     } finally {
       setLoading(false);
-      console.log('🏁 Announcement flow completed');
     }
   };
 
@@ -195,13 +143,16 @@ export function AnnouncementCreator() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Megaphone className="h-5 w-5" />
-          Send Announcement
+          Send Broadcast Message
         </CardTitle>
-        <CardDescription>Create announcements for students based on their enrolled courses</CardDescription>
+        <CardDescription className="flex items-center gap-2">
+          <MessageCircle className="h-4 w-4" />
+          Broadcasts appear in each user's chat. They can reply directly to you.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">Title</label>
+          <Label>Title</Label>
           <Input
             placeholder="Announcement title..."
             value={title}
@@ -210,21 +161,21 @@ export function AnnouncementCreator() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Message</label>
+          <Label>Message</Label>
           <Textarea
-            placeholder="Your announcement message..."
+            placeholder="Your message to all users..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             rows={4}
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Target Course</label>
+            <Label>Target Audience</Label>
             <Select value={targetCourse} onValueChange={setTargetCourse}>
               <SelectTrigger>
-                <SelectValue placeholder="Select course" />
+                <SelectValue placeholder="Select audience" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Students</SelectItem>
@@ -259,35 +210,38 @@ export function AnnouncementCreator() {
               </Select>
             </div>
           )}
+        </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Badge</label>
-            <Input
-              placeholder="Badge text..."
-              value={badge}
-              onChange={(e) => setBadge(e.target.value)}
-            />
+        {/* Notification Options */}
+        <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
+          <Label className="text-sm font-medium">Notification Options</Label>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium">Push Notification</p>
+                <p className="text-xs text-muted-foreground">Send iOS push notification</p>
+              </div>
+            </div>
+            <Switch checked={sendPush} onCheckedChange={setSendPush} />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Type</label>
-            <Select value={type} onValueChange={setType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="new">New Course</SelectItem>
-                <SelectItem value="event">Event</SelectItem>
-                <SelectItem value="update">Update</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium">Email Notification</p>
+                <p className="text-xs text-muted-foreground">Also send via email (coming soon)</p>
+              </div>
+            </div>
+            <Switch checked={sendEmail} onCheckedChange={setSendEmail} disabled />
           </div>
         </div>
 
         <Button onClick={handleSubmit} disabled={loading} className="w-full">
           <Megaphone className="mr-2 h-4 w-4" />
-          {loading ? 'Sending...' : 'Send Announcement'}
+          {loading ? 'Sending...' : 'Send Broadcast to Chat'}
         </Button>
       </CardContent>
     </Card>
