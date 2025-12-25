@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -10,6 +10,17 @@ export const useChatNotifications = () => {
   const navigate = useNavigate();
   const conversationIdRef = useRef<string | null>(null);
   const hasShownInitialNotification = useRef(false);
+  const [showUnreadPopup, setShowUnreadPopup] = useState(false);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+
+  const dismissPopup = () => {
+    setShowUnreadPopup(false);
+  };
+
+  const goToChat = () => {
+    setShowUnreadPopup(false);
+    navigate('/app/support-chat');
+  };
 
   useEffect(() => {
     if (!user?.id) return;
@@ -25,22 +36,15 @@ export const useChatNotifications = () => {
       if (data) {
         conversationIdRef.current = data.id;
         
-        // Show welcome-back notification if there are unread messages
+        // Show welcome-back popup if there are unread messages
         if (
           data.unread_count_user > 0 &&
           !hasShownInitialNotification.current &&
           location.pathname !== '/app/support-chat'
         ) {
           hasShownInitialNotification.current = true;
-          
-          toast(`You have ${data.unread_count_user} unread message${data.unread_count_user > 1 ? 's' : ''}`, {
-            description: 'Tap to view your conversation with Support',
-            duration: 8000,
-            action: {
-              label: 'View',
-              onClick: () => navigate('/app/support-chat')
-            }
-          });
+          setUnreadMessageCount(data.unread_count_user);
+          setShowUnreadPopup(true);
         }
       }
     };
@@ -87,4 +91,11 @@ export const useChatNotifications = () => {
       supabase.removeChannel(channel);
     };
   }, [user?.id, location.pathname, navigate]);
+
+  return {
+    showUnreadPopup,
+    unreadMessageCount,
+    dismissPopup,
+    goToChat
+  };
 };
