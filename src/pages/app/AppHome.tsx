@@ -1,8 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useHomeData } from '@/hooks/useAppData';
 import { StatsCards } from '@/components/dashboard/StatsCards';
-
 import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
 import { SEOHead } from '@/components/SEOHead';
@@ -17,11 +15,16 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
 import { CompletionCelebration } from '@/components/app/CompletionCelebration';
 import { useCompletedRoundCelebration } from '@/hooks/useCompletedRoundCelebration';
+import { HomeSkeleton } from '@/components/app/skeletons';
+import { supabase } from '@/integrations/supabase/client';
 
 const AppHome = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showNotificationBanner, setShowNotificationBanner] = useState(false);
+  
+  // Use centralized data hook with parallel fetching
+  const { profile, enrollments, wallet, hasActiveRounds, isLoading } = useHomeData();
   
   // Celebration for completed rounds
   const { celebrationData, closeCelebration, showCelebration } = useCompletedRoundCelebration();
@@ -69,20 +72,6 @@ const AppHome = () => {
     return () => window.removeEventListener('focus', handleFocus);
   }, [user?.id]);
 
-  const { data: profile } = useQuery({
-    queryKey: ['profile', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user?.id)
-        .single();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
   const handleContactSupport = () => {
     const message = `Hi! I need support.\n\nName: ${profile?.full_name || 'N/A'}\nEmail: ${profile?.email || user?.email || 'N/A'}\nPhone: ${profile?.phone || 'N/A'}\nCity: ${profile?.city || 'N/A'}`;
     const telegramUrl = `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
@@ -95,49 +84,28 @@ const AppHome = () => {
     window.location.href = `mailto:support@ladybosslook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
-
-  const { data: enrollments } = useQuery({
-    queryKey: ['course-enrollments', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('course_enrollments')
-        .select('*')
-        .eq('user_id', user?.id);
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
-  const { data: hasActiveRounds } = useQuery({
-    queryKey: ['has-active-rounds', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('course_enrollments')
-        .select('id')
-        .eq('user_id', user?.id)
-        .eq('status', 'active')
-        .not('round_id', 'is', null)
-        .limit(1);
-      if (error) throw error;
-      return data && data.length > 0;
-    },
-    enabled: !!user?.id,
-  });
-
-  const { data: wallet } = useQuery({
-    queryKey: ['user-wallet', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_wallets')
-        .select('credits_balance')
-        .eq('user_id', user?.id)
-        .single();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
+  // Show skeleton while loading
+  if (isLoading) {
+    return (
+      <>
+        <AppHeader
+          title="Welcome back!" 
+          subtitle="Loading..."
+          rightAction={
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-full h-10 w-10 border-2"
+            >
+              <User className="h-5 w-5" />
+            </Button>
+          }
+        />
+        <AppHeaderSpacer />
+        <HomeSkeleton />
+      </>
+    );
+  }
 
   return (
     <>

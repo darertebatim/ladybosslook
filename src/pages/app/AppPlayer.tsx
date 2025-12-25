@@ -3,98 +3,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Search, Clock } from "lucide-react";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isNativeApp } from "@/lib/platform";
+import { usePlayerData } from "@/hooks/useAppData";
+import { PlayerSkeleton } from "@/components/app/skeletons";
 
 export default function AppPlayer() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState<"all" | "in_progress" | "completed">("all");
 
-  // Fetch playlists
-  const { data: playlists, isLoading } = useQuery({
-    queryKey: ['audio-playlists'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('audio_playlists')
-        .select('*')
-        .order('sort_order', { ascending: true });
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // Fetch all playlist items with tracks
-  const { data: playlistItems } = useQuery({
-    queryKey: ['playlist-items'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('audio_playlist_items')
-        .select(`
-          playlist_id,
-          audio_id,
-          audio_content (
-            id,
-            duration_seconds,
-            cover_image_url
-          )
-        `)
-        .order('sort_order', { ascending: true });
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // Fetch user's progress
-  const { data: progressData } = useQuery({
-    queryKey: ['audio-progress'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('audio_progress')
-        .select('*')
-        .eq('user_id', user.id);
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // Fetch user's enrollments to check access
-  const { data: enrollments } = useQuery({
-    queryKey: ['user-enrollments'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('course_enrollments')
-        .select('program_slug')
-        .eq('user_id', user.id)
-        .eq('status', 'active');
-      
-      if (error) throw error;
-      return data.map(e => e.program_slug);
-    },
-  });
-
-  // Fetch programs to check mobile availability
-  const { data: programs } = useQuery({
-    queryKey: ['programs-mobile-check'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('program_catalog')
-        .select('slug, available_on_mobile');
-      
-      if (error) throw error;
-      return data;
-    },
-  });
+  // Use centralized data hook with parallel fetching
+  const { playlists, playlistItems, progressData, enrollments, programs, isLoading } = usePlayerData();
 
   const getPlaylistStats = (playlistId: string) => {
     const items = playlistItems?.filter(item => item.playlist_id === playlistId) || [];
@@ -234,6 +153,29 @@ export default function AppPlayer() {
     
     return lastPlayedB - lastPlayedA;
   }) || [];
+
+  // Show skeleton while loading all data
+  if (isLoading) {
+    return (
+      <div className="min-h-[100dvh] bg-background pb-28">
+        <div 
+          className="fixed top-0 left-0 right-0 z-10 bg-background/80 backdrop-blur-lg border-b"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
+          <div className="pt-6 pb-3 px-4 space-y-4">
+            <div>
+              <h1 className="text-2xl font-bold">Audio Library</h1>
+              <p className="text-sm text-muted-foreground">Listen and learn on the go</p>
+            </div>
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </div>
+        <div style={{ height: 'calc(200px + env(safe-area-inset-top, 0px))' }} />
+        <PlayerSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[100dvh] bg-background pb-28">

@@ -1,6 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useCoursesData } from '@/hooks/useAppData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
@@ -9,9 +8,13 @@ import { SEOHead } from '@/components/SEOHead';
 import { isNativeApp } from '@/lib/platform';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
+import { CoursesSkeleton } from '@/components/app/skeletons';
 
 const AppCourses = () => {
   const { user } = useAuth();
+  
+  // Use centralized data hook
+  const { enrollments, isLoading } = useCoursesData();
   
   // Get unseen content - wrap in try/catch in case provider is missing
   let unseenEnrollments = new Set<string>();
@@ -24,41 +27,12 @@ const AppCourses = () => {
     // Provider not available, ignore
   }
 
-  const { data: enrollments, isLoading } = useQuery({
-    queryKey: ['course-enrollments', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('course_enrollments')
-        .select(`
-          *,
-          program_rounds (
-            round_name,
-            round_number,
-            start_date,
-            status
-          )
-        `)
-        .eq('user_id', user?.id)
-        .order('enrolled_at', { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
   if (isLoading) {
     return (
       <>
         <AppHeader title="My Courses" subtitle="Loading..." />
         <AppHeaderSpacer />
-        <div className="container max-w-4xl py-4 px-4">
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 bg-muted rounded-lg" />
-            ))}
-          </div>
-        </div>
+        <CoursesSkeleton />
       </>
     );
   }
