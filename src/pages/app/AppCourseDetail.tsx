@@ -4,11 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft, CalendarPlus, Loader2 } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { downloadICSFile, generateICSFile } from '@/utils/calendar';
-import { addEventToCalendar, isCalendarAvailable } from '@/lib/calendarIntegration';
-import { format } from 'date-fns';
+import { addEventToCalendar, addMultipleEventsToCalendar, isCalendarAvailable, CalendarEvent } from '@/lib/calendarIntegration';
+import { format, addWeeks } from 'date-fns';
 import { toast } from "sonner";
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
@@ -17,7 +17,6 @@ import { isNativeApp } from '@/lib/platform';
 import { programImages } from '@/data/programs';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2 } from 'lucide-react';
 import { shouldShowEnrollmentReminder } from '@/hooks/useNotificationReminder';
 import { subscribeToPushNotifications, checkPermissionStatus } from '@/lib/pushNotifications';
 import { useState as reactUseState, useEffect as reactUseEffect } from 'react';
@@ -31,6 +30,7 @@ const AppCourseDetail = () => {
   const queryClient = useQueryClient();
   const [showEnrollmentReminder, setShowEnrollmentReminder] = reactUseState(false);
   const [isEnablingEnrollment, setIsEnablingEnrollment] = reactUseState(false);
+  const [isSyncingAllSessions, setIsSyncingAllSessions] = reactUseState(false);
 
   // Fetch enrollment and round data
   const { data: enrollment, isLoading: enrollmentLoading } = useQuery({
@@ -144,6 +144,97 @@ const AppCourseDetail = () => {
     }
   };
 
+  // Generate all session events for the course (weekly sessions from start to end date)
+  const generateAllSessionEvents = (): CalendarEvent[] => {
+    if (!round?.start_date || !program) return [];
+    
+    const events: CalendarEvent[] = [];
+    const startDate = new Date(round.start_date);
+    const endDate = round.end_date ? new Date(round.end_date) : addWeeks(startDate, 8); // Default 8 weeks
+    const sessionDuration = round.first_session_duration || 90;
+    
+    let sessionNumber = 1;
+    let currentDate = new Date(startDate);
+    
+    while (currentDate <= endDate) {
+      events.push({
+        title: `${program.title} - Session ${sessionNumber}`,
+        description: `Session ${sessionNumber} of ${program.title}`,
+        startDate: new Date(currentDate),
+        endDate: new Date(currentDate.getTime() + sessionDuration * 60000),
+        location: round.google_meet_link || undefined,
+        reminderMinutes: 60,
+      });
+      
+      sessionNumber++;
+      currentDate = addWeeks(currentDate, 1);
+    }
+    
+    return events;
+  };
+
+  // Sync all sessions to calendar
+  const handleSyncAllSessions = async () => {
+    if (!round || !program) return;
+    
+    const events = generateAllSessionEvents();
+    if (events.length === 0) {
+      toast.error('No sessions to sync');
+      return;
+    }
+
+    if (isNativeApp() && isCalendarAvailable()) {
+      setIsSyncingAllSessions(true);
+      try {
+        const result = await addMultipleEventsToCalendar(events);
+        
+        if (result.success) {
+          toast.success(`Added ${result.addedCount} sessions to your calendar!`);
+        } else if (result.error === 'Calendar permission denied') {
+          toast.error('Please allow calendar access in Settings');
+        } else {
+          toast.error(result.error || 'Failed to sync sessions');
+        }
+      } catch (error) {
+        console.error('Error syncing sessions:', error);
+        toast.error('Failed to sync sessions');
+      } finally {
+        setIsSyncingAllSessions(false);
+      }
+    } else {
+      // Web fallback: Download ICS with all events
+      const icsEvents = events.map(e => ({
+        title: e.title,
+        description: e.description,
+        startDate: e.startDate,
+        endDate: e.endDate,
+        location: e.location,
+      }));
+      
+      // For web, just download first session
+      downloadICSFile(icsEvents[0], `${program.title.replace(/\s+/g, '-')}-sessions.ics`);
+      toast.success('Calendar file downloaded!');
+    }
+  };
+
+  // Auto-sync calendar on enrollment if preference is enabled
+  const autoSyncCalendarOnEnrollment = async () => {
+    const autoSyncEnabled = localStorage.getItem('autoSyncCalendar') === 'true';
+    if (!autoSyncEnabled || !isNativeApp() || !isCalendarAvailable()) return;
+    
+    const events = generateAllSessionEvents();
+    if (events.length === 0) return;
+    
+    try {
+      const result = await addMultipleEventsToCalendar(events);
+      if (result.success) {
+        toast.success(`${result.addedCount} sessions added to calendar!`);
+      }
+    } catch (error) {
+      console.error('Auto-sync calendar error:', error);
+    }
+  };
+
   const handleContactSupport = () => {
     if (!profile || !program) return;
 
@@ -172,6 +263,9 @@ const AppCourseDetail = () => {
     onSuccess: async () => {
       toast.success('Enrolled successfully!');
       queryClient.invalidateQueries({ queryKey: ['course-enrollment', slug] });
+      
+      // Auto-sync calendar if preference enabled
+      await autoSyncCalendarOnEnrollment();
       
       // Show enrollment reminder popup if appropriate
       const shouldShow = await shouldShowEnrollmentReminder();
@@ -422,7 +516,7 @@ const AppCourseDetail = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {/* Add to Calendar */}
+                  {/* Add First Session to Calendar */}
                   {round.first_session_date && (
                     <Button 
                       variant="default" 
@@ -431,7 +525,30 @@ const AppCourseDetail = () => {
                       onClick={handleAddToCalendar}
                     >
                       <Calendar className="h-5 w-5 mr-2" />
-                      Add to Calendar
+                      Add First Session
+                    </Button>
+                  )}
+
+                  {/* Sync All Sessions to Calendar */}
+                  {round.start_date && (
+                    <Button 
+                      variant="secondary" 
+                      size="lg" 
+                      className="w-full"
+                      onClick={handleSyncAllSessions}
+                      disabled={isSyncingAllSessions}
+                    >
+                      {isSyncingAllSessions ? (
+                        <>
+                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                          Syncing...
+                        </>
+                      ) : (
+                        <>
+                          <CalendarPlus className="h-5 w-5 mr-2" />
+                          Sync All Sessions
+                        </>
+                      )}
                     </Button>
                   )}
 
