@@ -9,20 +9,39 @@ export const useChatNotifications = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const conversationIdRef = useRef<string | null>(null);
+  const hasShownInitialNotification = useRef(false);
 
   useEffect(() => {
     if (!user?.id) return;
 
-    // First, get the user's conversation ID
+    // Fetch conversation and check for unread messages on app open
     const fetchConversation = async () => {
       const { data } = await supabase
         .from('chat_conversations')
-        .select('id')
+        .select('id, unread_count_user')
         .eq('user_id', user.id)
         .single();
       
       if (data) {
         conversationIdRef.current = data.id;
+        
+        // Show welcome-back notification if there are unread messages
+        if (
+          data.unread_count_user > 0 &&
+          !hasShownInitialNotification.current &&
+          location.pathname !== '/app/support-chat'
+        ) {
+          hasShownInitialNotification.current = true;
+          
+          toast(`You have ${data.unread_count_user} unread message${data.unread_count_user > 1 ? 's' : ''}`, {
+            description: 'Tap to view your conversation with Support',
+            duration: 8000,
+            action: {
+              label: 'View',
+              onClick: () => navigate('/app/support-chat')
+            }
+          });
+        }
       }
     };
 
