@@ -236,8 +236,9 @@ export default function AppPlayer() {
   }) || [];
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b">
+    <div className="min-h-[100dvh] bg-background pb-20">
+      {/* Fixed Header with safe area */}
+      <div className="fixed top-0 left-0 right-0 z-10 bg-background/80 backdrop-blur-lg border-b pt-safe">
         <div className="p-4 space-y-4">
           <div>
             <h1 className="text-2xl font-bold">Audio Library</h1>
@@ -263,6 +264,9 @@ export default function AppPlayer() {
           </Tabs>
         </div>
       </div>
+
+      {/* Header spacer - matches fixed header height */}
+      <div className="pt-safe" style={{ height: 'calc(180px + env(safe-area-inset-top, 0px))' }} />
 
       <div className="p-4 space-y-6">
         {/* Continue Learning Section */}
