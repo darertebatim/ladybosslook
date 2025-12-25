@@ -14,7 +14,33 @@ interface ChatMessageProps {
   attachmentType?: string | null;
 }
 
-export function ChatMessage({ 
+// Function to make URLs clickable
+function linkifyText(text: string) {
+  const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|([a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/[^\s]*)?)/gi;
+  const parts = text.split(urlRegex);
+  
+  return parts.map((part, index) => {
+    if (!part) return null;
+    if (urlRegex.test(part)) {
+      const href = part.startsWith('http') ? part : `https://${part}`;
+      return (
+        <a 
+          key={index}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:opacity-80"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+}
+
+export function ChatMessage({
   content, 
   senderType, 
   createdAt, 
@@ -94,7 +120,7 @@ export function ChatMessage({
         {/* Text Content */}
         {content && (
           <div className="px-4 py-2.5">
-            <p className="text-sm whitespace-pre-wrap break-words">{content}</p>
+            <p className="text-sm whitespace-pre-wrap break-words">{linkifyText(content)}</p>
           </div>
         )}
 
