@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays } from "lucide-react";
+import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays, ListChecks } from "lucide-react";
+import { SessionsManager } from "./SessionsManager";
 import { format } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { Textarea } from "@/components/ui/textarea";
@@ -67,6 +68,7 @@ interface RoundFormData {
 export const ProgramRoundsManager = () => {
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [managingSessionsRound, setManagingSessionsRound] = useState<ProgramRound | null>(null);
   const [formData, setFormData] = useState<RoundFormData>({
     program_slug: "",
     round_name: "",
@@ -277,6 +279,22 @@ export const ProgramRoundsManager = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // If managing sessions, show the sessions manager
+  if (managingSessionsRound) {
+    const programTitle = programs?.find(p => p.slug === managingSessionsRound.program_slug)?.title || managingSessionsRound.program_slug;
+    return (
+      <SessionsManager
+        roundId={managingSessionsRound.id}
+        roundName={managingSessionsRound.round_name}
+        programTitle={programTitle}
+        defaultMeetLink={managingSessionsRound.google_meet_link || undefined}
+        startDate={managingSessionsRound.start_date}
+        endDate={managingSessionsRound.end_date || undefined}
+        onClose={() => setManagingSessionsRound(null)}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -599,6 +617,14 @@ export const ProgramRoundsManager = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setManagingSessionsRound(round)}
+                          title="Manage Sessions"
+                        >
+                          <ListChecks className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="outline"
                           size="sm"
