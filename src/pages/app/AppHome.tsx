@@ -188,7 +188,7 @@ const AppHome = () => {
               
               {/* In-App Chat Banner */}
               <div 
-                onClick={() => navigate('/app/support')}
+                onClick={() => navigate('/app/support-chat')}
                 className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-xl p-4 cursor-pointer hover:from-primary/15 hover:to-primary/10 transition-all"
               >
                 <div className="flex items-center gap-4">
