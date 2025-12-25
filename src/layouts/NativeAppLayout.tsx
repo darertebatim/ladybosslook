@@ -54,7 +54,7 @@ const NativeAppLayout = () => {
 
   return (
     <>
-      <div className="min-h-[100dvh] bg-background">
+      <div className="min-h-[100dvh] bg-background app-theme">
         {/* Main Content - pages render their own headers */}
         <main className="pb-24">
           <Outlet />

@@ -97,7 +97,7 @@ const AppLayout = () => {
   ];
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col">
+    <div className="min-h-[100dvh] bg-background flex flex-col app-theme">
       {/* Main content area - pb-28 for tab bar clearance (72px + safe area) */}
       <main className="flex-1 pb-28">
         <Outlet />
