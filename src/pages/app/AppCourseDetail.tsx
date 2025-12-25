@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft, CalendarPlus, Loader2, Bell } from 'lucide-react';
+import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft, CalendarPlus, Loader2, Bell, Clock } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { downloadICSFile, generateICSFile } from '@/utils/calendar';
 import { addEventToCalendar, addMultipleEventsToCalendar, isCalendarAvailable, CalendarEvent } from '@/lib/calendarIntegration';
@@ -31,6 +31,7 @@ const AppCourseDetail = () => {
   const [isEnablingEnrollment, setIsEnablingEnrollment] = useState(false);
   const [isSyncingAllSessions, setIsSyncingAllSessions] = useState(false);
   const [hasNewSessions, setHasNewSessions] = useState(false);
+  const [addingSessionId, setAddingSessionId] = useState<string | null>(null);
 
   // Fetch enrollment and round data
   const { data: enrollment, isLoading: enrollmentLoading } = useQuery({
@@ -310,6 +311,66 @@ const AppCourseDetail = () => {
     
     const telegramUrl = `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
     window.open(telegramUrl, '_blank');
+  };
+
+  // Add single session to calendar
+  const handleAddSingleSession = async (session: typeof dbSessions extends (infer T)[] ? T : never) => {
+    if (!program) return;
+    
+    setAddingSessionId(session.id);
+    
+    const event: CalendarEvent = {
+      title: session.title,
+      description: session.description || `Session ${session.session_number} of ${program.title}`,
+      startDate: new Date(session.session_date),
+      endDate: new Date(new Date(session.session_date).getTime() + (session.duration_minutes || 90) * 60000),
+      location: session.meeting_link || round?.google_meet_link || undefined,
+      reminderMinutes: 60,
+    };
+
+    if (isNativeApp() && isCalendarAvailable()) {
+      try {
+        const result = await addEventToCalendar(event);
+        
+        if (result.success) {
+          toast.success('Session added to calendar!');
+        } else if (result.error === 'Calendar permission denied') {
+          toast.error('Please allow calendar access in Settings');
+        } else {
+          toast.error(result.error || 'Failed to add session');
+        }
+      } catch (error) {
+        console.error('Error adding session:', error);
+        toast.error('Failed to add to calendar');
+      }
+    } else {
+      downloadICSFile({
+        title: event.title,
+        description: event.description,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        location: event.location,
+      }, `${session.title.replace(/\s+/g, '-')}.ics`);
+      toast.success('Calendar file downloaded!');
+    }
+    
+    setAddingSessionId(null);
+  };
+
+  // Helper to determine if a session is in the past
+  const isSessionPast = (sessionDate: string) => {
+    return new Date(sessionDate) < new Date();
+  };
+
+  // Helper to determine if a session is today
+  const isSessionToday = (sessionDate: string) => {
+    const today = new Date();
+    const session = new Date(sessionDate);
+    return (
+      session.getFullYear() === today.getFullYear() &&
+      session.getMonth() === today.getMonth() &&
+      session.getDate() === today.getDate()
+    );
   };
 
   // Free enrollment mutation
@@ -699,6 +760,92 @@ const AppCourseDetail = () => {
                       Round Playlist
                     </Button>
                   )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Upcoming Sessions Card */}
+            {dbSessions && dbSessions.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    Sessions
+                    <Badge variant="secondary" className="ml-auto">
+                      {dbSessions.length}
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {dbSessions.map((session) => {
+                      const sessionDate = new Date(session.session_date);
+                      const isPast = isSessionPast(session.session_date);
+                      const isToday = isSessionToday(session.session_date);
+                      
+                      return (
+                        <div 
+                          key={session.id}
+                          className={`flex items-center gap-3 p-3 rounded-lg border ${
+                            isPast 
+                              ? 'bg-muted/50 opacity-60' 
+                              : isToday 
+                                ? 'border-primary bg-primary/5' 
+                                : 'bg-card'
+                          }`}
+                        >
+                          {/* Date Column */}
+                          <div className="flex flex-col items-center justify-center w-12 shrink-0">
+                            <span className="text-xs text-muted-foreground uppercase">
+                              {format(sessionDate, 'MMM')}
+                            </span>
+                            <span className="text-xl font-bold leading-none">
+                              {format(sessionDate, 'd')}
+                            </span>
+                          </div>
+                          
+                          {/* Session Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium truncate">
+                                {session.title}
+                              </p>
+                              {isToday && (
+                                <Badge variant="default" className="shrink-0 text-xs">
+                                  Today
+                                </Badge>
+                              )}
+                              {isPast && (
+                                <Badge variant="secondary" className="shrink-0 text-xs">
+                                  Past
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {format(sessionDate, 'h:mm a')} • {session.duration_minutes || 90} min
+                            </p>
+                          </div>
+                          
+                          {/* Add to Calendar Button */}
+                          {!isPast && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="shrink-0"
+                              onClick={() => handleAddSingleSession(session)}
+                              disabled={addingSessionId === session.id}
+                            >
+                              {addingSessionId === session.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <CalendarPlus className="h-4 w-4" />
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </CardContent>
               </Card>
             )}
