@@ -17,6 +17,9 @@ interface Message {
   sender_type: 'user' | 'admin';
   is_read: boolean;
   created_at: string;
+  attachment_url: string | null;
+  attachment_name: string | null;
+  attachment_type: string | null;
 }
 
 interface Conversation {
@@ -58,6 +61,7 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
   const [userContext, setUserContext] = useState<UserContext | null>(null);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   // Fetch messages when conversation changes
   useEffect(() => {
@@ -70,7 +74,6 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch messages
         const { data: msgs, error: msgError } = await supabase
           .from('chat_messages')
           .select('*')
@@ -80,13 +83,11 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
         if (msgError) throw msgError;
         setMessages((msgs || []) as Message[]);
 
-        // Mark as read
         await supabase
           .from('chat_conversations')
           .update({ unread_count_admin: 0 })
           .eq('id', conversation.id);
 
-        // Fetch user context
         const [enrollmentsRes, ordersRes] = await Promise.all([
           supabase
             .from('course_enrollments')
@@ -146,21 +147,78 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = async (content: string) => {
+  const uploadAttachment = async (file: File): Promise<string | null> => {
+    if (!user || !conversation) return null;
+    
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${conversation.user_id}/${Date.now()}-admin-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from('chat-attachments')
+      .upload(fileName, file);
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      throw uploadError;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('chat-attachments')
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
+
+  const sendNotification = async (conversationId: string, messageContent: string) => {
+    try {
+      if (!user) return;
+
+      await supabase.functions.invoke('send-chat-notification', {
+        body: {
+          conversationId,
+          messageContent,
+          senderType: 'admin',
+          senderId: user.id
+        }
+      });
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+  };
+
+  const handleSendMessage = async (
+    content: string,
+    attachment?: { file: File; name: string; type: string; size: number }
+  ) => {
     if (!conversation || !user) return;
     setSending(true);
+    setUploading(!!attachment);
 
     try {
+      let attachmentUrl: string | null = null;
+      if (attachment) {
+        attachmentUrl = await uploadAttachment(attachment.file);
+      }
+
+      const messageContent = content || (attachment ? `Sent an attachment: ${attachment.name}` : '');
+
       const { error } = await supabase
         .from('chat_messages')
         .insert({
           conversation_id: conversation.id,
           sender_id: user.id,
           sender_type: 'admin',
-          content
+          content: messageContent,
+          attachment_url: attachmentUrl,
+          attachment_name: attachment?.name || null,
+          attachment_type: attachment?.type || null,
+          attachment_size: attachment?.size || null
         });
 
       if (error) throw error;
+
+      // Send push notification to user
+      await sendNotification(conversation.id, messageContent);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -169,7 +227,12 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
       });
     } finally {
       setSending(false);
+      setUploading(false);
     }
+  };
+
+  const handleQuickReply = (reply: string) => {
+    handleSendMessage(reply);
   };
 
   const handleStatusChange = async (status: string) => {
@@ -254,6 +317,9 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
                   createdAt={msg.created_at}
                   isRead={msg.is_read}
                   isCurrentUser={msg.sender_type === 'admin'}
+                  attachmentUrl={msg.attachment_url}
+                  attachmentName={msg.attachment_name}
+                  attachmentType={msg.attachment_type}
                 />
               ))}
               <div ref={messagesEndRef} />
@@ -269,7 +335,7 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
               variant="outline"
               size="sm"
               className="text-xs"
-              onClick={() => handleSendMessage(reply)}
+              onClick={() => handleQuickReply(reply)}
               disabled={sending}
             >
               {reply.substring(0, 30)}...
@@ -281,6 +347,7 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
         <ChatInput 
           onSend={handleSendMessage} 
           disabled={sending}
+          uploading={uploading}
           placeholder="Type a reply..."
         />
       </div>
