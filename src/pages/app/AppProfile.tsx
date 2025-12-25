@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell } from 'lucide-react';
+import { checkCalendarPermission, requestCalendarPermission, isCalendarAvailable } from '@/lib/calendarIntegration';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
@@ -28,13 +29,15 @@ const AppProfile = () => {
   const [notificationPermission, setNotificationPermission] = useState<'granted' | 'denied' | 'default'>('default');
   const [isEnablingNotifications, setIsEnablingNotifications] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState<'checking' | 'active' | 'none'>('checking');
+  const [calendarPermission, setCalendarPermission] = useState<'granted' | 'denied' | 'prompt'>('prompt');
+  const [isRequestingCalendar, setIsRequestingCalendar] = useState(false);
   const isNative = isNativeApp();
 
   // Check notification permission and subscription status on mount
   useEffect(() => {
     const checkStatus = async () => {
       if (isNative && user?.id) {
-        // Check permission
+        // Check push notification permission
         const status = await checkPermissionStatus();
         setNotificationPermission(status);
 
@@ -56,10 +59,47 @@ const AppProfile = () => {
           console.log('[Profile] No active subscription found');
           setSubscriptionStatus('none');
         }
+        
+        // Check calendar permission
+        if (isCalendarAvailable()) {
+          const calStatus = await checkCalendarPermission();
+          setCalendarPermission(calStatus);
+        }
       }
     };
     checkStatus();
   }, [isNative, user?.id]);
+
+  // Handle enabling calendar access
+  const handleEnableCalendar = async () => {
+    setIsRequestingCalendar(true);
+    try {
+      const result = await requestCalendarPermission();
+      setCalendarPermission(result);
+      
+      if (result === 'granted') {
+        toast({
+          title: 'Calendar Access Enabled',
+          description: 'Course sessions can now be added directly to your calendar',
+        });
+      } else {
+        toast({
+          title: 'Permission Denied',
+          description: 'Please enable calendar access in Settings > LadyBoss Academy',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Calendar permission error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to request calendar permission',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsRequestingCalendar(false);
+    }
+  };
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -313,6 +353,17 @@ const AppProfile = () => {
               <span className="text-xs">Notifications</span>
             </Button>
           )}
+          {isNative && isCalendarAvailable() && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => scrollToSection('calendar-section')}
+              className="flex flex-col h-auto py-3 gap-1"
+            >
+              <Calendar className="h-4 w-4" />
+              <span className="text-xs">Calendar</span>
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
@@ -542,6 +593,94 @@ const AppProfile = () => {
                   {notificationPermission === 'denied' && (
                     <p className="text-xs text-muted-foreground text-center">
                       Tap your Settings app → LadyBoss Academy → Notifications → Allow Notifications
+                    </p>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Calendar Sync Section - Native Only */}
+        {isNative && isCalendarAvailable() && (
+          <Card id="calendar-section">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Calendar Sync
+              </CardTitle>
+              <CardDescription>
+                Add course sessions directly to your iOS Calendar
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Status Badge */}
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <div className={`h-2 w-2 rounded-full ${
+                    calendarPermission === 'granted' 
+                      ? 'bg-green-500' 
+                      : calendarPermission === 'denied'
+                      ? 'bg-red-500'
+                      : 'bg-yellow-500'
+                  }`} />
+                  <span className="text-sm font-medium">
+                    {calendarPermission === 'granted'
+                      ? 'Enabled'
+                      : calendarPermission === 'denied'
+                      ? 'Denied'
+                      : 'Not Enabled'}
+                  </span>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {calendarPermission === 'granted' 
+                    ? 'Can add events'
+                    : calendarPermission === 'denied'
+                    ? 'Permission denied'
+                    : 'Tap to enable'}
+                </span>
+              </div>
+
+              {/* Enabled State */}
+              {calendarPermission === 'granted' && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">✅ Calendar Access Enabled</p>
+                  <p className="text-sm text-muted-foreground">
+                    When you tap "Add to Calendar" in a course, sessions will be added directly to your iOS Calendar with reminders.
+                  </p>
+                </div>
+              )}
+
+              {/* Not Enabled State */}
+              {calendarPermission !== 'granted' && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">
+                      {calendarPermission === 'denied' 
+                        ? '⚠️ Permission Denied' 
+                        : '📅 Enable Calendar Sync'}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {calendarPermission === 'denied'
+                        ? 'Calendar access is disabled. Enable it in Settings > LadyBoss Academy > Calendars'
+                        : 'Allow calendar access to add course sessions directly to your iPhone calendar with automatic reminders'}
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={handleEnableCalendar} 
+                    className="w-full"
+                    disabled={isRequestingCalendar || calendarPermission === 'denied'}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {isRequestingCalendar 
+                      ? 'Requesting...' 
+                      : calendarPermission === 'denied'
+                      ? 'Open Settings to Enable'
+                      : 'Enable Calendar Access'}
+                  </Button>
+                  {calendarPermission === 'denied' && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      Tap Settings app → LadyBoss Academy → Calendars → Enable
                     </p>
                   )}
                 </div>
