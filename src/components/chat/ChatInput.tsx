@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, X, Loader2, FileText, Image as ImageIcon, Mic, Square } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Attachment {
   file: File;
@@ -210,11 +211,11 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
   };
 
   return (
-    <div className="border-t bg-background">
+    <div className="bg-background/80 backdrop-blur-xl">
       {/* Recording UI */}
       {isRecording && (
         <div className="px-4 pt-3">
-          <div className="flex items-center gap-3 p-3 bg-destructive/10 rounded-lg">
+          <div className="flex items-center gap-3 p-3 bg-destructive/10 rounded-2xl border border-destructive/20">
             <div className="h-3 w-3 rounded-full bg-destructive animate-pulse" />
             <span className="text-sm font-medium text-destructive">
               Recording {formatDuration(recordingDuration)}
@@ -224,14 +225,14 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
               variant="ghost"
               size="sm"
               onClick={cancelRecording}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground rounded-full"
             >
               Cancel
             </Button>
             <Button
               size="sm"
               onClick={stopRecording}
-              className="gap-1"
+              className="gap-1 rounded-full"
             >
               <Square className="h-3 w-3 fill-current" />
               Stop
@@ -243,15 +244,15 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
       {/* Attachment Preview */}
       {attachment && !isRecording && (
         <div className="px-4 pt-3">
-          <div className="flex items-center gap-2 p-2 bg-muted rounded-lg max-w-xs">
+          <div className="flex items-center gap-2.5 p-2 bg-muted/60 backdrop-blur-sm rounded-2xl max-w-xs border border-border/50">
             {attachment.preview ? (
               <img 
                 src={attachment.preview} 
                 alt="Preview" 
-                className="h-12 w-12 object-cover rounded"
+                className="h-12 w-12 object-cover rounded-xl"
               />
             ) : (
-              <div className="h-12 w-12 bg-background rounded flex items-center justify-center">
+              <div className="h-12 w-12 bg-background rounded-xl flex items-center justify-center">
                 {getFileIcon(attachment.file.type)}
               </div>
             )}
@@ -262,7 +263,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-6 w-6 shrink-0"
+              className="h-7 w-7 shrink-0 rounded-full hover:bg-destructive/10 hover:text-destructive"
               onClick={removeAttachment}
             >
               <X className="h-4 w-4" />
@@ -278,8 +279,8 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
         </div>
       )}
 
-      {/* Input Row */}
-      <div className="flex gap-2 items-end p-4">
+      {/* iOS-style Input Row */}
+      <div className="flex gap-2 items-end p-3">
         <input
           ref={fileInputRef}
           type="file"
@@ -291,7 +292,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
         <Button
           variant="ghost"
           size="icon"
-          className="shrink-0"
+          className="shrink-0 h-9 w-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || uploading || !!attachment || isRecording}
         >
@@ -302,7 +303,10 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
         <Button
           variant={isRecording ? "destructive" : "ghost"}
           size="icon"
-          className="shrink-0"
+          className={cn(
+            "shrink-0 h-9 w-9 rounded-full transition-colors",
+            !isRecording && "text-muted-foreground hover:text-foreground hover:bg-muted/80"
+          )}
           onClick={isRecording ? stopRecording : startRecording}
           disabled={disabled || uploading || !!attachment}
         >
@@ -313,28 +317,36 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           )}
         </Button>
 
-        <Textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          disabled={disabled || uploading || isRecording}
-          className="min-h-[44px] max-h-32 resize-none text-base"
-          rows={1}
-        />
-        
-        <Button 
-          onClick={handleSend} 
-          disabled={disabled || uploading || isRecording || (!message.trim() && !attachment)}
-          size="icon"
-          className="shrink-0"
-        >
-          {uploading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Send className="h-4 w-4" />
-          )}
-        </Button>
+        {/* iOS-style pill input */}
+        <div className="flex-1 flex items-end gap-2 bg-muted/60 rounded-[22px] border border-border/50 px-1 py-1">
+          <Textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            disabled={disabled || uploading || isRecording}
+            className="min-h-[36px] max-h-28 resize-none text-[15px] bg-transparent border-0 focus-visible:ring-0 px-3 py-2"
+            rows={1}
+          />
+          
+          <Button 
+            onClick={handleSend} 
+            disabled={disabled || uploading || isRecording || (!message.trim() && !attachment)}
+            size="icon"
+            className={cn(
+              "shrink-0 h-8 w-8 rounded-full transition-all duration-200",
+              (message.trim() || attachment) 
+                ? "bg-primary hover:bg-primary/90 scale-100" 
+                : "bg-primary/50 scale-95"
+            )}
+          >
+            {uploading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
