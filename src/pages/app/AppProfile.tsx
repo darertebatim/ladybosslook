@@ -494,7 +494,7 @@ const AppProfile = () => {
       <div className="space-y-6">
 
         {/* Quick Navigation */}
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+        <div className={`grid gap-2 ${isNative ? 'grid-cols-4 sm:grid-cols-8' : 'grid-cols-3 sm:grid-cols-6'}`}>
           <Button
             variant="outline"
             size="sm"
@@ -545,6 +545,28 @@ const AppProfile = () => {
               </span>
             )}
           </Button>
+          {isNative && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => scrollToSection('notifications-section')}
+                className="flex flex-col h-auto py-3 gap-1"
+              >
+                <Bell className="h-4 w-4" />
+                <span className="text-xs">Notifications</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => scrollToSection('calendar-section')}
+                className="flex flex-col h-auto py-3 gap-1"
+              >
+                <Calendar className="h-4 w-4" />
+                <span className="text-xs">Calendar</span>
+              </Button>
+            </>
+          )}
           <Button
             variant="outline"
             size="sm"
