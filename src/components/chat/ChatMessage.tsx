@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { FileText, Download, ExternalLink, Megaphone, Check, CheckCheck } from "lucide-react";
+import { FileText, Download, ExternalLink, Megaphone, Check, CheckCheck, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState, useRef } from "react";
 
 interface ChatMessageProps {
   content: string;
@@ -13,6 +14,14 @@ interface ChatMessageProps {
   attachmentName?: string | null;
   attachmentType?: string | null;
   isBroadcast?: boolean;
+}
+
+// Format audio duration
+function formatTime(seconds: number) {
+  if (!seconds || !isFinite(seconds)) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 // Function to make URLs clickable
@@ -74,13 +83,58 @@ export function ChatMessage({
   isBroadcast
 }: ChatMessageProps) {
   const isImage = attachmentType?.startsWith('image/');
+  const isAudio = attachmentType?.startsWith('audio/');
   const { text, linkUrl, linkText } = parseMessageContent(content);
   const displayText = isBroadcast ? formatBroadcastText(text) : text;
+
+  // Audio playback state
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   const handleDownload = () => {
     if (attachmentUrl) {
       window.open(attachmentUrl, '_blank');
     }
+  };
+
+  const togglePlayback = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  const handleEnded = () => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+    }
+  };
+
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audioRef.current || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percentage = clickX / rect.width;
+    audioRef.current.currentTime = percentage * duration;
   };
 
   const handleLinkClick = () => {
@@ -139,8 +193,70 @@ export function ChatMessage({
           </div>
         )}
 
-        {/* File Attachment */}
-        {attachmentUrl && !isImage && (
+        {/* Voice Message */}
+        {attachmentUrl && isAudio && (
+          <div className="flex items-center gap-3 px-3.5 py-3 min-w-[220px]">
+            {/* Hidden audio element */}
+            <audio 
+              ref={audioRef} 
+              src={attachmentUrl} 
+              preload="metadata"
+              onLoadedMetadata={handleLoadedMetadata}
+              onTimeUpdate={handleTimeUpdate}
+              onEnded={handleEnded}
+            />
+            
+            {/* Play/Pause Button */}
+            <button 
+              onClick={togglePlayback}
+              className={cn(
+                "h-11 w-11 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                isCurrentUser 
+                  ? "bg-primary-foreground/20 hover:bg-primary-foreground/30" 
+                  : "bg-primary/10 hover:bg-primary/20"
+              )}
+            >
+              {isPlaying ? (
+                <Pause className={cn("h-5 w-5", isCurrentUser ? "text-primary-foreground" : "text-primary")} />
+              ) : (
+                <Play className={cn("h-5 w-5 ml-0.5", isCurrentUser ? "text-primary-foreground" : "text-primary")} />
+              )}
+            </button>
+            
+            {/* Waveform/Progress */}
+            <div className="flex-1 flex flex-col gap-1.5">
+              <div 
+                className={cn(
+                  "h-1.5 rounded-full overflow-hidden cursor-pointer",
+                  isCurrentUser ? "bg-primary-foreground/20" : "bg-muted-foreground/20"
+                )}
+                onClick={handleProgressClick}
+              >
+                <div 
+                  className={cn(
+                    "h-full rounded-full transition-all",
+                    isCurrentUser ? "bg-primary-foreground" : "bg-primary"
+                  )}
+                  style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }} 
+                />
+              </div>
+              
+              {/* Duration */}
+              <span className={cn(
+                "text-[11px]",
+                isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground"
+              )}>
+                {isPlaying || currentTime > 0 
+                  ? `${formatTime(currentTime)} / ${formatTime(duration)}`
+                  : formatTime(duration) || "0:00"
+                }
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* File Attachment (non-image, non-audio) */}
+        {attachmentUrl && !isImage && !isAudio && (
           <div 
             className={cn(
               "flex items-center gap-3 p-3 m-1 rounded-2xl cursor-pointer transition-colors",
