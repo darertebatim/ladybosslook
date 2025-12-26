@@ -72,14 +72,14 @@ async function sendToApns(
   payload: { title: string; body: string; url: string; badge?: number }, 
   jwt: string,
   topic: string,
-  environment: 'development' | 'production'
+  environment: string
 ): Promise<Response> {
-  // Use sandbox or production APNs URL based on environment
-  const apnsUrl = (environment === 'sandbox' || environment === 'development')
-    ? `https://api.sandbox.push.apple.com/3/device/${deviceToken}`
-    : `https://api.push.apple.com/3/device/${deviceToken}`;
+  // Use production APNs unless explicitly set to development/sandbox
+  const isProduction = environment === 'production';
+  const apnsHost = isProduction ? 'api.push.apple.com' : 'api.sandbox.push.apple.com';
+  const apnsUrl = `https://${apnsHost}/3/device/${deviceToken}`;
   
-  console.log(`📱 Sending to APNs (${environment}):`, deviceToken.substring(0, 20) + '...');
+  console.log(`📱 Sending to APNs (${isProduction ? 'production' : 'sandbox'}):`, deviceToken.substring(0, 20) + '...');
   
   const response = await fetch(apnsUrl, {
     method: 'POST',
