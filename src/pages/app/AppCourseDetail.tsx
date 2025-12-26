@@ -186,14 +186,14 @@ const AppCourseDetail = () => {
   // Helper to get event location - uses meeting link or fallback to app deep link
   const getEventLocation = (meetingLink?: string | null): string => {
     if (meetingLink) return meetingLink;
-    // Fallback: Deep link to open this course in the app
-    return `https://ladybosslook.com/app/courses/${slug}`;
+    // Fallback: Deep link to open this course in the app (note: route is /app/course/:slug singular)
+    return `https://ladybosslook.com/app/course/${slug}`;
   };
 
   // Helper to get event description with app link if no meeting link
   const getEventDescription = (baseDescription: string, meetingLink?: string | null): string => {
     if (meetingLink) return baseDescription;
-    return `${baseDescription}\n\nOpen in LadyBoss Academy: https://ladybosslook.com/app/courses/${slug}`;
+    return `${baseDescription}\n\nOpen in LadyBoss Academy: https://ladybosslook.com/app/course/${slug}`;
   };
 
   const handleAddToCalendar = async () => {
