@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, MessageCircle, Loader2 } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { format, isToday, isYesterday, isSameDay } from "date-fns";
+import { Capacitor } from "@capacitor/core";
+import { Keyboard } from "@capacitor/keyboard";
 
 interface Message {
   id: string;
@@ -54,44 +56,51 @@ export default function AppSupportChat() {
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
-  // Keyboard detection using visualViewport API
+  // Keyboard handling - use Capacitor plugin for native, visualViewport for web
   useEffect(() => {
-    const viewport = window.visualViewport;
-    if (!viewport) return;
+    const isNative = Capacitor.isNativePlatform();
 
-    let lastKeyboardHeight = 0;
+    if (isNative) {
+      // Use Capacitor Keyboard plugin for native apps
+      const showListener = Keyboard.addListener('keyboardWillShow', (info) => {
+        setKeyboardHeight(info.keyboardHeight);
+        setIsKeyboardVisible(true);
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 50);
+      });
 
-    const handleResize = () => {
-      const keyboardH = Math.max(0, window.innerHeight - viewport.height);
-      
-      if (Math.abs(keyboardH - lastKeyboardHeight) > 10) {
-        lastKeyboardHeight = keyboardH;
+      const hideListener = Keyboard.addListener('keyboardWillHide', () => {
+        setKeyboardHeight(0);
+        setIsKeyboardVisible(false);
+      });
+
+      return () => {
+        showListener.then(l => l.remove());
+        hideListener.then(l => l.remove());
+      };
+    } else {
+      // Fallback to visualViewport for web
+      const viewport = window.visualViewport;
+      if (!viewport) return;
+
+      const handleResize = () => {
+        const keyboardH = Math.max(0, window.innerHeight - viewport.height);
         setKeyboardHeight(keyboardH);
-
-        // Scroll to bottom when keyboard opens
-        if (keyboardH > 0) {
+        setIsKeyboardVisible(keyboardH > 50);
+        
+        if (keyboardH > 50) {
           setTimeout(() => {
             messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
           }, 50);
         }
-      }
-    };
+      };
 
-    // Prevent iOS Safari viewport shift
-    const handleScroll = () => {
-      if (viewport.offsetTop !== 0) {
-        window.scrollTo(0, 0);
-      }
-    };
-
-    viewport.addEventListener('resize', handleResize);
-    viewport.addEventListener('scroll', handleScroll);
-
-    return () => {
-      viewport.removeEventListener('resize', handleResize);
-      viewport.removeEventListener('scroll', handleScroll);
-    };
+      viewport.addEventListener('resize', handleResize);
+      return () => viewport.removeEventListener('resize', handleResize);
+    }
   }, []);
 
   // Fetch or create conversation
@@ -345,9 +354,9 @@ export default function AppSupportChat() {
         <div 
           className="flex-1 overflow-y-auto overscroll-contain"
           style={{
-            paddingBottom: keyboardHeight > 0 
-              ? `calc(132px + ${keyboardHeight}px)`
-              : 'calc(132px + env(safe-area-inset-bottom, 0px))'
+            paddingBottom: isKeyboardVisible 
+              ? `${80 + keyboardHeight}px`
+              : 'calc(160px + env(safe-area-inset-bottom, 0px))'
           }}
         >
           <div className="p-4">
@@ -403,12 +412,11 @@ export default function AppSupportChat() {
         <div 
           className="fixed left-0 right-0 bg-background border-t border-border z-40"
           style={{
-            bottom: keyboardHeight > 0 
+            bottom: isKeyboardVisible 
               ? `${keyboardHeight}px`
               : 'calc(72px + env(safe-area-inset-bottom, 0px))',
-            paddingBottom: 'calc(4px + env(safe-area-inset-bottom, 0px))',
-            transition: 'bottom 0.15s ease-out',
-            willChange: 'bottom'
+            paddingBottom: isKeyboardVisible ? '8px' : '8px',
+            transition: isKeyboardVisible ? 'none' : 'bottom 0.2s ease-out'
           }}
         >
           <div className="py-2 px-4">
