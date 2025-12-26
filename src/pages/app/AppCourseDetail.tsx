@@ -183,18 +183,31 @@ const AppCourseDetail = () => {
     checkCalendarPrompt();
   }, [enrollment, dbSessions]);
 
+  // Helper to get event location - uses meeting link or fallback to app deep link
+  const getEventLocation = (meetingLink?: string | null): string => {
+    if (meetingLink) return meetingLink;
+    // Fallback: Deep link to open this course in the app
+    return `https://ladybosslook.com/app/courses/${slug}`;
+  };
+
+  // Helper to get event description with app link if no meeting link
+  const getEventDescription = (baseDescription: string, meetingLink?: string | null): string => {
+    if (meetingLink) return baseDescription;
+    return `${baseDescription}\n\nOpen in LadyBoss Academy: https://ladybosslook.com/app/courses/${slug}`;
+  };
+
   const handleAddToCalendar = async () => {
     if (!round?.first_session_date || !program) return;
 
     const event = {
       title: `${program.title} - First Session`,
-      description: `Join us for the first session of ${program.title}`,
+      description: getEventDescription(`Join us for the first session of ${program.title}`, round.google_meet_link),
       startDate: new Date(round.first_session_date),
       endDate: new Date(
         new Date(round.first_session_date).getTime() +
         (round.first_session_duration || 90) * 60000
       ),
-      location: round.google_meet_link || undefined,
+      location: getEventLocation(round.google_meet_link),
     };
 
     // Native iOS/Android: Use native calendar integration
@@ -246,14 +259,17 @@ const AppCourseDetail = () => {
     
     // If we have real sessions from the database, use those
     if (dbSessions && dbSessions.length > 0) {
-      return dbSessions.map(session => ({
-        title: session.title,
-        description: session.description || `Session ${session.session_number} of ${program.title}`,
-        startDate: new Date(session.session_date),
-        endDate: new Date(new Date(session.session_date).getTime() + (session.duration_minutes || 90) * 60000),
-        location: session.meeting_link || round?.google_meet_link || undefined,
-        reminderMinutes: 60,
-      }));
+      return dbSessions.map(session => {
+        const meetingLink = session.meeting_link || round?.google_meet_link;
+        return {
+          title: session.title,
+          description: getEventDescription(session.description || `Session ${session.session_number} of ${program.title}`, meetingLink),
+          startDate: new Date(session.session_date),
+          endDate: new Date(new Date(session.session_date).getTime() + (session.duration_minutes || 90) * 60000),
+          location: getEventLocation(meetingLink),
+          reminderMinutes: 60,
+        };
+      });
     }
     
     // Fallback: generate weekly sessions from start to end date
@@ -270,10 +286,10 @@ const AppCourseDetail = () => {
     while (currentDate <= endDate) {
       events.push({
         title: `${program.title} - Session ${sessionNumber}`,
-        description: `Session ${sessionNumber} of ${program.title}`,
+        description: getEventDescription(`Session ${sessionNumber} of ${program.title}`, round.google_meet_link),
         startDate: new Date(currentDate),
         endDate: new Date(currentDate.getTime() + sessionDuration * 60000),
-        location: round.google_meet_link || undefined,
+        location: getEventLocation(round.google_meet_link),
         reminderMinutes: 60,
       });
       
