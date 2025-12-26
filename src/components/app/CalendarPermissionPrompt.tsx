@@ -27,6 +27,9 @@ export function CalendarPermissionPrompt({ open, onClose, onPermissionGranted }:
       const result = await requestCalendarPermission();
       
       if (result === 'granted') {
+        // Enable auto-sync calendar preference since they want calendar integration
+        localStorage.setItem('autoSyncCalendar', 'true');
+        
         toast.success('Calendar access enabled!');
         onPermissionGranted?.();
         onClose();
