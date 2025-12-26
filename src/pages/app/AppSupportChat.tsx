@@ -8,6 +8,7 @@ import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, MessageCircle, Loader2 } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
+import { format, isToday, isYesterday, isSameDay } from "date-fns";
 
 interface Message {
   id: string;
@@ -27,6 +28,19 @@ interface Conversation {
   status: string;
   unread_count_user: number;
 }
+
+// Helper to get date separator label
+const getDateLabel = (date: Date): string => {
+  if (isToday(date)) return "Today";
+  if (isYesterday(date)) return "Yesterday";
+  return format(date, "MMMM d, yyyy");
+};
+
+// Check if we need a date separator between two messages
+const needsDateSeparator = (currentMsg: Message, prevMsg: Message | null): boolean => {
+  if (!prevMsg) return true;
+  return !isSameDay(new Date(currentMsg.created_at), new Date(prevMsg.created_at));
+};
 
 export default function AppSupportChat() {
   const navigate = useNavigate();
@@ -295,23 +309,32 @@ export default function AppSupportChat() {
       />
       
       <div className="fixed inset-0 bg-background flex flex-col">
-        {/* Fixed Header with safe area + visual padding */}
+        {/* iOS-style Blur Header */}
         <header 
-          className="bg-background border-b border-border z-50 shrink-0"
+          className="bg-background/80 backdrop-blur-xl border-b border-border/50 z-50 shrink-0"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="flex items-center gap-3 pt-6 pb-3 px-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => navigate(-1)}
+              className="h-9 w-9 rounded-full hover:bg-muted/80 transition-colors"
+            >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <MessageCircle className="h-5 w-5 text-primary" />
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm">
+                  <MessageCircle className="h-5 w-5 text-primary" />
+                </div>
+                {/* Online indicator */}
+                <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-background" />
               </div>
               <div>
-                <h1 className="font-semibold">Support Chat</h1>
-                <p className="text-xs text-muted-foreground">
-                  {conversation?.status === 'resolved' ? 'Resolved' : 'We typically reply within a few hours'}
+                <h1 className="font-semibold text-[17px]">Support</h1>
+                <p className="text-[13px] text-muted-foreground">
+                  {conversation?.status === 'resolved' ? 'Resolved' : 'Usually replies within hours'}
                 </p>
               </div>
             </div>
@@ -330,28 +353,46 @@ export default function AppSupportChat() {
           <div className="p-4">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
-                <MessageCircle className="h-12 w-12 text-muted-foreground/30 mb-4" />
-                <h2 className="font-medium text-lg mb-1">Start a conversation</h2>
+                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-4">
+                  <MessageCircle className="h-8 w-8 text-primary/60" />
+                </div>
+                <h2 className="font-semibold text-lg mb-1">Start a conversation</h2>
                 <p className="text-sm text-muted-foreground max-w-xs">
                   Send us a message and we'll get back to you as soon as possible
                 </p>
               </div>
             ) : (
               <>
-                {messages.map((msg) => (
-                  <ChatMessage
-                    key={msg.id}
-                    content={msg.content}
-                    senderType={msg.sender_type}
-                    createdAt={msg.created_at}
-                    isRead={msg.is_read}
-                    isCurrentUser={msg.sender_type === 'user'}
-                    attachmentUrl={msg.attachment_url}
-                    attachmentName={msg.attachment_name}
-                    attachmentType={msg.attachment_type}
-                    isBroadcast={msg.is_broadcast}
-                  />
-                ))}
+                {messages.map((msg, index) => {
+                  const prevMsg = index > 0 ? messages[index - 1] : null;
+                  const showDateSeparator = needsDateSeparator(msg, prevMsg);
+                  
+                  return (
+                    <div key={msg.id}>
+                      {/* Date Separator */}
+                      {showDateSeparator && (
+                        <div className="flex items-center justify-center my-4">
+                          <div className="px-3 py-1 rounded-full bg-muted/60 backdrop-blur-sm">
+                            <span className="text-xs font-medium text-muted-foreground">
+                              {getDateLabel(new Date(msg.created_at))}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      <ChatMessage
+                        content={msg.content}
+                        senderType={msg.sender_type}
+                        createdAt={msg.created_at}
+                        isRead={msg.is_read}
+                        isCurrentUser={msg.sender_type === 'user'}
+                        attachmentUrl={msg.attachment_url}
+                        attachmentName={msg.attachment_name}
+                        attachmentType={msg.attachment_type}
+                        isBroadcast={msg.is_broadcast}
+                      />
+                    </div>
+                  );
+                })}
                 <div ref={messagesEndRef} />
               </>
             )}
