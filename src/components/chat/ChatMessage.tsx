@@ -26,28 +26,46 @@ function formatTime(seconds: number) {
 
 // Function to make URLs clickable
 function linkifyText(text: string) {
-  const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|([a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/[^\s]*)?)/gi;
-  const parts = text.split(urlRegex);
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/gi;
   
-  return parts.map((part, index) => {
-    if (!part) return null;
-    if (urlRegex.test(part)) {
-      const href = part.startsWith('http') ? part : `https://${part}`;
-      return (
-        <a 
-          key={index}
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline decoration-1 underline-offset-2 hover:opacity-80 transition-opacity"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {part}
-        </a>
-      );
+  const parts: (string | JSX.Element)[] = [];
+  let lastIndex = 0;
+  let match;
+  
+  // Reset regex state
+  urlRegex.lastIndex = 0;
+  
+  while ((match = urlRegex.exec(text)) !== null) {
+    // Add text before the match
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
     }
-    return part;
-  });
+    
+    // Add the link
+    const url = match[0];
+    const href = url.startsWith('http') ? url : `https://${url}`;
+    parts.push(
+      <a 
+        key={match.index}
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline decoration-1 underline-offset-2 hover:opacity-80 transition-opacity"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {url}
+      </a>
+    );
+    
+    lastIndex = urlRegex.lastIndex;
+  }
+  
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+  
+  return parts.length > 0 ? parts : [text];
 }
 
 // Parse message content for link buttons
