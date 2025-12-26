@@ -719,7 +719,7 @@ const AppProfile = () => {
                 {enrollments.map((enrollment) => (
                   <Link
                     key={enrollment.id}
-                    to={`/app/courses/${enrollment.program_slug || enrollment.course_name}`}
+                    to={`/app/course/${enrollment.program_slug || enrollment.course_name}`}
                     className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
                   >
                     <div className="min-w-0 flex-1">
