@@ -1,20 +1,23 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { usePrograms } from '@/hooks/usePrograms';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SEOHead } from '@/components/SEOHead';
-import { ShoppingBag, CheckCircle2, ChevronRight } from 'lucide-react';
+import { ShoppingBag, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
+import { useState } from 'react';
 
 const AppStore = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { programs, isLoading: programsLoading } = usePrograms();
+  const queryClient = useQueryClient();
+  const [enrollingSlug, setEnrollingSlug] = useState<string | null>(null);
 
   // Fetch user's enrollments
   const { data: enrollments = [] } = useQuery({
@@ -154,30 +157,64 @@ const AppStore = () => {
                       ) : (
                         <Button 
                           className="flex-1"
+                          disabled={enrollingSlug === program.slug}
                           onClick={async () => {
                             if (!user?.id) {
                               toast.error('Please sign in to enroll');
                               return;
                             }
-                            // Create free enrollment
-                            const { error } = await supabase
-                              .from('course_enrollments')
-                              .insert({
-                                user_id: user.id,
-                                course_name: program.title,
-                                program_slug: program.slug,
-                                status: 'active'
-                              });
                             
-                            if (error) {
-                              toast.error('Failed to enroll. Please try again.');
-                            } else {
-                              toast.success('Enrolled successfully!');
-                              setTimeout(() => navigate('/app/courses'), 1000);
+                            setEnrollingSlug(program.slug);
+                            
+                            try {
+                              // Check if there's an auto-enrollment round for this program
+                              let roundId: string | null = null;
+                              const { data: autoEnroll } = await supabase
+                                .from('program_auto_enrollment')
+                                .select('round_id')
+                                .eq('program_slug', program.slug)
+                                .maybeSingle();
+                              
+                              if (autoEnroll?.round_id) {
+                                roundId = autoEnroll.round_id;
+                              }
+                              
+                              // Create free enrollment with round_id if available
+                              const { error } = await supabase
+                                .from('course_enrollments')
+                                .insert({
+                                  user_id: user.id,
+                                  course_name: program.title,
+                                  program_slug: program.slug,
+                                  round_id: roundId,
+                                  status: 'active'
+                                });
+                              
+                              if (error) {
+                                toast.error('Failed to enroll. Please try again.');
+                              } else {
+                                toast.success('Enrolled successfully!');
+                                
+                                // Invalidate queries to refresh data immediately
+                                queryClient.invalidateQueries({ queryKey: ['user-enrollments'] });
+                                queryClient.invalidateQueries({ queryKey: ['courses-data', user.id] });
+                                queryClient.invalidateQueries({ queryKey: ['home-data', user.id] });
+                                
+                                navigate('/app/courses');
+                              }
+                            } finally {
+                              setEnrollingSlug(null);
                             }
                           }}
                         >
-                          Enroll Free
+                          {enrollingSlug === program.slug ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Enrolling...
+                            </>
+                          ) : (
+                            'Enroll Free'
+                          )}
                         </Button>
                       )}
                     </div>
