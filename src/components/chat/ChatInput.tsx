@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Capacitor } from "@capacitor/core";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, X, Loader2, FileText, Image as ImageIcon, Mic, Square } from "lucide-react";
@@ -114,12 +115,24 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
   const startRecording = async () => {
     try {
       setError(null);
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setError("Microphone is not available on this device.");
+        return;
+      }
+
+      if (typeof MediaRecorder === 'undefined') {
+        setError("Voice recording isn't supported on this device.");
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4'
-      });
-      
+
+      const preferredTypes = ['audio/webm', 'audio/mp4', 'audio/ogg'];
+      const chosenType = preferredTypes.find((t) => MediaRecorder.isTypeSupported?.(t)) || undefined;
+
+      const mediaRecorder = new MediaRecorder(stream, chosenType ? { mimeType: chosenType } : undefined);
+
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
@@ -130,20 +143,25 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { 
-          type: mediaRecorder.mimeType 
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: mediaRecorder.mimeType,
         });
-        
-        const extension = mediaRecorder.mimeType.includes('webm') ? 'webm' : 'm4a';
-        const audioFile = new File([audioBlob], `voice-message.${extension}`, { 
-          type: mediaRecorder.mimeType 
+
+        const extension = mediaRecorder.mimeType.includes('webm')
+          ? 'webm'
+          : mediaRecorder.mimeType.includes('ogg')
+            ? 'ogg'
+            : 'm4a';
+
+        const audioFile = new File([audioBlob], `voice-message.${extension}`, {
+          type: mediaRecorder.mimeType,
         });
 
         setAttachment({ file: audioFile });
-        
+
         // Stop all tracks
-        stream.getTracks().forEach(track => track.stop());
-        
+        stream.getTracks().forEach((track) => track.stop());
+
         // Clear interval
         if (recordingIntervalRef.current) {
           clearInterval(recordingIntervalRef.current);
@@ -154,14 +172,31 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
 
       mediaRecorder.start();
       setIsRecording(true);
-      
+
       // Start duration counter
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingDuration(prev => prev + 1);
+        setRecordingDuration((prev) => prev + 1);
       }, 1000);
-
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error accessing microphone:', err);
+      const name = err?.name as string | undefined;
+
+      const iosNative = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+
+      if (name === 'NotAllowedError' || name === 'SecurityError') {
+        setError(
+          iosNative
+            ? "Microphone permission is off. Go to iPhone Settings → Ladybosslook → Microphone and enable it, then reopen the app."
+            : "Microphone permission denied. Please allow microphone access."
+        );
+        return;
+      }
+
+      if (name === 'NotFoundError') {
+        setError("No microphone found on this device.");
+        return;
+      }
+
       setError("Could not access microphone. Please allow microphone permission.");
     }
   };

@@ -346,8 +346,8 @@ export default function AppSupportChat() {
           className="flex-1 overflow-y-auto overscroll-contain"
           style={{
             paddingBottom: keyboardHeight > 0 
-              ? `calc(72px + ${keyboardHeight}px)` 
-              : '132px'
+              ? `calc(132px + ${keyboardHeight}px)`
+              : 'calc(132px + env(safe-area-inset-bottom, 0px))'
           }}
         >
           <div className="p-4">
@@ -404,9 +404,9 @@ export default function AppSupportChat() {
           className="fixed left-0 right-0 bg-background border-t border-border z-40"
           style={{
             bottom: keyboardHeight > 0 
-              ? keyboardHeight 
-              : '72px',
-            paddingBottom: '4px',
+              ? `${keyboardHeight}px`
+              : 'calc(72px + env(safe-area-inset-bottom, 0px))',
+            paddingBottom: 'calc(4px + env(safe-area-inset-bottom, 0px))',
             transition: 'bottom 0.15s ease-out',
             willChange: 'bottom'
           }}
