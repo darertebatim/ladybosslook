@@ -280,7 +280,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
       )}
 
       {/* iOS-style Input Row */}
-      <div className="flex gap-2 items-end p-3">
+      <div className="flex gap-1.5 items-end px-2 py-2">
         <input
           ref={fileInputRef}
           type="file"
@@ -292,7 +292,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
         <Button
           variant="ghost"
           size="icon"
-          className="shrink-0 h-9 w-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+          className="shrink-0 h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || uploading || !!attachment || isRecording}
         >
@@ -304,7 +304,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           variant={isRecording ? "destructive" : "ghost"}
           size="icon"
           className={cn(
-            "shrink-0 h-9 w-9 rounded-full transition-colors",
+            "shrink-0 h-8 w-8 rounded-full transition-colors",
             !isRecording && "text-muted-foreground hover:text-foreground hover:bg-muted/80"
           )}
           onClick={isRecording ? stopRecording : startRecording}
@@ -318,14 +318,14 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
         </Button>
 
         {/* iOS-style pill input */}
-        <div className="flex-1 flex items-end gap-2 bg-muted/60 rounded-[22px] border border-border/50 px-1 py-1">
+        <div className="flex-1 flex items-center bg-muted/50 rounded-full border border-border/40 pl-4 pr-1 py-0.5">
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             disabled={disabled || uploading || isRecording}
-            className="min-h-[36px] max-h-28 resize-none text-[15px] bg-transparent border-0 focus-visible:ring-0 px-3 py-2"
+            className="min-h-[34px] max-h-24 resize-none text-[15px] leading-[22px] bg-transparent border-0 focus-visible:ring-0 p-0 py-1.5"
             rows={1}
           />
           
@@ -334,16 +334,16 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
             disabled={disabled || uploading || isRecording || (!message.trim() && !attachment)}
             size="icon"
             className={cn(
-              "shrink-0 h-8 w-8 rounded-full transition-all duration-200",
+              "shrink-0 h-7 w-7 rounded-full transition-all duration-200 ml-1",
               (message.trim() || attachment) 
-                ? "bg-primary hover:bg-primary/90 scale-100" 
-                : "bg-primary/50 scale-95"
+                ? "bg-primary hover:bg-primary/90 scale-100 opacity-100" 
+                : "bg-primary/40 scale-90 opacity-60"
             )}
           >
             {uploading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <Send className="h-4 w-4" />
+              <Send className="h-3.5 w-3.5" />
             )}
           </Button>
         </div>
