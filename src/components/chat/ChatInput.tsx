@@ -319,7 +319,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled || uploading || isRecording}
-          className="min-h-[44px] max-h-32 resize-none"
+          className="min-h-[44px] max-h-32 resize-none text-base"
           rows={1}
         />
         

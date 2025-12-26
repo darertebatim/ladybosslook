@@ -9,6 +9,17 @@ import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { useChatNotifications } from '@/hooks/useChatNotifications';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+
+/**
+ * Reset iOS viewport zoom - fixes stuck zoom after input focus
+ */
+const resetViewportZoom = () => {
+  const viewportMeta = document.querySelector('meta[name="viewport"]');
+  if (viewportMeta) {
+    viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+  }
+};
+
 /**
  * Native app layout - Clean layout specifically for iOS/Android native apps
  */
@@ -21,6 +32,11 @@ const NativeAppLayout = () => {
   // Custom hooks after useState declarations
   const { unreadCount } = useUnreadChat();
   const { showUnreadPopup, unreadMessageCount, dismissPopup, goToChat } = useChatNotifications();
+
+  // Reset viewport zoom on navigation to fix iOS zoom bug
+  useEffect(() => {
+    resetViewportZoom();
+  }, [location.pathname]);
 
   useEffect(() => {
     const checkPrompt = async () => {
