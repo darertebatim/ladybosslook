@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft, CalendarPlus, Loader2, Bell, Clock } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { downloadICSFile, generateICSFile } from '@/utils/calendar';
-import { addEventToCalendar, addMultipleEventsToCalendar, isCalendarAvailable, CalendarEvent } from '@/lib/calendarIntegration';
+import { addEventToCalendar, addMultipleEventsToCalendar, isCalendarAvailable, CalendarEvent, checkCalendarPermission } from '@/lib/calendarIntegration';
 import { format, addWeeks } from 'date-fns';
 import { toast } from "sonner";
 import { Share } from '@capacitor/share';
@@ -22,6 +22,7 @@ import { shouldShowEnrollmentReminder } from '@/hooks/useNotificationReminder';
 import { subscribeToPushNotifications, checkPermissionStatus } from '@/lib/pushNotifications';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
+import { CalendarPermissionPrompt } from '@/components/app/CalendarPermissionPrompt';
 import DOMPurify from 'dompurify';
 
 const AppCourseDetail = () => {
@@ -34,6 +35,7 @@ const AppCourseDetail = () => {
   const [isSyncingAllSessions, setIsSyncingAllSessions] = useState(false);
   const [hasNewSessions, setHasNewSessions] = useState(false);
   const [addingSessionId, setAddingSessionId] = useState<string | null>(null);
+  const [showCalendarPrompt, setShowCalendarPrompt] = useState(false);
   
   // Get unseen content functions for view tracking
   let markEnrollmentViewed: ((id: string) => Promise<void>) | null = null;
@@ -153,6 +155,33 @@ const AppCourseDetail = () => {
     
     setHasNewSessions(hasNewer);
   }, [round?.id, dbSessions]);
+
+  // Show calendar permission prompt for enrolled users on native app
+  useEffect(() => {
+    const checkCalendarPrompt = async () => {
+      // Only on native app with calendar available
+      if (!isNativeApp() || !isCalendarAvailable()) return;
+      
+      // Only for enrolled users with sessions
+      if (!enrollment || !dbSessions || dbSessions.length === 0) return;
+      
+      // Check if dismissed recently (within 7 days)
+      const dismissed = localStorage.getItem('calendarPermissionPromptDismissed');
+      if (dismissed) {
+        const daysSince = (Date.now() - parseInt(dismissed)) / (1000 * 60 * 60 * 24);
+        if (daysSince < 7) return;
+      }
+      
+      // Check current permission
+      const permission = await checkCalendarPermission();
+      if (permission === 'granted') return;
+      
+      // Show prompt after 1.5 seconds
+      setTimeout(() => setShowCalendarPrompt(true), 1500);
+    };
+    
+    checkCalendarPrompt();
+  }, [enrollment, dbSessions]);
 
   const handleAddToCalendar = async () => {
     if (!round?.first_session_date || !program) return;
@@ -958,6 +987,16 @@ const AppCourseDetail = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Calendar Permission Prompt */}
+      <CalendarPermissionPrompt 
+        open={showCalendarPrompt}
+        onClose={() => setShowCalendarPrompt(false)}
+        onPermissionGranted={() => {
+          // Auto-sync sessions after permission granted
+          handleSyncAllSessions();
+        }}
+      />
     </>
   );
 };
