@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, Sparkles } from 'lucide-react';
+import { Calendar, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -9,50 +9,40 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { subscribeToPushNotifications, requestNotificationPermission } from '@/lib/pushNotifications';
+import { requestCalendarPermission } from '@/lib/calendarIntegration';
 import { toast } from 'sonner';
 
-interface PushNotificationPromptProps {
-  userId: string;
+interface CalendarPermissionPromptProps {
   open: boolean;
   onClose: () => void;
+  onPermissionGranted?: () => void;
 }
 
-export function PushNotificationPrompt({ userId, open, onClose }: PushNotificationPromptProps) {
+export function CalendarPermissionPrompt({ open, onClose, onPermissionGranted }: CalendarPermissionPromptProps) {
   const [isEnabling, setIsEnabling] = useState(false);
 
   const handleEnable = async () => {
     setIsEnabling(true);
     try {
-      // CRITICAL: Request permission FIRST (same as Profile page)
-      const permission = await requestNotificationPermission();
+      const result = await requestCalendarPermission();
       
-      if (permission === 'granted') {
-        const result = await subscribeToPushNotifications(userId);
-        
-        if (result.success) {
-          toast.success('Notifications enabled!');
-          onClose();
-        } else if (result.error === 'Permission denied') {
-          toast.error('Permission denied. Open Settings to enable notifications.');
-        } else if (result.error === 'Registration timeout') {
-          toast.error('Could not connect. Please try again from Profile settings.');
-        } else {
-          toast.error(result.error || 'Failed to enable notifications');
-        }
+      if (result === 'granted') {
+        toast.success('Calendar access enabled!');
+        onPermissionGranted?.();
+        onClose();
       } else {
-        toast.error('Please enable notifications in iOS Settings.');
+        toast.error('Please enable calendar access in iOS Settings.');
       }
     } catch (error) {
-      console.error('[PushPrompt] Error:', error);
-      toast.error('Failed to enable notifications');
+      console.error('[CalendarPrompt] Error:', error);
+      toast.error('Failed to enable calendar access');
     } finally {
       setIsEnabling(false);
     }
   };
 
   const handleMaybeLater = () => {
-    localStorage.setItem('pushNotificationPromptDismissed', Date.now().toString());
+    localStorage.setItem('calendarPermissionPromptDismissed', Date.now().toString());
     onClose();
   };
 
@@ -64,7 +54,7 @@ export function PushNotificationPrompt({ userId, open, onClose }: PushNotificati
           <div className="flex justify-center mb-5">
             <div className="relative">
               <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg animate-scale-in">
-                <Bell className="h-9 w-9 text-primary-foreground" />
+                <Calendar className="h-9 w-9 text-primary-foreground" />
               </div>
               {/* Sparkle decorations */}
               <div className="absolute -top-1 -right-1 animate-pulse">
@@ -77,10 +67,10 @@ export function PushNotificationPrompt({ userId, open, onClose }: PushNotificati
           </div>
           
           <AlertDialogTitle className="text-center text-xl font-semibold leading-tight">
-            Stay in the Loop
+            Never Miss a Class
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center text-sm text-muted-foreground mt-2 leading-relaxed">
-            Get notified about new courses, class reminders, and exclusive updates.
+            Add course sessions directly to your calendar so you never miss an important class.
           </AlertDialogDescription>
         </AlertDialogHeader>
         
@@ -89,15 +79,15 @@ export function PushNotificationPrompt({ userId, open, onClose }: PushNotificati
           <div className="flex flex-col gap-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-              <span>New course announcements</span>
+              <span>Auto-add sessions to calendar</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-              <span>Live session reminders</span>
+              <span>Get native calendar reminders</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-              <span>Support chat replies</span>
+              <span>Sync with your schedule</span>
             </div>
           </div>
         </div>
@@ -114,7 +104,7 @@ export function PushNotificationPrompt({ userId, open, onClose }: PushNotificati
                 Enabling...
               </span>
             ) : (
-              'Enable Notifications'
+              'Enable Calendar'
             )}
           </Button>
           <Button 
