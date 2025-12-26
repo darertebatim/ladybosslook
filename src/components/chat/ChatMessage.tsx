@@ -285,8 +285,8 @@ export function ChatMessage({
           </div>
         )}
 
-        {/* Text Content */}
-        {displayText && (
+        {/* Text Content - hide for voice messages */}
+        {displayText && !isAudio && (
           <div className="px-3.5 py-2">
             <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words">
               {linkifyText(displayText)}
