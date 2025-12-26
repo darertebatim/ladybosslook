@@ -183,17 +183,14 @@ const AppCourseDetail = () => {
     checkCalendarPrompt();
   }, [enrollment, dbSessions]);
 
-  // Helper to get event location - uses meeting link or fallback to app deep link
-  const getEventLocation = (meetingLink?: string | null): string => {
-    if (meetingLink) return meetingLink;
-    // Fallback: Deep link to open this course in the app (note: route is /app/course/:slug singular)
-    return `https://ladybosslook.com/app/course/${slug}`;
+  // Helper to get event location - only returns meeting link, undefined otherwise
+  const getEventLocation = (meetingLink?: string | null): string | undefined => {
+    return meetingLink || undefined;
   };
 
-  // Helper to get event description with app link if no meeting link
-  const getEventDescription = (baseDescription: string, meetingLink?: string | null): string => {
-    if (meetingLink) return baseDescription;
-    return `${baseDescription}\n\nOpen in LadyBoss Academy: https://ladybosslook.com/app/course/${slug}`;
+  // Helper to get event description - just returns the base description
+  const getEventDescription = (baseDescription: string): string => {
+    return baseDescription;
   };
 
   const handleAddToCalendar = async () => {
@@ -201,7 +198,7 @@ const AppCourseDetail = () => {
 
     const event = {
       title: `${program.title} - First Session`,
-      description: getEventDescription(`Join us for the first session of ${program.title}`, round.google_meet_link),
+      description: getEventDescription(`Join us for the first session of ${program.title}`),
       startDate: new Date(round.first_session_date),
       endDate: new Date(
         new Date(round.first_session_date).getTime() +
@@ -263,7 +260,7 @@ const AppCourseDetail = () => {
         const meetingLink = session.meeting_link || round?.google_meet_link;
         return {
           title: session.title,
-          description: getEventDescription(session.description || `Session ${session.session_number} of ${program.title}`, meetingLink),
+          description: getEventDescription(session.description || `Session ${session.session_number} of ${program.title}`),
           startDate: new Date(session.session_date),
           endDate: new Date(new Date(session.session_date).getTime() + (session.duration_minutes || 90) * 60000),
           location: getEventLocation(meetingLink),
@@ -286,7 +283,7 @@ const AppCourseDetail = () => {
     while (currentDate <= endDate) {
       events.push({
         title: `${program.title} - Session ${sessionNumber}`,
-        description: getEventDescription(`Session ${sessionNumber} of ${program.title}`, round.google_meet_link),
+        description: getEventDescription(`Session ${sessionNumber} of ${program.title}`),
         startDate: new Date(currentDate),
         endDate: new Date(currentDate.getTime() + sessionDuration * 60000),
         location: getEventLocation(round.google_meet_link),
