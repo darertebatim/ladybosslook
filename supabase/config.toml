@@ -47,3 +47,6 @@ verify_jwt = true
 
 [functions.send-five-language-confirmation]
 verify_jwt = true
+
+[functions.tag-five-language-buyers]
+verify_jwt = true
