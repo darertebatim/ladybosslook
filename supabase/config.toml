@@ -50,3 +50,6 @@ verify_jwt = true
 
 [functions.tag-five-language-buyers]
 verify_jwt = true
+
+[functions.add-missing-five-language-buyers]
+verify_jwt = true
