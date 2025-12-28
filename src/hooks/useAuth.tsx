@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminPages, setAdminPages] = useState<string[]>([]);
+  const [roleCheckComplete, setRoleCheckComplete] = useState(false);
 
   const checkUserRole = async (userId: string) => {
     try {
@@ -46,6 +47,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch {
       setIsAdmin(false);
       setAdminPages([]);
+    } finally {
+      setRoleCheckComplete(true);
     }
   };
 
@@ -83,13 +86,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Defer role checking to avoid blocking
-          setTimeout(() => {
-            checkUserRole(session.user.id);
-          }, 0);
+          // Check role and only set loading false after role check completes
+          await checkUserRole(session.user.id);
         } else {
           setIsAdmin(false);
           setAdminPages([]);
+          setRoleCheckComplete(true);
         }
         
         setLoading(false);
@@ -97,14 +99,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        setTimeout(() => {
-          checkUserRole(session.user.id);
-        }, 0);
+        await checkUserRole(session.user.id);
+      } else {
+        setRoleCheckComplete(true);
       }
       
       setLoading(false);
@@ -182,7 +184,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const value = {
     user,
     session,
-    loading,
+    loading: loading || !roleCheckComplete, // Only not loading when role check is also complete
     isAdmin,
     adminPages,
     hasAdminAccess,
