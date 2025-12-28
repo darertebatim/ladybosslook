@@ -79,27 +79,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const hasAdminAccess = isAdmin || adminPages.length > 0;
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Check role and only set loading false after role check completes
-          await checkUserRole(session.user.id);
-        } else {
-          setIsAdmin(false);
-          setAdminPages([]);
-          setRoleCheckComplete(true);
-        }
-        
-        setLoading(false);
-      }
-    );
+    let isMounted = true;
 
-    // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    // Check for existing session first
+    const initSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!isMounted) return;
+      
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -110,9 +97,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       
       setLoading(false);
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    initSession();
+
+    // Set up auth state listener for future changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!isMounted) return;
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await checkUserRole(session.user.id);
+        } else {
+          setIsAdmin(false);
+          setAdminPages([]);
+          setRoleCheckComplete(true);
+        }
+      }
+    );
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
