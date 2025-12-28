@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { Loader2, X, Plus, Search, Tag, Users, ChevronDown, ChevronRight, RefreshCw } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -35,6 +36,16 @@ interface ProgramWithRounds {
   }[];
 }
 
+interface AutoTagProgress {
+  tagType: 'paid_customer' | 'free_customer';
+  total: number;
+  processed: number;
+  tagged: number;
+  alreadyTagged: number;
+  notFound: number;
+  failed: number;
+}
+
 export function MailchimpTagManager() {
   const queryClient = useQueryClient();
   
@@ -55,8 +66,8 @@ export function MailchimpTagManager() {
   const [memberLoading, setMemberLoading] = useState(false);
   const [newMemberTag, setNewMemberTag] = useState('');
 
-  // Auto-tagging state
-  const [autoTagLoading, setAutoTagLoading] = useState<'paid_customer' | 'free_customer' | null>(null);
+  // Auto-tagging state with progress
+  const [autoTagProgress, setAutoTagProgress] = useState<AutoTagProgress | null>(null);
 
   // Fetch programs with their rounds
   const { data: programsWithRounds, isLoading: programsLoading } = useQuery({
@@ -332,9 +343,18 @@ export function MailchimpTagManager() {
     }
   };
 
-  // Auto-tag enrollments
+  // Auto-tag enrollments with progress tracking
   const handleAutoTag = async (tagType: 'paid_customer' | 'free_customer') => {
-    setAutoTagLoading(tagType);
+    // Start with initial progress state
+    setAutoTagProgress({
+      tagType,
+      total: tagType === 'paid_customer' ? (enrollmentCounts?.paid || 0) : (enrollmentCounts?.free || 0),
+      processed: 0,
+      tagged: 0,
+      alreadyTagged: 0,
+      notFound: 0,
+      failed: 0
+    });
 
     try {
       const { data, error } = await supabase.functions.invoke('mailchimp-tag-enrollments', {
@@ -345,14 +365,28 @@ export function MailchimpTagManager() {
       if (!data.success) throw new Error(data.error);
 
       const { results } = data;
+      
+      // Update to final progress
+      setAutoTagProgress({
+        tagType,
+        total: results.total,
+        processed: results.total,
+        tagged: results.tagged,
+        alreadyTagged: results.already_tagged,
+        notFound: results.not_found,
+        failed: results.failed
+      });
+
       toast.success(
         `Tagged ${results.tagged} users with "${tagType}". ` +
         `Already tagged: ${results.already_tagged}, Not found: ${results.not_found}`
       );
+      
+      // Clear progress after 3 seconds
+      setTimeout(() => setAutoTagProgress(null), 3000);
     } catch (error: any) {
       toast.error(error.message || 'Failed to auto-tag');
-    } finally {
-      setAutoTagLoading(null);
+      setAutoTagProgress(null);
     }
   };
 
@@ -427,7 +461,40 @@ export function MailchimpTagManager() {
             Automatically tag customers based on their program enrollments
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {/* Progress bar when auto-tagging */}
+          {autoTagProgress && (
+            <div className="p-4 border rounded-lg bg-muted/50 space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Tagging {autoTagProgress.tagType === 'paid_customer' ? 'Paid' : 'Free'} Customers...
+                </h4>
+                <span className="text-sm text-muted-foreground">
+                  {autoTagProgress.processed === autoTagProgress.total 
+                    ? 'Complete!' 
+                    : `Processing ${autoTagProgress.total} users...`
+                  }
+                </span>
+              </div>
+              <Progress 
+                value={autoTagProgress.total > 0 
+                  ? (autoTagProgress.processed / autoTagProgress.total) * 100 
+                  : autoTagProgress.processed === 0 ? 0 : 100
+                } 
+                className="h-2"
+              />
+              <div className="flex gap-4 text-sm">
+                <span className="text-green-600">Tagged: {autoTagProgress.tagged}</span>
+                <span className="text-blue-600">Already tagged: {autoTagProgress.alreadyTagged}</span>
+                <span className="text-yellow-600">Not found: {autoTagProgress.notFound}</span>
+                {autoTagProgress.failed > 0 && (
+                  <span className="text-red-600">Failed: {autoTagProgress.failed}</span>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 border rounded-lg space-y-3">
               <div className="flex items-center justify-between">
@@ -441,10 +508,10 @@ export function MailchimpTagManager() {
               </div>
               <Button
                 onClick={() => handleAutoTag('paid_customer')}
-                disabled={autoTagLoading !== null}
+                disabled={autoTagProgress !== null}
                 className="w-full"
               >
-                {autoTagLoading === 'paid_customer' ? (
+                {autoTagProgress?.tagType === 'paid_customer' ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
                   <Tag className="h-4 w-4 mr-2" />
@@ -466,10 +533,10 @@ export function MailchimpTagManager() {
               <Button
                 variant="secondary"
                 onClick={() => handleAutoTag('free_customer')}
-                disabled={autoTagLoading !== null}
+                disabled={autoTagProgress !== null}
                 className="w-full"
               >
-                {autoTagLoading === 'free_customer' ? (
+                {autoTagProgress?.tagType === 'free_customer' ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
                   <Tag className="h-4 w-4 mr-2" />
