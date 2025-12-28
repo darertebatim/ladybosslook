@@ -132,13 +132,22 @@ async function triggerMailchimpSubscription(supabase: any, orderData: any, progr
     if (programSlug) {
       const { data: programConfig } = await supabase
         .from('program_catalog')
-        .select('mailchimp_tags, mailchimp_program_name, title')
+        .select('mailchimp_tags, mailchimp_program_name, title, price_amount, is_free_on_ios')
         .eq('slug', programSlug)
         .single();
       
       if (programConfig) {
         mailchimpProgramName = programConfig.mailchimp_program_name || programConfig.title || "General Purchase";
-        tags = programConfig.mailchimp_tags || ["paid_customer"];
+        
+        // Determine paid vs free customer based on program price
+        const isFree = programConfig.price_amount === 0 || programConfig.is_free_on_ios === true;
+        const customerTypeTag = isFree ? "free_customer" : "paid_customer";
+        
+        // Combine customer type tag with program-specific tags
+        const programTags = programConfig.mailchimp_tags || [];
+        tags = [customerTypeTag, ...programTags.filter((t: string) => t !== 'paid_customer' && t !== 'free_customer')];
+        
+        console.log('[WEBHOOK] Program price:', programConfig.price_amount, 'is_free_on_ios:', programConfig.is_free_on_ios, '-> Tag:', customerTypeTag);
       }
     }
     
