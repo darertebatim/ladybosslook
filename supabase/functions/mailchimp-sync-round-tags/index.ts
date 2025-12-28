@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
+import { createHash } from "node:crypto";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -11,12 +11,9 @@ const logStep = (step: string, details?: any) => {
   console.log(`[MAILCHIMP-SYNC-ROUND-TAGS] ${step}${detailsStr}`);
 };
 
-// MD5 hash for Mailchimp subscriber ID
-async function md5(message: string): Promise<string> {
-  const msgBuffer = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest('MD5', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+// Mailchimp subscriber hash: md5(lowercased_email)
+function md5(email: string): string {
+  return createHash('md5').update(email.trim().toLowerCase()).digest('hex');
 }
 
 interface SyncResult {
@@ -174,6 +171,7 @@ serve(async (req) => {
     }
 
     const datacenter = mailchimpApiKey.split('-')[1];
+    const authString = btoa(`anystring:${mailchimpApiKey}`);
 
     // Process each enrollment
     const results: SyncResult = {
@@ -193,12 +191,12 @@ serve(async (req) => {
       }
 
       try {
-        const emailHash = await md5(email.toLowerCase());
+        const emailHash = md5(email);
         const memberUrl = `https://${datacenter}.api.mailchimp.com/3.0/lists/${mailchimpListId}/members/${emailHash}`;
 
         // Check if member exists and get their current tags
         const checkResponse = await fetch(memberUrl, {
-          headers: { 'Authorization': `Bearer ${mailchimpApiKey}` },
+          headers: { 'Authorization': `Basic ${authString}` },
         });
 
         if (!checkResponse.ok) {
@@ -207,7 +205,9 @@ serve(async (req) => {
             logStep("Member not in Mailchimp", { email });
             continue;
           }
-          throw new Error(`Mailchimp lookup failed: ${checkResponse.status}`);
+
+          const bodyText = await checkResponse.text().catch(() => '');
+          throw new Error(`Mailchimp lookup failed: ${checkResponse.status}${bodyText ? ` - ${bodyText}` : ''}`);
         }
 
         const member = await checkResponse.json();
@@ -227,7 +227,7 @@ serve(async (req) => {
         const tagResponse = await fetch(tagsUrl, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${mailchimpApiKey}`,
+            'Authorization': `Basic ${authString}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -235,7 +235,7 @@ serve(async (req) => {
           }),
         });
 
-        if (!tagResponse.ok) {
+        if (!tagResponse.ok && tagResponse.status !== 204) {
           const errorText = await tagResponse.text();
           logStep("Failed to add tags", { email, error: errorText });
           results.failed++;
