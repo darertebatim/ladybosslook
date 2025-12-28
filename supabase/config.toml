@@ -109,3 +109,6 @@ verify_jwt = true
 
 [functions.mailchimp-sync-round-tags]
 verify_jwt = true
+
+[functions.generate-email-content]
+verify_jwt = true
