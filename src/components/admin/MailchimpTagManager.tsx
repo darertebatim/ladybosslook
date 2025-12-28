@@ -338,12 +338,12 @@ export function MailchimpTagManager() {
 
             <div className="space-y-2">
               <Label>Round (Optional)</Label>
-              <Select value={selectedRound} onValueChange={setSelectedRound} disabled={!selectedProgram}>
+              <Select value={selectedRound || "all"} onValueChange={(value) => setSelectedRound(value === "all" ? "" : value)} disabled={!selectedProgram}>
                 <SelectTrigger>
                   <SelectValue placeholder="All Rounds" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Rounds</SelectItem>
+                  <SelectItem value="all">All Rounds</SelectItem>
                   {rounds?.map(r => (
                     <SelectItem key={r.id} value={r.id}>{r.round_name}</SelectItem>
                   ))}
