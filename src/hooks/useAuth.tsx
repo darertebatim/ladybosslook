@@ -7,10 +7,14 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   isAdmin: boolean;
+  adminPages: string[];
+  hasAdminAccess: boolean;
+  canAccessAdminPage: (page: string) => boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
   logSecurityEvent: (action: string, details?: any) => Promise<void>;
+  refreshAdminPermissions: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,6 +24,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [adminPages, setAdminPages] = useState<string[]>([]);
 
   const checkUserRole = async (userId: string) => {
     try {
@@ -29,11 +34,46 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .eq('user_id', userId)
         .single();
       
-      setIsAdmin(data?.role === 'admin');
+      const userIsAdmin = data?.role === 'admin';
+      setIsAdmin(userIsAdmin);
+      
+      // If not admin, fetch their specific page permissions
+      if (!userIsAdmin) {
+        await fetchAdminPermissions(userId);
+      } else {
+        setAdminPages([]);
+      }
     } catch {
       setIsAdmin(false);
+      setAdminPages([]);
     }
   };
+
+  const fetchAdminPermissions = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from('user_admin_permissions')
+        .select('page_slug')
+        .eq('user_id', userId);
+      
+      setAdminPages(data?.map(p => p.page_slug) || []);
+    } catch {
+      setAdminPages([]);
+    }
+  };
+
+  const refreshAdminPermissions = async () => {
+    if (user) {
+      await checkUserRole(user.id);
+    }
+  };
+
+  const canAccessAdminPage = (page: string): boolean => {
+    if (isAdmin) return true;
+    return adminPages.includes(page);
+  };
+
+  const hasAdminAccess = isAdmin || adminPages.length > 0;
 
   useEffect(() => {
     // Set up auth state listener
@@ -49,6 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }, 0);
         } else {
           setIsAdmin(false);
+          setAdminPages([]);
         }
         
         setLoading(false);
@@ -106,6 +147,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
       setSession(null);
       setIsAdmin(false);
+      setAdminPages([]);
       
       // Then perform the sign out
       const { error } = await supabase.auth.signOut();
@@ -142,10 +184,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     session,
     loading,
     isAdmin,
-      signIn,
-      signUp,
-      signOut,
-      logSecurityEvent,
+    adminPages,
+    hasAdminAccess,
+    canAccessAdminPage,
+    signIn,
+    signUp,
+    signOut,
+    logSecurityEvent,
+    refreshAdminPermissions,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

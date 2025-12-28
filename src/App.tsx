@@ -140,15 +140,15 @@ const App = () => (
             {/* Admin Routes */}
             {!isNativeApp() && (
               <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<Overview />} />
-                <Route path="users" element={<Users />} />
-                <Route path="enrollment" element={<Enrollment />} />
-                <Route path="audio" element={<Audio />} />
-                <Route path="communications" element={<Communications />} />
-                <Route path="programs" element={<ProgramsAdmin />} />
-                <Route path="payments" element={<Payments />} />
-                <Route path="support" element={<Support />} />
-                <Route path="system" element={<System />} />
+                <Route index element={<ProtectedRoute requiredPage="overview"><Overview /></ProtectedRoute>} />
+                <Route path="users" element={<ProtectedRoute requiredPage="users"><Users /></ProtectedRoute>} />
+                <Route path="enrollment" element={<ProtectedRoute requiredPage="enrollment"><Enrollment /></ProtectedRoute>} />
+                <Route path="audio" element={<ProtectedRoute requiredPage="audio"><Audio /></ProtectedRoute>} />
+                <Route path="communications" element={<ProtectedRoute requiredPage="communications"><Communications /></ProtectedRoute>} />
+                <Route path="programs" element={<ProtectedRoute requiredPage="programs"><ProgramsAdmin /></ProtectedRoute>} />
+                <Route path="payments" element={<ProtectedRoute requiredPage="payments"><Payments /></ProtectedRoute>} />
+                <Route path="support" element={<ProtectedRoute requiredPage="support"><Support /></ProtectedRoute>} />
+                <Route path="system" element={<ProtectedRoute requiredPage="system"><System /></ProtectedRoute>} />
               </Route>
             )}
             
