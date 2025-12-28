@@ -4,22 +4,24 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 const menuItems = [
-  { title: 'Overview', url: '/admin', icon: LayoutDashboard, end: true },
-  { title: 'Users', url: '/admin/users', icon: Users },
-  { title: 'Enrollment', url: '/admin/enrollment', icon: GraduationCap },
-  { title: 'Audio', url: '/admin/audio', icon: Music },
-  { title: 'Communications', url: '/admin/communications', icon: Send },
-  { title: 'Programs', url: '/admin/programs', icon: UserCog },
-  { title: 'Payments', url: '/admin/payments', icon: CreditCard },
-  { title: 'Support', url: '/admin/support', icon: MessageCircle },
-  { title: 'System', url: '/admin/system', icon: Shield },
+  { title: 'Overview', url: '/admin', icon: LayoutDashboard, end: true, pageSlug: 'overview' },
+  { title: 'Users', url: '/admin/users', icon: Users, pageSlug: 'users' },
+  { title: 'Enrollment', url: '/admin/enrollment', icon: GraduationCap, pageSlug: 'enrollment' },
+  { title: 'Audio', url: '/admin/audio', icon: Music, pageSlug: 'audio' },
+  { title: 'Communications', url: '/admin/communications', icon: Send, pageSlug: 'communications' },
+  { title: 'Programs', url: '/admin/programs', icon: UserCog, pageSlug: 'programs' },
+  { title: 'Payments', url: '/admin/payments', icon: CreditCard, pageSlug: 'payments' },
+  { title: 'Support', url: '/admin/support', icon: MessageCircle, pageSlug: 'support' },
+  { title: 'System', url: '/admin/system', icon: Shield, pageSlug: 'system' },
 ];
 
 export function AdminNav() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { canAccessAdminPage } = useAuth();
 
   const handleSignOut = async () => {
     try {
@@ -38,6 +40,9 @@ export function AdminNav() {
     }
   };
 
+  // Filter menu items based on user permissions
+  const visibleMenuItems = menuItems.filter(item => canAccessAdminPage(item.pageSlug));
+
   return (
     <nav className="border-b bg-background">
       <div className="container mx-auto px-4">
@@ -45,7 +50,7 @@ export function AdminNav() {
           <h1 className="text-xl font-semibold">Admin Panel</h1>
           
           <div className="flex items-center gap-1">
-            {menuItems.map((item) => (
+            {visibleMenuItems.map((item) => (
               <NavLink
                 key={item.title}
                 to={item.url}

@@ -5,10 +5,11 @@ import { useNavigate } from 'react-router-dom';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
+  requiredPage?: string;
 }
 
-export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
-  const { user, loading, isAdmin } = useAuth();
+export function ProtectedRoute({ children, requireAdmin = false, requiredPage }: ProtectedRouteProps) {
+  const { user, loading, isAdmin, hasAdminAccess, canAccessAdminPage } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,9 +18,12 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
         navigate('/auth');
       } else if (requireAdmin && !isAdmin) {
         navigate('/');
+      } else if (requiredPage && !canAccessAdminPage(requiredPage)) {
+        // User doesn't have access to this specific admin page
+        navigate('/app/home');
       }
     }
-  }, [user, loading, isAdmin, requireAdmin, navigate]);
+  }, [user, loading, isAdmin, requireAdmin, requiredPage, canAccessAdminPage, navigate]);
 
   if (loading) {
     return (
@@ -29,7 +33,15 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
     );
   }
 
-  if (!user || (requireAdmin && !isAdmin)) {
+  if (!user) {
+    return null;
+  }
+
+  if (requireAdmin && !isAdmin) {
+    return null;
+  }
+
+  if (requiredPage && !canAccessAdminPage(requiredPage)) {
     return null;
   }
 

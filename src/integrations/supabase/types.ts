@@ -1149,6 +1149,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_admin_permissions: {
+        Row: {
+          created_at: string | null
+          id: string
+          page_slug: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          page_slug: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          page_slug?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_content_views: {
         Row: {
           content_id: string
@@ -1229,6 +1250,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_access_admin_page: {
+        Args: { _page_slug: string; _user_id: string }
+        Returns: boolean
+      }
       get_current_user_role: { Args: never; Returns: string }
       has_role: {
         Args: {
