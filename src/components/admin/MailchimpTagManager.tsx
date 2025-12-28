@@ -33,6 +33,7 @@ interface ProgramWithRounds {
     round_number: number;
     status: string;
     mailchimp_tags: string[];
+    enrollment_count?: number;
   }[];
 }
 
@@ -44,6 +45,16 @@ interface AutoTagProgress {
   alreadyTagged: number;
   notFound: number;
   failed: number;
+}
+
+interface RoundSyncProgress {
+  roundId: string;
+  total: number;
+  tagged: number;
+  alreadyTagged: number;
+  notFound: number;
+  failed: number;
+  isComplete: boolean;
 }
 
 export function MailchimpTagManager() {
@@ -68,8 +79,11 @@ export function MailchimpTagManager() {
 
   // Auto-tagging state with progress
   const [autoTagProgress, setAutoTagProgress] = useState<AutoTagProgress | null>(null);
+  
+  // Round sync state
+  const [roundSyncProgress, setRoundSyncProgress] = useState<RoundSyncProgress | null>(null);
 
-  // Fetch programs with their rounds
+  // Fetch programs with their rounds and enrollment counts
   const { data: programsWithRounds, isLoading: programsLoading } = useQuery({
     queryKey: ['programs-with-rounds-tags'],
     queryFn: async () => {
@@ -89,6 +103,21 @@ export function MailchimpTagManager() {
 
       if (roundError) throw roundError;
 
+      // Fetch enrollment counts per round
+      const { data: enrollments } = await supabase
+        .from('course_enrollments')
+        .select('round_id')
+        .eq('status', 'active')
+        .not('round_id', 'is', null);
+
+      // Count enrollments per round
+      const enrollmentCountMap = new Map<string, number>();
+      enrollments?.forEach(e => {
+        if (e.round_id) {
+          enrollmentCountMap.set(e.round_id, (enrollmentCountMap.get(e.round_id) || 0) + 1);
+        }
+      });
+
       // Combine programs with their rounds
       const programsMap: ProgramWithRounds[] = (programs || []).map(program => ({
         ...program,
@@ -97,7 +126,8 @@ export function MailchimpTagManager() {
           .filter(r => r.program_slug === program.slug)
           .map(r => ({
             ...r,
-            mailchimp_tags: (r.mailchimp_tags as string[] | null) || []
+            mailchimp_tags: (r.mailchimp_tags as string[] | null) || [],
+            enrollment_count: enrollmentCountMap.get(r.id) || 0
           }))
       }));
 
@@ -390,6 +420,63 @@ export function MailchimpTagManager() {
     }
   };
 
+  // Sync round tags to all enrolled members
+  const handleSyncRoundTags = async (roundId: string, roundName: string, programTags: string[], roundTags: string[]) => {
+    const allTags = [...new Set([...programTags, ...roundTags])];
+    
+    if (allTags.length === 0) {
+      toast.error('No tags configured for this round or its program');
+      return;
+    }
+
+    // Start with initial progress state
+    setRoundSyncProgress({
+      roundId,
+      total: 0,
+      tagged: 0,
+      alreadyTagged: 0,
+      notFound: 0,
+      failed: 0,
+      isComplete: false
+    });
+
+    try {
+      const { data, error } = await supabase.functions.invoke('mailchimp-sync-round-tags', {
+        body: { round_id: roundId }
+      });
+
+      if (error) throw error;
+      if (!data.success) throw new Error(data.error);
+
+      const { results } = data;
+      
+      // Update to final progress
+      setRoundSyncProgress({
+        roundId,
+        total: results.total,
+        tagged: results.tagged,
+        alreadyTagged: results.alreadyTagged,
+        notFound: results.notFound,
+        failed: results.failed,
+        isComplete: true
+      });
+
+      if (results.total === 0) {
+        toast.info(`No enrolled members found for ${roundName}`);
+      } else {
+        toast.success(
+          `Synced tags to ${roundName}: ${results.tagged} tagged, ${results.alreadyTagged} already had tags`
+        );
+      }
+      
+      // Clear progress after 3 seconds
+      setTimeout(() => setRoundSyncProgress(null), 3000);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to sync round tags');
+      setRoundSyncProgress(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Bulk Rename Tag */}
@@ -656,63 +743,108 @@ export function MailchimpTagManager() {
                         </div>
                       ) : (
                         <div className="divide-y">
-                          {program.rounds.map(round => (
-                            <div key={round.id} className="flex items-center gap-3 p-3 pl-12">
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm">{round.round_name}</span>
-                                  <Badge 
-                                    variant={round.status === 'active' ? 'default' : 'outline'} 
-                                    className="text-xs"
-                                  >
-                                    {round.status}
-                                  </Badge>
-                                </div>
-                              </div>
-
-                              {/* Round Tags */}
-                              <div className="flex items-center gap-1 flex-wrap">
-                                {round.mailchimp_tags.length === 0 ? (
-                                  <span className="text-xs text-muted-foreground">(no tags)</span>
-                                ) : (
-                                  round.mailchimp_tags.map(tag => (
-                                    <Badge key={tag} variant="outline" className="gap-1">
-                                      {tag}
-                                      <button
-                                        onClick={() => handleRemoveRoundTag(round.id, round.mailchimp_tags, tag)}
-                                        className="hover:text-destructive"
-                                      >
-                                        <X className="h-3 w-3" />
-                                      </button>
+                          {program.rounds.map(round => {
+                            const isSyncing = roundSyncProgress?.roundId === round.id && !roundSyncProgress.isComplete;
+                            const showSyncResult = roundSyncProgress?.roundId === round.id && roundSyncProgress.isComplete;
+                            const combinedTags = [...new Set([...program.mailchimp_tags, ...round.mailchimp_tags])];
+                            const hasTags = combinedTags.length > 0;
+                            
+                            return (
+                              <div key={round.id} className="flex items-center gap-3 p-3 pl-12">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm">{round.round_name}</span>
+                                    <Badge 
+                                      variant={round.status === 'active' ? 'default' : 'outline'} 
+                                      className="text-xs"
+                                    >
+                                      {round.status}
                                     </Badge>
-                                  ))
-                                )}
-                              </div>
+                                    {round.enrollment_count !== undefined && round.enrollment_count > 0 && (
+                                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                        <Users className="h-3 w-3" />
+                                        {round.enrollment_count}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {/* Show sync result inline */}
+                                  {showSyncResult && (
+                                    <div className="text-xs text-muted-foreground mt-1 flex gap-2">
+                                      <span className="text-green-600">+{roundSyncProgress.tagged}</span>
+                                      <span className="text-blue-600">={roundSyncProgress.alreadyTagged}</span>
+                                      {roundSyncProgress.notFound > 0 && (
+                                        <span className="text-yellow-600">?{roundSyncProgress.notFound}</span>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
 
-                              {/* Add tag input for round */}
-                              <div className="flex items-center gap-1">
-                                <Input
-                                  placeholder="Add tag"
-                                  value={newRoundTags[round.id] || ''}
-                                  onChange={(e) => setNewRoundTags(prev => ({ ...prev, [round.id]: e.target.value }))}
-                                  className="h-7 w-24 text-xs"
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                      handleAddRoundTag(round.id, round.mailchimp_tags);
-                                    }
-                                  }}
-                                />
+                                {/* Round Tags */}
+                                <div className="flex items-center gap-1 flex-wrap">
+                                  {round.mailchimp_tags.length === 0 ? (
+                                    <span className="text-xs text-muted-foreground">(no tags)</span>
+                                  ) : (
+                                    round.mailchimp_tags.map(tag => (
+                                      <Badge key={tag} variant="outline" className="gap-1">
+                                        {tag}
+                                        <button
+                                          onClick={() => handleRemoveRoundTag(round.id, round.mailchimp_tags, tag)}
+                                          className="hover:text-destructive"
+                                        >
+                                          <X className="h-3 w-3" />
+                                        </button>
+                                      </Badge>
+                                    ))
+                                  )}
+                                </div>
+
+                                {/* Add tag input for round */}
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    placeholder="Add tag"
+                                    value={newRoundTags[round.id] || ''}
+                                    onChange={(e) => setNewRoundTags(prev => ({ ...prev, [round.id]: e.target.value }))}
+                                    className="h-7 w-24 text-xs"
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        handleAddRoundTag(round.id, round.mailchimp_tags);
+                                      }
+                                    }}
+                                  />
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-7 w-7 p-0"
+                                    onClick={() => handleAddRoundTag(round.id, round.mailchimp_tags)}
+                                  >
+                                    <Plus className="h-3 w-3" />
+                                  </Button>
+                                </div>
+
+                                {/* Sync button */}
                                 <Button
                                   size="sm"
-                                  variant="ghost"
-                                  className="h-7 w-7 p-0"
-                                  onClick={() => handleAddRoundTag(round.id, round.mailchimp_tags)}
+                                  variant="outline"
+                                  className="h-7 gap-1 text-xs"
+                                  disabled={!hasTags || isSyncing || roundSyncProgress !== null}
+                                  onClick={() => handleSyncRoundTags(
+                                    round.id, 
+                                    round.round_name, 
+                                    program.mailchimp_tags, 
+                                    round.mailchimp_tags
+                                  )}
+                                  title={hasTags ? `Sync ${combinedTags.join(', ')} to ${round.enrollment_count || 0} members` : 'Add tags first'}
                                 >
-                                  <Plus className="h-3 w-3" />
+                                  {isSyncing ? (
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                  ) : (
+                                    <RefreshCw className="h-3 w-3" />
+                                  )}
+                                  Sync
                                 </Button>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </CollapsibleContent>
