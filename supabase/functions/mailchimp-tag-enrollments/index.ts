@@ -1,19 +1,15 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
-import { encodeHex } from "https://deno.land/std@0.168.0/encoding/hex.ts";
+import { createHash } from "node:crypto";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Helper function to compute MD5 hash using Deno's crypto module
-async function md5(str: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(str.toLowerCase());
-  const hash = await crypto.subtle.digest("MD5", data);
-  return encodeHex(new Uint8Array(hash));
+// Helper function to compute Mailchimp subscriber hash (md5(lowercased_email))
+function md5(email: string): string {
+  return createHash('md5').update(email.trim().toLowerCase()).digest('hex');
 }
 
 interface RequestBody {
@@ -87,6 +83,7 @@ serve(async (req) => {
       .select(`
         id,
         user_id,
+        course_name,
         program_slug,
         status
       `)
@@ -110,15 +107,58 @@ serve(async (req) => {
     // Create a map of program slugs to their pricing info
     const programMap = new Map(programs?.map(p => [p.slug, p]) || []);
 
+    // Backfill support: some enrollments have null program_slug (legacy data). Map course_name -> slug.
+    const courseNameToSlug = (courseName: string | null): string | null => {
+      if (!courseName) return null;
+      switch (courseName) {
+        case 'IQMoney Course - Income Growth':
+          return 'iqmoney-income-growth';
+        case 'Money Literacy Course':
+          return 'money-literacy-course';
+        case 'Ladyboss VIP Club Group Coaching':
+          return 'ladyboss-vip-club';
+        case 'Empowered Ladyboss Group Coaching':
+          return 'empowered-ladyboss-coaching';
+        case 'Business Growth Accelerator - 3-Month 1o1 Weekly Session':
+          return 'business-growth-accelerator';
+        case 'Business Startup Accelerator - 3-Month 1o1 Weekly Session':
+          return 'business-startup-accelerator';
+        case 'Instagram Fast Growth Course':
+          return 'instagram-growth-course';
+        case '1-Hour Private Session with Razie':
+          return 'private-coaching-session';
+        case 'Connection Literacy Course':
+          return 'connection-literacy-course';
+        case 'Courageous Character Course':
+          return 'courageous-character-course';
+        case 'Money Literacy Workshop':
+          return 'money-literacy-course';
+        case 'IQ Money Program':
+          return 'iqmoney-income-growth';
+        case 'Ladyboss Coaching':
+          return 'empowered-ladyboss-coaching';
+        case 'Networking Program':
+          return 'connection-literacy-course';
+        case 'Assertiveness Training':
+          return 'courageous-character-course';
+        default:
+          return null;
+      }
+    };
+
     // Filter enrollments based on tag_type
     const userIds = new Set<string>();
-    
+
     for (const enrollment of enrollments || []) {
-      const program = programMap.get(enrollment.program_slug);
+      const slug = enrollment.program_slug || courseNameToSlug(enrollment.course_name) || null;
+      if (!slug) continue;
+
+      const program = programMap.get(slug);
       if (!program) continue;
 
-      const isPaid = program.price_amount > 0 && !program.is_free_on_ios;
-      const isFree = program.price_amount === 0 || program.is_free_on_ios;
+      const isFreeOnIos = Boolean(program.is_free_on_ios);
+      const isPaid = program.price_amount > 0 && !isFreeOnIos;
+      const isFree = program.price_amount === 0 || isFreeOnIos;
 
       if (tag_type === 'paid_customer' && isPaid) {
         userIds.add(enrollment.user_id);
@@ -180,7 +220,7 @@ serve(async (req) => {
 
     for (const email of emails) {
       try {
-        const subscriberHash = await md5(email);
+        const subscriberHash = md5(email);
         
         // Check if member exists
         const memberResponse = await fetch(
