@@ -263,13 +263,85 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Enrollment created successfully: ${enrollment.id}`);
 
+    // Apply Mailchimp tags based on program type
+    let mailchimpTagged = false;
+    let mailchimpError: string | null = null;
+    
+    if (programSlug) {
+      try {
+        // Fetch program details to determine if paid or free
+        const { data: program } = await supabase
+          .from('program_catalog')
+          .select('price_amount, is_free_on_ios, mailchimp_tags')
+          .eq('slug', programSlug)
+          .single();
+
+        if (program) {
+          const isPaid = program.price_amount > 0 && !program.is_free_on_ios;
+          const baseTag = isPaid ? 'paid_customer' : 'free_customer';
+          
+          // Combine base tag with program-specific tags
+          const programTags = Array.isArray(program.mailchimp_tags) ? program.mailchimp_tags : [];
+          const allTags = [baseTag, ...programTags.filter((t: string) => t !== baseTag)];
+          
+          console.log(`Applying Mailchimp tags for ${email}: ${allTags.join(', ')}`);
+          
+          // Call Mailchimp API to add tags
+          const MAILCHIMP_API_KEY = Deno.env.get('MAILCHIMP_API_KEY');
+          const MAILCHIMP_SERVER_PREFIX = Deno.env.get('MAILCHIMP_SERVER_PREFIX') || 'us8';
+          const MAILCHIMP_LIST_ID = Deno.env.get('MAILCHIMP_LIST_ID');
+          
+          if (MAILCHIMP_API_KEY && MAILCHIMP_LIST_ID) {
+            // Create MD5 hash of lowercase email for Mailchimp subscriber ID
+            const encoder = new TextEncoder();
+            const data = encoder.encode(email.toLowerCase());
+            const hashBuffer = await crypto.subtle.digest('MD5', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const subscriberHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            
+            const mailchimpUrl = `https://${MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/lists/${MAILCHIMP_LIST_ID}/members/${subscriberHash}/tags`;
+            
+            const tagPayload = {
+              tags: allTags.map((tag: string) => ({ name: tag, status: 'active' }))
+            };
+            
+            const mailchimpResponse = await fetch(mailchimpUrl, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Basic ${btoa(`anystring:${MAILCHIMP_API_KEY}`)}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(tagPayload)
+            });
+            
+            if (mailchimpResponse.ok) {
+              mailchimpTagged = true;
+              console.log(`Mailchimp tags applied successfully for ${email}`);
+            } else {
+              const errorText = await mailchimpResponse.text();
+              mailchimpError = `Mailchimp error: ${mailchimpResponse.status} - ${errorText}`;
+              console.error(mailchimpError);
+            }
+          } else {
+            mailchimpError = 'Mailchimp credentials not configured';
+            console.warn(mailchimpError);
+          }
+        }
+      } catch (tagError: any) {
+        mailchimpError = `Failed to apply Mailchimp tags: ${tagError.message}`;
+        console.error(mailchimpError);
+      }
+    }
+
     return new Response(
       JSON.stringify({
         message: 'User created and enrolled successfully',
         userId,
         enrollmentId: enrollment.id,
         email,
-        courseName
+        courseName,
+        mailchimpTagged,
+        mailchimpError
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
