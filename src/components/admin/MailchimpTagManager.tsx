@@ -1,63 +1,48 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
-import { Search, Tag, Users, Loader2, X, Plus, Eye, Send } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
+import { ArrowRight, X, Plus, Search, RefreshCw, Tag, Loader2 } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface MemberInfo {
   email: string;
   status: string;
-  tags: string[];
-  merge_fields: Record<string, any>;
-  created: string;
-  updated: string;
-}
-
-interface TagResult {
-  tagged: number;
-  already_tagged: number;
-  not_found: number;
-  failed: number;
-  errors: string[];
+  tags: { id: number; name: string }[];
+  merge_fields: Record<string, string>;
+  timestamp_signup: string;
+  timestamp_opt: string;
 }
 
 export function MailchimpTagManager() {
-  const { toast } = useToast();
-  
-  // Tag by Program state
-  const [selectedProgram, setSelectedProgram] = useState<string>('');
-  const [selectedRound, setSelectedRound] = useState<string>('');
-  const [programTags, setProgramTags] = useState<string[]>(['paid_customer']);
-  const [newProgramTag, setNewProgramTag] = useState('');
-  const [isPreviewingProgram, setIsPreviewingProgram] = useState(false);
-  const [isTaggingProgram, setIsTaggingProgram] = useState(false);
-  const [programPreview, setProgramPreview] = useState<{ count: number; emails: string[] } | null>(null);
-  const [programResult, setProgramResult] = useState<TagResult | null>(null);
+  const queryClient = useQueryClient();
 
-  // Member Lookup state
+  // Bulk rename state
+  const [oldTagName, setOldTagName] = useState('');
+  const [newTagName, setNewTagName] = useState('');
+
+  // Add tag state (per program)
+  const [newTagInputs, setNewTagInputs] = useState<Record<string, string>>({});
+
+  // Member lookup state
   const [lookupEmail, setLookupEmail] = useState('');
-  const [isLookingUp, setIsLookingUp] = useState(false);
   const [memberInfo, setMemberInfo] = useState<MemberInfo | null>(null);
-  const [memberNotFound, setMemberNotFound] = useState(false);
-  const [newMemberTag, setNewMemberTag] = useState('');
-  const [isAddingTag, setIsAddingTag] = useState(false);
-  const [removingTag, setRemovingTag] = useState<string | null>(null);
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [memberTagInput, setMemberTagInput] = useState('');
 
-  // Fetch programs
-  const { data: programs } = useQuery({
-    queryKey: ['programs-for-tags'],
+  // Fetch all programs with their tags
+  const { data: programs, isLoading: programsLoading } = useQuery({
+    queryKey: ['programs-with-tags'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('program_catalog')
-        .select('slug, title')
-        .eq('is_active', true)
+        .select('id, slug, title, mailchimp_program_name, mailchimp_tags, is_active')
         .order('title');
       
       if (error) throw error;
@@ -65,439 +50,372 @@ export function MailchimpTagManager() {
     }
   });
 
-  // Fetch rounds for selected program
-  const { data: rounds } = useQuery({
-    queryKey: ['rounds-for-tags', selectedProgram],
-    queryFn: async () => {
-      if (!selectedProgram) return [];
-      const { data, error } = await supabase
-        .from('program_rounds')
-        .select('id, round_name, round_number')
-        .eq('program_slug', selectedProgram)
-        .order('round_number', { ascending: false });
-      
-      if (error) throw error;
-      return data;
+  // Bulk rename mutation
+  const bulkRenameMutation = useMutation({
+    mutationFn: async ({ oldTag, newTag }: { oldTag: string; newTag: string }) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const response = await supabase.functions.invoke('mailchimp-bulk-rename-tag', {
+        body: { old_tag: oldTag, new_tag: newTag }
+      });
+
+      if (response.error) throw response.error;
+      return response.data;
     },
-    enabled: !!selectedProgram
+    onSuccess: (data) => {
+      toast.success(`Renamed tag in ${data.updated_count} programs`);
+      setOldTagName('');
+      setNewTagName('');
+      queryClient.invalidateQueries({ queryKey: ['programs-with-tags'] });
+    },
+    onError: (error) => {
+      toast.error(`Failed to rename tag: ${error.message}`);
+    }
   });
 
-  // Add tag to program tags list
-  const addProgramTag = () => {
-    if (newProgramTag && !programTags.includes(newProgramTag)) {
-      setProgramTags([...programTags, newProgramTag]);
-      setNewProgramTag('');
+  // Update program tags mutation
+  const updateTagsMutation = useMutation({
+    mutationFn: async ({ programId, tags }: { programId: string; tags: string[] }) => {
+      const { error } = await supabase
+        .from('program_catalog')
+        .update({ mailchimp_tags: tags })
+        .eq('id', programId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['programs-with-tags'] });
+    },
+    onError: (error) => {
+      toast.error(`Failed to update tags: ${error.message}`);
     }
-  };
+  });
 
-  // Remove tag from program tags list
-  const removeProgramTag = (tag: string) => {
-    setProgramTags(programTags.filter(t => t !== tag));
-  };
-
-  // Preview program tagging
-  const previewProgramTagging = async () => {
-    if (!selectedProgram || programTags.length === 0) {
-      toast({
-        title: "Validation Error",
-        description: "Please select a program and add at least one tag",
-        variant: "destructive"
-      });
+  const handleBulkRename = () => {
+    if (!oldTagName.trim() || !newTagName.trim()) {
+      toast.error('Please enter both old and new tag names');
       return;
     }
-
-    setIsPreviewingProgram(true);
-    setProgramPreview(null);
-    setProgramResult(null);
-
-    try {
-      const { data, error } = await supabase.functions.invoke('mailchimp-tag-by-program', {
-        body: {
-          program_slug: selectedProgram,
-          round_id: selectedRound || undefined,
-          tags: programTags,
-          preview_only: true
-        }
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        setProgramPreview({ count: data.count, emails: data.emails });
-        toast({
-          title: "Preview Ready",
-          description: `Found ${data.count} customers to tag`
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Preview Failed",
-        description: (error as Error).message,
-        variant: "destructive"
-      });
-    } finally {
-      setIsPreviewingProgram(false);
-    }
+    bulkRenameMutation.mutate({ oldTag: oldTagName.trim(), newTag: newTagName.trim() });
   };
 
-  // Apply tags to program customers
-  const applyProgramTags = async () => {
-    if (!selectedProgram || programTags.length === 0) {
-      toast({
-        title: "Validation Error",
-        description: "Please select a program and add at least one tag",
-        variant: "destructive"
-      });
+  const handleRemoveTag = (programId: string, currentTags: string[], tagToRemove: string) => {
+    const newTags = currentTags.filter(t => t !== tagToRemove);
+    updateTagsMutation.mutate({ programId, tags: newTags });
+    toast.success(`Removed tag "${tagToRemove}"`);
+  };
+
+  const handleAddTag = (programId: string, currentTags: string[]) => {
+    const newTag = newTagInputs[programId]?.trim();
+    if (!newTag) {
+      toast.error('Please enter a tag name');
       return;
     }
-
-    setIsTaggingProgram(true);
-    setProgramResult(null);
-
-    try {
-      const { data, error } = await supabase.functions.invoke('mailchimp-tag-by-program', {
-        body: {
-          program_slug: selectedProgram,
-          round_id: selectedRound || undefined,
-          tags: programTags,
-          preview_only: false
-        }
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        setProgramResult(data.results);
-        toast({
-          title: "Tagging Complete",
-          description: `Tagged: ${data.results.tagged}, Already Tagged: ${data.results.already_tagged}, Not Found: ${data.results.not_found}`
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Tagging Failed",
-        description: (error as Error).message,
-        variant: "destructive"
-      });
-    } finally {
-      setIsTaggingProgram(false);
+    if (currentTags.includes(newTag)) {
+      toast.error('Tag already exists');
+      return;
     }
+    updateTagsMutation.mutate({ programId, tags: [...currentTags, newTag] });
+    setNewTagInputs(prev => ({ ...prev, [programId]: '' }));
+    toast.success(`Added tag "${newTag}"`);
   };
 
-  // Lookup member
+  // Member lookup functions
   const lookupMember = async () => {
-    if (!lookupEmail) {
-      toast({
-        title: "Validation Error",
-        description: "Please enter an email address",
-        variant: "destructive"
-      });
+    if (!lookupEmail.trim()) {
+      toast.error('Please enter an email address');
       return;
     }
 
-    setIsLookingUp(true);
+    setLookupLoading(true);
     setMemberInfo(null);
-    setMemberNotFound(false);
 
     try {
-      const { data, error } = await supabase.functions.invoke('mailchimp-manage-member', {
-        body: {
-          action: 'lookup',
-          email: lookupEmail
-        }
+      const response = await supabase.functions.invoke('mailchimp-manage-member', {
+        body: { action: 'lookup', email: lookupEmail.trim() }
       });
 
-      if (error) throw error;
-
-      if (data.success) {
-        if (data.found) {
-          setMemberInfo(data.member);
-        } else {
-          setMemberNotFound(true);
-        }
+      if (response.error) throw response.error;
+      
+      if (response.data.error) {
+        toast.error(response.data.error);
+      } else if (response.data.found === false) {
+        toast.error('Member not found in Mailchimp');
+      } else {
+        setMemberInfo(response.data.member);
       }
-    } catch (error) {
-      toast({
-        title: "Lookup Failed",
-        description: (error as Error).message,
-        variant: "destructive"
-      });
+    } catch (error: any) {
+      toast.error(`Lookup failed: ${error.message}`);
     } finally {
-      setIsLookingUp(false);
+      setLookupLoading(false);
     }
   };
 
-  // Add tag to member
   const addTagToMember = async () => {
-    if (!newMemberTag || !memberInfo) return;
+    if (!memberTagInput.trim() || !memberInfo) return;
 
-    setIsAddingTag(true);
     try {
-      const { data, error } = await supabase.functions.invoke('mailchimp-manage-member', {
-        body: {
-          action: 'add_tags',
-          email: memberInfo.email,
-          tags: [newMemberTag]
-        }
+      const response = await supabase.functions.invoke('mailchimp-manage-member', {
+        body: { action: 'add_tags', email: memberInfo.email, tags: [memberTagInput.trim()] }
       });
 
-      if (error) throw error;
-
-      if (data.success) {
-        setMemberInfo({
-          ...memberInfo,
-          tags: [...memberInfo.tags, newMemberTag]
-        });
-        setNewMemberTag('');
-        toast({
-          title: "Tag Added",
-          description: `Added "${newMemberTag}" to ${memberInfo.email}`
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Failed to Add Tag",
-        description: (error as Error).message,
-        variant: "destructive"
-      });
-    } finally {
-      setIsAddingTag(false);
+      if (response.error) throw response.error;
+      
+      toast.success(`Added tag "${memberTagInput}" to member`);
+      setMemberTagInput('');
+      lookupMember();
+    } catch (error: any) {
+      toast.error(`Failed to add tag: ${error.message}`);
     }
   };
 
-  // Remove tag from member
-  const removeTagFromMember = async (tag: string) => {
+  const removeTagFromMember = async (tagName: string) => {
     if (!memberInfo) return;
 
-    setRemovingTag(tag);
     try {
-      const { data, error } = await supabase.functions.invoke('mailchimp-manage-member', {
-        body: {
-          action: 'remove_tags',
-          email: memberInfo.email,
-          tags: [tag]
-        }
+      const response = await supabase.functions.invoke('mailchimp-manage-member', {
+        body: { action: 'remove_tags', email: memberInfo.email, tags: [tagName] }
       });
 
-      if (error) throw error;
-
-      if (data.success) {
-        setMemberInfo({
-          ...memberInfo,
-          tags: memberInfo.tags.filter(t => t !== tag)
-        });
-        toast({
-          title: "Tag Removed",
-          description: `Removed "${tag}" from ${memberInfo.email}`
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Failed to Remove Tag",
-        description: (error as Error).message,
-        variant: "destructive"
-      });
-    } finally {
-      setRemovingTag(null);
+      if (response.error) throw response.error;
+      
+      toast.success(`Removed tag "${tagName}" from member`);
+      lookupMember();
+    } catch (error: any) {
+      toast.error(`Failed to remove tag: ${error.message}`);
     }
   };
+
+  // Get all unique tags across programs
+  const allTags = programs?.reduce((acc, p) => {
+    const tags = (p.mailchimp_tags as string[]) || [];
+    tags.forEach(t => acc.add(t));
+    return acc;
+  }, new Set<string>()) || new Set();
 
   return (
     <div className="space-y-6">
-      {/* Tag Customers by Program */}
+      {/* Bulk Rename Section */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Tag Customers by Program
+            <RefreshCw className="h-5 w-5" />
+            Bulk Rename Tag
           </CardTitle>
           <CardDescription>
-            Add Mailchimp tags to all customers who purchased a specific program
+            Rename a tag across all programs at once. Currently {allTags.size} unique tags in use.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Program</Label>
-              <Select value={selectedProgram} onValueChange={(value) => {
-                setSelectedProgram(value);
-                setSelectedRound('');
-                setProgramPreview(null);
-                setProgramResult(null);
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a program" />
-                </SelectTrigger>
-                <SelectContent>
-                  {programs?.map(p => (
-                    <SelectItem key={p.slug} value={p.slug}>{p.title}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Round (Optional)</Label>
-              <Select value={selectedRound || "all"} onValueChange={(value) => setSelectedRound(value === "all" ? "" : value)} disabled={!selectedProgram}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Rounds" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Rounds</SelectItem>
-                  {rounds?.map(r => (
-                    <SelectItem key={r.id} value={r.id}>{r.round_name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Tags to Apply</Label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {programTags.map(tag => (
-                <Badge key={tag} variant="secondary" className="gap-1">
-                  {tag}
-                  <button onClick={() => removeProgramTag(tag)} className="ml-1 hover:text-destructive">
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-            <div className="flex gap-2">
+        <CardContent>
+          <div className="flex items-end gap-4">
+            <div className="flex-1 space-y-2">
+              <Label>Old Tag Name</Label>
               <Input
-                placeholder="Add a tag..."
-                value={newProgramTag}
-                onChange={(e) => setNewProgramTag(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && addProgramTag()}
+                value={oldTagName}
+                onChange={(e) => setOldTagName(e.target.value)}
+                placeholder="e.g., Old_Tag_Name"
               />
-              <Button variant="outline" onClick={addProgramTag}>
-                <Plus className="h-4 w-4" />
-              </Button>
             </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={previewProgramTagging} disabled={isPreviewingProgram || !selectedProgram}>
-              {isPreviewingProgram ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Eye className="h-4 w-4 mr-2" />}
-              Preview
-            </Button>
-            <Button onClick={applyProgramTags} disabled={isTaggingProgram || !selectedProgram}>
-              {isTaggingProgram ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
-              Apply Tags to Mailchimp
-            </Button>
-          </div>
-
-          {programPreview && (
-            <div className="mt-4 p-4 bg-muted rounded-lg">
-              <p className="font-medium">Preview: {programPreview.count} customers will be tagged</p>
-              {programPreview.emails.length > 0 && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  Sample: {programPreview.emails.slice(0, 5).join(', ')}{programPreview.count > 5 && '...'}
-                </p>
-              )}
+            <ArrowRight className="h-5 w-5 text-muted-foreground mb-2" />
+            <div className="flex-1 space-y-2">
+              <Label>New Tag Name</Label>
+              <Input
+                value={newTagName}
+                onChange={(e) => setNewTagName(e.target.value)}
+                placeholder="e.g., New_Tag_Name"
+              />
             </div>
-          )}
-
-          {programResult && (
-            <div className="mt-4 p-4 bg-muted rounded-lg space-y-2">
-              <p className="font-medium">Tagging Results:</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <Badge variant="default">{programResult.tagged}</Badge>
-                  <span>Tagged</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">{programResult.already_tagged}</Badge>
-                  <span>Already Tagged</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline">{programResult.not_found}</Badge>
-                  <span>Not Found</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="destructive">{programResult.failed}</Badge>
-                  <span>Failed</span>
-                </div>
+            <Button 
+              onClick={handleBulkRename} 
+              disabled={bulkRenameMutation.isPending}
+            >
+              {bulkRenameMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : null}
+              Rename All
+            </Button>
+          </div>
+          {allTags.size > 0 && (
+            <div className="mt-4">
+              <Label className="text-sm text-muted-foreground">Existing tags (click to select):</Label>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {Array.from(allTags).sort().map(tag => (
+                  <Badge 
+                    key={tag} 
+                    variant="outline" 
+                    className="cursor-pointer hover:bg-muted"
+                    onClick={() => setOldTagName(tag)}
+                  >
+                    {tag}
+                  </Badge>
+                ))}
               </div>
-              {programResult.errors.length > 0 && (
-                <div className="mt-2">
-                  <p className="text-sm font-medium text-destructive">Errors:</p>
-                  <ul className="text-xs text-muted-foreground max-h-20 overflow-y-auto">
-                    {programResult.errors.slice(0, 5).map((err, i) => (
-                      <li key={i}>{err}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Member Lookup */}
+      {/* Programs & Tags Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Tag className="h-5 w-5" />
+            Program Tags Configuration
+          </CardTitle>
+          <CardDescription>
+            View and edit Mailchimp tags for each program. These tags are applied to customers when they purchase.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {programsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[250px]">Program</TableHead>
+                  <TableHead className="w-[150px]">Mailchimp Name</TableHead>
+                  <TableHead>Tags</TableHead>
+                  <TableHead className="w-[200px]">Add Tag</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {programs?.map(program => {
+                  const tags = (program.mailchimp_tags as string[]) || [];
+                  return (
+                    <TableRow key={program.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{program.title}</span>
+                          {!program.is_active && (
+                            <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground">{program.slug}</div>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {program.mailchimp_program_name || '-'}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {tags.length === 0 ? (
+                            <span className="text-sm text-muted-foreground">No tags</span>
+                          ) : (
+                            tags.map(tag => (
+                              <Badge key={tag} variant="secondary" className="gap-1">
+                                {tag}
+                                <button
+                                  onClick={() => handleRemoveTag(program.id, tags, tag)}
+                                  className="hover:text-destructive ml-1"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </Badge>
+                            ))
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Input
+                            value={newTagInputs[program.id] || ''}
+                            onChange={(e) => setNewTagInputs(prev => ({ 
+                              ...prev, 
+                              [program.id]: e.target.value 
+                            }))}
+                            placeholder="New tag..."
+                            className="h-8 text-sm"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleAddTag(program.id, tags);
+                              }
+                            }}
+                          />
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleAddTag(program.id, tags)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      <Separator />
+
+      {/* Member Lookup Section */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Search className="h-5 w-5" />
-            Member Lookup
+            Mailchimp Member Lookup
           </CardTitle>
           <CardDescription>
-            Search for a member by email to view and manage their tags
+            Look up a member by email and manage their tags directly in Mailchimp
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
             <Input
-              placeholder="Enter email address..."
+              type="email"
               value={lookupEmail}
               onChange={(e) => setLookupEmail(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && lookupMember()}
+              placeholder="Enter email address..."
+              onKeyDown={(e) => e.key === 'Enter' && lookupMember()}
             />
-            <Button onClick={lookupMember} disabled={isLookingUp}>
-              {isLookingUp ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            <Button onClick={lookupMember} disabled={lookupLoading}>
+              {lookupLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
             </Button>
           </div>
 
-          {memberNotFound && (
-            <div className="p-4 bg-muted rounded-lg text-center">
-              <p className="text-muted-foreground">Member not found in Mailchimp</p>
-            </div>
-          )}
-
           {memberInfo && (
-            <div className="p-4 border rounded-lg space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="border rounded-lg p-4 space-y-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
+                  <Label className="text-muted-foreground">Email</Label>
                   <p className="font-medium">{memberInfo.email}</p>
-                  <p className="text-sm text-muted-foreground">Status: {memberInfo.status}</p>
                 </div>
-                <Badge variant={memberInfo.status === 'subscribed' ? 'default' : 'secondary'}>
-                  {memberInfo.status}
-                </Badge>
+                <div>
+                  <Label className="text-muted-foreground">Status</Label>
+                  <Badge variant={memberInfo.status === 'subscribed' ? 'default' : 'secondary'}>
+                    {memberInfo.status}
+                  </Badge>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Name</Label>
+                  <p>{memberInfo.merge_fields?.FNAME} {memberInfo.merge_fields?.LNAME || '-'}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Signed Up</Label>
+                  <p>{memberInfo.timestamp_signup ? new Date(memberInfo.timestamp_signup).toLocaleDateString() : '-'}</p>
+                </div>
               </div>
 
-              <Separator />
-
               <div>
-                <p className="text-sm font-medium mb-2">Current Tags:</p>
-                <div className="flex flex-wrap gap-2">
+                <Label className="text-muted-foreground">Current Tags</Label>
+                <div className="flex flex-wrap gap-1 mt-2">
                   {memberInfo.tags.length === 0 ? (
                     <span className="text-sm text-muted-foreground">No tags</span>
                   ) : (
                     memberInfo.tags.map(tag => (
-                      <Badge key={tag} variant="secondary" className="gap-1">
-                        {tag}
-                        <button 
-                          onClick={() => removeTagFromMember(tag)} 
-                          disabled={removingTag === tag}
-                          className="ml-1 hover:text-destructive"
+                      <Badge key={tag.id} variant="secondary" className="gap-1">
+                        {tag.name}
+                        <button
+                          onClick={() => removeTagFromMember(tag.name)}
+                          className="hover:text-destructive ml-1"
                         >
-                          {removingTag === tag ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (
-                            <X className="h-3 w-3" />
-                          )}
+                          <X className="h-3 w-3" />
                         </button>
                       </Badge>
                     ))
@@ -507,30 +425,14 @@ export function MailchimpTagManager() {
 
               <div className="flex gap-2">
                 <Input
-                  placeholder="Add new tag..."
-                  value={newMemberTag}
-                  onChange={(e) => setNewMemberTag(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && addTagToMember()}
+                  value={memberTagInput}
+                  onChange={(e) => setMemberTagInput(e.target.value)}
+                  placeholder="Add tag to member..."
+                  onKeyDown={(e) => e.key === 'Enter' && addTagToMember()}
                 />
-                <Button variant="outline" onClick={addTagToMember} disabled={isAddingTag || !newMemberTag}>
-                  {isAddingTag ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                <Button onClick={addTagToMember} size="sm">
+                  <Plus className="h-4 w-4 mr-1" /> Add Tag
                 </Button>
-              </div>
-
-              <Separator />
-
-              <div>
-                <p className="text-sm font-medium mb-2">Merge Fields:</p>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  {Object.entries(memberInfo.merge_fields || {}).map(([key, value]) => (
-                    value && (
-                      <div key={key} className="flex gap-2">
-                        <span className="font-medium">{key}:</span>
-                        <span className="text-muted-foreground">{String(value)}</span>
-                      </div>
-                    )
-                  ))}
-                </div>
               </div>
             </div>
           )}
