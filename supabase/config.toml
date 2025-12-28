@@ -89,12 +89,6 @@ verify_jwt = true
 [functions.update-mailchimp-cities]
 verify_jwt = true
 
-[functions.tag-five-language-buyers]
-verify_jwt = true
-
-[functions.add-missing-five-language-buyers]
-verify_jwt = true
-
 [functions.send-five-language-confirmation]
 verify_jwt = false
 
@@ -108,4 +102,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.mailchimp-bulk-rename-tag]
+verify_jwt = true
+
+[functions.mailchimp-tag-enrollments]
 verify_jwt = true
