@@ -106,3 +106,6 @@ verify_jwt = true
 
 [functions.mailchimp-tag-enrollments]
 verify_jwt = true
+
+[functions.mailchimp-sync-round-tags]
+verify_jwt = true
