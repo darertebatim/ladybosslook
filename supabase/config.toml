@@ -53,3 +53,9 @@ verify_jwt = true
 
 [functions.add-missing-five-language-buyers]
 verify_jwt = true
+
+[functions.mailchimp-tag-by-program]
+verify_jwt = true
+
+[functions.mailchimp-manage-member]
+verify_jwt = true

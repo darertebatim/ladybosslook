@@ -3,16 +3,15 @@ import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
 import { BroadcastHistory } from '@/components/admin/BroadcastHistory';
 import { PushNotificationSender } from '@/components/admin/PushNotificationSender';
 import { PushNotificationsHistory } from '@/components/admin/PushNotificationsHistory';
-import { EmailLogsViewer } from '@/components/admin/EmailLogsViewer';
 import { HomeBannerManager } from '@/components/admin/HomeBannerManager';
-import { FiveLanguageEmailSender } from '@/components/admin/FiveLanguageEmailSender';
+import { MailchimpTagManager } from '@/components/admin/MailchimpTagManager';
 
 export default function Communications() {
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Communications</h2>
-        <p className="text-muted-foreground">Manage broadcasts, push notifications, banners, and emails</p>
+        <p className="text-muted-foreground">Manage broadcasts, push notifications, banners, and Mailchimp</p>
       </div>
 
       <Tabs defaultValue="broadcasts">
@@ -20,7 +19,7 @@ export default function Communications() {
           <TabsTrigger value="broadcasts">Broadcasts</TabsTrigger>
           <TabsTrigger value="push">Push Only</TabsTrigger>
           <TabsTrigger value="banners">Banners</TabsTrigger>
-          <TabsTrigger value="emails">Email Logs</TabsTrigger>
+          <TabsTrigger value="mailchimp">Mailchimp</TabsTrigger>
         </TabsList>
 
         <TabsContent value="broadcasts" className="space-y-6">
@@ -37,9 +36,8 @@ export default function Communications() {
           <HomeBannerManager />
         </TabsContent>
 
-        <TabsContent value="emails" className="space-y-6">
-          <FiveLanguageEmailSender />
-          <EmailLogsViewer />
+        <TabsContent value="mailchimp" className="space-y-6">
+          <MailchimpTagManager />
         </TabsContent>
       </Tabs>
     </div>
