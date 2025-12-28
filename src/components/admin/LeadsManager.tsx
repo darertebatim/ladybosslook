@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key, Edit2, Trash2, UserPlus } from 'lucide-react';
+import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key, Edit2, Trash2, UserPlus, Smartphone, Send } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
@@ -31,6 +32,12 @@ import {
 } from '@/components/ui/alert-dialog';
 import { usePrograms } from '@/hooks/usePrograms';
 import { useQuery } from '@tanstack/react-query';
+
+interface PushSubscription {
+  id: string;
+  endpoint: string;
+  created_at: string;
+}
 
 interface UserLead {
   profile: {
@@ -66,6 +73,7 @@ interface UserLead {
       round_name: string;
     } | null;
   }>;
+  pushSubscriptions: PushSubscription[];
 }
 
 interface ProgramRound {
@@ -90,6 +98,8 @@ export function LeadsManager() {
   const [selectedEnrollRound, setSelectedEnrollRound] = useState('');
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [sendingTestTo, setSendingTestTo] = useState<string | null>(null);
+  const [deletingSubscription, setDeletingSubscription] = useState<string | null>(null);
   const { toast } = useToast();
   const { programs, isLoading: programsLoading } = usePrograms();
 
@@ -165,8 +175,10 @@ export function LeadsManager() {
         }
       }
 
-      // Search enrollments
+      // Search enrollments and push subscriptions
       let enrollments: any[] = [];
+      let pushSubscriptions: PushSubscription[] = [];
+      
       if (profile) {
         const { data: enrollmentData } = await supabase
           .from('course_enrollments')
@@ -179,6 +191,14 @@ export function LeadsManager() {
           .eq('user_id', profile.id)
           .order('enrolled_at', { ascending: false });
         enrollments = enrollmentData || [];
+        
+        // Fetch push subscriptions for this user
+        const { data: pushData } = await supabase
+          .from('push_subscriptions')
+          .select('id, endpoint, created_at')
+          .eq('user_id', profile.id)
+          .order('created_at', { ascending: false });
+        pushSubscriptions = pushData || [];
         
         // Fetch available rounds for each unique program_slug
         const uniqueSlugs = [...new Set(enrollments.map(e => e.program_slug).filter(Boolean))];
@@ -214,7 +234,8 @@ export function LeadsManager() {
         profile,
         paymentInfo,
         orders: orders || [],
-        enrollments
+        enrollments,
+        pushSubscriptions
       });
 
       toast({
@@ -417,6 +438,65 @@ export function LeadsManager() {
       });
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleSendTestNotification = async (email: string, subscriptionId: string) => {
+    setSendingTestTo(subscriptionId);
+    try {
+      const { error } = await supabase.functions.invoke('send-push-notification', {
+        body: {
+          targetUserEmail: email,
+          title: '🧪 Test Notification',
+          body: 'This is a test notification to verify your device registration.',
+          url: '/app/home',
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Test Sent',
+        description: `Test notification sent to ${email}`,
+      });
+    } catch (error: any) {
+      console.error('Error sending test notification:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to send test notification',
+        variant: 'destructive',
+      });
+    } finally {
+      setSendingTestTo(null);
+    }
+  };
+
+  const handleDeleteSubscription = async (id: string) => {
+    setDeletingSubscription(id);
+    try {
+      const { error } = await supabase
+        .from('push_subscriptions')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Device Removed',
+        description: 'Push notification subscription has been deleted',
+      });
+
+      // Refresh search results
+      handleSearch();
+    } catch (error: any) {
+      console.error('Error deleting subscription:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete subscription',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeletingSubscription(null);
     }
   };
 
@@ -653,6 +733,63 @@ export function LeadsManager() {
                         Joined: {new Date(searchResults.profile.created_at).toLocaleDateString()}
                       </span>
                     </div>
+                  </div>
+                  
+                  {/* Push Notifications Section */}
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Smartphone className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">
+                        Push Notifications
+                        {searchResults.pushSubscriptions.length > 0 ? (
+                          <Badge variant="default" className="ml-2">
+                            {searchResults.pushSubscriptions.length} device{searchResults.pushSubscriptions.length > 1 ? 's' : ''}
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="ml-2">No devices</Badge>
+                        )}
+                      </span>
+                    </div>
+                    
+                    {searchResults.pushSubscriptions.length > 0 ? (
+                      <div className="space-y-2">
+                        {searchResults.pushSubscriptions.map((sub) => (
+                          <div key={sub.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-xs">
+                                {sub.endpoint.startsWith('native:') ? 'Native App' : 'Web'}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                Registered {formatDistanceToNow(new Date(sub.created_at), { addSuffix: true })}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleSendTestNotification(searchResults.profile!.email, sub.id)}
+                                disabled={sendingTestTo === sub.id}
+                              >
+                                <Send className="h-3 w-3 mr-1" />
+                                {sendingTestTo === sub.id ? 'Sending...' : 'Test'}
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDeleteSubscription(sub.id)}
+                                disabled={deletingSubscription === sub.id}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        This user has no registered devices for push notifications.
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
