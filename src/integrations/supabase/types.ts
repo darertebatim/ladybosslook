@@ -926,6 +926,7 @@ export type Database = {
           google_meet_link: string | null
           id: string
           important_message: string | null
+          mailchimp_tags: Json | null
           max_students: number | null
           program_slug: string
           round_name: string
@@ -948,6 +949,7 @@ export type Database = {
           google_meet_link?: string | null
           id?: string
           important_message?: string | null
+          mailchimp_tags?: Json | null
           max_students?: number | null
           program_slug: string
           round_name: string
@@ -970,6 +972,7 @@ export type Database = {
           google_meet_link?: string | null
           id?: string
           important_message?: string | null
+          mailchimp_tags?: Json | null
           max_students?: number | null
           program_slug?: string
           round_name?: string
