@@ -62,6 +62,7 @@ interface SessionsManagerProps {
   programTitle: string;
   programSlug: string;
   defaultMeetLink?: string;
+  defaultDuration?: number;
   startDate?: string;
   endDate?: string;
   onClose: () => void;
@@ -73,6 +74,7 @@ export const SessionsManager = ({
   programTitle,
   programSlug,
   defaultMeetLink,
+  defaultDuration = 90,
   startDate,
   endDate,
   onClose,
@@ -87,7 +89,7 @@ export const SessionsManager = ({
     description: "",
     session_date: "",
     session_timezone: "America/Los_Angeles",
-    duration_minutes: "90",
+    duration_minutes: defaultDuration.toString(),
     meeting_link: defaultMeetLink || "",
     status: "scheduled",
   });
@@ -211,7 +213,7 @@ export const SessionsManager = ({
           session_number: sessionNumber,
           title: `${programTitle} - Session ${sessionNumber}`,
           session_date: currentDate.toISOString(),
-          duration_minutes: 90,
+          duration_minutes: defaultDuration,
           meeting_link: defaultMeetLink || null,
           status: 'scheduled',
         });
@@ -248,7 +250,7 @@ export const SessionsManager = ({
       description: "",
       session_date: "",
       session_timezone: "America/Los_Angeles",
-      duration_minutes: "90",
+      duration_minutes: defaultDuration.toString(),
       meeting_link: defaultMeetLink || "",
       status: "scheduled",
     });
