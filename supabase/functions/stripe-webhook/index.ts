@@ -276,6 +276,43 @@ serve(async (req) => {
       if (customerEmail) {
         userId = await findOrCreateUser(supabase, customerEmail, customerName);
         console.log('[WEBHOOK] User ID for order:', userId);
+
+        // Sync location data to profile (only update null fields)
+        if (userId) {
+          const profileUpdate: any = {};
+          if (customerPhone) profileUpdate.phone = customerPhone;
+          if (billingCity) profileUpdate.city = billingCity;
+          if (billingState) profileUpdate.state = billingState;
+          if (billingCountry) profileUpdate.country = billingCountry;
+
+          if (Object.keys(profileUpdate).length > 0) {
+            // Get current profile to check for null fields
+            const { data: currentProfile } = await supabase
+              .from('profiles')
+              .select('phone, city, state, country')
+              .eq('id', userId)
+              .single();
+
+            const updateData: any = {};
+            if (!currentProfile?.phone && profileUpdate.phone) updateData.phone = profileUpdate.phone;
+            if (!currentProfile?.city && profileUpdate.city) updateData.city = profileUpdate.city;
+            if (!currentProfile?.state && profileUpdate.state) updateData.state = profileUpdate.state;
+            if (!currentProfile?.country && profileUpdate.country) updateData.country = profileUpdate.country;
+
+            if (Object.keys(updateData).length > 0) {
+              const { error: profileError } = await supabase
+                .from('profiles')
+                .update(updateData)
+                .eq('id', userId);
+
+              if (profileError) {
+                console.error('[WEBHOOK] Error updating profile location:', profileError);
+              } else {
+                console.log('[WEBHOOK] Profile location synced:', updateData);
+              }
+            }
+          }
+        }
       }
 
       // Create order record with user_id
