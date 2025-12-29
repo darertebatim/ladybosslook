@@ -1,11 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Check, MessageCircle, Sparkles, Calendar, Users, Gift } from "lucide-react";
+import { Loader2, Check, MessageCircle, Sparkles, Calendar, Users, Gift, Mail } from "lucide-react";
 
 const EWPlus = () => {
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [isLoadingMonthly, setIsLoadingMonthly] = useState(false);
   const [isLoadingFull, setIsLoadingFull] = useState(false);
   const isSubmittingRef = useRef(false);
@@ -24,18 +27,36 @@ const EWPlus = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      setEmailError("لطفاً ایمیل خود را وارد کنید");
+      return false;
+    }
+    if (!emailRegex.test(email.trim())) {
+      setEmailError("لطفاً یک ایمیل معتبر وارد کنید");
+      return false;
+    }
+    setEmailError("");
+    return true;
+  };
+
   const handleMonthlyPayment = async () => {
+    if (!validateEmail(email)) return;
+    
     // Immediate lock to prevent double-clicks
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     setIsLoadingMonthly(true);
     
     try {
-      const idempotencyKey = `ewplus-monthly-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      const trimmedEmail = email.trim().toLowerCase();
+      const idempotencyKey = `ewplus-monthly-${trimmedEmail}`;
       
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: { 
           program: 'ewpluscoaching',
+          email: trimmedEmail,
           idempotencyKey 
         }
       });
@@ -44,12 +65,13 @@ const EWPlus = () => {
       
       if (data?.error === 'duplicate_detected') {
         toast.error('شما یک پرداخت در حال انتظار دارید. لطفاً چند دقیقه صبر کنید.');
+        isSubmittingRef.current = false;
+        setIsLoadingMonthly(false);
         return;
       }
       
       if (data?.url) {
         window.location.href = data.url;
-        // Keep the loading state since we're navigating away
         return;
       }
     } catch (error) {
@@ -61,18 +83,22 @@ const EWPlus = () => {
   };
 
   const handleFullPayment = async () => {
+    if (!validateEmail(email)) return;
+    
     // Immediate lock to prevent double-clicks
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     setIsLoadingFull(true);
     
     try {
-      const idempotencyKey = `ewplus-full-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      const trimmedEmail = email.trim().toLowerCase();
+      const idempotencyKey = `ewplus-full-${trimmedEmail}`;
       
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: { 
           program: 'ewpluscoaching', 
           paymentOption: 'full',
+          email: trimmedEmail,
           idempotencyKey 
         }
       });
@@ -81,12 +107,13 @@ const EWPlus = () => {
       
       if (data?.error === 'duplicate_detected') {
         toast.error('شما یک پرداخت در حال انتظار دارید. لطفاً چند دقیقه صبر کنید.');
+        isSubmittingRef.current = false;
+        setIsLoadingFull(false);
         return;
       }
       
       if (data?.url) {
         window.location.href = data.url;
-        // Keep the loading state since we're navigating away
         return;
       }
     } catch (error) {
@@ -151,6 +178,28 @@ const EWPlus = () => {
               </li>
             ))}
           </ul>
+        </Card>
+
+        {/* Email Input */}
+        <Card className="p-6 mb-6 border-border/50">
+          <div className="flex items-center gap-2 mb-3">
+            <Mail className="h-5 w-5 text-primary" />
+            <label className="font-medium text-foreground">ایمیل شما</label>
+          </div>
+          <Input
+            type="email"
+            placeholder="example@email.com"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailError) setEmailError("");
+            }}
+            className="text-left ltr"
+            dir="ltr"
+          />
+          {emailError && (
+            <p className="text-sm text-destructive mt-2">{emailError}</p>
+          )}
         </Card>
 
         {/* Monthly Payment Card (Primary) */}
