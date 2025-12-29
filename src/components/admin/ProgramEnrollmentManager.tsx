@@ -30,6 +30,9 @@ interface EnrolledUser {
   email: string;
   phone: string | null;
   full_name: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
   round_name: string | null;
 }
 
@@ -107,7 +110,7 @@ export function ProgramEnrollmentManager() {
       const userIds = [...new Set(enrollmentsData.map(e => e.user_id))];
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, email, phone, full_name')
+        .select('id, email, phone, full_name, city, state, country')
         .in('id', userIds);
 
       if (profilesError) throw profilesError;
@@ -126,6 +129,9 @@ export function ProgramEnrollmentManager() {
           email: profile?.email || 'Unknown',
           phone: profile?.phone || null,
           full_name: profile?.full_name || null,
+          city: profile?.city || null,
+          state: profile?.state || null,
+          country: profile?.country || null,
           round_name: e.round_id ? roundMap.get(e.round_id) || null : null
         };
       });
@@ -279,6 +285,7 @@ export function ProgramEnrollmentManager() {
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Phone</TableHead>
+                    <TableHead>Location</TableHead>
                     <TableHead>Enrolled</TableHead>
                     <TableHead>Current Round</TableHead>
                   </TableRow>
@@ -286,38 +293,44 @@ export function ProgramEnrollmentManager() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                         Loading...
                       </TableCell>
                     </TableRow>
                   ) : enrolledUsers.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                         No enrolled users found
                       </TableCell>
                     </TableRow>
                   ) : (
-                    enrolledUsers.map(user => (
-                      <TableRow key={user.id}>
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedUsers.has(user.id)}
-                            onCheckedChange={() => toggleUser(user.id)}
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium">{user.full_name || '-'}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.phone || '-'}</TableCell>
-                        <TableCell>{format(new Date(user.enrolled_at), 'MMM d, yyyy')}</TableCell>
-                        <TableCell>
-                          {user.round_name ? (
-                            <Badge variant="secondary">{user.round_name}</Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-muted-foreground">No round</Badge>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))
+                    enrolledUsers.map(user => {
+                      const locationParts = [user.city, user.state, user.country].filter(Boolean);
+                      const location = locationParts.length > 0 ? locationParts.join(', ') : null;
+                      
+                      return (
+                        <TableRow key={user.id}>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedUsers.has(user.id)}
+                              onCheckedChange={() => toggleUser(user.id)}
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium">{user.full_name || '-'}</TableCell>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>{user.phone || '-'}</TableCell>
+                          <TableCell className="text-sm">{location || '-'}</TableCell>
+                          <TableCell>{format(new Date(user.enrolled_at), 'MMM d, yyyy')}</TableCell>
+                          <TableCell>
+                            {user.round_name ? (
+                              <Badge variant="secondary">{user.round_name}</Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-muted-foreground">No round</Badge>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>
