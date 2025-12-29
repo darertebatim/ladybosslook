@@ -1,9 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle, CreditCard, Calendar, Sparkles, MessageCircle, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { CheckCircle, CreditCard, Calendar, Sparkles, MessageCircle, Loader2, Mail } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const EWCBalance = () => {
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [isLoadingOneTime, setIsLoadingOneTime] = useState(false);
   const [isLoadingMonthly, setIsLoadingMonthly] = useState(false);
   const isSubmittingRef = useRef(false);
@@ -22,7 +27,46 @@ const EWCBalance = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
 
-  const handlePayment = (url: string, type: 'onetime' | 'monthly') => {
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      setEmailError("لطفاً ایمیل خود را وارد کنید");
+      return false;
+    }
+    if (!emailRegex.test(email.trim())) {
+      setEmailError("لطفاً یک ایمیل معتبر وارد کنید");
+      return false;
+    }
+    setEmailError("");
+    return true;
+  };
+
+  const checkDuplicatePayment = async (trimmedEmail: string): Promise<boolean> => {
+    try {
+      // Check for recent orders for this email and program
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+      const { data: recentOrders } = await supabase
+        .from('orders')
+        .select('id, status')
+        .eq('email', trimmedEmail)
+        .eq('program_slug', 'empowered-woman-coaching')
+        .gte('created_at', tenMinutesAgo)
+        .in('status', ['pending', 'paid']);
+      
+      if (recentOrders && recentOrders.length > 0) {
+        toast.error('شما یک پرداخت در حال انتظار دارید. لطفاً چند دقیقه صبر کنید.');
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error checking duplicate:', error);
+      return false;
+    }
+  };
+
+  const handlePayment = async (url: string, type: 'onetime' | 'monthly') => {
+    if (!validateEmail(email)) return;
+    
     // Immediate lock to prevent double-clicks
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
@@ -32,9 +76,24 @@ const EWCBalance = () => {
     } else {
       setIsLoadingMonthly(true);
     }
+
+    const trimmedEmail = email.trim().toLowerCase();
+    
+    // Check for duplicate payment
+    const isDuplicate = await checkDuplicatePayment(trimmedEmail);
+    if (isDuplicate) {
+      isSubmittingRef.current = false;
+      setIsLoadingOneTime(false);
+      setIsLoadingMonthly(false);
+      return;
+    }
+    
+    // Add email as query param for Stripe prefill
+    const separator = url.includes('?') ? '&' : '?';
+    const urlWithEmail = `${url}${separator}prefilled_email=${encodeURIComponent(trimmedEmail)}`;
     
     // Navigate to payment
-    window.location.href = url;
+    window.location.href = urlWithEmail;
   };
 
   const isProcessing = isLoadingOneTime || isLoadingMonthly;
@@ -65,6 +124,28 @@ const EWCBalance = () => {
             برای شروع دوره، مبلغ باقیمانده را پرداخت کنید
           </p>
         </div>
+
+        {/* Email Input */}
+        <Card className="p-6 mb-6 border-border/50">
+          <div className="flex items-center gap-2 mb-3">
+            <Mail className="h-5 w-5 text-primary" />
+            <label className="font-medium text-foreground">ایمیل شما</label>
+          </div>
+          <Input
+            type="email"
+            placeholder="example@email.com"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailError) setEmailError("");
+            }}
+            className="text-left ltr"
+            dir="ltr"
+          />
+          {emailError && (
+            <p className="text-sm text-destructive mt-2">{emailError}</p>
+          )}
+        </Card>
 
         {/* Payment Options */}
         <div className="space-y-4">
