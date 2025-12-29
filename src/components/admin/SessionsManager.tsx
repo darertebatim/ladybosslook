@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Calendar, Plus, Trash2, Edit, ArrowLeft, Wand2, Loader2 } from "lucide-react";
-import { format, addWeeks } from "date-fns";
+import { Calendar, Plus, Trash2, Edit, ArrowLeft, Wand2, Loader2, CalendarDays } from "lucide-react";
+import { format, addWeeks, addDays } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -80,13 +80,13 @@ export const SessionsManager = ({
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState<'weekly' | 'daily' | null>(null);
   const [formData, setFormData] = useState<SessionFormData>({
     session_number: 1,
     title: "",
     description: "",
     session_date: "",
-    session_timezone: "America/New_York",
+    session_timezone: "America/Los_Angeles",
     duration_minutes: "90",
     meeting_link: defaultMeetLink || "",
     status: "scheduled",
@@ -194,13 +194,13 @@ export const SessionsManager = ({
     }
   };
 
-  // Generate sessions mutation
+  // Generate sessions mutation (weekly or daily)
   const generateMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (interval: 'weekly' | 'daily') => {
       if (!startDate) throw new Error("No start date set for this round");
 
       const start = new Date(startDate);
-      const end = endDate ? new Date(endDate) : addWeeks(start, 8);
+      const end = endDate ? new Date(endDate) : (interval === 'weekly' ? addWeeks(start, 8) : addDays(start, 30));
       const sessionsToCreate = [];
       let sessionNumber = (sessions?.length || 0) + 1;
       let currentDate = new Date(start);
@@ -216,7 +216,7 @@ export const SessionsManager = ({
           status: 'scheduled',
         });
         sessionNumber++;
-        currentDate = addWeeks(currentDate, 1);
+        currentDate = interval === 'weekly' ? addWeeks(currentDate, 1) : addDays(currentDate, 1);
       }
 
       if (sessionsToCreate.length === 0) {
@@ -247,7 +247,7 @@ export const SessionsManager = ({
       title: "",
       description: "",
       session_date: "",
-      session_timezone: "America/New_York",
+      session_timezone: "America/Los_Angeles",
       duration_minutes: "90",
       meeting_link: defaultMeetLink || "",
       status: "scheduled",
@@ -257,7 +257,7 @@ export const SessionsManager = ({
   };
 
   const handleEdit = (session: ProgramSession) => {
-    const defaultTimezone = "America/New_York";
+    const defaultTimezone = "America/Los_Angeles";
     let localDateTime = "";
 
     if (session.session_date) {
@@ -290,12 +290,12 @@ export const SessionsManager = ({
     saveMutation.mutate(formData);
   };
 
-  const handleGenerate = async () => {
-    setIsGenerating(true);
+  const handleGenerate = async (interval: 'weekly' | 'daily') => {
+    setIsGenerating(interval);
     try {
-      await generateMutation.mutateAsync();
+      await generateMutation.mutateAsync(interval);
     } finally {
-      setIsGenerating(false);
+      setIsGenerating(null);
     }
   };
 
@@ -324,10 +324,22 @@ export const SessionsManager = ({
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={handleGenerate}
-            disabled={isGenerating || !startDate}
+            onClick={() => handleGenerate('daily')}
+            disabled={!!isGenerating || !startDate}
           >
-            {isGenerating ? (
+            {isGenerating === 'daily' ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <CalendarDays className="h-4 w-4 mr-2" />
+            )}
+            Generate Daily
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => handleGenerate('weekly')}
+            disabled={!!isGenerating || !startDate}
+          >
+            {isGenerating === 'weekly' ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
               <Wand2 className="h-4 w-4 mr-2" />
