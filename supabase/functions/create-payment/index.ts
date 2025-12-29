@@ -60,7 +60,7 @@ serve(async (req) => {
 
     // Parse and validate request data
     const requestBody = await req.json();
-    const { program, paymentOption, name, email, phone } = requestBody;
+    const { program, paymentOption, name, email, phone, idempotencyKey } = requestBody;
     
     // Validate required program field
     if (!program || typeof program !== 'string') {
@@ -70,7 +70,7 @@ serve(async (req) => {
       );
     }
     
-    logStep("Request data validated", { program, paymentOption });
+    logStep("Request data validated", { program, paymentOption, hasIdempotencyKey: !!idempotencyKey });
 
     // Fetch program details from database
     const { data: programData, error: programError } = await supabase
@@ -98,7 +98,9 @@ serve(async (req) => {
       );
     }
     
-    if (email && !validateEmail(email)) {
+    const sanitizedEmail = email ? email.trim().toLowerCase() : null;
+    
+    if (sanitizedEmail && !validateEmail(sanitizedEmail)) {
       return new Response(
         JSON.stringify({ error: 'Invalid email address format.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -110,6 +112,42 @@ serve(async (req) => {
         JSON.stringify({ error: 'Invalid phone number format.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Check for recent duplicate payment attempts (within 10 minutes)
+    if (sanitizedEmail) {
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+      
+      const { data: recentOrder, error: recentOrderError } = await supabase
+        .from('orders')
+        .select('id, status, created_at, stripe_session_id')
+        .eq('email', sanitizedEmail)
+        .eq('program_slug', program)
+        .gte('created_at', tenMinutesAgo)
+        .in('status', ['pending', 'paid'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (!recentOrderError && recentOrder) {
+        logStep("Duplicate payment detected", { 
+          email: sanitizedEmail, 
+          program, 
+          existingOrderId: recentOrder.id,
+          status: recentOrder.status,
+          createdAt: recentOrder.created_at
+        });
+        
+        return new Response(
+          JSON.stringify({ 
+            error: 'duplicate_detected',
+            message: 'You have a recent payment attempt for this program. Please wait a few minutes before trying again.',
+            existingOrderId: recentOrder.id,
+            status: recentOrder.status
+          }),
+          { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // Determine payment mode and pricing
@@ -161,6 +199,11 @@ serve(async (req) => {
 
     let session: Stripe.Checkout.Session;
 
+    // Build Stripe idempotency key
+    const stripeIdempotencyKey = idempotencyKey 
+      ? `checkout-${program}-${idempotencyKey}` 
+      : undefined;
+
     if (isSubscription) {
       // Create subscription checkout session
       logStep("Creating subscription checkout session");
@@ -201,7 +244,7 @@ serve(async (req) => {
         });
       }
 
-      session = await stripe.checkout.sessions.create({
+      const sessionCreateParams: Stripe.Checkout.SessionCreateParams = {
         line_items: [
           {
             price: price.id,
@@ -221,13 +264,17 @@ serve(async (req) => {
           payment_type: programData.payment_type,
           product_name: productName,
         },
-      });
+      };
+
+      session = stripeIdempotencyKey 
+        ? await stripe.checkout.sessions.create(sessionCreateParams, { idempotencyKey: stripeIdempotencyKey })
+        : await stripe.checkout.sessions.create(sessionCreateParams);
 
     } else {
       // Create one-time payment checkout session
       logStep("Creating one-time payment checkout session");
       
-      session = await stripe.checkout.sessions.create({
+      const sessionCreateParams: Stripe.Checkout.SessionCreateParams = {
         line_items: [
           {
             price_data: {
@@ -265,7 +312,11 @@ serve(async (req) => {
           payment_type: programData.payment_type,
           product_name: productName,
         },
-      });
+      };
+
+      session = stripeIdempotencyKey
+        ? await stripe.checkout.sessions.create(sessionCreateParams, { idempotencyKey: stripeIdempotencyKey })
+        : await stripe.checkout.sessions.create(sessionCreateParams);
     }
 
     logStep("Stripe checkout session created", { sessionId: session.id, mode: session.mode });

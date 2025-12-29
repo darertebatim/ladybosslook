@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,41 +8,91 @@ import { Loader2, Check, MessageCircle, Sparkles, Calendar, Users, Gift } from "
 const EWPlus = () => {
   const [isLoadingMonthly, setIsLoadingMonthly] = useState(false);
   const [isLoadingFull, setIsLoadingFull] = useState(false);
+  const isSubmittingRef = useRef(false);
+
+  // Prevent accidental navigation during payment processing
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isSubmittingRef.current) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
 
   const handleMonthlyPayment = async () => {
+    // Immediate lock to prevent double-clicks
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     setIsLoadingMonthly(true);
+    
     try {
+      const idempotencyKey = `ewplus-monthly-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      
       const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { program: 'ewpluscoaching' }
+        body: { 
+          program: 'ewpluscoaching',
+          idempotencyKey 
+        }
       });
 
       if (error) throw error;
+      
+      if (data?.error === 'duplicate_detected') {
+        toast.error('شما یک پرداخت در حال انتظار دارید. لطفاً چند دقیقه صبر کنید.');
+        return;
+      }
+      
       if (data?.url) {
         window.location.href = data.url;
+        // Keep the loading state since we're navigating away
+        return;
       }
     } catch (error) {
       console.error('Payment error:', error);
       toast.error('خطا در اتصال به درگاه پرداخت');
-    } finally {
+      isSubmittingRef.current = false;
       setIsLoadingMonthly(false);
     }
   };
 
   const handleFullPayment = async () => {
+    // Immediate lock to prevent double-clicks
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     setIsLoadingFull(true);
+    
     try {
+      const idempotencyKey = `ewplus-full-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      
       const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { program: 'ewpluscoaching', paymentOption: 'full' }
+        body: { 
+          program: 'ewpluscoaching', 
+          paymentOption: 'full',
+          idempotencyKey 
+        }
       });
 
       if (error) throw error;
+      
+      if (data?.error === 'duplicate_detected') {
+        toast.error('شما یک پرداخت در حال انتظار دارید. لطفاً چند دقیقه صبر کنید.');
+        return;
+      }
+      
       if (data?.url) {
         window.location.href = data.url;
+        // Keep the loading state since we're navigating away
+        return;
       }
     } catch (error) {
       console.error('Payment error:', error);
       toast.error('خطا در اتصال به درگاه پرداخت');
-    } finally {
+      isSubmittingRef.current = false;
       setIsLoadingFull(false);
     }
   };
@@ -51,8 +101,21 @@ const EWPlus = () => {
     window.open('https://t.me/ladybosslook', '_blank');
   };
 
+  const isProcessing = isLoadingMonthly || isLoadingFull;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 font-[Vazirmatn]" dir="rtl">
+      {/* Processing overlay */}
+      {isProcessing && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+            <p className="text-lg font-medium text-foreground">در حال اتصال به درگاه پرداخت...</p>
+            <p className="text-sm text-muted-foreground mt-2">لطفاً صفحه را نبندید</p>
+          </div>
+        </div>
+      )}
+
       <div className="container mx-auto px-4 py-12 max-w-2xl">
         {/* Header */}
         <div className="text-center mb-10">
@@ -116,9 +179,10 @@ const EWPlus = () => {
 
             <Button
               onClick={handleMonthlyPayment}
-              disabled={isLoadingMonthly}
+              disabled={isProcessing}
               size="lg"
               className="w-full py-6 text-lg font-bold"
+              style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
             >
               {isLoadingMonthly ? (
                 <>
@@ -168,10 +232,11 @@ const EWPlus = () => {
 
             <Button
               onClick={handleFullPayment}
-              disabled={isLoadingFull}
+              disabled={isProcessing}
               variant="outline"
               size="lg"
               className="w-full py-6 text-lg font-bold border-orange-500/30 hover:bg-orange-500/10"
+              style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
             >
               {isLoadingFull ? (
                 <>
