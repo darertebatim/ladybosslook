@@ -1,14 +1,57 @@
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle, CreditCard, Calendar, Sparkles, MessageCircle } from "lucide-react";
+import { CheckCircle, CreditCard, Calendar, Sparkles, MessageCircle, Loader2 } from "lucide-react";
 
 const EWCBalance = () => {
-  const handlePayment = (url: string) => {
+  const [isLoadingOneTime, setIsLoadingOneTime] = useState(false);
+  const [isLoadingMonthly, setIsLoadingMonthly] = useState(false);
+  const isSubmittingRef = useRef(false);
+
+  // Prevent accidental navigation during payment processing
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isSubmittingRef.current) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+
+  const handlePayment = (url: string, type: 'onetime' | 'monthly') => {
+    // Immediate lock to prevent double-clicks
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    
+    if (type === 'onetime') {
+      setIsLoadingOneTime(true);
+    } else {
+      setIsLoadingMonthly(true);
+    }
+    
+    // Navigate to payment
     window.location.href = url;
   };
 
+  const isProcessing = isLoadingOneTime || isLoadingMonthly;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 font-[Vazirmatn]" dir="rtl">
+      {/* Processing overlay */}
+      {isProcessing && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+            <p className="text-lg font-medium text-foreground">در حال اتصال به درگاه پرداخت...</p>
+            <p className="text-sm text-muted-foreground mt-2">لطفاً صفحه را نبندید</p>
+          </div>
+        </div>
+      )}
+
       <div className="container mx-auto px-4 py-12 max-w-2xl">
         {/* Header */}
         <div className="text-center mb-10">
@@ -50,11 +93,22 @@ const EWCBalance = () => {
                   <span className="text-sm text-green-600 font-medium">صرفه‌جویی $150</span>
                 </div>
                 <Button 
-                  onClick={() => handlePayment('https://buy.stripe.com/14AdR84Zz5XcaVhgS59Ve06')}
+                  onClick={() => handlePayment('https://buy.stripe.com/14AdR84Zz5XcaVhgS59Ve06', 'onetime')}
+                  disabled={isProcessing}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-6 text-lg"
+                  style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
                 >
-                  <CreditCard className="ml-2 h-5 w-5" />
-                  پرداخت $747
+                  {isLoadingOneTime ? (
+                    <>
+                      <Loader2 className="ml-2 h-5 w-5 animate-spin" />
+                      در حال اتصال...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="ml-2 h-5 w-5" />
+                      پرداخت $747
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -79,12 +133,23 @@ const EWCBalance = () => {
                   <span className="text-sm text-muted-foreground">(مجموع: $897)</span>
                 </div>
                 <Button 
-                  onClick={() => handlePayment('https://buy.stripe.com/28EbJ03Vv2L0fbx0T79Ve05')}
+                  onClick={() => handlePayment('https://buy.stripe.com/28EbJ03Vv2L0fbx0T79Ve05', 'monthly')}
+                  disabled={isProcessing}
                   variant="outline"
                   className="w-full py-6 text-lg font-medium font-[Vazirmatn]"
+                  style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
                 >
-                  <Calendar className="ml-2 h-5 w-5" />
-                  پرداخت ماهیانه
+                  {isLoadingMonthly ? (
+                    <>
+                      <Loader2 className="ml-2 h-5 w-5 animate-spin" />
+                      در حال اتصال...
+                    </>
+                  ) : (
+                    <>
+                      <Calendar className="ml-2 h-5 w-5" />
+                      پرداخت ماهیانه
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

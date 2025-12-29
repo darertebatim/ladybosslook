@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, CreditCard, Shield, CheckCircle } from 'lucide-react';
-import { paymentFormSchema, type PaymentFormData } from '@/lib/validation';
+import { paymentFormSchema } from '@/lib/validation';
 import { z } from 'zod';
 
 interface PaymentFormProps {
@@ -33,7 +33,22 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const isSubmittingRef = useRef(false);
   const { toast } = useToast();
+
+  // Prevent accidental navigation during payment processing
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isSubmittingRef.current) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,6 +60,9 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Immediate lock to prevent double-clicks
+    if (isSubmittingRef.current) return;
     
     // Clear previous validation errors
     setValidationErrors({});
@@ -71,20 +89,36 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
       }
     }
 
+    // Lock submission
+    isSubmittingRef.current = true;
     setIsLoading(true);
 
     try {
+      const idempotencyKey = `${program}-${formData.email}-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
           name: formData.name.trim(),
           email: formData.email.trim().toLowerCase(),
           phone: formData.phone.trim(),
           program: program,
+          idempotencyKey,
         }
       });
 
       if (error) {
         throw new Error(error.message);
+      }
+
+      if (data?.error === 'duplicate_detected') {
+        toast({
+          title: "Payment Already in Progress",
+          description: "You have a recent payment attempt for this program. Please wait a few minutes before trying again.",
+          variant: "destructive",
+        });
+        isSubmittingRef.current = false;
+        setIsLoading(false);
+        return;
       }
 
       if (data?.url) {
@@ -95,6 +129,10 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
           title: "Redirecting to Payment",
           description: "Please complete your payment in the new tab that opened.",
         });
+        
+        // Reset form after successful redirect
+        isSubmittingRef.current = false;
+        setIsLoading(false);
       } else {
         throw new Error('No payment URL received');
       }
@@ -105,7 +143,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
         description: "There was an error processing your payment. Please try again.",
         variant: "destructive",
       });
-    } finally {
+      isSubmittingRef.current = false;
       setIsLoading(false);
     }
   };
@@ -118,7 +156,17 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
   };
 
   return (
-    <Card className="w-full max-w-lg mx-auto bg-white shadow-xl border-0">
+    <Card className="w-full max-w-lg mx-auto bg-white shadow-xl border-0 relative">
+      {/* Processing overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-2" />
+            <p className="text-sm font-medium text-foreground">Processing...</p>
+          </div>
+        </div>
+      )}
+
       <CardHeader className="text-center pb-6">
         <CardTitle className="text-2xl font-bold text-primary">
           {programName}
@@ -167,6 +215,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
               value={formData.name}
               onChange={handleInputChange}
               required
+              disabled={isLoading}
               className={`h-12 ${validationErrors.name ? 'border-red-500' : ''}`}
               aria-invalid={!!validationErrors.name}
               aria-describedby={validationErrors.name ? 'name-error' : undefined}
@@ -190,6 +239,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
               value={formData.email}
               onChange={handleInputChange}
               required
+              disabled={isLoading}
               className={`h-12 ${validationErrors.email ? 'border-red-500' : ''}`}
               aria-invalid={!!validationErrors.email}
               aria-describedby={validationErrors.email ? 'email-error' : undefined}
@@ -212,6 +262,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
               placeholder="Enter your phone number"
               value={formData.phone}
               onChange={handleInputChange}
+              disabled={isLoading}
               className={`h-12 ${validationErrors.phone ? 'border-red-500' : ''}`}
               aria-invalid={!!validationErrors.phone}
               aria-describedby={validationErrors.phone ? 'phone-error' : undefined}
@@ -228,6 +279,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
               type="submit"
               disabled={isLoading}
               className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary-dark"
+              style={{ pointerEvents: isLoading ? 'none' : 'auto' }}
             >
               {isLoading ? (
                 <>
