@@ -82,7 +82,7 @@ export const ProgramRoundsManager = () => {
     google_drive_link: "",
     first_session_date: "",
     first_session_duration: "90",
-    first_session_timezone: "America/New_York",
+    first_session_timezone: "America/Los_Angeles",
     important_message: "",
     support_link_url: "",
     support_link_label: "",
@@ -221,7 +221,7 @@ export const ProgramRoundsManager = () => {
       google_drive_link: "",
       first_session_date: "",
       first_session_duration: "90",
-      first_session_timezone: "America/New_York",
+      first_session_timezone: "America/Los_Angeles",
       important_message: "",
       support_link_url: "",
       support_link_label: "",
@@ -234,7 +234,7 @@ export const ProgramRoundsManager = () => {
   const handleEdit = (round: ProgramRound) => {
     // Convert UTC ISO string to local datetime for the default timezone
     let localDateTime = "";
-    const defaultTimezone = "America/New_York";
+    const defaultTimezone = "America/Los_Angeles";
     
     if (round.first_session_date) {
       const utcDate = new Date(round.first_session_date);
