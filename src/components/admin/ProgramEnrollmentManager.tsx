@@ -89,34 +89,46 @@ export function ProgramEnrollmentManager() {
       if (roundsError) throw roundsError;
       setRounds(roundsData || []);
 
-      // Load enrollments with user profiles
+      // Load enrollments
       const { data: enrollmentsData, error: enrollmentsError } = await supabase
         .from('course_enrollments')
-        .select(`
-          id,
-          user_id,
-          enrolled_at,
-          round_id,
-          profiles!inner(email, phone, full_name)
-        `)
+        .select('id, user_id, enrolled_at, round_id')
         .eq('program_slug', selectedProgram)
         .eq('status', 'active');
 
       if (enrollmentsError) throw enrollmentsError;
 
-      // Map enrollments with round names
+      if (!enrollmentsData || enrollmentsData.length === 0) {
+        setEnrolledUsers([]);
+        return;
+      }
+
+      // Get unique user IDs and fetch their profiles
+      const userIds = [...new Set(enrollmentsData.map(e => e.user_id))];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email, phone, full_name')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create lookup maps
       const roundMap = new Map((roundsData || []).map(r => [r.id, r.round_name]));
+      const profileMap = new Map((profilesData || []).map(p => [p.id, p]));
       
-      const users: EnrolledUser[] = (enrollmentsData || []).map((e: any) => ({
-        id: e.id,
-        user_id: e.user_id,
-        enrolled_at: e.enrolled_at,
-        round_id: e.round_id,
-        email: e.profiles.email,
-        phone: e.profiles.phone,
-        full_name: e.profiles.full_name,
-        round_name: e.round_id ? roundMap.get(e.round_id) || null : null
-      }));
+      const users: EnrolledUser[] = enrollmentsData.map((e) => {
+        const profile = profileMap.get(e.user_id);
+        return {
+          id: e.id,
+          user_id: e.user_id,
+          enrolled_at: e.enrolled_at,
+          round_id: e.round_id,
+          email: profile?.email || 'Unknown',
+          phone: profile?.phone || null,
+          full_name: profile?.full_name || null,
+          round_name: e.round_id ? roundMap.get(e.round_id) || null : null
+        };
+      });
 
       setEnrolledUsers(users);
     } catch (error: any) {
