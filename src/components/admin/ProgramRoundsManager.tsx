@@ -295,6 +295,7 @@ export const ProgramRoundsManager = () => {
         programTitle={programTitle}
         programSlug={managingSessionsRound.program_slug}
         defaultMeetLink={managingSessionsRound.google_meet_link || undefined}
+        defaultDuration={managingSessionsRound.first_session_duration || 90}
         startDate={managingSessionsRound.start_date}
         endDate={managingSessionsRound.end_date || undefined}
         onClose={() => setManagingSessionsRound(null)}
