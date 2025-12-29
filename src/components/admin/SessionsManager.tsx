@@ -63,6 +63,7 @@ interface SessionsManagerProps {
   programSlug: string;
   defaultMeetLink?: string;
   defaultDuration?: number;
+  firstSessionDate?: string;
   startDate?: string;
   endDate?: string;
   onClose: () => void;
@@ -75,6 +76,7 @@ export const SessionsManager = ({
   programSlug,
   defaultMeetLink,
   defaultDuration = 90,
+  firstSessionDate,
   startDate,
   endDate,
   onClose,
@@ -203,16 +205,30 @@ export const SessionsManager = ({
 
       const start = new Date(startDate);
       const end = endDate ? new Date(endDate) : (interval === 'weekly' ? addWeeks(start, 8) : addDays(start, 30));
+      
+      // Extract time from firstSessionDate if available, otherwise default to midnight
+      let sessionHour = 0;
+      let sessionMinute = 0;
+      if (firstSessionDate) {
+        const firstDate = new Date(firstSessionDate);
+        sessionHour = firstDate.getUTCHours();
+        sessionMinute = firstDate.getUTCMinutes();
+      }
+      
       const sessionsToCreate = [];
       let sessionNumber = (sessions?.length || 0) + 1;
       let currentDate = new Date(start);
 
       while (currentDate <= end) {
+        // Create session date with the correct time
+        const sessionDate = new Date(currentDate);
+        sessionDate.setUTCHours(sessionHour, sessionMinute, 0, 0);
+        
         sessionsToCreate.push({
           round_id: roundId,
           session_number: sessionNumber,
           title: `${programTitle} - Session ${sessionNumber}`,
-          session_date: currentDate.toISOString(),
+          session_date: sessionDate.toISOString(),
           duration_minutes: defaultDuration,
           meeting_link: defaultMeetLink || null,
           status: 'scheduled',
