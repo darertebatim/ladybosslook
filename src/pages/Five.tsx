@@ -355,6 +355,155 @@ const Five = () => {
           </div>
         </div>
 
+        {/* 10 Nights Challenge Details Section */}
+        <div className="py-10 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto" dir="rtl">
+              {/* Section Header */}
+              <div className="text-center mb-8">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+                  🌙 چالش «۱۰ شب زن قوی»
+                </h2>
+                <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+                  این چالش شامل <span className="text-secondary font-bold">۵ فایل آموزشی</span> و <span className="text-secondary font-bold">۵ میکرو‌اکت عملی</span> که توی کانال تلگرام مخصوص در اختیار شما قرار می‌گیره.
+                </p>
+              </div>
+
+              {/* Night 1 */}
+              <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/30 rounded-xl p-5 mb-4">
+                <div className="flex items-start gap-3 mb-3">
+                  <span className="text-2xl">🌙</span>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">شب اول: مدیریت افکار و احساسات</h3>
+                    <p className="text-gray-600 text-sm mt-1">
+                      در شب اول، یاد می‌گیریم چطور افکارمون رو مدیریت کنیم و تفاوت بین «فکر» و «احساس» رو بشناسیم.
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-white/70 rounded-lg p-3 mr-9">
+                  <p className="text-secondary font-bold text-sm mb-1">🔹 میکرو‌اکت شب اول</p>
+                  <p className="text-gray-600 text-xs leading-relaxed">
+                    وقتی این تمرین رو انجام بدی، یاد می‌گیری احساساتت رو از افکارت جدا کنی و کنترل ذهنی بیشتری داشته باشی، به‌جای این‌که ذهنت تو رو کنترل کنه.
+                  </p>
+                </div>
+              </div>
+
+              {/* Night 2 */}
+              <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/30 rounded-xl p-5 mb-4">
+                <div className="flex items-start gap-3 mb-3">
+                  <span className="text-2xl">🌙</span>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">شب دوم: خلأ قدرت نگرش</h3>
+                    <p className="text-gray-600 text-sm mt-2">وقتی خلأ نگرش داشته باشیم:</p>
+                    <ul className="text-gray-600 text-sm mt-1 space-y-1">
+                      <li>• روی فرصت‌های زندگی کنترل نداریم</li>
+                      <li>• فرصت‌ها رو از دست می‌دیم</li>
+                      <li>• به‌جای دیدن امکان‌ها، تهدید می‌بینیم</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="bg-white/70 rounded-lg p-3 mr-9">
+                  <p className="text-secondary font-bold text-sm mb-1">🔹 میکرو‌اکت نگرش</p>
+                  <p className="text-gray-600 text-xs leading-relaxed">
+                    کمکت می‌کنه بفهمی چه نوع نگرشی داری و کدوم باورها ممکنه مانع رشد تو باشن. این بخش شبیه یه آزمون خودشناسی عمل می‌کنه.
+                  </p>
+                </div>
+              </div>
+
+              {/* Night 5 */}
+              <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/30 rounded-xl p-5 mb-4">
+                <div className="flex items-start gap-3 mb-3">
+                  <span className="text-2xl">🌙</span>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">شب پنجم: خلأ قدرت سوم (ارتباطات)</h3>
+                    <p className="text-gray-600 text-sm mt-2">خانمی که این خلأ قدرت رو داره:</p>
+                    <ul className="text-gray-600 text-sm mt-1 space-y-1">
+                      <li>• ارتباطات ضعیفی داره</li>
+                      <li>• جدی گرفته نمی‌شه</li>
+                      <li>• روابطش هدفمند نیست</li>
+                      <li>• احساس نامرئی بودن می‌کنه</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="bg-white/70 rounded-lg p-3 mr-9">
+                  <p className="text-secondary font-bold text-sm mb-1">🔹 میکرو‌اکت ارتباطات</p>
+                  <p className="text-gray-600 text-xs leading-relaxed">یاد می‌گیری:</p>
+                  <ul className="text-gray-600 text-xs mt-1 space-y-0.5">
+                    <li>• حرفت وزن داشته باشه</li>
+                    <li>• جدی گرفته بشی</li>
+                    <li>• تأثیرگذار صحبت کنی</li>
+                    <li>• نامرئی نباشی</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Night 7 */}
+              <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/30 rounded-xl p-5 mb-4">
+                <div className="flex items-start gap-3 mb-3">
+                  <span className="text-2xl">🌙</span>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">شب هفتم: خلأ قدرت چهارم (لایف‌استایل)</h3>
+                    <p className="text-gray-600 text-sm mt-2">کسی که این خلأ رو داره:</p>
+                    <ul className="text-gray-600 text-sm mt-1 space-y-1">
+                      <li>• انگیزه‌ش مدام بالا و پایین می‌شه</li>
+                      <li>• درگیر روزمرگی می‌شه</li>
+                      <li>• هدف‌هاش گم می‌شن</li>
+                      <li>• سبک زندگی مشخصی نداره</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="bg-white/70 rounded-lg p-3 mr-9">
+                  <p className="text-secondary font-bold text-sm mb-1">🔹 میکرو‌اکت لایف‌استایل</p>
+                  <p className="text-gray-600 text-xs leading-relaxed">باعث می‌شه:</p>
+                  <ul className="text-gray-600 text-xs mt-1 space-y-0.5">
+                    <li>• صبح با برنامه از خواب بیدار بشی</li>
+                    <li>• انرژی بهتری داشته باشی</li>
+                    <li>• حجم احساسات منفی روزانه کمتر بشه</li>
+                    <li>• زندگی‌ت جهت‌دارتر بشه</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Night 9 */}
+              <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/30 rounded-xl p-5 mb-4">
+                <div className="flex items-start gap-3 mb-3">
+                  <span className="text-2xl">🌙</span>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">شب نهم: خلأ قدرت پنجم (پول و مدیریت مالی)</h3>
+                    <p className="text-gray-600 text-sm mt-2">کسی که این خلأ رو داره:</p>
+                    <ul className="text-gray-600 text-sm mt-1 space-y-1">
+                      <li>• نمی‌دونه با پولش چی کار کنه</li>
+                      <li>• بلد نیست پولش رو چند برابر کنه</li>
+                      <li>• پول توی دستش نمی‌مونه</li>
+                      <li>• با پول احساس غریبی می‌کنه</li>
+                    </ul>
+                  </div>
+                </div>
+                <p className="text-secondary font-bold text-sm text-center mt-3">
+                  (این شب، پایه‌ی تغییر رابطه‌ی تو با پوله.)
+                </p>
+              </div>
+
+              {/* Final CTA */}
+              <div className="bg-gradient-to-r from-secondary/20 via-secondary/25 to-secondary/20 border-2 border-secondary rounded-xl p-6 text-center mt-8">
+                <p className="text-gray-800 text-base mb-2">
+                  این چالش فقط آموزش نیست؛<br/>
+                  <span className="text-secondary font-bold text-lg">تغییر درونی + تمرین عملی</span>
+                </p>
+                <p className="text-gray-700 text-sm mb-4">
+                  اگه رشد رو دنبال می‌کنی، این مسیر دقیقاً برای تو طراحی شده 🌱
+                </p>
+                <Button
+                  onClick={() => setShowRegistrationForm(true)}
+                  className="px-8 py-3 text-base font-bold bg-secondary hover:brightness-110 text-white rounded-lg transform hover:scale-105 transition-all shadow-lg"
+                >
+                  ✅ شروع تغییر با $1
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Sticky Buy Button */}
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-3 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
           <div className="container mx-auto px-4 flex items-center justify-between gap-3 max-w-lg">
