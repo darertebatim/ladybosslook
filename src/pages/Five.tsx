@@ -215,7 +215,7 @@ const Five = () => {
               {/* Primary CTA */}
               <Button
                 onClick={() => setShowRegistrationForm(true)}
-                className="w-full md:w-auto px-8 md:px-12 py-4 md:py-5 text-base md:text-lg font-bold bg-gradient-to-r from-secondary to-secondary-light hover:brightness-110 text-white rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_40px_rgba(16,185,129,0.6)] transform hover:scale-105 transition-all duration-300 mb-2.5 animate-pulse"
+                className="w-full md:w-auto px-8 md:px-12 py-4 md:py-5 text-base md:text-lg font-bold bg-gradient-to-r from-secondary to-secondary-light hover:brightness-110 text-white rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_40px_rgba(16,185,129,0.6)] transform hover:scale-105 transition-all duration-300 mb-2.5 animate-[pulse_3s_ease-in-out_infinite]"
               >
                 🚀 ثبت نام فوری با $1
               </Button>
