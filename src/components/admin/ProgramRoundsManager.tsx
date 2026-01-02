@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays, ListChecks } from "lucide-react";
+import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays, ListChecks, Copy } from "lucide-react";
 import { SessionsManager } from "./SessionsManager";
 import { format } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
@@ -269,6 +269,34 @@ export const ProgramRoundsManager = () => {
       video_url: round.video_url || "",
     });
     setEditingId(round.id);
+  };
+
+  const handleDuplicate = (round: ProgramRound) => {
+    // Find the highest round number for this program
+    const programRounds = rounds?.filter(r => r.program_slug === round.program_slug) || [];
+    const maxRoundNumber = Math.max(...programRounds.map(r => r.round_number), 0);
+
+    setFormData({
+      program_slug: round.program_slug,
+      round_name: "", // Clear - user should set new name
+      round_number: maxRoundNumber + 1,
+      start_date: "", // Clear - user should set new dates
+      end_date: "",
+      status: "upcoming",
+      max_students: round.max_students?.toString() || "",
+      google_meet_link: round.google_meet_link || "",
+      google_drive_link: round.google_drive_link || "",
+      first_session_date: "", // Clear - user should set new date
+      first_session_duration: round.first_session_duration?.toString() || "90",
+      first_session_timezone: "America/Los_Angeles",
+      important_message: round.important_message || "",
+      support_link_url: (round as any).support_link_url || "",
+      support_link_label: (round as any).support_link_label || "",
+      audio_playlist_id: round.audio_playlist_id || "none",
+      video_url: round.video_url || "",
+    });
+    setEditingId(null); // This is a new round, not editing
+    toast.info("Round duplicated - update the name and dates, then save");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -650,7 +678,16 @@ export const ProgramRoundsManager = () => {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => handleDuplicate(round)}
+                          title="Duplicate Round"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => handleEdit(round)}
+                          title="Edit Round"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -658,6 +695,7 @@ export const ProgramRoundsManager = () => {
                           variant="destructive"
                           size="sm"
                           onClick={() => deleteMutation.mutate(round.id)}
+                          title="Delete Round"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
