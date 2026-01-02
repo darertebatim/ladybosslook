@@ -175,7 +175,7 @@ const Five = () => {
               </p>
 
               {/* Video */}
-              <div className="mb-4 max-w-sm mx-auto">
+              <div className="mb-4 mx-auto" style={{ maxWidth: '250px' }}>
                 <video 
                   src="/videos/five-promo.mp4"
                   controls
