@@ -108,28 +108,28 @@ const Five = () => {
   return (
     <>
       <style>{`
-        .one-page-green {
-          --secondary: 142 76% 45%;
-          --secondary-light: 142 70% 55%;
-          --secondary-dark: 142 80% 35%;
-          --cta-primary: 142 76% 45%;
-          --cta-primary-hover: 142 70% 55%;
-          --success: 142 76% 45%;
+        .five-page-purple {
+          --secondary: 270 60% 55%;
+          --secondary-light: 270 55% 65%;
+          --secondary-dark: 270 65% 45%;
+          --cta-primary: 270 60% 55%;
+          --cta-primary-hover: 270 55% 65%;
+          --success: 270 60% 55%;
         }
       `}</style>
       <SEOHead 
-        title="کلاس قدرت دو زبانه - کلاس آنلاین $1 | LadyBoss Academy"
-        description="یاد بگیرید چطور در هر زبانی با قدرت حرف بزنید. کلاس ویژه زنان ایرانی مهاجر - فقط $1"
+        title="چالش ۵ زبان قدرت - کلاس آنلاین $1 | LadyBoss Academy"
+        description="چالش ۱۰ روزه ۵ زبان قدرت - ۵ خلاء قدرت زنان - فقط $1"
       />
       <RecentRegistrations />
       
-      <div className="one-page-green min-h-screen bg-white font-farsi">
+      <div className="five-page-purple min-h-screen bg-white font-farsi">
         {/* Compact Hero Section */}
         <div className="relative overflow-hidden pb-8">
-          {/* Animated Green Glow */}
+          {/* Animated Purple Glow */}
           <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 left-1/4 w-96 h-96 bg-secondary rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-secondary/60 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+            <div className="absolute top-10 left-1/4 w-96 h-96 bg-[#9b59b6] rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#9b59b6]/60 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
           </div>
 
           <div className="container mx-auto px-4 pt-3 relative z-10">
@@ -138,7 +138,7 @@ const Five = () => {
               <div className="flex flex-col items-center justify-center gap-2 text-center">
                 {/* First Row: PST Time */}
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-secondary" />
+                  <Clock className="w-4 h-4 text-[#9b59b6]" />
                   <span className="text-gray-900 font-bold text-sm" dir="ltr">
                     Jan 12 • 10:30 AM PST
                   </span>
@@ -160,8 +160,8 @@ const Five = () => {
             {/* Hero Content - Optimized Hierarchy */}
             <div className="max-w-4xl mx-auto text-center">
               {/* Pre-headline */}
-              <div className="inline-block bg-secondary/20 border border-secondary rounded-full px-3 py-1 mb-2">
-                <span className="text-secondary font-bold text-xs md:text-sm">💎 چالش ۱۰ روزه ۵ زبان قدرت</span>
+              <div className="inline-block bg-[#9b59b6]/20 border border-[#9b59b6] rounded-full px-3 py-1 mb-2">
+                <span className="text-[#9b59b6] font-bold text-xs md:text-sm">💎 چالش ۱۰ روزه ۵ زبان قدرت</span>
               </div>
 
               {/* Main Headline */}
@@ -187,22 +187,22 @@ const Five = () => {
 
               {/* Value Prop - One Line */}
               <p className="text-xs md:text-sm text-gray-600 mb-4 max-w-2xl mx-auto">
-                شامل <span className="text-secondary font-semibold">۵ فایل آموزشی (۵ خلاء قدرت زنان)</span> و 
-                <span className="text-secondary font-semibold"> ۵ فایل میکرواکت</span>
+                شامل <span className="text-[#9b59b6] font-semibold">۵ فایل آموزشی (۵ خلاء قدرت زنان)</span> و 
+                <span className="text-[#9b59b6] font-semibold"> ۵ فایل میکرواکت</span>
               </p>
 
               {/* Compact Price Box - Side by Side */}
-              <div className="bg-gradient-to-br from-secondary/20 to-secondary/10 backdrop-blur-md border-2 border-secondary rounded-xl p-3 md:p-4 mb-3 max-w-sm mx-auto">
+              <div className="bg-gradient-to-br from-[#9b59b6]/20 to-[#9b59b6]/10 backdrop-blur-md border-2 border-[#9b59b6] rounded-xl p-3 md:p-4 mb-3 max-w-sm mx-auto">
                 <div className="flex items-center justify-center gap-4 mb-1.5">
-                  <span className="text-4xl md:text-5xl font-bold text-secondary">$1</span>
+                  <span className="text-4xl md:text-5xl font-bold text-[#9b59b6]">$1</span>
                   <div className="text-right">
                     <div className="text-gray-500 line-through text-base md:text-lg">$100</div>
-                    <div className="bg-[#FF6B6B] text-white px-2 py-0.5 rounded-full text-[10px] font-bold">
+                    <div className="bg-[#9b59b6] text-white px-2 py-0.5 rounded-full text-[10px] font-bold">
                       ۹۹٪ تخفیف
                     </div>
                   </div>
                 </div>
-                <p className="text-[#FF6B6B] font-bold text-xs">
+                <p className="text-[#9b59b6] font-bold text-xs">
                   ⚠️ فقط ۱۰۰۰ نفر اول
                 </p>
               </div>
@@ -210,7 +210,7 @@ const Five = () => {
               {/* Primary CTA */}
               <Button
                 onClick={() => setShowRegistrationForm(true)}
-                className="w-full md:w-auto px-8 md:px-12 py-4 md:py-5 text-base md:text-lg font-bold bg-gradient-to-r from-secondary to-secondary-light hover:brightness-110 text-white rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_40px_rgba(16,185,129,0.6)] transform hover:scale-105 transition-all duration-300 mb-2.5 animate-pulse"
+                className="w-full md:w-auto px-8 md:px-12 py-4 md:py-5 text-base md:text-lg font-bold bg-gradient-to-r from-[#9b59b6] to-[#8e44ad] hover:brightness-110 text-white rounded-xl shadow-[0_0_30px_rgba(155,89,182,0.4)] hover:shadow-[0_0_40px_rgba(155,89,182,0.6)] transform hover:scale-105 transition-all duration-300 mb-2.5 animate-pulse"
               >
                 🚀 ثبت نام فوری با $1
               </Button>
@@ -218,15 +218,15 @@ const Five = () => {
               {/* Trust Indicators - Inline */}
               <div className="flex flex-wrap items-center justify-center gap-3 text-gray-600 text-[10px]">
                 <div className="flex items-center gap-1">
-                  <Shield className="w-3 h-3 text-secondary" />
+                  <Shield className="w-3 h-3 text-[#9b59b6]" />
                   <span>پرداخت امن</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Users className="w-3 h-3 text-secondary" />
+                  <Users className="w-3 h-3 text-[#9b59b6]" />
                   <span>264K+ زن</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Star className="w-3 h-3 text-secondary fill-secondary" />
+                  <Star className="w-3 h-3 text-[#9b59b6] fill-[#9b59b6]" />
                   <span>4.9/5</span>
                 </div>
               </div>
@@ -255,14 +255,14 @@ const Five = () => {
                   return (
                     <div 
                       key={index}
-                      className="bg-gray-50 border border-secondary/20 rounded-lg p-2.5 hover:border-secondary transition-all group text-right shadow-sm"
+                      className="bg-gray-50 border border-[#9b59b6]/20 rounded-lg p-2.5 hover:border-[#9b59b6] transition-all group text-right shadow-sm"
                     >
                       <div className="flex items-start gap-1.5">
-                        <div className="bg-secondary rounded p-1.5 group-hover:scale-110 transition-transform flex-shrink-0">
+                        <div className="bg-[#9b59b6] rounded p-1.5 group-hover:scale-110 transition-transform flex-shrink-0">
                           <Icon className="w-3 h-3 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-xs font-bold text-secondary mb-0.5 leading-tight">
+                          <h3 className="text-xs font-bold text-[#9b59b6] mb-0.5 leading-tight">
                             {module.title}
                           </h3>
                           <p className="text-gray-600 text-[10px] leading-snug">
@@ -275,11 +275,11 @@ const Five = () => {
                 })}
 
                 {/* CTA Card in 6th Grid Spot */}
-                <div className="bg-gradient-to-br from-secondary/25 to-secondary/15 border border-secondary rounded-lg p-2.5 flex flex-col items-center justify-center text-center hover:scale-105 transition-all cursor-pointer"
+                <div className="bg-gradient-to-br from-[#9b59b6]/25 to-[#9b59b6]/15 border border-[#9b59b6] rounded-lg p-2.5 flex flex-col items-center justify-center text-center hover:scale-105 transition-all cursor-pointer"
                   onClick={() => setShowRegistrationForm(true)}
                 >
-                  <Sparkles className="w-6 h-6 text-secondary mb-1 animate-pulse" />
-                  <p className="text-secondary font-bold text-xs mb-0.5">
+                  <Sparkles className="w-6 h-6 text-[#9b59b6] mb-1 animate-pulse" />
+                  <p className="text-[#9b59b6] font-bold text-xs mb-0.5">
                     همین الان
                   </p>
                   <p className="text-gray-700 text-[10px]">
@@ -315,16 +315,16 @@ const Five = () => {
                 ))}
               </div>
 
-              <div className="bg-gradient-to-r from-secondary/20 via-secondary/25 to-secondary/20 border border-secondary rounded-lg p-4 text-center">
-                <p className="text-lg md:text-xl font-bold text-secondary mb-1.5">
+              <div className="bg-gradient-to-r from-[#9b59b6]/20 via-[#9b59b6]/25 to-[#9b59b6]/20 border border-[#9b59b6] rounded-lg p-4 text-center">
+                <p className="text-lg md:text-xl font-bold text-[#9b59b6] mb-1.5">
                   ✨ خبر خوب: قابل تغییر است!
                 </p>
                 <p className="text-gray-700 text-xs md:text-sm mb-3">
-                  با «چالش ۵ زبان قدرت»، این خلاءها را <span className="text-secondary font-bold">پر کن</span>
+                  با «چالش ۵ زبان قدرت»، این خلاءها را <span className="text-[#9b59b6] font-bold">پر کن</span>
                 </p>
                 <Button
                   onClick={() => setShowRegistrationForm(true)}
-                  className="px-6 py-2.5 text-sm font-bold bg-secondary hover:brightness-110 text-white rounded-lg transform hover:scale-105 transition-all"
+                  className="px-6 py-2.5 text-sm font-bold bg-[#9b59b6] hover:brightness-110 text-white rounded-lg transform hover:scale-105 transition-all"
                 >
                   ✅ می‌خواهم این تغییر را تجربه کنم
                 </Button>
@@ -338,14 +338,14 @@ const Five = () => {
           <div className="container mx-auto px-4 flex items-center justify-between gap-3 max-w-lg">
             <div className="text-right">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-secondary">$1</span>
+                <span className="text-2xl font-bold text-[#9b59b6]">$1</span>
                 <span className="text-gray-400 line-through text-sm">$100</span>
               </div>
               <p className="text-[10px] text-gray-600">فقط ۱۰۰۰ نفر اول</p>
             </div>
             <Button
               onClick={() => setShowRegistrationForm(true)}
-              className="flex-1 py-3 text-sm font-bold bg-gradient-to-r from-secondary to-secondary-light hover:brightness-110 text-white rounded-lg shadow-lg animate-pulse"
+              className="flex-1 py-3 text-sm font-bold bg-gradient-to-r from-[#9b59b6] to-[#8e44ad] hover:brightness-110 text-white rounded-lg shadow-lg animate-pulse"
             >
               🚀 ثبت نام فوری
             </Button>
@@ -358,19 +358,19 @@ const Five = () => {
 
       {/* Enhanced Registration Modal */}
       <Dialog open={showRegistrationForm} onOpenChange={setShowRegistrationForm}>
-        <DialogContent className="sm:max-w-md bg-luxury-white border-4 border-secondary shadow-2xl">
+        <DialogContent className="sm:max-w-md bg-white border-4 border-[#9b59b6] shadow-2xl">
           <DialogHeader className="text-center">
-            <DialogTitle className="text-2xl md:text-3xl font-bold text-luxury-black mb-2 font-farsi">
+            <DialogTitle className="text-xl md:text-2xl font-bold text-gray-900 mb-2 font-farsi">
               💎 ثبت نام Five language of Empowered woman !
             </DialogTitle>
             <DialogDescription className="sr-only">
               Register for the Five language of Empowered woman program
             </DialogDescription>
-            <div className="bg-gradient-to-r from-secondary/20 via-secondary/30 to-secondary/20 border-2 border-secondary rounded-xl p-3 mb-2">
-              <p className="text-secondary font-bold text-xl md:text-2xl">
+            <div className="bg-gradient-to-r from-[#9b59b6]/20 via-[#9b59b6]/30 to-[#9b59b6]/20 border-2 border-[#9b59b6] rounded-xl p-3 mb-2">
+              <p className="text-[#9b59b6] font-bold text-xl md:text-2xl">
                 فقط $1
               </p>
-              <p className="text-luxury-accent/70 font-farsi text-xs">
+              <p className="text-gray-600 font-farsi text-xs">
                 1000 نفر اول • قیمت اصلی: $100
               </p>
             </div>
@@ -378,7 +378,7 @@ const Five = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4 mt-2">
             <div className="space-y-2">
-              <Label htmlFor="modal-name" className="text-left block text-luxury-black font-medium text-sm">
+              <Label htmlFor="modal-name" className="text-left block text-gray-900 font-medium text-sm">
                 Your Name
               </Label>
               <Input
@@ -388,7 +388,7 @@ const Five = () => {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your Name"
                 required
-                className="text-left h-11 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
+                className="text-left h-11 border-2 border-[#9b59b6]/30 focus:border-[#9b59b6] bg-white"
                 dir="ltr"
               />
               {validationErrors.name && (
@@ -397,7 +397,7 @@ const Five = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="modal-email" className="text-left block text-luxury-black font-medium text-sm">
+              <Label htmlFor="modal-email" className="text-left block text-gray-900 font-medium text-sm">
                 Your Email
               </Label>
               <Input
@@ -407,7 +407,7 @@ const Five = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your.email@example.com"
                 required
-                className="text-left h-11 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
+                className="text-left h-11 border-2 border-[#9b59b6]/30 focus:border-[#9b59b6] bg-white"
                 dir="ltr"
               />
               {validationErrors.email && (
@@ -417,7 +417,7 @@ const Five = () => {
 
             <Button
               type="submit"
-              className="w-full h-12 text-lg font-bold bg-gradient-to-r from-secondary to-secondary-light hover:from-secondary-light hover:to-secondary text-luxury-white font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow border-2 border-secondary-light"
+              className="w-full h-12 text-lg font-bold bg-gradient-to-r from-[#9b59b6] to-[#8e44ad] hover:brightness-110 text-white font-farsi transition-all duration-300 transform hover:scale-105 shadow-lg"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'در حال ارسال...' : '✅ پرداخت $1'}
@@ -425,17 +425,17 @@ const Five = () => {
           </form>
 
           <div className="mt-3">
-            <div className="flex items-center justify-center gap-4 text-luxury-accent/70 text-[10px]">
+            <div className="flex items-center justify-center gap-4 text-gray-600 text-[10px]">
               <div className="flex items-center gap-1">
-                <Shield className="w-3 h-3 text-secondary" />
+                <Shield className="w-3 h-3 text-[#9b59b6]" />
                 <span>امن</span>
               </div>
               <div className="flex items-center gap-1">
-                <Lock className="w-3 h-3 text-secondary" />
+                <Lock className="w-3 h-3 text-[#9b59b6]" />
                 <span>SSL</span>
               </div>
               <div className="flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3 text-secondary" />
+                <CheckCircle2 className="w-3 h-3 text-[#9b59b6]" />
                 <span>ضمانت</span>
               </div>
             </div>
