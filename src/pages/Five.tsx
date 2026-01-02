@@ -358,7 +358,7 @@ const Five = () => {
 
       {/* Enhanced Registration Modal */}
       <Dialog open={showRegistrationForm} onOpenChange={setShowRegistrationForm}>
-        <DialogContent className="sm:max-w-md bg-white border-2 border-secondary shadow-2xl rounded-xl">
+        <DialogContent className="sm:max-w-md bg-white border-2 border-emerald-500 shadow-2xl rounded-xl">
           <DialogHeader className="text-center">
             <DialogTitle className="text-xl md:text-2xl font-bold text-gray-900 mb-2 font-farsi">
               💎 ثبت نام چالش ۵ زبان قدرت
@@ -366,8 +366,8 @@ const Five = () => {
             <DialogDescription className="sr-only">
               Register for the Five language of Empowered woman program
             </DialogDescription>
-            <div className="bg-gradient-to-r from-secondary/15 via-secondary/25 to-secondary/15 border border-secondary rounded-lg p-3 mb-2">
-              <p className="text-secondary font-bold text-xl md:text-2xl">
+            <div className="bg-gradient-to-r from-emerald-500/15 via-emerald-500/25 to-emerald-500/15 border border-emerald-500 rounded-lg p-3 mb-2">
+              <p className="text-emerald-600 font-bold text-xl md:text-2xl">
                 فقط $1
               </p>
               <p className="text-gray-600 font-farsi text-xs">
@@ -388,7 +388,7 @@ const Five = () => {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your Name"
                 required
-                className="text-left h-11 border border-gray-300 focus:border-secondary focus:ring-secondary bg-white rounded-lg"
+                className="text-left h-11 border border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 bg-white rounded-lg"
                 dir="ltr"
               />
               {validationErrors.name && (
@@ -407,7 +407,7 @@ const Five = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your.email@example.com"
                 required
-                className="text-left h-11 border border-gray-300 focus:border-secondary focus:ring-secondary bg-white rounded-lg"
+                className="text-left h-11 border border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 bg-white rounded-lg"
                 dir="ltr"
               />
               {validationErrors.email && (
@@ -417,7 +417,7 @@ const Five = () => {
 
             <Button
               type="submit"
-              className="w-full h-12 text-lg font-bold bg-gradient-to-r from-secondary to-secondary-light hover:brightness-110 text-white font-farsi transition-all duration-300 transform hover:scale-105 shadow-lg rounded-lg"
+              className="w-full h-12 text-lg font-bold bg-gradient-to-r from-emerald-500 to-emerald-400 hover:brightness-110 text-white font-farsi transition-all duration-300 transform hover:scale-105 shadow-lg rounded-lg"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'در حال ارسال...' : '✅ پرداخت $1'}
@@ -427,15 +427,15 @@ const Five = () => {
           <div className="mt-3">
             <div className="flex items-center justify-center gap-4 text-gray-500 text-[10px]">
               <div className="flex items-center gap-1">
-                <Shield className="w-3 h-3 text-secondary" />
+                <Shield className="w-3 h-3 text-emerald-500" />
                 <span>امن</span>
               </div>
               <div className="flex items-center gap-1">
-                <Lock className="w-3 h-3 text-secondary" />
+                <Lock className="w-3 h-3 text-emerald-500" />
                 <span>SSL</span>
               </div>
               <div className="flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3 text-secondary" />
+                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
                 <span>ضمانت</span>
               </div>
             </div>
