@@ -234,47 +234,6 @@ const Five = () => {
           </div>
         </div>
 
-        {/* Compact Problem Section */}
-        <div className="bg-gray-50 py-8">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 text-center">
-                آیا این چالش‌ها را تجربه می‌کنی؟
-              </h2>
-              
-              <div className="grid grid-cols-2 gap-2 mb-4">
-                {[
-                  "😔 شنیده نمی‌شوی",
-                  "😰 از لهجه خجالت",
-                  "🤐 نمی‌دانی «نه» بگویی",
-                  "😞 دیده نمی‌شوی"
-                ].map((problem, index) => (
-                  <div 
-                    key={index}
-                    className="bg-white border border-gray-200 rounded-lg p-2.5 text-gray-700 text-xs text-right shadow-sm"
-                  >
-                    {problem}
-                  </div>
-                ))}
-              </div>
-
-              <div className="bg-gradient-to-r from-secondary/20 via-secondary/25 to-secondary/20 border border-secondary rounded-lg p-4 text-center">
-                <p className="text-lg md:text-xl font-bold text-secondary mb-1.5">
-                  ✨ خبر خوب: قابل تغییر است!
-                </p>
-                <p className="text-gray-700 text-xs md:text-sm mb-3">
-                  با «کلاس قدرت دو زبانه»، زبان را به <span className="text-secondary font-bold">ابزار قدرت</span> تبدیل کن
-                </p>
-                <Button
-                  onClick={() => setShowRegistrationForm(true)}
-                  className="px-6 py-2.5 text-sm font-bold bg-secondary hover:brightness-110 text-white rounded-lg transform hover:scale-105 transition-all"
-                >
-                  ✅ می‌خواهم این تغییر را تجربه کنم
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Compact 5 Modules - Tight Grid Layout */}
         <div className="py-6 bg-white">
@@ -332,6 +291,69 @@ const Five = () => {
           </div>
         </div>
 
+        {/* Problem Section - Moved to Bottom */}
+        <div className="bg-gray-50 py-8">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 text-center">
+                آیا این خلاءها را احساس می‌کنی؟
+              </h2>
+              
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {[
+                  "😔 افکار منفی رهایت نمی‌کنند",
+                  "😰 نگرش محدودکننده داری",
+                  "🤐 ارتباطاتت ضعیف است",
+                  "😞 سبک زندگی‌ات را دوست نداری"
+                ].map((problem, index) => (
+                  <div 
+                    key={index}
+                    className="bg-white border border-gray-200 rounded-lg p-2.5 text-gray-700 text-xs text-right shadow-sm"
+                  >
+                    {problem}
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-gradient-to-r from-secondary/20 via-secondary/25 to-secondary/20 border border-secondary rounded-lg p-4 text-center">
+                <p className="text-lg md:text-xl font-bold text-secondary mb-1.5">
+                  ✨ خبر خوب: قابل تغییر است!
+                </p>
+                <p className="text-gray-700 text-xs md:text-sm mb-3">
+                  با «چالش ۵ زبان قدرت»، این خلاءها را <span className="text-secondary font-bold">پر کن</span>
+                </p>
+                <Button
+                  onClick={() => setShowRegistrationForm(true)}
+                  className="px-6 py-2.5 text-sm font-bold bg-secondary hover:brightness-110 text-white rounded-lg transform hover:scale-105 transition-all"
+                >
+                  ✅ می‌خواهم این تغییر را تجربه کنم
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sticky Buy Button */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-3 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+          <div className="container mx-auto px-4 flex items-center justify-between gap-3 max-w-lg">
+            <div className="text-right">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold text-secondary">$1</span>
+                <span className="text-gray-400 line-through text-sm">$100</span>
+              </div>
+              <p className="text-[10px] text-gray-600">فقط ۱۰۰۰ نفر اول</p>
+            </div>
+            <Button
+              onClick={() => setShowRegistrationForm(true)}
+              className="flex-1 py-3 text-sm font-bold bg-gradient-to-r from-secondary to-secondary-light hover:brightness-110 text-white rounded-lg shadow-lg animate-pulse"
+            >
+              🚀 ثبت نام فوری
+            </Button>
+          </div>
+        </div>
+
+        {/* Spacer for sticky button */}
+        <div className="h-20"></div>
       </div>
 
       {/* Enhanced Registration Modal */}
