@@ -239,7 +239,7 @@ const Five = () => {
         <div className="py-6 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-4">
+              <div className="text-center mb-4" dir="rtl">
                 <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1.5">
                   🌿 ۵ خلاء قدرت زنان
                 </h2>
@@ -366,12 +366,12 @@ const Five = () => {
             <DialogDescription className="sr-only">
               Register for the Five language of Empowered woman program
             </DialogDescription>
-            <div className="bg-gradient-to-r from-emerald-500/15 via-emerald-500/25 to-emerald-500/15 border border-emerald-500 rounded-lg p-3 mb-2">
+            <div className="bg-gradient-to-r from-emerald-500/15 via-emerald-500/25 to-emerald-500/15 border border-emerald-500 rounded-lg p-3 mb-2" dir="rtl">
               <p className="text-emerald-600 font-bold text-xl md:text-2xl">
-                فقط $1
+                فقط <span dir="ltr">$1</span>
               </p>
               <p className="text-gray-600 font-farsi text-xs">
-                1000 نفر اول • قیمت اصلی: $100
+                ۱۰۰۰ نفر اول • قیمت اصلی: <span dir="ltr">$100</span>
               </p>
             </div>
           </DialogHeader>
