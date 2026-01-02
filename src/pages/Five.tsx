@@ -175,13 +175,16 @@ const Five = () => {
               </p>
 
               {/* Video */}
-              <div className="mb-4 max-w-2xl mx-auto">
+              <div className="mb-4 max-w-md mx-auto">
                 <video 
                   src="/videos/five-promo.mp4"
                   controls
+                  autoPlay
+                  loop
+                  muted
                   playsInline
                   className="w-full rounded-lg shadow-lg"
-                  poster=""
+                  poster="/videos/five-promo-poster.jpg"
                 >
                   Your browser does not support the video tag.
                 </video>
