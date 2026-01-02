@@ -63,6 +63,22 @@ const Five = () => {
     setIsSubmitting(true);
 
     try {
+      // Save lead BEFORE payment - enables abandoned cart follow-up
+      const { error: leadError } = await supabase
+        .from('form_submissions')
+        .insert({
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+          phone: '',
+          city: '',
+          source: 'five_challenge_registration'
+        });
+      
+      if (leadError) {
+        console.error('Lead capture error:', leadError);
+        // Don't block payment - just log the error
+      }
+
       // Create payment session - Mailchimp will be called after successful payment
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke('create-payment', {
         body: {
