@@ -5,12 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Lock, CheckCircle2, Clock, Users, Star, Sparkles, Brain, MessageCircle, Globe, Mic, Zap, Heart } from "lucide-react";
-import CountdownTimer from "@/components/CountdownTimer";
+import { Shield, Lock, CheckCircle2, Clock, Users, Star, Sparkles, Brain, MessageCircle, Globe, Mic, Zap } from "lucide-react";
 import SpotCounter from "@/components/SpotCounter";
-import TestimonialsSection from "@/components/TestimonialsSection";
-import FAQSection from "@/components/FAQSection";
-import InstructorBio from "@/components/InstructorBio";
 
 import RecentRegistrations from "@/components/RecentRegistrations";
 import { SEOHead } from "@/components/SEOHead";
@@ -127,7 +123,7 @@ const Five = () => {
       />
       <RecentRegistrations />
       
-      <div className="one-page-green min-h-screen bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#1E293B] font-farsi">
+      <div className="one-page-green min-h-screen bg-white font-farsi">
         {/* Compact Hero Section */}
         <div className="relative overflow-hidden pb-8">
           {/* Animated Green Glow */}
@@ -143,12 +139,12 @@ const Five = () => {
                 {/* First Row: PST Time */}
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-secondary" />
-                  <span className="text-white font-bold text-sm" dir="ltr">
+                  <span className="text-gray-900 font-bold text-sm" dir="ltr">
                     Jan 12 • 10:30 AM PST
                   </span>
                 </div>
                 {/* Second Row: Local Time */}
-                <div className="text-xs text-white/80" dir="ltr">
+                <div className="text-xs text-gray-700" dir="ltr">
                   Your time: {new Date('2026-01-12T10:30:00-08:00').toLocaleString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -169,20 +165,15 @@ const Five = () => {
               </div>
 
               {/* Main Headline */}
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-1.5 leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-1.5 leading-tight">
                 Five language of Empowered woman
               </h1>
-              
-              {/* Persian Title */}
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary mb-2 leading-tight">
-                پنج زبان زن توانمند
-              </h2>
 
               {/* Video */}
               <div className="mb-4 max-w-2xl mx-auto">
                 <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
                   <iframe 
-                    src="https://player.vimeo.com/video/1151060154?badge=0&autopause=0&muted=0&player_id=0&app_id=58479" 
+                    src="https://player.vimeo.com/video/1151062416?badge=0&autopause=0&muted=0&player_id=0&app_id=58479"
                     frameBorder="0" 
                     allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
                     referrerPolicy="strict-origin-when-cross-origin" 
@@ -195,7 +186,7 @@ const Five = () => {
               </div>
 
               {/* Value Prop - One Line */}
-              <p className="text-xs md:text-sm text-[#94A3B8] mb-4 max-w-2xl mx-auto">
+              <p className="text-xs md:text-sm text-gray-600 mb-4 max-w-2xl mx-auto">
                 یاد بگیر <span className="text-secondary font-semibold">در هر زبانی خودت باشی</span> و 
                 با <span className="text-secondary font-semibold">اعتماد‌به‌نفس کامل</span> بدرخشی
               </p>
@@ -205,7 +196,7 @@ const Five = () => {
                 <div className="flex items-center justify-center gap-4 mb-1.5">
                   <span className="text-4xl md:text-5xl font-bold text-secondary">$1</span>
                   <div className="text-right">
-                    <div className="text-[#94A3B8] line-through text-base md:text-lg">$100</div>
+                    <div className="text-gray-500 line-through text-base md:text-lg">$100</div>
                     <div className="bg-[#FF6B6B] text-white px-2 py-0.5 rounded-full text-[10px] font-bold">
                       ۹۹٪ تخفیف
                     </div>
@@ -225,7 +216,7 @@ const Five = () => {
               </Button>
 
               {/* Trust Indicators - Inline */}
-              <div className="flex flex-wrap items-center justify-center gap-3 text-[#94A3B8] text-[10px]">
+              <div className="flex flex-wrap items-center justify-center gap-3 text-gray-600 text-[10px]">
                 <div className="flex items-center gap-1">
                   <Shield className="w-3 h-3 text-secondary" />
                   <span>پرداخت امن</span>
@@ -244,10 +235,10 @@ const Five = () => {
         </div>
 
         {/* Compact Problem Section */}
-        <div className="bg-white/5 backdrop-blur-sm py-8">
+        <div className="bg-gray-50 py-8">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-xl md:text-2xl font-bold text-white mb-4 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 text-center">
                 آیا این چالش‌ها را تجربه می‌کنی؟
               </h2>
               
@@ -260,7 +251,7 @@ const Five = () => {
                 ].map((problem, index) => (
                   <div 
                     key={index}
-                    className="bg-white/5 border border-[#334155] rounded-lg p-2.5 text-[#E2E8F0] text-xs text-right"
+                    className="bg-white border border-gray-200 rounded-lg p-2.5 text-gray-700 text-xs text-right shadow-sm"
                   >
                     {problem}
                   </div>
@@ -271,7 +262,7 @@ const Five = () => {
                 <p className="text-lg md:text-xl font-bold text-secondary mb-1.5">
                   ✨ خبر خوب: قابل تغییر است!
                 </p>
-                <p className="text-[#E2E8F0] text-xs md:text-sm mb-3">
+                <p className="text-gray-700 text-xs md:text-sm mb-3">
                   با «کلاس قدرت دو زبانه»، زبان را به <span className="text-secondary font-bold">ابزار قدرت</span> تبدیل کن
                 </p>
                 <Button
@@ -286,14 +277,14 @@ const Five = () => {
         </div>
 
         {/* Compact 5 Modules - Tight Grid Layout */}
-        <div className="py-6 bg-gradient-to-b from-transparent to-white/5">
+        <div className="py-6 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-4">
-                <h2 className="text-xl md:text-2xl font-bold text-white mb-1.5">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1.5">
                   🌿 در کلاس قدرت دو زبانه چه یاد می‌گیری؟
                 </h2>
-                <p className="text-[#94A3B8] text-xs">
+                <p className="text-gray-600 text-xs">
                   5 زبان قدرت که زندگی‌ات را متحول می‌کند
                 </p>
               </div>
@@ -305,7 +296,7 @@ const Five = () => {
                   return (
                     <div 
                       key={index}
-                      className="bg-white/5 backdrop-blur-sm border border-secondary/20 rounded-lg p-2.5 hover:border-secondary transition-all group text-right"
+                      className="bg-gray-50 border border-secondary/20 rounded-lg p-2.5 hover:border-secondary transition-all group text-right shadow-sm"
                     >
                       <div className="flex items-start gap-1.5">
                         <div className="bg-secondary rounded p-1.5 group-hover:scale-110 transition-transform flex-shrink-0">
@@ -315,7 +306,7 @@ const Five = () => {
                           <h3 className="text-xs font-bold text-secondary mb-0.5 leading-tight">
                             {module.title}
                           </h3>
-                          <p className="text-[#94A3B8] text-[10px] leading-snug">
+                          <p className="text-gray-600 text-[10px] leading-snug">
                             {module.desc}
                           </p>
                         </div>
@@ -332,7 +323,7 @@ const Five = () => {
                   <p className="text-secondary font-bold text-xs mb-0.5">
                     همین الان
                   </p>
-                  <p className="text-white/90 text-[10px]">
+                  <p className="text-gray-700 text-[10px]">
                     فقط $1
                   </p>
                 </div>
@@ -341,100 +332,6 @@ const Five = () => {
           </div>
         </div>
 
-        {/* Social Proof - Compact */}
-        <div className="py-6">
-          <TestimonialsSection />
-        </div>
-
-        {/* Instructor - Compact */}
-        <InstructorBio />
-
-        {/* FAQ - Compact */}
-        <FAQSection />
-
-        {/* Final CTA - Compact & Powerful */}
-        <div className="bg-gradient-to-br from-secondary/20 via-secondary/15 to-transparent py-8">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-xl md:text-2xl font-bold text-white mb-3">
-                ⏰ زمان تصمیم‌گیری رسیده
-              </h2>
-              
-              <div className="grid md:grid-cols-2 gap-2.5 mb-3">
-                {/* Take Action */}
-                <div className="bg-secondary/15 border border-secondary rounded-lg p-3">
-                  <div className="text-3xl mb-1">✅</div>
-                  <h3 className="text-base font-bold text-secondary mb-1">عمل کن</h3>
-                  <ul className="space-y-0.5 text-right text-[#E2E8F0] text-xs mb-1.5">
-                    <li>✨ 5 زبان قدرت</li>
-                    <li>💪 اعتماد‌به‌نفس کامل</li>
-                    <li>💰 فقط $1</li>
-                  </ul>
-                  <p className="text-secondary font-bold text-xs">
-                    = زندگی قدرتمندتر
-                  </p>
-                </div>
-
-                {/* Do Nothing */}
-                <div className="bg-white/5 border border-[#334155] rounded-lg p-3 opacity-70">
-                  <div className="text-3xl mb-1">❌</div>
-                  <h3 className="text-base font-bold text-white/70 mb-1">هیچ کاری نکن</h3>
-                  <ul className="space-y-0.5 text-right text-white/60 text-xs mb-1.5">
-                    <li>😔 شنیده نشوی</li>
-                    <li>😰 خجالت بکشی</li>
-                    <li>💸 بعداً $100</li>
-                  </ul>
-                  <p className="text-white/50 font-bold text-xs">
-                    = همان مشکلات
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-[#FF6B6B]/20 border border-[#FF6B6B] rounded-lg p-2.5 mb-3">
-                <p className="text-[#FF6B6B] font-bold text-sm mb-1.5">
-                  ⚠️ فقط چند جای خالی باقی!
-                </p>
-                <SpotCounter />
-              </div>
-
-              <Button
-                onClick={() => setShowRegistrationForm(true)}
-                className="w-full md:w-auto px-8 md:px-10 py-4 md:py-5 text-lg md:text-xl font-bold bg-gradient-to-r from-secondary to-secondary-light hover:brightness-110 text-white rounded-xl shadow-[0_0_40px_rgba(16,185,129,0.5)] transform hover:scale-105 transition-all mb-2.5"
-              >
-                🚀 بله! ثبت نام با $1
-              </Button>
-
-              <p className="text-[#94A3B8] text-xs">
-                ✓ پرداخت امن | ✓ ضمانت بازگشت وجه | ✓ دسترسی فوری
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Cleaner Sticky Bottom CTA */}
-        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-secondary to-secondary-light border-t border-secondary-light/30 p-2 z-50 backdrop-blur-md shadow-[0_-5px_30px_rgba(16,185,129,0.3)]">
-          <div className="container mx-auto max-w-4xl">
-            <div className="flex items-center justify-between gap-2">
-              <div className="text-right flex-1">
-                <p className="text-white font-bold text-xs md:text-sm leading-tight">
-                  فقط $1 • 73 جا باقی
-                </p>
-                <p className="text-white/90 text-[10px] md:text-xs leading-tight">
-                  بعدش $100 می‌شود
-                </p>
-              </div>
-              <Button
-                onClick={() => setShowRegistrationForm(true)}
-                className="px-4 md:px-8 py-2.5 md:py-3 text-sm md:text-base font-bold bg-[#1E293B] hover:bg-[#0F172A] text-secondary rounded-lg shadow-lg transform active:scale-95 transition-all flex-shrink-0"
-              >
-                🚀 ثبت نام
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Add padding at bottom to prevent content being hidden by sticky CTA */}
-        <div className="h-16"></div>
       </div>
 
       {/* Enhanced Registration Modal */}
