@@ -358,19 +358,19 @@ const Five = () => {
 
       {/* Enhanced Registration Modal */}
       <Dialog open={showRegistrationForm} onOpenChange={setShowRegistrationForm}>
-        <DialogContent className="sm:max-w-md bg-luxury-white border-4 border-secondary shadow-2xl">
+        <DialogContent className="sm:max-w-md bg-white border-2 border-secondary shadow-2xl rounded-xl">
           <DialogHeader className="text-center">
-            <DialogTitle className="text-2xl md:text-3xl font-bold text-luxury-black mb-2 font-farsi">
-              💎 ثبت نام Five language of Empowered woman !
+            <DialogTitle className="text-xl md:text-2xl font-bold text-gray-900 mb-2 font-farsi">
+              💎 ثبت نام چالش ۵ زبان قدرت
             </DialogTitle>
             <DialogDescription className="sr-only">
               Register for the Five language of Empowered woman program
             </DialogDescription>
-            <div className="bg-gradient-to-r from-secondary/20 via-secondary/30 to-secondary/20 border-2 border-secondary rounded-xl p-3 mb-2">
+            <div className="bg-gradient-to-r from-secondary/15 via-secondary/25 to-secondary/15 border border-secondary rounded-lg p-3 mb-2">
               <p className="text-secondary font-bold text-xl md:text-2xl">
                 فقط $1
               </p>
-              <p className="text-luxury-accent/70 font-farsi text-xs">
+              <p className="text-gray-600 font-farsi text-xs">
                 1000 نفر اول • قیمت اصلی: $100
               </p>
             </div>
@@ -378,7 +378,7 @@ const Five = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4 mt-2">
             <div className="space-y-2">
-              <Label htmlFor="modal-name" className="text-left block text-luxury-black font-medium text-sm">
+              <Label htmlFor="modal-name" className="text-left block text-gray-700 font-medium text-sm">
                 Your Name
               </Label>
               <Input
@@ -388,7 +388,7 @@ const Five = () => {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your Name"
                 required
-                className="text-left h-11 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
+                className="text-left h-11 border border-gray-300 focus:border-secondary focus:ring-secondary bg-white rounded-lg"
                 dir="ltr"
               />
               {validationErrors.name && (
@@ -397,7 +397,7 @@ const Five = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="modal-email" className="text-left block text-luxury-black font-medium text-sm">
+              <Label htmlFor="modal-email" className="text-left block text-gray-700 font-medium text-sm">
                 Your Email
               </Label>
               <Input
@@ -407,7 +407,7 @@ const Five = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your.email@example.com"
                 required
-                className="text-left h-11 border-2 border-luxury-accent/20 focus:border-secondary bg-luxury-white"
+                className="text-left h-11 border border-gray-300 focus:border-secondary focus:ring-secondary bg-white rounded-lg"
                 dir="ltr"
               />
               {validationErrors.email && (
@@ -417,7 +417,7 @@ const Five = () => {
 
             <Button
               type="submit"
-              className="w-full h-12 text-lg font-bold bg-gradient-to-r from-secondary to-secondary-light hover:from-secondary-light hover:to-secondary text-luxury-white font-farsi transition-all duration-300 transform hover:scale-105 shadow-glow border-2 border-secondary-light"
+              className="w-full h-12 text-lg font-bold bg-gradient-to-r from-secondary to-secondary-light hover:brightness-110 text-white font-farsi transition-all duration-300 transform hover:scale-105 shadow-lg rounded-lg"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'در حال ارسال...' : '✅ پرداخت $1'}
@@ -425,7 +425,7 @@ const Five = () => {
           </form>
 
           <div className="mt-3">
-            <div className="flex items-center justify-center gap-4 text-luxury-accent/70 text-[10px]">
+            <div className="flex items-center justify-center gap-4 text-gray-500 text-[10px]">
               <div className="flex items-center gap-1">
                 <Shield className="w-3 h-3 text-secondary" />
                 <span>امن</span>
