@@ -292,39 +292,48 @@ const Five = () => {
         </div>
 
         {/* Problem Section - Moved to Bottom */}
-        <div className="bg-gray-50 py-8">
+        <div className="py-6 bg-white">
           <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 text-center">
-                آیا این خلاءها را احساس می‌کنی؟
-              </h2>
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-4">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1.5">
+                  آیا این خلاءها را احساس می‌کنی؟
+                </h2>
+              </div>
               
               <div className="grid grid-cols-2 gap-2 mb-4">
                 {[
-                  "😔 افکار منفی رهایت نمی‌کنند",
-                  "😰 نگرش محدودکننده داری",
-                  "🤐 ارتباطاتت ضعیف است",
-                  "😞 سبک زندگی‌ات را دوست نداری"
+                  { emoji: "😔", text: "افکار منفی رهایت نمی‌کنند" },
+                  { emoji: "😰", text: "نگرش محدودکننده داری" },
+                  { emoji: "🤐", text: "ارتباطاتت ضعیف است" },
+                  { emoji: "😞", text: "سبک زندگی‌ات را دوست نداری" }
                 ].map((problem, index) => (
                   <div 
                     key={index}
-                    className="bg-white border border-gray-200 rounded-lg p-2.5 text-gray-700 text-xs text-right shadow-sm"
+                    className="bg-gray-50 border border-secondary/20 rounded-lg p-2.5 hover:border-secondary transition-all group text-right shadow-sm"
                   >
-                    {problem}
+                    <div className="flex items-start gap-1.5">
+                      <div className="bg-secondary rounded p-1.5 group-hover:scale-110 transition-transform flex-shrink-0">
+                        <span className="text-xs">{problem.emoji}</span>
+                      </div>
+                      <p className="text-gray-600 text-[10px] leading-snug pt-1">
+                        {problem.text}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
 
-              <div className="bg-gradient-to-r from-secondary/20 via-secondary/25 to-secondary/20 border border-secondary rounded-lg p-4 text-center">
-                <p className="text-lg md:text-xl font-bold text-secondary mb-1.5">
+              <div className="bg-gradient-to-br from-secondary/25 to-secondary/15 border border-secondary rounded-lg p-2.5 text-center hover:scale-[1.02] transition-all">
+                <p className="text-sm md:text-base font-bold text-secondary mb-1">
                   ✨ خبر خوب: قابل تغییر است!
                 </p>
-                <p className="text-gray-700 text-xs md:text-sm mb-3">
+                <p className="text-gray-700 text-[10px] md:text-xs mb-2">
                   با «چالش ۵ زبان قدرت»، این خلاءها را <span className="text-secondary font-bold">پر کن</span>
                 </p>
                 <Button
                   onClick={() => setShowRegistrationForm(true)}
-                  className="px-6 py-2.5 text-sm font-bold bg-secondary hover:brightness-110 text-white rounded-lg transform hover:scale-105 transition-all"
+                  className="px-4 py-2 text-xs font-bold bg-secondary hover:brightness-110 text-white rounded-lg transform hover:scale-105 transition-all"
                 >
                   ✅ می‌خواهم این تغییر را تجربه کنم
                 </Button>
