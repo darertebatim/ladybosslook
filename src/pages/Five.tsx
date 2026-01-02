@@ -144,12 +144,12 @@ const Five = () => {
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-secondary" />
                   <span className="text-white font-bold text-sm" dir="ltr">
-                    Nov 22 • 9:30 AM PST
+                    Jan 18 • 9:30 AM PST
                   </span>
                 </div>
                 {/* Second Row: Local Time */}
                 <div className="text-xs text-white/80" dir="ltr">
-                  Your time: {new Date('2025-11-22T09:30:00-08:00').toLocaleString('en-US', {
+                  Your time: {new Date('2026-01-18T09:30:00-08:00').toLocaleString('en-US', {
                     month: 'short',
                     day: 'numeric',
                     hour: 'numeric',
@@ -182,7 +182,7 @@ const Five = () => {
               <div className="mb-4 max-w-2xl mx-auto">
                 <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
                   <iframe 
-                    src="https://player.vimeo.com/video/1136585470?badge=0&autopause=0&muted=0&player_id=0&app_id=58479" 
+                    src="https://player.vimeo.com/video/1151060154?badge=0&autopause=0&muted=0&player_id=0&app_id=58479" 
                     frameBorder="0" 
                     allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
                     referrerPolicy="strict-origin-when-cross-origin" 
