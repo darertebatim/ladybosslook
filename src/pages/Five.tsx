@@ -144,12 +144,12 @@ const Five = () => {
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-secondary" />
                   <span className="text-white font-bold text-sm" dir="ltr">
-                    Jan 18 • 9:30 AM PST
+                    Jan 12 • 10:30 AM PST
                   </span>
                 </div>
                 {/* Second Row: Local Time */}
                 <div className="text-xs text-white/80" dir="ltr">
-                  Your time: {new Date('2026-01-18T09:30:00-08:00').toLocaleString('en-US', {
+                  Your time: {new Date('2026-01-12T10:30:00-08:00').toLocaleString('en-US', {
                     month: 'short',
                     day: 'numeric',
                     hour: 'numeric',
