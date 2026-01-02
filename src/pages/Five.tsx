@@ -98,11 +98,11 @@ const Five = () => {
   };
 
   const modules = [
-    { icon: Brain, title: "زبان درونی قدرت", desc: "طرز فکر، گفت‌وگو با خودت و بازنویسی روایت‌های منفی" },
-    { icon: MessageCircle, title: "زبان بیرونی قدرت", desc: "ساختار جملات قاطع، نه گفتن بدون گناه، حرف زدن با اعتماد‌به‌نفس" },
-    { icon: Globe, title: "زبان فرهنگی", desc: "تفاوت دو فرهنگ، آداب گفت‌وگو و assertiveness در محیط چندفرهنگی" },
-    { icon: Mic, title: "زبان حضور", desc: "تن صدای محکم و آرام، زبان بدن قدرتمند، حضور فیزیکی و ذهنی" },
-    { icon: Zap, title: "زبان تأثیر", desc: "storytelling، گفت‌وگوهای اعتمادساز، ساختن رابطه و فرصت با زبان" }
+    { icon: Brain, title: "خلاء قدرت اول", desc: "مدیریت افکار" },
+    { icon: MessageCircle, title: "خلاء قدرت دوم", desc: "نگرش" },
+    { icon: Globe, title: "خلاء قدرت سوم", desc: "ارتباطات" },
+    { icon: Mic, title: "خلاء قدرت چهارم", desc: "لایف استایل" },
+    { icon: Zap, title: "خلاء قدرت پنجم", desc: "زبان پول" }
   ];
 
   return (
@@ -161,7 +161,7 @@ const Five = () => {
             <div className="max-w-4xl mx-auto text-center">
               {/* Pre-headline */}
               <div className="inline-block bg-secondary/20 border border-secondary rounded-full px-3 py-1 mb-2">
-                <span className="text-secondary font-bold text-xs md:text-sm">💎 پنج زبان زن توانمند</span>
+                <span className="text-secondary font-bold text-xs md:text-sm">💎 چالش ۱۰ روزه ۵ زبان قدرت</span>
               </div>
 
               {/* Main Headline */}
@@ -187,8 +187,8 @@ const Five = () => {
 
               {/* Value Prop - One Line */}
               <p className="text-xs md:text-sm text-gray-600 mb-4 max-w-2xl mx-auto">
-                یاد بگیر <span className="text-secondary font-semibold">در هر زبانی خودت باشی</span> و 
-                با <span className="text-secondary font-semibold">اعتماد‌به‌نفس کامل</span> بدرخشی
+                شامل <span className="text-secondary font-semibold">۵ فایل آموزشی (۵ خلاء قدرت زنان)</span> و 
+                <span className="text-secondary font-semibold"> ۵ فایل میکرواکت</span>
               </p>
 
               {/* Compact Price Box - Side by Side */}
@@ -282,10 +282,10 @@ const Five = () => {
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-4">
                 <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1.5">
-                  🌿 در کلاس قدرت دو زبانه چه یاد می‌گیری؟
+                  🌿 ۵ خلاء قدرت زنان
                 </h2>
                 <p className="text-gray-600 text-xs">
-                  5 زبان قدرت که زندگی‌ات را متحول می‌کند
+                  ۵ فایل آموزشی + ۵ فایل میکرواکت
                 </p>
               </div>
 
