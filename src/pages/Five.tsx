@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Lock, CheckCircle2, Clock, Users, Star, Sparkles, Brain, MessageCircle, Globe, Mic, Zap } from "lucide-react";
+import { Shield, Lock, CheckCircle2, Clock, Users, Star, Sparkles, Brain, MessageCircle, Globe, Mic, Zap, Play } from "lucide-react";
 import SpotCounter from "@/components/SpotCounter";
 
 import RecentRegistrations from "@/components/RecentRegistrations";
@@ -19,6 +19,8 @@ const Five = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -175,19 +177,34 @@ const Five = () => {
               </p>
 
               {/* Video */}
-              <div className="mb-4 mx-auto" style={{ maxWidth: '250px' }}>
+              <div className="mb-4 mx-auto relative" style={{ maxWidth: '250px' }}>
                 <video 
+                  ref={videoRef}
                   src="/videos/five-promo.mp4"
                   controls
-                  autoPlay
-                  loop
-                  muted
                   playsInline
                   className="w-full rounded-lg shadow-lg"
                   poster="/videos/five-promo-poster.jpg"
+                  onPlay={() => setIsVideoPlaying(true)}
+                  onPause={() => setIsVideoPlaying(false)}
+                  onEnded={() => setIsVideoPlaying(false)}
                 >
                   Your browser does not support the video tag.
                 </video>
+                {!isVideoPlaying && (
+                  <button
+                    onClick={() => {
+                      if (videoRef.current) {
+                        videoRef.current.play();
+                      }
+                    }}
+                    className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg cursor-pointer hover:bg-black/40 transition-colors"
+                  >
+                    <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                      <Play className="w-8 h-8 text-secondary fill-secondary ml-1" />
+                    </div>
+                  </button>
+                )}
               </div>
 
               {/* Value Prop - One Line */}
