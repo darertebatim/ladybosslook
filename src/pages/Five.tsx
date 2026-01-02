@@ -176,18 +176,15 @@ const Five = () => {
 
               {/* Video */}
               <div className="mb-4 max-w-2xl mx-auto">
-                <div style={{ padding: '56.25% 0 0 0', position: 'relative' }}>
-                  <iframe 
-                    src="https://player.vimeo.com/video/1151062416?badge=0&autopause=0&muted=0&player_id=0&app_id=58479"
-                    frameBorder="0" 
-                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
-                    referrerPolicy="strict-origin-when-cross-origin" 
-                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                    title="Bilingual Power Class"
-                    className="rounded-lg shadow-lg"
-                  />
-                </div>
-                <script src="https://player.vimeo.com/api/player.js"></script>
+                <video 
+                  src="/videos/five-promo.mp4"
+                  controls
+                  playsInline
+                  className="w-full rounded-lg shadow-lg"
+                  poster=""
+                >
+                  Your browser does not support the video tag.
+                </video>
               </div>
 
               {/* Value Prop - One Line */}
