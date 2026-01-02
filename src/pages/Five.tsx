@@ -165,9 +165,14 @@ const Five = () => {
               </div>
 
               {/* Main Headline */}
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-1.5 leading-tight">
-                Five language of Empowered woman
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-1.5 leading-tight whitespace-nowrap">
+                Five languages of Empowered woman
               </h1>
+
+              {/* Persian Question Above Video */}
+              <p className="text-lg md:text-xl font-bold text-gray-800 mb-3" dir="rtl">
+                در چالش ۱۰ روزه زن قوی چه خبره؟
+              </p>
 
               {/* Video */}
               <div className="mb-4 max-w-2xl mx-auto">
