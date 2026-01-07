@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Check, MessageCircle, Sparkles, Calendar, Users, Gift, Mail } from "lucide-react";
@@ -11,6 +12,8 @@ const EWPlus = () => {
   const [emailError, setEmailError] = useState("");
   const [isLoadingMonthly, setIsLoadingMonthly] = useState(false);
   const [isLoadingFull, setIsLoadingFull] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [selectedPaymentType, setSelectedPaymentType] = useState<'monthly' | 'full'>('monthly');
   const isSubmittingRef = useRef(false);
 
   // Prevent accidental navigation during payment processing
@@ -27,13 +30,13 @@ const EWPlus = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
 
-  const validateEmail = (email: string): boolean => {
+  const validateEmail = (emailValue: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim()) {
+    if (!emailValue.trim()) {
       setEmailError("لطفاً ایمیل خود را وارد کنید");
       return false;
     }
-    if (!emailRegex.test(email.trim())) {
+    if (!emailRegex.test(emailValue.trim())) {
       setEmailError("لطفاً یک ایمیل معتبر وارد کنید");
       return false;
     }
@@ -41,22 +44,51 @@ const EWPlus = () => {
     return true;
   };
 
-  const handleMonthlyPayment = async () => {
+  const handlePaymentClick = (type: 'monthly' | 'full') => {
+    setSelectedPaymentType(type);
+    setEmailError("");
+    setShowEmailModal(true);
+  };
+
+  const handleModalSubmit = async () => {
     if (!validateEmail(email)) return;
     
     // Immediate lock to prevent double-clicks
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
-    setIsLoadingMonthly(true);
+    
+    if (selectedPaymentType === 'monthly') {
+      setIsLoadingMonthly(true);
+    } else {
+      setIsLoadingFull(true);
+    }
     
     try {
       const trimmedEmail = email.trim().toLowerCase();
-      const idempotencyKey = `ewplus-monthly-${trimmedEmail}`;
+      
+      // Save lead BEFORE payment - enables abandoned cart follow-up
+      const { error: leadError } = await supabase
+        .from('form_submissions')
+        .insert({
+          name: '',
+          email: trimmedEmail,
+          phone: '',
+          city: '',
+          source: 'ewplus_registration'
+        });
+      
+      if (leadError) {
+        console.error('Lead capture error:', leadError);
+        // Don't block payment - just log the error
+      }
+      
+      const idempotencyKey = `ewplus-${selectedPaymentType}-${trimmedEmail}`;
       
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: { 
           program: 'ewpluscoaching',
           email: trimmedEmail,
+          ...(selectedPaymentType === 'full' && { paymentOption: 'full' }),
           idempotencyKey 
         }
       });
@@ -67,47 +99,6 @@ const EWPlus = () => {
         toast.error('شما یک پرداخت در حال انتظار دارید. لطفاً چند دقیقه صبر کنید.');
         isSubmittingRef.current = false;
         setIsLoadingMonthly(false);
-        return;
-      }
-      
-      if (data?.url) {
-        window.location.href = data.url;
-        return;
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      toast.error('خطا در اتصال به درگاه پرداخت');
-      isSubmittingRef.current = false;
-      setIsLoadingMonthly(false);
-    }
-  };
-
-  const handleFullPayment = async () => {
-    if (!validateEmail(email)) return;
-    
-    // Immediate lock to prevent double-clicks
-    if (isSubmittingRef.current) return;
-    isSubmittingRef.current = true;
-    setIsLoadingFull(true);
-    
-    try {
-      const trimmedEmail = email.trim().toLowerCase();
-      const idempotencyKey = `ewplus-full-${trimmedEmail}`;
-      
-      const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { 
-          program: 'ewpluscoaching', 
-          paymentOption: 'full',
-          email: trimmedEmail,
-          idempotencyKey 
-        }
-      });
-
-      if (error) throw error;
-      
-      if (data?.error === 'duplicate_detected') {
-        toast.error('شما یک پرداخت در حال انتظار دارید. لطفاً چند دقیقه صبر کنید.');
-        isSubmittingRef.current = false;
         setIsLoadingFull(false);
         return;
       }
@@ -120,6 +111,7 @@ const EWPlus = () => {
       console.error('Payment error:', error);
       toast.error('خطا در اتصال به درگاه پرداخت');
       isSubmittingRef.current = false;
+      setIsLoadingMonthly(false);
       setIsLoadingFull(false);
     }
   };
@@ -180,27 +172,6 @@ const EWPlus = () => {
           </ul>
         </Card>
 
-        {/* Email Input */}
-        <Card className="p-6 mb-6 border-border/50">
-          <div className="flex items-center gap-2 mb-3">
-            <Mail className="h-5 w-5 text-primary" />
-            <label className="font-medium text-foreground">ایمیل شما</label>
-          </div>
-          <Input
-            type="email"
-            placeholder="example@email.com"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (emailError) setEmailError("");
-            }}
-            className="text-left ltr"
-            dir="ltr"
-          />
-          {emailError && (
-            <p className="text-sm text-destructive mt-2">{emailError}</p>
-          )}
-        </Card>
 
         {/* Monthly Payment Card (Primary) */}
         <Card className="p-6 mb-4 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
@@ -227,20 +198,13 @@ const EWPlus = () => {
             </p>
 
             <Button
-              onClick={handleMonthlyPayment}
+              onClick={() => handlePaymentClick('monthly')}
               disabled={isProcessing}
               size="lg"
               className="w-full py-6 text-lg font-bold"
               style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
             >
-              {isLoadingMonthly ? (
-                <>
-                  <Loader2 className="ml-2 h-5 w-5 animate-spin" />
-                  در حال اتصال...
-                </>
-              ) : (
-                "شروع عضویت ماهانه"
-              )}
+              شروع عضویت ماهانه
             </Button>
             
             <p className="text-xs text-muted-foreground mt-3">
@@ -280,21 +244,14 @@ const EWPlus = () => {
             </p>
 
             <Button
-              onClick={handleFullPayment}
+              onClick={() => handlePaymentClick('full')}
               disabled={isProcessing}
               variant="outline"
               size="lg"
               className="w-full py-6 text-lg font-bold border-orange-500/30 hover:bg-orange-500/10"
               style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
             >
-              {isLoadingFull ? (
-                <>
-                  <Loader2 className="ml-2 h-5 w-5 animate-spin" />
-                  در حال اتصال...
-                </>
-              ) : (
-                "پرداخت یکجا"
-              )}
+              پرداخت یکجا
             </Button>
           </div>
         </Card>
@@ -312,6 +269,60 @@ const EWPlus = () => {
           </Button>
         </div>
       </div>
+
+      {/* Email Collection Modal */}
+      <Dialog open={showEmailModal} onOpenChange={setShowEmailModal}>
+        <DialogContent className="font-[Vazirmatn] max-w-md" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Mail className="h-5 w-5 text-primary" />
+                ایمیل خود را وارد کنید
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <Input
+              type="email"
+              placeholder="example@email.com"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError) setEmailError("");
+              }}
+              className="text-left ltr text-lg py-6"
+              dir="ltr"
+              disabled={isProcessing}
+            />
+            {emailError && (
+              <p className="text-sm text-destructive text-center">{emailError}</p>
+            )}
+            
+            <Button
+              onClick={handleModalSubmit}
+              disabled={isProcessing}
+              size="lg"
+              className="w-full py-6 text-lg font-bold"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="ml-2 h-5 w-5 animate-spin" />
+                  در حال اتصال...
+                </>
+              ) : (
+                "ادامه به پرداخت"
+              )}
+            </Button>
+            
+            <p className="text-xs text-muted-foreground text-center">
+              {selectedPaymentType === 'monthly' 
+                ? 'پرداخت ماهانه $۱۹۹' 
+                : 'پرداخت یکجا $۱,۱۹۴'}
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
