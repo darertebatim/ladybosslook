@@ -201,15 +201,18 @@ export function StaffPermissionsManager() {
           description: `${selectedUser.email} is no longer an admin`
         });
       } else {
-        // Grant admin role
-        await supabase
+        // Grant admin role - use insert (not upsert) since unique is on (user_id, role)
+        const { error: insertError } = await supabase
           .from('user_roles')
-          .upsert({ 
+          .insert({ 
             user_id: selectedUser.id, 
             role: 'admin' 
-          }, { 
-            onConflict: 'user_id' 
           });
+        
+        if (insertError) {
+          console.error('Insert admin role error:', insertError);
+          throw insertError;
+        }
         
         // Clear page permissions since admin has full access
         await supabase
