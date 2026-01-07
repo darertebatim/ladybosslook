@@ -384,6 +384,41 @@ Implement a robust native iOS push notification system to keep users engaged wit
 - Analytics tracking per step
 - A/B testing different flows
 
+### 3.4 Universal Links & Deep Linking
+**Priority: MEDIUM**
+
+**Current State:**
+- Deep linking only works from push notification taps
+- App links opened in browser go to Safari instead of the app
+- No `apple-app-site-association` (AASA) file configured on domain
+
+**Planned Features:**
+
+**🔗 Universal Links Setup**
+- Add AASA file to domain (backend change - no app update needed)
+- Configure Associated Domains in Xcode (requires App Store update)
+- Add URL listener in app using `App.addListener('appUrlOpen', ...)`
+
+**📱 Link Types to Support:**
+- `/app/*` routes → Open in app
+- `/app/courses` → Navigate to courses list
+- `/app/course/:slug` → Open specific course
+- `/app/profile` → Open profile
+- Marketing links (optional) → Open landing pages
+
+**✅ Requirements:**
+- Backend: Add `/.well-known/apple-app-site-association` file to domain
+- Native: Add Associated Domains capability in Xcode
+- Native: Implement URL handling with Capacitor App plugin
+- **App Store Update Required: YES**
+
+**Implementation Steps:**
+1. Create and host AASA file on domain
+2. Add Associated Domains in Xcode project (`applinks:ladybosslook.com`)
+3. Implement `appUrlOpen` listener for URL routing in NativeAppLayout
+4. Test with `npx uri-scheme open` command
+5. Submit app update to App Store
+
 ---
 
 ## 📊 Phase 4: Analytics & Business Intelligence
