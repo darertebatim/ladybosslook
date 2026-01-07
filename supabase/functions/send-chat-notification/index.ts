@@ -158,21 +158,15 @@ const handler = async (req: Request): Promise<Response> => {
       : messageContent;
 
     if (senderType === 'user') {
-      // User sent a message - notify admins + staff with support permission
+      // User sent a message - notify all admins
       const { data: adminRoles } = await supabase
         .from('user_roles')
         .select('user_id')
         .eq('role', 'admin');
 
-      const { data: supportStaff } = await supabase
-        .from('user_admin_permissions')
-        .select('user_id')
-        .eq('page_slug', 'support');
-
-      // Combine and deduplicate
-      const adminIds = adminRoles?.map(r => r.user_id) || [];
-      const supportIds = supportStaff?.map(s => s.user_id) || [];
-      targetUserIds = [...new Set([...adminIds, ...supportIds])];
+      if (adminRoles) {
+        targetUserIds = adminRoles.map(r => r.user_id);
+      }
 
       // Get user's name
       const { data: senderProfile } = await supabase
