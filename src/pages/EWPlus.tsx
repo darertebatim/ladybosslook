@@ -135,137 +135,131 @@ const EWPlus = () => {
         </div>
       )}
 
-      <div className="container mx-auto px-4 py-12 max-w-2xl">
+      <div className="container mx-auto px-4 py-6 max-w-3xl">
         {/* Header */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
-            <Sparkles className="h-4 w-4" />
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-xs font-medium mb-2">
+            <Sparkles className="h-3 w-3" />
             ویژه فارغ‌التحصیلان EWC
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
             EWPLUS Coaching
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             ۹ ماه کوچینگ پیشرفته برای رشد مستمر
           </p>
         </div>
 
-        {/* Benefits */}
-        <Card className="p-6 mb-8 bg-card/50 backdrop-blur border-border/50">
-          <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-            <Users className="h-5 w-5 text-primary" />
-            مزایای عضویت
-          </h2>
-          <ul className="space-y-3">
-            {[
-              "جلسات گروهی هفتگی با رازیه",
-              "پشتیبانی اختصاصی در تلگرام",
-              "دسترسی به محتوای آموزشی جدید",
-              "شبکه‌سازی با سایر فارغ‌التحصیلان",
-              "تخفیف ویژه برای دوره‌های آینده"
-            ].map((benefit, index) => (
-              <li key={index} className="flex items-center gap-3 text-foreground">
-                <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                <span>{benefit}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
+        {/* Payment Cards - Side by side on desktop */}
+        <div className="grid md:grid-cols-2 gap-4 mb-6">
+          {/* Monthly Payment Card (Primary) */}
+          <Card className="p-4 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                <span className="text-muted-foreground text-sm font-medium">پرداخت ماهانه</span>
+              </div>
+              
+              {/* Savings highlight */}
+              <div className="inline-flex items-center gap-1 bg-green-500/10 text-green-600 px-3 py-1 rounded-full text-xs font-medium mb-3">
+                $۱۰۰ تخفیف ماهانه
+              </div>
 
+              {/* Price comparison */}
+              <div className="flex items-baseline justify-center gap-2 mb-1">
+                <span className="text-lg text-muted-foreground line-through">$299</span>
+                <span className="text-3xl font-bold text-primary">$199</span>
+                <span className="text-muted-foreground text-sm">/ماه</span>
+              </div>
+              
+              <p className="text-xs text-muted-foreground mb-4">
+                ۹ ماه × $۱۹۹ = $۱,۷۹۱
+              </p>
 
-        {/* Monthly Payment Card (Primary) */}
-        <Card className="p-6 mb-4 border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Calendar className="h-5 w-5 text-primary" />
-              <span className="text-muted-foreground font-medium">پرداخت ماهانه</span>
+              <Button
+                onClick={() => handlePaymentClick('monthly')}
+                disabled={isProcessing}
+                size="lg"
+                className="w-full py-5 text-base font-bold"
+                style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
+              >
+                شروع عضویت ماهانه
+              </Button>
+              
+              <p className="text-[10px] text-muted-foreground mt-2">
+                پس از ۹ ماه خودکار متوقف می‌شود
+              </p>
             </div>
-            
-            {/* Savings highlight */}
-            <div className="inline-flex items-center gap-2 bg-green-500/10 text-green-600 px-4 py-2 rounded-full text-sm font-medium mb-4">
-              $۱۰۰ تخفیف ماهانه ویژه فارغ‌التحصیلان EWC
+          </Card>
+
+          {/* One-Time Full Payment Card */}
+          <Card className="p-4 border border-border/50 bg-card/30">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Gift className="h-4 w-4 text-orange-500" />
+                <span className="text-muted-foreground text-sm font-medium">پرداخت یکجا</span>
+              </div>
+              
+              {/* Free months highlight */}
+              <div className="inline-flex items-center gap-1 bg-orange-500/10 text-orange-600 px-3 py-1 rounded-full text-xs font-medium mb-3">
+                🎁 ۳ ماه رایگان!
+              </div>
+
+              {/* Price comparison */}
+              <div className="flex items-baseline justify-center gap-2 mb-1">
+                <span className="text-lg text-muted-foreground line-through">$1,791</span>
+                <span className="text-3xl font-bold text-orange-600">$1,194</span>
+              </div>
+              
+              <p className="text-xs text-green-600 font-medium mb-4">
+                صرفه‌جویی $۵۹۷
+              </p>
+
+              <Button
+                onClick={() => handlePaymentClick('full')}
+                disabled={isProcessing}
+                variant="outline"
+                size="lg"
+                className="w-full py-5 text-base font-bold border-orange-500/30 hover:bg-orange-500/10"
+                style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
+              >
+                پرداخت یکجا
+              </Button>
             </div>
-
-            {/* Price comparison */}
-            <div className="flex items-baseline justify-center gap-3 mb-2">
-              <span className="text-2xl text-muted-foreground line-through">$299</span>
-              <span className="text-4xl font-bold text-primary">$199</span>
-              <span className="text-muted-foreground">/ماه</span>
-            </div>
-            
-            <p className="text-sm text-muted-foreground mb-6">
-              ۹ ماه × $۱۹۹ = مجموع $۱,۷۹۱
-            </p>
-
-            <Button
-              onClick={() => handlePaymentClick('monthly')}
-              disabled={isProcessing}
-              size="lg"
-              className="w-full py-6 text-lg font-bold"
-              style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
-            >
-              شروع عضویت ماهانه
-            </Button>
-            
-            <p className="text-xs text-muted-foreground mt-3">
-              اشتراک پس از ۹ ماه به‌صورت خودکار متوقف می‌شود
-            </p>
-          </div>
-        </Card>
-
-        {/* Divider */}
-        <div className="flex items-center gap-4 my-6">
-          <div className="flex-1 h-px bg-border"></div>
-          <span className="text-muted-foreground text-sm font-medium">یا</span>
-          <div className="flex-1 h-px bg-border"></div>
+          </Card>
         </div>
 
-        {/* One-Time Full Payment Card (Secondary) */}
-        <Card className="p-6 mb-8 border border-border/50 bg-card/30">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Gift className="h-5 w-5 text-orange-500" />
-              <span className="text-muted-foreground font-medium">پرداخت یکجا</span>
-            </div>
-            
-            {/* Free months highlight */}
-            <div className="inline-flex items-center gap-2 bg-orange-500/10 text-orange-600 px-4 py-2 rounded-full text-sm font-medium mb-4">
-              🎁 ۳ ماه رایگان!
-            </div>
-
-            {/* Price comparison */}
-            <div className="flex items-baseline justify-center gap-3 mb-2">
-              <span className="text-xl text-muted-foreground line-through">$1,791</span>
-              <span className="text-3xl font-bold text-orange-600">$1,194</span>
-            </div>
-            
-            <p className="text-sm text-green-600 font-medium mb-6">
-              صرفه‌جویی $۵۹۷
-            </p>
-
-            <Button
-              onClick={() => handlePaymentClick('full')}
-              disabled={isProcessing}
-              variant="outline"
-              size="lg"
-              className="w-full py-6 text-lg font-bold border-orange-500/30 hover:bg-orange-500/10"
-              style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
-            >
-              پرداخت یکجا
-            </Button>
+        {/* Benefits - Compact */}
+        <Card className="p-4 mb-4 bg-card/50 backdrop-blur border-border/50">
+          <div className="flex items-center gap-2 mb-3">
+            <Users className="h-4 w-4 text-primary" />
+            <span className="font-bold text-foreground text-sm">مزایای عضویت</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            {[
+              "جلسات گروهی هفتگی",
+              "پشتیبانی تلگرام",
+              "محتوای آموزشی جدید",
+              "شبکه‌سازی با دیگران"
+            ].map((benefit, index) => (
+              <div key={index} className="flex items-center gap-1.5 text-foreground">
+                <Check className="h-3 w-3 text-green-500 flex-shrink-0" />
+                <span>{benefit}</span>
+              </div>
+            ))}
           </div>
         </Card>
 
         {/* Telegram Support */}
         <div className="text-center">
-          <p className="text-muted-foreground mb-3">سوالی دارید؟</p>
           <Button
-            variant="outline"
+            variant="ghost"
+            size="sm"
             onClick={handleTelegram}
-            className="font-[Vazirmatn]"
+            className="font-[Vazirmatn] text-muted-foreground"
           >
-            <MessageCircle className="ml-2 h-5 w-5" />
-            پشتیبانی تلگرام
+            <MessageCircle className="ml-2 h-4 w-4" />
+            سوالی دارید؟ پشتیبانی تلگرام
           </Button>
         </div>
       </div>
