@@ -782,8 +782,8 @@ const AppCourseDetail = () => {
                     </Button>
                   )}
 
-                  {/* Join Google Meet - Web only */}
-                  {!isNativeApp() && round.google_meet_link && (
+                  {/* Join Google Meet */}
+                  {round.google_meet_link && (
                     <Button 
                       variant="secondary" 
                       size="lg" 
@@ -795,8 +795,8 @@ const AppCourseDetail = () => {
                     </Button>
                   )}
 
-                  {/* Access Google Drive - Web only */}
-                  {!isNativeApp() && round.google_drive_link && (
+                  {/* Access Google Drive */}
+                  {round.google_drive_link && (
                     <Button 
                       variant="outline" 
                       size="lg" 
