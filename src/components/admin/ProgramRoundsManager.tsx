@@ -640,7 +640,7 @@ export const ProgramRoundsManager = () => {
                     </TableCell>
                     <TableCell>{round.round_name}</TableCell>
                     <TableCell>#{round.round_number}</TableCell>
-                    <TableCell>{format(new Date(round.start_date), 'MMM d, yyyy')}</TableCell>
+                    <TableCell>{format(new Date(round.start_date + 'T00:00:00'), 'MMM d, yyyy')}</TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(round.status)}`}>
                         {round.status}
