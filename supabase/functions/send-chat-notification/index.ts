@@ -158,14 +158,16 @@ const handler = async (req: Request): Promise<Response> => {
       : messageContent;
 
     if (senderType === 'user') {
-      // User sent a message - notify all admins
-      const { data: adminRoles } = await supabase
-        .from('user_roles')
+      // User sent a message - notify users with support_notifications permission
+      const { data: notificationRecipients } = await supabase
+        .from('user_admin_permissions')
         .select('user_id')
-        .eq('role', 'admin');
+        .eq('page_slug', 'support_notifications');
 
-      if (adminRoles) {
-        targetUserIds = adminRoles.map(r => r.user_id);
+      if (notificationRecipients && notificationRecipients.length > 0) {
+        targetUserIds = notificationRecipients.map(r => r.user_id);
+      } else {
+        console.log('No users have support_notifications permission enabled');
       }
 
       // Get user's name

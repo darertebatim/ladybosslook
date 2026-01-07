@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Shield, User, UserCog, Loader2, ChevronRight } from 'lucide-react';
+import { Search, Shield, User, UserCog, Loader2, ChevronRight, Bell } from 'lucide-react';
 
 const ADMIN_PAGES = [
   { slug: 'overview', label: 'Overview' },
@@ -302,8 +302,60 @@ export function StaffPermissionsManager() {
 
   const getPermissionLabels = (permissions: string[]) => {
     return permissions
+      .filter(slug => slug !== 'support_notifications')
       .map(slug => ADMIN_PAGES.find(p => p.slug === slug)?.label || slug)
       .join(', ');
+  };
+
+  const hasNotificationPermission = (permissions: string[]) => {
+    return permissions.includes('support_notifications');
+  };
+
+  const handleToggleNotifications = async () => {
+    if (!selectedUser) return;
+    
+    setSaving(true);
+    try {
+      const hasPermission = selectedUser.permissions.includes('support_notifications');
+      
+      if (hasPermission) {
+        await supabase
+          .from('user_admin_permissions')
+          .delete()
+          .eq('user_id', selectedUser.id)
+          .eq('page_slug', 'support_notifications');
+        
+        setSelectedUser({
+          ...selectedUser,
+          permissions: selectedUser.permissions.filter(p => p !== 'support_notifications')
+        });
+      } else {
+        await supabase
+          .from('user_admin_permissions')
+          .insert({ user_id: selectedUser.id, page_slug: 'support_notifications' });
+        
+        setSelectedUser({
+          ...selectedUser,
+          permissions: [...selectedUser.permissions, 'support_notifications']
+        });
+      }
+      
+      toast({
+        title: "Notification setting updated",
+        description: hasPermission ? 'Will no longer receive chat notifications' : 'Will now receive chat notifications'
+      });
+      
+      fetchStaffList();
+    } catch (error) {
+      console.error('Toggle notifications error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update notification setting",
+        variant: "destructive"
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -360,6 +412,9 @@ export function StaffPermissionsManager() {
                         {staff.full_name || 'No name'}
                       </p>
                       {getRoleBadge(staff)}
+                      {hasNotificationPermission(staff.permissions) && (
+                        <Bell className="h-3.5 w-3.5 text-amber-500" />
+                      )}
                     </div>
                     <p className="text-sm text-muted-foreground truncate">
                       {staff.email}
@@ -402,6 +457,25 @@ export function StaffPermissionsManager() {
                   id="admin-toggle"
                   checked={selectedUser.isAdmin}
                   onCheckedChange={handleToggleAdmin}
+                  disabled={saving}
+                />
+              </div>
+
+              {/* Notification Settings */}
+              <div className="flex items-center justify-between border-t pt-4">
+                <div>
+                  <Label htmlFor="notifications-toggle" className="font-medium flex items-center gap-2">
+                    <Bell className="h-4 w-4 text-amber-500" />
+                    Receive Support Notifications
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Get push notifications when users send support messages
+                  </p>
+                </div>
+                <Switch
+                  id="notifications-toggle"
+                  checked={selectedUser.permissions.includes('support_notifications')}
+                  onCheckedChange={handleToggleNotifications}
                   disabled={saving}
                 />
               </div>
