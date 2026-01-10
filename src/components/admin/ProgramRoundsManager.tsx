@@ -20,8 +20,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays, ListChecks, Copy } from "lucide-react";
+import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays, ListChecks, Copy, Pause, FastForward } from "lucide-react";
 import { SessionsManager } from "./SessionsManager";
 import { format } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
@@ -44,6 +52,7 @@ interface ProgramRound {
   whatsapp_support_number: string | null;
   audio_playlist_id: string | null;
   video_url: string | null;
+  drip_offset_days: number;
 }
 
 interface RoundFormData {
@@ -70,6 +79,12 @@ export const ProgramRoundsManager = () => {
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [managingSessionsRound, setManagingSessionsRound] = useState<ProgramRound | null>(null);
+  
+  // Drip adjustment dialog state
+  const [adjustingDripRound, setAdjustingDripRound] = useState<ProgramRound | null>(null);
+  const [dripAdjustmentType, setDripAdjustmentType] = useState<'freeze' | 'forward'>('freeze');
+  const [dripAdjustmentDays, setDripAdjustmentDays] = useState<string>('7');
+  
   const [formData, setFormData] = useState<RoundFormData>({
     program_slug: "",
     round_name: "",
@@ -202,6 +217,39 @@ export const ProgramRoundsManager = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["program-rounds"] });
       toast.success("Round deleted");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  // Update drip offset mutation
+  const updateDripOffsetMutation = useMutation({
+    mutationFn: async ({ roundId, offsetChange }: { roundId: string; offsetChange: number }) => {
+      // Get current offset
+      const { data: round, error: fetchError } = await supabase
+        .from('program_rounds')
+        .select('drip_offset_days')
+        .eq('id', roundId)
+        .single();
+      
+      if (fetchError) throw fetchError;
+      
+      const currentOffset = round?.drip_offset_days || 0;
+      const newOffset = currentOffset + offsetChange;
+      
+      const { error } = await supabase
+        .from('program_rounds')
+        .update({ drip_offset_days: newOffset })
+        .eq('id', roundId);
+      
+      if (error) throw error;
+      return newOffset;
+    },
+    onSuccess: (newOffset) => {
+      queryClient.invalidateQueries({ queryKey: ['program-rounds'] });
+      toast.success(`Drip offset updated to ${newOffset >= 0 ? '+' : ''}${newOffset} days`);
+      setAdjustingDripRound(null);
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -628,6 +676,7 @@ export const ProgramRoundsManager = () => {
                   <TableHead>Number</TableHead>
                   <TableHead>Start Date</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Drip Offset</TableHead>
                   <TableHead>Resources</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -645,6 +694,45 @@ export const ProgramRoundsManager = () => {
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(round.status)}`}>
                         {round.status}
                       </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm font-medium ${
+                          (round.drip_offset_days || 0) > 0 ? 'text-orange-600' : 
+                          (round.drip_offset_days || 0) < 0 ? 'text-green-600' : 
+                          'text-muted-foreground'
+                        }`}>
+                          {(round.drip_offset_days || 0) >= 0 ? '+' : ''}{round.drip_offset_days || 0}d
+                        </span>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => {
+                              setAdjustingDripRound(round);
+                              setDripAdjustmentType('freeze');
+                              setDripAdjustmentDays('7');
+                            }}
+                            title="Freeze drip (delay all tracks)"
+                          >
+                            <Pause className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => {
+                              setAdjustingDripRound(round);
+                              setDripAdjustmentType('forward');
+                              setDripAdjustmentDays('1');
+                            }}
+                            title="Forward drip (release earlier)"
+                          >
+                            <FastForward className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
@@ -710,6 +798,69 @@ export const ProgramRoundsManager = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Drip Adjustment Dialog */}
+      <Dialog open={!!adjustingDripRound} onOpenChange={() => setAdjustingDripRound(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {dripAdjustmentType === 'freeze' ? 'Freeze Drip Schedule' : 'Forward Drip Schedule'}
+            </DialogTitle>
+            <DialogDescription>
+              {dripAdjustmentType === 'freeze' 
+                ? 'Delay all track unlocks for this round. Use during holidays or breaks.'
+                : 'Release tracks earlier than scheduled. Tracks will unlock sooner.'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="flex items-center gap-3">
+              <Label>Days to {dripAdjustmentType === 'freeze' ? 'delay' : 'advance'}:</Label>
+              <Input
+                type="number"
+                min="1"
+                max="30"
+                value={dripAdjustmentDays}
+                onChange={(e) => setDripAdjustmentDays(e.target.value)}
+                className="w-20"
+              />
+            </div>
+            
+            <p className="text-sm text-muted-foreground">
+              Current offset: {(adjustingDripRound?.drip_offset_days || 0) >= 0 ? '+' : ''}
+              {adjustingDripRound?.drip_offset_days || 0} days
+            </p>
+            
+            <p className="text-sm text-muted-foreground">
+              New offset will be: {(() => {
+                const current = adjustingDripRound?.drip_offset_days || 0;
+                const days = parseInt(dripAdjustmentDays) || 0;
+                const newOffset = dripAdjustmentType === 'freeze' ? current + days : current - days;
+                return `${newOffset >= 0 ? '+' : ''}${newOffset} days`;
+              })()}
+            </p>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAdjustingDripRound(null)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                const days = parseInt(dripAdjustmentDays) || 0;
+                const change = dripAdjustmentType === 'freeze' ? days : -days;
+                updateDripOffsetMutation.mutate({ 
+                  roundId: adjustingDripRound!.id, 
+                  offsetChange: change 
+                });
+              }}
+              disabled={updateDripOffsetMutation.isPending}
+            >
+              {dripAdjustmentType === 'freeze' ? 'Freeze' : 'Forward'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

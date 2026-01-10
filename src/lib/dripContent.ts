@@ -2,10 +2,14 @@ import { differenceInDays, differenceInHours } from "date-fns";
 
 /**
  * Calculate the availability status and countdown text for a drip content track
+ * @param dripDelayDays - Days after round start when the track becomes available
+ * @param roundStartDate - The start date of the round (YYYY-MM-DD format)
+ * @param roundDripOffset - Additional offset days (positive = delay/freeze, negative = release earlier)
  */
 export function getTrackAvailabilityWithCountdown(
   dripDelayDays: number,
-  roundStartDate: string | null | undefined
+  roundStartDate: string | null | undefined,
+  roundDripOffset: number = 0
 ): {
   isAvailable: boolean;
   availableDate: Date | null;
@@ -18,7 +22,8 @@ export function getTrackAvailabilityWithCountdown(
 
   const roundStart = new Date(roundStartDate + 'T00:00:00');
   const availableDate = new Date(roundStart);
-  availableDate.setDate(availableDate.getDate() + dripDelayDays);
+  // Include the round's drip offset in the calculation
+  availableDate.setDate(availableDate.getDate() + dripDelayDays + roundDripOffset);
   
   const now = new Date();
   const today = new Date();

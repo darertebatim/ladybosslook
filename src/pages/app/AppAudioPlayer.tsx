@@ -94,7 +94,7 @@ export default function AppAudioPlayer() {
     enabled: !!playlistInfo?.playlist_id,
   });
 
-  // Fetch user's round for drip content calculation
+  // Fetch user's round for drip content calculation (including drip_offset_days)
   const { data: userRound } = useQuery({
     queryKey: ['user-round-for-playlist', playlistInfo?.playlist_id],
     queryFn: async () => {
@@ -108,6 +108,7 @@ export default function AppAudioPlayer() {
           program_rounds!inner (
             id,
             start_date,
+            drip_offset_days,
             audio_playlist_id
           )
         `)
@@ -122,9 +123,13 @@ export default function AppAudioPlayer() {
     enabled: !!playlistInfo?.playlist_id,
   });
 
-  // Check if a track is available based on drip delay - now with countdown
+  // Check if a track is available based on drip delay - now with countdown and offset
   const getTrackAvailability = (dripDelayDays: number) => {
-    return getTrackAvailabilityWithCountdown(dripDelayDays, userRound?.start_date);
+    return getTrackAvailabilityWithCountdown(
+      dripDelayDays, 
+      userRound?.start_date,
+      userRound?.drip_offset_days || 0
+    );
   };
 
   // Fetch progress
