@@ -16,7 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { format, addDays } from "date-fns";
+import { getTrackAvailabilityWithCountdown } from "@/lib/dripContent";
 
 export default function AppAudioPlayer() {
   const { audioId } = useParams();
@@ -122,21 +122,9 @@ export default function AppAudioPlayer() {
     enabled: !!playlistInfo?.playlist_id,
   });
 
-  // Check if a track is available based on drip delay
+  // Check if a track is available based on drip delay - now with countdown
   const getTrackAvailability = (dripDelayDays: number) => {
-    if (!userRound?.start_date) {
-      return { isAvailable: true, availableDate: null };
-    }
-    
-    const roundStart = new Date(userRound.start_date + 'T00:00:00');
-    const availableDate = addDays(roundStart, dripDelayDays);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    return {
-      isAvailable: today >= availableDate,
-      availableDate: availableDate,
-    };
+    return getTrackAvailabilityWithCountdown(dripDelayDays, userRound?.start_date);
   };
 
   // Fetch progress
@@ -435,7 +423,7 @@ export default function AppAudioPlayer() {
                 </SheetHeader>
                 <div className="mt-4 space-y-2 overflow-y-auto h-[calc(70vh-80px)]">
                   {playlistTracks.map((track, index) => {
-                    const { isAvailable, availableDate } = getTrackAvailability(track.drip_delay_days || 0);
+                    const { isAvailable, countdownText } = getTrackAvailability(track.drip_delay_days || 0);
                     
                     return (
                       <button
@@ -462,9 +450,9 @@ export default function AppAudioPlayer() {
                             }`}>
                               {track.audio_content.title}
                             </p>
-                            {!isAvailable && availableDate && (
+                            {!isAvailable && countdownText && (
                               <p className="text-xs text-muted-foreground">
-                                Available {format(availableDate, 'MMM d, yyyy')}
+                                {countdownText}
                               </p>
                             )}
                           </div>
