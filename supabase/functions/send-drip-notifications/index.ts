@@ -23,13 +23,14 @@ Deno.serve(async (req) => {
     today.setHours(0, 0, 0, 0);
     const todayStr = today.toISOString().split('T')[0];
 
-    // Find all active rounds with playlists
+    // Find all active rounds with playlists (including drip_offset_days)
     const { data: activeRounds, error: roundsError } = await supabase
       .from('program_rounds')
       .select(`
         id,
-        name,
+        round_name,
         start_date,
+        drip_offset_days,
         audio_playlist_id,
         program_slug,
         audio_playlists (
@@ -50,13 +51,24 @@ Deno.serve(async (req) => {
     let notificationsSent = 0;
 
     for (const round of activeRounds || []) {
-      // Calculate days since round start
+      // Calculate days since round start, accounting for drip offset
       const roundStart = new Date(round.start_date + 'T00:00:00');
+      const dripOffset = round.drip_offset_days || 0;
       const daysSinceStart = Math.floor((today.getTime() - roundStart.getTime()) / (1000 * 60 * 60 * 24));
+      
+      // The effective day for drip content, accounting for freezes/forwards
+      // If drip_offset_days is +7, we're effectively 7 days behind, so subtract the offset
+      const effectiveDay = daysSinceStart - dripOffset;
 
-      console.log(`Round "${round.name}": ${daysSinceStart} days since start`);
+      console.log(`Round "${round.round_name}": ${daysSinceStart} days since start, offset: ${dripOffset}, effective day: ${effectiveDay}`);
 
-      // Find tracks that unlock today (drip_delay_days === daysSinceStart)
+      // Skip if effective day is negative (round hasn't effectively started yet due to freeze)
+      if (effectiveDay < 0) {
+        console.log(`Skipping round "${round.round_name}" - effective day is negative due to freeze`);
+        continue;
+      }
+
+      // Find tracks that unlock today (drip_delay_days === effectiveDay)
       const { data: unlockedTracks, error: tracksError } = await supabase
         .from('audio_playlist_items')
         .select(`
@@ -68,7 +80,7 @@ Deno.serve(async (req) => {
           )
         `)
         .eq('playlist_id', round.audio_playlist_id)
-        .eq('drip_delay_days', daysSinceStart);
+        .eq('drip_delay_days', effectiveDay);
 
       if (tracksError) {
         console.error('Error fetching tracks:', tracksError);
@@ -76,11 +88,11 @@ Deno.serve(async (req) => {
       }
 
       if (!unlockedTracks || unlockedTracks.length === 0) {
-        console.log(`No tracks unlocking today for round "${round.name}"`);
+        console.log(`No tracks unlocking today for round "${round.round_name}"`);
         continue;
       }
 
-      console.log(`${unlockedTracks.length} track(s) unlocking today for round "${round.name}"`);
+      console.log(`${unlockedTracks.length} track(s) unlocking today for round "${round.round_name}"`);
 
       // Get users enrolled in this round
       const { data: enrollments, error: enrollError } = await supabase
@@ -95,7 +107,7 @@ Deno.serve(async (req) => {
       }
 
       if (!enrollments || enrollments.length === 0) {
-        console.log(`No active enrollments for round "${round.name}"`);
+        console.log(`No active enrollments for round "${round.round_name}"`);
         continue;
       }
 
@@ -121,7 +133,7 @@ Deno.serve(async (req) => {
       // Send notifications
       for (const track of unlockedTracks) {
         const trackTitle = track.audio_content?.title || 'New Content';
-        const playlistName = round.audio_playlists?.name || round.name;
+        const playlistName = round.audio_playlists?.name || round.round_name;
 
         // Call send-push-notification for each subscribed user
         for (const sub of subscriptions) {

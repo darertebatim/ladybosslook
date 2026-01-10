@@ -928,6 +928,7 @@ export type Database = {
         Row: {
           audio_playlist_id: string | null
           created_at: string
+          drip_offset_days: number
           end_date: string | null
           first_session_date: string | null
           first_session_duration: number | null
@@ -951,6 +952,7 @@ export type Database = {
         Insert: {
           audio_playlist_id?: string | null
           created_at?: string
+          drip_offset_days?: number
           end_date?: string | null
           first_session_date?: string | null
           first_session_duration?: number | null
@@ -974,6 +976,7 @@ export type Database = {
         Update: {
           audio_playlist_id?: string | null
           created_at?: string
+          drip_offset_days?: number
           end_date?: string | null
           first_session_date?: string | null
           first_session_duration?: number | null
