@@ -146,6 +146,7 @@ export type Database = {
         Row: {
           audio_id: string
           created_at: string
+          drip_delay_days: number
           id: string
           playlist_id: string
           sort_order: number
@@ -153,6 +154,7 @@ export type Database = {
         Insert: {
           audio_id: string
           created_at?: string
+          drip_delay_days?: number
           id?: string
           playlist_id: string
           sort_order?: number
@@ -160,6 +162,7 @@ export type Database = {
         Update: {
           audio_id?: string
           created_at?: string
+          drip_delay_days?: number
           id?: string
           playlist_id?: string
           sort_order?: number

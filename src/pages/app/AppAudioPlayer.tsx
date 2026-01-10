@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Headphones, ChevronLeft, ChevronRight, List } from "lucide-react";
+import { ArrowLeft, Headphones, ChevronLeft, ChevronRight, List, Lock } from "lucide-react";
 import { AudioControls } from "@/components/audio/AudioControls";
 import { ProgressBar } from "@/components/audio/ProgressBar";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { format, addDays } from "date-fns";
 
 export default function AppAudioPlayer() {
   const { audioId } = useParams();
@@ -77,6 +78,7 @@ export default function AppAudioPlayer() {
         .select(`
           audio_id,
           sort_order,
+          drip_delay_days,
           audio_content (
             id,
             title,
@@ -91,6 +93,51 @@ export default function AppAudioPlayer() {
     },
     enabled: !!playlistInfo?.playlist_id,
   });
+
+  // Fetch user's round for drip content calculation
+  const { data: userRound } = useQuery({
+    queryKey: ['user-round-for-playlist', playlistInfo?.playlist_id],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .select(`
+          round_id,
+          program_rounds!inner (
+            id,
+            start_date,
+            audio_playlist_id
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('program_rounds.audio_playlist_id', playlistInfo!.playlist_id)
+        .eq('status', 'active')
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data?.program_rounds;
+    },
+    enabled: !!playlistInfo?.playlist_id,
+  });
+
+  // Check if a track is available based on drip delay
+  const getTrackAvailability = (dripDelayDays: number) => {
+    if (!userRound?.start_date) {
+      return { isAvailable: true, availableDate: null };
+    }
+    
+    const roundStart = new Date(userRound.start_date + 'T00:00:00');
+    const availableDate = addDays(roundStart, dripDelayDays);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return {
+      isAvailable: today >= availableDate,
+      availableDate: availableDate,
+    };
+  };
 
   // Fetch progress
   const { data: progress } = useQuery({
@@ -154,11 +201,14 @@ export default function AppAudioPlayer() {
       setIsPlaying(false);
       saveProgressMutation.mutate(audio.duration);
       
-      // Auto-advance to next track if available
+      // Auto-advance to next track if available and not locked
       const currentIndex = playlistTracks?.findIndex(t => t.audio_id === audioId);
       if (currentIndex !== undefined && currentIndex >= 0 && playlistTracks && currentIndex < playlistTracks.length - 1) {
         const nextTrack = playlistTracks[currentIndex + 1];
-        navigate(`/app/player/${nextTrack.audio_id}`);
+        const { isAvailable } = getTrackAvailability(nextTrack.drip_delay_days || 0);
+        if (isAvailable) {
+          navigate(`/app/player/${nextTrack.audio_id}`);
+        }
       }
     };
     const handleError = (e: Event) => {
@@ -260,21 +310,42 @@ export default function AppAudioPlayer() {
     }
   };
 
-  // Track navigation
+  // Track navigation - check availability for drip content
   const currentTrackIndex = playlistTracks?.findIndex(t => t.audio_id === audioId) ?? -1;
-  const hasPrevious = currentTrackIndex > 0;
-  const hasNext = playlistTracks && currentTrackIndex >= 0 && currentTrackIndex < playlistTracks.length - 1;
+  
+  // Find available previous track
+  const previousAvailableIndex = (() => {
+    if (currentTrackIndex <= 0 || !playlistTracks) return -1;
+    for (let i = currentTrackIndex - 1; i >= 0; i--) {
+      const { isAvailable } = getTrackAvailability(playlistTracks[i].drip_delay_days || 0);
+      if (isAvailable) return i;
+    }
+    return -1;
+  })();
+  
+  // Find available next track
+  const nextAvailableIndex = (() => {
+    if (!playlistTracks || currentTrackIndex < 0 || currentTrackIndex >= playlistTracks.length - 1) return -1;
+    for (let i = currentTrackIndex + 1; i < playlistTracks.length; i++) {
+      const { isAvailable } = getTrackAvailability(playlistTracks[i].drip_delay_days || 0);
+      if (isAvailable) return i;
+    }
+    return -1;
+  })();
+  
+  const hasPrevious = previousAvailableIndex >= 0;
+  const hasNext = nextAvailableIndex >= 0;
 
   const handlePreviousTrack = () => {
     if (hasPrevious && playlistTracks) {
-      const prevTrack = playlistTracks[currentTrackIndex - 1];
+      const prevTrack = playlistTracks[previousAvailableIndex];
       navigate(`/app/player/${prevTrack.audio_id}`);
     }
   };
 
   const handleNextTrack = () => {
     if (hasNext && playlistTracks) {
-      const nextTrack = playlistTracks[currentTrackIndex + 1];
+      const nextTrack = playlistTracks[nextAvailableIndex];
       navigate(`/app/player/${nextTrack.audio_id}`);
     }
   };
@@ -363,31 +434,47 @@ export default function AppAudioPlayer() {
                   <SheetTitle>Playlist Tracks</SheetTitle>
                 </SheetHeader>
                 <div className="mt-4 space-y-2 overflow-y-auto h-[calc(70vh-80px)]">
-                  {playlistTracks.map((track, index) => (
-                    <button
-                      key={track.audio_id}
-                      onClick={() => navigate(`/app/player/${track.audio_id}`)}
-                      className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                        track.audio_id === audioId 
-                          ? 'bg-primary/10 border-primary' 
-                          : 'hover:bg-accent'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm text-muted-foreground w-6">{index + 1}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-medium truncate ${
-                            track.audio_id === audioId ? 'text-primary' : ''
-                          }`}>
-                            {track.audio_content.title}
-                          </p>
+                  {playlistTracks.map((track, index) => {
+                    const { isAvailable, availableDate } = getTrackAvailability(track.drip_delay_days || 0);
+                    
+                    return (
+                      <button
+                        key={track.audio_id}
+                        onClick={() => isAvailable && navigate(`/app/player/${track.audio_id}`)}
+                        disabled={!isAvailable}
+                        className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                          !isAvailable
+                            ? 'opacity-60 bg-muted/30 cursor-not-allowed'
+                            : track.audio_id === audioId 
+                              ? 'bg-primary/10 border-primary' 
+                              : 'hover:bg-accent'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {!isAvailable ? (
+                            <Lock className="h-4 w-4 text-muted-foreground w-6" />
+                          ) : (
+                            <span className="text-sm text-muted-foreground w-6">{index + 1}</span>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-medium truncate ${
+                              track.audio_id === audioId ? 'text-primary' : ''
+                            }`}>
+                              {track.audio_content.title}
+                            </p>
+                            {!isAvailable && availableDate && (
+                              <p className="text-xs text-muted-foreground">
+                                Available {format(availableDate, 'MMM d, yyyy')}
+                              </p>
+                            )}
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            {formatDuration(track.audio_content.duration_seconds)}
+                          </span>
                         </div>
-                        <span className="text-xs text-muted-foreground">
-                          {formatDuration(track.audio_content.duration_seconds)}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
               </SheetContent>
             </Sheet>
@@ -465,32 +552,34 @@ export default function AppAudioPlayer() {
             onPlaybackRateChange={handlePlaybackRateChange}
           />
 
-          {/* Up Next Section */}
-          {upNextTracks.length > 0 && (
+          {/* Up Next Section - only show available tracks */}
+          {upNextTracks.filter(t => getTrackAvailability(t.drip_delay_days || 0).isAvailable).length > 0 && (
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground">Up Next</h3>
               <div className="space-y-2">
-                {upNextTracks.map((track, index) => (
-                  <button
-                    key={track.audio_id}
-                    onClick={() => navigate(`/app/player/${track.audio_id}`)}
-                    className="w-full text-left p-3 rounded-lg border hover:bg-accent transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-muted-foreground w-6">
-                        {currentTrackIndex + index + 2}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
-                          {track.audio_content.title}
-                        </p>
+                {upNextTracks
+                  .filter(t => getTrackAvailability(t.drip_delay_days || 0).isAvailable)
+                  .map((track, index) => (
+                    <button
+                      key={track.audio_id}
+                      onClick={() => navigate(`/app/player/${track.audio_id}`)}
+                      className="w-full text-left p-3 rounded-lg border hover:bg-accent transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-muted-foreground w-6">
+                          {currentTrackIndex + index + 2}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {track.audio_content.title}
+                          </p>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {formatDuration(track.audio_content.duration_seconds)}
+                        </span>
                       </div>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDuration(track.audio_content.duration_seconds)}
-                      </span>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  ))}
               </div>
             </div>
           )}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { GripVertical, ArrowUp, ArrowDown, Save } from "lucide-react";
+import { GripVertical, ArrowUp, ArrowDown, Save, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface PlaylistTracksManagerProps {
@@ -39,6 +40,7 @@ export const PlaylistTracksManager = ({
         .select(`
           id,
           sort_order,
+          drip_delay_days,
           audio_id,
           audio_content (
             id,
@@ -63,12 +65,16 @@ export const PlaylistTracksManager = ({
       const updates = tracks.map((track, index) => ({
         id: track.id,
         sort_order: index + 1,
+        drip_delay_days: track.drip_delay_days || 0,
       }));
 
       for (const update of updates) {
         const { error } = await supabase
           .from('audio_playlist_items')
-          .update({ sort_order: update.sort_order })
+          .update({ 
+            sort_order: update.sort_order,
+            drip_delay_days: update.drip_delay_days,
+          })
           .eq('id', update.id);
         
         if (error) throw error;
@@ -108,6 +114,14 @@ export const PlaylistTracksManager = ({
     const [movedTrack] = newTracks.splice(index, 1);
     newTracks.splice(newOrder - 1, 0, movedTrack);
     
+    setTracks(newTracks);
+    setHasChanges(true);
+  };
+
+  const handleDripDelayChange = (index: number, value: string) => {
+    const delay = parseInt(value) || 0;
+    const newTracks = [...tracks];
+    newTracks[index] = { ...newTracks[index], drip_delay_days: Math.max(0, delay) };
     setTracks(newTracks);
     setHasChanges(true);
   };
@@ -166,7 +180,7 @@ export const PlaylistTracksManager = ({
                       max={tracks.length}
                       value={index + 1}
                       onChange={(e) => handleSortOrderChange(index, e.target.value)}
-                      className="w-16 h-8 text-center"
+                      className="w-14 h-8 text-center"
                     />
                   </div>
 
@@ -177,6 +191,18 @@ export const PlaylistTracksManager = ({
                     <p className="text-xs text-muted-foreground">
                       {formatDuration(track.audio_content.duration_seconds)}
                     </p>
+                  </div>
+
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="number"
+                      min="0"
+                      value={track.drip_delay_days || 0}
+                      onChange={(e) => handleDripDelayChange(index, e.target.value)}
+                      className="w-14 h-8 text-center"
+                    />
+                    <span className="text-xs text-muted-foreground">days</span>
                   </div>
 
                   <div className="flex gap-1 flex-shrink-0">

@@ -10,6 +10,7 @@ import { ArrowLeft, Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Vi
 import { Separator } from "@/components/ui/separator";
 import { SupplementViewer } from "@/components/app/SupplementViewer";
 import { isNativeApp } from "@/lib/platform";
+import { format, addDays } from "date-fns";
 
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
@@ -45,6 +46,7 @@ export default function AppPlaylistDetail() {
         .select(`
           id,
           sort_order,
+          drip_delay_days,
           audio_id,
           audio_content (
             id,
@@ -129,6 +131,35 @@ export default function AppPlaylistDetail() {
     },
   });
 
+  // Fetch user's round for this playlist (to get start_date for drip content)
+  const { data: userRound } = useQuery({
+    queryKey: ['user-round-for-playlist', playlistId],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      // Find the user's enrollment that has a round linked to this playlist
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .select(`
+          round_id,
+          program_rounds!inner (
+            id,
+            start_date,
+            audio_playlist_id
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('program_rounds.audio_playlist_id', playlistId)
+        .eq('status', 'active')
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data?.program_rounds;
+    },
+    enabled: !!playlistId && !playlist?.is_free,
+  });
+
   console.log('Debug - Playlist:', playlist?.name, 'Program Slug:', playlist?.program_slug, 'Is Free:', playlist?.is_free);
   console.log('Debug - User Enrollments:', enrollments);
   console.log('Debug - Has Access Check:', playlist?.is_free || enrollments?.includes(playlist?.program_slug));
@@ -149,22 +180,46 @@ export default function AppPlaylistDetail() {
     };
   };
 
+  // Check if a track is available based on drip delay
+  const getTrackAvailability = (dripDelayDays: number) => {
+    // Free playlists or no round = all tracks available
+    if (playlist?.is_free || !userRound?.start_date) {
+      return { isAvailable: true, availableDate: null };
+    }
+    
+    const roundStart = new Date(userRound.start_date + 'T00:00:00');
+    const availableDate = addDays(roundStart, dripDelayDays);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return {
+      isAvailable: today >= availableDate,
+      availableDate: availableDate,
+    };
+  };
+
   const completedCount = tracks?.filter(t => getTrackProgress(t.audio_content.id).completed).length || 0;
   const totalTracks = tracks?.length || 0;
   const overallProgress = totalTracks > 0 ? (completedCount / totalTracks) * 100 : 0;
 
-  const firstIncompleteTrack = tracks?.find(t => !getTrackProgress(t.audio_content.id).completed);
+  // Find first incomplete track that is also available
+  const firstIncompleteTrack = tracks?.find(t => {
+    const { isAvailable } = getTrackAvailability(t.drip_delay_days || 0);
+    return isAvailable && !getTrackProgress(t.audio_content.id).completed;
+  });
 
   const handleContinue = () => {
     if (!hasAccess) return;
-    const trackToPlay = firstIncompleteTrack || tracks?.[0];
+    const trackToPlay = firstIncompleteTrack || tracks?.find(t => getTrackAvailability(t.drip_delay_days || 0).isAvailable);
     if (trackToPlay) {
       navigate(`/app/player/${trackToPlay.audio_content.id}`);
     }
   };
 
-  const handleTrackClick = (audioId: string) => {
+  const handleTrackClick = (audioId: string, dripDelayDays: number) => {
     if (!hasAccess) return;
+    const { isAvailable } = getTrackAvailability(dripDelayDays);
+    if (!isAvailable) return;
     navigate(`/app/player/${audioId}`);
   };
 
@@ -351,17 +406,25 @@ export default function AppPlaylistDetail() {
         {tracks?.map((item, index) => {
           const track = item.audio_content;
           const progress = getTrackProgress(track.id);
+          const { isAvailable, availableDate } = getTrackAvailability(item.drip_delay_days || 0);
           
           return (
             <div
               key={item.id}
-              onClick={() => handleTrackClick(track.id)}
+              onClick={() => handleTrackClick(track.id, item.drip_delay_days || 0)}
               className={`flex items-center gap-3 p-3 rounded-lg border ${
-                hasAccess ? 'cursor-pointer hover:bg-accent' : 'opacity-60'
+                !isAvailable 
+                  ? 'opacity-60 bg-muted/30 cursor-not-allowed' 
+                  : hasAccess 
+                    ? 'cursor-pointer hover:bg-accent' 
+                    : 'opacity-60'
               }`}
             >
+              {/* Track number / status icon */}
               <div className="flex-shrink-0 w-8 text-center">
-                {progress.completed ? (
+                {!isAvailable ? (
+                  <Lock className="h-5 w-5 text-muted-foreground mx-auto" />
+                ) : progress.completed ? (
                   <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
                 ) : progress.percentage > 0 ? (
                   <div className="relative h-5 w-5 mx-auto">
@@ -380,10 +443,14 @@ export default function AppPlaylistDetail() {
 
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-sm truncate">{track.title}</h3>
-                {track.description && (
+                {!isAvailable && availableDate ? (
+                  <p className="text-xs text-muted-foreground">
+                    Available {format(availableDate, 'MMM d, yyyy')}
+                  </p>
+                ) : track.description ? (
                   <p className="text-xs text-muted-foreground truncate">{track.description}</p>
-                )}
-                {progress.percentage > 0 && !progress.completed && (
+                ) : null}
+                {isAvailable && progress.percentage > 0 && !progress.completed && (
                   <div className="mt-1">
                     <Progress value={progress.percentage} className="h-1" />
                   </div>
@@ -395,7 +462,7 @@ export default function AppPlaylistDetail() {
                 <span>{formatDuration(track.duration_seconds)}</span>
               </div>
 
-              {hasAccess && (
+              {isAvailable && hasAccess && (
                 <Button variant="ghost" size="icon" className="flex-shrink-0">
                   <Play className="h-4 w-4" />
                 </Button>
