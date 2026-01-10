@@ -79,6 +79,7 @@ export const ProgramRoundsManager = () => {
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [managingSessionsRound, setManagingSessionsRound] = useState<ProgramRound | null>(null);
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   
   // Drip adjustment dialog state
   const [adjustingDripRound, setAdjustingDripRound] = useState<ProgramRound | null>(null);
@@ -199,6 +200,7 @@ export const ProgramRoundsManager = () => {
       queryClient.invalidateQueries({ queryKey: ["program-rounds"] });
       toast.success(editingId ? "Round updated" : "Round created");
       resetForm();
+      setIsFormDialogOpen(false);
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -279,6 +281,11 @@ export const ProgramRoundsManager = () => {
     setEditingId(null);
   };
 
+  const handleCreateNew = () => {
+    resetForm();
+    setIsFormDialogOpen(true);
+  };
+
   const handleEdit = (round: ProgramRound) => {
     // Convert UTC ISO string to local datetime for the default timezone
     let localDateTime = "";
@@ -317,6 +324,7 @@ export const ProgramRoundsManager = () => {
       video_url: round.video_url || "",
     });
     setEditingId(round.id);
+    setIsFormDialogOpen(true);
   };
 
   const handleDuplicate = (round: ProgramRound) => {
@@ -344,6 +352,7 @@ export const ProgramRoundsManager = () => {
       video_url: round.video_url || "",
     });
     setEditingId(null); // This is a new round, not editing
+    setIsFormDialogOpen(true);
     toast.info("Round duplicated - update the name and dates, then save");
   };
 
@@ -382,14 +391,166 @@ export const ProgramRoundsManager = () => {
 
   return (
     <div className="space-y-6">
+      {/* Main Rounds List Card */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            {editingId ? "Edit Round" : "Create New Round"}
+            Program Rounds
           </CardTitle>
+          <Button onClick={handleCreateNew}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create New Round
+          </Button>
         </CardHeader>
         <CardContent>
+          {isLoading ? (
+            <p>Loading rounds...</p>
+          ) : rounds && rounds.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Program</TableHead>
+                  <TableHead>Round</TableHead>
+                  <TableHead>Number</TableHead>
+                  <TableHead>Start Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Drip Offset</TableHead>
+                  <TableHead>Resources</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rounds.map((round) => (
+                  <TableRow key={round.id}>
+                    <TableCell className="font-medium">
+                      {programs?.find(p => p.slug === round.program_slug)?.title || round.program_slug}
+                    </TableCell>
+                    <TableCell>{round.round_name}</TableCell>
+                    <TableCell>#{round.round_number}</TableCell>
+                    <TableCell>{format(new Date(round.start_date + 'T00:00:00'), 'MMM d, yyyy')}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(round.status)}`}>
+                        {round.status}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm font-medium ${
+                          (round.drip_offset_days || 0) > 0 ? 'text-orange-600' : 
+                          (round.drip_offset_days || 0) < 0 ? 'text-green-600' : 
+                          'text-muted-foreground'
+                        }`}>
+                          {(round.drip_offset_days || 0) >= 0 ? '+' : ''}{round.drip_offset_days || 0}d
+                        </span>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => {
+                              setAdjustingDripRound(round);
+                              setDripAdjustmentType('freeze');
+                              setDripAdjustmentDays('7');
+                            }}
+                            title="Freeze drip (delay all tracks)"
+                          >
+                            <Pause className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => {
+                              setAdjustingDripRound(round);
+                              setDripAdjustmentType('forward');
+                              setDripAdjustmentDays('1');
+                            }}
+                            title="Forward drip (release earlier)"
+                          >
+                            <FastForward className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        {round.google_meet_link && (
+                          <div title="Meet link added">
+                            <Video className="h-4 w-4 text-primary" />
+                          </div>
+                        )}
+                        {round.google_drive_link && (
+                          <div title="Drive folder added">
+                            <FolderOpen className="h-4 w-4 text-primary" />
+                          </div>
+                        )}
+                        {round.first_session_date && (
+                          <div title="First session scheduled">
+                            <CalendarDays className="h-4 w-4 text-primary" />
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setManagingSessionsRound(round)}
+                          title="Manage Sessions"
+                        >
+                          <ListChecks className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDuplicate(round)}
+                          title="Duplicate Round"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(round)}
+                          title="Edit Round"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => deleteMutation.mutate(round.id)}
+                          title="Delete Round"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <p className="text-muted-foreground">No rounds created yet. Click "Create New Round" to get started.</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Create/Edit Round Dialog */}
+      <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              {editingId ? "Edit Round" : "Create New Round"}
+            </DialogTitle>
+            <DialogDescription>
+              {editingId ? "Update the round details below." : "Fill in the details to create a new program round."}
+            </DialogDescription>
+          </DialogHeader>
+          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -645,159 +806,18 @@ export const ProgramRoundsManager = () => {
               <p className="text-xs text-muted-foreground">Select the audio playlist for this round's supplementary materials</p>
             </div>
 
-            <div className="flex gap-2 mt-6">
+            <DialogFooter className="mt-6">
+              <Button type="button" variant="outline" onClick={() => setIsFormDialogOpen(false)}>
+                Cancel
+              </Button>
               <Button type="submit" disabled={saveMutation.isPending}>
                 <Plus className="h-4 w-4 mr-2" />
                 {editingId ? "Update Round" : "Create Round"}
               </Button>
-              {editingId && (
-                <Button type="button" variant="outline" onClick={resetForm}>
-                  Cancel
-                </Button>
-              )}
-            </div>
+            </DialogFooter>
           </form>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Existing Rounds</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <p>Loading rounds...</p>
-          ) : rounds && rounds.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Program</TableHead>
-                  <TableHead>Round</TableHead>
-                  <TableHead>Number</TableHead>
-                  <TableHead>Start Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Drip Offset</TableHead>
-                  <TableHead>Resources</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rounds.map((round) => (
-                  <TableRow key={round.id}>
-                    <TableCell className="font-medium">
-                      {programs?.find(p => p.slug === round.program_slug)?.title || round.program_slug}
-                    </TableCell>
-                    <TableCell>{round.round_name}</TableCell>
-                    <TableCell>#{round.round_number}</TableCell>
-                    <TableCell>{format(new Date(round.start_date + 'T00:00:00'), 'MMM d, yyyy')}</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(round.status)}`}>
-                        {round.status}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className={`text-sm font-medium ${
-                          (round.drip_offset_days || 0) > 0 ? 'text-orange-600' : 
-                          (round.drip_offset_days || 0) < 0 ? 'text-green-600' : 
-                          'text-muted-foreground'
-                        }`}>
-                          {(round.drip_offset_days || 0) >= 0 ? '+' : ''}{round.drip_offset_days || 0}d
-                        </span>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => {
-                              setAdjustingDripRound(round);
-                              setDripAdjustmentType('freeze');
-                              setDripAdjustmentDays('7');
-                            }}
-                            title="Freeze drip (delay all tracks)"
-                          >
-                            <Pause className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => {
-                              setAdjustingDripRound(round);
-                              setDripAdjustmentType('forward');
-                              setDripAdjustmentDays('1');
-                            }}
-                            title="Forward drip (release earlier)"
-                          >
-                            <FastForward className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        {round.google_meet_link && (
-                          <div title="Meet link added">
-                            <Video className="h-4 w-4 text-primary" />
-                          </div>
-                        )}
-                        {round.google_drive_link && (
-                          <div title="Drive folder added">
-                            <FolderOpen className="h-4 w-4 text-primary" />
-                          </div>
-                        )}
-                        {round.first_session_date && (
-                          <div title="First session scheduled">
-                            <CalendarDays className="h-4 w-4 text-primary" />
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setManagingSessionsRound(round)}
-                          title="Manage Sessions"
-                        >
-                          <ListChecks className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDuplicate(round)}
-                          title="Duplicate Round"
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(round)}
-                          title="Edit Round"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => deleteMutation.mutate(round.id)}
-                          title="Delete Round"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <p className="text-muted-foreground">No rounds created yet.</p>
-          )}
-        </CardContent>
-      </Card>
+        </DialogContent>
+      </Dialog>
 
       {/* Drip Adjustment Dialog */}
       <Dialog open={!!adjustingDripRound} onOpenChange={() => setAdjustingDripRound(null)}>
