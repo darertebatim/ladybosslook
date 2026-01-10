@@ -112,3 +112,6 @@ verify_jwt = true
 
 [functions.generate-email-content]
 verify_jwt = true
+
+[functions.send-drip-notifications]
+verify_jwt = false

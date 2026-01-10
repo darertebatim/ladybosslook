@@ -10,7 +10,7 @@ import { ArrowLeft, Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Vi
 import { Separator } from "@/components/ui/separator";
 import { SupplementViewer } from "@/components/app/SupplementViewer";
 import { isNativeApp } from "@/lib/platform";
-import { format, addDays } from "date-fns";
+import { getTrackAvailabilityWithCountdown } from "@/lib/dripContent";
 
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
@@ -180,22 +180,14 @@ export default function AppPlaylistDetail() {
     };
   };
 
-  // Check if a track is available based on drip delay
+  // Check if a track is available based on drip delay - now with countdown
   const getTrackAvailability = (dripDelayDays: number) => {
-    // Free playlists or no round = all tracks available
-    if (playlist?.is_free || !userRound?.start_date) {
-      return { isAvailable: true, availableDate: null };
+    // Free playlists = all tracks available
+    if (playlist?.is_free) {
+      return { isAvailable: true, availableDate: null, countdownText: null };
     }
     
-    const roundStart = new Date(userRound.start_date + 'T00:00:00');
-    const availableDate = addDays(roundStart, dripDelayDays);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    return {
-      isAvailable: today >= availableDate,
-      availableDate: availableDate,
-    };
+    return getTrackAvailabilityWithCountdown(dripDelayDays, userRound?.start_date);
   };
 
   const completedCount = tracks?.filter(t => getTrackProgress(t.audio_content.id).completed).length || 0;
@@ -406,7 +398,7 @@ export default function AppPlaylistDetail() {
         {tracks?.map((item, index) => {
           const track = item.audio_content;
           const progress = getTrackProgress(track.id);
-          const { isAvailable, availableDate } = getTrackAvailability(item.drip_delay_days || 0);
+          const { isAvailable, countdownText } = getTrackAvailability(item.drip_delay_days || 0);
           
           return (
             <div
@@ -443,9 +435,9 @@ export default function AppPlaylistDetail() {
 
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-sm truncate">{track.title}</h3>
-                {!isAvailable && availableDate ? (
+                {!isAvailable && countdownText ? (
                   <p className="text-xs text-muted-foreground">
-                    Available {format(availableDate, 'MMM d, yyyy')}
+                    {countdownText}
                   </p>
                 ) : track.description ? (
                   <p className="text-xs text-muted-foreground truncate">{track.description}</p>

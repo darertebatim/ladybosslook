@@ -1,18 +1,24 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { GripVertical, ArrowUp, ArrowDown, Save, Calendar } from "lucide-react";
+import { GripVertical, ArrowUp, ArrowDown, Save, Calendar, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { DRIP_SCHEDULE_TEMPLATES } from "@/lib/dripContent";
 
 interface PlaylistTracksManagerProps {
   playlistId: string;
@@ -126,6 +132,19 @@ export const PlaylistTracksManager = ({
     setHasChanges(true);
   };
 
+  const applyDripTemplate = (templateId: string) => {
+    const template = DRIP_SCHEDULE_TEMPLATES.find(t => t.id === templateId);
+    if (!template) return;
+
+    const newTracks = tracks.map((track, index) => ({
+      ...track,
+      drip_delay_days: template.getDays(index),
+    }));
+    setTracks(newTracks);
+    setHasChanges(true);
+    toast.success(`Applied "${template.name}" schedule`);
+  };
+
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -153,16 +172,39 @@ export const PlaylistTracksManager = ({
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <p className="text-sm text-muted-foreground">
                 {tracks.length} tracks total
               </p>
-              {hasChanges && (
-                <Button onClick={handleSave} disabled={updateTracksMutation.isPending}>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Order
-                </Button>
-              )}
+              <div className="flex items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Zap className="h-4 w-4 mr-2" />
+                      Quick Schedule
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {DRIP_SCHEDULE_TEMPLATES.map((template) => (
+                      <DropdownMenuItem
+                        key={template.id}
+                        onClick={() => applyDripTemplate(template.id)}
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-medium">{template.name}</span>
+                          <span className="text-xs text-muted-foreground">{template.description}</span>
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {hasChanges && (
+                  <Button onClick={handleSave} disabled={updateTracksMutation.isPending}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save
+                  </Button>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
