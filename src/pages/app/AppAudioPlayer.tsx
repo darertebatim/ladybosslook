@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Headphones, ChevronLeft, ChevronRight, List, Lock } from "lucide-react";
+import { ArrowLeft, Headphones, List, Lock } from "lucide-react";
 import { AudioControls } from "@/components/audio/AudioControls";
 import { ProgressBar } from "@/components/audio/ProgressBar";
 import { BookmarkButton } from "@/components/audio/BookmarkButton";
@@ -10,7 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
   SheetContent,
@@ -175,6 +174,11 @@ export default function AppAudioPlayer() {
     );
   };
 
+  // Scroll to top on load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [audioId]);
+
   // Start playing when audio data is loaded
   useEffect(() => {
     if (audio && audioId && (!currentTrack || currentTrack.id !== audioId)) {
@@ -222,45 +226,6 @@ export default function AppAudioPlayer() {
 
   // Track navigation - check availability for drip content
   const currentTrackIndex = playlistTracks?.findIndex(t => t.audio_id === audioId) ?? -1;
-  
-  // Find available previous track
-  const previousAvailableIndex = (() => {
-    if (currentTrackIndex <= 0 || !playlistTracks) return -1;
-    for (let i = currentTrackIndex - 1; i >= 0; i--) {
-      const { isAvailable } = getTrackAvailability(playlistTracks[i].drip_delay_days || 0);
-      if (isAvailable) return i;
-    }
-    return -1;
-  })();
-  
-  // Find available next track
-  const nextAvailableIndex = (() => {
-    if (!playlistTracks || currentTrackIndex < 0 || currentTrackIndex >= playlistTracks.length - 1) return -1;
-    for (let i = currentTrackIndex + 1; i < playlistTracks.length; i++) {
-      const { isAvailable } = getTrackAvailability(playlistTracks[i].drip_delay_days || 0);
-      if (isAvailable) return i;
-    }
-    return -1;
-  })();
-  
-  const hasPrevious = previousAvailableIndex >= 0;
-  const hasNext = nextAvailableIndex >= 0;
-
-  const handlePreviousTrack = () => {
-    if (hasPrevious && playlistTracks) {
-      const prevTrack = playlistTracks[previousAvailableIndex];
-      navigate(`/app/player/${prevTrack.audio_id}`);
-    }
-  };
-
-  const handleNextTrack = () => {
-    if (hasNext && playlistTracks) {
-      const nextTrack = playlistTracks[nextAvailableIndex];
-      navigate(`/app/player/${nextTrack.audio_id}`);
-    }
-  };
-
-  const upNextTracks = playlistTracks?.slice(currentTrackIndex + 1, currentTrackIndex + 4) || [];
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -293,7 +258,7 @@ export default function AppAudioPlayer() {
   }
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="h-[100dvh] bg-background relative overflow-hidden flex flex-col">
       {/* Blurred Background with Cover Art */}
       {audio.cover_image_url && (
         <div className="fixed inset-0 z-0">
@@ -308,42 +273,36 @@ export default function AppAudioPlayer() {
 
       {/* Fixed Header with safe area */}
       <div 
-        className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/50"
+        className="relative z-50 bg-background/60 backdrop-blur-xl border-b border-border/50 shrink-0"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-6 pb-3 px-4 flex items-center gap-2">
+        <div className="py-3 px-4 flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => playlistInfo?.playlist_id ? navigate(`/app/player/playlist/${playlistInfo.playlist_id}`) : navigate('/app/player')}
-            className="rounded-full"
+            className="rounded-full shrink-0"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           
-          {playlistInfo && (
-            <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 flex items-center gap-2">
+            {playlistInfo ? (
               <button
                 onClick={() => navigate(`/app/player/playlist/${playlistInfo.playlist_id}`)}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors truncate block"
+                className="text-sm font-medium hover:text-primary transition-colors truncate"
               >
                 {playlistInfo.audio_playlists.name}
               </button>
-              {playlistTracks && currentTrackIndex >= 0 && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Badge variant="outline" className="text-xs">
-                    Track {currentTrackIndex + 1} of {playlistTracks.length}
-                  </Badge>
-                </div>
-              )}
-            </div>
-          )}
-
-          {!playlistInfo && (
-            <div className="flex-1 min-w-0">
-              <h1 className="font-semibold text-lg truncate">Now Playing</h1>
-            </div>
-          )}
+            ) : (
+              <span className="text-sm font-medium">Now Playing</span>
+            )}
+            {playlistTracks && currentTrackIndex >= 0 && (
+              <span className="text-xs text-muted-foreground shrink-0">
+                • {currentTrackIndex + 1}/{playlistTracks.length}
+              </span>
+            )}
+          </div>
 
           {/* Bookmark Button */}
           <BookmarkButton
@@ -355,7 +314,7 @@ export default function AppAudioPlayer() {
           {playlistTracks && playlistTracks.length > 1 && (
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
+                <Button variant="ghost" size="icon" className="rounded-full shrink-0">
                   <List className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -412,13 +371,11 @@ export default function AppAudioPlayer() {
         </div>
       </div>
 
-      {/* Header spacer */}
-      <div style={{ height: 'calc(76px + env(safe-area-inset-top, 0px))' }} />
-
-      <div className="relative z-10 p-4 pb-24">
-        <div className="max-w-md mx-auto space-y-8">
-          {/* Cover Art with enhanced shadow */}
-          <div className="aspect-square rounded-3xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] animate-scale-in">
+      {/* Main Content - Flex grow to fill remaining space */}
+      <div className="relative z-10 flex-1 flex flex-col px-4 py-4 overflow-hidden">
+        <div className="max-w-md mx-auto w-full flex flex-col h-full gap-4">
+          {/* Cover Art - Fixed height, not aspect ratio */}
+          <div className="w-full max-h-[35vh] aspect-square mx-auto rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] shrink-0">
             {audio.cover_image_url ? (
               <img
                 src={audio.cover_image_url}
@@ -427,104 +384,51 @@ export default function AppAudioPlayer() {
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center backdrop-blur-xl">
-                <Headphones className="h-24 w-24 text-primary/40" />
+                <Headphones className="h-16 w-16 text-primary/40" />
               </div>
             )}
           </div>
 
-          {/* Title & Description - Glass Card */}
-          <div className="text-center space-y-3 p-4 rounded-2xl bg-card/50 backdrop-blur-md border border-border/30">
-            <h1 className="text-2xl font-bold leading-tight">{audio.title}</h1>
+          {/* Title & Description - Compact */}
+          <div className="text-center shrink-0">
+            <h1 className="text-lg font-bold leading-tight line-clamp-2">{audio.title}</h1>
             {audio.description && (
-              <p className="text-muted-foreground text-sm line-clamp-2">{audio.description}</p>
+              <p className="text-muted-foreground text-sm line-clamp-1 mt-1">{audio.description}</p>
             )}
           </div>
 
           {/* Progress Bar */}
-          <ProgressBar
-            currentTime={currentTime}
-            duration={duration}
-            onSeek={handleSeek}
-          />
+          <div className="shrink-0">
+            <ProgressBar
+              currentTime={currentTime}
+              duration={duration}
+              onSeek={handleSeek}
+              variant="glass"
+            />
+          </div>
 
-          {/* Bookmarks List */}
+          {/* Controls */}
+          <div className="shrink-0">
+            <AudioControls
+              isPlaying={isPlaying}
+              onPlayPause={handlePlayPause}
+              onSkipBack={handleSkipBack}
+              onSkipForward={handleSkipForward}
+              playbackRate={playbackRate}
+              onPlaybackRateChange={handlePlaybackRateChange}
+              variant="glass"
+            />
+          </div>
+
+          {/* Bookmarks - Only if present, scrollable if needed */}
           {bookmarks.length > 0 && (
-            <div className="flex justify-center">
+            <div className="flex-1 min-h-0 overflow-auto">
               <BookmarksList
                 bookmarks={bookmarks}
                 onSeek={handleSeek}
                 onDelete={deleteBookmark}
                 isDeleting={isDeletingBookmark}
               />
-            </div>
-          )}
-
-          {/* Controls */}
-          <AudioControls
-            isPlaying={isPlaying}
-            onPlayPause={handlePlayPause}
-            onSkipBack={handleSkipBack}
-            onSkipForward={handleSkipForward}
-            playbackRate={playbackRate}
-            onPlaybackRateChange={handlePlaybackRateChange}
-          />
-
-          {/* Track Navigation */}
-          {(hasPrevious || hasNext) && (
-            <div className="flex justify-center items-center gap-6">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handlePreviousTrack}
-                disabled={!hasPrevious}
-                className="rounded-full h-12 w-12"
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </Button>
-              <span className="text-sm text-muted-foreground font-medium">
-                {currentTrackIndex + 1} / {playlistTracks?.length}
-              </span>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleNextTrack}
-                disabled={!hasNext}
-                className="rounded-full h-12 w-12"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </Button>
-            </div>
-          )}
-
-          {/* Up Next Section - only show available tracks */}
-          {upNextTracks.filter(t => getTrackAvailability(t.drip_delay_days || 0).isAvailable).length > 0 && (
-            <div className="space-y-3 p-4 rounded-2xl bg-card/50 backdrop-blur-md border border-border/30">
-              <h3 className="text-sm font-semibold text-muted-foreground">Up Next</h3>
-              <div className="space-y-2">
-                {upNextTracks
-                  .filter(t => getTrackAvailability(t.drip_delay_days || 0).isAvailable)
-                  .map((track, index) => (
-                    <button
-                      key={track.audio_id}
-                      onClick={() => navigate(`/app/player/${track.audio_id}`)}
-                      className="w-full text-left p-3 rounded-xl hover:bg-accent/50 transition-all active:scale-[0.98]"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs text-muted-foreground w-6 font-medium">
-                          {currentTrackIndex + index + 2}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
-                            {track.audio_content.title}
-                          </p>
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          {formatDuration(track.audio_content.duration_seconds)}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-              </div>
             </div>
           )}
         </div>
