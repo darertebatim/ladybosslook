@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { FileText, Download, ExternalLink, Megaphone, Check, CheckCheck, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 
 interface ChatMessageProps {
   content: string;
@@ -97,6 +97,21 @@ function formatBroadcastText(text: string) {
   return text.replace(/\*\*(.+?)\*\*/g, '$1');
 }
 
+// Generate consistent waveform bars based on a seed (URL hash)
+function generateWaveformBars(seed: string, count: number = 28): number[] {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    const char = seed.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  
+  return Array.from({ length: count }, (_, i) => {
+    const pseudoRandom = Math.abs(Math.sin(hash * (i + 1) * 0.1) * 10000) % 100;
+    return 20 + (pseudoRandom * 0.6); // Heights between 20-80%
+  });
+}
+
 export function ChatMessage({
   content, 
   senderType, 
@@ -141,6 +156,12 @@ export function ChatMessage({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+
+  // Generate consistent waveform bars based on attachment URL
+  const waveformBars = useMemo(() => {
+    return generateWaveformBars(attachmentUrl || 'default', 28);
+  }, [attachmentUrl]);
 
   const handleDownload = () => {
     if (attachmentUrl) {
@@ -158,6 +179,17 @@ export function ChatMessage({
     setIsPlaying(!isPlaying);
   };
 
+  const cyclePlaybackSpeed = () => {
+    const speeds = [1, 1.5, 2];
+    const currentIndex = speeds.indexOf(playbackSpeed);
+    const nextIndex = (currentIndex + 1) % speeds.length;
+    const newSpeed = speeds[nextIndex];
+    setPlaybackSpeed(newSpeed);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = newSpeed;
+    }
+  };
+
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       setCurrentTime(audioRef.current.currentTime);
@@ -167,6 +199,7 @@ export function ChatMessage({
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
       setDuration(audioRef.current.duration);
+      audioRef.current.playbackRate = playbackSpeed;
     }
   };
 
@@ -178,7 +211,7 @@ export function ChatMessage({
     }
   };
 
-  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleWaveformClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!audioRef.current || !duration) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
@@ -258,9 +291,9 @@ export function ChatMessage({
           </div>
         )}
 
-        {/* Voice Message */}
+        {/* Voice Message - Telegram Style */}
         {attachmentUrl && isAudio && (
-          <div className="flex items-center gap-3 px-3.5 py-3 min-w-[220px]">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 min-w-[200px] max-w-[260px]">
             {/* Hidden audio element */}
             <audio 
               ref={audioRef} 
@@ -275,47 +308,71 @@ export function ChatMessage({
             <button 
               onClick={togglePlayback}
               className={cn(
-                "h-11 w-11 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                "h-10 w-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
                 isCurrentUser 
                   ? "bg-primary-foreground/20 hover:bg-primary-foreground/30" 
                   : "bg-primary/10 hover:bg-primary/20"
               )}
             >
               {isPlaying ? (
-                <Pause className={cn("h-5 w-5", isCurrentUser ? "text-primary-foreground" : "text-primary")} />
+                <Pause className={cn("h-4 w-4", isCurrentUser ? "text-primary-foreground" : "text-primary")} />
               ) : (
-                <Play className={cn("h-5 w-5 ml-0.5", isCurrentUser ? "text-primary-foreground" : "text-primary")} />
+                <Play className={cn("h-4 w-4 ml-0.5", isCurrentUser ? "text-primary-foreground" : "text-primary")} />
               )}
             </button>
             
-            {/* Waveform/Progress */}
-            <div className="flex-1 flex flex-col gap-1.5">
+            {/* Waveform + Controls */}
+            <div className="flex-1 flex flex-col gap-1">
+              {/* Waveform Bars */}
               <div 
-                className={cn(
-                  "h-1.5 rounded-full overflow-hidden cursor-pointer",
-                  isCurrentUser ? "bg-primary-foreground/20" : "bg-muted-foreground/20"
-                )}
-                onClick={handleProgressClick}
+                className="flex items-center gap-[2px] h-5 cursor-pointer"
+                onClick={handleWaveformClick}
               >
-                <div 
-                  className={cn(
-                    "h-full rounded-full transition-all",
-                    isCurrentUser ? "bg-primary-foreground" : "bg-primary"
-                  )}
-                  style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }} 
-                />
+                {waveformBars.map((height, i) => {
+                  const barProgress = ((i + 1) / waveformBars.length) * 100;
+                  const progress = duration ? (currentTime / duration) * 100 : 0;
+                  const isActive = barProgress <= progress;
+                  return (
+                    <div
+                      key={i}
+                      className={cn(
+                        "w-[3px] rounded-full transition-colors duration-100",
+                        isActive 
+                          ? (isCurrentUser ? "bg-primary-foreground" : "bg-primary")
+                          : (isCurrentUser ? "bg-primary-foreground/30" : "bg-muted-foreground/30")
+                      )}
+                      style={{ height: `${height}%` }}
+                    />
+                  );
+                })}
               </div>
               
-              {/* Duration */}
-              <span className={cn(
-                "text-[11px]",
-                isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground"
-              )}>
-                {isPlaying || currentTime > 0 
-                  ? `${formatTime(currentTime)} / ${formatTime(duration)}`
-                  : formatTime(duration) || "0:00"
-                }
-              </span>
+              {/* Duration + Speed */}
+              <div className="flex items-center justify-between">
+                <span className={cn(
+                  "text-[11px]",
+                  isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground"
+                )}>
+                  {isPlaying || currentTime > 0 
+                    ? formatTime(currentTime)
+                    : formatTime(duration) || "0:00"
+                  }
+                </span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    cyclePlaybackSpeed();
+                  }}
+                  className={cn(
+                    "text-[10px] font-medium px-1.5 py-0.5 rounded-full transition-colors",
+                    isCurrentUser 
+                      ? "bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30" 
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  )}
+                >
+                  {playbackSpeed}x
+                </button>
+              </div>
             </div>
           </div>
         )}
