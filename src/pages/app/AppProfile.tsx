@@ -20,7 +20,8 @@ import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
 import { useState, useEffect } from 'react';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications, unsubscribeFromPushNotifications } from '@/lib/pushNotifications';
-import { isNativeApp } from '@/lib/platform';
+import { Capacitor } from '@capacitor/core';
+
 import { format } from 'date-fns';
 
 const AppProfile = () => {
@@ -42,7 +43,7 @@ const AppProfile = () => {
   const [autoSyncCalendar, setAutoSyncCalendar] = useState(() => {
     return localStorage.getItem('autoSyncCalendar') === 'true';
   });
-  const isNative = isNativeApp();
+  
 
   // Editable profile state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -54,7 +55,7 @@ const AppProfile = () => {
   // Check notification permission and subscription status on mount
   useEffect(() => {
     const checkStatus = async () => {
-      if (isNative && user?.id) {
+      if (Capacitor.isNativePlatform() && user?.id) {
         // Check push notification permission
         const status = await checkPermissionStatus();
         setNotificationPermission(status);
@@ -86,7 +87,7 @@ const AppProfile = () => {
       }
     };
     checkStatus();
-  }, [isNative, user?.id]);
+  }, [user?.id]);
 
   // Handle enabling calendar access
   const handleEnableCalendar = async () => {
@@ -494,7 +495,7 @@ const AppProfile = () => {
       <div className="space-y-6">
 
         {/* Quick Navigation */}
-        <div className={`grid gap-2 ${isNative ? 'grid-cols-4 sm:grid-cols-8' : 'grid-cols-3 sm:grid-cols-6'}`}>
+        <div className="grid gap-2 grid-cols-4 sm:grid-cols-8">
           <Button
             variant="outline"
             size="sm"
@@ -545,7 +546,7 @@ const AppProfile = () => {
               </span>
             )}
           </Button>
-          {isNative && (
+          {Capacitor.isNativePlatform() && (
             <>
               <Button
                 variant="outline"
@@ -921,7 +922,7 @@ const AppProfile = () => {
           </CardContent>
         </Card>
 
-        {isNative && (
+        {Capacitor.isNativePlatform() && (
           <Card id="notifications-section">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1053,7 +1054,7 @@ const AppProfile = () => {
         )}
 
         {/* Calendar Sync Section - Native Only */}
-        {isNative && isCalendarAvailable() && (
+        {Capacitor.isNativePlatform() && isCalendarAvailable() && (
           <Card id="calendar-section">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
