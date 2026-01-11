@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Calendar, Plus, Trash2, Edit, ArrowLeft, Wand2, Loader2, CalendarDays } from "lucide-react";
+import { Calendar, Plus, Trash2, Edit, ArrowLeft, Wand2, Loader2, CalendarDays, CheckCircle } from "lucide-react";
 import { format, addWeeks, addDays } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { Textarea } from "@/components/ui/textarea";
@@ -172,6 +172,24 @@ export const SessionsManager = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["program-sessions", roundId] });
       toast.success("Session deleted");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  // Quick mark complete mutation
+  const markCompleteMutation = useMutation({
+    mutationFn: async (sessionId: string) => {
+      const { error } = await supabase
+        .from("program_sessions")
+        .update({ status: 'completed' })
+        .eq("id", sessionId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["program-sessions", roundId] });
+      toast.success("Session marked as completed");
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -546,6 +564,18 @@ export const SessionsManager = ({
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
+                        {session.status === 'scheduled' && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-green-600 hover:bg-green-50 hover:text-green-700"
+                            onClick={() => markCompleteMutation.mutate(session.id)}
+                            disabled={markCompleteMutation.isPending}
+                            title="Mark as completed"
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button
                           variant="outline"
                           size="sm"
