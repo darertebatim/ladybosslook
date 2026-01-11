@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { BrandedSplash } from '@/components/app/BrandedSplash';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -26,11 +27,7 @@ export function ProtectedRoute({ children, requireAdmin = false, requiredPage }:
   }, [user, loading, isAdmin, requireAdmin, requiredPage, canAccessAdminPage, navigate]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <BrandedSplash />;
   }
 
   if (!user) {
