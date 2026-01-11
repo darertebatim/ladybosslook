@@ -12,8 +12,10 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell,
-  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight
+  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, NotebookPen
 } from 'lucide-react';
+import { JournalStats } from '@/components/app/JournalStats';
+import { JournalReminderSettings } from '@/components/app/JournalReminderSettings';
 import { checkCalendarPermission, requestCalendarPermission, isCalendarAvailable } from '@/lib/calendarIntegration';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -517,6 +519,15 @@ const AppProfile = () => {
           <Button
             variant="outline"
             size="sm"
+            onClick={() => scrollToSection('journal-section')}
+            className="flex flex-col h-auto py-3 gap-1"
+          >
+            <NotebookPen className="h-4 w-4" />
+            <span className="text-xs">Journal</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => scrollToSection('wallet-section')}
             className="flex flex-col h-auto py-3 gap-1"
           >
@@ -696,6 +707,12 @@ const AppProfile = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Journal Stats Section */}
+        <JournalStats />
+
+        {/* Journal Reminder Settings (native only) */}
+        <JournalReminderSettings />
 
         {/* My Courses Section */}
         <Card id="courses-section">

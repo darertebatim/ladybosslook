@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Trash2, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, Trash2, Check, Loader2, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MoodSelector } from '@/components/app/MoodSelector';
+import { WritingPrompts } from '@/components/app/WritingPrompts';
 import { 
   useJournalEntry, 
   useCreateJournalEntry, 
@@ -23,6 +24,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
 
 const AppJournalEntry = () => {
   const navigate = useNavigate();
@@ -199,6 +201,21 @@ const AppJournalEntry = () => {
                 Saved
               </span>
             )}
+            <Button 
+              size="sm" 
+              onClick={() => {
+                if (saveTimeoutRef.current) {
+                  clearTimeout(saveTimeoutRef.current);
+                }
+                saveEntry().then(() => {
+                  toast.success('Entry saved!');
+                });
+              }}
+              disabled={saveStatus === 'saving' || !content.trim()}
+            >
+              <Save className="h-4 w-4 mr-1" />
+              Save
+            </Button>
           </div>
         </div>
       </div>
@@ -218,6 +235,15 @@ const AppJournalEntry = () => {
           <p className="text-sm text-muted-foreground mb-3">How are you feeling?</p>
           <MoodSelector value={mood} onChange={handleMoodChange} />
         </div>
+
+        {/* Writing prompts for new entries */}
+        {isNew && !content.trim() && (
+          <WritingPrompts 
+            onSelectPrompt={(prompt) => {
+              setContent(prompt + '\n\n');
+            }} 
+          />
+        )}
 
         {/* Content editor */}
         <div className="flex-1">
