@@ -249,7 +249,7 @@ export function FeedChannelManager() {
                       <SelectValue placeholder="Select program" />
                     </SelectTrigger>
                     <SelectContent>
-                      {programs?.map((p) => (
+                      {programs?.filter(p => p.slug).map((p) => (
                         <SelectItem key={p.slug} value={p.slug}>{p.title}</SelectItem>
                       ))}
                     </SelectContent>
@@ -268,7 +268,7 @@ export function FeedChannelManager() {
                       <SelectValue placeholder="Select round" />
                     </SelectTrigger>
                     <SelectContent>
-                      {rounds?.map((r) => (
+                      {rounds?.filter(r => r.id).map((r) => (
                         <SelectItem key={r.id} value={r.id}>
                           {r.round_name} ({r.program_slug})
                         </SelectItem>

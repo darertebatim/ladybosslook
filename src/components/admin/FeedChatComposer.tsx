@@ -39,11 +39,11 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
   const [videoUrl, setVideoUrl] = useState('');
   const [isPinned, setIsPinned] = useState(false);
   const [sendPush, setSendPush] = useState(false);
-  const [displayName, setDisplayName] = useState('');
+  const [displayName, setDisplayName] = useState('default');
   const [customDisplayName, setCustomDisplayName] = useState('');
 
   const SENDER_OPTIONS = [
-    { value: '', label: 'Use my name' },
+    { value: 'default', label: 'Use my name' },
     { value: 'Razie', label: 'Razie' },
     { value: 'Team', label: 'The Team' },
     { value: 'custom', label: 'Custom...' },
@@ -214,7 +214,7 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
         action_data: actionData,
         is_pinned: isPinned,
         send_push: sendPush,
-        display_name: displayName === 'custom' ? customDisplayName : (displayName || null),
+        display_name: displayName === 'custom' ? customDisplayName : (displayName === 'default' ? null : displayName),
       });
 
       if (error) throw error;
@@ -237,7 +237,7 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
     setVideoUrl('');
     setIsPinned(false);
     setSendPush(false);
-    setDisplayName('');
+    setDisplayName('default');
     setCustomDisplayName('');
     setActionType('none');
     setActionLabel('');
@@ -285,7 +285,7 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
     send_push: sendPush,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    display_name: displayName === 'custom' ? customDisplayName : (displayName || null),
+    display_name: displayName === 'custom' ? customDisplayName : (displayName === 'default' ? null : displayName),
     author: {
       full_name: profile?.full_name || 'Admin',
       avatar_url: profile?.avatar_url || null,
