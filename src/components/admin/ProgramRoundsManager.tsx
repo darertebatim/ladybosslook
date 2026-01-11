@@ -190,10 +190,29 @@ export const ProgramRoundsManager = () => {
           .eq("id", editingId);
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        // Create new round
+        const { data: newRound, error } = await supabase
           .from("program_rounds")
-          .insert(roundData);
+          .insert(roundData)
+          .select()
+          .single();
         if (error) throw error;
+
+        // Auto-create a feed channel for this round
+        if (newRound) {
+          const programTitle = programs?.find(p => p.slug === data.program_slug)?.title || data.program_slug;
+          const channelSlug = `${data.program_slug}-round-${data.round_number}`.toLowerCase().replace(/\s+/g, '-');
+          
+          await supabase.from("feed_channels").insert({
+            name: `${programTitle} - ${data.round_name}`,
+            slug: channelSlug,
+            type: 'round',
+            program_slug: data.program_slug,
+            round_id: newRound.id,
+            allow_reactions: true,
+            allow_comments: true,
+          });
+        }
       }
     },
     onSuccess: () => {

@@ -36,6 +36,7 @@ import ProgramsAdmin from "./pages/admin/Programs";
 import Payments from "./pages/admin/Payments";
 import System from "./pages/admin/System";
 import Support from "./pages/admin/Support";
+import Community from "./pages/admin/Community";
 import AssertLanding from "./pages/AssertLanding";
 import Auth from "./pages/Auth";
 import BusinessIdeas from "./pages/BusinessIdeas";
@@ -146,6 +147,7 @@ const App = () => (
                 <Route path="users" element={<ProtectedRoute requiredPage="users"><Users /></ProtectedRoute>} />
                 <Route path="enrollment" element={<ProtectedRoute requiredPage="enrollment"><Enrollment /></ProtectedRoute>} />
                 <Route path="audio" element={<ProtectedRoute requiredPage="audio"><Audio /></ProtectedRoute>} />
+                <Route path="community" element={<ProtectedRoute requiredPage="community"><Community /></ProtectedRoute>} />
                 <Route path="communications" element={<ProtectedRoute requiredPage="communications"><Communications /></ProtectedRoute>} />
                 <Route path="programs" element={<ProtectedRoute requiredPage="programs"><ProgramsAdmin /></ProtectedRoute>} />
                 <Route path="payments" element={<ProtectedRoute requiredPage="payments"><Payments /></ProtectedRoute>} />
