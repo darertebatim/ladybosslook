@@ -3,7 +3,7 @@
     "apps": [],
     "details": [
       {
-        "appID": "TEAM_ID.com.ladybosslook.academy",
+        "appID": "W37S6CA72P.com.ladybosslook.academy",
         "paths": [
           "/app/*",
           "/auth",
@@ -14,7 +14,7 @@
   },
   "webcredentials": {
     "apps": [
-      "TEAM_ID.com.ladybosslook.academy"
+      "W37S6CA72P.com.ladybosslook.academy"
     ]
   }
 }
