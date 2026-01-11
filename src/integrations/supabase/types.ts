@@ -1091,6 +1091,7 @@ export type Database = {
           title: string
           type: string
           updated_at: string | null
+          video_url: string | null
         }
         Insert: {
           android_product_id?: string | null
@@ -1126,6 +1127,7 @@ export type Database = {
           title: string
           type: string
           updated_at?: string | null
+          video_url?: string | null
         }
         Update: {
           android_product_id?: string | null
@@ -1161,6 +1163,7 @@ export type Database = {
           title?: string
           type?: string
           updated_at?: string | null
+          video_url?: string | null
         }
         Relationships: [
           {

@@ -63,6 +63,7 @@ export function ProgramsManager() {
     description: '',
     is_active: true,
     audio_playlist_id: null as string | null,
+    video_url: '',
     available_on_web: true,
     available_on_mobile: true,
     is_free_on_ios: false,
@@ -129,6 +130,7 @@ export function ProgramsManager() {
       description: '',
       is_active: true,
       audio_playlist_id: null,
+      video_url: '',
       available_on_web: true,
       available_on_mobile: true,
       is_free_on_ios: false,
@@ -203,6 +205,7 @@ export function ProgramsManager() {
       description: program.description || '',
       is_active: program.is_active,
       audio_playlist_id: (program as any).audio_playlist_id || null,
+      video_url: (program as any).video_url || '',
       available_on_web: program.available_on_web,
       available_on_mobile: program.available_on_mobile,
       is_free_on_ios: program.is_free_on_ios || false,
@@ -676,6 +679,19 @@ export function ProgramsManager() {
                 </Select>
                 <p className="text-xs text-muted-foreground">
                   Playlist button will appear on course detail page in the app
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="video_url">Video URL (Optional)</Label>
+                <Input
+                  id="video_url"
+                  value={formData.video_url}
+                  onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                  placeholder="https://youtube.com/watch?v=... or Vimeo URL"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Promotional or intro video for this program
                 </p>
               </div>
 
