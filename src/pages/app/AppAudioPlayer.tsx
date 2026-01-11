@@ -271,12 +271,12 @@ export default function AppAudioPlayer() {
         </div>
       )}
 
-      {/* Fixed Header with safe area */}
+      {/* Fixed Header with safe area - matching AppHeader padding */}
       <div 
         className="relative z-50 bg-background/60 backdrop-blur-xl border-b border-border/50 shrink-0"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="py-3 px-4 flex items-center gap-3">
+        <div className="pt-6 pb-3 px-4 flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
@@ -371,11 +371,11 @@ export default function AppAudioPlayer() {
         </div>
       </div>
 
-      {/* Main Content - Flex grow to fill remaining space */}
-      <div className="relative z-10 flex-1 flex flex-col px-4 py-4 overflow-hidden">
-        <div className="max-w-md mx-auto w-full flex flex-col h-full gap-4">
-          {/* Cover Art - Fixed height, not aspect ratio */}
-          <div className="w-full max-h-[35vh] aspect-square mx-auto rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] shrink-0">
+      {/* Main Content - Centered vertically */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-3 overflow-hidden">
+        <div className="max-w-md w-full flex flex-col gap-3">
+          {/* Cover Art - Constrained size */}
+          <div className="w-full max-w-[220px] mx-auto rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] shrink-0">
             {audio.cover_image_url ? (
               <img
                 src={audio.cover_image_url}
@@ -419,18 +419,6 @@ export default function AppAudioPlayer() {
               variant="glass"
             />
           </div>
-
-          {/* Bookmarks - Only if present, scrollable if needed */}
-          {bookmarks.length > 0 && (
-            <div className="flex-1 min-h-0 overflow-auto">
-              <BookmarksList
-                bookmarks={bookmarks}
-                onSeek={handleSeek}
-                onDelete={deleteBookmark}
-                isDeleting={isDeletingBookmark}
-              />
-            </div>
-          )}
         </div>
       </div>
     </div>
