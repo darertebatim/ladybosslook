@@ -44,6 +44,30 @@ const needsDateSeparator = (currentMsg: Message, prevMsg: Message | null): boole
   return !isSameDay(new Date(currentMsg.created_at), new Date(prevMsg.created_at));
 };
 
+// Time threshold for grouping messages (5 minutes)
+const GROUP_TIME_THRESHOLD = 5 * 60 * 1000;
+
+// Check if message should show avatar (first in group)
+const shouldShowAvatar = (msg: Message, prevMsg: Message | null): boolean => {
+  if (!prevMsg) return true;
+  if (prevMsg.sender_type !== msg.sender_type) return true;
+  const timeDiff = new Date(msg.created_at).getTime() - new Date(prevMsg.created_at).getTime();
+  return timeDiff > GROUP_TIME_THRESHOLD;
+};
+
+// Check if message is first in its group
+const isFirstInGroup = (msg: Message, prevMsg: Message | null): boolean => {
+  return shouldShowAvatar(msg, prevMsg);
+};
+
+// Check if message is last in its group
+const isLastInGroup = (msg: Message, nextMsg: Message | null): boolean => {
+  if (!nextMsg) return true;
+  if (nextMsg.sender_type !== msg.sender_type) return true;
+  const timeDiff = new Date(nextMsg.created_at).getTime() - new Date(msg.created_at).getTime();
+  return timeDiff > GROUP_TIME_THRESHOLD;
+};
+
 export default function AppSupportChat() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -374,7 +398,13 @@ export default function AppSupportChat() {
               <>
                 {messages.map((msg, index) => {
                   const prevMsg = index > 0 ? messages[index - 1] : null;
+                  const nextMsg = index < messages.length - 1 ? messages[index + 1] : null;
                   const showDateSeparator = needsDateSeparator(msg, prevMsg);
+                  
+                  // Grouping logic
+                  const showAvatar = shouldShowAvatar(msg, showDateSeparator ? null : prevMsg);
+                  const firstInGroup = isFirstInGroup(msg, showDateSeparator ? null : prevMsg);
+                  const lastInGroup = isLastInGroup(msg, nextMsg);
                   
                   return (
                     <div key={msg.id}>
@@ -398,6 +428,11 @@ export default function AppSupportChat() {
                         attachmentName={msg.attachment_name}
                         attachmentType={msg.attachment_type}
                         isBroadcast={msg.is_broadcast}
+                        senderName="Ladyboss Support"
+                        showAvatar={showAvatar}
+                        isFirstInGroup={firstInGroup}
+                        isLastInGroup={lastInGroup}
+                        showTimestamp={lastInGroup}
                       />
                     </div>
                   );
