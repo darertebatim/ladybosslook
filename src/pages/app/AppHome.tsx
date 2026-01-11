@@ -27,7 +27,16 @@ const AppHome = () => {
   const [showNotificationBanner, setShowNotificationBanner] = useState(false);
   
   // Use centralized data hook with parallel fetching
-  const { profile, enrollments, wallet, hasActiveRounds, isLoading } = useHomeData();
+  const { 
+    profile, 
+    enrollments, 
+    hasActiveRounds, 
+    isLoading,
+    listeningMinutes,
+    completedTracks,
+    unreadPosts,
+    nextSession
+  } = useHomeData();
   
   // Get unseen content for new course notification
   const { hasUnseenCourses, unseenEnrollments } = useUnseenContentContext();
@@ -194,8 +203,10 @@ const AppHome = () => {
           ) : (
             <>
               <StatsCards 
-                enrolledCount={enrollments?.length || 0}
-                creditsBalance={wallet?.credits_balance || 0}
+                listeningMinutes={listeningMinutes}
+                unreadPosts={unreadPosts}
+                completedTracks={completedTracks}
+                nextSession={nextSession}
               />
               {hasActiveRounds && <ActiveRound />}
               

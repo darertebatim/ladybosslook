@@ -13,6 +13,10 @@ interface HomeData {
   enrollments: any[];
   wallet: { credits_balance: number } | null;
   hasActiveRounds: boolean;
+  listeningMinutes: number;
+  completedTracks: number;
+  unreadPosts: number;
+  nextSession: Date | null;
 }
 
 interface CoursesData {
@@ -30,7 +34,16 @@ interface PlayerData {
 // ============ HOME PAGE DATA ============
 async function fetchHomeData(userId: string): Promise<HomeData> {
   // Parallel fetch all home page data
-  const [profileRes, enrollmentsRes, walletRes, activeRoundsRes] = await Promise.all([
+  const [
+    profileRes, 
+    enrollmentsRes, 
+    walletRes, 
+    activeRoundsRes,
+    audioProgressRes,
+    allPostsRes,
+    readPostsRes,
+    nextSessionRes
+  ] = await Promise.all([
     supabase
       .from('profiles')
       .select('*')
@@ -52,13 +65,56 @@ async function fetchHomeData(userId: string): Promise<HomeData> {
       .eq('status', 'active')
       .not('round_id', 'is', null)
       .limit(1),
+    // Audio progress for listening time and completed tracks
+    supabase
+      .from('audio_progress')
+      .select('current_position_seconds, completed')
+      .eq('user_id', userId),
+    // All feed posts for unread count
+    supabase
+      .from('feed_posts')
+      .select('id'),
+    // User's read posts
+    supabase
+      .from('feed_post_reads')
+      .select('post_id')
+      .eq('user_id', userId),
+    // Next upcoming session for user's enrolled rounds
+    supabase
+      .from('program_sessions')
+      .select('session_date, round_id')
+      .gte('session_date', new Date().toISOString())
+      .order('session_date', { ascending: true })
+      .limit(20),
   ]);
+
+  // Calculate listening stats
+  const audioProgress = audioProgressRes.data || [];
+  const listeningSeconds = audioProgress.reduce((sum, p) => sum + (p.current_position_seconds || 0), 0);
+  const completedTracks = audioProgress.filter(p => p.completed).length;
+
+  // Calculate unread posts
+  const readPostIds = new Set((readPostsRes.data || []).map(r => r.post_id));
+  const unreadPosts = (allPostsRes.data || []).filter(p => !readPostIds.has(p.id)).length;
+
+  // Get user's round IDs from enrollments
+  const userRoundIds = (enrollmentsRes.data || [])
+    .filter(e => e.round_id)
+    .map(e => e.round_id);
+
+  // Find next session for user's rounds
+  const nextSessionData = (nextSessionRes.data || [])
+    .find(s => userRoundIds.includes(s.round_id));
 
   return {
     profile: profileRes.data,
     enrollments: enrollmentsRes.data || [],
     wallet: walletRes.data,
     hasActiveRounds: (activeRoundsRes.data?.length || 0) > 0,
+    listeningMinutes: Math.floor(listeningSeconds / 60),
+    completedTracks,
+    unreadPosts,
+    nextSession: nextSessionData ? new Date(nextSessionData.session_date) : null,
   };
 }
 
@@ -91,6 +147,10 @@ export function useHomeData() {
     enrollments: query.data?.enrollments || [],
     wallet: query.data?.wallet || null,
     hasActiveRounds: query.data?.hasActiveRounds || false,
+    listeningMinutes: query.data?.listeningMinutes || 0,
+    completedTracks: query.data?.completedTracks || 0,
+    unreadPosts: query.data?.unreadPosts || 0,
+    nextSession: query.data?.nextSession || null,
   };
 }
 
