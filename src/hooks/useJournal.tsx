@@ -9,6 +9,8 @@ export interface JournalEntry {
   title: string | null;
   content: string;
   mood: string | null;
+  shared_with_admin: boolean | null;
+  shared_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -24,6 +26,7 @@ export interface UpdateJournalEntry {
   title?: string;
   content?: string;
   mood?: string;
+  shared_with_admin?: boolean;
 }
 
 export const useJournalEntries = (searchQuery?: string) => {
@@ -116,6 +119,12 @@ export const useUpdateJournalEntry = () => {
       if (entry.title !== undefined) updateData.title = entry.title || null;
       if (entry.content !== undefined) updateData.content = entry.content;
       if (entry.mood !== undefined) updateData.mood = entry.mood || null;
+      if (entry.shared_with_admin !== undefined) {
+        updateData.shared_with_admin = entry.shared_with_admin;
+        if (entry.shared_with_admin) {
+          updateData.shared_at = new Date().toISOString();
+        }
+      }
 
       const { data, error } = await supabase
         .from('journal_entries')

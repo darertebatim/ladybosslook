@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NotebookPen, Bell, Clock } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Bell, Clock } from 'lucide-react';
+import { toast } from 'sonner';
 import { Capacitor } from '@capacitor/core';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface JournalReminderSettingsProps {
   className?: string;
@@ -17,6 +18,7 @@ const REMINDER_TIMES = [
   { value: '07:00', label: '7:00 AM' },
   { value: '08:00', label: '8:00 AM' },
   { value: '09:00', label: '9:00 AM' },
+  { value: '10:00', label: '10:00 AM' },
   { value: '12:00', label: '12:00 PM' },
   { value: '18:00', label: '6:00 PM' },
   { value: '19:00', label: '7:00 PM' },
@@ -26,47 +28,80 @@ const REMINDER_TIMES = [
 ];
 
 export const JournalReminderSettings = ({ className }: JournalReminderSettingsProps) => {
-  const { toast } = useToast();
-  const [reminderEnabled, setReminderEnabled] = useState(() => {
-    return localStorage.getItem('journalReminderEnabled') === 'true';
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  // Fetch settings from database
+  const { data: settings } = useQuery({
+    queryKey: ['journal-reminder-settings', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('journal_reminder_settings')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
   });
-  const [reminderTime, setReminderTime] = useState(() => {
-    return localStorage.getItem('journalReminderTime') || '20:00';
+
+  // Update settings mutation
+  const updateSettingsMutation = useMutation({
+    mutationFn: async ({ enabled, reminderTime }: { enabled: boolean; reminderTime: string }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      const { error } = await supabase
+        .from('journal_reminder_settings')
+        .upsert({
+          user_id: user.id,
+          enabled,
+          reminder_time: reminderTime,
+          timezone,
+        }, {
+          onConflict: 'user_id',
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['journal-reminder-settings'] });
+    },
   });
 
-  useEffect(() => {
-    localStorage.setItem('journalReminderEnabled', reminderEnabled.toString());
-  }, [reminderEnabled]);
+  const reminderEnabled = settings?.enabled ?? false;
+  const reminderTime = settings?.reminder_time ?? '20:00';
 
-  useEffect(() => {
-    localStorage.setItem('journalReminderTime', reminderTime);
-  }, [reminderTime]);
-
-  const handleToggleReminder = (enabled: boolean) => {
-    setReminderEnabled(enabled);
-    
-    if (enabled) {
-      const time = REMINDER_TIMES.find(t => t.value === reminderTime);
-      toast({
-        title: 'Journal Reminder Set',
-        description: `You'll be reminded to write at ${time?.label || reminderTime} daily`,
-      });
-    } else {
-      toast({
-        title: 'Reminder Disabled',
-        description: 'Daily journal reminders have been turned off',
-      });
+  const handleToggleReminder = async (enabled: boolean) => {
+    try {
+      await updateSettingsMutation.mutateAsync({ enabled, reminderTime });
+      
+      if (enabled) {
+        const time = REMINDER_TIMES.find(t => t.value === reminderTime);
+        toast.success(`Daily reminder set for ${time?.label || reminderTime}`);
+      } else {
+        toast.success('Daily reminder turned off');
+      }
+    } catch (error) {
+      console.error('Failed to update settings:', error);
+      toast.error('Failed to update settings');
     }
   };
 
-  const handleTimeChange = (newTime: string) => {
-    setReminderTime(newTime);
-    if (reminderEnabled) {
+  const handleTimeChange = async (newTime: string) => {
+    try {
+      await updateSettingsMutation.mutateAsync({ enabled: reminderEnabled, reminderTime: newTime });
+      
       const time = REMINDER_TIMES.find(t => t.value === newTime);
-      toast({
-        title: 'Reminder Time Updated',
-        description: `You'll be reminded at ${time?.label || newTime}`,
-      });
+      toast.success(`Reminder time updated to ${time?.label || newTime}`);
+    } catch (error) {
+      console.error('Failed to update time:', error);
+      toast.error('Failed to update time');
     }
   };
 
@@ -76,19 +111,12 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
   }
 
   return (
-    <Card className={className} id="journal-reminder-section">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <NotebookPen className="h-5 w-5" />
-          Journal Reminders
-        </CardTitle>
-        <CardDescription>Get daily prompts to write in your journal</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className={className}>
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Bell className="h-5 w-5 text-muted-foreground" />
-            <Label htmlFor="journal-reminder" className="text-sm">
+            <Label htmlFor="journal-reminder" className="text-sm font-medium">
               Daily Reminder
             </Label>
           </div>
@@ -96,6 +124,7 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
             id="journal-reminder"
             checked={reminderEnabled}
             onCheckedChange={handleToggleReminder}
+            disabled={updateSettingsMutation.isPending}
           />
         </div>
 
@@ -105,7 +134,11 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
               <Clock className="h-4 w-4 text-muted-foreground" />
               <Label className="text-sm text-muted-foreground">Remind me at</Label>
             </div>
-            <Select value={reminderTime} onValueChange={handleTimeChange}>
+            <Select 
+              value={reminderTime} 
+              onValueChange={handleTimeChange}
+              disabled={updateSettingsMutation.isPending}
+            >
               <SelectTrigger className="w-[120px]">
                 <SelectValue />
               </SelectTrigger>
@@ -122,10 +155,10 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
 
         {reminderEnabled && (
           <p className="text-xs text-muted-foreground pl-8">
-            You'll receive a gentle reminder to reflect and write in your journal
+            You'll receive a gentle reminder to reflect and write
           </p>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

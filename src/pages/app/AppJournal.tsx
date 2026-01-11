@@ -1,13 +1,16 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Search, BookOpen } from 'lucide-react';
+import { ArrowLeft, Plus, Search, BookOpen, Bell, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useJournalEntries } from '@/hooks/useJournal';
 import { JournalEntryCard, formatDateGroup } from '@/components/app/JournalEntryCard';
 import { JournalSkeleton } from '@/components/app/skeletons/JournalSkeleton';
+import { JournalReminderSettings } from '@/components/app/JournalReminderSettings';
 import { SEOHead } from '@/components/SEOHead';
 import { format, startOfDay } from 'date-fns';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Capacitor } from '@capacitor/core';
 
 const AppJournal = () => {
   const navigate = useNavigate();
@@ -33,6 +36,7 @@ const AppJournal = () => {
   }, [entries]);
 
   const dateKeys = Object.keys(groupedEntries).sort((a, b) => b.localeCompare(a));
+  const isNative = Capacitor.isNativePlatform();
 
   if (isLoading) {
     return (
@@ -65,7 +69,7 @@ const AppJournal = () => {
             </Button>
             <h1 className="text-xl font-semibold">My Journal</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Button 
               variant="ghost" 
               size="icon"
@@ -73,6 +77,23 @@ const AppJournal = () => {
             >
               <Search className="h-5 w-5" />
             </Button>
+            {isNative && (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Bell className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="h-auto">
+                  <SheetHeader>
+                    <SheetTitle>Daily Reminder</SheetTitle>
+                  </SheetHeader>
+                  <div className="py-4">
+                    <JournalReminderSettings />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
             <Button 
               variant="ghost" 
               size="icon"
@@ -128,6 +149,7 @@ const AppJournal = () => {
                     content={entry.content}
                     mood={entry.mood}
                     createdAt={entry.created_at}
+                    sharedWithAdmin={entry.shared_with_admin}
                     onClick={() => navigate(`/app/journal/${entry.id}`)}
                   />
                 ))}

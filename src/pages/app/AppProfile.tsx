@@ -15,7 +15,6 @@ import {
   BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, NotebookPen
 } from 'lucide-react';
 import { JournalStats } from '@/components/app/JournalStats';
-import { JournalReminderSettings } from '@/components/app/JournalReminderSettings';
 import { checkCalendarPermission, requestCalendarPermission, isCalendarAvailable } from '@/lib/calendarIntegration';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -709,10 +708,9 @@ const AppProfile = () => {
         </Card>
 
         {/* Journal Stats Section */}
-        <JournalStats />
-
-        {/* Journal Reminder Settings (native only) */}
-        <JournalReminderSettings />
+        <div id="journal-section">
+          <JournalStats />
+        </div>
 
         {/* My Courses Section */}
         <Card id="courses-section">

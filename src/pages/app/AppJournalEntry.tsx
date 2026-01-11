@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Trash2, Check, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, Trash2, Check, Loader2, Save, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MoodSelector } from '@/components/app/MoodSelector';
@@ -39,8 +39,10 @@ const AppJournalEntry = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [mood, setMood] = useState<string | null>(null);
+  const [sharedWithAdmin, setSharedWithAdmin] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -52,6 +54,7 @@ const AppJournalEntry = () => {
       setTitle(existingEntry.title || '');
       setContent(existingEntry.content || '');
       setMood(existingEntry.mood);
+      setSharedWithAdmin(existingEntry.shared_with_admin || false);
     }
   }, [existingEntry]);
 
@@ -122,6 +125,28 @@ const AppJournalEntry = () => {
     triggerAutoSave();
   };
 
+  // Handle share with admin
+  const handleShareWithAdmin = async () => {
+    const id = createdEntryIdRef.current || entryId;
+    if (!id) {
+      toast.error('Please save your entry first');
+      return;
+    }
+
+    try {
+      await updateMutation.mutateAsync({
+        id,
+        shared_with_admin: true,
+      });
+      setSharedWithAdmin(true);
+      setShowShareDialog(false);
+      toast.success('Entry shared with Razie');
+    } catch (error) {
+      console.error('Share failed:', error);
+      toast.error('Failed to share entry');
+    }
+  };
+
   // Handle delete
   const handleDelete = async () => {
     const id = createdEntryIdRef.current || entryId;
@@ -141,6 +166,15 @@ const AppJournalEntry = () => {
       await saveEntry();
     }
     navigate('/app/journal');
+  };
+
+  // Handle explicit save
+  const handleSave = async () => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    await saveEntry();
+    toast.success('Entry saved!');
   };
 
   // Cleanup timeout on unmount
@@ -170,6 +204,8 @@ const AppJournalEntry = () => {
     );
   }
 
+  const canShare = (entryId || createdEntryIdRef.current) && !sharedWithAdmin;
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead 
@@ -188,34 +224,17 @@ const AppJournalEntry = () => {
               {isNew ? 'New Entry' : 'Edit Entry'}
             </h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {saveStatus === 'saving' && (
               <span className="flex items-center text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                Saving...
               </span>
             )}
             {saveStatus === 'saved' && (
               <span className="flex items-center text-sm text-green-600">
-                <Check className="h-4 w-4 mr-1" />
-                Saved
+                <Check className="h-4 w-4" />
               </span>
             )}
-            <Button 
-              size="sm" 
-              onClick={() => {
-                if (saveTimeoutRef.current) {
-                  clearTimeout(saveTimeoutRef.current);
-                }
-                saveEntry().then(() => {
-                  toast.success('Entry saved!');
-                });
-              }}
-              disabled={saveStatus === 'saving' || !content.trim()}
-            >
-              <Save className="h-4 w-4 mr-1" />
-              Save
-            </Button>
           </div>
         </div>
       </div>
@@ -255,6 +274,36 @@ const AppJournalEntry = () => {
           />
         </div>
 
+        {/* Save button - below content */}
+        <Button 
+          className="w-full"
+          onClick={handleSave}
+          disabled={saveStatus === 'saving' || !content.trim()}
+        >
+          <Save className="h-4 w-4 mr-2" />
+          Save Entry
+        </Button>
+
+        {/* Share with Razie button (for saved entries only) */}
+        {canShare && (
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => setShowShareDialog(true)}
+          >
+            <Share2 className="h-4 w-4 mr-2" />
+            Share with Razie
+          </Button>
+        )}
+
+        {/* Already shared indicator */}
+        {sharedWithAdmin && (
+          <div className="flex items-center justify-center gap-2 py-2 text-sm text-primary">
+            <Share2 className="h-4 w-4" />
+            Shared with Razie
+          </div>
+        )}
+
         {/* Delete button (for existing entries) */}
         {(entryId || createdEntryIdRef.current) && (
           <Button
@@ -284,6 +333,24 @@ const AppJournalEntry = () => {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Share confirmation dialog */}
+      <AlertDialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Share with Razie</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will allow Razie to read this journal entry. She may use it to better understand and support you. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleShareWithAdmin}>
+              Share Entry
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
