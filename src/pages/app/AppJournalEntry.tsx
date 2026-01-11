@@ -207,7 +207,7 @@ const AppJournalEntry = () => {
   const canShare = (entryId || createdEntryIdRef.current) && !sharedWithAdmin;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pb-24">
       <SEOHead 
         title={isNew ? 'New Entry' : 'Edit Entry'} 
         description="Write your journal entry" 
@@ -240,7 +240,7 @@ const AppJournalEntry = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-4 space-y-6">
+      <div className="flex-1 p-4 space-y-4">
         {/* Title */}
         <Input
           placeholder="Title (optional)"
