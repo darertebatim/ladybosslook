@@ -205,7 +205,7 @@ export default function PastSessionsManager() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Programs</SelectItem>
-                  {programs?.map((program) => (
+                  {programs?.filter(p => p.slug).map((program) => (
                     <SelectItem key={program.slug} value={program.slug}>
                       {program.title}
                     </SelectItem>
