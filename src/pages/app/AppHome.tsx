@@ -225,6 +225,25 @@ const AppHome = () => {
               />
               {hasActiveRounds && <ActiveRound />}
               
+              {/* My Courses Quick Action */}
+              <div 
+                onClick={() => navigate('/app/courses')}
+                className="bg-muted/50 border rounded-xl p-4 cursor-pointer hover:bg-muted transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <BookOpen className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground">My Courses</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {enrollments?.length || 0} enrolled course{(enrollments?.length || 0) !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                </div>
+              </div>
+              
               {/* In-App Chat Banner */}
               <div 
                 onClick={() => navigate('/app/support-chat')}
