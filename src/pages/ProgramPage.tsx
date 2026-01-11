@@ -23,7 +23,24 @@ interface ProgramData {
   available_on_web: boolean;
   is_active: boolean;
   stripe_payment_link: string | null;
+  video_url: string | null;
 }
+
+const convertToEmbedUrl = (url: string): string => {
+  // Handle youtube.com/watch?v= format
+  const watchMatch = url.match(/youtube\.com\/watch\?v=([^&]+)/);
+  if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
+  
+  // Handle youtu.be/ format
+  const shortMatch = url.match(/youtu\.be\/([^?]+)/);
+  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+  
+  // Handle vimeo
+  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  
+  return url;
+};
 
 const ProgramPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -239,6 +256,42 @@ const ProgramPage = () => {
               </div>
             </div>
           </section>
+
+          {/* Video Section */}
+          {program.video_url && (
+            <section className="py-12 bg-card/50">
+              <div className="container mx-auto px-4">
+                <div className="max-w-4xl mx-auto">
+                  <div className="aspect-video rounded-2xl overflow-hidden shadow-lg bg-muted">
+                    {program.video_url.includes('youtube') || program.video_url.includes('youtu.be') ? (
+                      <iframe 
+                        src={convertToEmbedUrl(program.video_url)}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={`${program.title} video`}
+                      />
+                    ) : program.video_url.includes('vimeo') ? (
+                      <iframe 
+                        src={convertToEmbedUrl(program.video_url)}
+                        className="w-full h-full"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                        title={`${program.title} video`}
+                      />
+                    ) : (
+                      <video 
+                        src={program.video_url} 
+                        controls 
+                        className="w-full h-full object-cover"
+                        poster=""
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
 
           {/* Description Section */}
           {program.description && (

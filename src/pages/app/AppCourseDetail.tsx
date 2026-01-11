@@ -527,8 +527,48 @@ const AppCourseDetail = () => {
               Browse
             </Button>
 
-            {/* Program Hero Image */}
-            {program && programImages[program.slug] && (
+            {/* Program Video */}
+            {program?.video_url && (
+              <Card className="overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="aspect-video rounded-md overflow-hidden bg-muted">
+                    {(() => {
+                      let embedUrl = program.video_url;
+                      if (embedUrl.includes('youtube.com/watch')) {
+                        embedUrl = embedUrl.replace('watch?v=', 'embed/');
+                      } else if (embedUrl.includes('youtu.be/')) {
+                        embedUrl = embedUrl.replace('youtu.be/', 'youtube.com/embed/');
+                      }
+                      if (embedUrl.includes('vimeo.com/') && !embedUrl.includes('/video/')) {
+                        embedUrl = embedUrl.replace('vimeo.com/', 'player.vimeo.com/video/');
+                      }
+                      
+                      if (embedUrl.includes('youtube') || embedUrl.includes('vimeo')) {
+                        return (
+                          <iframe
+                            src={embedUrl}
+                            title={`${program.title} video`}
+                            className="w-full h-full border-0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        );
+                      }
+                      return (
+                        <video 
+                          src={embedUrl} 
+                          controls 
+                          className="w-full h-full object-cover"
+                        />
+                      );
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Program Hero Image (only if no video) */}
+            {program && !program.video_url && programImages[program.slug] && (
               <Card className="overflow-hidden">
                 <div className="relative h-64 overflow-hidden">
                   <img 
@@ -629,8 +669,9 @@ const AppCourseDetail = () => {
           </div>
         ) : (
           <>
-            {round?.video_url && (() => {
-              let embedUrl = round.video_url;
+            {/* Show round video if available, otherwise show program video */}
+            {(round?.video_url || program?.video_url) && (() => {
+              let embedUrl = round?.video_url || program?.video_url || '';
               
               // Convert YouTube URLs to embed format
               if (embedUrl.includes('youtube.com/watch')) {
@@ -648,13 +689,21 @@ const AppCourseDetail = () => {
                 <Card>
                   <CardContent className="p-0">
                     <div className="aspect-video rounded-md overflow-hidden bg-muted">
-                      <iframe
-                        src={embedUrl}
-                        title="Course video"
-                        className="w-full h-full border-0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
+                      {embedUrl.includes('youtube') || embedUrl.includes('vimeo') ? (
+                        <iframe
+                          src={embedUrl}
+                          title="Course video"
+                          className="w-full h-full border-0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <video 
+                          src={embedUrl} 
+                          controls 
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                     </div>
                   </CardContent>
                 </Card>
