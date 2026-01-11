@@ -25,13 +25,8 @@ import { Calendar, Plus, Trash2, Edit, ArrowLeft, Wand2, Loader2, CalendarDays, 
 import { format, addWeeks, addDays } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { useSessionComplete } from "@/hooks/useSessionComplete";
+import { SessionCompleteDialog } from "@/components/admin/SessionCompleteDialog";
 
 interface ProgramSession {
   id: string;
@@ -178,23 +173,8 @@ export const SessionsManager = ({
     },
   });
 
-  // Quick mark complete mutation
-  const markCompleteMutation = useMutation({
-    mutationFn: async (sessionId: string) => {
-      const { error } = await supabase
-        .from("program_sessions")
-        .update({ status: 'completed' })
-        .eq("id", sessionId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["program-sessions", roundId] });
-      toast.success("Session marked as completed");
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
-  });
+  // Session complete with announcement
+  const sessionComplete = useSessionComplete([["program-sessions", roundId]]);
 
   // Send push notification to enrolled users
   const sendNewSessionsNotification = async (sessionCount: number) => {
@@ -569,8 +549,12 @@ export const SessionsManager = ({
                             variant="outline"
                             size="sm"
                             className="text-green-600 hover:bg-green-50 hover:text-green-700"
-                            onClick={() => markCompleteMutation.mutate(session.id)}
-                            disabled={markCompleteMutation.isPending}
+                            onClick={() => sessionComplete.openDialog({
+                              id: session.id,
+                              title: session.title,
+                              roundId: roundId,
+                              programSlug: programSlug,
+                            })}
                             title="Mark as completed"
                           >
                             <CheckCircle className="h-4 w-4" />
@@ -605,6 +589,16 @@ export const SessionsManager = ({
           )}
         </CardContent>
       </Card>
+
+      <SessionCompleteDialog
+        open={!!sessionComplete.sessionToComplete}
+        sessionTitle={sessionComplete.sessionToComplete?.title}
+        recordingLink={sessionComplete.recordingLink}
+        onRecordingLinkChange={sessionComplete.setRecordingLink}
+        onConfirm={sessionComplete.confirmComplete}
+        onCancel={sessionComplete.closeDialog}
+        isPending={sessionComplete.isPending}
+      />
     </div>
   );
 };

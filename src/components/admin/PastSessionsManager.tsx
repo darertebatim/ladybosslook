@@ -20,9 +20,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Calendar, CheckCircle, Edit, AlertTriangle, Loader2 } from "lucide-react";
+import { Calendar, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 import { format, isPast } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { useSessionComplete } from "@/hooks/useSessionComplete";
+import { SessionCompleteDialog } from "@/components/admin/SessionCompleteDialog";
 
 interface ProgramSession {
   id: string;
@@ -108,23 +110,8 @@ export default function PastSessionsManager() {
     },
   });
 
-  // Quick mark complete mutation
-  const markCompleteMutation = useMutation({
-    mutationFn: async (sessionId: string) => {
-      const { error } = await supabase
-        .from("program_sessions")
-        .update({ status: 'completed' })
-        .eq("id", sessionId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["all-program-sessions"] });
-      toast.success("Session marked as completed");
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
-  });
+  // Session complete with announcement
+  const sessionComplete = useSessionComplete([["all-program-sessions"]]);
 
   // Bulk mark complete mutation
   const [selectedSessions, setSelectedSessions] = useState<string[]>([]);
@@ -352,8 +339,12 @@ export default function PastSessionsManager() {
                             variant="outline"
                             size="sm"
                             className="text-green-600 hover:bg-green-50 hover:text-green-700"
-                            onClick={() => markCompleteMutation.mutate(session.id)}
-                            disabled={markCompleteMutation.isPending}
+                            onClick={() => sessionComplete.openDialog({
+                              id: session.id,
+                              title: session.title,
+                              roundId: session.round_id,
+                              programSlug: session.program_rounds.program_slug,
+                            })}
                             title="Mark as completed"
                           >
                             <CheckCircle className="h-4 w-4" />
@@ -373,6 +364,16 @@ export default function PastSessionsManager() {
           )}
         </CardContent>
       </Card>
+
+      <SessionCompleteDialog
+        open={!!sessionComplete.sessionToComplete}
+        sessionTitle={sessionComplete.sessionToComplete?.title}
+        recordingLink={sessionComplete.recordingLink}
+        onRecordingLinkChange={sessionComplete.setRecordingLink}
+        onConfirm={sessionComplete.confirmComplete}
+        onCancel={sessionComplete.closeDialog}
+        isPending={sessionComplete.isPending}
+      />
     </div>
   );
 }
