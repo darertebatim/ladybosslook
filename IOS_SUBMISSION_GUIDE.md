@@ -104,6 +104,25 @@ npx cap open ios
 4. Select your Team (your Apple Developer account)
 5. Verify Bundle Identifier: `com.ladybosslook.academy`
 
+#### A2. Background Audio Capability (REQUIRED for audio player)
+1. In "Signing & Capabilities" tab, click "+ Capability"
+2. Search for and add "Background Modes"
+3. Check **"Audio, AirPlay, and Picture in Picture"**
+4. This allows audio to continue playing when:
+   - App is in background
+   - Screen is locked
+   - User switches to another app
+
+**Also add to Info.plist** (if not auto-added):
+1. Open `ios/App/App/Info.plist`
+2. Add:
+```xml
+<key>UIBackgroundModes</key>
+<array>
+  <string>audio</string>
+</array>
+```
+
 #### B. App Icons
 1. Open `App/App/Assets.xcassets/AppIcon.appiconset/`
 2. Drag and drop your generated icons for each size:
