@@ -88,6 +88,41 @@ export type Database = {
         }
         Relationships: []
       }
+      audio_bookmarks: {
+        Row: {
+          audio_id: string
+          created_at: string
+          id: string
+          note: string | null
+          timestamp_seconds: number
+          user_id: string
+        }
+        Insert: {
+          audio_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          timestamp_seconds: number
+          user_id: string
+        }
+        Update: {
+          audio_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          timestamp_seconds?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audio_bookmarks_audio_id_fkey"
+            columns: ["audio_id"]
+            isOneToOne: false
+            referencedRelation: "audio_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audio_content: {
         Row: {
           category: Database["public"]["Enums"]["audio_category"]

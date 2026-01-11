@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Headphones, ChevronLeft, ChevronRight, List, Lock } from "lucide-react";
 import { AudioControls } from "@/components/audio/AudioControls";
 import { ProgressBar } from "@/components/audio/ProgressBar";
+import { BookmarkButton } from "@/components/audio/BookmarkButton";
+import { BookmarksList } from "@/components/audio/BookmarksList";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -17,17 +19,38 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { getTrackAvailabilityWithCountdown } from "@/lib/dripContent";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { useBookmarks } from "@/hooks/useBookmarks";
 
 export default function AppAudioPlayer() {
   const { audioId } = useParams();
   const navigate = useNavigate();
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const queryClient = useQueryClient();
+  
+  // Use global audio player context
+  const {
+    isPlaying,
+    currentTime,
+    duration,
+    playbackRate,
+    currentTrack,
+    isLoading: audioLoading,
+    playTrack,
+    pause,
+    resume,
+    seek,
+    setPlaybackRate,
+    skipForward,
+    skipBack,
+  } = useAudioPlayer();
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [playbackRate, setPlaybackRate] = useState(1);
+  // Bookmarks
+  const { 
+    bookmarks, 
+    addBookmark, 
+    deleteBookmark, 
+    isAdding: isAddingBookmark,
+    isDeleting: isDeletingBookmark 
+  } = useBookmarks(audioId);
 
   // Fetch audio content
   const { data: audio, isLoading } = useQuery({
@@ -123,17 +146,8 @@ export default function AppAudioPlayer() {
     enabled: !!playlistInfo?.playlist_id,
   });
 
-  // Check if a track is available based on drip delay - now with countdown and offset
-  const getTrackAvailability = (dripDelayDays: number) => {
-    return getTrackAvailabilityWithCountdown(
-      dripDelayDays, 
-      userRound?.start_date,
-      userRound?.drip_offset_days || 0
-    );
-  };
-
-  // Fetch progress
-  const { data: progress } = useQuery({
+  // Fetch saved progress
+  const { data: savedProgress } = useQuery({
     queryKey: ['audio-progress', audioId],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -152,155 +166,58 @@ export default function AppAudioPlayer() {
     enabled: !!audioId,
   });
 
-  // Save progress mutation
-  const saveProgressMutation = useMutation({
-    mutationFn: async (position: number) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+  // Check if a track is available based on drip delay - now with countdown and offset
+  const getTrackAvailability = (dripDelayDays: number) => {
+    return getTrackAvailabilityWithCountdown(
+      dripDelayDays, 
+      userRound?.start_date,
+      userRound?.drip_offset_days || 0
+    );
+  };
 
-      const { error } = await supabase
-        .from('audio_progress')
-        .upsert({
-          user_id: user.id,
-          audio_id: audioId!,
-          current_position_seconds: Math.floor(position),
-          completed: duration > 0 && position >= duration * 0.95,
-          last_played_at: new Date().toISOString(),
-        });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['audio-progress'] });
-    },
-  });
-
-  // Load initial progress
+  // Start playing when audio data is loaded
   useEffect(() => {
-    if (progress && audioRef.current) {
-      audioRef.current.currentTime = progress.current_position_seconds;
-      setCurrentTime(progress.current_position_seconds);
+    if (audio && audioId && (!currentTrack || currentTrack.id !== audioId)) {
+      const currentTrackIndex = playlistTracks?.findIndex(t => t.audio_id === audioId) ?? -1;
+      
+      playTrack({
+        id: audio.id,
+        title: audio.title,
+        coverImageUrl: audio.cover_image_url || undefined,
+        playlistId: playlistInfo?.playlist_id,
+        playlistName: playlistInfo?.audio_playlists?.name,
+        trackPosition: playlistTracks && currentTrackIndex >= 0 
+          ? `${currentTrackIndex + 1}/${playlistTracks.length}` 
+          : undefined,
+        fileUrl: audio.file_url,
+        duration: audio.duration_seconds,
+      }, savedProgress?.current_position_seconds || 0);
     }
-  }, [progress]);
-
-  // Audio element event handlers
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const handleDurationChange = () => setDuration(audio.duration);
-    const handleEnded = () => {
-      setIsPlaying(false);
-      saveProgressMutation.mutate(audio.duration);
-      
-      // Auto-advance to next track if available and not locked
-      const currentIndex = playlistTracks?.findIndex(t => t.audio_id === audioId);
-      if (currentIndex !== undefined && currentIndex >= 0 && playlistTracks && currentIndex < playlistTracks.length - 1) {
-        const nextTrack = playlistTracks[currentIndex + 1];
-        const { isAvailable } = getTrackAvailability(nextTrack.drip_delay_days || 0);
-        if (isAvailable) {
-          navigate(`/app/player/${nextTrack.audio_id}`);
-        }
-      }
-    };
-    const handleError = (e: Event) => {
-      const target = e.target as HTMLAudioElement;
-      console.error('Audio error:', {
-        error: target.error,
-        networkState: target.networkState,
-        readyState: target.readyState,
-        src: target.src
-      });
-      
-      let errorMessage = 'Failed to load audio file';
-      if (target.error) {
-        switch (target.error.code) {
-          case MediaError.MEDIA_ERR_ABORTED:
-            errorMessage = 'Audio loading aborted';
-            break;
-          case MediaError.MEDIA_ERR_NETWORK:
-            errorMessage = 'Network error loading audio';
-            break;
-          case MediaError.MEDIA_ERR_DECODE:
-            errorMessage = 'Audio file corrupted';
-            break;
-          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-            errorMessage = 'Audio format not supported or file not accessible';
-            break;
-        }
-      }
-      
-      toast.error(errorMessage);
-      setIsPlaying(false);
-    };
-    const handleLoadedMetadata = () => {
-      console.log('Audio loaded successfully, duration:', audio.duration);
-    };
-
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('durationchange', handleDurationChange);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('durationchange', handleDurationChange);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('error', handleError);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-    };
-  }, [audio?.file_url, playlistTracks, audioId]);
-
-  // Save progress every 5 seconds
-  useEffect(() => {
-    if (!isPlaying) return;
-
-    const interval = setInterval(() => {
-      if (audioRef.current) {
-        saveProgressMutation.mutate(audioRef.current.currentTime);
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isPlaying]);
+  }, [audio, audioId, playlistInfo, playlistTracks, savedProgress]);
 
   // Playback controls
   const handlePlayPause = () => {
-    if (!audioRef.current) return;
-
     if (isPlaying) {
-      audioRef.current.pause();
+      pause();
     } else {
-      audioRef.current.play().catch(err => {
-        toast.error('Failed to play audio');
-        console.error(err);
-      });
+      resume();
     }
-    setIsPlaying(!isPlaying);
   };
 
   const handleSeek = (time: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setCurrentTime(time);
-    }
+    seek(time);
   };
 
   const handleSkipBack = () => {
-    handleSeek(Math.max(0, currentTime - 10));
+    skipBack(10);
   };
 
   const handleSkipForward = () => {
-    handleSeek(Math.min(duration, currentTime + 10));
+    skipForward(10);
   };
 
   const handlePlaybackRateChange = (rate: number) => {
     setPlaybackRate(rate);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = rate;
-    }
   };
 
   // Track navigation - check availability for drip content
@@ -415,6 +332,13 @@ export default function AppAudioPlayer() {
             </div>
           )}
 
+          {/* Bookmark Button */}
+          <BookmarkButton
+            currentTime={currentTime}
+            onAddBookmark={addBookmark}
+            isAdding={isAddingBookmark}
+          />
+
           {playlistTracks && playlistTracks.length > 1 && (
             <Sheet>
               <SheetTrigger asChild>
@@ -510,6 +434,18 @@ export default function AppAudioPlayer() {
             onSeek={handleSeek}
           />
 
+          {/* Bookmarks List */}
+          {bookmarks.length > 0 && (
+            <div className="flex justify-center">
+              <BookmarksList
+                bookmarks={bookmarks}
+                onSeek={handleSeek}
+                onDelete={deleteBookmark}
+                isDeleting={isDeletingBookmark}
+              />
+            </div>
+          )}
+
           {/* Track Navigation */}
           {(hasPrevious || hasNext) && (
             <div className="flex justify-center items-center gap-4">
@@ -576,14 +512,6 @@ export default function AppAudioPlayer() {
               </div>
             </div>
           )}
-
-          {/* Hidden Audio Element */}
-          <audio
-            ref={audioRef}
-            src={audio.file_url}
-            preload="metadata"
-            crossOrigin="anonymous"
-          />
         </div>
       </div>
     </div>
