@@ -15,6 +15,8 @@ interface ChatInputProps {
   disabled?: boolean;
   placeholder?: string;
   uploading?: boolean;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -25,7 +27,7 @@ const ALLOWED_TYPES = [
   'audio/webm', 'audio/mp4', 'audio/mpeg', 'audio/ogg'
 ];
 
-export function ChatInput({ onSend, disabled, placeholder = "Type a message...", uploading }: ChatInputProps) {
+export function ChatInput({ onSend, disabled, placeholder = "Type a message...", uploading, onFocus, onBlur }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [attachment, setAttachment] = useState<Attachment | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -314,8 +316,8 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
         </div>
       )}
 
-      {/* iOS-style Input Row */}
-      <div className="flex gap-1.5 items-end px-2 py-2">
+      {/* Telegram-style Input Row */}
+      <div className="flex gap-2 items-center px-1 py-1">
         <input
           ref={fileInputRef}
           type="file"
@@ -324,43 +326,28 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           className="hidden"
         />
         
+        {/* Attachment button - LEFT outside pill */}
         <Button
           variant="ghost"
           size="icon"
-          className="shrink-0 h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+          className="shrink-0 h-9 w-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || uploading || !!attachment || isRecording}
         >
           <Paperclip className="h-5 w-5" />
         </Button>
 
-        {/* Microphone Button */}
-        <Button
-          variant={isRecording ? "destructive" : "ghost"}
-          size="icon"
-          className={cn(
-            "shrink-0 h-8 w-8 rounded-full transition-colors",
-            !isRecording && "text-muted-foreground hover:text-foreground hover:bg-muted/80"
-          )}
-          onClick={isRecording ? stopRecording : startRecording}
-          disabled={disabled || uploading || !!attachment}
-        >
-          {isRecording ? (
-            <Square className="h-4 w-4 fill-current" />
-          ) : (
-            <Mic className="h-5 w-5" />
-          )}
-        </Button>
-
-        {/* iOS-style pill input */}
-        <div className="flex-1 flex items-center bg-muted/50 rounded-full border border-border/40 pl-4 pr-1 py-0.5">
+        {/* Telegram-style pill input - CENTER */}
+        <div className="flex-1 flex items-center bg-muted/50 rounded-full border border-border/30 pl-4 pr-1">
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
+            onFocus={onFocus}
+            onBlur={onBlur}
             placeholder={placeholder}
             disabled={disabled || uploading || isRecording}
-            className="min-h-[34px] max-h-24 resize-none text-[15px] leading-[22px] bg-transparent border-0 focus-visible:ring-0 p-0 py-1.5"
+            className="min-h-[32px] max-h-24 resize-none text-[15px] leading-[22px] bg-transparent border-0 focus-visible:ring-0 p-0 py-1"
             rows={1}
           />
           
@@ -382,6 +369,24 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
             )}
           </Button>
         </div>
+
+        {/* Mic button - RIGHT outside pill */}
+        <Button
+          variant={isRecording ? "destructive" : "ghost"}
+          size="icon"
+          className={cn(
+            "shrink-0 h-9 w-9 rounded-full transition-colors",
+            !isRecording && "text-muted-foreground hover:text-foreground hover:bg-muted/80"
+          )}
+          onClick={isRecording ? stopRecording : startRecording}
+          disabled={disabled || uploading || !!attachment}
+        >
+          {isRecording ? (
+            <Square className="h-4 w-4 fill-current" />
+          ) : (
+            <Mic className="h-5 w-5" />
+          )}
+        </Button>
       </div>
     </div>
   );
