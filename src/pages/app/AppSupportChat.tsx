@@ -255,6 +255,32 @@ export default function AppSupportChat() {
     }
   };
 
+  const reopenConversation = async () => {
+    if (!conversation?.id) return;
+    
+    try {
+      const { error } = await supabase
+        .from('chat_conversations')
+        .update({ status: 'open' })
+        .eq('id', conversation.id);
+      
+      if (error) throw error;
+      
+      setConversation({ ...conversation, status: 'open' });
+      toast({
+        title: "Conversation reopened",
+        description: "You can now send messages"
+      });
+    } catch (error: any) {
+      console.error('Error reopening conversation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reopen conversation",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleSendMessage = async (
     content: string, 
     attachment?: { file: File; name: string; type: string; size: number }
@@ -457,16 +483,29 @@ export default function AppSupportChat() {
           }}
         >
           <div className="px-3 py-1.5">
-            <ChatInput 
-              onSend={handleSendMessage} 
-              disabled={sending || conversation?.status === 'resolved'}
-              uploading={uploading}
-              placeholder={conversation?.status === 'resolved' 
-                ? "This conversation is resolved" 
-                : "Type a message..."}
-              onFocus={() => setIsInputFocused(true)}
-              onBlur={() => setIsInputFocused(false)}
-            />
+            {conversation?.status === 'resolved' ? (
+              <div className="flex items-center gap-3">
+                <p className="flex-1 text-sm text-muted-foreground text-center">
+                  This conversation was resolved
+                </p>
+                <Button 
+                  size="sm" 
+                  onClick={reopenConversation}
+                  className="shrink-0"
+                >
+                  Reopen
+                </Button>
+              </div>
+            ) : (
+              <ChatInput 
+                onSend={handleSendMessage} 
+                disabled={sending}
+                uploading={uploading}
+                placeholder="Type a message..."
+                onFocus={() => setIsInputFocused(true)}
+                onBlur={() => setIsInputFocused(false)}
+              />
+            )}
           </div>
         </div>
       </div>
