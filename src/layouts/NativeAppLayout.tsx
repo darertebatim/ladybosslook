@@ -8,6 +8,8 @@ import { PushNotificationPrompt } from '@/components/app/PushNotificationPrompt'
 import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { useChatNotifications } from '@/hooks/useChatNotifications';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
+import { AudioPlayerProvider, useAudioPlayer } from '@/contexts/AudioPlayerContext';
+import { MiniPlayer } from '@/components/audio/MiniPlayer';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 /**
@@ -32,6 +34,15 @@ const NativeAppLayout = () => {
   // Custom hooks after useState declarations
   const { unreadCount } = useUnreadChat();
   const { showUnreadPopup, unreadMessageCount, dismissPopup, goToChat } = useChatNotifications();
+
+  // Get current track for mini player visibility
+  let currentTrack = null;
+  try {
+    const audioPlayer = useAudioPlayer();
+    currentTrack = audioPlayer.currentTrack;
+  } catch {
+    // AudioPlayerContext not available yet
+  }
 
   // Reset viewport zoom on navigation to fix iOS zoom bug
   useEffect(() => {
@@ -79,6 +90,9 @@ const NativeAppLayout = () => {
     // Hook not available
   }
 
+  // Check if we're on the audio player page - don't show mini player there
+  const isOnPlayerPage = location.pathname.match(/^\/app\/player\/[^/]+$/);
+
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home' },
     { path: '/app/feed', icon: Newspaper, label: 'Community', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount },
@@ -91,9 +105,12 @@ const NativeAppLayout = () => {
     <>
       <div className="min-h-[100dvh] bg-background app-theme">
         {/* Main Content - pages render their own headers */}
-        <main className="pb-24">
+        <main className={currentTrack && !isOnPlayerPage ? "pb-40" : "pb-24"}>
           <Outlet />
         </main>
+
+        {/* Mini Player - show when audio is playing and not on player page */}
+        {!isOnPlayerPage && <MiniPlayer />}
 
         {/* Bottom Navigation with safe area */}
         <nav 
@@ -184,11 +201,13 @@ const NativeAppLayout = () => {
   );
 };
 
-// Wrap with provider
+// Wrap with providers
 const NativeAppLayoutWithProvider = () => (
-  <UnseenContentProvider>
-    <NativeAppLayout />
-  </UnseenContentProvider>
+  <AudioPlayerProvider>
+    <UnseenContentProvider>
+      <NativeAppLayout />
+    </UnseenContentProvider>
+  </AudioPlayerProvider>
 );
 
 export default NativeAppLayoutWithProvider;
