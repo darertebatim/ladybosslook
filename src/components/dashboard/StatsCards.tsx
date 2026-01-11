@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Headphones, Newspaper, CheckCircle2, Calendar } from "lucide-react";
 import { format, isToday, isTomorrow } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 interface StatsCardsProps {
   listeningMinutes: number;
@@ -15,6 +16,8 @@ export function StatsCards({
   completedTracks, 
   nextSession 
 }: StatsCardsProps) {
+  const navigate = useNavigate();
+
   // Format listening time (e.g., "2h 15m" or "45m")
   const formatListening = () => {
     const hours = Math.floor(listeningMinutes / 60);
@@ -35,7 +38,10 @@ export function StatsCards({
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4">
       {/* Listening Time */}
-      <Card className="overflow-hidden">
+      <Card 
+        className="overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors"
+        onClick={() => navigate('/app/player')}
+      >
         <CardContent className="p-3 lg:pt-6">
           <div className="flex items-center justify-between">
             <div>
@@ -50,7 +56,10 @@ export function StatsCards({
       </Card>
 
       {/* Unread Posts */}
-      <Card className="overflow-hidden">
+      <Card 
+        className="overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors"
+        onClick={() => navigate('/app/feed')}
+      >
         <CardContent className="p-3 lg:pt-6">
           <div className="flex items-center justify-between">
             <div>
@@ -64,8 +73,11 @@ export function StatsCards({
         </CardContent>
       </Card>
 
-      {/* Completed Tracks - Desktop only */}
-      <Card className="overflow-hidden hidden lg:block">
+      {/* Completed Tracks */}
+      <Card 
+        className="overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors"
+        onClick={() => navigate('/app/player')}
+      >
         <CardContent className="p-3 lg:pt-6">
           <div className="flex items-center justify-between">
             <div>
@@ -79,8 +91,11 @@ export function StatsCards({
         </CardContent>
       </Card>
 
-      {/* Next Session - Desktop only */}
-      <Card className="overflow-hidden hidden lg:block">
+      {/* Next Session */}
+      <Card 
+        className="overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors"
+        onClick={() => navigate('/app/courses')}
+      >
         <CardContent className="p-3 lg:pt-6">
           <div className="flex items-center justify-between">
             <div>
