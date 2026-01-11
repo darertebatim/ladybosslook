@@ -11,6 +11,7 @@ import { registerNavigationCallback, refreshDeviceToken, initializePushNotificat
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Capacitor } from "@capacitor/core";
+import { useDeepLinks, checkInitialDeepLink } from "@/hooks/useDeepLinks";
 import AppLayout from "@/layouts/NativeAppLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import AppHome from "@/pages/app/AppHome";
@@ -95,6 +96,9 @@ const NativeAppRedirect = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
+  // Initialize Universal Link handler
+  useDeepLinks();
+  
   useEffect(() => {
     // Register navigation callback for push notification deep linking
     if (isNativeApp()) {
@@ -119,6 +123,16 @@ const NativeAppRedirect = () => {
         }
       };
       refreshToken();
+      
+      // Check if app was launched with a deep link (cold start)
+      const handleInitialDeepLink = async () => {
+        const initialPath = await checkInitialDeepLink();
+        if (initialPath) {
+          console.log('[App] App launched with deep link, navigating to:', initialPath);
+          navigate(initialPath);
+        }
+      };
+      handleInitialDeepLink();
     }
   }, [navigate]);
   
