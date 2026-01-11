@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 
 interface ProgressBarProps {
   currentTime: number;
@@ -76,7 +76,7 @@ export const ProgressBar = ({
   }, [isDragging, calculateProgress, duration, onSeek]);
 
   // Add/remove event listeners for dragging
-  useState(() => {
+  React.useEffect(() => {
     if (isDragging) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
@@ -89,7 +89,7 @@ export const ProgressBar = ({
       document.removeEventListener("touchmove", handleTouchMove);
       document.removeEventListener("touchend", handleTouchEnd);
     };
-  });
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging) {
