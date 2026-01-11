@@ -77,6 +77,7 @@ export default function AppSupportChat() {
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const [initialScrollDone, setInitialScrollDone] = useState(false);
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -210,10 +211,21 @@ export default function AppSupportChat() {
     };
   }, [conversation?.id]);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom - instant on initial load, smooth for new messages
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (messages.length === 0) return;
+    
+    if (!initialScrollDone) {
+      // Use instant scroll for initial load, with a slight delay to ensure DOM is ready
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+        setInitialScrollDone(true);
+      }, 50);
+    } else {
+      // Smooth scroll for subsequent messages
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, initialScrollDone]);
 
   const uploadAttachment = async (file: File): Promise<string | null> => {
     if (!user) return null;
