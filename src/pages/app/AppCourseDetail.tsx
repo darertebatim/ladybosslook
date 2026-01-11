@@ -130,6 +130,24 @@ const AppCourseDetail = () => {
     enabled: !!round?.id,
   });
 
+  // Fetch the round's feed channel for Community button
+  const { data: roundChannel } = useQuery({
+    queryKey: ['round-channel', round?.id],
+    queryFn: async () => {
+      if (!round?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('feed_channels')
+        .select('id, name, slug')
+        .eq('round_id', round.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!round?.id,
+  });
+
   // Check if there are new sessions since last sync
   useEffect(() => {
     if (!round?.id || !dbSessions || dbSessions.length === 0) {
@@ -867,6 +885,19 @@ const AppCourseDetail = () => {
                     >
                       <Music className="h-5 w-5 mr-2" />
                       Round Playlist
+                    </Button>
+                  )}
+
+                  {/* Round Community Channel */}
+                  {roundChannel && (
+                    <Button 
+                      variant="default" 
+                      size="lg" 
+                      className="w-full"
+                      onClick={() => navigate(`/app/feed?channel=${roundChannel.id}`)}
+                    >
+                      <MessageCircle className="h-5 w-5 mr-2" />
+                      Community
                     </Button>
                   )}
                 </CardContent>
