@@ -33,6 +33,7 @@ export interface FeedPost {
   is_pinned: boolean;
   is_system: boolean;
   send_push: boolean;
+  display_name: string | null;
   created_at: string;
   updated_at: string;
   author?: {
