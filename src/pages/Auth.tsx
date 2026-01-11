@@ -17,7 +17,7 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<'google' | 'apple' | null>(null);
-  const { signIn, signUp, signInWithGoogle, signInWithApple, user } = useAuth();
+  const { signIn, signUp, signInWithGoogle, signInWithApple, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -27,6 +27,15 @@ export default function Auth() {
       navigate('/app/home');
     }
   }, [user, navigate]);
+
+  // Show loading spinner while checking auth state (prevents flash of login form)
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
