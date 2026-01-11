@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Paperclip, X, Loader2, FileText, Image as ImageIcon, Mic, Square } from "lucide-react";
+import { Send, Paperclip, X, Loader2, FileText, Image as ImageIcon, Mic, Square, Play, Pause, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Attachment {
@@ -33,10 +33,22 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
   const [error, setError] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
+  const [waveformData, setWaveformData] = useState<number[]>(Array(24).fill(15));
+  
+  // Voice preview state
+  const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+  const [previewCurrentTime, setPreviewCurrentTime] = useState(0);
+  const [previewDuration, setPreviewDuration] = useState(0);
+  const [previewWaveform, setPreviewWaveform] = useState<number[]>(Array(28).fill(30));
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -47,8 +59,35 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
         mediaRecorderRef.current.stop();
       }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+      if (previewAudioRef.current) {
+        previewAudioRef.current.pause();
+      }
     };
   }, []);
+
+  // Update waveform visualization during recording
+  const updateWaveform = useCallback(() => {
+    if (!analyserRef.current || !isRecording) return;
+    
+    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+    analyserRef.current.getByteFrequencyData(dataArray);
+    
+    // Map frequency data to bar heights (15-95%)
+    const bars = Array.from({ length: 24 }, (_, i) => {
+      const index = Math.floor((i / 24) * dataArray.length);
+      const value = dataArray[index] || 0;
+      return 15 + (value / 255) * 80;
+    });
+    
+    setWaveformData(bars);
+    animationFrameRef.current = requestAnimationFrame(updateWaveform);
+  }, [isRecording]);
 
   const handleSend = () => {
     if ((message.trim() || attachment) && !disabled && !uploading) {
@@ -117,6 +156,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
   const startRecording = async () => {
     try {
       setError(null);
+      setWaveformData(Array(24).fill(15));
 
       if (!navigator.mediaDevices?.getUserMedia) {
         setError("Microphone is not available on this device.");
@@ -130,6 +170,19 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
+      // Set up audio analyzer for waveform visualization
+      try {
+        const audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 64;
+        source.connect(analyser);
+        analyserRef.current = analyser;
+        audioContextRef.current = audioContext;
+      } catch (e) {
+        console.warn('Could not set up audio analyzer:', e);
+      }
+
       const preferredTypes = ['audio/webm', 'audio/mp4', 'audio/ogg'];
       const chosenType = preferredTypes.find((t) => MediaRecorder.isTypeSupported?.(t)) || undefined;
 
@@ -137,6 +190,8 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
 
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
+
+      const savedDuration = { current: 0 };
 
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -160,9 +215,26 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
         });
 
         setAttachment({ file: audioFile });
+        
+        // Generate preview waveform from final waveform state
+        setPreviewWaveform(waveformData.map(v => 20 + Math.random() * 60));
+        setPreviewDuration(savedDuration.current);
 
         // Stop all tracks
         stream.getTracks().forEach((track) => track.stop());
+
+        // Clean up audio context
+        if (audioContextRef.current) {
+          audioContextRef.current.close();
+          audioContextRef.current = null;
+        }
+        analyserRef.current = null;
+
+        // Clear animation frame
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+          animationFrameRef.current = null;
+        }
 
         // Clear interval
         if (recordingIntervalRef.current) {
@@ -170,14 +242,21 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           recordingIntervalRef.current = null;
         }
         setRecordingDuration(0);
+        setWaveformData(Array(24).fill(15));
       };
 
       mediaRecorder.start();
       setIsRecording(true);
 
+      // Start waveform animation
+      animationFrameRef.current = requestAnimationFrame(updateWaveform);
+
       // Start duration counter
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingDuration((prev) => prev + 1);
+        setRecordingDuration((prev) => {
+          savedDuration.current = prev + 1;
+          return prev + 1;
+        });
       }, 1000);
     } catch (err: any) {
       console.error('Error accessing microphone:', err);
@@ -223,15 +302,66 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
       clearInterval(recordingIntervalRef.current);
       recordingIntervalRef.current = null;
     }
+
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+    analyserRef.current = null;
     
     setIsRecording(false);
     setRecordingDuration(0);
+    setWaveformData(Array(24).fill(15));
     audioChunksRef.current = [];
+  };
+
+  // Voice preview controls
+  const togglePreviewPlayback = () => {
+    if (!attachment?.file.type.startsWith('audio/')) return;
+    
+    if (!previewAudioRef.current) {
+      const url = URL.createObjectURL(attachment.file);
+      previewAudioRef.current = new Audio(url);
+      previewAudioRef.current.onloadedmetadata = () => {
+        setPreviewDuration(previewAudioRef.current?.duration || 0);
+      };
+      previewAudioRef.current.ontimeupdate = () => {
+        setPreviewCurrentTime(previewAudioRef.current?.currentTime || 0);
+      };
+      previewAudioRef.current.onended = () => {
+        setIsPreviewPlaying(false);
+        setPreviewCurrentTime(0);
+      };
+    }
+    
+    if (isPreviewPlaying) {
+      previewAudioRef.current.pause();
+    } else {
+      previewAudioRef.current.play();
+    }
+    setIsPreviewPlaying(!isPreviewPlaying);
+  };
+
+  const removeAttachmentWithCleanup = () => {
+    if (previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current = null;
+    }
+    setIsPreviewPlaying(false);
+    setPreviewCurrentTime(0);
+    setPreviewDuration(0);
+    setAttachment(null);
+    setError(null);
   };
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
@@ -247,39 +377,104 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
+  const isVoiceAttachment = attachment?.file.type.startsWith('audio/');
+
   return (
     <div className="bg-background/80 backdrop-blur-xl">
-      {/* Recording UI */}
+      {/* Recording UI - Telegram Style with Live Waveform */}
       {isRecording && (
         <div className="px-4 pt-3">
           <div className="flex items-center gap-3 p-3 bg-destructive/10 rounded-2xl border border-destructive/20">
-            <div className="h-3 w-3 rounded-full bg-destructive animate-pulse" />
-            <span className="text-sm font-medium text-destructive">
-              Recording {formatDuration(recordingDuration)}
+            {/* Live Waveform */}
+            <div className="flex items-center gap-[2px] h-6 flex-1">
+              {waveformData.map((height, i) => (
+                <div
+                  key={i}
+                  className="w-1 rounded-full bg-destructive transition-all duration-75"
+                  style={{ height: `${height}%` }}
+                />
+              ))}
+            </div>
+            <span className="text-sm font-medium text-destructive tabular-nums">
+              {formatDuration(recordingDuration)}
             </span>
-            <div className="flex-1" />
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={cancelRecording}
-              className="text-muted-foreground hover:text-foreground rounded-full"
+              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full"
             >
-              Cancel
+              <Trash2 className="h-4 w-4" />
             </Button>
             <Button
-              size="sm"
+              size="icon"
               onClick={stopRecording}
-              className="gap-1 rounded-full"
+              className="h-8 w-8 rounded-full"
             >
-              <Square className="h-3 w-3 fill-current" />
-              Stop
+              <Square className="h-3.5 w-3.5 fill-current" />
             </Button>
           </div>
         </div>
       )}
 
-      {/* Attachment Preview */}
-      {attachment && !isRecording && (
+      {/* Voice Message Preview - Telegram Style */}
+      {attachment && isVoiceAttachment && !isRecording && (
+        <div className="px-4 pt-3">
+          <div className="flex items-center gap-2.5 p-3 bg-primary/10 rounded-2xl border border-primary/20">
+            {/* Play/Pause Button */}
+            <button 
+              onClick={togglePreviewPlayback}
+              className="h-9 w-9 rounded-full bg-primary flex items-center justify-center shrink-0 hover:bg-primary/90 transition-colors"
+            >
+              {isPreviewPlaying ? (
+                <Pause className="h-4 w-4 text-primary-foreground" />
+              ) : (
+                <Play className="h-4 w-4 text-primary-foreground ml-0.5" />
+              )}
+            </button>
+            
+            {/* Waveform */}
+            <div className="flex-1 flex items-center gap-[2px] h-5">
+              {previewWaveform.map((height, i) => {
+                const barProgress = ((i + 1) / previewWaveform.length) * 100;
+                const progress = previewDuration ? (previewCurrentTime / previewDuration) * 100 : 0;
+                const isActive = barProgress <= progress;
+                return (
+                  <div
+                    key={i}
+                    className={cn(
+                      "w-[3px] rounded-full transition-colors",
+                      isActive ? "bg-primary" : "bg-primary/30"
+                    )}
+                    style={{ height: `${height}%` }}
+                  />
+                );
+              })}
+            </div>
+            
+            {/* Duration */}
+            <span className="text-xs font-medium text-muted-foreground tabular-nums">
+              {isPreviewPlaying || previewCurrentTime > 0 
+                ? formatDuration(previewCurrentTime)
+                : formatDuration(previewDuration || recordingDuration)
+              }
+            </span>
+            
+            {/* Delete Button */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-7 w-7 shrink-0 rounded-full hover:bg-destructive/10 hover:text-destructive"
+              onClick={removeAttachmentWithCleanup}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Non-Voice Attachment Preview */}
+      {attachment && !isVoiceAttachment && !isRecording && (
         <div className="px-4 pt-3">
           <div className="flex items-center gap-2.5 p-2 bg-muted/60 backdrop-blur-sm rounded-2xl max-w-xs border border-border/50">
             {attachment.preview ? (
