@@ -5,7 +5,7 @@ import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
 import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Bell, ArrowRight, User, Send, Mail, Sparkles, BookOpen } from 'lucide-react';
+import { MessageCircle, Bell, ArrowRight, User, Send, Mail, Sparkles, BookOpen, Newspaper } from 'lucide-react';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
 import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
@@ -19,6 +19,7 @@ import { HomeSkeleton } from '@/components/app/skeletons';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { HomeBanner } from '@/components/app/HomeBanner';
+import { useUnreadFeedCount } from '@/hooks/useFeed';
 
 const AppHome = () => {
   const { user } = useAuth();
@@ -31,6 +32,9 @@ const AppHome = () => {
   // Get unseen content for new course notification
   const { hasUnseenCourses, unseenEnrollments } = useUnseenContentContext();
   const unseenCount = unseenEnrollments.size;
+  
+  // Get unread feed count
+  const { data: unreadFeedCount = 0 } = useUnreadFeedCount();
   
   // Celebration for completed rounds
   const { celebrationData, closeCelebration, showCelebration } = useCompletedRoundCelebration();
@@ -98,13 +102,22 @@ const AppHome = () => {
           title="Welcome back!" 
           subtitle="Loading..."
           rightAction={
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full h-10 w-10 border-2"
-            >
-              <User className="h-5 w-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative h-10 w-10"
+              >
+                <Newspaper className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full h-10 w-10 border-2"
+              >
+                <User className="h-5 w-5" />
+              </Button>
+            </div>
           }
         />
         <AppHeaderSpacer />
@@ -132,14 +145,29 @@ const AppHome = () => {
         title="Welcome back!" 
         subtitle={user?.email}
         rightAction={
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => navigate('/app/profile')}
-            className="rounded-full h-10 w-10 border-2"
-          >
-            <User className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/app/feed')}
+              className="relative h-10 w-10"
+            >
+              <Newspaper className="h-5 w-5" />
+              {unreadFeedCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+                  {unreadFeedCount > 9 ? '9+' : unreadFeedCount}
+                </span>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate('/app/profile')}
+              className="rounded-full h-10 w-10 border-2"
+            >
+              <User className="h-5 w-5" />
+            </Button>
+          </div>
         }
       />
       <AppHeaderSpacer />
