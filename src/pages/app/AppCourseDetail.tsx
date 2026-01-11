@@ -148,6 +148,37 @@ const AppCourseDetail = () => {
     enabled: !!round?.id,
   });
 
+  // Fetch unread post count for the round's channel
+  const { data: channelUnreadCount } = useQuery({
+    queryKey: ['channel-unread-count', roundChannel?.id, user?.id],
+    queryFn: async () => {
+      if (!roundChannel?.id || !user?.id) return 0;
+      
+      // Get all posts in this channel
+      const { data: allPosts } = await supabase
+        .from('feed_posts')
+        .select('id')
+        .eq('channel_id', roundChannel.id);
+      
+      if (!allPosts || allPosts.length === 0) return 0;
+      
+      const postIds = allPosts.map(p => p.id);
+      
+      // Get which ones the user has read
+      const { data: readPostIds } = await supabase
+        .from('feed_post_reads')
+        .select('post_id')
+        .eq('user_id', user.id)
+        .in('post_id', postIds);
+      
+      const readSet = new Set(readPostIds?.map(r => r.post_id) || []);
+      const unreadCount = postIds.filter(id => !readSet.has(id)).length;
+      
+      return unreadCount;
+    },
+    enabled: !!roundChannel?.id && !!user?.id,
+  });
+
   // Check if there are new sessions since last sync
   useEffect(() => {
     if (!round?.id || !dbSessions || dbSessions.length === 0) {
@@ -893,11 +924,19 @@ const AppCourseDetail = () => {
                     <Button 
                       variant="default" 
                       size="lg" 
-                      className="w-full"
+                      className="w-full relative"
                       onClick={() => navigate(`/app/feed?channel=${roundChannel.id}`)}
                     >
                       <MessageCircle className="h-5 w-5 mr-2" />
                       Community
+                      {channelUnreadCount && channelUnreadCount > 0 && (
+                        <Badge 
+                          variant="destructive" 
+                          className="absolute -top-2 -right-2 h-5 min-w-5 px-1.5 flex items-center justify-center text-xs"
+                        >
+                          {channelUnreadCount > 99 ? '99+' : channelUnreadCount}
+                        </Badge>
+                      )}
                     </Button>
                   )}
                 </CardContent>
