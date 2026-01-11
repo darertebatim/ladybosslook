@@ -130,10 +130,50 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // Send notifications
+      // Send notifications and create feed posts for each unlocked track
       for (const track of unlockedTracks) {
         const trackTitle = track.audio_content?.title || 'New Content';
         const playlistName = round.audio_playlists?.name || round.round_name;
+
+        // Create a feed post for this drip unlock (if round has a channel)
+        try {
+          // Check if round has a channel
+          const { data: roundChannel } = await supabase
+            .from('feed_channels')
+            .select('id')
+            .eq('round_id', round.id)
+            .single();
+
+          if (roundChannel) {
+            // Get an admin user ID for the author
+            const { data: adminUser } = await supabase
+              .from('user_roles')
+              .select('user_id')
+              .eq('role', 'admin')
+              .limit(1)
+              .single();
+
+            await supabase.from('feed_posts').insert({
+              channel_id: roundChannel.id,
+              author_id: adminUser?.user_id || null,
+              post_type: 'drip_unlock',
+              title: `🎧 New Lesson Available!`,
+              content: `"${trackTitle}" is now available. Tap to listen!`,
+              action_type: 'play_audio',
+              action_data: { 
+                playlistId: round.audio_playlist_id, 
+                audioId: track.audio_content?.id,
+                label: 'Listen Now'
+              },
+              is_system: true,
+              send_push: false, // We're already sending push separately
+            });
+            console.log(`Created feed post for track "${trackTitle}" in round channel`);
+          }
+        } catch (feedErr) {
+          console.error('Error creating feed post:', feedErr);
+          // Don't fail the whole function if feed post creation fails
+        }
 
         // Call send-push-notification for each subscribed user
         for (const sub of subscriptions) {
