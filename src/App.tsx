@@ -11,7 +11,7 @@ import { registerNavigationCallback, refreshDeviceToken, initializePushNotificat
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Capacitor } from "@capacitor/core";
-import PlatformAwareAppLayout from "@/layouts/PlatformAwareAppLayout";
+import AppLayout from "@/layouts/NativeAppLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import AppHome from "@/pages/app/AppHome";
 import AppCourses from "@/pages/app/AppCourses";
@@ -188,7 +188,7 @@ const App = () => (
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             
             {/* App Routes */}
-            <Route path="/app" element={<ProtectedRoute><PlatformAwareAppLayout /></ProtectedRoute>}>
+            <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<Navigate to="/app/home" replace />} />
               <Route path="home" element={<AppHome />} />
               <Route path="courses" element={<AppCourses />} />
