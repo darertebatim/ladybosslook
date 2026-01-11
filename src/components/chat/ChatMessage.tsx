@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { FileText, Download, ExternalLink, Megaphone, Check, CheckCheck, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useRef } from "react";
 
 interface ChatMessageProps {
@@ -14,6 +15,13 @@ interface ChatMessageProps {
   attachmentName?: string | null;
   attachmentType?: string | null;
   isBroadcast?: boolean;
+  // Grouping props for Telegram-style UI
+  senderName?: string;
+  senderAvatar?: string;
+  showAvatar?: boolean;
+  isFirstInGroup?: boolean;
+  isLastInGroup?: boolean;
+  showTimestamp?: boolean;
 }
 
 // Format audio duration
@@ -98,12 +106,35 @@ export function ChatMessage({
   attachmentUrl,
   attachmentName,
   attachmentType,
-  isBroadcast
+  isBroadcast,
+  senderName,
+  senderAvatar,
+  showAvatar = true,
+  isFirstInGroup = true,
+  isLastInGroup = true,
+  showTimestamp = true
 }: ChatMessageProps) {
   const isImage = attachmentType?.startsWith('image/');
   const isAudio = attachmentType?.startsWith('audio/');
   const { text, linkUrl, linkText } = parseMessageContent(content);
   const displayText = isBroadcast ? formatBroadcastText(text) : text;
+
+  // Dynamic border radius based on group position (Telegram-style)
+  const getBubbleRadius = () => {
+    if (isCurrentUser) {
+      // User messages on right
+      if (isFirstInGroup && isLastInGroup) return "rounded-[20px] rounded-br-[6px]";
+      if (isFirstInGroup) return "rounded-[20px] rounded-br-[8px]";
+      if (isLastInGroup) return "rounded-[20px] rounded-tr-[8px] rounded-br-[6px]";
+      return "rounded-[20px] rounded-tr-[8px] rounded-br-[8px]";
+    } else {
+      // Admin messages on left
+      if (isFirstInGroup && isLastInGroup) return "rounded-[20px] rounded-bl-[6px]";
+      if (isFirstInGroup) return "rounded-[20px] rounded-bl-[8px]";
+      if (isLastInGroup) return "rounded-[20px] rounded-tl-[8px] rounded-bl-[6px]";
+      return "rounded-[20px] rounded-tl-[8px] rounded-bl-[8px]";
+    }
+  };
 
   // Audio playback state
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -164,20 +195,36 @@ export function ChatMessage({
   return (
     <div 
       className={cn(
-        "flex w-full mb-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300",
-        isCurrentUser ? "justify-end" : "justify-start"
+        "flex w-full animate-in fade-in-0 slide-in-from-bottom-2 duration-300",
+        isCurrentUser ? "justify-end" : "justify-start",
+        // Tighter spacing for grouped messages
+        isLastInGroup ? "mb-2" : "mb-0.5"
       )}
     >
+      {/* Admin Avatar - only show for admin messages */}
+      {!isCurrentUser && (
+        <div className="w-8 mr-2 shrink-0 self-end">
+          {showAvatar ? (
+            <Avatar className="h-8 w-8 shadow-sm">
+              <AvatarImage src={senderAvatar} alt={senderName || "Support"} />
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
+                LA
+              </AvatarFallback>
+            </Avatar>
+          ) : null}
+        </div>
+      )}
+      
       <div className={cn(
         "max-w-[78%] overflow-hidden transition-all",
-        // iOS-style bubble shapes
+        // Dynamic bubble radius based on grouping
+        getBubbleRadius(),
+        // Colors
         isCurrentUser 
-          ? "bg-primary text-primary-foreground rounded-[20px] rounded-br-[6px]" 
-          : "bg-muted/80 text-foreground rounded-[20px] rounded-bl-[6px]",
+          ? "bg-primary text-primary-foreground" 
+          : "bg-muted/80 text-foreground",
         // Subtle shadow for depth
-        isCurrentUser 
-          ? "shadow-sm" 
-          : "shadow-sm",
+        "shadow-sm",
         // Broadcast styling
         isBroadcast && !isCurrentUser && "border border-primary/20 bg-gradient-to-br from-muted/90 to-primary/5"
       )}>
@@ -327,27 +374,29 @@ export function ChatMessage({
           </div>
         )}
 
-        {/* Timestamp & Read Receipt */}
-        <div className={cn(
-          "flex items-center gap-1 px-3.5 pb-2",
-          isCurrentUser ? "justify-end" : "justify-start"
-        )}>
-          <span className={cn(
-            "text-[11px]",
-            isCurrentUser ? "text-primary-foreground/60" : "text-muted-foreground/80"
+        {/* Timestamp & Read Receipt - only show on last message of group */}
+        {showTimestamp && (
+          <div className={cn(
+            "flex items-center gap-1 px-3.5 pb-2",
+            isCurrentUser ? "justify-end" : "justify-start"
           )}>
-            {format(new Date(createdAt), 'h:mm a')}
-          </span>
-          {isCurrentUser && (
-            <span className="text-primary-foreground/60">
-              {isRead ? (
-                <CheckCheck className="h-3.5 w-3.5" />
-              ) : (
-                <Check className="h-3.5 w-3.5" />
-              )}
+            <span className={cn(
+              "text-[11px]",
+              isCurrentUser ? "text-primary-foreground/60" : "text-muted-foreground/80"
+            )}>
+              {format(new Date(createdAt), 'h:mm a')}
             </span>
-          )}
-        </div>
+            {isCurrentUser && (
+              <span className="text-primary-foreground/60">
+                {isRead ? (
+                  <CheckCheck className="h-3.5 w-3.5" />
+                ) : (
+                  <Check className="h-3.5 w-3.5" />
+                )}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
