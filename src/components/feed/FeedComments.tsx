@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { usePostComments, useAddComment, useDeleteComment } from '@/hooks/useFeed';
+import { usePostCommentsRealtime } from '@/hooks/useFeedRealtime';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageCircle, Send, Trash2, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { MessageCircle, Send, Loader2 } from 'lucide-react';
 
 interface FeedCommentsProps {
   postId: string;
@@ -27,6 +27,9 @@ export function FeedComments({
   const { data: comments, isLoading } = usePostComments(postId);
   const addComment = useAddComment();
   const deleteComment = useDeleteComment();
+
+  // Subscribe to real-time comment updates
+  usePostCommentsRealtime(postId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

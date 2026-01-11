@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useFeedPost, useMarkPostRead } from '@/hooks/useFeed';
+import { useFeedRealtime, usePostCommentsRealtime } from '@/hooks/useFeedRealtime';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
@@ -34,6 +35,10 @@ export default function AppFeedPost() {
   
   const { data: post, isLoading } = useFeedPost(postId || '');
   const markPostRead = useMarkPostRead();
+
+  // Subscribe to real-time updates for this post
+  useFeedRealtime();
+  usePostCommentsRealtime(postId || '');
 
   // Mark post as read
   useEffect(() => {

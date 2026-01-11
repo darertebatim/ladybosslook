@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useChannels, useFeedPosts, useMarkPostRead } from '@/hooks/useFeed';
+import { useFeedRealtime } from '@/hooks/useFeedRealtime';
 import { FeedChannelTabs } from '@/components/feed/FeedChannelTabs';
 import { FeedPostCard } from '@/components/feed/FeedPostCard';
 import { SEOHead } from '@/components/SEOHead';
@@ -17,6 +18,9 @@ export default function AppFeed() {
   const { data: channels, isLoading: channelsLoading } = useChannels();
   const { data: posts, isLoading: postsLoading } = useFeedPosts(selectedChannelId || undefined);
   const markPostRead = useMarkPostRead();
+
+  // Subscribe to real-time updates
+  useFeedRealtime(selectedChannelId || undefined);
 
   // Set initial channel from URL params
   useEffect(() => {
