@@ -81,6 +81,7 @@ export default function AppSupportChat() {
   const [uploading, setUploading] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
 
   // Keyboard handling - use Capacitor plugin for native, visualViewport for web
   useEffect(() => {
@@ -379,8 +380,8 @@ export default function AppSupportChat() {
           className="flex-1 overflow-y-auto overscroll-contain"
           style={{
             paddingBottom: isKeyboardVisible 
-              ? `${80 + keyboardHeight}px`
-              : 'calc(160px + env(safe-area-inset-bottom, 0px))'
+              ? `${60 + keyboardHeight}px`
+              : 'calc(130px + env(safe-area-inset-bottom, 0px))'
           }}
         >
           <div className="p-4">
@@ -445,16 +446,17 @@ export default function AppSupportChat() {
 
         {/* Fixed Input Area that moves with keyboard */}
         <div 
-          className="fixed left-0 right-0 bg-background border-t border-border z-40"
+          className="fixed left-0 right-0 bg-background/95 backdrop-blur-xl z-40"
           style={{
             bottom: isKeyboardVisible 
               ? `${keyboardHeight}px`
-              : 'calc(72px + env(safe-area-inset-bottom, 0px))',
-            paddingBottom: isKeyboardVisible ? '8px' : '8px',
-            transition: isKeyboardVisible ? 'none' : 'bottom 0.2s ease-out'
+              : isInputFocused && Capacitor.isNativePlatform()
+                ? '300px'
+                : 'calc(72px + env(safe-area-inset-bottom, 0px))',
+            transition: isKeyboardVisible ? 'none' : 'bottom 0.15s ease-out'
           }}
         >
-          <div className="py-2 px-4">
+          <div className="px-3 py-1.5">
             <ChatInput 
               onSend={handleSendMessage} 
               disabled={sending || conversation?.status === 'resolved'}
@@ -462,6 +464,8 @@ export default function AppSupportChat() {
               placeholder={conversation?.status === 'resolved' 
                 ? "This conversation is resolved" 
                 : "Type a message..."}
+              onFocus={() => setIsInputFocused(true)}
+              onBlur={() => setIsInputFocused(false)}
             />
           </div>
         </div>
