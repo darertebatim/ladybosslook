@@ -243,6 +243,37 @@ npx cap sync
 - Verify VAPID keys in environment
 - Check console logs for token registration
 
+## 🎵 CRITICAL: Background Audio Setup
+
+⚠️ **For audio to continue playing when the phone is locked or the app is in the background, you MUST configure Background Modes in Xcode.**
+
+### Steps to Enable Background Audio:
+
+1. **Open iOS project:** `npx cap open ios`
+2. **Select the "App" target** in the project navigator
+3. **Go to "Signing & Capabilities" tab**
+4. **Click "+ Capability"** button
+5. **Search for and add "Background Modes"**
+6. **Check "Audio, AirPlay, and Picture in Picture"**
+
+This adds the required `UIBackgroundModes` key to `Info.plist`. You can verify it exists at `ios/App/App/Info.plist`:
+
+```xml
+<key>UIBackgroundModes</key>
+<array>
+    <string>audio</string>
+</array>
+```
+
+**Without this configuration, audio will pause when:**
+- The phone is locked
+- The user switches to another app
+- The screen turns off
+
+**Important**: If you ever delete the `ios/` folder and run `npx cap add ios` again, you will need to re-enable this capability.
+
+---
+
 ## 🚨 CRITICAL: Push Notifications Setup
 
 ⚠️ **If you plan to use push notifications, there is a required manual step that is NOT handled by `npx cap add ios`.**
