@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
+import { Capacitor } from '@capacitor/core';
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
@@ -12,6 +14,8 @@ interface AuthContextType {
   canAccessAdminPage: (page: string) => boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithGoogle: () => Promise<{ error: any }>;
+  signInWithApple: () => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
   logSecurityEvent: (action: string, details?: any) => Promise<void>;
   refreshAdminPermissions: () => Promise<void>;
@@ -144,6 +148,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return { error };
   };
 
+  const signInWithGoogle = async () => {
+    // Determine the redirect URL based on platform
+    const isNative = Capacitor.isNativePlatform();
+    const redirectTo = isNative 
+      ? 'app.lovable.9d54663c1af540669ceb1723206ae5f8://auth/callback'
+      : 'https://ladybosslook.com/app/home';
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo,
+        skipBrowserRedirect: isNative,
+      }
+    });
+    return { error };
+  };
+
+  const signInWithApple = async () => {
+    // Determine the redirect URL based on platform
+    const isNative = Capacitor.isNativePlatform();
+    const redirectTo = isNative 
+      ? 'app.lovable.9d54663c1af540669ceb1723206ae5f8://auth/callback'
+      : 'https://ladybosslook.com/app/home';
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'apple',
+      options: {
+        redirectTo,
+        skipBrowserRedirect: isNative,
+      }
+    });
+    return { error };
+  };
+
   const signOut = async () => {
     try {
       // Clear local state immediately
@@ -185,13 +223,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const value = {
     user,
     session,
-    loading: loading || !roleCheckComplete, // Only not loading when role check is also complete
+    loading: loading || !roleCheckComplete,
     isAdmin,
     adminPages,
     hasAdminAccess,
     canAccessAdminPage,
     signIn,
     signUp,
+    signInWithGoogle,
+    signInWithApple,
     signOut,
     logSecurityEvent,
     refreshAdminPermissions,
