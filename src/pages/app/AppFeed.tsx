@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { useChannels, useFeedPosts, useMarkPostRead } from '@/hooks/useFeed';
 import { useFeedRealtime } from '@/hooks/useFeedRealtime';
 import { FeedChannelTabs } from '@/components/feed/FeedChannelTabs';
-import { FeedPostCard } from '@/components/feed/FeedPostCard';
+import { FeedMessage } from '@/components/feed/FeedMessage';
+import { FeedThread } from '@/components/feed/FeedThread';
 import { SEOHead } from '@/components/SEOHead';
 
 export default function AppFeed() {
@@ -14,6 +15,7 @@ export default function AppFeed() {
   const initialChannel = searchParams.get('channel');
   
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
+  const [threadPost, setThreadPost] = useState<any>(null);
   
   const { data: channels, isLoading: channelsLoading } = useChannels();
   const { data: posts, isLoading: postsLoading } = useFeedPosts(selectedChannelId || undefined);
@@ -46,7 +48,7 @@ export default function AppFeed() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead 
-        title="Community Feed" 
+        title="Community" 
         description="Stay connected with announcements, content updates, and community discussions"
       />
 
@@ -71,31 +73,41 @@ export default function AppFeed() {
         )}
       </header>
 
-      {/* Content */}
-      <main className="p-4 space-y-4 pb-24">
+      {/* Messages stream */}
+      <main className="divide-y pb-24">
         {postsLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : posts && posts.length > 0 ? (
           posts.map((post) => (
-            <FeedPostCard
+            <FeedMessage
               key={post.id}
               post={post}
               allowReactions={selectedChannel?.allow_reactions ?? true}
-              allowComments={selectedChannel?.allow_comments ?? true}
               showChannelBadge={!selectedChannelId}
+              commentsCount={post.comments_count || 0}
+              onOpenThread={() => setThreadPost(post)}
             />
           ))
         ) : (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No posts yet</p>
+          <div className="text-center py-12 px-4">
+            <p className="text-muted-foreground">No messages yet</p>
             <p className="text-sm text-muted-foreground mt-1">
-              Check back later for announcements and updates
+              Check back later for updates
             </p>
           </div>
         )}
       </main>
+
+      {/* Thread sheet */}
+      {threadPost && (
+        <FeedThread
+          post={threadPost}
+          open={!!threadPost}
+          onOpenChange={(open) => !open && setThreadPost(null)}
+        />
+      )}
     </div>
   );
 }

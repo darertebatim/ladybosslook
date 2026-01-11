@@ -21,11 +21,13 @@ export interface FeedPost {
   id: string;
   channel_id: string;
   author_id: string | null;
-  post_type: 'announcement' | 'drip_unlock' | 'session_reminder' | 'media' | 'discussion';
+  post_type: 'announcement' | 'drip_unlock' | 'session_reminder' | 'media' | 'discussion' | 'voice_message';
   title: string | null;
   content: string;
   image_url: string | null;
   video_url: string | null;
+  audio_url: string | null;
+  audio_duration: number | null;
   action_type: 'none' | 'play_audio' | 'join_session' | 'view_materials' | 'external_link';
   action_data: Record<string, any>;
   is_pinned: boolean;
