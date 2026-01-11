@@ -6,7 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MessageCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, MessageCircle, RefreshCw } from "lucide-react";
+import { ChatSkeleton } from "@/components/app/skeletons";
 import { SEOHead } from "@/components/SEOHead";
 import { format, isToday, isYesterday, isSameDay } from "date-fns";
 import { Capacitor } from "@capacitor/core";
@@ -83,6 +84,11 @@ export default function AppSupportChat() {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const touchStartY = useRef(0);
+  const isPulling = useRef(false);
 
   // Keyboard handling - use Capacitor plugin for native, visualViewport for web
   useEffect(() => {
@@ -335,11 +341,71 @@ export default function AppSupportChat() {
     }
   };
 
+  // Pull-to-refresh handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (scrollContainerRef.current?.scrollTop === 0) {
+      touchStartY.current = e.touches[0].clientY;
+      isPulling.current = true;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isPulling.current || scrollContainerRef.current?.scrollTop !== 0) return;
+    
+    const touchY = e.touches[0].clientY;
+    const distance = Math.max(0, Math.min(100, touchY - touchStartY.current));
+    setPullDistance(distance);
+  };
+
+  const handleTouchEnd = async () => {
+    if (pullDistance >= 60 && conversation?.id) {
+      setIsRefreshing(true);
+      try {
+        await fetchMessages(conversation.id);
+      } finally {
+        setIsRefreshing(false);
+      }
+    }
+    setPullDistance(0);
+    isPulling.current = false;
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[100dvh]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
+      <>
+        <SEOHead 
+          title="Support Chat | Ladyboss Academy"
+          description="Chat with our support team"
+        />
+        <div className="fixed inset-0 bg-background flex flex-col">
+          {/* Header skeleton */}
+          <header 
+            className="bg-background/80 backdrop-blur-xl border-b border-border/50 z-50 shrink-0"
+            style={{ paddingTop: 'env(safe-area-inset-top)' }}
+          >
+            <div className="flex items-center gap-3 pt-6 pb-3 px-4">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => navigate(-1)}
+                className="h-9 w-9 rounded-full"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div className="flex items-center gap-3">
+                <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                  <MessageCircle className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h1 className="font-semibold text-[17px]">Support</h1>
+                  <p className="text-[13px] text-muted-foreground">Loading...</p>
+                </div>
+              </div>
+            </div>
+          </header>
+          <ChatSkeleton />
+        </div>
+      </>
     );
   }
 
@@ -389,13 +455,35 @@ export default function AppSupportChat() {
 
         {/* Messages area - positioned between header and input */}
         <div 
+          ref={scrollContainerRef}
           className="flex-1 overflow-y-auto overscroll-contain"
           style={{
             paddingBottom: isKeyboardVisible 
               ? `${60 + keyboardHeight}px`
               : 'calc(130px + env(safe-area-inset-bottom, 0px))'
           }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
+          {/* Pull to refresh indicator */}
+          {(pullDistance > 0 || isRefreshing) && (
+            <div 
+              className="flex items-center justify-center transition-all duration-200"
+              style={{ 
+                height: isRefreshing ? 50 : pullDistance,
+                opacity: isRefreshing ? 1 : pullDistance / 60
+              }}
+            >
+              <RefreshCw 
+                className={`h-5 w-5 text-muted-foreground ${isRefreshing ? 'animate-spin' : ''}`}
+                style={{ 
+                  transform: `rotate(${pullDistance * 3.6}deg)`,
+                  transition: isRefreshing ? 'none' : 'transform 0.1s'
+                }}
+              />
+            </div>
+          )}
           <div className="p-4">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
