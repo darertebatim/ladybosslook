@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, BookOpen, MessageCircle, Headphones, ShoppingBag } from 'lucide-react';
+import { Home, Newspaper, MessageCircle, Headphones, ShoppingBag } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
@@ -69,9 +69,19 @@ const NativeAppLayout = () => {
     // Provider not available, ignore
   }
 
+  // Get unread feed count for Community badge
+  let unreadFeedCount = 0;
+  try {
+    const { useUnreadFeedCount } = require('@/hooks/useFeed');
+    const { data } = useUnreadFeedCount();
+    unreadFeedCount = data || 0;
+  } catch {
+    // Hook not available
+  }
+
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home' },
-    { path: '/app/courses', icon: BookOpen, label: 'Courses', showBadge: hasUnseenCourses },
+    { path: '/app/feed', icon: Newspaper, label: 'Community', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount },
     { path: '/app/browse', icon: ShoppingBag, label: 'Browse' },
     { path: '/app/player', icon: Headphones, label: 'Player' },
     { path: '/app/support-chat', icon: MessageCircle, label: 'Chat' },
@@ -113,7 +123,12 @@ const NativeAppLayout = () => {
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
                     )}
-                    {item.showBadge && !showChatBadge && (
+                    {item.showBadge && !showChatBadge && item.badgeCount && (
+                      <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                        {item.badgeCount > 9 ? '9+' : item.badgeCount}
+                      </span>
+                    )}
+                    {item.showBadge && !showChatBadge && !item.badgeCount && (
                       <span className="absolute -top-0.5 -right-0.5 bg-primary w-2.5 h-2.5 rounded-full" />
                     )}
                   </div>
