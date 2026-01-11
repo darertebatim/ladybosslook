@@ -2,7 +2,6 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Music, Lock, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Progress } from "@/components/ui/progress";
 
 interface PlaylistCardProps {
   id: string;
@@ -58,7 +57,11 @@ export const PlaylistCard = ({
 
   return (
     <Card 
-      className={`overflow-hidden ${isLocked ? 'opacity-60' : 'cursor-pointer hover:shadow-lg transition-shadow'}`}
+      className={`overflow-hidden rounded-2xl border-border/50 ${
+        isLocked 
+          ? 'opacity-60' 
+          : 'cursor-pointer hover:shadow-lg hover:border-border transition-all hover:scale-[1.02] active:scale-[0.98]'
+      }`}
       onClick={handleClick}
     >
       <div className="relative aspect-square">
@@ -77,15 +80,25 @@ export const PlaylistCard = ({
         )}
         
         {isFree && !isLocked && (
-          <Badge className="absolute top-2 right-2 bg-green-500 hover:bg-green-600">
+          <Badge className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 rounded-full">
             FREE
           </Badge>
         )}
         
         {category && (
-          <Badge variant="secondary" className="absolute top-2 left-2">
+          <Badge variant="secondary" className="absolute top-2 left-2 rounded-full">
             {getCategoryLabel()}
           </Badge>
+        )}
+        
+        {/* Progress overlay at bottom */}
+        {!isLocked && progressPercentage > 0 && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted/30">
+            <div 
+              className="h-full bg-primary transition-all duration-300"
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
         )}
       </div>
       
@@ -108,12 +121,12 @@ export const PlaylistCard = ({
         </div>
         
         {!isLocked && progressPercentage > 0 && (
-          <div className="space-y-1">
-            <Progress value={progressPercentage} className="h-1.5" />
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-1 text-primary font-medium">
               <CheckCircle2 className="h-3 w-3" />
-              <span>{completedTracks}/{trackCount} completed • {Math.round(progressPercentage)}%</span>
+              <span>{completedTracks}/{trackCount}</span>
             </div>
+            <span className="text-muted-foreground">• {Math.round(progressPercentage)}% complete</span>
           </div>
         )}
         

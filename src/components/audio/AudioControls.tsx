@@ -1,12 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Play, Pause, RotateCcw, RotateCw } from "lucide-react";
+import { GlassButton } from "./GlassButton";
+import { cn } from "@/lib/utils";
 
 interface AudioControlsProps {
   isPlaying: boolean;
@@ -15,6 +9,7 @@ interface AudioControlsProps {
   onSkipForward: () => void;
   playbackRate: number;
   onPlaybackRateChange: (rate: number) => void;
+  variant?: "default" | "glass";
 }
 
 export const AudioControls = ({
@@ -24,55 +19,127 @@ export const AudioControls = ({
   onSkipForward,
   playbackRate,
   onPlaybackRateChange,
+  variant = "default",
 }: AudioControlsProps) => {
-  return (
-    <div className="flex items-center justify-center gap-4">
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={onSkipBack}
-        className="h-10 w-10"
-      >
-        <SkipBack className="h-5 w-5" />
-      </Button>
+  const isGlass = variant === "glass";
+  
+  const playbackRates = [0.5, 0.75, 1, 1.25, 1.5, 2];
+  const currentRateIndex = playbackRates.indexOf(playbackRate);
+  const nextRate = playbackRates[(currentRateIndex + 1) % playbackRates.length];
 
-      <Button
-        size="icon"
+  if (isGlass) {
+    return (
+      <div className="flex items-center justify-center gap-6 py-4">
+        {/* Skip Back */}
+        <div className="flex flex-col items-center gap-1">
+          <GlassButton
+            onClick={onSkipBack}
+            size="md"
+            className="bg-white/10 hover:bg-white/20"
+          >
+            <RotateCcw className="h-5 w-5" />
+          </GlassButton>
+          <span className="text-xs text-white/60 font-medium">10s</span>
+        </div>
+
+        {/* Play/Pause - Large Central Button */}
+        <GlassButton
+          onClick={onPlayPause}
+          size="xl"
+          variant="primary"
+          className="h-20 w-20 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+        >
+          {isPlaying ? (
+            <Pause className="h-8 w-8" />
+          ) : (
+            <Play className="h-8 w-8 ml-1" />
+          )}
+        </GlassButton>
+
+        {/* Skip Forward */}
+        <div className="flex flex-col items-center gap-1">
+          <GlassButton
+            onClick={onSkipForward}
+            size="md"
+            className="bg-white/10 hover:bg-white/20"
+          >
+            <RotateCw className="h-5 w-5" />
+          </GlassButton>
+          <span className="text-xs text-white/60 font-medium">10s</span>
+        </div>
+
+        {/* Speed Button */}
+        <div className="flex flex-col items-center gap-1">
+          <GlassButton
+            onClick={() => onPlaybackRateChange(nextRate)}
+            size="md"
+            className="bg-white/10 hover:bg-white/20 font-semibold text-sm"
+          >
+            {playbackRate}x
+          </GlassButton>
+          <span className="text-xs text-white/60 font-medium">Speed</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-center gap-6 py-4">
+      {/* Skip Back */}
+      <button
+        onClick={onSkipBack}
+        className={cn(
+          "flex flex-col items-center gap-1 p-3 rounded-2xl",
+          "bg-secondary/50 hover:bg-secondary transition-colors",
+          "active:scale-95"
+        )}
+      >
+        <RotateCcw className="h-6 w-6" />
+        <span className="text-xs text-muted-foreground font-medium">10s</span>
+      </button>
+
+      {/* Play/Pause - Large Central Button */}
+      <button
         onClick={onPlayPause}
-        className="h-14 w-14"
+        className={cn(
+          "h-20 w-20 rounded-full flex items-center justify-center",
+          "bg-primary text-primary-foreground",
+          "shadow-lg hover:shadow-xl transition-all",
+          "active:scale-95 hover:scale-105"
+        )}
       >
         {isPlaying ? (
-          <Pause className="h-6 w-6" />
+          <Pause className="h-8 w-8" />
         ) : (
-          <Play className="h-6 w-6 ml-0.5" />
+          <Play className="h-8 w-8 ml-1" />
         )}
-      </Button>
+      </button>
 
-      <Button
-        variant="outline"
-        size="icon"
+      {/* Skip Forward */}
+      <button
         onClick={onSkipForward}
-        className="h-10 w-10"
+        className={cn(
+          "flex flex-col items-center gap-1 p-3 rounded-2xl",
+          "bg-secondary/50 hover:bg-secondary transition-colors",
+          "active:scale-95"
+        )}
       >
-        <SkipForward className="h-5 w-5" />
-      </Button>
+        <RotateCw className="h-6 w-6" />
+        <span className="text-xs text-muted-foreground font-medium">10s</span>
+      </button>
 
-      <Select
-        value={playbackRate.toString()}
-        onValueChange={(value) => onPlaybackRateChange(parseFloat(value))}
+      {/* Speed Button */}
+      <button
+        onClick={() => onPlaybackRateChange(nextRate)}
+        className={cn(
+          "flex flex-col items-center gap-1 p-3 rounded-2xl min-w-[52px]",
+          "bg-secondary/50 hover:bg-secondary transition-colors",
+          "active:scale-95"
+        )}
       >
-        <SelectTrigger className="w-20 h-10">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="0.5">0.5x</SelectItem>
-          <SelectItem value="0.75">0.75x</SelectItem>
-          <SelectItem value="1">1x</SelectItem>
-          <SelectItem value="1.25">1.25x</SelectItem>
-          <SelectItem value="1.5">1.5x</SelectItem>
-          <SelectItem value="2">2x</SelectItem>
-        </SelectContent>
-      </Select>
+        <span className="text-sm font-bold">{playbackRate}x</span>
+        <span className="text-xs text-muted-foreground font-medium">Speed</span>
+      </button>
     </div>
   );
 };

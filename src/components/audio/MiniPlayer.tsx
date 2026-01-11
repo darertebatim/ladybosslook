@@ -1,10 +1,8 @@
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Play, Pause, Headphones, X } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { AudioEqualizer } from "./AudioEqualizer";
+import { cn } from "@/lib/utils";
 
 export const MiniPlayer = () => {
   const navigate = useNavigate();
@@ -37,12 +35,29 @@ export const MiniPlayer = () => {
   };
 
   return (
-    <Card 
-      className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-2 right-2 z-40 rounded-xl border shadow-lg cursor-pointer animate-in slide-in-from-bottom-4 duration-300"
+    <div 
+      className={cn(
+        "fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-2 right-2 z-40",
+        "rounded-2xl overflow-hidden cursor-pointer",
+        "animate-in slide-in-from-bottom-4 duration-300",
+        // Glass effect
+        "bg-card/80 dark:bg-card/90 backdrop-blur-xl",
+        "border border-border/50",
+        "shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+      )}
       onClick={() => navigate(`/app/player/${currentTrack.id}`)}
     >
+      {/* Progress bar at top */}
+      <div className="h-1 bg-muted/30 w-full">
+        <div 
+          className="h-full bg-primary transition-all duration-300 ease-out"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
       <div className="flex items-center gap-3 p-3">
-        <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0">
+        {/* Cover Art */}
+        <div className="relative h-14 w-14 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
           {currentTrack.coverImageUrl ? (
             <img 
               src={currentTrack.coverImageUrl} 
@@ -56,43 +71,58 @@ export const MiniPlayer = () => {
           )}
         </div>
         
+        {/* Track Info */}
         <div className="flex-1 min-w-0">
           {currentTrack.playlistName && (
-            <p className="text-xs text-muted-foreground truncate">{currentTrack.playlistName}</p>
+            <p className="text-xs text-muted-foreground truncate mb-0.5">
+              {currentTrack.playlistName}
+            </p>
           )}
           <div className="flex items-center gap-2">
-            <p className="font-semibold text-sm truncate">{currentTrack.title}</p>
-            {currentTrack.trackPosition && (
-              <Badge variant="secondary" className="text-xs flex-shrink-0">
-                {currentTrack.trackPosition}
-              </Badge>
+            {isPlaying && (
+              <AudioEqualizer isPlaying={isPlaying} size="sm" className="flex-shrink-0" />
             )}
+            <p className="font-semibold text-sm truncate">{currentTrack.title}</p>
           </div>
-          <Progress value={progress} className="h-1 mt-1" />
+          {currentTrack.trackPosition && (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Track {currentTrack.trackPosition}
+            </p>
+          )}
         </div>
 
-        <Button
-          size="icon"
-          variant="ghost"
+        {/* Play/Pause Button */}
+        <button
           onClick={handlePlayPause}
-          className="flex-shrink-0 h-10 w-10"
+          className={cn(
+            "flex-shrink-0 h-12 w-12 rounded-full",
+            "flex items-center justify-center",
+            "bg-primary text-primary-foreground",
+            "shadow-md hover:shadow-lg transition-all",
+            "active:scale-95 hover:scale-105"
+          )}
         >
           {isPlaying ? (
             <Pause className="h-5 w-5" />
           ) : (
-            <Play className="h-5 w-5" />
+            <Play className="h-5 w-5 ml-0.5" />
           )}
-        </Button>
+        </button>
 
-        <Button
-          size="icon"
-          variant="ghost"
+        {/* Close Button */}
+        <button
           onClick={handleClose}
-          className="flex-shrink-0 h-8 w-8"
+          className={cn(
+            "flex-shrink-0 h-8 w-8 rounded-full",
+            "flex items-center justify-center",
+            "text-muted-foreground hover:text-foreground",
+            "hover:bg-muted/50 transition-colors",
+            "active:scale-95"
+          )}
         >
           <X className="h-4 w-4" />
-        </Button>
+        </button>
       </div>
-    </Card>
+    </div>
   );
 };
