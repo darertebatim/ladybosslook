@@ -39,6 +39,15 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
   const [videoUrl, setVideoUrl] = useState('');
   const [isPinned, setIsPinned] = useState(false);
   const [sendPush, setSendPush] = useState(false);
+  const [displayName, setDisplayName] = useState('');
+  const [customDisplayName, setCustomDisplayName] = useState('');
+
+  const SENDER_OPTIONS = [
+    { value: '', label: 'Use my name' },
+    { value: 'Razie', label: 'Razie' },
+    { value: 'Team', label: 'The Team' },
+    { value: 'custom', label: 'Custom...' },
+  ];
   
   // Voice recording
   const [isRecording, setIsRecording] = useState(false);
@@ -205,6 +214,7 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
         action_data: actionData,
         is_pinned: isPinned,
         send_push: sendPush,
+        display_name: displayName === 'custom' ? customDisplayName : (displayName || null),
       });
 
       if (error) throw error;
@@ -227,6 +237,8 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
     setVideoUrl('');
     setIsPinned(false);
     setSendPush(false);
+    setDisplayName('');
+    setCustomDisplayName('');
     setActionType('none');
     setActionLabel('');
     setActionUrl('');
@@ -273,6 +285,7 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
     send_push: sendPush,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    display_name: displayName === 'custom' ? customDisplayName : (displayName || null),
     author: {
       full_name: profile?.full_name || 'Admin',
       avatar_url: profile?.avatar_url || null,
@@ -287,22 +300,53 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
 
   return (
     <div className="space-y-6">
-      {/* Channel selector */}
-      <div>
-        <Label className="text-sm font-medium">Channel</Label>
-        <Select value={channelId} onValueChange={setChannelId}>
-          <SelectTrigger className="mt-1.5">
-            <SelectValue placeholder="Select channel..." />
-          </SelectTrigger>
-          <SelectContent>
-            {channels?.map((c) => (
-              <SelectItem key={c.id} value={c.id}>
-                {c.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {/* Channel and Sender selector */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label className="text-sm font-medium">Channel</Label>
+          <Select value={channelId} onValueChange={setChannelId}>
+            <SelectTrigger className="mt-1.5">
+              <SelectValue placeholder="Select channel..." />
+            </SelectTrigger>
+            <SelectContent>
+              {channels?.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Sender name selector */}
+        <div>
+          <Label className="text-sm font-medium">Post as</Label>
+          <Select value={displayName} onValueChange={setDisplayName}>
+            <SelectTrigger className="mt-1.5">
+              <SelectValue placeholder="Select sender..." />
+            </SelectTrigger>
+            <SelectContent>
+              {SENDER_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
+
+      {/* Custom name input */}
+      {displayName === 'custom' && (
+        <div>
+          <Input
+            value={customDisplayName}
+            onChange={(e) => setCustomDisplayName(e.target.value)}
+            placeholder="Enter custom sender name..."
+            className="border-dashed"
+          />
+        </div>
+      )}
 
       {/* Live Preview */}
       {channelId && hasContent && (

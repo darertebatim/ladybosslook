@@ -666,6 +666,7 @@ export type Database = {
           channel_id: string
           content: string
           created_at: string
+          display_name: string | null
           id: string
           image_url: string | null
           is_pinned: boolean
@@ -685,6 +686,7 @@ export type Database = {
           channel_id: string
           content: string
           created_at?: string
+          display_name?: string | null
           id?: string
           image_url?: string | null
           is_pinned?: boolean
@@ -704,6 +706,7 @@ export type Database = {
           channel_id?: string
           content?: string
           created_at?: string
+          display_name?: string | null
           id?: string
           image_url?: string | null
           is_pinned?: boolean
