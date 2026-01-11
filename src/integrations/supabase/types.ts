@@ -525,6 +525,245 @@ export type Database = {
           },
         ]
       }
+      feed_channels: {
+        Row: {
+          allow_comments: boolean
+          allow_reactions: boolean
+          cover_image_url: string | null
+          created_at: string
+          id: string
+          is_archived: boolean
+          name: string
+          program_slug: string | null
+          round_id: string | null
+          slug: string
+          sort_order: number
+          type: string
+        }
+        Insert: {
+          allow_comments?: boolean
+          allow_reactions?: boolean
+          cover_image_url?: string | null
+          created_at?: string
+          id?: string
+          is_archived?: boolean
+          name: string
+          program_slug?: string | null
+          round_id?: string | null
+          slug: string
+          sort_order?: number
+          type?: string
+        }
+        Update: {
+          allow_comments?: boolean
+          allow_reactions?: boolean
+          cover_image_url?: string | null
+          created_at?: string
+          id?: string
+          is_archived?: boolean
+          name?: string
+          program_slug?: string | null
+          round_id?: string | null
+          slug?: string
+          sort_order?: number
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_channels_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_hidden: boolean
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "feed_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feed_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_post_reads: {
+        Row: {
+          id: string
+          post_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          post_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_post_reads_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "feed_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feed_post_reads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_posts: {
+        Row: {
+          action_data: Json | null
+          action_type: string | null
+          author_id: string | null
+          channel_id: string
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          is_pinned: boolean
+          is_system: boolean
+          post_type: string
+          send_push: boolean
+          title: string | null
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          action_data?: Json | null
+          action_type?: string | null
+          author_id?: string | null
+          channel_id: string
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_pinned?: boolean
+          is_system?: boolean
+          post_type?: string
+          send_push?: boolean
+          title?: string | null
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          action_data?: Json | null
+          action_type?: string | null
+          author_id?: string | null
+          channel_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_pinned?: boolean
+          is_system?: boolean
+          post_type?: string
+          send_push?: boolean
+          title?: string | null
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feed_posts_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "feed_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_reactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "feed_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feed_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       form_submissions: {
         Row: {
           city: string
