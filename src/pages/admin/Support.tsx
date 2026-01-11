@@ -59,6 +59,13 @@ export default function Support() {
       );
 
       setConversations(conversationsWithDetails);
+      
+      // Update selected conversation with fresh data if one is selected
+      setSelectedConversation(prev => {
+        if (!prev) return null;
+        const updated = conversationsWithDetails.find(c => c.id === prev.id);
+        return updated || prev;
+      });
     } catch (error) {
       console.error('Error fetching conversations:', error);
     } finally {
@@ -103,6 +110,12 @@ export default function Support() {
 
   const handleSelectConversation = (conv: Conversation) => {
     setSelectedConversation(conv);
+    // Optimistically clear the unread count in the list
+    if (conv.unread_count_admin > 0) {
+      setConversations(prev => prev.map(c => 
+        c.id === conv.id ? { ...c, unread_count_admin: 0 } : c
+      ));
+    }
   };
 
   return (
