@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
 import { Separator } from '@/components/ui/separator';
+import { BrandedSplash } from '@/components/app/BrandedSplash';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -28,13 +29,9 @@ export default function Auth() {
     }
   }, [user, navigate]);
 
-  // Show loading spinner while checking auth state (prevents flash of login form)
+  // Show branded splash while checking auth state (prevents flash of login form)
   if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <BrandedSplash />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
