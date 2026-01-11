@@ -5,7 +5,7 @@ import { ActiveRound } from '@/components/dashboard/ActiveRound';
 import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
 import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Bell, ArrowRight, User, Send, Mail, Sparkles, BookOpen } from 'lucide-react';
+import { MessageCircle, Bell, ArrowRight, User, Send, Mail, Sparkles, BookOpen, NotebookPen } from 'lucide-react';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
 import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
@@ -109,13 +109,22 @@ const AppHome = () => {
           title="Welcome back!" 
           subtitle="Loading..."
           rightAction={
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full h-10 w-10 border-2"
-            >
-              <User className="h-5 w-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full h-10 w-10 border-2"
+              >
+                <NotebookPen className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full h-10 w-10 border-2"
+              >
+                <User className="h-5 w-5" />
+              </Button>
+            </div>
           }
         />
         <AppHeaderSpacer />
@@ -143,14 +152,24 @@ const AppHome = () => {
         title="Welcome back!" 
         subtitle={user?.email}
         rightAction={
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => navigate('/app/profile')}
-            className="rounded-full h-10 w-10 border-2"
-          >
-            <User className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate('/app/journal')}
+              className="rounded-full h-10 w-10 border-2"
+            >
+              <NotebookPen className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate('/app/profile')}
+              className="rounded-full h-10 w-10 border-2"
+            >
+              <User className="h-5 w-5" />
+            </Button>
+          </div>
         }
       />
       <AppHeaderSpacer />

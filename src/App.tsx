@@ -25,6 +25,8 @@ import AppAudioPlayer from "@/pages/app/AppAudioPlayer";
 import AppSupportChat from "@/pages/app/AppSupportChat";
 import AppFeed from "@/pages/app/AppFeed";
 import AppFeedPost from "@/pages/app/AppFeedPost";
+import AppJournal from "@/pages/app/AppJournal";
+import AppJournalEntry from "@/pages/app/AppJournalEntry";
 import Programs from "./pages/Programs";
 import About from "./pages/About";
 import Overview from "./pages/admin/Overview";
@@ -200,6 +202,9 @@ const App = () => (
               <Route path="support-chat" element={<AppSupportChat />} />
               <Route path="feed" element={<AppFeed />} />
               <Route path="feed/post/:postId" element={<AppFeedPost />} />
+              <Route path="journal" element={<AppJournal />} />
+              <Route path="journal/new" element={<AppJournalEntry />} />
+              <Route path="journal/:entryId" element={<AppJournalEntry />} />
               <Route path="profile" element={<AppProfile />} />
             </Route>
             
