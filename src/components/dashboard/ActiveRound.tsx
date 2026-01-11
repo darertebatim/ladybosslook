@@ -27,7 +27,7 @@ export function ActiveRound() {
     // Provider not available, ignore
   }
 
-  const { data: activeEnrollments, isLoading } = useQuery({
+  const { data: queryResult, isLoading } = useQuery({
     queryKey: ['active-enrollments', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -44,10 +44,39 @@ export function ActiveRound() {
         .order('enrolled_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      
+      // Get all round IDs to fetch next sessions
+      const roundIds = data
+        .map(e => e.program_rounds?.id)
+        .filter((id): id is string => Boolean(id));
+      
+      // Fetch next upcoming session for each round
+      let nextSessionMap = new Map<string, string>();
+      if (roundIds.length > 0) {
+        const { data: sessions } = await supabase
+          .from('program_sessions')
+          .select('round_id, session_date')
+          .in('round_id', roundIds)
+          .gt('session_date', new Date().toISOString())
+          .order('session_date', { ascending: true });
+        
+        // Build map with first (soonest) session per round
+        if (sessions) {
+          for (const session of sessions) {
+            if (!nextSessionMap.has(session.round_id)) {
+              nextSessionMap.set(session.round_id, session.session_date);
+            }
+          }
+        }
+      }
+      
+      return { enrollments: data, nextSessionMap };
     },
     enabled: !!user?.id,
   });
+
+  const activeEnrollments = queryResult?.enrollments;
+  const nextSessionMap = queryResult?.nextSessionMap || new Map<string, string>();
 
   if (isLoading) {
     return (
@@ -93,6 +122,27 @@ export function ActiveRound() {
   const activeRounds = activeEnrollments.filter(e => e.program_rounds?.status !== 'completed');
   const completedRounds = activeEnrollments.filter(e => e.program_rounds?.status === 'completed');
 
+  // Sort active rounds by next session date (soonest first)
+  const sortedActiveRounds = [...activeRounds].sort((a, b) => {
+    const aRoundId = a.program_rounds?.id;
+    const bRoundId = b.program_rounds?.id;
+    
+    // Get next session or fallback to first_session_date
+    const aNextSession = aRoundId ? nextSessionMap.get(aRoundId) : null;
+    const bNextSession = bRoundId ? nextSessionMap.get(bRoundId) : null;
+    
+    const aDate = aNextSession || a.program_rounds?.first_session_date || a.program_rounds?.start_date;
+    const bDate = bNextSession || b.program_rounds?.first_session_date || b.program_rounds?.start_date;
+    
+    // Rounds with dates come first
+    if (aDate && !bDate) return -1;
+    if (!aDate && bDate) return 1;
+    if (!aDate && !bDate) return 0;
+    
+    // Sort by soonest date first
+    return new Date(aDate!).getTime() - new Date(bDate!).getTime();
+  });
+
   const RoundCard = ({ enrollment, isCompleted = false }: { enrollment: typeof activeEnrollments[0], isCompleted?: boolean }) => {
     const round = enrollment.program_rounds;
     if (!round) return null;
@@ -102,6 +152,9 @@ export function ActiveRound() {
     const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
     const isRoundUnseen = unseenRounds.has(round.id);
     const hasNotification = isEnrollmentUnseen || isRoundUnseen;
+    
+    // Get actual next session date from our map
+    const nextSessionDate = round.id ? nextSessionMap.get(round.id) : null;
 
     return (
       <Link 
@@ -157,12 +210,12 @@ export function ActiveRound() {
                     <span className="font-medium">{round.round_name}</span>
                   </div>
                   
-                  {!isCompleted && round.first_session_date && (
+                  {!isCompleted && (nextSessionDate || round.first_session_date) && (
                     <div className="flex items-center gap-2">
                       <Calendar className="h-3.5 w-3.5" />
                       <span>
                         {isUpcoming ? 'Starts ' : 'Next session: '}
-                        {format(new Date(round.first_session_date), 'MMM d, yyyy • h:mm a')}
+                        {format(new Date(nextSessionDate || round.first_session_date!), 'MMM d, yyyy • h:mm a')}
                       </span>
                     </div>
                   )}
@@ -250,7 +303,7 @@ export function ActiveRound() {
           </div>
 
           <div className="flex flex-col gap-4">
-            {activeRounds.map((enrollment) => (
+            {sortedActiveRounds.map((enrollment) => (
               <RoundCard key={enrollment.id} enrollment={enrollment} />
             ))}
           </div>
