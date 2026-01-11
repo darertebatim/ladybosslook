@@ -118,3 +118,6 @@ verify_jwt = false
 
 [functions.send-session-reminders]
 verify_jwt = false
+
+[functions.send-journal-reminders]
+verify_jwt = false
