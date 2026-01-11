@@ -1,0 +1,20 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAM_ID.com.ladybosslook.academy",
+        "paths": [
+          "/app/*",
+          "/auth",
+          "/auth/*"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "TEAM_ID.com.ladybosslook.academy"
+    ]
+  }
+}

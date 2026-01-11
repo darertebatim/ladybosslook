@@ -274,6 +274,50 @@ This adds the required `UIBackgroundModes` key to `Info.plist`. You can verify i
 
 ---
 
+## 🔗 Universal Links Setup
+
+Universal Links allow URLs like `https://ladybosslook.com/app/home` to open directly in the native iOS app instead of Safari.
+
+### Step 1: Update the AASA File
+
+The Apple App Site Association file is already created at `public/.well-known/apple-app-site-association`. 
+
+**⚠️ You MUST replace `TEAM_ID` with your actual Apple Developer Team ID:**
+
+1. Find your Team ID in [Apple Developer Portal](https://developer.apple.com/account) → Membership → Team ID
+2. Edit `public/.well-known/apple-app-site-association` and replace all instances of `TEAM_ID` with your actual Team ID (e.g., `ABC123XYZ.com.ladybosslook.academy`)
+
+### Step 2: Configure Xcode
+
+1. **Open iOS project:** `npx cap open ios`
+2. **Select the "App" target** in the project navigator
+3. **Go to "Signing & Capabilities" tab**
+4. **Click "+ Capability"** button
+5. **Search for and add "Associated Domains"**
+6. **Add the following domain:**
+   ```
+   applinks:ladybosslook.com
+   ```
+
+### Step 3: Deploy and Verify
+
+1. **Deploy the app** with the AASA file to your production domain
+2. **Verify the AASA file** is accessible at: `https://ladybosslook.com/.well-known/apple-app-site-association`
+3. The file must be served with `Content-Type: application/json`
+4. **Test Universal Links** after installing a new build with Associated Domains enabled
+
+### Paths Configured
+
+The following paths will open in the native app:
+- `/app/*` - All logged-in app routes (home, courses, player, etc.)
+- `/auth` and `/auth/*` - Authentication pages
+
+**Note**: Marketing pages (`/ewcnow`, `/cc`, etc.) intentionally open in Safari for App Store compliance.
+
+**Important**: If you ever delete the `ios/` folder and run `npx cap add ios` again, you will need to re-add the Associated Domains capability.
+
+---
+
 ## 🚨 CRITICAL: Push Notifications Setup
 
 ⚠️ **If you plan to use push notifications, there is a required manual step that is NOT handled by `npx cap add ios`.**
