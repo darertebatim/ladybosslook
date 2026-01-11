@@ -875,8 +875,6 @@ export type Database = {
           created_at: string
           id: string
           mood: string | null
-          shared_at: string | null
-          shared_with_admin: boolean | null
           title: string | null
           updated_at: string
           user_id: string
@@ -886,8 +884,6 @@ export type Database = {
           created_at?: string
           id?: string
           mood?: string | null
-          shared_at?: string | null
-          shared_with_admin?: boolean | null
           title?: string | null
           updated_at?: string
           user_id: string
@@ -897,43 +893,8 @@ export type Database = {
           created_at?: string
           id?: string
           mood?: string | null
-          shared_at?: string | null
-          shared_with_admin?: boolean | null
           title?: string | null
           updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      journal_reminder_settings: {
-        Row: {
-          created_at: string | null
-          enabled: boolean | null
-          id: string
-          last_reminded_at: string | null
-          reminder_time: string
-          timezone: string | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          enabled?: boolean | null
-          id?: string
-          last_reminded_at?: string | null
-          reminder_time?: string
-          timezone?: string | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          enabled?: boolean | null
-          id?: string
-          last_reminded_at?: string | null
-          reminder_time?: string
-          timezone?: string | null
-          updated_at?: string | null
           user_id?: string
         }
         Relationships: []

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Trash2, Check, Loader2, Save, Share2, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Trash2, Check, Loader2, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MoodSelector } from '@/components/app/MoodSelector';
@@ -11,7 +11,6 @@ import {
   useUpdateJournalEntry,
   useDeleteJournalEntry 
 } from '@/hooks/useJournal';
-import { useShareJournalEntry } from '@/hooks/useShareJournal';
 import { JournalEntrySkeleton } from '@/components/app/skeletons/JournalSkeleton';
 import { SEOHead } from '@/components/SEOHead';
 import {
@@ -36,16 +35,13 @@ const AppJournalEntry = () => {
   const createMutation = useCreateJournalEntry();
   const updateMutation = useUpdateJournalEntry();
   const deleteMutation = useDeleteJournalEntry();
-  const shareMutation = useShareJournalEntry();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [mood, setMood] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showShareDialog, setShowShareDialog] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [isShared, setIsShared] = useState(false);
   
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const createdEntryIdRef = useRef<string | null>(null);
@@ -56,7 +52,6 @@ const AppJournalEntry = () => {
       setTitle(existingEntry.title || '');
       setContent(existingEntry.content || '');
       setMood(existingEntry.mood);
-      setIsShared((existingEntry as { shared_with_admin?: boolean }).shared_with_admin || false);
     }
   }, [existingEntry]);
 
@@ -127,30 +122,6 @@ const AppJournalEntry = () => {
     triggerAutoSave();
   };
 
-  // Handle explicit save
-  const handleSave = async () => {
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-    await saveEntry();
-    toast.success('Entry saved!');
-  };
-
-  // Handle share with admin
-  const handleShare = async () => {
-    const id = createdEntryIdRef.current || entryId;
-    if (!id || !content.trim()) return;
-
-    await shareMutation.mutateAsync({
-      entryId: id,
-      title,
-      content,
-      mood,
-    });
-    setIsShared(true);
-    setShowShareDialog(false);
-  };
-
   // Handle delete
   const handleDelete = async () => {
     const id = createdEntryIdRef.current || entryId;
@@ -181,8 +152,6 @@ const AppJournalEntry = () => {
     };
   }, []);
 
-  const hasEntry = entryId || createdEntryIdRef.current;
-
   if (isLoading && entryId) {
     return (
       <div className="min-h-screen bg-background">
@@ -202,7 +171,7 @@ const AppJournalEntry = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-32">
+    <div className="min-h-screen bg-background flex flex-col">
       <SEOHead 
         title={isNew ? 'New Entry' : 'Edit Entry'} 
         description="Write your journal entry" 
@@ -232,12 +201,21 @@ const AppJournalEntry = () => {
                 Saved
               </span>
             )}
-            {isShared && (
-              <span className="flex items-center text-sm text-primary">
-                <CheckCircle className="h-4 w-4 mr-1" />
-                Shared
-              </span>
-            )}
+            <Button 
+              size="sm" 
+              onClick={() => {
+                if (saveTimeoutRef.current) {
+                  clearTimeout(saveTimeoutRef.current);
+                }
+                saveEntry().then(() => {
+                  toast.success('Entry saved!');
+                });
+              }}
+              disabled={saveStatus === 'saving' || !content.trim()}
+            >
+              <Save className="h-4 w-4 mr-1" />
+              Save
+            </Button>
           </div>
         </div>
       </div>
@@ -276,58 +254,17 @@ const AppJournalEntry = () => {
             className="min-h-[300px] resize-none text-base leading-relaxed"
           />
         </div>
-      </div>
 
-      {/* Sticky Footer Actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 space-y-3">
-        {/* Save Button */}
-        <Button 
-          className="w-full"
-          onClick={handleSave}
-          disabled={saveStatus === 'saving' || !content.trim()}
-        >
-          {saveStatus === 'saving' ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4 mr-2" />
-              Save Entry
-            </>
-          )}
-        </Button>
-
-        {/* Share and Delete buttons (only for existing entries) */}
-        {hasEntry && (
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => setShowShareDialog(true)}
-              disabled={shareMutation.isPending || isShared}
-            >
-              {isShared ? (
-                <>
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Shared with Razie
-                </>
-              ) : (
-                <>
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share with Razie
-                </>
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={() => setShowDeleteDialog(true)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
+        {/* Delete button (for existing entries) */}
+        {(entryId || createdEntryIdRef.current) && (
+          <Button
+            variant="ghost"
+            className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete Entry
+          </Button>
         )}
       </div>
 
@@ -347,25 +284,6 @@ const AppJournalEntry = () => {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Share confirmation dialog */}
-      <AlertDialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Share with Razie</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will share your journal entry with Razie through the support chat. 
-              She'll be able to read your reflection and respond if needed.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleShare}>
-              Share Entry
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
