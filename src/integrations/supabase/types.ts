@@ -660,6 +660,8 @@ export type Database = {
         Row: {
           action_data: Json | null
           action_type: string | null
+          audio_duration: number | null
+          audio_url: string | null
           author_id: string | null
           channel_id: string
           content: string
@@ -677,6 +679,8 @@ export type Database = {
         Insert: {
           action_data?: Json | null
           action_type?: string | null
+          audio_duration?: number | null
+          audio_url?: string | null
           author_id?: string | null
           channel_id: string
           content: string
@@ -694,6 +698,8 @@ export type Database = {
         Update: {
           action_data?: Json | null
           action_type?: string | null
+          audio_duration?: number | null
+          audio_url?: string | null
           author_id?: string | null
           channel_id?: string
           content?: string

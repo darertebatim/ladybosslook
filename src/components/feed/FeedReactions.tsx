@@ -1,7 +1,6 @@
 import { cn } from '@/lib/utils';
 import { EMOJI_OPTIONS, useToggleReaction } from '@/hooks/useFeed';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
 import { SmilePlus } from 'lucide-react';
 import { useState } from 'react';
 
@@ -10,18 +9,21 @@ interface FeedReactionsProps {
   reactionsCount: Record<string, number>;
   userReactions: string[];
   allowReactions?: boolean;
+  compact?: boolean;
 }
 
 export function FeedReactions({ 
   postId, 
   reactionsCount, 
   userReactions, 
-  allowReactions = true 
+  allowReactions = true,
+  compact = true
 }: FeedReactionsProps) {
   const [open, setOpen] = useState(false);
   const toggleReaction = useToggleReaction();
 
-  const handleReaction = (emoji: string) => {
+  const handleReaction = (emoji: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     toggleReaction.mutate({ postId, emoji });
     setOpen(false);
   };
@@ -29,10 +31,75 @@ export function FeedReactions({
   if (!allowReactions) return null;
 
   const hasReactions = Object.keys(reactionsCount).length > 0;
+  const totalReactions = Object.values(reactionsCount).reduce((a, b) => a + b, 0);
 
+  // Compact mode: show combined reactions inline
+  if (compact) {
+    return (
+      <div className="flex items-center gap-1.5">
+        {/* Existing reactions - compact inline */}
+        {hasReactions && (
+          <div className="flex items-center">
+            {EMOJI_OPTIONS.filter(opt => (reactionsCount[opt.key] || 0) > 0)
+              .slice(0, 3)
+              .map((option, idx) => (
+                <button
+                  key={option.key}
+                  onClick={(e) => handleReaction(option.key, e)}
+                  disabled={toggleReaction.isPending}
+                  className={cn(
+                    "text-base -ml-1 first:ml-0 hover:scale-110 transition-transform",
+                    userReactions.includes(option.key) && "drop-shadow-sm"
+                  )}
+                >
+                  {option.emoji}
+                </button>
+              ))}
+            {totalReactions > 0 && (
+              <span className="text-xs text-muted-foreground ml-1.5">{totalReactions}</span>
+            )}
+          </div>
+        )}
+
+        {/* Add reaction button - compact */}
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <button
+              onClick={(e) => e.stopPropagation()}
+              className={cn(
+                "p-1 rounded-full hover:bg-muted transition-colors",
+                "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <SmilePlus className="h-4 w-4" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-1.5" align="start" onClick={(e) => e.stopPropagation()}>
+            <div className="flex gap-0.5">
+              {EMOJI_OPTIONS.map((option) => (
+                <button
+                  key={option.key}
+                  onClick={(e) => handleReaction(option.key, e)}
+                  disabled={toggleReaction.isPending}
+                  className={cn(
+                    "p-1.5 rounded-lg hover:bg-muted transition-colors text-lg",
+                    userReactions.includes(option.key) && "bg-primary/20"
+                  )}
+                  title={option.label}
+                >
+                  {option.emoji}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+    );
+  }
+
+  // Full mode: show individual reaction buttons
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      {/* Existing reactions */}
       {EMOJI_OPTIONS.map((option) => {
         const count = reactionsCount[option.key] || 0;
         if (count === 0) return null;
@@ -42,7 +109,7 @@ export function FeedReactions({
         return (
           <button
             key={option.key}
-            onClick={() => handleReaction(option.key)}
+            onClick={(e) => handleReaction(option.key, e)}
             disabled={toggleReaction.isPending}
             className={cn(
               "flex items-center gap-1 px-2 py-1 rounded-full text-sm transition-colors",
@@ -57,26 +124,24 @@ export function FeedReactions({
         );
       })}
 
-      {/* Add reaction button */}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
+            onClick={(e) => e.stopPropagation()}
             className={cn(
-              "h-8 px-2 rounded-full",
-              !hasReactions && "text-muted-foreground"
+              "h-7 px-2 rounded-full hover:bg-muted transition-colors",
+              "text-muted-foreground"
             )}
           >
             <SmilePlus className="h-4 w-4" />
-          </Button>
+          </button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-2" align="start">
+        <PopoverContent className="w-auto p-2" align="start" onClick={(e) => e.stopPropagation()}>
           <div className="flex gap-1">
             {EMOJI_OPTIONS.map((option) => (
               <button
                 key={option.key}
-                onClick={() => handleReaction(option.key)}
+                onClick={(e) => handleReaction(option.key, e)}
                 disabled={toggleReaction.isPending}
                 className={cn(
                   "p-2 rounded-lg hover:bg-muted transition-colors text-xl",
