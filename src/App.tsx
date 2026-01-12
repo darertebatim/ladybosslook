@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Capacitor } from "@capacitor/core";
 import { useDeepLinks, checkInitialDeepLink } from "@/hooks/useDeepLinks";
+import { initializeSocialLogin } from "@/lib/nativeSocialAuth";
 import AppLayout from "@/layouts/NativeAppLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import AppHome from "@/pages/app/AppHome";
@@ -110,6 +111,9 @@ const NativeAppRedirect = () => {
 
       // Initialize push notification handlers once
       initializePushNotificationHandlers();
+      
+      // Initialize native social login (Google/Apple)
+      initializeSocialLogin();
       
       // Clear badge on app open
       clearBadge();
