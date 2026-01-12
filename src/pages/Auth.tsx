@@ -10,6 +10,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
 import { Separator } from '@/components/ui/separator';
 import { BrandedSplash } from '@/components/app/BrandedSplash';
+import { getDisplayBuildInfo } from '@/lib/buildInfo';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -253,6 +254,13 @@ export default function Auth() {
                 : (isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in")
               }
             </Button>
+          </div>
+          
+          {/* Build ID - helps diagnose which code version is running */}
+          <div className="mt-4 text-center">
+            <p className="text-[10px] text-muted-foreground/50 font-mono">
+              {getDisplayBuildInfo()}
+            </p>
           </div>
         </CardContent>
       </Card>
