@@ -6,6 +6,10 @@ import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { initializePushNotificationHandlers, clearBadge } from './lib/pushNotifications';
+import { logBuildInfo } from './lib/buildInfo';
+
+// Log build info immediately on app start
+logBuildInfo();
 
 // Initialize Capacitor native features
 if (Capacitor.isNativePlatform()) {

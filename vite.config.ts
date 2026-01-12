@@ -3,8 +3,17 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
+// Generate build ID based on current timestamp
+const buildTime = new Date().toISOString();
+const buildId = `B${Date.now().toString(36).toUpperCase()}`;
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  define: {
+    __BUILD_TIME__: JSON.stringify(buildTime),
+    __BUILD_ID__: JSON.stringify(buildId),
+    __APP_VERSION__: JSON.stringify('1.0.0'),
+  },
   server: {
     host: "::",
     port: 8080,
