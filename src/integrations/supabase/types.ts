@@ -866,7 +866,7 @@ export type Database = {
           starts_at: string | null
           title: string
           updated_at: string | null
-          youtube_url: string | null
+          video_url: string | null
         }
         Insert: {
           background_color?: string | null
@@ -883,7 +883,7 @@ export type Database = {
           starts_at?: string | null
           title: string
           updated_at?: string | null
-          youtube_url?: string | null
+          video_url?: string | null
         }
         Update: {
           background_color?: string | null
@@ -900,7 +900,7 @@ export type Database = {
           starts_at?: string | null
           title?: string
           updated_at?: string | null
-          youtube_url?: string | null
+          video_url?: string | null
         }
         Relationships: []
       }
