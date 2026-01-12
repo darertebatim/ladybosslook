@@ -1,8 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-
-import { Capacitor } from '@capacitor/core';
+import { nativeGoogleSignIn, nativeAppleSignIn } from '@/lib/nativeSocialAuth';
 
 interface AuthContextType {
   user: User | null;
@@ -149,37 +148,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signInWithGoogle = async () => {
-    // Determine the redirect URL based on platform
-    const isNative = Capacitor.isNativePlatform();
-    const redirectTo = isNative 
-      ? 'app.lovable.9d54663c1af540669ceb1723206ae5f8://auth/callback'
-      : 'https://ladybosslook.com/app/home';
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo,
-        skipBrowserRedirect: isNative,
-      }
-    });
-    return { error };
+    return nativeGoogleSignIn();
   };
 
   const signInWithApple = async () => {
-    // Determine the redirect URL based on platform
-    const isNative = Capacitor.isNativePlatform();
-    const redirectTo = isNative 
-      ? 'app.lovable.9d54663c1af540669ceb1723206ae5f8://auth/callback'
-      : 'https://ladybosslook.com/app/home';
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-      options: {
-        redirectTo,
-        skipBrowserRedirect: isNative,
-      }
-    });
-    return { error };
+    return nativeAppleSignIn();
   };
 
   const signOut = async () => {
