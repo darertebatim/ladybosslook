@@ -318,7 +318,6 @@ serve(async (req) => {
       const sessionCreateParams: Stripe.Checkout.SessionCreateParams = {
         line_items: lineItems,
         mode: "payment",
-        payment_method_types: ['card'],
         billing_address_collection: 'required',
         phone_number_collection: {
           enabled: true
