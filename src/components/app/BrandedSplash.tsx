@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import appIcon from '@/assets/app-icon.png';
 
 interface BrandedSplashProps {
   className?: string;
@@ -13,7 +14,7 @@ export function BrandedSplash({ className }: BrandedSplashProps) {
       {/* Logo */}
       <div className="relative mb-8">
         <img 
-          src="/app-icons/ios/icon-180.png" 
+          src={appIcon} 
           alt="LadyBoss" 
           className="w-24 h-24 rounded-3xl shadow-xl animate-in fade-in duration-500"
         />
