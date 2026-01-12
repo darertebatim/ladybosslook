@@ -125,7 +125,7 @@ export default function AppFeed() {
       </header>
 
       {/* Messages stream */}
-      <main className="pb-24">
+      <main className="pb-24 px-4">
         {postsLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
