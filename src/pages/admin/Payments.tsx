@@ -1,4 +1,5 @@
 import { StripePaymentsViewer } from '@/components/admin/StripePaymentsViewer';
+import { StripeSyncButton } from '@/components/admin/StripeSyncButton';
 
 export default function Payments() {
   return (
@@ -7,6 +8,7 @@ export default function Payments() {
         <h2 className="text-2xl font-bold">Payments</h2>
         <p className="text-muted-foreground">View and manage Stripe payment transactions</p>
       </div>
+      <StripeSyncButton />
       <StripePaymentsViewer />
     </div>
   );
