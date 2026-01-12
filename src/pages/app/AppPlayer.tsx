@@ -40,7 +40,12 @@ export default function AppPlayer() {
     // If no program_slug, it's a standalone free playlist - show it
     if (!playlist.program_slug) return true;
     
+    // If user is enrolled in this program, always show the playlist
+    // This ensures purchased content is visible even if program is hidden from store
+    if (enrollments?.includes(playlist.program_slug)) return true;
+    
     // If in native app, check if the associated program is available on mobile
+    // (for non-enrolled users - controls visibility in store/discovery)
     if (isNativeApp()) {
       const program = programs?.find(p => p.slug === playlist.program_slug);
       return program?.available_on_mobile !== false;
