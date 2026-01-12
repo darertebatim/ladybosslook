@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -10,30 +10,25 @@ interface CompletedRound {
   roundId: string;
 }
 
-const CELEBRATED_ROUNDS_KEY = 'celebrated_completed_rounds';
-
 export function useCompletedRoundCelebration() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [celebrationData, setCelebrationData] = useState<CompletedRound | null>(null);
 
-  // Get list of already celebrated rounds from localStorage
-  const getCelebratedRounds = (): string[] => {
-    try {
-      const stored = localStorage.getItem(CELEBRATED_ROUNDS_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  };
+  // Fetch already celebrated rounds from database (persistent across devices/sessions)
+  const { data: celebratedRounds } = useQuery({
+    queryKey: ['celebrated-rounds', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_celebrated_rounds')
+        .select('round_id')
+        .eq('user_id', user?.id);
 
-  // Mark a round as celebrated
-  const markAsCelebrated = (roundId: string) => {
-    const celebrated = getCelebratedRounds();
-    if (!celebrated.includes(roundId)) {
-      celebrated.push(roundId);
-      localStorage.setItem(CELEBRATED_ROUNDS_KEY, JSON.stringify(celebrated));
-    }
-  };
+      if (error) throw error;
+      return data?.map(r => r.round_id) || [];
+    },
+    enabled: !!user?.id,
+  });
 
   // Fetch completed enrollments
   const { data: completedEnrollments } = useQuery({
@@ -59,12 +54,30 @@ export function useCompletedRoundCelebration() {
     enabled: !!user?.id,
   });
 
+  // Mutation to mark a round as celebrated in the database
+  const markCelebratedMutation = useMutation({
+    mutationFn: async (roundId: string) => {
+      const { error } = await supabase
+        .from('user_celebrated_rounds')
+        .insert({
+          user_id: user?.id,
+          round_id: roundId,
+        });
+
+      // Ignore unique constraint violations (already celebrated)
+      if (error && !error.message.includes('duplicate')) {
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['celebrated-rounds', user?.id] });
+    },
+  });
+
   // Check for newly completed rounds
   useEffect(() => {
-    if (!completedEnrollments) return;
+    if (!completedEnrollments || !celebratedRounds) return;
 
-    const celebratedRounds = getCelebratedRounds();
-    
     // Find completed rounds that haven't been celebrated yet
     for (const enrollment of completedEnrollments) {
       const round = enrollment.program_rounds;
@@ -78,11 +91,11 @@ export function useCompletedRoundCelebration() {
         break; // Show one at a time
       }
     }
-  }, [completedEnrollments]);
+  }, [completedEnrollments, celebratedRounds]);
 
   const closeCelebration = () => {
     if (celebrationData) {
-      markAsCelebrated(celebrationData.roundId);
+      markCelebratedMutation.mutate(celebrationData.roundId);
     }
     setCelebrationData(null);
   };

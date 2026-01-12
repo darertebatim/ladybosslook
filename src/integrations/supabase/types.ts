@@ -1546,6 +1546,35 @@ export type Database = {
         }
         Relationships: []
       }
+      user_celebrated_rounds: {
+        Row: {
+          celebrated_at: string
+          id: string
+          round_id: string
+          user_id: string
+        }
+        Insert: {
+          celebrated_at?: string
+          id?: string
+          round_id: string
+          user_id: string
+        }
+        Update: {
+          celebrated_at?: string
+          id?: string
+          round_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_celebrated_rounds_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_content_views: {
         Row: {
           content_id: string
