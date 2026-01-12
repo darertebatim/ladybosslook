@@ -1187,6 +1187,8 @@ export type Database = {
           price_amount: number
           slug: string
           stripe_payment_link: string | null
+          stripe_price_id: string | null
+          stripe_product_id: string | null
           subscription_duration: string | null
           subscription_full_payment_discount: number | null
           subscription_full_payment_price: number | null
@@ -1223,6 +1225,8 @@ export type Database = {
           price_amount?: number
           slug: string
           stripe_payment_link?: string | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
           subscription_duration?: string | null
           subscription_full_payment_discount?: number | null
           subscription_full_payment_price?: number | null
@@ -1259,6 +1263,8 @@ export type Database = {
           price_amount?: number
           slug?: string
           stripe_payment_link?: string | null
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
           subscription_duration?: string | null
           subscription_full_payment_discount?: number | null
           subscription_full_payment_price?: number | null
