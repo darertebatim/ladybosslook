@@ -255,10 +255,9 @@ export default function Auth() {
               }
             </Button>
           </div>
-          
           {/* Build ID - helps diagnose which code version is running */}
-          <div className="mt-4 text-center">
-            <p className="text-[10px] text-muted-foreground/50 font-mono">
+          <div className="fixed bottom-2 left-0 right-0 flex justify-center pointer-events-none">
+            <p className="text-xs text-muted-foreground font-mono bg-background/80 backdrop-blur px-2 py-1 rounded">
               {getDisplayBuildInfo()}
             </p>
           </div>
