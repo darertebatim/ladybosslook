@@ -16,7 +16,7 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const prompt = `A feminine queen crown tiara made of liquid glass, frosted translucent glass material, purple and magenta gradient tones within the glass, rose gold and golden amber reflections, glassmorphism aesthetic with depth and transparency, soft glowing edges, pure white background filling entire canvas, NO border NO frame NO rounded rectangle NO card shape, crown centered and filling most of the square, 1024x1024 square format, no text, professional quality, ultra high resolution, designed for women, elegant royal feminine style`;
+    const prompt = `Minimal elegant crown silhouette, simplified iconic design, liquid glass glassmorphism aesthetic, translucent frosted glass effect, subtle depth with layered transparency, soft glows and reflections, purple to pink gradient base with glass overlay, subtle gold amber accents for premium touch, clean minimal design, pure white background edge to edge, NO frame NO border NO rounded corners NO card shape NO container, crown fills the canvas, 1024x1024 square, no text, ultra high resolution, premium modern futuristic feel`;
 
     console.log('Generating app icon with prompt:', prompt);
 
