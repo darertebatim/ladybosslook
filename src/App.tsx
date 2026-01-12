@@ -39,6 +39,7 @@ import Communications from "./pages/admin/Communications";
 import ProgramsAdmin from "./pages/admin/Programs";
 import Payments from "./pages/admin/Payments";
 import System from "./pages/admin/System";
+import AppIconGenerator from "./pages/admin/AppIconGenerator";
 import Support from "./pages/admin/Support";
 import Community from "./pages/admin/Community";
 import AssertLanding from "./pages/AssertLanding";
@@ -173,6 +174,7 @@ const App = () => (
                 <Route path="payments" element={<ProtectedRoute requiredPage="payments"><Payments /></ProtectedRoute>} />
                 <Route path="support" element={<ProtectedRoute requiredPage="support"><Support /></ProtectedRoute>} />
                 <Route path="system" element={<ProtectedRoute requiredPage="system"><System /></ProtectedRoute>} />
+                <Route path="app-icon" element={<ProtectedRoute requiredPage="system"><AppIconGenerator /></ProtectedRoute>} />
               </Route>
             )}
             
