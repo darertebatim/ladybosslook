@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { X, Play, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { detectVideoType, extractYouTubeId, extractVimeoId, getVideoEmbedUrl, getVideoPlatformLabel } from '@/lib/videoUtils';
 
 interface HomeBannerData {
   id: string;
@@ -10,20 +11,9 @@ interface HomeBannerData {
   description: string | null;
   button_text: string | null;
   button_url: string | null;
-  youtube_url: string | null;
+  video_url: string | null;
   background_color: string | null;
 }
-
-const extractYouTubeId = (url: string): string | null => {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-  ];
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) return match[1];
-  }
-  return null;
-};
 
 export function HomeBanner() {
   const [banners, setBanners] = useState<HomeBannerData[]>([]);
@@ -39,7 +29,7 @@ export function HomeBanner() {
     try {
       const { data, error } = await supabase
         .from('home_banners')
-        .select('id, title, description, button_text, button_url, youtube_url, background_color')
+        .select('id, title, description, button_text, button_url, video_url, background_color')
         .eq('is_active', true)
         .or('starts_at.is.null,starts_at.lte.now()')
         .or('ends_at.is.null,ends_at.gte.now()')
@@ -72,7 +62,7 @@ export function HomeBanner() {
   return (
     <div className="space-y-3">
       {visibleBanners.map((banner) => {
-        const youtubeId = banner.youtube_url ? extractYouTubeId(banner.youtube_url) : null;
+        const videoType = banner.video_url ? detectVideoType(banner.video_url) : null;
         const isVideoExpanded = expandedVideoId === banner.id;
 
         return (
@@ -88,39 +78,98 @@ export function HomeBanner() {
               <X className="h-4 w-4 text-muted-foreground" />
             </button>
 
-            {/* YouTube Video */}
-            {youtubeId && (
+            {/* Video Section */}
+            {banner.video_url && videoType && (
               <div className="mb-3">
-                {isVideoExpanded ? (
-                  <div className="relative aspect-video rounded-lg overflow-hidden">
-                    <iframe
-                      src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1`}
-                      title={banner.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="absolute inset-0 w-full h-full"
-                    />
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setExpandedVideoId(banner.id)}
-                    className="relative w-full aspect-video rounded-lg overflow-hidden group"
-                  >
-                    <img
-                      src={`https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`}
-                      alt={banner.title}
-                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                      onError={(e) => {
-                        // Fallback to lower quality thumbnail if maxres doesn't exist
-                        (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
-                      <div className="bg-primary text-primary-foreground rounded-full p-3">
-                        <Play className="h-6 w-6 fill-current" />
+                {/* YouTube with embed */}
+                {videoType === 'youtube' && (
+                  <>
+                    {isVideoExpanded ? (
+                      <div className="relative aspect-video rounded-lg overflow-hidden">
+                        <iframe
+                          src={getVideoEmbedUrl(banner.video_url, 'youtube', true) || ''}
+                          title={banner.title}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="absolute inset-0 w-full h-full"
+                        />
                       </div>
-                    </div>
-                  </button>
+                    ) : (
+                      <button
+                        onClick={() => setExpandedVideoId(banner.id)}
+                        className="relative w-full aspect-video rounded-lg overflow-hidden group"
+                      >
+                        <img
+                          src={`https://img.youtube.com/vi/${extractYouTubeId(banner.video_url)}/maxresdefault.jpg`}
+                          alt={banner.title}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                          onError={(e) => {
+                            const youtubeId = extractYouTubeId(banner.video_url!);
+                            if (youtubeId) {
+                              (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+                            }
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
+                          <div className="bg-primary text-primary-foreground rounded-full p-3">
+                            <Play className="h-6 w-6 fill-current" />
+                          </div>
+                        </div>
+                      </button>
+                    )}
+                  </>
+                )}
+
+                {/* Vimeo with embed */}
+                {videoType === 'vimeo' && (
+                  <>
+                    {isVideoExpanded ? (
+                      <div className="relative aspect-video rounded-lg overflow-hidden">
+                        <iframe
+                          src={getVideoEmbedUrl(banner.video_url, 'vimeo', true) || ''}
+                          title={banner.title}
+                          allow="autoplay; fullscreen; picture-in-picture"
+                          allowFullScreen
+                          className="absolute inset-0 w-full h-full"
+                        />
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setExpandedVideoId(banner.id)}
+                        className="relative w-full aspect-video rounded-lg overflow-hidden group bg-muted flex items-center justify-center"
+                      >
+                        <div className="text-center">
+                          <div className="bg-primary text-primary-foreground rounded-full p-3 mx-auto mb-2">
+                            <Play className="h-6 w-6 fill-current" />
+                          </div>
+                          <span className="text-sm text-muted-foreground">Play Vimeo Video</span>
+                        </div>
+                      </button>
+                    )}
+                  </>
+                )}
+
+                {/* Direct MP4/video file */}
+                {videoType === 'direct' && (
+                  <video
+                    src={banner.video_url}
+                    controls
+                    playsInline
+                    className="w-full aspect-video rounded-lg object-cover"
+                  />
+                )}
+
+                {/* Instagram/TikTok - external link */}
+                {(videoType === 'instagram' || videoType === 'tiktok') && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => window.open(banner.video_url!, '_blank')}
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    Watch on {getVideoPlatformLabel(videoType)}
+                    <ExternalLink className="h-3 w-3 ml-2" />
+                  </Button>
                 )}
               </div>
             )}

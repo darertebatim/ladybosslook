@@ -7,9 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Plus, Trash2, Edit, Eye, EyeOff, Youtube, Link, Megaphone, X } from 'lucide-react';
+import { Plus, Trash2, Edit, Eye, EyeOff, Video, Link, Megaphone, Play } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { format } from 'date-fns';
+import { detectVideoType, extractYouTubeId, getVideoPlatformLabel } from '@/lib/videoUtils';
 
 interface HomeBanner {
   id: string;
@@ -17,7 +18,7 @@ interface HomeBanner {
   description: string | null;
   button_text: string | null;
   button_url: string | null;
-  youtube_url: string | null;
+  video_url: string | null;
   background_color: string | null;
   icon: string | null;
   is_active: boolean;
@@ -26,17 +27,6 @@ interface HomeBanner {
   ends_at: string | null;
   created_at: string;
 }
-
-const extractYouTubeId = (url: string): string | null => {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-  ];
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) return match[1];
-  }
-  return null;
-};
 
 export function HomeBannerManager() {
   const [banners, setBanners] = useState<HomeBanner[]>([]);
@@ -49,7 +39,7 @@ export function HomeBannerManager() {
   const [description, setDescription] = useState('');
   const [buttonText, setButtonText] = useState('');
   const [buttonUrl, setButtonUrl] = useState('');
-  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
   const [isActive, setIsActive] = useState(true);
   const [priority, setPriority] = useState(0);
   const [startsAt, setStartsAt] = useState('');
@@ -83,7 +73,7 @@ export function HomeBannerManager() {
     setDescription('');
     setButtonText('');
     setButtonUrl('');
-    setYoutubeUrl('');
+    setVideoUrl('');
     setIsActive(true);
     setPriority(0);
     setStartsAt('');
@@ -102,7 +92,7 @@ export function HomeBannerManager() {
     setDescription(banner.description || '');
     setButtonText(banner.button_text || '');
     setButtonUrl(banner.button_url || '');
-    setYoutubeUrl(banner.youtube_url || '');
+    setVideoUrl(banner.video_url || '');
     setIsActive(banner.is_active);
     setPriority(banner.priority);
     setStartsAt(banner.starts_at ? banner.starts_at.slice(0, 16) : '');
@@ -123,7 +113,7 @@ export function HomeBannerManager() {
         description: description.trim() || null,
         button_text: buttonText.trim() || null,
         button_url: buttonUrl.trim() || null,
-        youtube_url: youtubeUrl.trim() || null,
+        video_url: videoUrl.trim() || null,
         is_active: isActive,
         priority,
         starts_at: startsAt ? new Date(startsAt).toISOString() : null,
@@ -188,7 +178,9 @@ export function HomeBannerManager() {
     }
   };
 
-  const youtubeId = youtubeUrl ? extractYouTubeId(youtubeUrl) : null;
+  // Preview helpers
+  const detectedVideoType = videoUrl ? detectVideoType(videoUrl) : null;
+  const youtubeId = detectedVideoType === 'youtube' ? extractYouTubeId(videoUrl) : null;
 
   return (
     <Card>
@@ -199,7 +191,7 @@ export function HomeBannerManager() {
             Home Banners
           </CardTitle>
           <CardDescription>
-            Create banners with custom messages, buttons, and YouTube videos for the app home screen
+            Create banners with custom messages, buttons, and videos for the app home screen
           </CardDescription>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -260,23 +252,49 @@ export function HomeBannerManager() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="youtubeUrl" className="flex items-center gap-2">
-                  <Youtube className="h-4 w-4 text-red-500" />
-                  YouTube Video URL
+                <Label htmlFor="videoUrl" className="flex items-center gap-2">
+                  <Video className="h-4 w-4 text-primary" />
+                  Video URL
                 </Label>
                 <Input
-                  id="youtubeUrl"
-                  value={youtubeUrl}
-                  onChange={(e) => setYoutubeUrl(e.target.value)}
-                  placeholder="e.g., https://youtube.com/watch?v=..."
+                  id="videoUrl"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="YouTube, Vimeo, Instagram, or direct MP4 link"
                 />
-                {youtubeId && (
-                  <div className="mt-2 rounded-lg overflow-hidden border">
-                    <img 
-                      src={`https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`}
-                      alt="YouTube thumbnail"
-                      className="w-full h-auto"
-                    />
+                <p className="text-xs text-muted-foreground">
+                  Supports: YouTube, Vimeo, Instagram Reels, TikTok, or direct video files (.mp4, .webm)
+                </p>
+                
+                {/* Video preview */}
+                {detectedVideoType && (
+                  <div className="mt-2 p-3 bg-muted rounded-lg">
+                    <div className="flex items-center gap-2 text-sm mb-2">
+                      <Play className="h-4 w-4" />
+                      <span>Detected: <strong>{getVideoPlatformLabel(detectedVideoType)}</strong></span>
+                    </div>
+                    {youtubeId && (
+                      <div className="rounded-lg overflow-hidden border">
+                        <img 
+                          src={`https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`}
+                          alt="YouTube thumbnail"
+                          className="w-full h-auto"
+                        />
+                      </div>
+                    )}
+                    {detectedVideoType === 'direct' && (
+                      <video
+                        src={videoUrl}
+                        className="w-full rounded-lg"
+                        controls
+                        muted
+                      />
+                    )}
+                    {(detectedVideoType === 'instagram' || detectedVideoType === 'tiktok') && (
+                      <p className="text-xs text-muted-foreground">
+                        Will open in external app (embeds not supported)
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -341,63 +359,69 @@ export function HomeBannerManager() {
           <p className="text-muted-foreground text-center py-8">No banners yet. Create one to get started.</p>
         ) : (
           <div className="space-y-3">
-            {banners.map((banner) => (
-              <div
-                key={banner.id}
-                className={`flex items-center justify-between p-4 border rounded-lg ${
-                  banner.is_active ? 'bg-card' : 'bg-muted/50 opacity-60'
-                }`}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium truncate">{banner.title}</span>
-                    {banner.youtube_url && (
-                      <Youtube className="h-4 w-4 text-red-500 flex-shrink-0" />
+            {banners.map((banner) => {
+              const bannerVideoType = banner.video_url ? detectVideoType(banner.video_url) : null;
+              
+              return (
+                <div
+                  key={banner.id}
+                  className={`flex items-center justify-between p-4 border rounded-lg ${
+                    banner.is_active ? 'bg-card' : 'bg-muted/50 opacity-60'
+                  }`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium truncate">{banner.title}</span>
+                      {bannerVideoType && (
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded flex-shrink-0">
+                          {getVideoPlatformLabel(bannerVideoType)}
+                        </span>
+                      )}
+                      {banner.button_url && (
+                        <Link className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                      )}
+                      {!banner.is_active && (
+                        <span className="text-xs bg-muted px-2 py-0.5 rounded">Inactive</span>
+                      )}
+                    </div>
+                    {banner.description && (
+                      <p className="text-sm text-muted-foreground truncate">{banner.description}</p>
                     )}
-                    {banner.button_url && (
-                      <Link className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                    )}
-                    {!banner.is_active && (
-                      <span className="text-xs bg-muted px-2 py-0.5 rounded">Inactive</span>
-                    )}
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Priority: {banner.priority}
+                      {banner.starts_at && ` • Starts: ${format(new Date(banner.starts_at), 'MMM d, h:mm a')}`}
+                      {banner.ends_at && ` • Ends: ${format(new Date(banner.ends_at), 'MMM d, h:mm a')}`}
+                    </div>
                   </div>
-                  {banner.description && (
-                    <p className="text-sm text-muted-foreground truncate">{banner.description}</p>
-                  )}
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Priority: {banner.priority}
-                    {banner.starts_at && ` • Starts: ${format(new Date(banner.starts_at), 'MMM d, h:mm a')}`}
-                    {banner.ends_at && ` • Ends: ${format(new Date(banner.ends_at), 'MMM d, h:mm a')}`}
+                  
+                  <div className="flex items-center gap-2 ml-4">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => toggleActive(banner)}
+                      title={banner.is_active ? 'Deactivate' : 'Activate'}
+                    >
+                      {banner.is_active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openEditDialog(banner)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteBanner(banner.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-2 ml-4">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => toggleActive(banner)}
-                    title={banner.is_active ? 'Deactivate' : 'Activate'}
-                  >
-                    {banner.is_active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => openEditDialog(banner)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => deleteBanner(banner.id)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </CardContent>
