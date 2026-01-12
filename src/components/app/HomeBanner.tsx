@@ -73,9 +73,10 @@ export function HomeBanner() {
             {/* Dismiss button */}
             <button
               onClick={() => handleDismiss(banner.id)}
-              className="absolute top-2 right-2 p-1 rounded-full hover:bg-background/50 transition-colors z-10"
+              className="absolute top-3 right-3 p-2 rounded-full bg-black/60 hover:bg-black/80 transition-colors z-10 shadow-lg"
+              aria-label="Dismiss banner"
             >
-              <X className="h-4 w-4 text-muted-foreground" />
+              <X className="h-5 w-5 text-white" />
             </button>
 
             {/* Video Section */}
