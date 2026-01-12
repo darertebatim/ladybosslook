@@ -75,7 +75,7 @@ serve(async (req) => {
     // Fetch program details from database
     const { data: programData, error: programError } = await supabase
       .from('program_catalog')
-      .select('slug, title, price_amount, description, payment_type, deposit_price, subscription_interval, subscription_interval_count, subscription_full_payment_price')
+      .select('slug, title, price_amount, description, payment_type, deposit_price, subscription_interval, subscription_interval_count, subscription_full_payment_price, stripe_product_id, stripe_price_id')
       .eq('slug', program)
       .eq('is_active', true)
       .single();
@@ -208,22 +208,30 @@ serve(async (req) => {
       // Create subscription checkout session
       logStep("Creating subscription checkout session");
       
-      // Create a price for the subscription
-      const price = await stripe.prices.create({
-        unit_amount: chargeAmount,
-        currency: 'usd',
-        recurring: {
-          interval: (programData.subscription_interval as 'day' | 'week' | 'month' | 'year') || 'month',
-        },
-        product_data: {
-          name: productName,
-          metadata: {
-            program_slug: program,
+      let priceId: string;
+      
+      // Check if we have an existing Stripe price ID to reuse
+      if (programData.stripe_price_id) {
+        priceId = programData.stripe_price_id;
+        logStep("Reusing existing Stripe price", { priceId });
+      } else {
+        // Create a new price for the subscription (legacy behavior)
+        const price = await stripe.prices.create({
+          unit_amount: chargeAmount,
+          currency: 'usd',
+          recurring: {
+            interval: (programData.subscription_interval as 'day' | 'week' | 'month' | 'year') || 'month',
           },
-        },
-      });
-
-      logStep("Stripe price created for subscription", { priceId: price.id });
+          product_data: {
+            name: productName,
+            metadata: {
+              program_slug: program,
+            },
+          },
+        });
+        priceId = price.id;
+        logStep("Created new Stripe price for subscription", { priceId });
+      }
 
       // Build subscription data
       // Note: cancel_at is not supported in Checkout Session subscription_data
@@ -247,7 +255,7 @@ serve(async (req) => {
       const sessionCreateParams: Stripe.Checkout.SessionCreateParams = {
         line_items: [
           {
-            price: price.id,
+            price: priceId,
             quantity: 1,
           },
         ],
@@ -274,8 +282,25 @@ serve(async (req) => {
       // Create one-time payment checkout session
       logStep("Creating one-time payment checkout session");
       
-      const sessionCreateParams: Stripe.Checkout.SessionCreateParams = {
-        line_items: [
+      // Build line items - reuse existing product if available
+      let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[];
+      
+      if (programData.stripe_product_id) {
+        // Create a price using the existing product
+        logStep("Reusing existing Stripe product", { productId: programData.stripe_product_id });
+        lineItems = [
+          {
+            price_data: {
+              currency: "usd",
+              product: programData.stripe_product_id,
+              unit_amount: chargeAmount,
+            },
+            quantity: 1,
+          },
+        ];
+      } else {
+        // Create inline product_data (legacy behavior)
+        lineItems = [
           {
             price_data: {
               currency: "usd",
@@ -287,7 +312,11 @@ serve(async (req) => {
             },
             quantity: 1,
           },
-        ],
+        ];
+      }
+      
+      const sessionCreateParams: Stripe.Checkout.SessionCreateParams = {
+        line_items: lineItems,
         mode: "payment",
         payment_method_types: ['card'],
         billing_address_collection: 'required',

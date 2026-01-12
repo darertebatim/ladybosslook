@@ -74,6 +74,9 @@ export function ProgramsManager() {
     balance_monthly_price: 0,
     balance_monthly_count: 0,
     balance_full_discount: 0,
+    // Stripe product IDs for reuse
+    stripe_product_id: '',
+    stripe_price_id: '',
   });
 
   // Fetch playlists for dropdown
@@ -140,6 +143,8 @@ export function ProgramsManager() {
       balance_monthly_price: 0,
       balance_monthly_count: 0,
       balance_full_discount: 0,
+      stripe_product_id: '',
+      stripe_price_id: '',
     });
     setEditingId(null);
     setShowForm(false);
@@ -215,6 +220,8 @@ export function ProgramsManager() {
       balance_monthly_price: (program as any).balance_monthly_price || 0,
       balance_monthly_count: (program as any).balance_monthly_count || 0,
       balance_full_discount: (program as any).balance_full_discount || 0,
+      stripe_product_id: (program as any).stripe_product_id || '',
+      stripe_price_id: (program as any).stripe_price_id || '',
     });
     setEditingId(program.id);
     setShowForm(true);
@@ -694,6 +701,46 @@ export function ProgramsManager() {
                   Promotional or intro video for this program
                 </p>
               </div>
+
+              {/* Stripe Product IDs Section */}
+              {(formData.payment_type === 'subscription' || formData.payment_type === 'one-time') && (
+                <div className="space-y-4 border-t pt-4">
+                  <Label className="text-base font-semibold">💳 Stripe Product Configuration</Label>
+                  <p className="text-xs text-muted-foreground -mt-2">
+                    Store Stripe IDs to reuse the same product/price (prevents duplicates in Stripe dashboard)
+                  </p>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="stripe_product_id">Stripe Product ID</Label>
+                      <Input
+                        id="stripe_product_id"
+                        value={formData.stripe_product_id}
+                        onChange={(e) => setFormData({ ...formData, stripe_product_id: e.target.value })}
+                        placeholder="prod_xxx"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        For one-time payments. Find in Stripe Dashboard → Products
+                      </p>
+                    </div>
+
+                    {formData.payment_type === 'subscription' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="stripe_price_id">Stripe Price ID</Label>
+                        <Input
+                          id="stripe_price_id"
+                          value={formData.stripe_price_id}
+                          onChange={(e) => setFormData({ ...formData, stripe_price_id: e.target.value })}
+                          placeholder="price_xxx"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          For subscriptions. Find in Stripe Dashboard → Products → Pricing
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Platform Availability Section */}
               <div className="space-y-4 border-t pt-4">
