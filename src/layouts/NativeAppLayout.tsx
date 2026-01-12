@@ -103,7 +103,7 @@ const NativeAppLayout = () => {
 
   return (
     <>
-      <div className="min-h-[100dvh] bg-background app-theme">
+      <div className="min-h-[100dvh] bg-background app-theme overscroll-none">
         {/* Main Content - pages render their own headers */}
         <main className={currentTrack && !isOnPlayerPage ? "pb-40" : "pb-24"}>
           <Outlet />

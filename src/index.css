@@ -324,10 +324,22 @@
     @apply border-border;
   }
 
+  /* Prevent iOS rubber band scroll effect on fixed elements */
+  html,
+  body {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
   body {
     @apply bg-background text-foreground font-body;
     font-feature-settings: 'cv11', 'ss01';
     font-variation-settings: 'opsz' 32;
+  }
+
+  /* App theme overscroll prevention */
+  .app-theme {
+    overscroll-behavior: none;
   }
 
   /* Typography Classes */
