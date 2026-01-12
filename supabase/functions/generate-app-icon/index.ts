@@ -16,7 +16,7 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const prompt = `A premium iOS app icon featuring an elegant minimalist crown silhouette, liquid glass aesthetic with frosted translucent effect, clean pure white background, subtle purple and magenta tones within the glass crown, golden amber highlights and warm reflections on the crown, modern glassmorphism design with depth and layered transparency, soft glowing edges with delicate purple shadows, professional app store quality, 1024x1024 square format, no text, centered composition, ultra high resolution`;
+    const prompt = `A premium iOS app icon featuring an elegant feminine queen crown tiara silhouette, liquid glass aesthetic with frosted translucent effect, clean pure white background, soft flowing curves with rounded elegant points, subtle purple and magenta tones within the glass crown, rose gold and golden amber highlights with warm reflections, modern glassmorphism design with depth and layered transparency, jewel-like luminosity, soft glowing edges with delicate purple shadows, professional app store quality, 1024x1024 square format, no text, centered composition, ultra high resolution, designed for women, royal feminine elegance`;
 
     console.log('Generating app icon with prompt:', prompt);
 
