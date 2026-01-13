@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MoodSelector } from '@/components/app/MoodSelector';
 import { WritingPrompts } from '@/components/app/WritingPrompts';
+import { useKeyboard } from '@/hooks/useKeyboard';
 import { 
   useJournalEntry, 
   useCreateJournalEntry, 
@@ -30,6 +31,7 @@ const AppJournalEntry = () => {
   const navigate = useNavigate();
   const { entryId } = useParams();
   const isNew = !entryId;
+  const { keyboardHeight, isKeyboardOpen } = useKeyboard();
   
   const { data: existingEntry, isLoading } = useJournalEntry(entryId);
   const createMutation = useCreateJournalEntry();
@@ -47,6 +49,9 @@ const AppJournalEntry = () => {
   
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const createdEntryIdRef = useRef<string | null>(null);
+
+  // Calculate button position based on keyboard state
+  const buttonBottom = isKeyboardOpen ? keyboardHeight : 72;
 
   // Load existing entry data
   useEffect(() => {
@@ -307,10 +312,13 @@ const AppJournalEntry = () => {
         )}
       </div>
 
-      {/* Fixed Save Button - always visible above tab bar */}
+      {/* Fixed Save Button - always visible above tab bar or keyboard */}
       <div 
         className="fixed left-0 right-0 p-4 bg-background border-t z-10"
-        style={{ bottom: '72px' }}
+        style={{ 
+          bottom: `${buttonBottom}px`,
+          transition: 'bottom 0.25s ease-out'
+        }}
       >
         <Button 
           className="w-full"

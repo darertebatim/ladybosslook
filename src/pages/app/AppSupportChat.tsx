@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useKeyboard } from "@/hooks/useKeyboard";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
@@ -71,6 +72,7 @@ export default function AppSupportChat() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { keyboardHeight, isKeyboardOpen } = useKeyboard();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const [conversation, setConversation] = useState<Conversation | null>(null);
@@ -84,6 +86,9 @@ export default function AppSupportChat() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
+
+  // Calculate input position based on keyboard state
+  const inputBottom = isKeyboardOpen ? keyboardHeight : 72;
 
   // Fetch or create conversation
   useEffect(() => {
@@ -489,13 +494,16 @@ export default function AppSupportChat() {
           </div>
         </div>
 
-        {/* Fixed Input Area - positioned above tab bar */}
+        {/* Fixed Input Area - positioned above tab bar or keyboard */}
         <div 
           className="fixed left-0 right-0 bg-background/95 backdrop-blur-xl z-40"
-          style={{ bottom: '72px' }}
+          style={{ 
+            bottom: `${inputBottom}px`,
+            transition: 'bottom 0.25s ease-out'
+          }}
         >
           <div className="px-3 py-1.5">
-            <ChatInput 
+            <ChatInput
               onSend={handleSendMessage} 
               disabled={sending}
               uploading={uploading}
