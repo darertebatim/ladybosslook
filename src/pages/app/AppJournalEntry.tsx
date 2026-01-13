@@ -50,8 +50,9 @@ const AppJournalEntry = () => {
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const createdEntryIdRef = useRef<string | null>(null);
 
-  // Calculate button position based on keyboard state
-  const buttonBottom = isKeyboardOpen ? keyboardHeight : 72;
+  // Layout constants
+  const SAVE_BAR_HEIGHT = 72; // Height of the save button area
+  const TAB_BAR_HEIGHT = 72; // Height of the bottom tab bar
 
   // Load existing entry data
   useEffect(() => {
@@ -211,8 +212,16 @@ const AppJournalEntry = () => {
 
   const canShare = (entryId || createdEntryIdRef.current) && !sharedWithAdmin;
 
+  // Calculate scroll padding to keep content visible above fixed save button
+  const scrollPaddingBottom = isKeyboardOpen 
+    ? keyboardHeight + SAVE_BAR_HEIGHT + 16
+    : TAB_BAR_HEIGHT + SAVE_BAR_HEIGHT + 32;
+
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-40">
+    <div 
+      className="min-h-screen bg-background flex flex-col"
+      style={{ paddingBottom: scrollPaddingBottom }}
+    >
       <SEOHead 
         title={isNew ? 'New Entry' : 'Edit Entry'} 
         description="Write your journal entry" 
@@ -316,7 +325,9 @@ const AppJournalEntry = () => {
       <div 
         className="fixed left-0 right-0 p-4 bg-background border-t z-10"
         style={{ 
-          bottom: `${buttonBottom}px`,
+          bottom: isKeyboardOpen 
+            ? keyboardHeight 
+            : `calc(${TAB_BAR_HEIGHT}px + env(safe-area-inset-bottom, 0px))`,
           transition: 'bottom 0.25s ease-out'
         }}
       >
