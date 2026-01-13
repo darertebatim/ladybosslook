@@ -37,9 +37,9 @@ export const MiniPlayer = () => {
   return (
     <div 
       className={cn(
-        "fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-2 right-2 z-40",
+        "fixed top-[calc(76px+env(safe-area-inset-top))] left-2 right-2 z-40",
         "rounded-2xl overflow-hidden cursor-pointer",
-        "animate-in slide-in-from-bottom-4 duration-300",
+        "animate-in slide-in-from-top-4 duration-300",
         // Glass effect
         "bg-card/80 dark:bg-card/90 backdrop-blur-xl",
         "border border-border/50",
