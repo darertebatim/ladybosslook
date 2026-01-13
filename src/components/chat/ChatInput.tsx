@@ -42,6 +42,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
   const [previewWaveform, setPreviewWaveform] = useState<number[]>(Array(28).fill(30));
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -103,6 +104,8 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
       setMessage("");
       setAttachment(null);
       setError(null);
+      // Refocus textarea to keep keyboard open on iOS
+      setTimeout(() => textareaRef.current?.focus(), 50);
     }
   };
 
@@ -535,6 +538,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
         {/* Telegram-style pill input - CENTER */}
         <div className="flex-1 flex items-center bg-muted/50 rounded-full border border-border/30 pl-4 pr-1">
           <Textarea
+            ref={textareaRef}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
