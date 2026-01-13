@@ -212,6 +212,8 @@ const App = () => (
             
             {/* Full-screen Chat - Outside of AppLayout so no tab bar */}
             <Route path="/app/chat" element={<ProtectedRoute><AppChat /></ProtectedRoute>} />
+            <Route path="/app/journal/new" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
+            <Route path="/app/journal/:entryId" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
             
             {/* App Routes */}
             <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
@@ -227,8 +229,6 @@ const App = () => (
               <Route path="feed" element={<AppFeed />} />
               <Route path="feed/post/:postId" element={<AppFeedPost />} />
               <Route path="journal" element={<AppJournal />} />
-              <Route path="journal/new" element={<AppJournalEntry />} />
-              <Route path="journal/:entryId" element={<AppJournalEntry />} />
               <Route path="profile" element={<AppProfile />} />
             </Route>
             
