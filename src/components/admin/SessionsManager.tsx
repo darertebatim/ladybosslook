@@ -215,40 +215,30 @@ export const SessionsManager = ({
 
   // Generate preview sessions (no database save yet)
   const handleGeneratePreview = (interval: 'weekly' | 'daily') => {
-    if (!startDate) {
-      toast.error("No start date set for this round");
+    if (!firstSessionDate) {
+      toast.error("No first session date/time set for this round. Please set it in round settings first.");
       return;
     }
 
     setIsGenerating(interval);
 
     try {
-      const start = new Date(startDate);
-      const end = endDate ? new Date(endDate) : (interval === 'weekly' ? addWeeks(start, 8) : addDays(start, 30));
-      
-      // Extract time from firstSessionDate if available, otherwise default to midnight
-      let sessionHour = 0;
-      let sessionMinute = 0;
-      if (firstSessionDate) {
-        const firstDate = new Date(firstSessionDate);
-        sessionHour = firstDate.getUTCHours();
-        sessionMinute = firstDate.getUTCMinutes();
-      }
+      // Use firstSessionDate as the single source of truth for both date AND time
+      const start = new Date(firstSessionDate);
+      const end = endDate 
+        ? new Date(endDate + 'T23:59:59') 
+        : (interval === 'weekly' ? addWeeks(start, 8) : addDays(start, 30));
       
       const sessionsToPreview: PreviewSession[] = [];
       let sessionNumber = (sessions?.length || 0) + 1;
       let currentDate = new Date(start);
 
       while (currentDate <= end) {
-        // Create session date with the correct time
-        const sessionDate = new Date(currentDate);
-        sessionDate.setUTCHours(sessionHour, sessionMinute, 0, 0);
-        
         sessionsToPreview.push({
           tempId: `preview-${Date.now()}-${sessionNumber}`,
           session_number: sessionNumber,
           title: `${programTitle} - Session ${sessionNumber}`,
-          session_date: sessionDate.toISOString(),
+          session_date: currentDate.toISOString(),
           duration_minutes: defaultDuration,
           meeting_link: defaultMeetLink || null,
           status: 'scheduled',
