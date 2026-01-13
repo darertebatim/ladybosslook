@@ -2,12 +2,13 @@ import { FeedPost } from '@/hooks/useFeed';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { Pin, CheckCheck } from 'lucide-react';
+import { Pin, CheckCheck, ExternalLink } from 'lucide-react';
 import { FeedReactions } from './FeedReactions';
 import { FeedActionButton } from './FeedActionButton';
 import { FeedVoiceMessage } from './FeedVoiceMessage';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { detectVideoType, getVideoEmbedUrl, getVideoPlatformLabel } from '@/lib/videoUtils';
 
 interface FeedMessageProps {
   post: FeedPost;
@@ -132,20 +133,61 @@ export function FeedMessage({
           {/* Video embed */}
           {post.video_url && (
             <div className="aspect-video rounded-xl overflow-hidden bg-muted mt-2">
-              {post.video_url.includes('youtube') || post.video_url.includes('youtu.be') ? (
-                <iframe
-                  src={getYouTubeEmbedUrl(post.video_url)}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              ) : (
-                <video 
-                  src={post.video_url} 
-                  controls 
-                  className="w-full h-full object-contain"
-                />
-              )}
+              {(() => {
+                const videoType = detectVideoType(post.video_url);
+                const embedUrl = getVideoEmbedUrl(post.video_url, videoType);
+                
+                if (videoType === 'youtube' || videoType === 'vimeo') {
+                  return (
+                    <iframe
+                      src={embedUrl || post.video_url}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  );
+                } else if (videoType === 'instagram') {
+                  return (
+                    <a 
+                      href={post.video_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center h-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="text-center">
+                        <ExternalLink className="h-8 w-8 mx-auto mb-2" />
+                        <span className="font-medium">View on Instagram</span>
+                      </div>
+                    </a>
+                  );
+                } else if (videoType === 'tiktok') {
+                  return (
+                    <a 
+                      href={post.video_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center h-full bg-black text-white"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="text-center">
+                        <ExternalLink className="h-8 w-8 mx-auto mb-2" />
+                        <span className="font-medium">View on TikTok</span>
+                      </div>
+                    </a>
+                  );
+                } else {
+                  // Direct video (MP4, WebM, etc.)
+                  return (
+                    <video 
+                      src={post.video_url} 
+                      controls 
+                      className="w-full h-full object-contain"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  );
+                }
+              })()}
             </div>
           )}
 
@@ -192,11 +234,4 @@ export function FeedMessage({
       )}
     </div>
   );
-}
-
-function getYouTubeEmbedUrl(url: string): string {
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  const videoId = match && match[2].length === 11 ? match[2] : null;
-  return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
 }
