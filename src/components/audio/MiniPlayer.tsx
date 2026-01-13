@@ -50,7 +50,7 @@ export const MiniPlayer = () => {
       {/* Progress bar at top */}
       <div className="h-1 bg-muted/30 w-full">
         <div 
-          className="h-full bg-primary transition-all duration-300 ease-out"
+          className="h-full bg-primary"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -78,10 +78,12 @@ export const MiniPlayer = () => {
               {currentTrack.playlistName}
             </p>
           )}
-          <div className="flex items-center gap-2">
-            {isPlaying && (
-              <AudioEqualizer isPlaying={isPlaying} size="sm" className="flex-shrink-0" />
-            )}
+          <div className="flex items-center gap-2 h-5">
+            <AudioEqualizer 
+              isPlaying={isPlaying} 
+              size="sm" 
+              className={cn("flex-shrink-0 transition-opacity", isPlaying ? "opacity-100" : "opacity-0")} 
+            />
             <p className="font-semibold text-sm truncate">{currentTrack.title}</p>
           </div>
           {currentTrack.trackPosition && (
