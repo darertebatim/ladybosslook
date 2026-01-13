@@ -103,9 +103,9 @@ const NativeAppLayout = () => {
 
   return (
     <>
-      <div className="min-h-[100dvh] bg-background app-theme overscroll-none font-farsi">
-        {/* Main Content - pages render their own headers */}
-        <main className="pb-24">
+      <div className="flex flex-col h-full bg-background app-theme font-farsi">
+        {/* Main Content - scrollable container for iOS */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pb-24">
           <Outlet />
         </main>
 
