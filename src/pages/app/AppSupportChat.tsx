@@ -87,8 +87,9 @@ export default function AppSupportChat() {
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
 
-  // Calculate input position based on keyboard state
-  const inputBottom = isKeyboardOpen ? keyboardHeight : 72;
+  // Layout constants
+  const INPUT_BAR_HEIGHT = 68; // Height of the ChatInput area
+  const TAB_BAR_HEIGHT = 72; // Height of the bottom tab bar
 
   // Fetch or create conversation
   useEffect(() => {
@@ -411,7 +412,12 @@ export default function AppSupportChat() {
         {/* Messages area - positioned between header and input */}
         <div 
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto overscroll-contain pb-36"
+          className="flex-1 overflow-y-auto overscroll-contain"
+          style={{
+            paddingBottom: isKeyboardOpen 
+              ? keyboardHeight + INPUT_BAR_HEIGHT + 16
+              : TAB_BAR_HEIGHT + INPUT_BAR_HEIGHT + 32 // Extra padding for safe area
+          }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -498,7 +504,9 @@ export default function AppSupportChat() {
         <div 
           className="fixed left-0 right-0 bg-background/95 backdrop-blur-xl z-40"
           style={{ 
-            bottom: `${inputBottom}px`,
+            bottom: isKeyboardOpen 
+              ? keyboardHeight 
+              : `calc(${TAB_BAR_HEIGHT}px + env(safe-area-inset-bottom, 0px))`,
             transition: 'bottom 0.25s ease-out'
           }}
         >
