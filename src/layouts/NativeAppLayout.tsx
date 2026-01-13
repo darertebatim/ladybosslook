@@ -98,7 +98,7 @@ const NativeAppLayout = () => {
     { path: '/app/feed', icon: Newspaper, label: 'Community', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount },
     { path: '/app/browse', icon: ShoppingBag, label: 'Browse' },
     { path: '/app/player', icon: Headphones, label: 'Player' },
-    { path: '/app/support-chat', icon: MessageCircle, label: 'Chat' },
+    { path: '/app/chat', icon: MessageCircle, label: 'Chat' },
   ];
 
   // Tab bar actual height: grid content (~56px) + safe area inset
@@ -125,7 +125,7 @@ const NativeAppLayout = () => {
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               const Icon = item.icon;
-              const showChatBadge = item.path === '/app/support-chat' && unreadCount > 0;
+              const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
               const showBadge = showChatBadge || item.showBadge;
               return (
                 <Link

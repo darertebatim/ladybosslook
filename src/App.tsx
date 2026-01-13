@@ -25,6 +25,7 @@ import AppPlayer from "@/pages/app/AppPlayer";
 import AppPlaylistDetail from "@/pages/app/AppPlaylistDetail";
 import AppAudioPlayer from "@/pages/app/AppAudioPlayer";
 import AppSupportChat from "@/pages/app/AppSupportChat";
+import AppChat from "@/pages/app/AppChat";
 import AppFeed from "@/pages/app/AppFeed";
 import AppFeedPost from "@/pages/app/AppFeedPost";
 import AppJournal from "@/pages/app/AppJournal";
@@ -208,6 +209,9 @@ const App = () => (
             {!isNativeApp() && <Route path="/iqmoney" element={<IQMoneyWorkshop />} />}
             <Route path="/rathus" element={<RathusAssessment />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            
+            {/* Full-screen Chat - Outside of AppLayout so no tab bar */}
+            <Route path="/app/chat" element={<ProtectedRoute><AppChat /></ProtectedRoute>} />
             
             {/* App Routes */}
             <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>

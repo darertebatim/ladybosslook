@@ -37,7 +37,8 @@ const config: CapacitorConfig = {
       showSpinner: false,
     },
     Keyboard: {
-      resize: 'body',
+      // 'native' lets iOS handle viewport resize naturally - works perfectly with flexbox
+      resize: 'native',
       style: 'dark',
       resizeOnFullScreen: true
     }
