@@ -19,7 +19,7 @@ export const useChatNotifications = () => {
 
   const goToChat = () => {
     setShowUnreadPopup(false);
-    navigate('/app/support-chat');
+    navigate('/app/chat');
   };
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export const useChatNotifications = () => {
         if (
           data.unread_count_user > 0 &&
           !hasShownInitialNotification.current &&
-          location.pathname !== '/app/support-chat'
+          location.pathname !== '/app/chat'
         ) {
           hasShownInitialNotification.current = true;
           setUnreadMessageCount(data.unread_count_user);
@@ -68,7 +68,7 @@ export const useChatNotifications = () => {
           if (
             newMessage.sender_type === 'admin' &&
             newMessage.conversation_id === conversationIdRef.current &&
-            location.pathname !== '/app/support-chat'
+            location.pathname !== '/app/chat'
           ) {
             const preview = newMessage.content.length > 60
               ? newMessage.content.substring(0, 60) + '...'
@@ -79,7 +79,7 @@ export const useChatNotifications = () => {
               duration: 6000,
               action: {
                 label: 'View',
-                onClick: () => navigate('/app/support-chat')
+                onClick: () => navigate('/app/chat')
               }
             });
           }
