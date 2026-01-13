@@ -10,8 +10,6 @@ import { ArrowLeft, MessageCircle, RefreshCw } from "lucide-react";
 import { ChatSkeleton } from "@/components/app/skeletons";
 import { SEOHead } from "@/components/SEOHead";
 import { format, isToday, isYesterday, isSameDay } from "date-fns";
-import { Capacitor } from "@capacitor/core";
-import { Keyboard } from "@capacitor/keyboard";
 
 interface Message {
   id: string;
@@ -81,59 +79,11 @@ export default function AppSupportChat() {
   const [initialScrollDone, setInitialScrollDone] = useState(false);
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const [isInputFocused, setIsInputFocused] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
-
-  // Keyboard handling - use Capacitor plugin for native, visualViewport for web
-  useEffect(() => {
-    const isNative = Capacitor.isNativePlatform();
-
-    if (isNative) {
-      // Use Capacitor Keyboard plugin for native apps
-      const showListener = Keyboard.addListener('keyboardWillShow', (info) => {
-        setKeyboardHeight(info.keyboardHeight);
-        setIsKeyboardVisible(true);
-        setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 50);
-      });
-
-      const hideListener = Keyboard.addListener('keyboardWillHide', () => {
-        setKeyboardHeight(0);
-        setIsKeyboardVisible(false);
-      });
-
-      return () => {
-        showListener.then(l => l.remove());
-        hideListener.then(l => l.remove());
-      };
-    } else {
-      // Fallback to visualViewport for web
-      const viewport = window.visualViewport;
-      if (!viewport) return;
-
-      const handleResize = () => {
-        const keyboardH = Math.max(0, window.innerHeight - viewport.height);
-        setKeyboardHeight(keyboardH);
-        setIsKeyboardVisible(keyboardH > 50);
-        
-        if (keyboardH > 50) {
-          setTimeout(() => {
-            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-          }, 50);
-        }
-      };
-
-      viewport.addEventListener('resize', handleResize);
-      return () => viewport.removeEventListener('resize', handleResize);
-    }
-  }, []);
 
   // Fetch or create conversation
   useEffect(() => {
@@ -456,12 +406,7 @@ export default function AppSupportChat() {
         {/* Messages area - positioned between header and input */}
         <div 
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto overscroll-contain"
-          style={{
-            paddingBottom: isKeyboardVisible 
-              ? `${60 + keyboardHeight}px`
-              : 'calc(130px + env(safe-area-inset-bottom, 0px))'
-          }}
+          className="flex-1 overflow-y-auto overscroll-contain pb-36"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -544,17 +489,10 @@ export default function AppSupportChat() {
           </div>
         </div>
 
-        {/* Fixed Input Area that moves with keyboard */}
+        {/* Fixed Input Area - positioned above tab bar */}
         <div 
           className="fixed left-0 right-0 bg-background/95 backdrop-blur-xl z-40"
-          style={{
-            bottom: isKeyboardVisible 
-              ? `${keyboardHeight}px`
-              : isInputFocused && Capacitor.isNativePlatform()
-                ? '300px'
-                : 'calc(72px + env(safe-area-inset-bottom, 0px))',
-            transition: isKeyboardVisible ? 'none' : 'bottom 0.15s ease-out'
-          }}
+          style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' }}
         >
           <div className="px-3 py-1.5">
             <ChatInput 
@@ -562,8 +500,6 @@ export default function AppSupportChat() {
               disabled={sending}
               uploading={uploading}
               placeholder="Type a message..."
-              onFocus={() => setIsInputFocused(true)}
-              onBlur={() => setIsInputFocused(false)}
             />
           </div>
         </div>
