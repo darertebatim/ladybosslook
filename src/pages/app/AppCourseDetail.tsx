@@ -836,10 +836,57 @@ const AppCourseDetail = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {/* Add First Session to Calendar */}
-                  {round.first_session_date && (
+                  {/* 1. Community Channel - Most used */}
+                  {roundChannel && (
                     <Button 
                       variant="default" 
+                      size="lg" 
+                      className="w-full relative"
+                      onClick={() => navigate(`/app/feed?channel=${roundChannel.id}`)}
+                    >
+                      <MessageCircle className="h-5 w-5 mr-2" />
+                      Community
+                      {channelUnreadCount && channelUnreadCount > 0 && (
+                        <Badge 
+                          variant="destructive" 
+                          className="absolute -top-2 -right-2 h-5 min-w-5 px-1.5 flex items-center justify-center text-xs"
+                        >
+                          {channelUnreadCount > 99 ? '99+' : channelUnreadCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  )}
+
+                  {/* 2. Round Audio Playlist - Primary content */}
+                  {round.audio_playlist_id && (
+                    <Button 
+                      variant="default" 
+                      size="lg" 
+                      className="w-full"
+                      onClick={() => navigate(`/app/player/playlist/${round.audio_playlist_id}`)}
+                    >
+                      <Music className="h-5 w-5 mr-2" />
+                      Round Playlist
+                    </Button>
+                  )}
+
+                  {/* 3. Join Google Meet - Time-sensitive */}
+                  {round.google_meet_link && (
+                    <Button 
+                      variant="default" 
+                      size="lg" 
+                      className="w-full"
+                      onClick={() => window.open(round.google_meet_link!, '_blank')}
+                    >
+                      <Video className="h-5 w-5 mr-2" />
+                      Join Google Meet
+                    </Button>
+                  )}
+
+                  {/* 4. Add First Session to Calendar */}
+                  {round.first_session_date && (
+                    <Button 
+                      variant="secondary" 
                       size="lg" 
                       className="w-full"
                       onClick={handleAddToCalendar}
@@ -849,7 +896,7 @@ const AppCourseDetail = () => {
                     </Button>
                   )}
 
-                  {/* Sync All Sessions to Calendar - Only show if there are multiple sessions */}
+                  {/* 5. Sync All Sessions to Calendar */}
                   {dbSessions && dbSessions.length > 1 && (
                     <Button 
                       variant="secondary" 
@@ -872,33 +919,7 @@ const AppCourseDetail = () => {
                     </Button>
                   )}
 
-                  {/* Contact Support - Customizable link */}
-                  {(round as any).support_link_url && (
-                    <Button 
-                      variant="default" 
-                      size="lg" 
-                      className="w-full bg-[#0088cc] hover:bg-[#0088cc]/90"
-                      onClick={handleContactSupport}
-                    >
-                      <MessageCircle className="h-5 w-5 mr-2" />
-                      {(round as any).support_link_label || 'Contact Support'}
-                    </Button>
-                  )}
-
-                  {/* Join Google Meet */}
-                  {round.google_meet_link && (
-                    <Button 
-                      variant="secondary" 
-                      size="lg" 
-                      className="w-full"
-                      onClick={() => window.open(round.google_meet_link!, '_blank')}
-                    >
-                      <Video className="h-5 w-5 mr-2" />
-                      Join Google Meet
-                    </Button>
-                  )}
-
-                  {/* Access Google Drive */}
+                  {/* 6. Access Google Drive - Resources */}
                   {round.google_drive_link && (
                     <Button 
                       variant="outline" 
@@ -911,37 +932,16 @@ const AppCourseDetail = () => {
                     </Button>
                   )}
 
-                  {/* Round Audio Playlist */}
-                  {round.audio_playlist_id && (
+                  {/* 7. Contact Support - When needed */}
+                  {(round as any).support_link_url && (
                     <Button 
-                      variant="default" 
+                      variant="outline" 
                       size="lg" 
                       className="w-full"
-                      onClick={() => navigate(`/app/player/playlist/${round.audio_playlist_id}`)}
-                    >
-                      <Music className="h-5 w-5 mr-2" />
-                      Round Playlist
-                    </Button>
-                  )}
-
-                  {/* Round Community Channel */}
-                  {roundChannel && (
-                    <Button 
-                      variant="default" 
-                      size="lg" 
-                      className="w-full relative"
-                      onClick={() => navigate(`/app/feed?channel=${roundChannel.id}`)}
+                      onClick={handleContactSupport}
                     >
                       <MessageCircle className="h-5 w-5 mr-2" />
-                      Community
-                      {channelUnreadCount && channelUnreadCount > 0 && (
-                        <Badge 
-                          variant="destructive" 
-                          className="absolute -top-2 -right-2 h-5 min-w-5 px-1.5 flex items-center justify-center text-xs"
-                        >
-                          {channelUnreadCount > 99 ? '99+' : channelUnreadCount}
-                        </Badge>
-                      )}
+                      {(round as any).support_link_label || 'Contact Support'}
                     </Button>
                   )}
                 </CardContent>
