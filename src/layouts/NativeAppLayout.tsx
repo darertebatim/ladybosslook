@@ -105,7 +105,7 @@ const NativeAppLayout = () => {
     <>
       <div className="flex flex-col h-full bg-background app-theme font-farsi">
         {/* Main Content - scrollable container for iOS */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pb-24">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pb-20">
           <Outlet />
         </main>
 
