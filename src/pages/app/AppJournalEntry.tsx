@@ -310,7 +310,7 @@ const AppJournalEntry = () => {
       {/* Fixed Save Button - always visible above tab bar */}
       <div 
         className="fixed left-0 right-0 p-4 bg-background border-t z-10"
-        style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' }}
+        style={{ bottom: '72px' }}
       >
         <Button 
           className="w-full"

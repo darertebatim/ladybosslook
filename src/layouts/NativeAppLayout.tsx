@@ -112,12 +112,9 @@ const NativeAppLayout = () => {
         {/* Mini Player - show when audio is playing and not on player page */}
         {!isOnPlayerPage && <MiniPlayer />}
 
-        {/* Bottom Navigation with safe area */}
-        <nav 
-          className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg"
-          style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-        >
-          <div className="grid grid-cols-5 pt-2 pb-4">
+        {/* Bottom Navigation - no extra safe area since #root handles top */}
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg pb-safe">
+          <div className="grid grid-cols-5 pt-2 pb-2">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               const Icon = item.icon;

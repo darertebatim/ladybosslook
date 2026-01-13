@@ -492,7 +492,7 @@ export default function AppSupportChat() {
         {/* Fixed Input Area - positioned above tab bar */}
         <div 
           className="fixed left-0 right-0 bg-background/95 backdrop-blur-xl z-40"
-          style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' }}
+          style={{ bottom: '72px' }}
         >
           <div className="px-3 py-1.5">
             <ChatInput 
