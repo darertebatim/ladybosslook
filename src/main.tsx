@@ -14,6 +14,10 @@ logBuildInfo();
 // Initialize Capacitor native features
 if (Capacitor.isNativePlatform()) {
   console.log('[Main] 📱 Native platform detected:', Capacitor.getPlatform());
+  
+  // Add native-app class to html for iOS scroll containment
+  document.documentElement.classList.add('native-app');
+  
   StatusBar.setStyle({ style: Style.Dark }).catch(console.error);
   SplashScreen.hide().catch(console.error);
   
