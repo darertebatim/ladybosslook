@@ -167,16 +167,16 @@ export default function AppPlayer() {
           className="fixed top-0 left-0 right-0 z-10 bg-background/80 backdrop-blur-lg border-b"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="pt-6 pb-3 px-4 space-y-4">
-            <div>
-              <h1 className="text-2xl font-bold">Audio Library</h1>
-              <p className="text-sm text-muted-foreground">Listen and learn on the go</p>
-            </div>
+        <div className="pt-3 pb-2 px-4 space-y-4">
+          <div>
+            <h1 className="text-2xl font-bold">Audio Library</h1>
+            <p className="text-sm text-muted-foreground">Listen and learn on the go</p>
+          </div>
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
           </div>
         </div>
-        <div style={{ height: 'calc(200px + env(safe-area-inset-top, 0px))' }} />
+      <div style={{ height: 'calc(188px + env(safe-area-inset-top, 0px))' }} />
         <PlayerSkeleton />
       </div>
     );
@@ -189,7 +189,7 @@ export default function AppPlayer() {
         className="fixed top-0 left-0 right-0 z-10 bg-background/80 backdrop-blur-lg border-b"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-6 pb-3 px-4 space-y-4">
+        <div className="pt-3 pb-2 px-4 space-y-4">
           <div>
             <h1 className="text-2xl font-bold">Audio Library</h1>
             <p className="text-sm text-muted-foreground">Listen and learn on the go</p>
@@ -215,8 +215,8 @@ export default function AppPlayer() {
         </div>
       </div>
 
-      {/* Header spacer - matches fixed header height (~200px + safe area) */}
-      <div style={{ height: 'calc(200px + env(safe-area-inset-top, 0px))' }} />
+      {/* Header spacer - matches fixed header height (~188px + safe area) */}
+      <div style={{ height: 'calc(188px + env(safe-area-inset-top, 0px))' }} />
 
       <div className="p-4 space-y-6">
         {/* Continue Learning Section */}
