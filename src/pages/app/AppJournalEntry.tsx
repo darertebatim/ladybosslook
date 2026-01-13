@@ -207,7 +207,7 @@ const AppJournalEntry = () => {
   const canShare = (entryId || createdEntryIdRef.current) && !sharedWithAdmin;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-24">
+    <div className="min-h-screen bg-background flex flex-col pb-40">
       <SEOHead 
         title={isNew ? 'New Entry' : 'Edit Entry'} 
         description="Write your journal entry" 
@@ -270,19 +270,9 @@ const AppJournalEntry = () => {
             placeholder="Write your thoughts..."
             value={content}
             onChange={(e) => handleContentChange(e.target.value)}
-            className="min-h-[300px] resize-none text-base leading-relaxed"
+            className="min-h-[200px] resize-none text-base leading-relaxed"
           />
         </div>
-
-        {/* Save button - below content */}
-        <Button 
-          className="w-full"
-          onClick={handleSave}
-          disabled={saveStatus === 'saving' || !content.trim()}
-        >
-          <Save className="h-4 w-4 mr-2" />
-          Save Entry
-        </Button>
 
         {/* Share with Razie button (for saved entries only) */}
         {canShare && (
@@ -315,6 +305,22 @@ const AppJournalEntry = () => {
             Delete Entry
           </Button>
         )}
+      </div>
+
+      {/* Fixed Save Button - always visible above tab bar */}
+      <div className="fixed bottom-20 left-0 right-0 p-4 bg-background border-t z-10">
+        <Button 
+          className="w-full"
+          onClick={handleSave}
+          disabled={saveStatus === 'saving' || !content.trim()}
+        >
+          {saveStatus === 'saving' ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Save className="h-4 w-4 mr-2" />
+          )}
+          {saveStatus === 'saving' ? 'Saving...' : 'Save Entry'}
+        </Button>
       </div>
 
       {/* Delete confirmation dialog */}
