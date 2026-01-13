@@ -45,7 +45,7 @@ export function StatsCards({
         <CardContent className="p-3 lg:pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs lg:text-sm font-medium text-muted-foreground">Listening</p>
+              <p className="text-xs lg:text-sm font-medium text-muted-foreground">Listen Time</p>
               <h3 className="text-xl lg:text-2xl font-bold mt-0.5 lg:mt-2">{formatListening()}</h3>
             </div>
             <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-orange-500/10 flex items-center justify-center">
@@ -63,8 +63,8 @@ export function StatsCards({
         <CardContent className="p-3 lg:pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs lg:text-sm font-medium text-muted-foreground">Unread</p>
-              <h3 className="text-xl lg:text-2xl font-bold mt-0.5 lg:mt-2">{unreadPosts}</h3>
+              <p className="text-xs lg:text-sm font-medium text-muted-foreground">New Posts</p>
+              <h3 className="text-xl lg:text-2xl font-bold mt-0.5 lg:mt-2">{unreadPosts} unread</h3>
             </div>
             <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-primary/10 flex items-center justify-center">
               <Newspaper className="h-4 w-4 lg:h-6 lg:w-6 text-primary" />
@@ -81,8 +81,8 @@ export function StatsCards({
         <CardContent className="p-3 lg:pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs lg:text-sm font-medium text-muted-foreground">Completed</p>
-              <h3 className="text-xl lg:text-2xl font-bold mt-0.5 lg:mt-2">{completedTracks}</h3>
+              <p className="text-xs lg:text-sm font-medium text-muted-foreground">Audio Tracks</p>
+              <h3 className="text-xl lg:text-2xl font-bold mt-0.5 lg:mt-2">{completedTracks} done</h3>
             </div>
             <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-green-500/10 flex items-center justify-center">
               <CheckCircle2 className="h-4 w-4 lg:h-6 lg:w-6 text-green-600" />
