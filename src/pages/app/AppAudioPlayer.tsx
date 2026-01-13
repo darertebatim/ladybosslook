@@ -276,7 +276,7 @@ export default function AppAudioPlayer() {
         className="relative z-50 bg-background/60 backdrop-blur-xl border-b border-border/50 shrink-0"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-6 pb-3 px-4 flex items-center gap-3">
+        <div className="pt-3 pb-2 px-4 flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
