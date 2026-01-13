@@ -21,12 +21,13 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Calendar, Plus, Trash2, Edit, ArrowLeft, Wand2, Loader2, CalendarDays, CheckCircle } from "lucide-react";
+import { Calendar, Plus, Trash2, Edit, ArrowLeft, Wand2, Loader2, CalendarDays, CheckCircle, AlertTriangle, Save, X } from "lucide-react";
 import { format, addWeeks, addDays } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { Textarea } from "@/components/ui/textarea";
 import { useSessionComplete } from "@/hooks/useSessionComplete";
 import { SessionCompleteDialog } from "@/components/admin/SessionCompleteDialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface ProgramSession {
   id: string;
@@ -38,6 +39,16 @@ interface ProgramSession {
   duration_minutes: number;
   meeting_link: string | null;
   status: 'scheduled' | 'completed' | 'cancelled' | 'rescheduled';
+}
+
+interface PreviewSession {
+  tempId: string;
+  session_number: number;
+  title: string;
+  session_date: string;
+  duration_minutes: number;
+  meeting_link: string | null;
+  status: 'scheduled';
 }
 
 interface SessionFormData {
@@ -90,6 +101,12 @@ export const SessionsManager = ({
     meeting_link: defaultMeetLink || "",
     status: "scheduled",
   });
+  
+  // Preview state for generated sessions
+  const [previewSessions, setPreviewSessions] = useState<PreviewSession[]>([]);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isSavingPreview, setIsSavingPreview] = useState(false);
+  const [editingPreviewId, setEditingPreviewId] = useState<string | null>(null);
 
   // Fetch sessions for this round
   const { data: sessions, isLoading } = useQuery({
@@ -196,11 +213,16 @@ export const SessionsManager = ({
     }
   };
 
-  // Generate sessions mutation (weekly or daily)
-  const generateMutation = useMutation({
-    mutationFn: async (interval: 'weekly' | 'daily') => {
-      if (!startDate) throw new Error("No start date set for this round");
+  // Generate preview sessions (no database save yet)
+  const handleGeneratePreview = (interval: 'weekly' | 'daily') => {
+    if (!startDate) {
+      toast.error("No start date set for this round");
+      return;
+    }
 
+    setIsGenerating(interval);
+
+    try {
       const start = new Date(startDate);
       const end = endDate ? new Date(endDate) : (interval === 'weekly' ? addWeeks(start, 8) : addDays(start, 30));
       
@@ -213,7 +235,7 @@ export const SessionsManager = ({
         sessionMinute = firstDate.getUTCMinutes();
       }
       
-      const sessionsToCreate = [];
+      const sessionsToPreview: PreviewSession[] = [];
       let sessionNumber = (sessions?.length || 0) + 1;
       let currentDate = new Date(start);
 
@@ -222,8 +244,8 @@ export const SessionsManager = ({
         const sessionDate = new Date(currentDate);
         sessionDate.setUTCHours(sessionHour, sessionMinute, 0, 0);
         
-        sessionsToCreate.push({
-          round_id: roundId,
+        sessionsToPreview.push({
+          tempId: `preview-${Date.now()}-${sessionNumber}`,
           session_number: sessionNumber,
           title: `${programTitle} - Session ${sessionNumber}`,
           session_date: sessionDate.toISOString(),
@@ -235,27 +257,79 @@ export const SessionsManager = ({
         currentDate = interval === 'weekly' ? addWeeks(currentDate, 1) : addDays(currentDate, 1);
       }
 
-      if (sessionsToCreate.length === 0) {
-        throw new Error("No sessions to generate");
+      if (sessionsToPreview.length === 0) {
+        toast.error("No sessions to generate");
+        return;
       }
+
+      setPreviewSessions(sessionsToPreview);
+      setIsPreviewMode(true);
+      toast.info(`Generated ${sessionsToPreview.length} sessions for preview. Review and save when ready.`);
+    } catch (error) {
+      toast.error("Failed to generate preview");
+    } finally {
+      setIsGenerating(null);
+    }
+  };
+
+  // Save preview sessions to database
+  const handleSavePreview = async () => {
+    if (previewSessions.length === 0) return;
+
+    setIsSavingPreview(true);
+    try {
+      const sessionsToCreate = previewSessions.map(ps => ({
+        round_id: roundId,
+        session_number: ps.session_number,
+        title: ps.title,
+        session_date: ps.session_date,
+        duration_minutes: ps.duration_minutes,
+        meeting_link: ps.meeting_link,
+        status: ps.status,
+      }));
 
       const { error } = await supabase
         .from("program_sessions")
         .insert(sessionsToCreate);
+      
       if (error) throw error;
 
-      return sessionsToCreate.length;
-    },
-    onSuccess: async (count) => {
       queryClient.invalidateQueries({ queryKey: ["program-sessions", roundId] });
-      toast.success(`Generated ${count} sessions`);
+      toast.success(`Saved ${sessionsToCreate.length} sessions`);
+      
       // Send push notification to enrolled users
-      await sendNewSessionsNotification(count);
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
-  });
+      await sendNewSessionsNotification(sessionsToCreate.length);
+      
+      // Clear preview
+      setPreviewSessions([]);
+      setIsPreviewMode(false);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to save sessions");
+    } finally {
+      setIsSavingPreview(false);
+    }
+  };
+
+  // Cancel preview
+  const handleCancelPreview = () => {
+    setPreviewSessions([]);
+    setIsPreviewMode(false);
+    setEditingPreviewId(null);
+    toast.info("Preview cancelled");
+  };
+
+  // Delete from preview
+  const handleDeletePreviewSession = (tempId: string) => {
+    setPreviewSessions(prev => prev.filter(s => s.tempId !== tempId));
+  };
+
+  // Update preview session
+  const handleUpdatePreviewSession = (tempId: string, updates: Partial<PreviewSession>) => {
+    setPreviewSessions(prev => prev.map(s => 
+      s.tempId === tempId ? { ...s, ...updates } : s
+    ));
+    setEditingPreviewId(null);
+  };
 
   const resetForm = () => {
     setFormData({
@@ -306,13 +380,8 @@ export const SessionsManager = ({
     saveMutation.mutate(formData);
   };
 
-  const handleGenerate = async (interval: 'weekly' | 'daily') => {
-    setIsGenerating(interval);
-    try {
-      await generateMutation.mutateAsync(interval);
-    } finally {
-      setIsGenerating(null);
-    }
+  const handleGenerate = (interval: 'weekly' | 'daily') => {
+    handleGeneratePreview(interval);
   };
 
   const getStatusBadgeColor = (status: string) => {
@@ -369,7 +438,101 @@ export const SessionsManager = ({
         </div>
       </div>
 
-      {showForm && (
+      {/* Preview Mode Banner */}
+      {isPreviewMode && (
+        <Alert variant="default" className="border-amber-500 bg-amber-50">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-800">Preview Mode - Sessions Not Saved Yet</AlertTitle>
+          <AlertDescription className="text-amber-700">
+            Review the {previewSessions.length} generated sessions below. You can edit or delete individual sessions before saving.
+            <strong> Push notifications will only be sent after you click "Save All Sessions".</strong>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Preview Sessions Table */}
+      {isPreviewMode && previewSessions.length > 0 && (
+        <Card className="border-amber-300">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-amber-800">
+              <Wand2 className="h-5 w-5" />
+              Preview: {previewSessions.length} Sessions to Create
+            </CardTitle>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleCancelPreview} disabled={isSavingPreview}>
+                <X className="h-4 w-4 mr-2" />
+                Cancel
+              </Button>
+              <Button onClick={handleSavePreview} disabled={isSavingPreview} className="bg-green-600 hover:bg-green-700">
+                {isSavingPreview ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
+                Save All & Notify
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>#</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Duration</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {previewSessions.map((session) => (
+                  <TableRow key={session.tempId} className="bg-amber-50/50">
+                    <TableCell>{session.session_number}</TableCell>
+                    <TableCell>
+                      {editingPreviewId === session.tempId ? (
+                        <Input
+                          value={session.title}
+                          onChange={(e) => handleUpdatePreviewSession(session.tempId, { title: e.target.value })}
+                          onBlur={() => setEditingPreviewId(null)}
+                          onKeyDown={(e) => e.key === 'Enter' && setEditingPreviewId(null)}
+                          autoFocus
+                          className="w-full"
+                        />
+                      ) : (
+                        <span className="font-medium">{session.title}</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(session.session_date), 'MMM d, yyyy h:mm a')}
+                    </TableCell>
+                    <TableCell>{session.duration_minutes} min</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditingPreviewId(session.tempId)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeletePreviewSession(session.tempId)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+
+      {showForm && !isPreviewMode && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -509,86 +672,89 @@ export const SessionsManager = ({
         </Card>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Sessions ({sessions?.length || 0})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <p>Loading sessions...</p>
-          ) : sessions && sessions.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>#</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Date & Time</TableHead>
-                  <TableHead>Duration</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sessions.map((session) => (
-                  <TableRow key={session.id}>
-                    <TableCell>{session.session_number}</TableCell>
-                    <TableCell className="font-medium">{session.title}</TableCell>
-                    <TableCell>
-                      {format(new Date(session.session_date), 'MMM d, yyyy h:mm a')}
-                    </TableCell>
-                    <TableCell>{session.duration_minutes} min</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(session.status)}`}>
-                        {session.status}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        {session.status === 'scheduled' && (
+      {/* Existing Sessions (only show when not in preview mode) */}
+      {!isPreviewMode && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Sessions ({sessions?.length || 0})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <p>Loading sessions...</p>
+            ) : sessions && sessions.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Date & Time</TableHead>
+                    <TableHead>Duration</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sessions.map((session) => (
+                    <TableRow key={session.id}>
+                      <TableCell>{session.session_number}</TableCell>
+                      <TableCell className="font-medium">{session.title}</TableCell>
+                      <TableCell>
+                        {format(new Date(session.session_date), 'MMM d, yyyy h:mm a')}
+                      </TableCell>
+                      <TableCell>{session.duration_minutes} min</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(session.status)}`}>
+                          {session.status}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          {session.status === 'scheduled' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-green-600 hover:bg-green-50 hover:text-green-700"
+                              onClick={() => sessionComplete.openDialog({
+                                id: session.id,
+                                title: session.title,
+                                roundId: roundId,
+                                programSlug: programSlug,
+                              })}
+                              title="Mark as completed"
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                          )}
                           <Button
                             variant="outline"
                             size="sm"
-                            className="text-green-600 hover:bg-green-50 hover:text-green-700"
-                            onClick={() => sessionComplete.openDialog({
-                              id: session.id,
-                              title: session.title,
-                              roundId: roundId,
-                              programSlug: programSlug,
-                            })}
-                            title="Mark as completed"
+                            onClick={() => handleEdit(session)}
                           >
-                            <CheckCircle className="h-4 w-4" />
+                            <Edit className="h-4 w-4" />
                           </Button>
-                        )}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(session)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => deleteMutation.mutate(session.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No sessions created yet.</p>
-              <p className="text-sm mt-1">Click "Generate Weekly" to auto-create sessions or "Add Session" to add manually.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => deleteMutation.mutate(session.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No sessions created yet.</p>
+                <p className="text-sm mt-1">Click "Generate Weekly" to auto-create sessions or "Add Session" to add manually.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <SessionCompleteDialog
         open={!!sessionComplete.sessionToComplete}
