@@ -41,7 +41,10 @@ const AppJournal = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="sticky top-0 z-10 bg-background border-b">
+        <div 
+          className="sticky top-0 z-10 bg-background border-b"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
           <div className="flex items-center justify-between px-4 pt-3 pb-2">
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" onClick={() => navigate('/app/home')}>
@@ -61,7 +64,10 @@ const AppJournal = () => {
       <SEOHead title="My Journal" description="Your personal journal entries" />
       
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background border-b">
+      <div 
+        className="sticky top-0 z-10 bg-background border-b"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => navigate('/app/home')}>
