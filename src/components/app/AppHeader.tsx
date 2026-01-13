@@ -29,7 +29,7 @@ export function AppHeader({
       }`}
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <div className="flex items-center justify-between pt-6 pb-3 px-4">
+      <div className="flex items-center justify-between pt-3 pb-2 px-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {showBack && (
             <Button 
@@ -58,12 +58,12 @@ export function AppHeader({
   );
 }
 
-// Spacer to offset content below fixed header (56px header + safe area)
+// Spacer to offset content below fixed header (~48px header + safe area)
 export function AppHeaderSpacer() {
   return (
     <div 
       style={{ 
-        height: 'calc(76px + env(safe-area-inset-top, 0px))' 
+        height: 'calc(48px + env(safe-area-inset-top, 0px))' 
       }} 
     />
   );
