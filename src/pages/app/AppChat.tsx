@@ -348,12 +348,12 @@ export default function AppChat() {
             className="bg-background/80 backdrop-blur-xl border-b border-border/50 shrink-0"
             style={{ paddingTop: 'env(safe-area-inset-top)' }}
           >
-            <div className="flex items-center gap-1 pt-3 pb-2 px-2">
-              <Button 
-                variant="ghost" 
-                onClick={handleBack}
-                className="-ml-1 h-10 px-2 gap-0.5 text-primary hover:bg-transparent active:opacity-70"
-              >
+          <div className="flex items-center gap-1 pt-3 pb-2 px-4">
+            <Button 
+              variant="ghost" 
+              onClick={handleBack}
+              className="-ml-2 h-10 px-2 gap-0.5 text-primary hover:bg-transparent active:opacity-70"
+            >
                 <ChevronLeft className="h-7 w-7" />
                 <span className="text-[17px]">Back</span>
               </Button>
@@ -391,11 +391,11 @@ export default function AppChat() {
           className="bg-background/80 backdrop-blur-xl border-b border-border/50 shrink-0"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="flex items-center gap-1 pt-3 pb-2 px-2">
+          <div className="flex items-center gap-1 pt-3 pb-2 px-4">
             <Button 
               variant="ghost" 
               onClick={handleBack}
-              className="-ml-1 h-10 px-2 gap-0.5 text-primary hover:bg-transparent active:opacity-70"
+              className="-ml-2 h-10 px-2 gap-0.5 text-primary hover:bg-transparent active:opacity-70"
             >
               <ChevronLeft className="h-7 w-7" />
               <span className="text-[17px]">Back</span>
