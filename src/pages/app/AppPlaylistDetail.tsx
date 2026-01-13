@@ -277,7 +277,7 @@ export default function AppPlaylistDetail() {
         className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-6 pb-3 px-4">
+        <div className="pt-3 pb-2 px-4">
           <Button variant="ghost" size="sm" onClick={() => navigate('/app/player')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Library
@@ -286,7 +286,7 @@ export default function AppPlaylistDetail() {
       </div>
 
       {/* Header spacer */}
-      <div style={{ height: 'calc(76px + env(safe-area-inset-top, 0px))' }} />
+      <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} />
 
       {/* Playlist Info */}
       <div className="p-4 space-y-4">

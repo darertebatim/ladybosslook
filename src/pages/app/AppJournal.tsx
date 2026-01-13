@@ -42,7 +42,7 @@ const AppJournal = () => {
     return (
       <div className="min-h-screen bg-background">
         <div className="sticky top-0 z-10 bg-background border-b">
-          <div className="flex items-center justify-between p-4">
+          <div className="flex items-center justify-between px-4 pt-3 pb-2">
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" onClick={() => navigate('/app/home')}>
                 <ArrowLeft className="h-5 w-5" />
@@ -62,7 +62,7 @@ const AppJournal = () => {
       
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background border-b">
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between px-4 pt-3 pb-2">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => navigate('/app/home')}>
               <ArrowLeft className="h-5 w-5" />
