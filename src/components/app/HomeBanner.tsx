@@ -14,10 +14,21 @@ interface HomeBannerData {
   video_url: string | null;
   background_color: string | null;
 }
+const DISMISSED_BANNERS_KEY = 'dismissedBannerIds';
 
 export function HomeBanner() {
   const [banners, setBanners] = useState<HomeBannerData[]>([]);
-  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem(DISMISSED_BANNERS_KEY);
+      if (saved) {
+        return new Set(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error('Error reading dismissed banners:', e);
+    }
+    return new Set();
+  });
   const [expandedVideoId, setExpandedVideoId] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -44,7 +55,15 @@ export function HomeBanner() {
   };
 
   const handleDismiss = (id: string) => {
-    setDismissedIds(prev => new Set([...prev, id]));
+    setDismissedIds(prev => {
+      const updated = new Set([...prev, id]);
+      try {
+        localStorage.setItem(DISMISSED_BANNERS_KEY, JSON.stringify([...updated]));
+      } catch (e) {
+        console.error('Error saving dismissed banner:', e);
+      }
+      return updated;
+    });
   };
 
   const handleButtonClick = (url: string) => {
