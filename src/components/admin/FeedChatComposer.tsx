@@ -8,13 +8,15 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { 
   Loader2, Image, Video, Link, Play, FileText, ExternalLink, 
-  Mic, Square, Send, Pin, Bell, X, Trash2 
+  Mic, Square, Send, Pin, Bell, X, Trash2, Upload 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FeedMessage } from '@/components/feed/FeedMessage';
+import { detectVideoType, getVideoPlatformLabel, getVideoEmbedUrl, extractYouTubeId } from '@/lib/videoUtils';
 
 const ACTION_TYPES = [
   { value: 'none', label: 'No Action', icon: null },
@@ -66,6 +68,11 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
   
   // Attachments panel
   const [showAttachments, setShowAttachments] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  // Detect video type when URL changes
+  const detectedVideoType = videoUrl ? detectVideoType(videoUrl) : null;
 
   const { data: channels } = useQuery({
     queryKey: ['admin-feed-channels'],
@@ -171,6 +178,50 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
       .getPublicUrl(data.path);
     
     return { url: publicUrl, duration: recordingDuration };
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image must be less than 10MB');
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('feed-attachments')
+        .upload(fileName, file, { contentType: file.type });
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('feed-attachments')
+        .getPublicUrl(data.path);
+
+      setImageUrl(publicUrl);
+      toast.success('Image uploaded!');
+    } catch (err: any) {
+      toast.error('Failed to upload image: ' + err.message);
+    } finally {
+      setIsUploadingImage(false);
+      // Reset input
+      if (imageInputRef.current) {
+        imageInputRef.current.value = '';
+      }
+    }
   };
 
   const createPost = useMutation({
@@ -406,6 +457,11 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
             {videoUrl && (
               <div className="relative group bg-muted rounded-lg px-3 py-2 flex items-center gap-2">
                 <Video className="h-4 w-4" />
+                {detectedVideoType && (
+                  <Badge variant="secondary" className="text-xs">
+                    {getVideoPlatformLabel(detectedVideoType)}
+                  </Badge>
+                )}
                 <span className="text-sm truncate max-w-32">{videoUrl}</span>
                 <button
                   type="button"
@@ -429,24 +485,58 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
                   <Link className="h-5 w-5" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent align="start" className="w-64 p-3 space-y-3">
-                <div>
-                  <Label className="text-xs">Image URL</Label>
-                  <Input
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="https://..."
-                    className="mt-1"
+              <PopoverContent align="start" className="w-72 p-3 space-y-4">
+                {/* Image Section */}
+                <div className="space-y-2">
+                  <Label className="text-xs font-medium">Image</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      placeholder="Paste URL or upload..."
+                      className="flex-1"
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="icon"
+                      disabled={isUploadingImage}
+                      onClick={() => imageInputRef.current?.click()}
+                    >
+                      {isUploadingImage ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageUpload}
                   />
                 </div>
-                <div>
-                  <Label className="text-xs">Video URL (YouTube)</Label>
+
+                {/* Video Section */}
+                <div className="space-y-2">
+                  <Label className="text-xs font-medium">Video URL</Label>
                   <Input
                     value={videoUrl}
                     onChange={(e) => setVideoUrl(e.target.value)}
-                    placeholder="https://youtube.com/..."
-                    className="mt-1"
+                    placeholder="YouTube, Vimeo, Instagram, MP4..."
                   />
+                  {videoUrl && detectedVideoType && (
+                    <Badge variant="secondary" className="text-xs">
+                      {getVideoPlatformLabel(detectedVideoType)} detected
+                    </Badge>
+                  )}
+                  {videoUrl && !detectedVideoType && (
+                    <p className="text-xs text-muted-foreground">
+                      Unsupported format. Use YouTube, Vimeo, Instagram, or direct video URL.
+                    </p>
+                  )}
                 </div>
               </PopoverContent>
             </Popover>
