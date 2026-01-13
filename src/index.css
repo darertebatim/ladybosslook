@@ -27,11 +27,13 @@ html.native-app body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  /* Remove default safe area - let layout handle it */
+  padding: 0 !important;
 }
 
 html.native-app #root {
   position: fixed;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   left: 0;
   right: 0;
   bottom: 0;
