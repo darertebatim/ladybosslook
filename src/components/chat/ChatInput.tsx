@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Capacitor } from "@capacitor/core";
+import { Keyboard } from "@capacitor/keyboard";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, X, Loader2, FileText, Image as ImageIcon, Mic, Square, Play, Pause, Trash2 } from "lucide-react";
@@ -104,8 +105,25 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
       setMessage("");
       setAttachment(null);
       setError(null);
-      // Refocus textarea to keep keyboard open on iOS
-      setTimeout(() => textareaRef.current?.focus(), 50);
+      
+      // Keep keyboard open after sending on iOS
+      // Use multiple strategies for reliability
+      const refocusInput = () => {
+        textareaRef.current?.focus();
+        
+        // On native iOS, also use Capacitor Keyboard API
+        if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios') {
+          Keyboard.show().catch(() => {
+            // Fallback: try focus again
+            setTimeout(() => textareaRef.current?.focus(), 50);
+          });
+        }
+      };
+      
+      // Primary attempt after short delay
+      setTimeout(refocusInput, 10);
+      // Secondary attempt as fallback
+      setTimeout(refocusInput, 100);
     }
   };
 
