@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { usePostComments, useAddComment, useDeleteComment, FeedPost } from '@/hooks/useFeed';
 import { usePostCommentsRealtime } from '@/hooks/useFeedRealtime';
 import { useAuth } from '@/hooks/useAuth';
+import { useKeyboard } from '@/hooks/useKeyboard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -18,6 +19,7 @@ interface FeedThreadProps {
 export function FeedThread({ post, open, onOpenChange }: FeedThreadProps) {
   const [newComment, setNewComment] = useState('');
   const { user } = useAuth();
+  const { keyboardHeight, isKeyboardOpen } = useKeyboard();
   const { data: comments, isLoading } = usePostComments(post.id);
   const addComment = useAddComment();
   const deleteComment = useDeleteComment();
@@ -38,6 +40,7 @@ export function FeedThread({ post, open, onOpenChange }: FeedThreadProps) {
       <SheetContent 
         side="bottom" 
         className="h-[85vh] rounded-t-3xl p-0 flex flex-col"
+        hideCloseButton
       >
         {/* Header */}
         <SheetHeader className="px-4 py-3 border-b shrink-0">
@@ -130,6 +133,10 @@ export function FeedThread({ post, open, onOpenChange }: FeedThreadProps) {
         <form 
           onSubmit={handleSubmit} 
           className="shrink-0 border-t px-4 py-3 bg-background"
+          style={{ 
+            paddingBottom: isKeyboardOpen ? `${keyboardHeight}px` : undefined,
+            transition: 'padding-bottom 0.25s ease-out'
+          }}
         >
           <div className="flex gap-3 items-end">
             <div className="flex-1 relative">
