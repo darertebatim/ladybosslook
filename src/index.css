@@ -59,7 +59,8 @@ html.native-app #root {
 
 @layer utilities {
   .pb-safe {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    /* Only use actual safe-area, no forced minimum - prevents extra whitespace */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
 

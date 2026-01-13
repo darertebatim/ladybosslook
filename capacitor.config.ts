@@ -6,7 +6,8 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   // 🚨 NUCLEAR GUARD: Ensure native platform is always detected
   ios: {
-    contentInset: 'always',
+    // Use 'never' to prevent double safe-area insets - we handle them manually in CSS
+    contentInset: 'never',
     icon: {
       sources: [
         { src: 'public/app-icons/ios/icon-40.png', width: 40, height: 40 },

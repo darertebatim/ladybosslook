@@ -72,7 +72,7 @@ export default function AppSupportChat() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const { keyboardHeight, isKeyboardOpen } = useKeyboard();
+  const { keyboardHeight, isKeyboardOpen, effectiveInset } = useKeyboard();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const [conversation, setConversation] = useState<Conversation | null>(null);
@@ -423,8 +423,9 @@ export default function AppSupportChat() {
           ref={scrollContainerRef}
           className="flex-1 overflow-y-auto overscroll-contain"
           style={{
+            // When keyboard is open, use effectiveInset to ensure content stays above input
             paddingBottom: isKeyboardOpen 
-              ? INPUT_BAR_HEIGHT + 16 // Just input bar + buffer when keyboard is open (Capacitor resizes viewport)
+              ? INPUT_BAR_HEIGHT + effectiveInset + 16 // Input + keyboard inset + buffer
               : TAB_BAR_HEIGHT + INPUT_BAR_HEIGHT + 48 // Tab bar + input + safe area buffer when closed
           }}
           onTouchStart={handleTouchStart}
@@ -513,8 +514,9 @@ export default function AppSupportChat() {
         <div 
           className="fixed left-0 right-0 bg-background/95 backdrop-blur-xl z-40"
           style={{ 
+            // Use effectiveInset when keyboard is open for reliable positioning
             bottom: isKeyboardOpen 
-              ? 0 // Capacitor resize: 'body' already shrinks viewport, so input sits at bottom
+              ? effectiveInset // Position above the keyboard
               : `calc(${TAB_BAR_HEIGHT}px + env(safe-area-inset-bottom, 0px))`,
             transition: 'bottom 0.25s ease-out'
           }}
