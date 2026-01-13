@@ -89,7 +89,7 @@ export default function AppSupportChat() {
 
   // Layout constants
   const INPUT_BAR_HEIGHT = 68; // Height of the ChatInput area
-  const TAB_BAR_HEIGHT = 72; // Height of the bottom tab bar
+  const TAB_BAR_HEIGHT = 56; // Visible tab bar height (safe area handled separately)
 
   // Fetch or create conversation
   useEffect(() => {
@@ -188,6 +188,15 @@ export default function AppSupportChat() {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, initialScrollDone]);
+
+  // Auto-scroll when keyboard opens to keep latest messages visible
+  useEffect(() => {
+    if (isKeyboardOpen && messages.length > 0) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [isKeyboardOpen, messages.length]);
 
   const uploadAttachment = async (file: File): Promise<string | null> => {
     if (!user) return null;
@@ -339,7 +348,7 @@ export default function AppSupportChat() {
             className="bg-background/80 backdrop-blur-xl border-b border-border/50 z-50 shrink-0"
             style={{ paddingTop: 'env(safe-area-inset-top)' }}
           >
-            <div className="flex items-center gap-3 pt-6 pb-3 px-4">
+            <div className="flex items-center gap-3 pt-3 pb-2 px-4">
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -382,7 +391,7 @@ export default function AppSupportChat() {
           className="bg-background/80 backdrop-blur-xl border-b border-border/50 z-50 shrink-0"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="flex items-center gap-3 pt-6 pb-3 px-4">
+          <div className="flex items-center gap-3 pt-3 pb-2 px-4">
             <Button 
               variant="ghost" 
               size="icon" 
@@ -415,8 +424,8 @@ export default function AppSupportChat() {
           className="flex-1 overflow-y-auto overscroll-contain"
           style={{
             paddingBottom: isKeyboardOpen 
-              ? keyboardHeight + INPUT_BAR_HEIGHT + 16
-              : TAB_BAR_HEIGHT + INPUT_BAR_HEIGHT + 32 // Extra padding for safe area
+              ? INPUT_BAR_HEIGHT + 16 // Just input bar + buffer when keyboard is open (Capacitor resizes viewport)
+              : TAB_BAR_HEIGHT + INPUT_BAR_HEIGHT + 48 // Tab bar + input + safe area buffer when closed
           }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
@@ -505,7 +514,7 @@ export default function AppSupportChat() {
           className="fixed left-0 right-0 bg-background/95 backdrop-blur-xl z-40"
           style={{ 
             bottom: isKeyboardOpen 
-              ? keyboardHeight 
+              ? 0 // Capacitor resize: 'body' already shrinks viewport, so input sits at bottom
               : `calc(${TAB_BAR_HEIGHT}px + env(safe-area-inset-bottom, 0px))`,
             transition: 'bottom 0.25s ease-out'
           }}
