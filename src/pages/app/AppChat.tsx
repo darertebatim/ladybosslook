@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MessageCircle, RefreshCw } from "lucide-react";
+import { ChevronLeft, MessageCircle, RefreshCw } from "lucide-react";
 import { ChatSkeleton } from "@/components/app/skeletons";
 import { SEOHead } from "@/components/SEOHead";
 import { format, isToday, isYesterday, isSameDay } from "date-fns";
@@ -348,14 +348,14 @@ export default function AppChat() {
             className="bg-background/80 backdrop-blur-xl border-b border-border/50 shrink-0"
             style={{ paddingTop: 'env(safe-area-inset-top)' }}
           >
-            <div className="flex items-center gap-3 pt-3 pb-2 px-4">
+            <div className="flex items-center gap-1 pt-3 pb-2 px-2">
               <Button 
                 variant="ghost" 
-                size="icon" 
                 onClick={handleBack}
-                className="h-9 w-9 rounded-full"
+                className="-ml-1 h-10 px-2 gap-0.5 text-primary hover:bg-transparent active:opacity-70"
               >
-                <ArrowLeft className="h-5 w-5" />
+                <ChevronLeft className="h-7 w-7" />
+                <span className="text-[17px]">Back</span>
               </Button>
               <div className="flex items-center gap-3">
                 <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
@@ -391,14 +391,14 @@ export default function AppChat() {
           className="bg-background/80 backdrop-blur-xl border-b border-border/50 shrink-0"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="flex items-center gap-3 pt-3 pb-2 px-4">
+          <div className="flex items-center gap-1 pt-3 pb-2 px-2">
             <Button 
               variant="ghost" 
-              size="icon" 
               onClick={handleBack}
-              className="h-9 w-9 rounded-full hover:bg-muted/80 transition-colors"
+              className="-ml-1 h-10 px-2 gap-0.5 text-primary hover:bg-transparent active:opacity-70"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ChevronLeft className="h-7 w-7" />
+              <span className="text-[17px]">Back</span>
             </Button>
             <div className="flex items-center gap-3">
               <div className="relative">
