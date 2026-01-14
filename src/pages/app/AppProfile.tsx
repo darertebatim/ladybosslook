@@ -490,7 +490,7 @@ const AppProfile = () => {
       </header>
       
       {/* Header spacer */}
-      <div style={{ height: 'calc(56px + env(safe-area-inset-top, 0px))' }} />
+      <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} />
       
       <div className="container max-w-4xl py-4 px-4">
       <div className="space-y-6">

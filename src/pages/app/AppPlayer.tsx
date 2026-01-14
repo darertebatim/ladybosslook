@@ -176,7 +176,7 @@ export default function AppPlayer() {
             <Skeleton className="h-10 w-full" />
           </div>
         </div>
-      <div style={{ height: 'calc(188px + env(safe-area-inset-top, 0px))' }} />
+      <div style={{ height: 'calc(160px + env(safe-area-inset-top, 0px))' }} />
         <PlayerSkeleton />
       </div>
     );
@@ -215,8 +215,8 @@ export default function AppPlayer() {
         </div>
       </div>
 
-      {/* Header spacer - matches fixed header height (~188px + safe area) */}
-      <div style={{ height: 'calc(188px + env(safe-area-inset-top, 0px))' }} />
+      {/* Header spacer - matches fixed header height (~160px + safe area) */}
+      <div style={{ height: 'calc(160px + env(safe-area-inset-top, 0px))' }} />
 
       <div className="p-4 space-y-6">
         {/* Continue Learning Section */}

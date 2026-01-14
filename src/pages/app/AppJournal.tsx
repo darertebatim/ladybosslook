@@ -42,7 +42,7 @@ const AppJournal = () => {
     return (
       <div className="min-h-screen bg-background">
         <div 
-          className="sticky top-0 z-10 bg-background border-b"
+          className="fixed top-0 left-0 right-0 z-10 bg-background border-b"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="flex items-center justify-between px-4 pt-3 pb-2">
@@ -54,6 +54,7 @@ const AppJournal = () => {
             </div>
           </div>
         </div>
+        <div style={{ height: 'calc(56px + env(safe-area-inset-top, 0px))' }} />
         <JournalSkeleton />
       </div>
     );
@@ -65,7 +66,7 @@ const AppJournal = () => {
       
       {/* Header */}
       <div 
-        className="sticky top-0 z-10 bg-background border-b"
+        className="fixed top-0 left-0 right-0 z-10 bg-background border-b"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
@@ -123,6 +124,9 @@ const AppJournal = () => {
           </div>
         )}
       </div>
+
+      {/* Spacer for fixed header */}
+      <div style={{ height: 'calc(56px + env(safe-area-inset-top, 0px))' }} />
 
       {/* Content */}
       <div className="p-4 space-y-6">
