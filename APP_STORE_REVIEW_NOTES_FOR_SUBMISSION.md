@@ -76,6 +76,21 @@ All program content is delivered in English.
 - Users simply sign up, browse courses, and enroll for free
 - The test account already has courses enrolled, but reviewers can also test the enrollment flow by enrolling in additional courses from the Browse tab
 
+**Background Audio Feature (Guideline 2.5.4 - UIBackgroundModes audio):**
+The app includes persistent audio playback for educational content. This is the core learning feature. To locate and test:
+
+1. **Log in** with the test account (reviewer@ladybosslook.com)
+2. **Tap "Audio" tab** in the bottom navigation bar
+3. **Select any playlist** (e.g., "Financial Confidence", "Courageous Character", or "LBPodcast")
+4. **Tap any audio track** to start playback
+5. **Test background audio:**
+   - Lock the device → Audio continues playing
+   - Switch to another app → Audio continues playing
+   - Use lock screen controls to pause/play, skip forward/back
+6. **MiniPlayer:** While audio is playing, navigate within the app - the MiniPlayer appears at the top of the screen for persistent playback control
+
+This background audio capability is essential for users to listen to educational audio courses and podcasts while multitasking, driving, or exercising - a core use case for our learning platform.
+
 **What's New in Version 1.0.6:**
 - Improved chat experience with haptic feedback for better interactivity
 - Enhanced journal entry saving with dedicated Done button
