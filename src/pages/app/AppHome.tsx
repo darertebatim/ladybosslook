@@ -35,7 +35,7 @@ const AppHome = () => {
     listeningMinutes,
     completedTracks,
     unreadPosts,
-    nextSession
+    journalStreak
   } = useHomeData();
   
   // Get unseen content for new course notification
@@ -225,7 +225,7 @@ const AppHome = () => {
                 listeningMinutes={listeningMinutes}
                 unreadPosts={unreadPosts}
                 completedTracks={completedTracks}
-                nextSession={nextSession}
+                journalStreak={journalStreak}
               />
               {hasActiveRounds && <ActiveRound />}
               
