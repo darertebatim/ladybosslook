@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, X, Loader2, FileText, Image as ImageIcon, Mic, Square, Play, Pause, Trash2 } from "lucide-react";
@@ -73,6 +74,17 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
     };
   }, []);
 
+  // Auto-resize textarea based on content
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      // Reset height to auto to get the correct scrollHeight
+      textarea.style.height = 'auto';
+      // Set height to scrollHeight, capped at max-height (96px = 6rem)
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 96)}px`;
+    }
+  }, [message]);
+
   // Update waveform visualization during recording
   const updateWaveform = useCallback(() => {
     if (!analyserRef.current || !isRecording) return;
@@ -93,6 +105,11 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
 
   const handleSend = () => {
     if ((message.trim() || attachment) && !disabled && !uploading) {
+      // Haptic feedback on iOS/Android
+      if (Capacitor.isNativePlatform()) {
+        Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+      }
+      
       // Store textarea reference before any state changes
       const textarea = textareaRef.current;
       

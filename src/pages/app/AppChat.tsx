@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, MessageCircle, RefreshCw } from "lucide-react";
+import { ChevronLeft, MessageCircle, RefreshCw, ChevronDown } from "lucide-react";
 import { ChatSkeleton } from "@/components/app/skeletons";
 import { SEOHead } from "@/components/SEOHead";
 import { format, isToday, isYesterday, isSameDay } from "date-fns";
@@ -90,6 +90,7 @@ export default function AppChat() {
   const [uploading, setUploading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
@@ -296,7 +297,7 @@ export default function AppChat() {
       // Send push notification to admins
       await sendNotification(conversationId, messageContent);
 
-      await fetchMessages(conversationId);
+      // Note: No fetchMessages needed - realtime subscription handles new messages
     } catch (error: any) {
       console.error('Error sending message:', error);
       toast({
@@ -343,6 +344,18 @@ export default function AppChat() {
   const handleBack = () => {
     navigate('/app/home');
   };
+
+  // Track scroll position to show/hide scroll-to-bottom button
+  const handleScroll = useCallback(() => {
+    if (!scrollContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+    setShowScrollButton(distanceFromBottom > 200);
+  }, []);
+
+  const scrollToBottomSmooth = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
 
   if (loading) {
     return (
@@ -433,10 +446,11 @@ export default function AppChat() {
         {/* Messages area - flex-1 takes remaining space, scrollable */}
         <div 
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto overscroll-contain"
+          className="flex-1 overflow-y-auto overscroll-contain relative"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
+          onScroll={handleScroll}
         >
           {/* Pull to refresh indicator */}
           {(pullDistance > 0 || isRefreshing) && (
@@ -515,6 +529,16 @@ export default function AppChat() {
               </>
             )}
           </div>
+          
+          {/* Scroll to bottom button */}
+          {showScrollButton && (
+            <button
+              onClick={scrollToBottomSmooth}
+              className="absolute bottom-4 right-4 h-10 w-10 rounded-full bg-background border border-border shadow-lg flex items-center justify-center z-10 transition-all hover:scale-105 active:scale-95"
+            >
+              <ChevronDown className="h-5 w-5 text-muted-foreground" />
+            </button>
+          )}
         </div>
 
         {/* Input Area - shrink-0 so it stays at its natural height */}
