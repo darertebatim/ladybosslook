@@ -546,15 +546,15 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
         <Button
           variant="ghost"
           size="icon"
-          className="shrink-0 h-10 w-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+          className="shrink-0 h-9 w-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || uploading || !!attachment || isRecording}
         >
-          <Paperclip className="h-6 w-6" strokeWidth={2.5} />
+          <Paperclip className="h-5 w-5" />
         </Button>
 
         {/* Telegram-style pill input - CENTER */}
-        <div className="flex-1 flex items-center bg-muted/50 rounded-full border border-border/30 pl-4 pr-1.5">
+        <div className="flex-1 flex items-center bg-muted/50 rounded-full border border-border/30 pl-4 pr-1">
           <Textarea
             ref={textareaRef}
             value={message}
@@ -573,16 +573,16 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
             disabled={disabled || uploading || isRecording || (!message.trim() && !attachment)}
             size="icon"
             className={cn(
-              "shrink-0 h-8 w-8 rounded-full transition-all duration-200 ml-1",
+              "shrink-0 h-7 w-7 rounded-full transition-all duration-200 ml-1",
               (message.trim() || attachment) 
                 ? "bg-primary hover:bg-primary/90 scale-100 opacity-100" 
                 : "bg-primary/40 scale-90 opacity-60"
             )}
           >
             {uploading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <Send className="h-4 w-4" strokeWidth={2.5} />
+              <Send className="h-3.5 w-3.5" />
             )}
           </Button>
         </div>
@@ -592,16 +592,16 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           variant={isRecording ? "destructive" : "ghost"}
           size="icon"
           className={cn(
-            "shrink-0 h-10 w-10 rounded-full transition-colors",
+            "shrink-0 h-9 w-9 rounded-full transition-colors",
             !isRecording && "text-muted-foreground hover:text-foreground hover:bg-muted/80"
           )}
           onClick={isRecording ? stopRecording : startRecording}
           disabled={disabled || uploading || !!attachment}
         >
           {isRecording ? (
-            <Square className="h-5 w-5 fill-current" />
+            <Square className="h-4 w-4 fill-current" />
           ) : (
-            <Mic className="h-6 w-6" strokeWidth={2.5} />
+            <Mic className="h-5 w-5" />
           )}
         </Button>
       </div>
