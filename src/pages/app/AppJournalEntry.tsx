@@ -145,6 +145,22 @@ const AppJournalEntry = () => {
     navigate('/app/journal');
   };
 
+  const handleDone = async () => {
+    // Cancel any pending auto-save
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+    
+    // Save immediately if there's content
+    if (content.trim()) {
+      await saveEntry();
+      toast.success('Entry saved');
+    }
+    
+    // Navigate back to journal list
+    navigate('/app/journal');
+  };
+
   const handleDelete = async () => {
     if (!entryIdState) {
       navigate('/app/journal');
@@ -225,20 +241,18 @@ const AppJournalEntry = () => {
             </h1>
           </div>
           
-          {/* Save Status Indicator */}
+          {/* Done button + save status */}
           <div className="flex items-center gap-2">
             {saveStatus === 'saving' && (
-              <div className="flex items-center gap-1 text-muted-foreground text-sm">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Saving...</span>
-              </div>
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             )}
-            {saveStatus === 'saved' && (
-              <div className="flex items-center gap-1 text-green-600 text-sm">
-                <Check className="h-4 w-4" />
-                <span>Saved</span>
-              </div>
-            )}
+            <Button 
+              size="sm"
+              onClick={handleDone}
+              disabled={!content.trim() || saveStatus === 'saving'}
+            >
+              Done
+            </Button>
           </div>
         </div>
       </header>
