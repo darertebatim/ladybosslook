@@ -31,12 +31,8 @@ export const useKeyboard = () => {
       console.log('[useKeyboard] Keyboard will show, height:', info.keyboardHeight);
       setKeyboardHeight(info.keyboardHeight);
       setIsKeyboardOpen(true);
-      
-      // Also calculate effective inset as backup
-      setTimeout(() => {
-        const inset = calculateEffectiveInset();
-        setEffectiveInset(Math.max(info.keyboardHeight, inset));
-      }, 50);
+      // Set effective inset directly from keyboard height - no setTimeout to prevent jitter
+      setEffectiveInset(info.keyboardHeight);
     });
 
     const hideListener = Keyboard.addListener('keyboardWillHide', () => {
