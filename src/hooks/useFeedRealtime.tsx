@@ -17,9 +17,9 @@ export function useFeedRealtime(channelId?: string) {
   useEffect(() => {
     if (!user) return;
 
-    // Subscribe to new posts
-    const postsChannel = supabase
-      .channel('feed-posts-realtime')
+    // Single consolidated channel for all feed-related changes (better performance)
+    const feedChannel = supabase
+      .channel('feed-combined-realtime')
       .on(
         'postgres_changes',
         {
@@ -30,11 +30,9 @@ export function useFeedRealtime(channelId?: string) {
         },
         (payload) => {
           console.log('New feed post received:', payload);
-          // Invalidate queries to refresh the feed
           queryClient.invalidateQueries({ queryKey: ['feed-posts'] });
           queryClient.invalidateQueries({ queryKey: ['feed-unread-count'] });
           
-          // Show toast for new posts (only if not from current user)
           const newPost = payload.new as { author_id: string; title: string | null };
           if (newPost.author_id !== user.id) {
             toast('New post in Community', {
@@ -51,7 +49,6 @@ export function useFeedRealtime(channelId?: string) {
           table: 'feed_posts',
         },
         (payload) => {
-          // Handle post updates (e.g., pinned status change)
           const updatedPost = payload.new as { id: string };
           queryClient.invalidateQueries({ queryKey: ['feed-posts'] });
           queryClient.invalidateQueries({ queryKey: ['feed-post', updatedPost.id] });
@@ -68,11 +65,6 @@ export function useFeedRealtime(channelId?: string) {
           queryClient.invalidateQueries({ queryKey: ['feed-posts'] });
         }
       )
-      .subscribe();
-
-    // Subscribe to reactions
-    const reactionsChannel = supabase
-      .channel('feed-reactions-realtime')
       .on(
         'postgres_changes',
         {
@@ -91,8 +83,7 @@ export function useFeedRealtime(channelId?: string) {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(postsChannel);
-      supabase.removeChannel(reactionsChannel);
+      supabase.removeChannel(feedChannel);
     };
   }, [user, channelId, queryClient]);
 }

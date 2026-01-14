@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { format, isToday, isYesterday } from 'date-fns';
 import { getMoodEmoji } from './MoodSelector';
 import { Card, CardContent } from '@/components/ui/card';
@@ -39,14 +40,14 @@ const getDisplayTitle = (title: string | null, content: string, createdAt: strin
   return format(date, 'EEEE, MMMM d');
 };
 
-export const JournalEntryCard = ({
+export const JournalEntryCard = memo(function JournalEntryCard({
   title,
   content,
   mood,
   createdAt,
   sharedWithAdmin,
   onClick,
-}: JournalEntryCardProps) => {
+}: JournalEntryCardProps) {
   const plainContent = stripHtml(content);
   const displayTitle = getDisplayTitle(title, content, createdAt);
   const preview = plainContent.length > 100 ? plainContent.slice(0, 100) + '...' : plainContent;
@@ -82,7 +83,7 @@ export const JournalEntryCard = ({
       </CardContent>
     </Card>
   );
-};
+});
 
 export const formatDateGroup = (dateString: string): string => {
   const date = new Date(dateString);

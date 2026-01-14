@@ -41,6 +41,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { user } = useAuth();
   const saveProgressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTimeUpdateRef = useRef<number>(0);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -59,7 +60,12 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     const audio = audioRef.current;
     
     const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
+      // Throttle state updates to every 500ms for better performance
+      const now = Date.now();
+      if (now - lastTimeUpdateRef.current > 500) {
+        lastTimeUpdateRef.current = now;
+        setCurrentTime(audio.currentTime);
+      }
     };
     
     const handleDurationChange = () => {

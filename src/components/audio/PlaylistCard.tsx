@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Music, Lock, CheckCircle2 } from "lucide-react";
@@ -17,7 +18,7 @@ interface PlaylistCardProps {
   totalDuration: number;
 }
 
-export const PlaylistCard = ({
+export const PlaylistCard = memo(function PlaylistCard({
   id,
   name,
   description,
@@ -29,7 +30,7 @@ export const PlaylistCard = ({
   trackCount,
   completedTracks,
   totalDuration,
-}: PlaylistCardProps) => {
+}: PlaylistCardProps) {
   const navigate = useNavigate();
   
   const progressPercentage = trackCount > 0 ? (completedTracks / trackCount) * 100 : 0;
@@ -66,7 +67,7 @@ export const PlaylistCard = ({
     >
       <div className="relative aspect-square">
         {coverImageUrl ? (
-          <img src={coverImageUrl} alt={name} className="w-full h-full object-cover" />
+          <img src={coverImageUrl} alt={name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
             <Music className="h-16 w-16 text-primary/40" />
@@ -138,4 +139,4 @@ export const PlaylistCard = ({
       </div>
     </Card>
   );
-};
+});
