@@ -16,7 +16,7 @@ interface HomeData {
   listeningMinutes: number;
   completedTracks: number;
   unreadPosts: number;
-  nextSession: Date | null;
+  journalStreak: number;
 }
 
 interface CoursesData {
@@ -42,7 +42,7 @@ async function fetchHomeData(userId: string): Promise<HomeData> {
     audioProgressRes,
     allPostsRes,
     readPostsRes,
-    nextSessionRes
+    journalEntriesRes
   ] = await Promise.all([
     supabase
       .from('profiles')
@@ -79,13 +79,13 @@ async function fetchHomeData(userId: string): Promise<HomeData> {
       .from('feed_post_reads')
       .select('post_id')
       .eq('user_id', userId),
-    // Next upcoming session for user's enrolled rounds
+    // Journal entries for streak calculation (last 30 days)
     supabase
-      .from('program_sessions')
-      .select('session_date, round_id')
-      .gte('session_date', new Date().toISOString())
-      .order('session_date', { ascending: true })
-      .limit(20),
+      .from('journal_entries')
+      .select('created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(100),
   ]);
 
   // Calculate listening stats
@@ -97,14 +97,30 @@ async function fetchHomeData(userId: string): Promise<HomeData> {
   const readPostIds = new Set((readPostsRes.data || []).map(r => r.post_id));
   const unreadPosts = (allPostsRes.data || []).filter(p => !readPostIds.has(p.id)).length;
 
-  // Get user's round IDs from enrollments
-  const userRoundIds = (enrollmentsRes.data || [])
-    .filter(e => e.round_id)
-    .map(e => e.round_id);
-
-  // Find next session for user's rounds
-  const nextSessionData = (nextSessionRes.data || [])
-    .find(s => userRoundIds.includes(s.round_id));
+  // Calculate journal streak
+  let journalStreak = 0;
+  const entries = journalEntriesRes.data || [];
+  if (entries.length > 0) {
+    // Get unique dates with entries
+    const entryDates = new Set(
+      entries.map(e => new Date(e.created_at).toDateString())
+    );
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let checkDate = new Date(today);
+    
+    // Allow streak to continue if wrote today OR yesterday
+    if (!entryDates.has(checkDate.toDateString())) {
+      checkDate.setDate(checkDate.getDate() - 1);
+    }
+    
+    // Count consecutive days
+    while (entryDates.has(checkDate.toDateString())) {
+      journalStreak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    }
+  }
 
   return {
     profile: profileRes.data,
@@ -114,7 +130,7 @@ async function fetchHomeData(userId: string): Promise<HomeData> {
     listeningMinutes: Math.floor(listeningSeconds / 60),
     completedTracks,
     unreadPosts,
-    nextSession: nextSessionData ? new Date(nextSessionData.session_date) : null,
+    journalStreak,
   };
 }
 
@@ -150,7 +166,7 @@ export function useHomeData() {
     listeningMinutes: query.data?.listeningMinutes || 0,
     completedTracks: query.data?.completedTracks || 0,
     unreadPosts: query.data?.unreadPosts || 0,
-    nextSession: query.data?.nextSession || null,
+    journalStreak: query.data?.journalStreak || 0,
   };
 }
 

@@ -1,20 +1,19 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Headphones, Newspaper, CheckCircle2, Calendar } from "lucide-react";
-import { format, isToday, isTomorrow } from "date-fns";
+import { Headphones, Newspaper, CheckCircle2, NotebookPen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface StatsCardsProps {
   listeningMinutes: number;
   unreadPosts: number;
   completedTracks: number;
-  nextSession: Date | null;
+  journalStreak: number;
 }
 
 export function StatsCards({ 
   listeningMinutes, 
   unreadPosts, 
   completedTracks, 
-  nextSession 
+  journalStreak 
 }: StatsCardsProps) {
   const navigate = useNavigate();
 
@@ -25,14 +24,6 @@ export function StatsCards({
     if (hours > 0 && mins > 0) return `${hours}h ${mins}m`;
     if (hours > 0) return `${hours}h`;
     return `${mins}m`;
-  };
-
-  // Format next session date
-  const formatNextSession = () => {
-    if (!nextSession) return 'None';
-    if (isToday(nextSession)) return 'Today';
-    if (isTomorrow(nextSession)) return 'Tomorrow';
-    return format(nextSession, 'MMM d');
   };
 
   return (
@@ -91,19 +82,21 @@ export function StatsCards({
         </CardContent>
       </Card>
 
-      {/* Next Session */}
+      {/* Journal */}
       <Card 
         className="overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors"
-        onClick={() => navigate('/app/courses')}
+        onClick={() => navigate('/app/journal')}
       >
         <CardContent className="p-3 lg:pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs lg:text-sm font-medium text-muted-foreground">Next Session</p>
-              <h3 className="text-xl lg:text-2xl font-bold mt-0.5 lg:mt-2">{formatNextSession()}</h3>
+              <p className="text-xs lg:text-sm font-medium text-muted-foreground">Journal</p>
+              <h3 className="text-xl lg:text-2xl font-bold mt-0.5 lg:mt-2">
+                {journalStreak > 0 ? `🔥 ${journalStreak} days` : 'Start today'}
+              </h3>
             </div>
-            <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-blue-500/10 flex items-center justify-center">
-              <Calendar className="h-4 w-4 lg:h-6 lg:w-6 text-blue-600" />
+            <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-violet-500/10 flex items-center justify-center">
+              <NotebookPen className="h-4 w-4 lg:h-6 lg:w-6 text-violet-600" />
             </div>
           </div>
         </CardContent>
