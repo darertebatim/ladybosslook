@@ -103,7 +103,7 @@ export default function AppFeed() {
 
       {/* Header */}
       <header 
-        className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b"
+        className="fixed top-0 left-0 right-0 z-10 bg-background/95 backdrop-blur border-b"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center gap-3 px-4 pt-3 pb-2">
@@ -125,6 +125,9 @@ export default function AppFeed() {
         )}
       </header>
 
+      {/* Spacer for fixed header */}
+      <div style={{ height: 'calc(100px + env(safe-area-inset-top, 0px))' }} />
+
       {/* Messages stream */}
       <main className="pb-24 px-4">
         {postsLoading ? (
@@ -135,7 +138,7 @@ export default function AppFeed() {
           groupedPosts.map((group) => (
             <div key={group.dateLabel}>
               {/* Date separator */}
-              <div className="sticky top-[105px] z-[5] flex justify-center py-3">
+              <div className="flex justify-center py-3">
                 <Badge 
                   variant="secondary" 
                   className="bg-background/80 backdrop-blur-sm shadow-sm border text-xs font-normal"
