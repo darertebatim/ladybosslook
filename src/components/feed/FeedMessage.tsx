@@ -14,7 +14,6 @@ interface FeedMessageProps {
   post: FeedPost;
   allowReactions?: boolean;
   showChannelBadge?: boolean;
-  onOpenThread?: () => void;
   commentsCount?: number;
   isFollowUp?: boolean;
 }
@@ -23,7 +22,6 @@ export function FeedMessage({
   post, 
   allowReactions = true, 
   showChannelBadge = false,
-  onOpenThread,
   commentsCount = 0,
   isFollowUp = false
 }: FeedMessageProps) {
@@ -220,15 +218,9 @@ export function FeedMessage({
           />
           
           {commentsCount > 0 && (
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenThread?.();
-              }}
-              className="text-xs text-muted-foreground hover:text-primary transition-colors"
-            >
+            <span className="text-xs text-muted-foreground">
               {commentsCount} {commentsCount === 1 ? 'reply' : 'replies'}
-            </button>
+            </span>
           )}
         </div>
       )}
