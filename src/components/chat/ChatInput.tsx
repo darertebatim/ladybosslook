@@ -93,6 +93,9 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
 
   const handleSend = () => {
     if ((message.trim() || attachment) && !disabled && !uploading) {
+      // Store textarea reference before any state changes
+      const textarea = textareaRef.current;
+      
       onSend(
         message.trim(),
         attachment ? {
@@ -106,24 +109,25 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
       setAttachment(null);
       setError(null);
       
-      // Keep keyboard open after sending on iOS
-      // Use multiple strategies for reliability
-      const refocusInput = () => {
-        textareaRef.current?.focus();
+      // Keep keyboard open - multiple strategies for iOS reliability
+      const keepKeyboardOpen = () => {
+        if (textarea) {
+          textarea.focus();
+        }
         
-        // On native iOS, also use Capacitor Keyboard API
         if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios') {
-          Keyboard.show().catch(() => {
-            // Fallback: try focus again
-            setTimeout(() => textareaRef.current?.focus(), 50);
-          });
+          Keyboard.show().catch(() => {});
         }
       };
       
-      // Primary attempt after short delay
-      setTimeout(refocusInput, 10);
-      // Secondary attempt as fallback
-      setTimeout(refocusInput, 100);
+      // Use requestAnimationFrame for paint-sync timing, then multiple delays
+      // to handle async operations (message send, refetch, re-render)
+      requestAnimationFrame(() => {
+        keepKeyboardOpen();
+        setTimeout(keepKeyboardOpen, 50);
+        setTimeout(keepKeyboardOpen, 150);
+        setTimeout(keepKeyboardOpen, 300);
+      });
     }
   };
 
