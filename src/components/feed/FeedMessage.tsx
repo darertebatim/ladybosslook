@@ -10,6 +10,7 @@ import { FeedVoiceMessage } from './FeedVoiceMessage';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { detectVideoType, getVideoEmbedUrl, getVideoPlatformLabel } from '@/lib/videoUtils';
+import { useBilingualText } from '@/components/ui/BilingualText';
 
 interface FeedMessageProps {
   post: FeedPost;
@@ -31,6 +32,9 @@ export const FeedMessage = memo(function FeedMessage({
 
   // Use display_name if set, otherwise fallback to author's name or 'Admin'
   const senderName = post.display_name || post.author?.full_name || 'Admin';
+  
+  // Detect Persian text for proper font and direction
+  const { isPersian, direction, className: bilingualClassName } = useBilingualText(post.content || '');
 
   const handleClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking on interactive elements
@@ -106,14 +110,20 @@ export const FeedMessage = memo(function FeedMessage({
 
           {/* Text content */}
           {post.content && !isVoiceMessage && (
-            <p className="text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">
+            <p 
+              className={cn("text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed", bilingualClassName)}
+              dir={direction}
+            >
               {post.content}
             </p>
           )}
 
           {/* Caption for voice message */}
           {isVoiceMessage && post.content && (
-            <p className="text-sm text-muted-foreground mt-2">
+            <p 
+              className={cn("text-sm text-muted-foreground mt-2", bilingualClassName)}
+              dir={direction}
+            >
               {post.content}
             </p>
           )}

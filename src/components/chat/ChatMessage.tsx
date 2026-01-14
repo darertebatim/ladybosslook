@@ -4,6 +4,7 @@ import { FileText, Download, ExternalLink, Megaphone, Check, CheckCheck, Play, P
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useRef, useMemo } from "react";
+import { useBilingualText } from "@/components/ui/BilingualText";
 
 interface ChatMessageProps {
   content: string;
@@ -133,6 +134,9 @@ export function ChatMessage({
   const isAudio = attachmentType?.startsWith('audio/');
   const { text, linkUrl, linkText } = parseMessageContent(content);
   const displayText = isBroadcast ? formatBroadcastText(text) : text;
+  
+  // Detect Persian text for proper font and direction
+  const { isPersian, direction, className: bilingualClassName } = useBilingualText(displayText);
 
   // Dynamic border radius based on group position (Telegram-style)
   const getBubbleRadius = () => {
@@ -410,7 +414,10 @@ export function ChatMessage({
         {/* Text Content - hide for voice messages */}
         {displayText && !isAudio && (
           <div className="px-3.5 py-2">
-            <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words">
+            <p 
+              className={cn("text-[15px] leading-relaxed whitespace-pre-wrap break-words", bilingualClassName)}
+              dir={direction}
+            >
               {linkifyText(displayText)}
             </p>
           </div>

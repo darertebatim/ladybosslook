@@ -10,6 +10,8 @@ import { WritingPrompts } from '@/components/app/WritingPrompts';
 import { JournalEntrySkeleton } from '@/components/app/skeletons/JournalSkeleton';
 import { SEOHead } from '@/components/SEOHead';
 import { toast } from 'sonner';
+import { useBilingualText } from '@/components/ui/BilingualText';
+import { cn } from '@/lib/utils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +44,10 @@ const AppJournalEntry = () => {
   const createMutation = useCreateJournalEntry();
   const updateMutation = useUpdateJournalEntry();
   const deleteMutation = useDeleteJournalEntry();
+  
+  // Detect Persian text for proper font and direction
+  const { className: contentBilingualClassName, direction: contentDirection } = useBilingualText(content);
+  const { className: titleBilingualClassName, direction: titleDirection } = useBilingualText(title);
 
   // Load existing entry data
   useEffect(() => {
@@ -245,7 +251,11 @@ const AppJournalEntry = () => {
             placeholder="Title (optional)"
             value={title}
             onChange={(e) => handleTitleChange(e.target.value)}
-            className="text-lg font-medium border-0 px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50"
+            className={cn(
+              "text-lg font-medium border-0 px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50",
+              titleBilingualClassName
+            )}
+            dir={titleDirection}
           />
 
           {/* Mood Selector - Compact */}
@@ -268,7 +278,11 @@ const AppJournalEntry = () => {
             onChange={(e) => handleContentChange(e.target.value)}
             onFocus={() => setIsTextareaFocused(true)}
             onBlur={() => setIsTextareaFocused(false)}
-            className="min-h-[200px] resize-none border-0 px-0 focus-visible:ring-0 text-base leading-relaxed placeholder:text-muted-foreground/50"
+            className={cn(
+              "min-h-[200px] resize-none border-0 px-0 focus-visible:ring-0 text-base leading-relaxed placeholder:text-muted-foreground/50",
+              contentBilingualClassName
+            )}
+            dir={contentDirection}
             style={{ overflow: 'hidden' }}
           />
         </div>
