@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useKeyboard } from "@/hooks/useKeyboard";
 import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
@@ -77,6 +78,7 @@ export default function AppChat() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { isKeyboardOpen } = useKeyboard();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
@@ -189,6 +191,16 @@ export default function AppChat() {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, initialScrollDone]);
+
+  // Scroll to bottom when keyboard opens so last message stays visible
+  useEffect(() => {
+    if (isKeyboardOpen && messages.length > 0) {
+      // Small delay to let keyboard animation complete
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [isKeyboardOpen, messages.length]);
 
   const uploadAttachment = async (file: File): Promise<string | null> => {
     if (!user) return null;
