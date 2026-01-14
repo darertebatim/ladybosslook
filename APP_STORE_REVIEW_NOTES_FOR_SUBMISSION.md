@@ -68,7 +68,7 @@ All program content is delivered in English.
 - Telegram: @ladybosslook (optional, user-initiated)
 
 **Notes for Review:**
-- This is version 1.0.1 with NEW push notification functionality
+- This is version 1.0.6 with improved chat and community features
 - Push notifications are used exclusively for educational purposes: course updates, announcements, and learning reminders
 - Users must explicitly opt-in to receive notifications via the initial prompt or Profile settings
 - All courses can be enrolled in at no cost - this is a completely free educational app
@@ -76,11 +76,12 @@ All program content is delivered in English.
 - Users simply sign up, browse courses, and enroll for free
 - The test account already has courses enrolled, but reviewers can also test the enrollment flow by enrolling in additional courses from the Browse tab
 
-**What's New in Version 1.0.1:**
-- Added native push notifications to keep students informed about course updates and announcements
-- Improved authentication with "Forgot Password" feature for easy password recovery
-- Enhanced sign-up validation with better error messages
-- Performance improvements and bug fixes
+**What's New in Version 1.0.6:**
+- Improved chat experience with haptic feedback for better interactivity
+- Enhanced journal entry saving with dedicated Done button
+- Better chat scrolling with scroll-to-bottom button for long conversations
+- Community feed reply improvements with keyboard stability fixes
+- Performance optimizations and bug fixes
 
 Thank you for reviewing LadyBoss Academy!
 
