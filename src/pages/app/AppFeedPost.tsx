@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Loader2, Pin, Megaphone, Music, Calendar, FileText, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import { FeedActionButton } from '@/components/feed/FeedActionButton';
 import { ChatInput } from '@/components/chat/ChatInput';
 import { SEOHead } from '@/components/SEOHead';
 import { cn } from '@/lib/utils';
+import { useBilingualText } from '@/components/ui/BilingualText';
 
 const POST_TYPE_ICONS = {
   announcement: Megaphone,
@@ -42,6 +43,82 @@ function getDateLabel(date: Date): string {
   if (isToday(date)) return 'Today';
   if (isYesterday(date)) return 'Yesterday';
   return format(date, 'MMM d, yyyy');
+}
+
+// Separate component for comment bubble to use hooks properly
+function CommentBubble({ 
+  comment, 
+  isFollowUp, 
+  isOwn, 
+  onDelete, 
+  deleteDisabled 
+}: { 
+  comment: { id: string; content: string; created_at: string; user?: { full_name?: string; avatar_url?: string } };
+  isFollowUp: boolean;
+  isOwn: boolean;
+  onDelete: () => void;
+  deleteDisabled: boolean;
+}) {
+  const { isPersian, direction, className: bilingualClassName } = useBilingualText(comment.content);
+
+  return (
+    <div 
+      className={cn(
+        "flex gap-2.5 group py-1",
+        !isFollowUp && "pt-3"
+      )}
+    >
+      {/* Avatar - hidden for follow-ups */}
+      {!isFollowUp ? (
+        <Avatar className="h-8 w-8 shrink-0">
+          <AvatarImage src={comment.user?.avatar_url || undefined} />
+          <AvatarFallback className="text-xs bg-muted">
+            {comment.user?.full_name?.charAt(0) || 'U'}
+          </AvatarFallback>
+        </Avatar>
+      ) : (
+        <div className="w-8 shrink-0" />
+      )}
+
+      {/* Comment bubble */}
+      <div className="flex-1 min-w-0">
+        <div className={cn(
+          "bg-muted rounded-2xl rounded-tl-md px-3 py-2 max-w-[85%] inline-block",
+          isOwn && "bg-primary/10"
+        )}>
+          {/* Header - hidden for follow-ups */}
+          {!isFollowUp && (
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="font-semibold text-sm">
+                {comment.user?.full_name || 'User'}
+              </span>
+            </div>
+          )}
+          <p 
+            className={cn("text-sm text-foreground whitespace-pre-wrap break-words", bilingualClassName)}
+            dir={direction}
+          >
+            {comment.content}
+          </p>
+          {/* Timestamp in bubble */}
+          <div className="flex items-center justify-end gap-2 mt-1">
+            <span className="text-[10px] text-muted-foreground">
+              {format(new Date(comment.created_at), 'HH:mm')}
+            </span>
+            {isOwn && (
+              <button
+                onClick={onDelete}
+                disabled={deleteDisabled}
+                className="text-[10px] text-muted-foreground hover:text-destructive transition-colors"
+              >
+                Delete
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function AppFeedPost() {
@@ -339,60 +416,14 @@ export default function AppFeedPost() {
                 const isOwn = user?.id === comment.user_id;
 
                 return (
-                  <div 
-                    key={comment.id} 
-                    className={cn(
-                      "flex gap-2.5 group py-1",
-                      !isFollowUp && "pt-3"
-                    )}
-                  >
-                    {/* Avatar - hidden for follow-ups */}
-                    {!isFollowUp ? (
-                      <Avatar className="h-8 w-8 shrink-0">
-                        <AvatarImage src={comment.user?.avatar_url || undefined} />
-                        <AvatarFallback className="text-xs bg-muted">
-                          {comment.user?.full_name?.charAt(0) || 'U'}
-                        </AvatarFallback>
-                      </Avatar>
-                    ) : (
-                      <div className="w-8 shrink-0" />
-                    )}
-
-                    {/* Comment bubble */}
-                    <div className="flex-1 min-w-0">
-                      <div className={cn(
-                        "bg-muted rounded-2xl rounded-tl-md px-3 py-2 max-w-[85%] inline-block",
-                        isOwn && "bg-primary/10"
-                      )}>
-                        {/* Header - hidden for follow-ups */}
-                        {!isFollowUp && (
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <span className="font-semibold text-sm">
-                              {comment.user?.full_name || 'User'}
-                            </span>
-                          </div>
-                        )}
-                        <p className="text-sm text-foreground whitespace-pre-wrap break-words">
-                          {comment.content}
-                        </p>
-                        {/* Timestamp in bubble */}
-                        <div className="flex items-center justify-end gap-2 mt-1">
-                          <span className="text-[10px] text-muted-foreground">
-                            {format(new Date(comment.created_at), 'HH:mm')}
-                          </span>
-                          {isOwn && (
-                            <button
-                              onClick={() => deleteComment.mutate(comment.id)}
-                              disabled={deleteComment.isPending}
-                              className="text-[10px] text-muted-foreground hover:text-destructive transition-colors"
-                            >
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <CommentBubble 
+                    key={comment.id}
+                    comment={comment}
+                    isFollowUp={isFollowUp}
+                    isOwn={isOwn}
+                    onDelete={() => deleteComment.mutate(comment.id)}
+                    deleteDisabled={deleteComment.isPending}
+                  />
                 );
               })}
               <div ref={commentsEndRef} />
