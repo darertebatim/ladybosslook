@@ -7,7 +7,6 @@ import { useChannels, useFeedPosts, useMarkPostRead, FeedPost } from '@/hooks/us
 import { useFeedRealtime } from '@/hooks/useFeedRealtime';
 import { FeedChannelTabs } from '@/components/feed/FeedChannelTabs';
 import { FeedMessage } from '@/components/feed/FeedMessage';
-import { FeedThread } from '@/components/feed/FeedThread';
 import { SEOHead } from '@/components/SEOHead';
 import { format, isToday, isYesterday, differenceInMinutes } from 'date-fns';
 
@@ -22,7 +21,6 @@ export default function AppFeed() {
   const initialChannel = searchParams.get('channel');
   
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
-  const [threadPost, setThreadPost] = useState<any>(null);
   
   const { data: channels, isLoading: channelsLoading } = useChannels();
   const { data: posts, isLoading: postsLoading } = useFeedPosts(selectedChannelId || undefined);
@@ -154,7 +152,6 @@ export default function AppFeed() {
                   allowReactions={selectedChannel?.allow_reactions ?? true}
                   showChannelBadge={!selectedChannelId}
                   commentsCount={post.comments_count || 0}
-                  onOpenThread={() => setThreadPost(post)}
                   isFollowUp={post.isFollowUp}
                 />
               ))}
@@ -169,15 +166,6 @@ export default function AppFeed() {
           </div>
         )}
       </main>
-
-      {/* Thread sheet */}
-      {threadPost && (
-        <FeedThread
-          post={threadPost}
-          open={!!threadPost}
-          onOpenChange={(open) => !open && setThreadPost(null)}
-        />
-      )}
     </div>
   );
 }

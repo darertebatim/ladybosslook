@@ -210,10 +210,11 @@ const App = () => (
             <Route path="/rathus" element={<RathusAssessment />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             
-            {/* Full-screen Chat - Outside of AppLayout so no tab bar */}
+            {/* Full-screen pages - Outside of AppLayout so no tab bar */}
             <Route path="/app/chat" element={<ProtectedRoute><AppChat /></ProtectedRoute>} />
             <Route path="/app/journal/new" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
             <Route path="/app/journal/:entryId" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
+            <Route path="/app/feed/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
             
             {/* App Routes */}
             <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
@@ -227,7 +228,6 @@ const App = () => (
               <Route path="player/:audioId" element={<AppAudioPlayer />} />
               
               <Route path="feed" element={<AppFeed />} />
-              <Route path="feed/post/:postId" element={<AppFeedPost />} />
               <Route path="journal" element={<AppJournal />} />
               <Route path="profile" element={<AppProfile />} />
             </Route>
