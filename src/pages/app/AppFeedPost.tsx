@@ -125,7 +125,7 @@ export default function AppFeedPost() {
   const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>();
   const { user } = useAuth();
-  const { effectiveInset, isKeyboardOpen } = useKeyboard();
+  const { isKeyboardOpen } = useKeyboard();
   const commentsEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [sending, setSending] = useState(false);
@@ -172,14 +172,8 @@ export default function AppFeedPost() {
     navigate('/app/feed');
   };
 
-  // Calculate input bar bottom offset (keyboard handling)
-  const inputBottomOffset = isKeyboardOpen ? effectiveInset : 0;
-  
-  // Calculate scroll padding to keep content visible above input
-  const INPUT_BAR_HEIGHT = 80;
-  const scrollPaddingBottom = isKeyboardOpen 
-    ? effectiveInset + INPUT_BAR_HEIGHT + 16 
-    : INPUT_BAR_HEIGHT + 24;
+  // Simple scroll padding - input bar is ~80px, plus buffer
+  const scrollPaddingBottom = 100;
 
   const isLoading = postLoading;
 
@@ -437,14 +431,10 @@ export default function AppFeedPost() {
         </div>
       </div>
 
-      {/* Fixed Input Bar - Reuses ChatInput */}
+      {/* Input Bar - Flexbox positioned like AppChat */}
       <div 
-        className="absolute left-0 right-0 border-t bg-background shrink-0"
-        style={{ 
-          bottom: inputBottomOffset,
-          paddingBottom: isKeyboardOpen ? 0 : 'env(safe-area-inset-bottom)',
-          transition: 'bottom 0.25s ease-out'
-        }}
+        className="shrink-0 bg-background/95 backdrop-blur-xl border-t"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <div className="px-2">
           <ChatInput
