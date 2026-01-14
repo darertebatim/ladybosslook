@@ -546,11 +546,11 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
         <Button
           variant="ghost"
           size="icon"
-          className="shrink-0 h-9 w-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+          className="shrink-0 h-11 w-11 rounded-full text-foreground/70 hover:text-foreground hover:bg-muted/80 transition-colors"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || uploading || !!attachment || isRecording}
         >
-          <Paperclip className="h-5 w-5" />
+          <Paperclip className="h-6 w-6" />
         </Button>
 
         {/* Telegram-style pill input - CENTER */}
@@ -592,8 +592,8 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           variant={isRecording ? "destructive" : "ghost"}
           size="icon"
           className={cn(
-            "shrink-0 h-9 w-9 rounded-full transition-colors",
-            !isRecording && "text-muted-foreground hover:text-foreground hover:bg-muted/80"
+            "shrink-0 h-11 w-11 rounded-full transition-colors",
+            !isRecording && "text-foreground/70 hover:text-foreground hover:bg-muted/80"
           )}
           onClick={isRecording ? stopRecording : startRecording}
           disabled={disabled || uploading || !!attachment}
@@ -601,7 +601,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           {isRecording ? (
             <Square className="h-4 w-4 fill-current" />
           ) : (
-            <Mic className="h-5 w-5" />
+            <Mic className="h-6 w-6" />
           )}
         </Button>
       </div>
