@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { FeedPost } from '@/hooks/useFeed';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +19,7 @@ interface FeedMessageProps {
   isFollowUp?: boolean;
 }
 
-export function FeedMessage({ 
+export const FeedMessage = memo(function FeedMessage({ 
   post, 
   allowReactions = true, 
   showChannelBadge = false,
@@ -123,6 +124,8 @@ export function FeedMessage({
               <img 
                 src={post.image_url} 
                 alt="" 
+                loading="lazy"
+                decoding="async"
                 className="w-full max-h-72 object-cover"
               />
             </div>
@@ -226,4 +229,4 @@ export function FeedMessage({
       )}
     </div>
   );
-}
+});

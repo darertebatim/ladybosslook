@@ -47,11 +47,14 @@ export const MiniPlayer = () => {
       )}
       onClick={() => navigate(`/app/player/${currentTrack.id}`)}
     >
-      {/* Progress bar at top */}
+      {/* Progress bar at top - CSS transition for smoothness */}
       <div className="h-1 bg-muted/30 w-full">
         <div 
           className="h-full bg-primary"
-          style={{ width: `${progress}%` }}
+          style={{ 
+            width: `${progress}%`,
+            transition: 'width 0.5s linear'
+          }}
         />
       </div>
 
@@ -61,7 +64,9 @@ export const MiniPlayer = () => {
           {currentTrack.coverImageUrl ? (
             <img 
               src={currentTrack.coverImageUrl} 
-              alt={currentTrack.title} 
+              alt={currentTrack.title}
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover" 
             />
           ) : (

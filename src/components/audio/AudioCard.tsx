@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -16,7 +17,7 @@ interface AudioCardProps {
   category: string;
 }
 
-export const AudioCard = ({
+export const AudioCard = memo(function AudioCard({
   id,
   title,
   description,
@@ -26,7 +27,7 @@ export const AudioCard = ({
   isLocked,
   progress = 0,
   category,
-}: AudioCardProps) => {
+}: AudioCardProps) {
   const navigate = useNavigate();
 
   const formatDuration = (seconds: number) => {
@@ -59,6 +60,8 @@ export const AudioCard = ({
           <img
             src={coverImageUrl}
             alt={title}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover"
           />
         ) : (
@@ -105,4 +108,4 @@ export const AudioCard = ({
       </CardContent>
     </Card>
   );
-};
+});
