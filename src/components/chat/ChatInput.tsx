@@ -156,37 +156,46 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    try {
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-    setError(null);
+      setError(null);
 
-    if (file.size > MAX_FILE_SIZE) {
-      setError("File size must be less than 10MB");
-      return;
-    }
+      if (file.size > MAX_FILE_SIZE) {
+        setError("File size must be less than 10MB");
+        return;
+      }
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      setError("File type not supported. Allowed: images, PDF, text, Word docs, audio");
-      return;
-    }
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        setError("File type not supported. Allowed: images, PDF, text, Word docs, audio");
+        return;
+      }
 
-    const newAttachment: Attachment = { file };
-    
-    // Create preview for images
-    if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAttachment({ ...newAttachment, preview: reader.result as string });
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setAttachment(newAttachment);
-    }
-
-    // Reset input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      const newAttachment: Attachment = { file };
+      
+      // Create preview for images
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setAttachment({ ...newAttachment, preview: reader.result as string });
+        };
+        reader.onerror = () => {
+          console.error('Error reading file for preview');
+          setAttachment(newAttachment);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setAttachment(newAttachment);
+      }
+    } catch (err) {
+      console.error('Error selecting file:', err);
+      setError("Failed to select file. Please try again.");
+    } finally {
+      // Reset input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
