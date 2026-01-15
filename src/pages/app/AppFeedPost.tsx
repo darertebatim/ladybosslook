@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { format, formatDistanceToNow, isToday, isYesterday, differenceInMinutes } from 'date-fns';
 import { FeedReactions } from '@/components/feed/FeedReactions';
 import { FeedActionButton } from '@/components/feed/FeedActionButton';
-import { ChatInput } from '@/components/chat/ChatInput';
+import { FeedReplyInput } from '@/components/feed/FeedReplyInput';
 import { SEOHead } from '@/components/SEOHead';
 import { cn } from '@/lib/utils';
 import { useBilingualText } from '@/components/ui/BilingualText';
@@ -436,12 +436,11 @@ export default function AppFeedPost() {
         className="shrink-0 bg-background/95 backdrop-blur-xl border-t"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <div className="px-2">
-          <ChatInput
+        <div className="px-4">
+          <FeedReplyInput
             onSend={handleSend}
             placeholder="Write a reply..."
             disabled={sending}
-            uploading={sending}
           />
         </div>
       </div>
