@@ -2,11 +2,9 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
-import { ActionSheet, ActionSheetButtonStyle } from "@capacitor/action-sheet";
-import { FilePicker } from "@capawesome/capacitor-file-picker";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Paperclip, X, Loader2, FileText, Image as ImageIcon, Mic, Square, Play, Pause, Trash2 } from "lucide-react";
+import { Send, X, Loader2, FileText, Image as ImageIcon, Mic, Square, Play, Pause, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 interface Attachment {
   file: File;
@@ -204,96 +202,8 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
     }
   };
 
-  // Custom iOS file picker that excludes camera option (and avoids Camera plugin entirely)
-  const handleNativeFilePick = async () => {
-    const base64ToBlob = (base64: string, mimeType: string) => {
-      const cleaned = base64.includes(",") ? base64.split(",")[1] : base64;
-      const byteChars = atob(cleaned);
-      const bytes = new Uint8Array(byteChars.length);
-      for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
-      return new Blob([bytes], { type: mimeType });
-    };
-
-    const filePickerCancelled = (err: unknown) => {
-      const msg = (err as any)?.message as string | undefined;
-      return !!msg && (msg.toLowerCase().includes("cancel") || msg.toLowerCase().includes("canceled") || msg.toLowerCase().includes("cancelled"));
-    };
-
-    try {
-      setError(null);
-
-      const result = await ActionSheet.showActions({
-        title: "Attach File",
-        message: "Choose an option",
-        options: [
-          { title: "Photo Library" },
-          { title: "Choose File" },
-          { title: "Cancel", style: ActionSheetButtonStyle.Cancel },
-        ],
-      });
-
-      // 0 = photos, 1 = files, 2 = cancel
-      if (result.index === 0) {
-        try {
-          const { files } = await FilePicker.pickImages({
-            readData: true,
-          });
-
-          const picked = files?.[0];
-          if (!picked) return;
-
-          const mimeType = picked.mimeType || "image/jpeg";
-          const name = picked.name || "photo.jpg";
-
-          if (!picked.data) {
-            setError("Could not read the selected photo.");
-            return;
-          }
-
-          const blob = base64ToBlob(picked.data, mimeType);
-          const file = new File([blob], name, { type: mimeType });
-          applySelectedFile(file);
-        } catch (err) {
-          if (filePickerCancelled(err)) return;
-          console.error("Error picking image:", err);
-          setError("Could not access photos. Please check permissions.");
-        }
-      } else if (result.index === 1) {
-        try {
-          // Intentionally exclude images here to prevent iOS showing camera-related options.
-          const nonImageTypes = ALLOWED_TYPES.filter((t) => !t.startsWith("image/"));
-
-          const { files } = await FilePicker.pickFiles({
-            limit: 1,
-            readData: true,
-            types: nonImageTypes,
-          });
-
-          const picked = files?.[0];
-          if (!picked) return;
-
-          const mimeType = picked.mimeType || "application/octet-stream";
-          const name = picked.name || "attachment";
-
-          if (!picked.data) {
-            setError("Could not read the selected file.");
-            return;
-          }
-
-          const blob = base64ToBlob(picked.data, mimeType);
-          const file = new File([blob], name, { type: mimeType });
-          applySelectedFile(file);
-        } catch (err) {
-          if (filePickerCancelled(err)) return;
-          console.error("Error picking file:", err);
-          setError("Could not open file picker. Please try again.");
-        }
-      }
-    } catch (err) {
-      console.error("Error showing action sheet:", err);
-      setError("Could not open attachment options. Please try again.");
-    }
-  };
+  // NOTE: File attachment temporarily disabled for this version
+  // Will be re-enabled in next version with proper implementation
 
   const removeAttachment = () => {
     setAttachment(null);
@@ -668,23 +578,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           className="hidden"
         />
         
-        {/* Attachment button - LEFT outside pill */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="shrink-0 h-11 w-11 rounded-full text-foreground/70 hover:text-foreground hover:bg-muted/80 transition-colors"
-          onClick={() => {
-            // Use custom picker on iOS to exclude camera option
-            if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios') {
-              handleNativeFilePick();
-            } else {
-              fileInputRef.current?.click();
-            }
-          }}
-          disabled={disabled || uploading || !!attachment || isRecording}
-        >
-          <Paperclip className="h-6 w-6" />
-        </Button>
+        {/* Attachment button - HIDDEN for this version, coming in next release */}
 
         {/* Telegram-style pill input - CENTER */}
         <div className="flex-1 flex items-center bg-muted/50 rounded-full border border-border/30 pl-4 pr-1">
