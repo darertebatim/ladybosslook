@@ -3,7 +3,7 @@ import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { ActionSheet, ActionSheetButtonStyle } from "@capacitor/action-sheet";
-import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
+import { FilePicker } from "@capawesome/capacitor-file-picker";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, X, Loader2, FileText, Image as ImageIcon, Mic, Square, Play, Pause, Trash2 } from "lucide-react";
@@ -156,115 +156,142 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
     }
   };
 
+  const applySelectedFile = (file: File) => {
+    setError(null);
+
+    if (file.size > MAX_FILE_SIZE) {
+      setError("File size must be less than 10MB");
+      return;
+    }
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setError("File type not supported. Allowed: images, PDF, text, Word docs, audio");
+      return;
+    }
+
+    const newAttachment: Attachment = { file };
+
+    // Create preview for images
+    if (file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAttachment({ ...newAttachment, preview: reader.result as string });
+      };
+      reader.onerror = () => {
+        console.error("Error reading file for preview");
+        setAttachment(newAttachment);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setAttachment(newAttachment);
+    }
+  };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const file = e.target.files?.[0];
       if (!file) return;
 
-      setError(null);
-
-      if (file.size > MAX_FILE_SIZE) {
-        setError("File size must be less than 10MB");
-        return;
-      }
-
-      if (!ALLOWED_TYPES.includes(file.type)) {
-        setError("File type not supported. Allowed: images, PDF, text, Word docs, audio");
-        return;
-      }
-
-      const newAttachment: Attachment = { file };
-      
-      // Create preview for images
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setAttachment({ ...newAttachment, preview: reader.result as string });
-        };
-        reader.onerror = () => {
-          console.error('Error reading file for preview');
-          setAttachment(newAttachment);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        setAttachment(newAttachment);
-      }
+      applySelectedFile(file);
     } catch (err) {
-      console.error('Error selecting file:', err);
+      console.error("Error selecting file:", err);
       setError("Failed to select file. Please try again.");
     } finally {
       // Reset input
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     }
   };
 
-  // Custom iOS file picker that excludes camera option
+  // Custom iOS file picker that excludes camera option (and avoids Camera plugin entirely)
   const handleNativeFilePick = async () => {
+    const base64ToBlob = (base64: string, mimeType: string) => {
+      const cleaned = base64.includes(",") ? base64.split(",")[1] : base64;
+      const byteChars = atob(cleaned);
+      const bytes = new Uint8Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
+      return new Blob([bytes], { type: mimeType });
+    };
+
+    const filePickerCancelled = (err: unknown) => {
+      const msg = (err as any)?.message as string | undefined;
+      return !!msg && (msg.toLowerCase().includes("cancel") || msg.toLowerCase().includes("canceled") || msg.toLowerCase().includes("cancelled"));
+    };
+
     try {
       setError(null);
-      
+
       const result = await ActionSheet.showActions({
-        title: 'Attach File',
-        message: 'Choose an option',
+        title: "Attach File",
+        message: "Choose an option",
         options: [
-          { title: 'Photo Library' },
-          { title: 'Choose File' },
-          { title: 'Cancel', style: ActionSheetButtonStyle.Cancel }
-        ]
+          { title: "Photo Library" },
+          { title: "Choose File" },
+          { title: "Cancel", style: ActionSheetButtonStyle.Cancel },
+        ],
       });
 
+      // 0 = photos, 1 = files, 2 = cancel
       if (result.index === 0) {
-        // Photo Library - use Camera plugin with gallery source (no camera)
         try {
-          const photo = await Camera.getPhoto({
-            resultType: CameraResultType.Uri,
-            source: CameraSource.Photos, // Only photos, no camera option
-            quality: 90
+          const { files } = await FilePicker.pickImages({
+            readData: true,
           });
-          
-          if (photo.webPath) {
-            // Fetch the image and convert to File
-            const response = await fetch(photo.webPath);
-            const blob = await response.blob();
-            const extension = photo.format || 'jpeg';
-            const file = new File([blob], `photo.${extension}`, { 
-              type: `image/${extension}` 
-            });
-            
-            if (file.size > MAX_FILE_SIZE) {
-              setError("File size must be less than 10MB");
-              return;
-            }
-            
-            // Create preview
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              setAttachment({ file, preview: reader.result as string });
-            };
-            reader.onerror = () => {
-              setAttachment({ file });
-            };
-            reader.readAsDataURL(file);
+
+          const picked = files?.[0];
+          if (!picked) return;
+
+          const mimeType = picked.mimeType || "image/jpeg";
+          const name = picked.name || "photo.jpg";
+
+          if (!picked.data) {
+            setError("Could not read the selected photo.");
+            return;
           }
-        } catch (err: any) {
-          // User cancelled or permission denied
-          if (err?.message?.includes('cancelled') || err?.message?.includes('canceled')) {
-            return; // User cancelled, not an error
-          }
-          console.error('Error picking photo:', err);
+
+          const blob = base64ToBlob(picked.data, mimeType);
+          const file = new File([blob], name, { type: mimeType });
+          applySelectedFile(file);
+        } catch (err) {
+          if (filePickerCancelled(err)) return;
+          console.error("Error picking image:", err);
           setError("Could not access photos. Please check permissions.");
         }
       } else if (result.index === 1) {
-        // Choose File - use native file input (will show Files app)
-        fileInputRef.current?.click();
+        try {
+          // Intentionally exclude images here to prevent iOS showing camera-related options.
+          const nonImageTypes = ALLOWED_TYPES.filter((t) => !t.startsWith("image/"));
+
+          const { files } = await FilePicker.pickFiles({
+            limit: 1,
+            readData: true,
+            types: nonImageTypes,
+          });
+
+          const picked = files?.[0];
+          if (!picked) return;
+
+          const mimeType = picked.mimeType || "application/octet-stream";
+          const name = picked.name || "attachment";
+
+          if (!picked.data) {
+            setError("Could not read the selected file.");
+            return;
+          }
+
+          const blob = base64ToBlob(picked.data, mimeType);
+          const file = new File([blob], name, { type: mimeType });
+          applySelectedFile(file);
+        } catch (err) {
+          if (filePickerCancelled(err)) return;
+          console.error("Error picking file:", err);
+          setError("Could not open file picker. Please try again.");
+        }
       }
-      // index === 2 is Cancel, do nothing
     } catch (err) {
-      console.error('Error showing action sheet:', err);
-      // Fallback to native file input
-      fileInputRef.current?.click();
+      console.error("Error showing action sheet:", err);
+      setError("Could not open attachment options. Please try again.");
     }
   };
 
