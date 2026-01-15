@@ -248,17 +248,17 @@ const AppCourseDetail = () => {
   };
 
   const handleAddToCalendar = async () => {
-    if (!round?.first_session_date || !program) return;
+    if (!nextSession || !program) return;
 
     const event = {
-      title: `${program.title} - First Session`,
-      description: getEventDescription(`Join us for the first session of ${program.title}`),
-      startDate: new Date(round.first_session_date),
+      title: nextSession.title,
+      description: getEventDescription(nextSession.description || `Session ${nextSession.session_number} of ${program.title}`),
+      startDate: new Date(nextSession.session_date),
       endDate: new Date(
-        new Date(round.first_session_date).getTime() +
-        (round.first_session_duration || 90) * 60000
+        new Date(nextSession.session_date).getTime() +
+        (nextSession.duration_minutes || 90) * 60000
       ),
-      location: getEventLocation(round.google_meet_link),
+      location: getEventLocation(nextSession.meeting_link || round?.google_meet_link),
     };
 
     // Native iOS/Android: Use native calendar integration
@@ -470,6 +470,16 @@ const AppCourseDetail = () => {
     
     setAddingSessionId(null);
   };
+
+  // Find the next upcoming session (first session with date in the future)
+  const getNextUpcomingSession = () => {
+    if (!dbSessions || dbSessions.length === 0) return null;
+    
+    const now = new Date();
+    return dbSessions.find(session => new Date(session.session_date) > now) || null;
+  };
+
+  const nextSession = getNextUpcomingSession();
 
   // Helper to determine if a session is in the past
   const isSessionPast = (sessionDate: string) => {
@@ -883,8 +893,8 @@ const AppCourseDetail = () => {
                     </Button>
                   )}
 
-                  {/* 4. Add First Session to Calendar */}
-                  {round.first_session_date && (
+                  {/* 4. Add Next Session to Calendar - only shows if there's an upcoming session */}
+                  {nextSession && (
                     <Button 
                       variant="secondary" 
                       size="lg" 
@@ -892,7 +902,7 @@ const AppCourseDetail = () => {
                       onClick={handleAddToCalendar}
                     >
                       <Calendar className="h-5 w-5 mr-2" />
-                      Add First Session
+                      {nextSession.session_number === 1 ? 'Add First Session' : `Add Session ${nextSession.session_number}`}
                     </Button>
                   )}
 
