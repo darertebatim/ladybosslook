@@ -12,8 +12,19 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell,
-  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, NotebookPen
+  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, NotebookPen, Trash2, AlertTriangle
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { JournalStats } from '@/components/app/JournalStats';
 import { checkCalendarPermission, requestCalendarPermission, isCalendarAvailable } from '@/lib/calendarIntegration';
 import { useNavigate, Link } from 'react-router-dom';
@@ -44,6 +55,11 @@ const AppProfile = () => {
   const [autoSyncCalendar, setAutoSyncCalendar] = useState(() => {
     return localStorage.getItem('autoSyncCalendar') === 'true';
   });
+  
+  // Delete account state
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
 
   // Editable profile state
@@ -276,6 +292,74 @@ const AppProfile = () => {
     setEditedPhone(profile?.phone || '');
     setEditedCity(profile?.city || '');
     setIsEditingProfile(false);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'DELETE') {
+      toast({
+        title: 'Confirmation Required',
+        description: 'Please type DELETE to confirm account deletion',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsDeletingAccount(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: 'Error',
+          description: 'You must be logged in to delete your account',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('delete-own-account', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Delete account error:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to delete account. Please contact support.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (data?.success) {
+        toast({
+          title: 'Account Deleted',
+          description: 'Your account has been permanently deleted',
+        });
+        // Sign out and redirect
+        await signOut();
+        navigate('/auth');
+      } else {
+        toast({
+          title: 'Error',
+          description: data?.error || 'Failed to delete account',
+          variant: 'destructive',
+        });
+      }
+    } catch (error: any) {
+      console.error('Delete account error:', error);
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeletingAccount(false);
+      setShowDeleteDialog(false);
+      setDeleteConfirmText('');
+    }
   };
 
   const handleSignOut = async () => {
@@ -1227,6 +1311,67 @@ const AppProfile = () => {
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
             </Button>
+            
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Account
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                    <AlertTriangle className="h-5 w-5" />
+                    Delete Your Account?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="space-y-3">
+                    <p>
+                      This action is <strong>permanent and cannot be undone</strong>. 
+                      All your data will be immediately deleted, including:
+                    </p>
+                    <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
+                      <li>Your profile and account information</li>
+                      <li>All course enrollments and progress</li>
+                      <li>Journal entries and chat history</li>
+                      <li>Audio bookmarks and listening history</li>
+                      <li>Wallet balance and transaction history</li>
+                    </ul>
+                    <div className="pt-2">
+                      <Label htmlFor="deleteConfirm" className="text-sm font-medium">
+                        Type <span className="font-bold text-destructive">DELETE</span> to confirm:
+                      </Label>
+                      <Input
+                        id="deleteConfirm"
+                        value={deleteConfirmText}
+                        onChange={(e) => setDeleteConfirmText(e.target.value.toUpperCase())}
+                        placeholder="Type DELETE"
+                        className="mt-2"
+                        disabled={isDeletingAccount}
+                      />
+                    </div>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel 
+                    disabled={isDeletingAccount}
+                    onClick={() => setDeleteConfirmText('')}
+                  >
+                    Cancel
+                  </AlertDialogCancel>
+                  <Button
+                    variant="destructive"
+                    onClick={handleDeleteAccount}
+                    disabled={deleteConfirmText !== 'DELETE' || isDeletingAccount}
+                  >
+                    {isDeletingAccount ? 'Deleting...' : 'Delete My Account'}
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardContent>
         </Card>
       </div>

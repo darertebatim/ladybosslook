@@ -15,22 +15,26 @@ LadyBoss Academy is a free educational platform offering personal and profession
 **Key Features to Test:**
 
 1. **Sign in** → Access dashboard with enrolled courses displayed
-2. **Browse tab** → View all available free courses and test enrolling in additional courses
-3. **Courses tab** → View enrolled courses with materials and playlists
-4. **Audio Player tab** → Browse and play audio playlists (supports background playback)
-5. **Push Notifications (NEW)** → 
+2. **Sign in with Apple/Google** → Quick authentication options on the login screen
+3. **Browse tab** → View all available free courses and test enrolling in additional courses
+4. **Courses tab** → View enrolled courses with materials and playlists
+5. **Audio Player tab** → Browse and play audio playlists (supports background playback)
+6. **Community Feed** → Share updates, react to posts, and engage with other students
+7. **Daily Journal** → Create journal entries with mood tracking and writing prompts
+8. **Push Notifications** → 
    - On first launch, you'll see a prompt to enable notifications
    - Grant permission to receive course updates and announcements
    - Navigate to Profile tab → Push Notifications section to manage settings
-   - Test receiving notifications for course updates
-6. **Course Details** → Tap any enrolled course to view:
-   - Course materials (downloadable PDFs)
-   - Audio playlists (if available)
-   - Course announcements
-   - Support contact options
-7. **Enroll Free** → From Browse tab, tap any course and use "Enroll Free" button (instant enrollment, no payment)
-8. **Profile tab** → View user information, manage push notification settings, and logout
-9. **Forgot Password** → On login screen, tap "Forgot password?" to reset your password via email
+9. **Chat Support** → Send messages and attachments to support team
+10. **Course Details** → Tap any enrolled course to view:
+    - Course materials (downloadable PDFs)
+    - Audio playlists (if available)
+    - Course announcements
+    - Support contact options
+11. **Enroll Free** → From Browse tab, tap any course and use "Enroll Free" button (instant enrollment, no payment)
+12. **Profile tab** → View user information, manage settings, and account options
+13. **Delete Account** → Profile tab → Actions section → "Delete Account" button with confirmation
+14. **Forgot Password** → On login screen, tap "Forgot password?" to reset your password via email
 
 **Content & Materials:**
 All courses include:
@@ -47,7 +51,19 @@ All courses include:
 - **Telegram (@ladybosslook):** Optional student support communication channel (users must choose to contact)
 
 **Permissions Requested:**
-- **Push Notifications (NEW in v1.0.1):** Users receive important course updates, announcements, and educational reminders. On first app launch, users see a prompt to enable notifications. Users can manage notification preferences anytime in Profile → Push Notifications settings. This feature enhances the learning experience by keeping students informed about course content and updates.
+- **Push Notifications:** Users receive important course updates, announcements, and educational reminders. On first app launch, users see a prompt to enable notifications. Users can manage notification preferences anytime in Profile → Push Notifications settings.
+- **Camera (optional):** Used only when users choose to attach photos/videos in Chat support. No photos are taken without explicit user action.
+- **Microphone (optional):** Used only for voice messages in Chat support. Requires explicit user action.
+- **Calendar (optional):** Used to add course sessions to the user's calendar. Requires user to tap "Add to Calendar" in course details.
+
+**Account Deletion (Guideline 5.1.1(v)):**
+Users can delete their account at any time:
+1. Go to **Profile tab**
+2. Scroll down to **Actions section**  
+3. Tap **"Delete Account"** button
+4. Read the warning about permanent data deletion
+5. Type **DELETE** to confirm
+6. Account and all associated data are immediately and permanently removed
 
 **Privacy & Data:**
 - User data stored securely via Supabase backend
@@ -91,12 +107,14 @@ The app includes persistent audio playback for educational content. This is the 
 
 This background audio capability is essential for users to listen to educational audio courses and podcasts while multitasking, driving, or exercising - a core use case for our learning platform.
 
-**What's New in Version 1.0.6:**
-- Improved chat experience with haptic feedback for better interactivity
-- Enhanced journal entry saving with dedicated Done button
-- Better chat scrolling with scroll-to-bottom button for long conversations
-- Community feed reply improvements with keyboard stability fixes
-- Performance optimizations and bug fixes
+**What's New in Version 1.0.7:**
+- NEW: Account deletion - Users can permanently delete their account from Profile → Actions
+- NEW: Sign in with Apple & Google - Quick and secure authentication options
+- NEW: Community Feed - Connect with fellow students and share experiences
+- NEW: Daily Journal - Private journaling with mood tracking and writing prompts
+- Background Audio & MiniPlayer - Persistent audio playback with lock screen controls
+- Enhanced Chat - Improved attachment handling and error recovery
+- Performance improvements and bug fixes
 
 Thank you for reviewing LadyBoss Academy!
 
