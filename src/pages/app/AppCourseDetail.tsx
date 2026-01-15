@@ -855,7 +855,7 @@ const AppCourseDetail = () => {
                       onClick={() => navigate(`/app/feed?channel=${roundChannel.id}`)}
                     >
                       <MessageCircle className="h-5 w-5 mr-2" />
-                      Community
+                      Visit Community
                       {channelUnreadCount && channelUnreadCount > 0 && (
                         <Badge 
                           variant="destructive" 
