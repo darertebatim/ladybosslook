@@ -2,11 +2,12 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
+import { ActionSheet, ActionSheetButtonStyle } from "@capacitor/action-sheet";
+import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, X, Loader2, FileText, Image as ImageIcon, Mic, Square, Play, Pause, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 interface Attachment {
   file: File;
   preview?: string;
@@ -196,6 +197,74 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+    }
+  };
+
+  // Custom iOS file picker that excludes camera option
+  const handleNativeFilePick = async () => {
+    try {
+      setError(null);
+      
+      const result = await ActionSheet.showActions({
+        title: 'Attach File',
+        message: 'Choose an option',
+        options: [
+          { title: 'Photo Library' },
+          { title: 'Choose File' },
+          { title: 'Cancel', style: ActionSheetButtonStyle.Cancel }
+        ]
+      });
+
+      if (result.index === 0) {
+        // Photo Library - use Camera plugin with gallery source (no camera)
+        try {
+          const photo = await Camera.getPhoto({
+            resultType: CameraResultType.Uri,
+            source: CameraSource.Photos, // Only photos, no camera option
+            quality: 90
+          });
+          
+          if (photo.webPath) {
+            // Fetch the image and convert to File
+            const response = await fetch(photo.webPath);
+            const blob = await response.blob();
+            const extension = photo.format || 'jpeg';
+            const file = new File([blob], `photo.${extension}`, { 
+              type: `image/${extension}` 
+            });
+            
+            if (file.size > MAX_FILE_SIZE) {
+              setError("File size must be less than 10MB");
+              return;
+            }
+            
+            // Create preview
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              setAttachment({ file, preview: reader.result as string });
+            };
+            reader.onerror = () => {
+              setAttachment({ file });
+            };
+            reader.readAsDataURL(file);
+          }
+        } catch (err: any) {
+          // User cancelled or permission denied
+          if (err?.message?.includes('cancelled') || err?.message?.includes('canceled')) {
+            return; // User cancelled, not an error
+          }
+          console.error('Error picking photo:', err);
+          setError("Could not access photos. Please check permissions.");
+        }
+      } else if (result.index === 1) {
+        // Choose File - use native file input (will show Files app)
+        fileInputRef.current?.click();
+      }
+      // index === 2 is Cancel, do nothing
+    } catch (err) {
+      console.error('Error showing action sheet:', err);
+      // Fallback to native file input
+      fileInputRef.current?.click();
     }
   };
 
@@ -577,7 +646,14 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           variant="ghost"
           size="icon"
           className="shrink-0 h-11 w-11 rounded-full text-foreground/70 hover:text-foreground hover:bg-muted/80 transition-colors"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => {
+            // Use custom picker on iOS to exclude camera option
+            if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios') {
+              handleNativeFilePick();
+            } else {
+              fileInputRef.current?.click();
+            }
+          }}
           disabled={disabled || uploading || !!attachment || isRecording}
         >
           <Paperclip className="h-6 w-6" />
