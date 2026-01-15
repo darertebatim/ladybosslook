@@ -9,7 +9,7 @@ import { JournalSkeleton } from '@/components/app/skeletons/JournalSkeleton';
 import { JournalReminderSettings } from '@/components/app/JournalReminderSettings';
 import { SEOHead } from '@/components/SEOHead';
 import { format, startOfDay } from 'date-fns';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter, SheetClose } from '@/components/ui/sheet';
 import { Capacitor } from '@capacitor/core';
 
 const AppJournal = () => {
@@ -91,13 +91,22 @@ const AppJournal = () => {
                     <Bell className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="bottom" className="h-auto">
+                <SheetContent 
+                  side="bottom" 
+                  className="h-auto"
+                  style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+                >
                   <SheetHeader>
                     <SheetTitle>Daily Reminder</SheetTitle>
                   </SheetHeader>
                   <div className="py-4">
                     <JournalReminderSettings />
                   </div>
+                  <SheetFooter className="pt-2">
+                    <SheetClose asChild>
+                      <Button className="w-full">Done</Button>
+                    </SheetClose>
+                  </SheetFooter>
                 </SheetContent>
               </Sheet>
             )}

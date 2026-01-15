@@ -140,9 +140,11 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
               disabled={updateSettingsMutation.isPending}
             >
               <SelectTrigger className="w-[120px]">
-                <SelectValue />
+                <SelectValue placeholder="Select time">
+                  {REMINDER_TIMES.find(t => t.value === reminderTime)?.label}
+                </SelectValue>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[60] bg-background">
                 {REMINDER_TIMES.map((time) => (
                   <SelectItem key={time.value} value={time.value}>
                     {time.label}
