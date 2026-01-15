@@ -1,15 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Headphones, List, Lock } from "lucide-react";
+import { ArrowLeft, Headphones, List, Lock, CheckCircle, Play } from "lucide-react";
 import { AudioControls } from "@/components/audio/AudioControls";
 import { ProgressBar } from "@/components/audio/ProgressBar";
 import { BookmarkButton } from "@/components/audio/BookmarkButton";
 import { BookmarksList } from "@/components/audio/BookmarksList";
+import { TrackCompletionCelebration } from "@/components/audio/TrackCompletionCelebration";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
   SheetContent,
@@ -18,12 +20,14 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { getTrackAvailabilityWithCountdown } from "@/lib/dripContent";
-import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { useAudioPlayer, TrackInfo } from "@/contexts/AudioPlayerContext";
 import { useBookmarks } from "@/hooks/useBookmarks";
+import { cn } from "@/lib/utils";
 
 export default function AppAudioPlayer() {
   const { audioId } = useParams();
   const navigate = useNavigate();
+  const [showCelebration, setShowCelebration] = useState(false);
   
   // Use global audio player context
   const {
@@ -33,6 +37,8 @@ export default function AppAudioPlayer() {
     playbackRate,
     currentTrack,
     isLoading: audioLoading,
+    nextTrack,
+    hasNextTrack,
     playTrack,
     pause,
     resume,
@@ -40,6 +46,9 @@ export default function AppAudioPlayer() {
     setPlaybackRate,
     skipForward,
     skipBack,
+    setPlaylistContext,
+    setOnTrackComplete,
+    playNextTrack,
   } = useAudioPlayer();
 
   // Bookmarks
@@ -76,10 +85,12 @@ export default function AppAudioPlayer() {
         .select(`
           playlist_id,
           sort_order,
+          drip_delay_days,
           audio_playlists (
             id,
             name,
-            category
+            category,
+            cover_image_url
           )
         `)
         .eq('audio_id', audioId)
@@ -104,7 +115,9 @@ export default function AppAudioPlayer() {
           audio_content (
             id,
             title,
-            duration_seconds
+            duration_seconds,
+            cover_image_url,
+            file_url
           )
         `)
         .eq('playlist_id', playlistInfo!.playlist_id)
@@ -146,7 +159,7 @@ export default function AppAudioPlayer() {
   });
 
   // Fetch saved progress
-  const { data: savedProgress } = useQuery({
+  const { data: savedProgress, refetch: refetchProgress } = useQuery({
     queryKey: ['audio-progress', audioId],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -174,6 +187,48 @@ export default function AppAudioPlayer() {
     );
   };
 
+  // Calculate current track index
+  const currentTrackIndex = playlistTracks?.findIndex(t => t.audio_id === audioId) ?? -1;
+
+  // Build playlist context for auto-play
+  const playlistContextTracks: TrackInfo[] = useMemo(() => {
+    if (!playlistTracks || !playlistInfo) return [];
+    
+    return playlistTracks.map((track, index) => ({
+      id: track.audio_content.id,
+      title: track.audio_content.title,
+      coverImageUrl: track.audio_content.cover_image_url || playlistInfo.audio_playlists?.cover_image_url || undefined,
+      playlistId: playlistInfo.playlist_id,
+      playlistName: playlistInfo.audio_playlists?.name,
+      trackPosition: `${index + 1}/${playlistTracks.length}`,
+      fileUrl: track.audio_content.file_url,
+      duration: track.audio_content.duration_seconds,
+      dripDelayDays: track.drip_delay_days || 0,
+    }));
+  }, [playlistTracks, playlistInfo]);
+
+  // Set playlist context whenever it changes
+  useEffect(() => {
+    if (playlistContextTracks.length > 0 && currentTrackIndex >= 0) {
+      setPlaylistContext({
+        tracks: playlistContextTracks,
+        currentIndex: currentTrackIndex,
+        roundStartDate: userRound?.start_date,
+        roundDripOffset: userRound?.drip_offset_days || 0,
+      });
+    }
+  }, [playlistContextTracks, currentTrackIndex, userRound, setPlaylistContext]);
+
+  // Setup completion callback
+  useEffect(() => {
+    setOnTrackComplete(() => {
+      setShowCelebration(true);
+      refetchProgress();
+    });
+    
+    return () => setOnTrackComplete(null);
+  }, [setOnTrackComplete, refetchProgress]);
+
   // Scroll to top on load
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -182,8 +237,6 @@ export default function AppAudioPlayer() {
   // Start playing when audio data is loaded
   useEffect(() => {
     if (audio && audioId && (!currentTrack || currentTrack.id !== audioId)) {
-      const currentTrackIndex = playlistTracks?.findIndex(t => t.audio_id === audioId) ?? -1;
-      
       playTrack({
         id: audio.id,
         title: audio.title,
@@ -198,6 +251,19 @@ export default function AppAudioPlayer() {
       }, savedProgress?.current_position_seconds || 0);
     }
   }, [audio, audioId, playlistInfo, playlistTracks, savedProgress]);
+
+  // Handle celebration close and auto-play
+  const handleCelebrationClose = () => {
+    setShowCelebration(false);
+  };
+
+  const handlePlayNext = () => {
+    playNextTrack();
+    // Navigate to next track page
+    if (nextTrack) {
+      navigate(`/app/player/${nextTrack.id}`);
+    }
+  };
 
   // Playback controls
   const handlePlayPause = () => {
@@ -224,14 +290,17 @@ export default function AppAudioPlayer() {
     setPlaybackRate(rate);
   };
 
-  // Track navigation - check availability for drip content
-  const currentTrackIndex = playlistTracks?.findIndex(t => t.audio_id === audioId) ?? -1;
-
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Check if current track is completed
+  const isTrackCompleted = savedProgress?.completed === true;
+
+  // Check if this is the last track in playlist
+  const isPlaylistComplete = !hasNextTrack && playlistTracks && currentTrackIndex === playlistTracks.length - 1;
 
   if (isLoading) {
     return (
@@ -259,6 +328,19 @@ export default function AppAudioPlayer() {
 
   return (
     <div className="h-[100dvh] bg-background relative overflow-hidden flex flex-col">
+      {/* Track Completion Celebration */}
+      <TrackCompletionCelebration
+        isOpen={showCelebration}
+        onClose={handleCelebrationClose}
+        trackTitle={audio.title}
+        nextTrack={nextTrack ? {
+          title: nextTrack.title,
+          coverImageUrl: nextTrack.coverImageUrl,
+        } : null}
+        onPlayNext={handlePlayNext}
+        isPlaylistComplete={isPlaylistComplete}
+      />
+
       {/* Blurred Background with Cover Art */}
       {audio.cover_image_url && (
         <div className="fixed inset-0 z-0">
@@ -395,6 +477,13 @@ export default function AppAudioPlayer() {
             {audio.description && (
               <p className="text-muted-foreground text-sm line-clamp-1 mt-1">{audio.description}</p>
             )}
+            {/* Completed Badge */}
+            {isTrackCompleted && (
+              <Badge variant="secondary" className="mt-2 gap-1 bg-green-500/10 text-green-600 border-green-500/20">
+                <CheckCircle className="h-3 w-3" />
+                Completed
+              </Badge>
+            )}
           </div>
 
           {/* Progress Bar */}
@@ -419,6 +508,42 @@ export default function AppAudioPlayer() {
               variant={audio.cover_image_url ? "glass" : "default"}
             />
           </div>
+
+          {/* Up Next Preview */}
+          {nextTrack && (
+            <button
+              onClick={() => navigate(`/app/player/${nextTrack.id}`)}
+              className={cn(
+                "w-full mt-2 p-3 rounded-xl",
+                "bg-muted/30 hover:bg-muted/50 transition-colors",
+                "border border-border/30"
+              )}
+            >
+              <p className="text-xs text-muted-foreground mb-2 text-left">Up Next</p>
+              <div className="flex items-center gap-3">
+                {nextTrack.coverImageUrl ? (
+                  <img
+                    src={nextTrack.coverImageUrl}
+                    alt={nextTrack.title}
+                    className="h-10 w-10 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Play className="h-4 w-4 text-primary" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium truncate">{nextTrack.title}</p>
+                  {nextTrack.duration && (
+                    <p className="text-xs text-muted-foreground">
+                      {formatDuration(nextTrack.duration)}
+                    </p>
+                  )}
+                </div>
+                <Play className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </button>
+          )}
         </div>
       </div>
     </div>
