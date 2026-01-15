@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { updateMusicControls, destroyMusicControls, setupMusicControlsListeners } from "@/lib/musicControls";
 import { Capacitor } from "@capacitor/core";
 
-interface TrackInfo {
+export interface TrackInfo {
   id: string;
   title: string;
   coverImageUrl?: string;
@@ -13,6 +13,14 @@ interface TrackInfo {
   trackPosition?: string;
   fileUrl: string;
   duration?: number;
+  dripDelayDays?: number;
+}
+
+interface PlaylistContext {
+  tracks: TrackInfo[];
+  currentIndex: number;
+  roundStartDate?: string | null;
+  roundDripOffset?: number;
 }
 
 interface AudioPlayerContextType {
@@ -23,6 +31,8 @@ interface AudioPlayerContextType {
   playbackRate: number;
   currentTrack: TrackInfo | null;
   isLoading: boolean;
+  nextTrack: TrackInfo | null;
+  hasNextTrack: boolean;
   
   // Actions
   playTrack: (track: TrackInfo, startPosition?: number) => void;
@@ -33,6 +43,9 @@ interface AudioPlayerContextType {
   skipForward: (seconds?: number) => void;
   skipBack: (seconds?: number) => void;
   stop: () => void;
+  setPlaylistContext: (context: PlaylistContext) => void;
+  setOnTrackComplete: (callback: (() => void) | null) => void;
+  playNextTrack: () => void;
 }
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | null>(null);
@@ -42,6 +55,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const { user } = useAuth();
   const saveProgressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastTimeUpdateRef = useRef<number>(0);
+  const onTrackCompleteRef = useRef<(() => void) | null>(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -49,6 +63,37 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const [playbackRate, setPlaybackRateState] = useState(1);
   const [currentTrack, setCurrentTrack] = useState<TrackInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [playlistContext, setPlaylistContextState] = useState<PlaylistContext | null>(null);
+
+  // Calculate next available track
+  const getNextAvailableTrack = useCallback((): TrackInfo | null => {
+    if (!playlistContext || playlistContext.currentIndex < 0) return null;
+    
+    const { tracks, currentIndex, roundStartDate, roundDripOffset } = playlistContext;
+    
+    for (let i = currentIndex + 1; i < tracks.length; i++) {
+      const track = tracks[i];
+      const dripDays = track.dripDelayDays || 0;
+      
+      // Check availability if there's drip content
+      if (dripDays > 0 && roundStartDate) {
+        const effectiveDripDays = dripDays - (roundDripOffset || 0);
+        const startDate = new Date(roundStartDate);
+        const availableDate = new Date(startDate);
+        availableDate.setDate(availableDate.getDate() + effectiveDripDays);
+        
+        if (new Date() < availableDate) {
+          continue; // Skip locked tracks
+        }
+      }
+      
+      return track;
+    }
+    return null;
+  }, [playlistContext]);
+
+  const nextTrack = getNextAvailableTrack();
+  const hasNextTrack = !!nextTrack;
 
   // Initialize audio element
   useEffect(() => {
@@ -72,11 +117,24 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       setDuration(audio.duration || 0);
     };
     
-    const handleEnded = () => {
+    const handleEnded = async () => {
       setIsPlaying(false);
-      if (Capacitor.isNativePlatform()) {
-        destroyMusicControls();
+      
+      // Save final completion state
+      if (user?.id && currentTrack) {
+        await supabase.from("audio_progress").upsert({
+          user_id: user.id,
+          audio_id: currentTrack.id,
+          current_position_seconds: Math.floor(audio.duration || 0),
+          completed: true,
+          last_played_at: new Date().toISOString(),
+        }, {
+          onConflict: "user_id,audio_id",
+        });
       }
+      
+      // Trigger completion callback (for celebration)
+      onTrackCompleteRef.current?.();
     };
     
     const handlePlay = () => setIsPlaying(true);
@@ -111,7 +169,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       audio.removeEventListener("loadstart", handleLoadStart);
       audio.removeEventListener("canplay", handleCanPlay);
     };
-  }, []);
+  }, [user?.id, currentTrack]);
 
   // Save progress periodically
   useEffect(() => {
@@ -152,9 +210,9 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       duration: Math.floor(duration),
       elapsed: Math.floor(currentTime),
       hasPrev: false,
-      hasNext: false,
+      hasNext: hasNextTrack,
     });
-  }, [currentTrack, isPlaying, duration, currentTime]);
+  }, [currentTrack, isPlaying, duration, currentTime, hasNextTrack]);
 
   const playTrack = useCallback(async (track: TrackInfo, startPosition?: number) => {
     if (!audioRef.current) return;
@@ -231,11 +289,37 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     setCurrentTime(0);
     setDuration(0);
     setIsPlaying(false);
+    setPlaylistContextState(null);
     
     if (Capacitor.isNativePlatform()) {
       destroyMusicControls();
     }
   }, []);
+
+  const setPlaylistContext = useCallback((context: PlaylistContext) => {
+    setPlaylistContextState(context);
+  }, []);
+
+  const setOnTrackComplete = useCallback((callback: (() => void) | null) => {
+    onTrackCompleteRef.current = callback;
+  }, []);
+
+  const playNextTrack = useCallback(() => {
+    if (nextTrack) {
+      playTrack(nextTrack, 0);
+      
+      // Update playlist context index
+      if (playlistContext) {
+        const newIndex = playlistContext.tracks.findIndex(t => t.id === nextTrack.id);
+        if (newIndex >= 0) {
+          setPlaylistContextState({
+            ...playlistContext,
+            currentIndex: newIndex,
+          });
+        }
+      }
+    }
+  }, [nextTrack, playTrack, playlistContext]);
 
   return (
     <AudioPlayerContext.Provider
@@ -246,6 +330,8 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         playbackRate,
         currentTrack,
         isLoading,
+        nextTrack,
+        hasNextTrack,
         playTrack,
         pause,
         resume,
@@ -254,6 +340,9 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         skipForward,
         skipBack,
         stop,
+        setPlaylistContext,
+        setOnTrackComplete,
+        playNextTrack,
       }}
     >
       {children}

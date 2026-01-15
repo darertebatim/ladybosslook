@@ -1,4 +1,4 @@
-import { Play, Pause, Headphones, X } from "lucide-react";
+import { Play, Pause, Headphones, X, SkipForward } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 import { AudioEqualizer } from "./AudioEqualizer";
@@ -11,9 +11,12 @@ export const MiniPlayer = () => {
     isPlaying, 
     currentTime, 
     duration, 
+    nextTrack,
+    hasNextTrack,
     pause, 
     resume, 
-    stop 
+    stop,
+    playNextTrack,
   } = useAudioPlayer();
 
   if (!currentTrack) return null;
