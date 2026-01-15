@@ -902,7 +902,7 @@ const AppCourseDetail = () => {
                       onClick={handleAddToCalendar}
                     >
                       <Calendar className="h-5 w-5 mr-2" />
-                      {nextSession.session_number === 1 ? 'Add First Session' : `Add Session ${nextSession.session_number}`}
+                      {nextSession.session_number === 1 ? 'Add First Session to Calendar' : `Add Session ${nextSession.session_number} to Calendar`}
                     </Button>
                   )}
 
