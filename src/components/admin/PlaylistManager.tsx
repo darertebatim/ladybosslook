@@ -14,9 +14,9 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Trash2, Plus, Pencil, List, BookOpen, Eye, EyeOff } from "lucide-react";
+import { Loader2, Trash2, Plus, Pencil, List, Layers, Eye, EyeOff } from "lucide-react";
 import { PlaylistTracksManager } from "./PlaylistTracksManager";
-import { PlaylistSupplementsManager } from "./PlaylistSupplementsManager";
+import { PlaylistModulesManager } from "./PlaylistModulesManager";
 import { usePrograms } from "@/hooks/usePrograms";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -35,6 +35,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+type DisplayMode = 'tracks' | 'modules' | 'both';
+
 interface PlaylistFormData {
   name: string;
   description: string;
@@ -42,6 +44,7 @@ interface PlaylistFormData {
   is_free: boolean;
   category: 'audiobook' | 'course_supplement' | 'podcast';
   sort_order: number;
+  display_mode: DisplayMode;
 }
 
 interface PlaylistFormProps {
@@ -101,6 +104,28 @@ const PlaylistForm = ({
           <SelectItem value="podcast">Podcast</SelectItem>
         </SelectContent>
       </Select>
+    </div>
+
+    <div>
+      <Label htmlFor="playlist_display_mode">Display Mode *</Label>
+      <Select
+        value={formData.display_mode}
+        onValueChange={(value: DisplayMode) => 
+          setFormData({ ...formData, display_mode: value })
+        }
+      >
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="tracks">Show Tracks (Traditional playlist)</SelectItem>
+          <SelectItem value="modules">Show Modules (Course mode)</SelectItem>
+          <SelectItem value="both">Show Both</SelectItem>
+        </SelectContent>
+      </Select>
+      <p className="text-xs text-muted-foreground mt-1">
+        "Modules" mode shows a unified list of audio, video, PDF, and links with drip scheduling
+      </p>
     </div>
 
     <div>
@@ -166,25 +191,27 @@ export const PlaylistManager = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingPlaylist, setEditingPlaylist] = useState<any>(null);
   const [isTracksDialogOpen, setIsTracksDialogOpen] = useState(false);
-  const [isSupplementsDialogOpen, setIsSupplementsDialogOpen] = useState(false);
+  const [isModulesDialogOpen, setIsModulesDialogOpen] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState<any>(null);
 
-  const [createFormData, setCreateFormData] = useState({
+  const [createFormData, setCreateFormData] = useState<PlaylistFormData>({
     name: "",
     description: "",
     program_slug: "",
     is_free: true,
-    category: "audiobook" as 'audiobook' | 'course_supplement' | 'podcast',
+    category: "audiobook",
     sort_order: 0,
+    display_mode: "tracks",
   });
 
-  const [editFormData, setEditFormData] = useState({
+  const [editFormData, setEditFormData] = useState<PlaylistFormData>({
     name: "",
     description: "",
     program_slug: "",
     is_free: true,
-    category: "audiobook" as 'audiobook' | 'course_supplement' | 'podcast',
+    category: "audiobook",
     sort_order: 0,
+    display_mode: "tracks",
   });
 
   // Fetch playlists with item count
@@ -216,6 +243,7 @@ export const PlaylistManager = () => {
           program_slug: createFormData.program_slug || null,
           is_free: createFormData.is_free,
           sort_order: createFormData.sort_order,
+          display_mode: createFormData.display_mode,
         });
 
       if (error) throw error;
@@ -300,6 +328,7 @@ export const PlaylistManager = () => {
       is_free: true,
       category: "audiobook",
       sort_order: 0,
+      display_mode: "tracks",
     });
   };
 
@@ -311,6 +340,7 @@ export const PlaylistManager = () => {
       is_free: true,
       category: "audiobook",
       sort_order: 0,
+      display_mode: "tracks",
     });
   };
 
@@ -333,6 +363,7 @@ export const PlaylistManager = () => {
       is_free: playlist.is_free,
       category: playlist.category || "audiobook",
       sort_order: playlist.sort_order,
+      display_mode: playlist.display_mode || "tracks",
     });
     setIsEditDialogOpen(true);
   };
@@ -361,6 +392,7 @@ export const PlaylistManager = () => {
         program_slug: editFormData.program_slug || null,
         is_free: editFormData.is_free,
         sort_order: editFormData.sort_order,
+        display_mode: editFormData.display_mode,
       },
     });
   };
@@ -375,13 +407,13 @@ export const PlaylistManager = () => {
     setSelectedPlaylist(null);
   };
 
-  const handleOpenSupplements = (playlist: any) => {
+  const handleOpenModules = (playlist: any) => {
     setSelectedPlaylist(playlist);
-    setIsSupplementsDialogOpen(true);
+    setIsModulesDialogOpen(true);
   };
 
-  const handleCloseSupplements = () => {
-    setIsSupplementsDialogOpen(false);
+  const handleCloseModules = () => {
+    setIsModulesDialogOpen(false);
     setSelectedPlaylist(null);
   };
 
@@ -456,10 +488,10 @@ export const PlaylistManager = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleOpenSupplements(playlist)}
-                      title="Manage supplements"
+                      onClick={() => handleOpenModules(playlist)}
+                      title="Manage modules"
                     >
-                      <BookOpen className="h-4 w-4" />
+                      <Layers className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -525,11 +557,11 @@ export const PlaylistManager = () => {
             isOpen={isTracksDialogOpen}
             onClose={handleCloseTracks}
           />
-          <PlaylistSupplementsManager
+          <PlaylistModulesManager
             playlistId={selectedPlaylist.id}
             playlistName={selectedPlaylist.name}
-            isOpen={isSupplementsDialogOpen}
-            onClose={handleCloseSupplements}
+            isOpen={isModulesDialogOpen}
+            onClose={handleCloseModules}
           />
         </>
       )}
