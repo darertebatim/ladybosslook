@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -39,7 +39,8 @@ import {
   Calendar,
   Zap,
   Save,
-  GripVertical
+  GripVertical,
+  ListPlus
 } from "lucide-react";
 import { DRIP_SCHEDULE_TEMPLATES } from "@/lib/dripContent";
 
@@ -98,6 +99,31 @@ export const PlaylistModulesManager = ({
     enabled: isOpen,
   });
 
+  // Fetch playlist tracks to enable "Import All Tracks"
+  const { data: playlistTracks } = useQuery({
+    queryKey: ['playlist-tracks', playlistId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlist_items')
+        .select(`
+          id,
+          sort_order,
+          drip_delay_days,
+          audio_content (
+            id,
+            title,
+            duration_seconds
+          )
+        `)
+        .eq('playlist_id', playlistId)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: isOpen && !!playlistId,
+  });
+
   // Handle PDF file upload
   const handleFileUpload = async (file: File) => {
     if (!file.type.includes('pdf')) {
@@ -147,12 +173,28 @@ export const PlaylistModulesManager = ({
         .order('sort_order', { ascending: true });
       
       if (error) throw error;
-      setLocalModules(data || []);
-      setHasChanges(false);
       return data;
     },
-    enabled: isOpen,
+    enabled: isOpen && !!playlistId,
+    refetchOnMount: 'always',
+    staleTime: 0,
   });
+
+  // Sync localModules with query data
+  useEffect(() => {
+    if (modules) {
+      setLocalModules(modules);
+      setHasChanges(false);
+    }
+  }, [modules]);
+
+  // Reset when dialog closes
+  useEffect(() => {
+    if (!isOpen) {
+      setLocalModules([]);
+      setHasChanges(false);
+    }
+  }, [isOpen]);
 
   // Add module mutation
   const addMutation = useMutation({
@@ -234,6 +276,58 @@ export const PlaylistModulesManager = ({
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to update modules');
+    },
+  });
+
+  // Import all tracks as audio modules
+  const importAllTracksMutation = useMutation({
+    mutationFn: async () => {
+      if (!playlistTracks || playlistTracks.length === 0) {
+        throw new Error('No tracks to import');
+      }
+
+      // Get existing audio_ids in modules to avoid duplicates
+      const existingAudioIds = new Set(
+        localModules
+          .filter(m => m.type === 'audio' && m.audio_id)
+          .map(m => m.audio_id)
+      );
+
+      // Filter out tracks that are already in modules
+      const tracksToImport = playlistTracks.filter(
+        track => track.audio_content && !existingAudioIds.has(track.audio_content.id)
+      );
+
+      if (tracksToImport.length === 0) {
+        throw new Error('All tracks are already added as modules');
+      }
+
+      const startSortOrder = localModules.length;
+
+      const modulesToInsert = tracksToImport.map((track, index) => ({
+        playlist_id: playlistId,
+        title: track.audio_content!.title,
+        type: 'audio',
+        url: '',
+        description: '',
+        sort_order: startSortOrder + index,
+        drip_delay_days: track.drip_delay_days || 0,
+        audio_id: track.audio_content!.id,
+      }));
+
+      const { error } = await supabase
+        .from('playlist_supplements')
+        .insert(modulesToInsert);
+
+      if (error) throw error;
+      return tracksToImport.length;
+    },
+    onSuccess: (count) => {
+      toast.success(`Imported ${count} tracks as modules`);
+      queryClient.invalidateQueries({ queryKey: ['playlist-modules', playlistId] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to import tracks');
     },
   });
 
@@ -338,11 +432,26 @@ export const PlaylistModulesManager = ({
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center justify-between flex-wrap gap-2">
               <p className="text-sm text-muted-foreground">
                 {localModules.length} modules total
               </p>
               <div className="flex items-center gap-2">
+                {playlistTracks && playlistTracks.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => importAllTracksMutation.mutate()}
+                    disabled={importAllTracksMutation.isPending}
+                  >
+                    {importAllTracksMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <ListPlus className="h-4 w-4 mr-2" />
+                    )}
+                    Import All Tracks ({playlistTracks.length})
+                  </Button>
+                )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
