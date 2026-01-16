@@ -225,6 +225,7 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           description: string | null
+          display_mode: string
           id: string
           is_free: boolean
           is_hidden: boolean
@@ -237,6 +238,7 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
+          display_mode?: string
           id?: string
           is_free?: boolean
           is_hidden?: boolean
@@ -249,6 +251,7 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
+          display_mode?: string
           id?: string
           is_free?: boolean
           is_hidden?: boolean
@@ -973,6 +976,41 @@ export type Database = {
         }
         Relationships: []
       }
+      module_progress: {
+        Row: {
+          created_at: string | null
+          id: string
+          supplement_id: string
+          user_id: string
+          viewed: boolean | null
+          viewed_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          supplement_id: string
+          user_id: string
+          viewed?: boolean | null
+          viewed_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          supplement_id?: string
+          user_id?: string
+          viewed?: boolean | null
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_progress_supplement_id_fkey"
+            columns: ["supplement_id"]
+            isOneToOne: false
+            referencedRelation: "playlist_supplements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           amount: number
@@ -1044,8 +1082,10 @@ export type Database = {
       }
       playlist_supplements: {
         Row: {
+          audio_id: string | null
           created_at: string
           description: string | null
+          drip_delay_days: number
           id: string
           playlist_id: string
           sort_order: number
@@ -1055,8 +1095,10 @@ export type Database = {
           url: string
         }
         Insert: {
+          audio_id?: string | null
           created_at?: string
           description?: string | null
+          drip_delay_days?: number
           id?: string
           playlist_id: string
           sort_order?: number
@@ -1066,8 +1108,10 @@ export type Database = {
           url: string
         }
         Update: {
+          audio_id?: string | null
           created_at?: string
           description?: string | null
+          drip_delay_days?: number
           id?: string
           playlist_id?: string
           sort_order?: number
@@ -1077,6 +1121,13 @@ export type Database = {
           url?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "playlist_supplements_audio_id_fkey"
+            columns: ["audio_id"]
+            isOneToOne: false
+            referencedRelation: "audio_content"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "playlist_supplements_playlist_id_fkey"
             columns: ["playlist_id"]

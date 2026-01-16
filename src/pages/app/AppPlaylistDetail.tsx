@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,7 @@ import { useEnrollments } from "@/hooks/useAppData";
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [selectedSupplement, setSelectedSupplement] = useState<{
     title: string;
     type: string;
@@ -98,13 +99,22 @@ export default function AppPlaylistDetail() {
     enabled: !!tracks && tracks.length > 0,
   });
 
-  // Fetch supplements
-  const { data: supplements } = useQuery({
-    queryKey: ['playlist-supplements', playlistId],
+  // Fetch modules (supplements with drip)
+  const { data: modules } = useQuery({
+    queryKey: ['playlist-modules', playlistId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('playlist_supplements')
-        .select('*')
+        .select(`
+          *,
+          audio_content (
+            id,
+            title,
+            description,
+            duration_seconds,
+            cover_image_url
+          )
+        `)
         .eq('playlist_id', playlistId)
         .order('sort_order', { ascending: true });
       
@@ -112,6 +122,49 @@ export default function AppPlaylistDetail() {
       return data;
     },
     enabled: !!playlistId,
+  });
+
+  // Fetch module progress
+  const { data: moduleProgressData } = useQuery({
+    queryKey: ['module-progress', playlistId],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !modules || modules.length === 0) return [];
+
+      const moduleIds = modules.map(m => m.id);
+
+      const { data, error } = await supabase
+        .from('module_progress')
+        .select('*')
+        .eq('user_id', user.id)
+        .in('supplement_id', moduleIds);
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!modules && modules.length > 0,
+  });
+
+  // Mark module as viewed mutation
+  const markModuleViewedMutation = useMutation({
+    mutationFn: async (supplementId: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('module_progress')
+        .upsert({
+          user_id: user.id,
+          supplement_id: supplementId,
+          viewed: true,
+          viewed_at: new Date().toISOString(),
+        });
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['module-progress', playlistId] });
+    },
   });
 
   // Use centralized enrollments hook - single source of truth
@@ -147,10 +200,7 @@ export default function AppPlaylistDetail() {
     enabled: !!playlistId && !playlist?.is_free,
   });
 
-  console.log('Debug - Playlist:', playlist?.name, 'Program Slug:', playlist?.program_slug, 'Is Free:', playlist?.is_free);
-  console.log('Debug - User Enrollments:', enrollments);
-  console.log('Debug - Has Access Check:', playlist?.is_free || enrollments?.includes(playlist?.program_slug));
-  
+  const displayMode = (playlist as any)?.display_mode || 'tracks';
   const hasAccess = playlist?.is_free || enrollments?.includes(playlist?.program_slug);
 
   const getTrackProgress = (audioId: string) => {
@@ -167,9 +217,30 @@ export default function AppPlaylistDetail() {
     };
   };
 
-  // Check if a track is available based on drip delay - now with countdown and offset
-  const getTrackAvailability = (dripDelayDays: number) => {
-    // Free playlists = all tracks available
+  const getModuleProgress = (moduleId: string, audioId?: string | null) => {
+    // For audio modules, check audio_progress
+    if (audioId) {
+      const audioProgress = progressData?.find(p => p.audio_id === audioId);
+      if (audioProgress) {
+        return {
+          viewed: audioProgress.completed || false,
+          percentage: audioProgress.current_position_seconds / 
+            (tracks?.find(t => t.audio_content?.id === audioId)?.audio_content?.duration_seconds || 1) * 100,
+        };
+      }
+    }
+    
+    // For non-audio modules, check module_progress
+    const progress = moduleProgressData?.find(p => p.supplement_id === moduleId);
+    return {
+      viewed: progress?.viewed || false,
+      percentage: progress?.viewed ? 100 : 0,
+    };
+  };
+
+  // Check if content is available based on drip delay
+  const getContentAvailability = (dripDelayDays: number) => {
+    // Free playlists = all content available
     if (playlist?.is_free) {
       return { isAvailable: true, availableDate: null, countdownText: null };
     }
@@ -181,29 +252,109 @@ export default function AppPlaylistDetail() {
     );
   };
 
-  const completedCount = tracks?.filter(t => getTrackProgress(t.audio_content.id).completed).length || 0;
-  const totalTracks = tracks?.length || 0;
-  const overallProgress = totalTracks > 0 ? (completedCount / totalTracks) * 100 : 0;
+  // Calculate progress based on display mode
+  const getOverallProgress = () => {
+    if (displayMode === 'modules' || displayMode === 'both') {
+      const totalModules = modules?.length || 0;
+      if (totalModules === 0) return { completed: 0, total: 0, percentage: 0 };
+      
+      const completedModules = modules?.filter(m => {
+        const progress = getModuleProgress(m.id, m.audio_id);
+        return progress.viewed;
+      }).length || 0;
+      
+      return {
+        completed: completedModules,
+        total: totalModules,
+        percentage: (completedModules / totalModules) * 100,
+      };
+    }
+    
+    // Traditional tracks mode
+    const totalTracks = tracks?.length || 0;
+    if (totalTracks === 0) return { completed: 0, total: 0, percentage: 0 };
+    
+    const completedCount = tracks?.filter(t => getTrackProgress(t.audio_content.id).completed).length || 0;
+    return {
+      completed: completedCount,
+      total: totalTracks,
+      percentage: (completedCount / totalTracks) * 100,
+    };
+  };
 
-  // Find first incomplete track that is also available
-  const firstIncompleteTrack = tracks?.find(t => {
-    const { isAvailable } = getTrackAvailability(t.drip_delay_days || 0);
-    return isAvailable && !getTrackProgress(t.audio_content.id).completed;
-  });
+  const { completed: completedCount, total: totalItems, percentage: overallProgress } = getOverallProgress();
+
+  // Find first incomplete item that is also available
+  const getNextPlayableItem = () => {
+    if (displayMode === 'modules' || displayMode === 'both') {
+      return modules?.find(m => {
+        const { isAvailable } = getContentAvailability(m.drip_delay_days || 0);
+        const progress = getModuleProgress(m.id, m.audio_id);
+        return isAvailable && !progress.viewed;
+      });
+    }
+    
+    return tracks?.find(t => {
+      const { isAvailable } = getContentAvailability(t.drip_delay_days || 0);
+      return isAvailable && !getTrackProgress(t.audio_content.id).completed;
+    });
+  };
 
   const handleContinue = () => {
     if (!hasAccess) return;
-    const trackToPlay = firstIncompleteTrack || tracks?.find(t => getTrackAvailability(t.drip_delay_days || 0).isAvailable);
-    if (trackToPlay) {
-      navigate(`/app/player/${trackToPlay.audio_content.id}`);
+    
+    if (displayMode === 'modules' || displayMode === 'both') {
+      const nextModule = getNextPlayableItem();
+      if (nextModule) {
+        handleModuleClick(nextModule);
+      } else if (modules && modules.length > 0) {
+        // Play first available
+        const firstAvailable = modules.find(m => getContentAvailability(m.drip_delay_days || 0).isAvailable);
+        if (firstAvailable) handleModuleClick(firstAvailable);
+      }
+    } else {
+      const trackToPlay = getNextPlayableItem() || tracks?.find(t => getContentAvailability(t.drip_delay_days || 0).isAvailable);
+      if (trackToPlay && 'audio_content' in trackToPlay) {
+        navigate(`/app/player/${trackToPlay.audio_content.id}`);
+      }
     }
   };
 
   const handleTrackClick = (audioId: string, dripDelayDays: number) => {
     if (!hasAccess) return;
-    const { isAvailable } = getTrackAvailability(dripDelayDays);
+    const { isAvailable } = getContentAvailability(dripDelayDays);
     if (!isAvailable) return;
     navigate(`/app/player/${audioId}`);
+  };
+
+  const handleModuleClick = (module: any) => {
+    if (!hasAccess) return;
+    const { isAvailable } = getContentAvailability(module.drip_delay_days || 0);
+    if (!isAvailable) return;
+
+    switch (module.type) {
+      case 'audio':
+        if (module.audio_id) {
+          navigate(`/app/player/${module.audio_id}`);
+        }
+        break;
+      case 'video':
+      case 'pdf':
+        // Mark as viewed
+        markModuleViewedMutation.mutate(module.id);
+        setSelectedSupplement({
+          title: module.title,
+          type: module.type,
+          url: module.url,
+          description: module.description || undefined,
+        });
+        break;
+      case 'link':
+        // Mark as viewed
+        markModuleViewedMutation.mutate(module.id);
+        window.open(module.url, '_blank', 'noopener,noreferrer');
+        break;
+    }
   };
 
   const formatDuration = (seconds: number) => {
@@ -221,8 +372,9 @@ export default function AppPlaylistDetail() {
     }
   };
 
-  const getSupplementIcon = (type: string) => {
+  const getModuleIcon = (type: string) => {
     switch (type) {
+      case 'audio': return <Music className="h-5 w-5" />;
       case 'video': return <Video className="h-5 w-5" />;
       case 'pdf': return <FileText className="h-5 w-5" />;
       case 'link': return <ExternalLink className="h-5 w-5" />;
@@ -255,6 +407,9 @@ export default function AppPlaylistDetail() {
       </div>
     );
   }
+
+  const showTracks = displayMode === 'tracks' || displayMode === 'both';
+  const showModules = displayMode === 'modules' || displayMode === 'both';
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -307,11 +462,11 @@ export default function AppPlaylistDetail() {
         </div>
 
         {/* Progress */}
-        {hasAccess && totalTracks > 0 && (
+        {hasAccess && totalItems > 0 && (
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">
-                {completedCount}/{totalTracks} tracks completed
+                {completedCount}/{totalItems} {showModules ? 'modules' : 'tracks'} completed
               </span>
               <span className="font-medium">{Math.round(overallProgress)}%</span>
             </div>
@@ -320,10 +475,10 @@ export default function AppPlaylistDetail() {
         )}
 
         {/* Continue Button */}
-        {hasAccess && tracks && tracks.length > 0 && (
+        {hasAccess && totalItems > 0 && (
           <Button onClick={handleContinue} className="w-full" size="lg">
             <Play className="h-5 w-5 mr-2" />
-            {firstIncompleteTrack ? 'Continue Listening' : 'Play from Start'}
+            {getNextPlayableItem() ? 'Continue' : 'Play from Start'}
           </Button>
         )}
 
@@ -348,120 +503,149 @@ export default function AppPlaylistDetail() {
         )}
       </div>
 
-      {/* Course Supplements */}
-      {hasAccess && supplements && supplements.length > 0 && (
-        <div className="px-4 pb-4">
-          <h2 className="text-lg font-semibold mb-3">Course Supplements</h2>
-          <div className="space-y-2">
-            {supplements.map((supplement) => (
-              <button
-                key={supplement.id}
-                onClick={() => {
-                  if (supplement.type === 'link') {
-                    window.open(supplement.url, '_blank', 'noopener,noreferrer');
-                  } else {
-                    setSelectedSupplement({
-                      title: supplement.title,
-                      type: supplement.type,
-                      url: supplement.url,
-                      description: supplement.description || undefined,
-                    });
-                  }
-                }}
-                className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors text-left"
+      {/* Course Modules */}
+      {hasAccess && showModules && modules && modules.length > 0 && (
+        <div className="px-4 pb-4 space-y-2">
+          <h2 className="text-lg font-semibold mb-3">Course Modules</h2>
+          {modules.map((module, index) => {
+            const { isAvailable, countdownText } = getContentAvailability(module.drip_delay_days || 0);
+            const progress = getModuleProgress(module.id, module.audio_id);
+            
+            return (
+              <div
+                key={module.id}
+                onClick={() => handleModuleClick(module)}
+                className={`flex items-center gap-3 p-3 rounded-lg border ${
+                  !isAvailable 
+                    ? 'opacity-60 bg-muted/30 cursor-not-allowed' 
+                    : 'cursor-pointer hover:bg-accent'
+                }`}
               >
-                <div className="flex-shrink-0">
-                  {getSupplementIcon(supplement.type)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-sm">{supplement.title}</h3>
-                  {supplement.description && (
-                    <p className="text-xs text-muted-foreground truncate">
-                      {supplement.description}
-                    </p>
+                {/* Status icon */}
+                <div className="flex-shrink-0 w-8 text-center">
+                  {!isAvailable ? (
+                    <Lock className="h-5 w-5 text-muted-foreground mx-auto" />
+                  ) : progress.viewed ? (
+                    <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
+                  ) : (
+                    <span className="text-sm text-muted-foreground">{index + 1}</span>
                   )}
                 </div>
-                <Badge variant="outline" className="flex-shrink-0">
-                  {supplement.type.toUpperCase()}
-                </Badge>
-              </button>
-            ))}
-          </div>
-          <Separator className="my-6" />
+
+                {/* Type icon */}
+                <div className="flex-shrink-0 text-muted-foreground">
+                  {getModuleIcon(module.type)}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-medium text-sm truncate">{module.title}</h3>
+                    <Badge variant="outline" className="flex-shrink-0 text-[10px] px-1.5 py-0">
+                      {module.type.toUpperCase()}
+                    </Badge>
+                  </div>
+                  {!isAvailable && countdownText ? (
+                    <p className="text-xs text-muted-foreground">
+                      {countdownText}
+                    </p>
+                  ) : module.description ? (
+                    <p className="text-xs text-muted-foreground truncate">{module.description}</p>
+                  ) : null}
+                </div>
+
+                {/* Duration for audio modules */}
+                {module.type === 'audio' && module.audio_content && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0">
+                    <Clock className="h-3 w-3" />
+                    <span>{formatDuration(module.audio_content.duration_seconds)}</span>
+                  </div>
+                )}
+
+                {isAvailable && (
+                  <Button variant="ghost" size="icon" className="flex-shrink-0">
+                    <Play className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+          {showTracks && <Separator className="my-6" />}
         </div>
       )}
 
       {/* Track List */}
-      <div className="px-4 pb-4 space-y-2">
-        <h2 className="text-lg font-semibold mb-3">Tracks</h2>
-        {tracks?.map((item, index) => {
-          const track = item.audio_content;
-          const progress = getTrackProgress(track.id);
-          const { isAvailable, countdownText } = getTrackAvailability(item.drip_delay_days || 0);
-          
-          return (
-            <div
-              key={item.id}
-              onClick={() => handleTrackClick(track.id, item.drip_delay_days || 0)}
-              className={`flex items-center gap-3 p-3 rounded-lg border ${
-                !isAvailable 
-                  ? 'opacity-60 bg-muted/30 cursor-not-allowed' 
-                  : hasAccess 
-                    ? 'cursor-pointer hover:bg-accent' 
-                    : 'opacity-60'
-              }`}
-            >
-              {/* Track number / status icon */}
-              <div className="flex-shrink-0 w-8 text-center">
-                {!isAvailable ? (
-                  <Lock className="h-5 w-5 text-muted-foreground mx-auto" />
-                ) : progress.completed ? (
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
-                ) : progress.percentage > 0 ? (
-                  <div className="relative h-5 w-5 mx-auto">
-                    <Circle className="h-5 w-5 text-muted-foreground" />
-                    <div 
-                      className="absolute inset-0 rounded-full border-2 border-primary"
-                      style={{
-                        clipPath: `polygon(50% 50%, 50% 0%, ${progress.percentage > 50 ? '100%' : '50%'} 0%, ${progress.percentage > 50 ? '100%' : '50%'} ${progress.percentage > 50 ? '100%' : `${(progress.percentage / 50) * 100}%`}, ${progress.percentage > 50 ? `${100 - ((progress.percentage - 50) / 50) * 100}%` : '50%'} ${progress.percentage > 50 ? '100%' : '100%'}, 50% 100%)`
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <span className="text-sm text-muted-foreground">{index + 1}</span>
+      {showTracks && tracks && tracks.length > 0 && (
+        <div className="px-4 pb-4 space-y-2">
+          <h2 className="text-lg font-semibold mb-3">Tracks</h2>
+          {tracks.map((item, index) => {
+            const track = item.audio_content;
+            const progress = getTrackProgress(track.id);
+            const { isAvailable, countdownText } = getContentAvailability(item.drip_delay_days || 0);
+            
+            return (
+              <div
+                key={item.id}
+                onClick={() => handleTrackClick(track.id, item.drip_delay_days || 0)}
+                className={`flex items-center gap-3 p-3 rounded-lg border ${
+                  !isAvailable 
+                    ? 'opacity-60 bg-muted/30 cursor-not-allowed' 
+                    : hasAccess 
+                      ? 'cursor-pointer hover:bg-accent' 
+                      : 'opacity-60'
+                }`}
+              >
+                {/* Track number / status icon */}
+                <div className="flex-shrink-0 w-8 text-center">
+                  {!isAvailable ? (
+                    <Lock className="h-5 w-5 text-muted-foreground mx-auto" />
+                  ) : progress.completed ? (
+                    <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
+                  ) : progress.percentage > 0 ? (
+                    <div className="relative h-5 w-5 mx-auto">
+                      <Circle className="h-5 w-5 text-muted-foreground" />
+                      <div 
+                        className="absolute inset-0 rounded-full border-2 border-primary"
+                        style={{
+                          clipPath: `polygon(50% 50%, 50% 0%, ${progress.percentage > 50 ? '100%' : '50%'} 0%, ${progress.percentage > 50 ? '100%' : '50%'} ${progress.percentage > 50 ? '100%' : `${(progress.percentage / 50) * 100}%`}, ${progress.percentage > 50 ? `${100 - ((progress.percentage - 50) / 50) * 100}%` : '50%'} ${progress.percentage > 50 ? '100%' : '100%'}, 50% 100%)`
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">{index + 1}</span>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-sm truncate">{track.title}</h3>
+                  {!isAvailable && countdownText ? (
+                    <p className="text-xs text-muted-foreground">
+                      {countdownText}
+                    </p>
+                  ) : track.description ? (
+                    <p className="text-xs text-muted-foreground truncate">{track.description}</p>
+                  ) : null}
+                  {isAvailable && progress.percentage > 0 && !progress.completed && (
+                    <div className="mt-1">
+                      <Progress value={progress.percentage} className="h-1" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0">
+                  <Clock className="h-3 w-3" />
+                  <span>{formatDuration(track.duration_seconds)}</span>
+                </div>
+
+                {isAvailable && hasAccess && (
+                  <Button variant="ghost" size="icon" className="flex-shrink-0">
+                    <Play className="h-4 w-4" />
+                  </Button>
                 )}
               </div>
-
-              <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-sm truncate">{track.title}</h3>
-                {!isAvailable && countdownText ? (
-                  <p className="text-xs text-muted-foreground">
-                    {countdownText}
-                  </p>
-                ) : track.description ? (
-                  <p className="text-xs text-muted-foreground truncate">{track.description}</p>
-                ) : null}
-                {isAvailable && progress.percentage > 0 && !progress.completed && (
-                  <div className="mt-1">
-                    <Progress value={progress.percentage} className="h-1" />
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0">
-                <Clock className="h-3 w-3" />
-                <span>{formatDuration(track.duration_seconds)}</span>
-              </div>
-
-              {isAvailable && hasAccess && (
-                <Button variant="ghost" size="icon" className="flex-shrink-0">
-                  <Play className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       <SupplementViewer
         isOpen={!!selectedSupplement}
