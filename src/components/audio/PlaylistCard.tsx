@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Music, Lock, CheckCircle2 } from "lucide-react";
+import { Clock, Music, Lock, CheckCircle2, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface PlaylistCardProps {
@@ -52,16 +52,19 @@ export const PlaylistCard = memo(function PlaylistCard({
   };
 
   const handleClick = () => {
-    if (isLocked) return;
+    if (isLocked && programSlug) {
+      // Navigate to course detail page where user can enroll
+      navigate(`/app/course/${programSlug}`);
+      return;
+    }
+    if (isLocked) return; // No programSlug, can't navigate
     navigate(`/app/player/playlist/${id}`);
   };
 
   return (
     <Card 
-      className={`overflow-hidden rounded-2xl border-border/50 ${
-        isLocked 
-          ? 'opacity-60' 
-          : 'cursor-pointer hover:shadow-lg hover:border-border transition-all hover:scale-[1.02] active:scale-[0.98]'
+      className={`overflow-hidden rounded-2xl border-border/50 cursor-pointer hover:shadow-lg hover:border-border transition-all hover:scale-[1.02] active:scale-[0.98] ${
+        isLocked ? 'opacity-80' : ''
       }`}
       onClick={handleClick}
     >
@@ -132,9 +135,10 @@ export const PlaylistCard = memo(function PlaylistCard({
         )}
         
         {isLocked && programSlug && (
-          <p className="text-xs text-muted-foreground italic">
-            Enroll to unlock
-          </p>
+          <div className="flex items-center justify-between text-xs text-primary">
+            <span className="font-medium">Tap to enroll</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+          </div>
         )}
       </div>
     </Card>

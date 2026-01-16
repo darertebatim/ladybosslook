@@ -328,14 +328,22 @@ export default function AppPlaylistDetail() {
         )}
 
         {!hasAccess && (
-          <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
-            <Lock className="h-5 w-5 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              {isNativeApp() 
-                ? 'This content is not available in your subscription'
-                : `Enroll in ${playlist.program_slug} to access this content`
-              }
-            </p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
+              <Lock className="h-5 w-5 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">
+                Enroll to access this content
+              </p>
+            </div>
+            {playlist.program_slug && (
+              <Button 
+                className="w-full" 
+                size="lg"
+                onClick={() => navigate(`/app/course/${playlist.program_slug}`)}
+              >
+                View Course Details
+              </Button>
+            )}
           </div>
         )}
       </div>
