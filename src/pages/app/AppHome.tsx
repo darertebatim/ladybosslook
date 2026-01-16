@@ -19,6 +19,7 @@ import { HomeSkeleton } from '@/components/app/skeletons';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { HomeBanner } from '@/components/app/HomeBanner';
+import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
 
 
 const AppHome = () => {
@@ -176,7 +177,10 @@ const AppHome = () => {
       
       <div className="container max-w-7xl py-4 px-4">
         <div className="space-y-6">
-          {/* Admin Banners - shown first */}
+          {/* App Update Banner - shown first, highest priority */}
+          <AppUpdateBanner />
+          
+          {/* Admin Banners */}
           <HomeBanner />
           
           {showNotificationBanner && (
