@@ -6,6 +6,7 @@ import { CheckCircle, ArrowRight, Download, Calendar, MessageCircle, Loader2 } f
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
+import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
@@ -16,6 +17,7 @@ export default function PaymentSuccess() {
   const [isLoading, setIsLoading] = useState(true);
   const [verificationAttempts, setVerificationAttempts] = useState(0);
   const { toast } = useToast();
+  const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
 
   useEffect(() => {
     const verifyPayment = async () => {
@@ -66,6 +68,10 @@ export default function PaymentSuccess() {
         if (data?.success && data?.paymentStatus === 'paid') {
           setPaymentVerified(true);
           setOrderDetails(data.orderDetails);
+          
+          // Invalidate all enrollment caches so user sees their new access immediately
+          invalidateAllEnrollmentData();
+          
           toast({
             title: "Payment Confirmed!",
             description: "Your payment has been successfully processed.",

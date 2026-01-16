@@ -11,6 +11,8 @@ import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/Unsee
 import { AudioPlayerProvider, useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { MiniPlayer } from '@/components/audio/MiniPlayer';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
@@ -34,6 +36,34 @@ const NativeAppLayout = () => {
   // Custom hooks after useState declarations
   const { unreadCount } = useUnreadChat();
   const { showUnreadPopup, unreadMessageCount, dismissPopup, goToChat } = useChatNotifications();
+  const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
+
+  // Realtime subscription for enrollment changes - auto-refresh when enrollments change
+  // This handles Stripe webhook enrollments and any external enrollment changes
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel('enrollment-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'course_enrollments',
+          filter: `user_id=eq.${user.id}`
+        },
+        () => {
+          console.log('[EnrollmentRealtime] Enrollment changed, invalidating caches');
+          invalidateAllEnrollmentData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, invalidateAllEnrollmentData]);
 
   // Get current track for mini player visibility
   let currentTrack = null;

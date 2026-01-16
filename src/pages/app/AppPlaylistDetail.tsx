@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { SupplementViewer } from "@/components/app/SupplementViewer";
 import { isNativeApp } from "@/lib/platform";
 import { getTrackAvailabilityWithCountdown } from "@/lib/dripContent";
+import { useEnrollments } from "@/hooks/useAppData";
 
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
@@ -113,23 +114,8 @@ export default function AppPlaylistDetail() {
     enabled: !!playlistId,
   });
 
-  // Check if user has access
-  const { data: enrollments } = useQuery({
-    queryKey: ['user-enrollments'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('course_enrollments')
-        .select('program_slug')
-        .eq('user_id', user.id)
-        .eq('status', 'active');
-      
-      if (error) throw error;
-      return data.map(e => e.program_slug);
-    },
-  });
+  // Use centralized enrollments hook - single source of truth
+  const { data: enrollments } = useEnrollments();
 
   // Fetch user's round for this playlist (to get start_date and drip_offset_days for drip content)
   const { data: userRound } = useQuery({

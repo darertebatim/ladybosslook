@@ -1,11 +1,51 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 
 // Cache time constants
 const STALE_TIME = 2 * 60 * 1000; // 2 minutes
 const GC_TIME = 10 * 60 * 1000; // 10 minutes
+
+// ============ ENROLLMENTS - SINGLE SOURCE OF TRUTH ============
+export function useEnrollments() {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['enrollments', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .select('program_slug')
+        .eq('user_id', user!.id)
+        .eq('status', 'active');
+      
+      if (error) throw error;
+      return (data || []).map(e => e.program_slug).filter(Boolean) as string[];
+    },
+    enabled: !!user?.id,
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+  });
+}
+
+// ============ INVALIDATE ALL ENROLLMENT-RELATED CACHES ============
+export function useInvalidateAllEnrollmentData() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useCallback(() => {
+    if (user?.id) {
+      // Invalidate all enrollment-related caches atomically
+      queryClient.invalidateQueries({ queryKey: ['enrollments', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['player-data', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['home-data', user.id] });
+      queryClient.invalidateQueries({ queryKey: ['courses-data', user.id] });
+      // Legacy key used by some components
+      queryClient.invalidateQueries({ queryKey: ['user-enrollments'] });
+    }
+  }, [queryClient, user?.id]);
+}
 
 // Types
 interface HomeData {
@@ -287,29 +327,29 @@ export function usePlayerData() {
 export function useInvalidateHomeData() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  return () => {
+  return useCallback(() => {
     if (user?.id) {
       queryClient.invalidateQueries({ queryKey: ['home-data', user.id] });
     }
-  };
+  }, [queryClient, user?.id]);
 }
 
 export function useInvalidateCoursesData() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  return () => {
+  return useCallback(() => {
     if (user?.id) {
       queryClient.invalidateQueries({ queryKey: ['courses-data', user.id] });
     }
-  };
+  }, [queryClient, user?.id]);
 }
 
 export function useInvalidatePlayerData() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  return () => {
+  return useCallback(() => {
     if (user?.id) {
       queryClient.invalidateQueries({ queryKey: ['player-data', user.id] });
     }
-  };
+  }, [queryClient, user?.id]);
 }
