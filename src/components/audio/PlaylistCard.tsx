@@ -135,8 +135,8 @@ export const PlaylistCard = memo(function PlaylistCard({
         )}
         
         {isLocked && programSlug && (
-          <div className="flex items-center justify-between text-xs text-primary">
-            <span className="font-medium">Tap to enroll</span>
+          <div className="flex items-center justify-center gap-1.5 py-2 px-3 bg-primary text-primary-foreground rounded-lg text-xs font-medium">
+            <span>Tap to enroll</span>
             <ChevronRight className="h-3.5 w-3.5" />
           </div>
         )}
