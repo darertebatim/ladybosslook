@@ -25,7 +25,7 @@ LadyBoss Academy is a free educational platform offering personal and profession
    - On first launch, you'll see a prompt to enable notifications
    - Grant permission to receive course updates and announcements
    - Navigate to Profile tab → Push Notifications section to manage settings
-9. **Chat Support** → Send messages and attachments to support team
+9. **Chat Support** → Send text and voice messages to support team
 10. **Course Details** → Tap any enrolled course to view:
     - Course materials (downloadable PDFs)
     - Audio playlists (if available)
@@ -50,11 +50,10 @@ All courses include:
 **External Services (User-Initiated Only):**
 - **Telegram (@ladybosslook):** Optional student support communication channel (users must choose to contact)
 
-**Permissions Requested:**
+**Permissions Requested (v1.0.6):**
 - **Push Notifications:** Users receive important course updates, announcements, and educational reminders. On first app launch, users see a prompt to enable notifications. Users can manage notification preferences anytime in Profile → Push Notifications settings.
-- **Camera (optional):** Used only when users choose to attach photos/videos in Chat support. No photos are taken without explicit user action.
 - **Microphone (optional):** Used only for voice messages in Chat support. Requires explicit user action.
-- **Calendar (optional):** Used to add course sessions to the user's calendar. Requires user to tap "Add to Calendar" in course details.
+- **Calendar (optional):** Used to add course sessions to the user's calendar. Requires user to tap "Add to Calendar" in course details. Write-only access - we never read existing calendar events.
 
 **Account Deletion (Guideline 5.1.1(v)):**
 Users can delete their account at any time:

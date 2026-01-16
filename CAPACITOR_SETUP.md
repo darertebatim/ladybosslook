@@ -243,34 +243,54 @@ npx cap sync
 - Verify VAPID keys in environment
 - Check console logs for token registration
 
-## 🎵 CRITICAL: Background Audio Setup
+## 🎵 CRITICAL: Required iOS Configuration (v1.0.6)
 
-⚠️ **For audio to continue playing when the phone is locked or the app is in the background, you MUST configure Background Modes in Xcode.**
+⚠️ **You MUST configure these settings in Xcode for the app to work properly.**
 
-### Steps to Enable Background Audio:
+### Required Xcode Capabilities
 
-1. **Open iOS project:** `npx cap open ios`
-2. **Select the "App" target** in the project navigator
-3. **Go to "Signing & Capabilities" tab**
-4. **Click "+ Capability"** button
-5. **Search for and add "Background Modes"**
-6. **Check "Audio, AirPlay, and Picture in Picture"**
+Open iOS project (`npx cap open ios`), select "App" target, go to "Signing & Capabilities", and add:
 
-This adds the required `UIBackgroundModes` key to `Info.plist`. You can verify it exists at `ios/App/App/Info.plist`:
+| Capability | Configuration |
+|------------|---------------|
+| **Sign in with Apple** | Just add it |
+| **Push Notifications** | Just add it |
+| **Background Modes** | ✅ "Audio, AirPlay, and Picture in Picture" + ✅ "Remote notifications" |
+| **Associated Domains** | `applinks:ladybosslook.com`, `webcredentials:ladybosslook.com` |
+| **Calendars** | Just add it |
+
+### Required URL Types (Info tab)
+
+| Identifier | URL Scheme |
+|------------|------------|
+| `auth-callback` | `app.lovable.9d54663c1af540669ceb1723206ae5f8` |
+| `google-signin` | `com.googleusercontent.apps.945736365946-auuab5v8310rvlpol3uh226p088nj1n5` |
+| `bundle-id` | `com.ladybosslook.academy` |
+
+### Required Info.plist Permissions (v1.0.6)
+
+Add to `ios/App/App/Info.plist`:
 
 ```xml
+<key>NSCalendarsUsageDescription</key>
+<string>We need calendar access to add your course sessions to your calendar</string>
+
+<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+<string>We only add course sessions to your calendar - we never read your existing events</string>
+
+<key>NSMicrophoneUsageDescription</key>
+<string>Used for recording voice messages in chat support</string>
+
 <key>UIBackgroundModes</key>
 <array>
-    <string>audio</string>
+  <string>audio</string>
+  <string>remote-notification</string>
 </array>
 ```
 
-**Without this configuration, audio will pause when:**
-- The phone is locked
-- The user switches to another app
-- The screen turns off
+> ⚠️ **v1.0.6:** Do NOT add Camera or Photo Library permissions - attachments are disabled.
 
-**Important**: If you ever delete the `ios/` folder and run `npx cap add ios` again, you will need to re-enable this capability.
+**Important**: If you delete the `ios/` folder and run `npx cap add ios` again, you must re-apply all these settings.
 
 ---
 
