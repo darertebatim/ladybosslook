@@ -14,7 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Trash2, Upload, RefreshCw, Pencil } from "lucide-react";
+import { Loader2, Trash2, Upload, RefreshCw, Pencil, Wrench } from "lucide-react";
 import { usePrograms } from "@/hooks/usePrograms";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -44,6 +44,8 @@ export const AudioManager = () => {
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
   const [editingAudio, setEditingAudio] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isFixingDurations, setIsFixingDurations] = useState(false);
+  const [fixProgress, setFixProgress] = useState({ current: 0, total: 0, fixed: 0 });
 
   const [formData, setFormData] = useState({
     title: "",
@@ -275,6 +277,86 @@ export const AudioManager = () => {
     },
   });
 
+  // Fix audio durations mutation
+  const fixDurationsMutation = useMutation({
+    mutationFn: async () => {
+      // Find all audios with 0 duration
+      const { data: zeroAudios, error } = await supabase
+        .from('audio_content')
+        .select('id, title, file_url')
+        .eq('duration_seconds', 0);
+
+      if (error) throw error;
+      if (!zeroAudios || zeroAudios.length === 0) {
+        return { fixed: 0, total: 0 };
+      }
+
+      setFixProgress({ current: 0, total: zeroAudios.length, fixed: 0 });
+      let fixedCount = 0;
+
+      for (let i = 0; i < zeroAudios.length; i++) {
+        const audio = zeroAudios[i];
+        setFixProgress(prev => ({ ...prev, current: i + 1 }));
+
+        try {
+          // Load audio to get duration
+          const audioElement = new Audio();
+          audioElement.crossOrigin = 'anonymous';
+          
+          const duration = await new Promise<number>((resolve, reject) => {
+            const timeout = setTimeout(() => reject(new Error('Timeout')), 30000);
+            
+            audioElement.addEventListener('loadedmetadata', () => {
+              clearTimeout(timeout);
+              resolve(Math.floor(audioElement.duration));
+            });
+            
+            audioElement.addEventListener('error', () => {
+              clearTimeout(timeout);
+              reject(new Error('Failed to load audio'));
+            });
+            
+            audioElement.src = audio.file_url;
+            audioElement.load();
+          });
+
+          if (duration > 0) {
+            // Update database
+            const { error: updateError } = await supabase
+              .from('audio_content')
+              .update({ duration_seconds: duration })
+              .eq('id', audio.id);
+
+            if (!updateError) {
+              fixedCount++;
+              setFixProgress(prev => ({ ...prev, fixed: fixedCount }));
+              console.log(`Fixed: ${audio.title} - ${duration}s`);
+            }
+          }
+        } catch (err) {
+          console.error(`Failed to fix duration for: ${audio.title}`, err);
+        }
+      }
+
+      return { fixed: fixedCount, total: zeroAudios.length };
+    },
+    onSuccess: (result) => {
+      toast.success(`Fixed ${result.fixed} of ${result.total} audio durations`);
+      queryClient.invalidateQueries({ queryKey: ['admin-audio-content'] });
+      setIsFixingDurations(false);
+      setFixProgress({ current: 0, total: 0, fixed: 0 });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to fix durations');
+      setIsFixingDurations(false);
+    },
+  });
+
+  const handleFixDurations = () => {
+    setIsFixingDurations(true);
+    fixDurationsMutation.mutate();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (audioFiles.length === 0) {
@@ -423,24 +505,44 @@ export const AudioManager = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Existing Audio Content</CardTitle>
-          <Button
-            onClick={() => syncMutation.mutate()}
-            disabled={syncMutation.isPending}
-            variant="outline"
-            size="sm"
-          >
-            {syncMutation.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Syncing...
-              </>
-            ) : (
-              <>
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Sync Storage Files
-              </>
-            )}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={handleFixDurations}
+              disabled={isFixingDurations}
+              variant="outline"
+              size="sm"
+            >
+              {isFixingDurations ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Fixing {fixProgress.current}/{fixProgress.total} ({fixProgress.fixed} fixed)
+                </>
+              ) : (
+                <>
+                  <Wrench className="mr-2 h-4 w-4" />
+                  Fix Audio Durations
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={() => syncMutation.mutate()}
+              disabled={syncMutation.isPending}
+              variant="outline"
+              size="sm"
+            >
+              {syncMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Syncing...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Sync Storage Files
+                </>
+              )}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
