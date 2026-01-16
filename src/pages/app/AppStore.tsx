@@ -1,4 +1,3 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { usePrograms } from '@/hooks/usePrograms';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,34 +10,20 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
 import { useState } from 'react';
+import { useEnrollments, useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 
 const AppStore = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { programs, isLoading: programsLoading } = usePrograms();
-  const queryClient = useQueryClient();
   const [enrollingSlug, setEnrollingSlug] = useState<string | null>(null);
 
-  // Fetch user's enrollments
-  const { data: enrollments = [] } = useQuery({
-    queryKey: ['user-enrollments'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('course_enrollments')
-        .select('program_slug, status')
-        .eq('user_id', user.id)
-        .eq('status', 'active');
-
-      if (error) throw error;
-      return data || [];
-    },
-  });
+  // Use centralized enrollments hook - single source of truth
+  const { data: enrollments = [] } = useEnrollments();
+  const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
 
   const isEnrolled = (slug: string) => {
-    return enrollments.some(e => e.program_slug === slug);
+    return enrollments.includes(slug);
   };
 
   // Filter to show only free programs or programs marked free on iOS
@@ -195,11 +180,8 @@ const AppStore = () => {
                               } else {
                                 toast.success('Enrolled successfully!');
                                 
-                                // Invalidate queries to refresh data immediately
-                                queryClient.invalidateQueries({ queryKey: ['user-enrollments'] });
-                                queryClient.invalidateQueries({ queryKey: ['courses-data', user.id] });
-                                queryClient.invalidateQueries({ queryKey: ['home-data', user.id] });
-                                queryClient.invalidateQueries({ queryKey: ['player-data', user.id] });
+                                // Invalidate ALL enrollment-related caches atomically
+                                invalidateAllEnrollmentData();
                                 
                                 navigate('/app/courses');
                               }
