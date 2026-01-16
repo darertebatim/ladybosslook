@@ -49,6 +49,8 @@ export const AudioManager = () => {
     title: "",
     description: "",
     playlist_id: "",
+    duration_minutes: "",
+    duration_seconds: "",
   });
 
   // Fetch playlists
@@ -183,6 +185,8 @@ export const AudioManager = () => {
         title: "",
         description: "",
         playlist_id: "",
+        duration_minutes: "",
+        duration_seconds: "",
       });
       setAudioFiles([]);
       setCoverFile(null);
@@ -286,10 +290,14 @@ export const AudioManager = () => {
 
   const handleEdit = (audio: any) => {
     setEditingAudio(audio);
+    const durationMins = Math.floor(audio.duration_seconds / 60);
+    const durationSecs = audio.duration_seconds % 60;
     setFormData({
       title: audio.title,
       description: audio.description || "",
       playlist_id: audio.audio_playlist_items?.[0]?.playlist_id || "",
+      duration_minutes: durationMins.toString(),
+      duration_seconds: durationSecs.toString(),
     });
     setIsEditDialogOpen(true);
   };
@@ -298,11 +306,16 @@ export const AudioManager = () => {
     e.preventDefault();
     if (!editingAudio) return;
 
+    const totalSeconds = 
+      (parseInt(formData.duration_minutes) || 0) * 60 + 
+      (parseInt(formData.duration_seconds) || 0);
+
     updateMutation.mutate({
       id: editingAudio.id,
       updates: {
         title: formData.title,
         description: formData.description,
+        duration_seconds: totalSeconds,
       },
       playlistId: formData.playlist_id,
     });
@@ -517,6 +530,33 @@ export const AudioManager = () => {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
               />
+            </div>
+
+            <div>
+              <Label>Duration</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="Min"
+                  value={formData.duration_minutes}
+                  onChange={(e) => setFormData({ ...formData, duration_minutes: e.target.value })}
+                  className="w-20"
+                />
+                <span className="text-muted-foreground">:</span>
+                <Input
+                  type="number"
+                  min="0"
+                  max="59"
+                  placeholder="Sec"
+                  value={formData.duration_seconds}
+                  onChange={(e) => setFormData({ ...formData, duration_seconds: e.target.value })}
+                  className="w-20"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Format: minutes : seconds
+              </p>
             </div>
 
             <div>
