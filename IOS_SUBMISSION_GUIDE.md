@@ -104,24 +104,55 @@ npx cap open ios
 4. Select your Team (your Apple Developer account)
 5. Verify Bundle Identifier: `com.ladybosslook.academy`
 
-#### A2. Background Audio Capability (REQUIRED for audio player)
-1. In "Signing & Capabilities" tab, click "+ Capability"
-2. Search for and add "Background Modes"
-3. Check **"Audio, AirPlay, and Picture in Picture"**
-4. This allows audio to continue playing when:
-   - App is in background
-   - Screen is locked
-   - User switches to another app
+#### A2. Required Capabilities (v1.0.6)
 
-**Also add to Info.plist** (if not auto-added):
-1. Open `ios/App/App/Info.plist`
-2. Add:
+In "Signing & Capabilities" tab, click "+ Capability" and add each of these:
+
+| Capability | Configuration |
+|------------|---------------|
+| **Sign in with Apple** | Just add it (no extra config) |
+| **Push Notifications** | Just add it (no extra config) |
+| **Background Modes** | Check ✅ "Audio, AirPlay, and Picture in Picture" AND ✅ "Remote notifications" |
+| **Associated Domains** | Add: `applinks:ladybosslook.com` and `webcredentials:ladybosslook.com` |
+| **Calendars** | Just add it (for adding sessions to user calendar) |
+
+#### A3. URL Types (Info tab)
+
+1. Go to the **Info** tab (not Info.plist)
+2. Expand **URL Types** section
+3. Add these 3 URL schemes:
+
+| Identifier | URL Scheme |
+|------------|------------|
+| `auth-callback` | `app.lovable.9d54663c1af540669ceb1723206ae5f8` |
+| `google-signin` | `com.googleusercontent.apps.945736365946-auuab5v8310rvlpol3uh226p088nj1n5` |
+| `bundle-id` | `com.ladybosslook.academy` |
+
+#### A4. Info.plist Permissions (v1.0.6)
+
+Open `ios/App/App/Info.plist` and add ONLY these keys:
+
 ```xml
+<!-- Calendar (write-only access) -->
+<key>NSCalendarsUsageDescription</key>
+<string>We need calendar access to add your course sessions to your calendar</string>
+
+<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+<string>We only add course sessions to your calendar - we never read your existing events</string>
+
+<!-- Microphone (for voice messages) -->
+<key>NSMicrophoneUsageDescription</key>
+<string>Used for recording voice messages in chat support</string>
+
+<!-- Background Modes -->
 <key>UIBackgroundModes</key>
 <array>
   <string>audio</string>
+  <string>remote-notification</string>
 </array>
 ```
+
+> ⚠️ **v1.0.6 Note:** Do NOT add `NSCameraUsageDescription` or `NSPhotoLibraryUsageDescription` - the attachment feature is disabled in this version to avoid crashes.
 
 #### B. App Icons
 1. Open `App/App/Assets.xcassets/AppIcon.appiconset/`

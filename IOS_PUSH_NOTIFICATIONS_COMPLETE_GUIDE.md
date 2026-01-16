@@ -127,7 +127,11 @@ This document contains everything you need to implement iOS push notifications f
 2. Go to **"Signing & Capabilities"** tab
 3. Click **"+ Capability"**
 4. Add **"Push Notifications"**
-5. Add **"Background Modes"** → Check **"Remote notifications"**
+5. Add **"Background Modes"** → Check BOTH:
+   - ✅ **"Remote notifications"** (for push notifications)
+   - ✅ **"Audio, AirPlay, and Picture in Picture"** (for background audio)
+
+> 📋 **Full Configuration:** See `IOS_SUBMISSION_GUIDE.md` → Step 3 → Section A2 for the complete list of all required capabilities, URL Types, and Info.plist permissions for v1.0.6.
 
 ---
 
