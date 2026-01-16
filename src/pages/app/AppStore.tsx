@@ -199,6 +199,7 @@ const AppStore = () => {
                                 queryClient.invalidateQueries({ queryKey: ['user-enrollments'] });
                                 queryClient.invalidateQueries({ queryKey: ['courses-data', user.id] });
                                 queryClient.invalidateQueries({ queryKey: ['home-data', user.id] });
+                                queryClient.invalidateQueries({ queryKey: ['player-data', user.id] });
                                 
                                 navigate('/app/courses');
                               }
