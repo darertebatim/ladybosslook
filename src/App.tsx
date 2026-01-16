@@ -225,7 +225,6 @@ const App = () => (
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 
                 {/* Full-screen pages - Outside of AppLayout so no tab bar */}
-                <Route path="/app/chat" element={<ProtectedRoute><AppChat /></ProtectedRoute>} />
                 <Route path="/app/journal/new" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
                 <Route path="/app/journal/:entryId" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
                 <Route path="/app/feed/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
@@ -240,7 +239,7 @@ const App = () => (
                   <Route path="player" element={<AppPlayer />} />
                   <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />
                   <Route path="player/:audioId" element={<AppAudioPlayer />} />
-                  
+                  <Route path="chat" element={<AppChat />} />
                   <Route path="feed" element={<AppFeed />} />
                   <Route path="journal" element={<AppJournal />} />
                   <Route path="profile" element={<AppProfile />} />

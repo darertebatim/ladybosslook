@@ -364,13 +364,10 @@ export default function AppChat() {
           title="Chat | Ladyboss Academy"
           description="Chat with our support team"
         />
-        <div 
-          className="flex flex-col bg-background"
-          style={{ height: '100dvh' }}
-        >
+        <div className="flex flex-col bg-background h-full">
           {/* Header */}
           <header 
-            className="bg-background/80 backdrop-blur-xl border-b border-border/50 shrink-0"
+            className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50"
             style={{ paddingTop: 'env(safe-area-inset-top)' }}
           >
           <div className="flex items-center gap-1 pt-3 pb-2 px-4">
@@ -393,6 +390,8 @@ export default function AppChat() {
               </div>
             </div>
           </header>
+          {/* Spacer for fixed header */}
+          <div style={{ height: 'calc(64px + env(safe-area-inset-top))' }} className="shrink-0" />
           <ChatSkeleton />
         </div>
       </>
@@ -406,14 +405,11 @@ export default function AppChat() {
         description="Chat with our support team"
       />
       
-      {/* Full-screen container with 100dvh - uses dynamic viewport height */}
-      <div 
-        className="flex flex-col bg-background"
-        style={{ height: '100dvh' }}
-      >
-        {/* iOS-style Blur Header - shrink-0 so it doesn't compress */}
+      {/* Container - h-full to fill NativeAppLayout's main area */}
+      <div className="flex flex-col bg-background h-full">
+        {/* iOS-style Blur Header - fixed for proper scroll behavior */}
         <header 
-          className="bg-background/80 backdrop-blur-xl border-b border-border/50 shrink-0"
+          className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="flex items-center gap-1 pt-3 pb-2 px-4">
@@ -442,6 +438,9 @@ export default function AppChat() {
             </div>
           </div>
         </header>
+
+        {/* Spacer for fixed header */}
+        <div style={{ height: 'calc(64px + env(safe-area-inset-top))' }} className="shrink-0" />
 
         {/* Messages area - flex-1 takes remaining space, scrollable */}
         <div 
