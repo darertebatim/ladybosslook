@@ -92,6 +92,8 @@ const NativeAppLayout = () => {
 
   // Check if we're on the audio player page - don't show mini player there
   const isOnPlayerPage = location.pathname.match(/^\/app\/player\/[^/]+$/);
+  // Check if we're on chat page - hide tab bar for full-screen experience
+  const isOnChatPage = location.pathname === '/app/chat';
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home' },
@@ -111,15 +113,16 @@ const NativeAppLayout = () => {
         {/* Bottom padding = tab bar content height only, safe-area handled by nav */}
         <main 
           className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
-          style={{ paddingBottom: TAB_BAR_CONTENT_HEIGHT + 8 }} // 56px + small buffer
+          style={{ paddingBottom: isOnChatPage ? 0 : TAB_BAR_CONTENT_HEIGHT + 8 }}
         >
           <Outlet />
         </main>
 
-        {/* Mini Player - show when audio is playing and not on player page */}
-        {!isOnPlayerPage && <MiniPlayer />}
+        {/* Mini Player - show when audio is playing and not on player page or chat page */}
+        {!isOnPlayerPage && !isOnChatPage && <MiniPlayer />}
 
-        {/* Bottom Navigation - safe area applied via pb-safe */}
+        {/* Bottom Navigation - hidden on chat page for full-screen experience */}
+        {!isOnChatPage && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg pb-safe">
           <div className="grid grid-cols-5 pt-2 pb-2">
             {navItems.map((item) => {
@@ -159,6 +162,7 @@ const NativeAppLayout = () => {
             })}
           </div>
         </nav>
+        )}
       </div>
 
     {user && (
