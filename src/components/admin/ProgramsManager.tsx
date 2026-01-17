@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2 } from 'lucide-react';
+import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2, Upload, X, ImageIcon } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { RichTextEditor } from './RichTextEditor';
 
@@ -35,6 +35,7 @@ interface ProgramCatalog {
   is_free_on_ios?: boolean;
   ios_product_id?: string | null;
   android_product_id?: string | null;
+  cover_image_url?: string | null;
 }
 
 export function ProgramsManager() {
@@ -43,8 +44,9 @@ export function ProgramsManager() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-
   const [formData, setFormData] = useState({
     slug: '',
     title: '',
@@ -77,6 +79,8 @@ export function ProgramsManager() {
     // Stripe product IDs for reuse
     stripe_product_id: '',
     stripe_price_id: '',
+    // Cover image
+    cover_image_url: '',
   });
 
   // Fetch playlists for dropdown
@@ -145,6 +149,7 @@ export function ProgramsManager() {
       balance_full_discount: 0,
       stripe_product_id: '',
       stripe_price_id: '',
+      cover_image_url: '',
     });
     setEditingId(null);
     setShowForm(false);
@@ -222,6 +227,7 @@ export function ProgramsManager() {
       balance_full_discount: (program as any).balance_full_discount || 0,
       stripe_product_id: (program as any).stripe_product_id || '',
       stripe_price_id: (program as any).stripe_price_id || '',
+      cover_image_url: program.cover_image_url || '',
     });
     setEditingId(program.id);
     setShowForm(true);
@@ -275,6 +281,75 @@ export function ProgramsManager() {
   useEffect(() => {
     fetchPrograms();
   }, []);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Invalid file',
+        description: 'Please select an image file',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'File too large',
+        description: 'Please select an image under 5MB',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsUploadingImage(true);
+
+    try {
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${formData.slug || 'program'}-${Date.now()}.${fileExt}`;
+      const filePath = `covers/${fileName}`;
+
+      // Upload to Supabase storage
+      const { error: uploadError } = await supabase.storage
+        .from('program-covers')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('program-covers')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, cover_image_url: urlData.publicUrl });
+
+      toast({
+        title: 'Image uploaded',
+        description: 'Cover image uploaded successfully',
+      });
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast({
+        title: 'Upload failed',
+        description: error.message || 'Failed to upload image',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const removeCoverImage = () => {
+    setFormData({ ...formData, cover_image_url: '' });
+  };
 
   return (
     <>
@@ -657,6 +732,73 @@ export function ProgramsManager() {
                   placeholder="Program description... Use the toolbar to format text with bold, lists, headers, etc."
                 />
               </div>
+
+              {/* Cover Image Upload */}
+              <div className="space-y-2">
+                <Label>Cover Image</Label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                
+                {formData.cover_image_url ? (
+                  <div className="relative inline-block">
+                    <img 
+                      src={formData.cover_image_url} 
+                      alt="Program cover" 
+                      className="w-48 h-32 object-cover rounded-lg border"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute -top-2 -right-2 h-6 w-6"
+                      onClick={removeCoverImage}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-48 h-32 border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary/50 transition-colors"
+                  >
+                    {isUploadingImage ? (
+                      <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">Click to upload</span>
+                      </>
+                    )}
+                  </div>
+                )}
+                
+                {formData.cover_image_url && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploadingImage}
+                  >
+                    {isUploadingImage ? (
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Upload className="h-4 w-4 mr-2" />
+                    )}
+                    Change Image
+                  </Button>
+                )}
+                
+                <p className="text-xs text-muted-foreground">
+                  Recommended: 800x600px, max 5MB. Used on product pages and in the app.
+                </p>
+              </div>
+
 
               <div className="space-y-2">
                 <Label htmlFor="audio_playlist_id">Featured Playlist (Optional)</Label>

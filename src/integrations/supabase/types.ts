@@ -1248,6 +1248,7 @@ export type Database = {
           balance_full_price: number | null
           balance_monthly_count: number | null
           balance_monthly_price: number | null
+          cover_image_url: string | null
           created_at: string | null
           delivery_method: string | null
           deposit_price: number | null
@@ -1286,6 +1287,7 @@ export type Database = {
           balance_full_price?: number | null
           balance_monthly_count?: number | null
           balance_monthly_price?: number | null
+          cover_image_url?: string | null
           created_at?: string | null
           delivery_method?: string | null
           deposit_price?: number | null
@@ -1324,6 +1326,7 @@ export type Database = {
           balance_full_price?: number | null
           balance_monthly_count?: number | null
           balance_monthly_price?: number | null
+          cover_image_url?: string | null
           created_at?: string | null
           delivery_method?: string | null
           deposit_price?: number | null
