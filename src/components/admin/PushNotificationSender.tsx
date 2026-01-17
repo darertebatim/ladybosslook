@@ -27,7 +27,7 @@ const IN_APP_LINKS = [
   { value: '/app/courses', label: 'My Courses' },
   { value: '/app/browse', label: 'Browse Store' },
   { value: '/app/player', label: 'Audio Player' },
-  { value: '/app/support-chat', label: 'Support Chat' },
+  { value: '/app/chat', label: 'Support Chat' },
   { value: '/app/profile', label: 'Profile' },
   { value: 'custom', label: '✏️ Custom URL...' },
 ];

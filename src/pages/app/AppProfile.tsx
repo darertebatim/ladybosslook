@@ -949,7 +949,7 @@ const AppProfile = () => {
             {/* In-App Chat Button - Primary */}
             <Button
               className="w-full relative"
-              onClick={() => navigate('/app/support-chat')}
+              onClick={() => navigate('/app/chat')}
             >
               <MessageCircle className="mr-2 h-4 w-4" />
               Chat with Support

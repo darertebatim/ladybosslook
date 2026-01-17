@@ -128,7 +128,7 @@ const AppSupport = () => {
               <div className="text-center pt-8 space-y-3">
                 {user && (
                   <Button asChild size="lg" className="w-full max-w-xs">
-                    <Link to="/app/support-chat">
+                    <Link to="/app/chat">
                       <MessageCircle className="mr-2 h-5 w-5" />
                       Chat with Support
                     </Link>
