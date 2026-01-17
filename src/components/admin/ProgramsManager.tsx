@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2, Upload, X, ImageIcon } from 'lucide-react';
+import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2, Upload, X, ImageIcon, Sparkles } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { RichTextEditor } from './RichTextEditor';
 import { programImages } from '@/data/programs';
@@ -46,6 +46,7 @@ export function ProgramsManager() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [formData, setFormData] = useState({
@@ -351,6 +352,50 @@ export function ProgramsManager() {
 
   const removeCoverImage = () => {
     setFormData({ ...formData, cover_image_url: '' });
+  };
+
+  const generateCoverWithAI = async () => {
+    if (!formData.slug && !formData.title) {
+      toast({
+        title: 'Missing info',
+        description: 'Please enter a title or slug first',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsGeneratingCover(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-program-cover', {
+        body: {
+          programTitle: formData.title,
+          programSlug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, '-'),
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data?.imageUrl) {
+        setFormData({ ...formData, cover_image_url: data.imageUrl });
+        toast({
+          title: 'Cover generated!',
+          description: 'AI-generated cover image has been applied',
+        });
+      } else {
+        throw new Error('No image returned');
+      }
+    } catch (error: any) {
+      console.error('Generation error:', error);
+      toast({
+        title: 'Generation failed',
+        description: error.message || 'Failed to generate cover image',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsGeneratingCover(false);
+    }
   };
 
   return (
@@ -736,7 +781,7 @@ export function ProgramsManager() {
               </div>
 
               {/* Cover Image Upload */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label>Cover Image</Label>
                 <input
                   ref={fileInputRef}
@@ -746,58 +791,77 @@ export function ProgramsManager() {
                   className="hidden"
                 />
                 
-                {formData.cover_image_url ? (
-                  <div className="relative inline-block">
-                    <img 
-                      src={formData.cover_image_url} 
-                      alt="Program cover" 
-                      className="w-48 h-32 object-cover rounded-lg border"
-                    />
+                <div className="flex gap-4 items-start">
+                  {formData.cover_image_url ? (
+                    <div className="relative inline-block">
+                      <img 
+                        src={formData.cover_image_url} 
+                        alt="Program cover" 
+                        className="w-48 h-32 object-cover rounded-lg border"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute -top-2 -right-2 h-6 w-6"
+                        onClick={removeCoverImage}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div 
+                      onClick={() => !isUploadingImage && !isGeneratingCover && fileInputRef.current?.click()}
+                      className="w-48 h-32 border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary/50 transition-colors"
+                    >
+                      {isUploadingImage || isGeneratingCover ? (
+                        <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+                      ) : (
+                        <>
+                          <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">Click to upload</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-2">
                     <Button
                       type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute -top-2 -right-2 h-6 w-6"
-                      onClick={removeCoverImage}
+                      variant="outline"
+                      size="sm"
+                      onClick={generateCoverWithAI}
+                      disabled={isGeneratingCover || isUploadingImage}
                     >
-                      <X className="h-3 w-3" />
+                      {isGeneratingCover ? (
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-4 w-4 mr-2" />
+                      )}
+                      {isGeneratingCover ? 'Generating...' : 'Generate with AI'}
                     </Button>
-                  </div>
-                ) : (
-                  <div 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-48 h-32 border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary/50 transition-colors"
-                  >
-                    {isUploadingImage ? (
-                      <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
-                    ) : (
-                      <>
-                        <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">Click to upload</span>
-                      </>
+
+                    {formData.cover_image_url && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploadingImage || isGeneratingCover}
+                      >
+                        {isUploadingImage ? (
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Upload className="h-4 w-4 mr-2" />
+                        )}
+                        Upload New
+                      </Button>
                     )}
                   </div>
-                )}
-                
-                {formData.cover_image_url && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploadingImage}
-                  >
-                    {isUploadingImage ? (
-                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <Upload className="h-4 w-4 mr-2" />
-                    )}
-                    Change Image
-                  </Button>
-                )}
+                </div>
                 
                 <p className="text-xs text-muted-foreground">
-                  Recommended: 800x600px, max 5MB. Used on product pages and in the app.
+                  Upload an image or generate one with AI. Recommended: 800x600px.
                 </p>
               </div>
 
