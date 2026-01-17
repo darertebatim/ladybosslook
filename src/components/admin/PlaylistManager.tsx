@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Trash2, Plus, Pencil, List, Layers, Eye, EyeOff } from "lucide-react";
+import { Loader2, Trash2, Plus, Pencil, List, Layers, Eye, EyeOff, Upload, X, Sparkles, RefreshCw } from "lucide-react";
 import { PlaylistTracksManager } from "./PlaylistTracksManager";
 import { PlaylistModulesManager } from "./PlaylistModulesManager";
 import { usePrograms } from "@/hooks/usePrograms";
@@ -45,6 +45,7 @@ interface PlaylistFormData {
   category: 'audiobook' | 'course_supplement' | 'podcast';
   sort_order: number;
   display_mode: DisplayMode;
+  cover_image_url: string;
 }
 
 interface PlaylistFormProps {
@@ -55,6 +56,12 @@ interface PlaylistFormProps {
   isSubmitting: boolean;
   submitLabel: string;
   programs: any[];
+  isUploadingCover: boolean;
+  isGeneratingCover: boolean;
+  onUploadCover: (file: File) => void;
+  onRemoveCover: () => void;
+  onGenerateCover: () => void;
+  fileInputRef: React.RefObject<HTMLInputElement>;
 }
 
 const PlaylistForm = ({ 
@@ -64,9 +71,15 @@ const PlaylistForm = ({
   onCancel, 
   isSubmitting, 
   submitLabel,
-  programs 
+  programs,
+  isUploadingCover,
+  isGeneratingCover,
+  onUploadCover,
+  onRemoveCover,
+  onGenerateCover,
+  fileInputRef,
 }: PlaylistFormProps) => (
-  <form onSubmit={onSubmit} className="space-y-4">
+  <form onSubmit={onSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
     <div>
       <Label htmlFor="playlist_name">Playlist/Album Name *</Label>
       <Input
@@ -85,6 +98,73 @@ const PlaylistForm = ({
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         rows={3}
       />
+    </div>
+
+    {/* Cover Image Section */}
+    <div className="space-y-2">
+      <Label>Cover Image</Label>
+      {formData.cover_image_url ? (
+        <div className="relative w-32 h-32 group">
+          <img
+            src={formData.cover_image_url}
+            alt="Playlist cover"
+            className="w-full h-full object-cover rounded-lg border"
+          />
+          <Button
+            type="button"
+            variant="destructive"
+            size="icon"
+            className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={onRemoveCover}
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </div>
+      ) : (
+        <div className="w-32 h-32 border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground text-xs">
+          No cover
+        </div>
+      )}
+      <div className="flex gap-2">
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) onUploadCover(file);
+          }}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploadingCover || isGeneratingCover}
+        >
+          {isUploadingCover ? (
+            <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
+          ) : (
+            <Upload className="h-4 w-4 mr-1" />
+          )}
+          Upload
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onGenerateCover}
+          disabled={isUploadingCover || isGeneratingCover || !formData.name}
+        >
+          {isGeneratingCover ? (
+            <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
+          ) : (
+            <Sparkles className="h-4 w-4 mr-1" />
+          )}
+          Generate with AI
+        </Button>
+      </div>
     </div>
 
     <div>
@@ -166,7 +246,7 @@ const PlaylistForm = ({
       />
     </div>
 
-    <div className="flex justify-end gap-2">
+    <div className="flex justify-end gap-2 pt-2 sticky bottom-0 bg-background">
       <Button type="button" variant="outline" onClick={onCancel}>
         Cancel
       </Button>
@@ -193,6 +273,10 @@ export const PlaylistManager = () => {
   const [isTracksDialogOpen, setIsTracksDialogOpen] = useState(false);
   const [isModulesDialogOpen, setIsModulesDialogOpen] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState<any>(null);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [isGeneratingCover, setIsGeneratingCover] = useState(false);
+  const createFileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
 
   const [createFormData, setCreateFormData] = useState<PlaylistFormData>({
     name: "",
@@ -202,6 +286,7 @@ export const PlaylistManager = () => {
     category: "audiobook",
     sort_order: 0,
     display_mode: "tracks",
+    cover_image_url: "",
   });
 
   const [editFormData, setEditFormData] = useState<PlaylistFormData>({
@@ -212,6 +297,7 @@ export const PlaylistManager = () => {
     category: "audiobook",
     sort_order: 0,
     display_mode: "tracks",
+    cover_image_url: "",
   });
 
   // Fetch playlists with item count
@@ -231,6 +317,120 @@ export const PlaylistManager = () => {
     },
   });
 
+  // Upload cover image helper
+  const uploadCoverImage = async (file: File, playlistId?: string): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${playlistId || 'new'}-${Date.now()}.${fileExt}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from('playlist-covers')
+      .upload(fileName, file, { upsert: true });
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('playlist-covers')
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
+
+  // Handle cover upload for create form
+  const handleCreateCoverUpload = async (file: File) => {
+    setIsUploadingCover(true);
+    try {
+      const url = await uploadCoverImage(file);
+      setCreateFormData({ ...createFormData, cover_image_url: url });
+      toast.success('Cover image uploaded');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to upload cover');
+    } finally {
+      setIsUploadingCover(false);
+    }
+  };
+
+  // Handle cover upload for edit form
+  const handleEditCoverUpload = async (file: File) => {
+    setIsUploadingCover(true);
+    try {
+      const url = await uploadCoverImage(file, editingPlaylist?.id);
+      setEditFormData({ ...editFormData, cover_image_url: url });
+      toast.success('Cover image uploaded');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to upload cover');
+    } finally {
+      setIsUploadingCover(false);
+    }
+  };
+
+  // Generate cover with AI for create form
+  const handleCreateGenerateCover = async () => {
+    if (!createFormData.name) {
+      toast.error('Please enter a playlist name first');
+      return;
+    }
+
+    setIsGeneratingCover(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-playlist-cover', {
+        body: {
+          playlistName: createFormData.name,
+          playlistId: `new-${Date.now()}`,
+          playlistDescription: createFormData.description,
+          playlistCategory: createFormData.category,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.coverUrl) {
+        setCreateFormData({ ...createFormData, cover_image_url: data.coverUrl });
+        toast.success('Cover generated successfully!');
+      } else {
+        throw new Error(data?.error || 'Failed to generate cover');
+      }
+    } catch (error: any) {
+      console.error('Generate cover error:', error);
+      toast.error(error.message || 'Failed to generate cover');
+    } finally {
+      setIsGeneratingCover(false);
+    }
+  };
+
+  // Generate cover with AI for edit form
+  const handleEditGenerateCover = async () => {
+    if (!editFormData.name) {
+      toast.error('Please enter a playlist name first');
+      return;
+    }
+
+    setIsGeneratingCover(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-playlist-cover', {
+        body: {
+          playlistName: editFormData.name,
+          playlistId: editingPlaylist?.id || `edit-${Date.now()}`,
+          playlistDescription: editFormData.description,
+          playlistCategory: editFormData.category,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.coverUrl) {
+        setEditFormData({ ...editFormData, cover_image_url: data.coverUrl });
+        toast.success('Cover generated successfully!');
+      } else {
+        throw new Error(data?.error || 'Failed to generate cover');
+      }
+    } catch (error: any) {
+      console.error('Generate cover error:', error);
+      toast.error(error.message || 'Failed to generate cover');
+    } finally {
+      setIsGeneratingCover(false);
+    }
+  };
+
   // Create playlist mutation
   const createMutation = useMutation({
     mutationFn: async () => {
@@ -244,6 +444,7 @@ export const PlaylistManager = () => {
           is_free: createFormData.is_free,
           sort_order: createFormData.sort_order,
           display_mode: createFormData.display_mode,
+          cover_image_url: createFormData.cover_image_url || null,
         });
 
       if (error) throw error;
@@ -329,6 +530,7 @@ export const PlaylistManager = () => {
       category: "audiobook",
       sort_order: 0,
       display_mode: "tracks",
+      cover_image_url: "",
     });
   };
 
@@ -341,6 +543,7 @@ export const PlaylistManager = () => {
       category: "audiobook",
       sort_order: 0,
       display_mode: "tracks",
+      cover_image_url: "",
     });
   };
 
@@ -364,6 +567,7 @@ export const PlaylistManager = () => {
       category: playlist.category || "audiobook",
       sort_order: playlist.sort_order,
       display_mode: playlist.display_mode || "tracks",
+      cover_image_url: playlist.cover_image_url || "",
     });
     setIsEditDialogOpen(true);
   };
@@ -393,6 +597,7 @@ export const PlaylistManager = () => {
         is_free: editFormData.is_free,
         sort_order: editFormData.sort_order,
         display_mode: editFormData.display_mode,
+        cover_image_url: editFormData.cover_image_url || null,
       },
     });
   };
@@ -430,6 +635,7 @@ export const PlaylistManager = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-16">Cover</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Tracks</TableHead>
@@ -440,6 +646,19 @@ export const PlaylistManager = () => {
           <TableBody>
             {playlists?.map((playlist) => (
               <TableRow key={playlist.id} className={playlist.is_hidden ? "opacity-50" : ""}>
+                <TableCell>
+                  {playlist.cover_image_url ? (
+                    <img
+                      src={playlist.cover_image_url}
+                      alt={playlist.name}
+                      className="w-12 h-12 object-cover rounded"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 bg-muted rounded flex items-center justify-center text-muted-foreground text-xs">
+                      No cover
+                    </div>
+                  )}
+                </TableCell>
                 <TableCell className="font-medium">{playlist.name}</TableCell>
                 <TableCell className="max-w-xs truncate">
                   {playlist.description || <span className="text-muted-foreground">No description</span>}
@@ -516,7 +735,7 @@ export const PlaylistManager = () => {
       </CardContent>
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Create New Playlist</DialogTitle>
           </DialogHeader>
@@ -528,12 +747,18 @@ export const PlaylistManager = () => {
             isSubmitting={createMutation.isPending}
             submitLabel="Create Playlist"
             programs={programs}
+            isUploadingCover={isUploadingCover}
+            isGeneratingCover={isGeneratingCover}
+            onUploadCover={handleCreateCoverUpload}
+            onRemoveCover={() => setCreateFormData({ ...createFormData, cover_image_url: "" })}
+            onGenerateCover={handleCreateGenerateCover}
+            fileInputRef={createFileInputRef}
           />
         </DialogContent>
       </Dialog>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit Playlist</DialogTitle>
           </DialogHeader>
@@ -545,6 +770,12 @@ export const PlaylistManager = () => {
             isSubmitting={updateMutation.isPending}
             submitLabel="Update Playlist"
             programs={programs}
+            isUploadingCover={isUploadingCover}
+            isGeneratingCover={isGeneratingCover}
+            onUploadCover={handleEditCoverUpload}
+            onRemoveCover={() => setEditFormData({ ...editFormData, cover_image_url: "" })}
+            onGenerateCover={handleEditGenerateCover}
+            fileInputRef={editFileInputRef}
           />
         </DialogContent>
       </Dialog>

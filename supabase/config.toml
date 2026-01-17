@@ -133,3 +133,9 @@ verify_jwt = true
 
 [functions.check-app-version]
 verify_jwt = false
+
+[functions.generate-program-cover]
+verify_jwt = true
+
+[functions.generate-playlist-cover]
+verify_jwt = true
