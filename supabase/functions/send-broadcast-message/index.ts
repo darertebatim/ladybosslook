@@ -340,7 +340,7 @@ const handler = async (req: Request): Promise<Response> => {
               const deviceToken = subscription.endpoint.replace('native:', '');
               const response = await sendToApns(
                 deviceToken,
-                { title: `📢 ${title}`, body: content.substring(0, 100), url: '/app/support-chat' },
+                { title: `📢 ${title}`, body: content.substring(0, 100), url: '/app/chat' },
                 apnsJwt,
                 topic,
                 apnsEnvironment
