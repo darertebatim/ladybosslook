@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2, Upload, X, ImageIcon } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { RichTextEditor } from './RichTextEditor';
+import { programImages } from '@/data/programs';
 
 interface ProgramCatalog {
   id: string;
@@ -227,7 +228,8 @@ export function ProgramsManager() {
       balance_full_discount: (program as any).balance_full_discount || 0,
       stripe_product_id: (program as any).stripe_product_id || '',
       stripe_price_id: (program as any).stripe_price_id || '',
-      cover_image_url: program.cover_image_url || '',
+      // Use cover_image_url from DB, or fallback to programImages mapping
+      cover_image_url: program.cover_image_url || programImages[program.slug] || '',
     });
     setEditingId(program.id);
     setShowForm(true);

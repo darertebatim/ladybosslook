@@ -23,11 +23,12 @@ export const usePrograms = () => {
       }).sort((a: any, b: any) => a.slug.localeCompare(b.slug));
       
       // Map database records to Program type with images
+      // Prefer cover_image_url from DB, fallback to static programImages mapping
       return filteredData.map((dbProgram: any) => ({
         title: dbProgram.title,
         slug: dbProgram.slug,
         description: dbProgram.description || '',
-        image: programImages[dbProgram.slug] || programImages['default'],
+        image: dbProgram.cover_image_url || programImages[dbProgram.slug] || programImages['default'],
         duration: dbProgram.duration || 'Self-paced',
         participants: '0', // Not stored in DB
         rating: 4.9, // Not stored in DB
