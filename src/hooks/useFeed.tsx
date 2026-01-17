@@ -104,7 +104,7 @@ export function useFeedPosts(channelId?: string) {
           channel:feed_channels!feed_posts_channel_id_fkey(*)
         `)
         .order('is_pinned', { ascending: false })
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: true });
 
       if (channelId) {
         query = query.eq('channel_id', channelId);

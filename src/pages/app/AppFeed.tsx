@@ -55,8 +55,7 @@ export default function AppFeed() {
     const groups: PostGroup[] = [];
     let currentDateLabel = '';
 
-    // Posts are already sorted by created_at descending (newest first)
-    // We need to process them in order
+    // Posts are sorted by created_at ascending (oldest first, like Telegram)
     posts.forEach((post, index) => {
       const postDate = new Date(post.created_at);
       let dateLabel: string;
