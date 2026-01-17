@@ -371,6 +371,7 @@ export function ProgramsManager() {
         body: {
           programTitle: formData.title,
           programSlug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, '-'),
+          programDescription: formData.description, // Include description for better AI context
         },
       });
 

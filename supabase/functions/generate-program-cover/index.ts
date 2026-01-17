@@ -17,21 +17,33 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const { programTitle, programSlug, customPrompt } = await req.json();
+    const { programTitle, programSlug, programDescription, customPrompt } = await req.json();
 
     if (!programSlug) {
       throw new Error('Program slug is required');
     }
 
-    // Generate a prompt based on the program title or use custom prompt
-    const basePrompt = customPrompt || `Professional course cover image for "${programTitle || programSlug}". 
-Modern, aspirational, empowering visual for a women's personal development program.
-Features confident, successful woman or abstract representation of growth and transformation.
-Warm, inviting color palette with rose gold, coral, champagne, and soft purple tones.
-Clean, editorial style with subtle gradient overlay.
-High-end, premium aesthetic suitable for a coaching/education program.
-16:9 aspect ratio landscape orientation, 800x600 resolution.
-No text, no logos, photorealistic quality.`;
+    // Build context from title and description
+    const programContext = programDescription 
+      ? `"${programTitle}" - ${programDescription.replace(/<[^>]*>/g, '').substring(0, 500)}`
+      : programTitle || programSlug;
+
+    // Generate a prompt based on the program title and description
+    const basePrompt = customPrompt || `Create a professional, inspiring course cover image for a women's empowerment program:
+
+PROGRAM: ${programContext}
+
+Requirements:
+- Modern, aspirational, and empowering visual that reflects the program's theme
+- Should visually represent the core concept: ${programTitle}
+- Warm, inviting color palette (rose gold, coral, champagne, soft purple, or colors that match the topic)
+- Clean, editorial style with elegant composition
+- High-end, premium aesthetic suitable for a coaching/education program
+- Can include: confident woman silhouette, abstract growth symbols, or relevant metaphorical imagery
+- Landscape orientation (16:9 aspect ratio, 800x600px)
+- No text, no logos, no words
+- Photorealistic or high-quality illustration style
+- Evoke feelings of transformation, confidence, and success`;
 
     console.log('Generating program cover for:', programSlug);
 
