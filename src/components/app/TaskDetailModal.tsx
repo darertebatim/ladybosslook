@@ -89,14 +89,14 @@ export const TaskDetailModal = ({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="sm:max-w-md p-0 gap-0 rounded-3xl overflow-hidden">
-        {/* Header with emoji and time */}
-        <div className={cn('p-6 pb-4', colorClass)}>
+      <DialogContent hideCloseButton className="sm:max-w-md p-0 gap-0 rounded-3xl overflow-hidden">
+        {/* Header with icon and time */}
+        <div className={cn('p-6 pb-4 relative', colorClass)}>
           <button 
             onClick={onClose}
-            className="absolute right-4 top-4 rounded-full bg-white/50 p-1"
+            className="absolute right-4 top-4 w-7 h-7 rounded-full border border-foreground/30 flex items-center justify-center hover:bg-white/30 transition-colors"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4" strokeWidth={1.5} />
           </button>
           
           <div className="flex items-center gap-4">
