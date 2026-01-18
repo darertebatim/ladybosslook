@@ -10,6 +10,7 @@ import {
 } from '@/hooks/useTaskPlanner';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { TaskIcon } from './IconPicker';
 
 interface TaskCardProps {
   task: UserTask;
@@ -93,9 +94,9 @@ export const TaskCard = ({
     >
       {/* Main row */}
       <div className="flex items-center gap-3">
-        {/* Emoji circle */}
-        <div className="w-11 h-11 rounded-full bg-white/90 flex items-center justify-center text-xl shrink-0 shadow-sm">
-          {task.emoji}
+        {/* Icon circle */}
+        <div className="w-11 h-11 rounded-full bg-white/90 flex items-center justify-center shrink-0 shadow-sm">
+          <TaskIcon iconName={task.emoji} size={22} className="text-foreground/80" />
         </div>
 
         {/* Content */}
