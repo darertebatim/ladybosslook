@@ -40,8 +40,9 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Image, Settings } from 'lucide-react';
+import { Plus, Pencil, Trash2, Image, Settings, Wand2, Loader2 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 interface Plan {
   id: string;
@@ -91,6 +92,8 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isBulkGenerating, setIsBulkGenerating] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
   const [formData, setFormData] = useState({
     category_id: '' as string | null,
     title: '',
@@ -274,14 +277,82 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
     return Icon ? <Icon className="h-4 w-4" /> : null;
   };
 
+  const plansWithoutCovers = plans?.filter(p => !p.cover_image_url) || [];
+
+  const handleBulkGenerate = async (onlyMissing: boolean) => {
+    const targetPlans = onlyMissing ? plansWithoutCovers : plans;
+    if (!targetPlans?.length) {
+      toast.error('No plans to generate covers for');
+      return;
+    }
+
+    setIsBulkGenerating(true);
+    setBulkProgress({ current: 0, total: targetPlans.length });
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-routine-covers-bulk', {
+        body: { 
+          planIds: targetPlans.map(p => p.id),
+          onlyMissing 
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      toast.success(`Generated ${data.successCount} covers, ${data.failedCount} failed`);
+      queryClient.invalidateQueries({ queryKey: ['admin-routine-plans'] });
+    } catch (error) {
+      console.error('Bulk generation error:', error);
+      toast.error('Failed to generate covers');
+    } finally {
+      setIsBulkGenerating(false);
+      setBulkProgress({ current: 0, total: 0 });
+    }
+  };
+
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
         <CardTitle>Routine Plans</CardTitle>
-        <Button onClick={handleOpenCreate} size="sm">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Plan
-        </Button>
+        <div className="flex gap-2 flex-wrap">
+          {plansWithoutCovers.length > 0 && (
+            <Button 
+              onClick={() => handleBulkGenerate(true)} 
+              size="sm" 
+              variant="outline"
+              disabled={isBulkGenerating}
+            >
+              {isBulkGenerating ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Wand2 className="h-4 w-4 mr-2" />
+              )}
+              AI Generate Missing ({plansWithoutCovers.length})
+            </Button>
+          )}
+          <Button 
+            onClick={() => handleBulkGenerate(false)} 
+            size="sm" 
+            variant="outline"
+            disabled={isBulkGenerating || !plans?.length}
+          >
+            {isBulkGenerating ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Wand2 className="h-4 w-4 mr-2" />
+            )}
+            AI Generate All
+          </Button>
+          <Button onClick={handleOpenCreate} size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Plan
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
