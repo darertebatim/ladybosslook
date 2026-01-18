@@ -1606,6 +1606,112 @@ export type Database = {
         }
         Relationships: []
       }
+      subtask_completions: {
+        Row: {
+          completed_at: string
+          completed_date: string
+          id: string
+          subtask_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          completed_date: string
+          id?: string
+          subtask_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          completed_date?: string
+          id?: string
+          subtask_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subtask_completions_subtask_id_fkey"
+            columns: ["subtask_id"]
+            isOneToOne: false
+            referencedRelation: "user_subtasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_completions: {
+        Row: {
+          completed_at: string
+          completed_date: string
+          id: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          completed_date: string
+          id?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          completed_date?: string
+          id?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_completions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "user_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_templates: {
+        Row: {
+          category: string
+          color: string
+          created_at: string
+          description: string | null
+          display_order: number
+          emoji: string
+          id: string
+          is_active: boolean
+          repeat_pattern: string
+          suggested_time: string | null
+          title: string
+        }
+        Insert: {
+          category: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          emoji?: string
+          id?: string
+          is_active?: boolean
+          repeat_pattern?: string
+          suggested_time?: string | null
+          title: string
+        }
+        Update: {
+          category?: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          emoji?: string
+          id?: string
+          is_active?: boolean
+          repeat_pattern?: string
+          suggested_time?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       user_admin_permissions: {
         Row: {
           created_at: string | null
@@ -1703,6 +1809,146 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_streaks: {
+        Row: {
+          current_streak: number
+          id: string
+          last_completion_date: string | null
+          longest_streak: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          current_streak?: number
+          id?: string
+          last_completion_date?: string | null
+          longest_streak?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          current_streak?: number
+          id?: string
+          last_completion_date?: string | null
+          longest_streak?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_subtasks: {
+        Row: {
+          created_at: string
+          id: string
+          order_index: number
+          task_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          task_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          task_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subtasks_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "user_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_tags: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_tasks: {
+        Row: {
+          color: string
+          created_at: string
+          emoji: string
+          id: string
+          is_active: boolean
+          order_index: number
+          reminder_enabled: boolean
+          reminder_offset: number
+          repeat_days: number[] | null
+          repeat_pattern: string
+          scheduled_date: string | null
+          scheduled_time: string | null
+          tag: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          emoji?: string
+          id?: string
+          is_active?: boolean
+          order_index?: number
+          reminder_enabled?: boolean
+          reminder_offset?: number
+          repeat_days?: number[] | null
+          repeat_pattern?: string
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          tag?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          emoji?: string
+          id?: string
+          is_active?: boolean
+          order_index?: number
+          reminder_enabled?: boolean
+          reminder_offset?: number
+          repeat_days?: number[] | null
+          repeat_pattern?: string
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          tag?: string | null
+          title?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
