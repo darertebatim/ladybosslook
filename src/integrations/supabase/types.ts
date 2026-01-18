@@ -1576,6 +1576,215 @@ export type Database = {
         }
         Relationships: []
       }
+      routine_categories: {
+        Row: {
+          color: string
+          created_at: string
+          display_order: number
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          display_order?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          display_order?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      routine_plan_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          plan_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          plan_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          plan_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routine_plan_ratings_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "routine_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      routine_plan_sections: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          plan_id: string
+          section_order: number
+          title: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          plan_id: string
+          section_order?: number
+          title: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          plan_id?: string
+          section_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routine_plan_sections_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "routine_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      routine_plan_tasks: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          icon: string
+          id: string
+          is_active: boolean
+          plan_id: string
+          task_order: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          plan_id: string
+          task_order?: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          plan_id?: string
+          task_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routine_plan_tasks_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "routine_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      routine_plans: {
+        Row: {
+          category_id: string | null
+          color: string
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          display_order: number
+          estimated_minutes: number
+          icon: string
+          id: string
+          is_active: boolean
+          is_featured: boolean
+          is_popular: boolean
+          points: number
+          subtitle: string | null
+          title: string
+        }
+        Insert: {
+          category_id?: string | null
+          color?: string
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          estimated_minutes?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          is_popular?: boolean
+          points?: number
+          subtitle?: string | null
+          title: string
+        }
+        Update: {
+          category_id?: string | null
+          color?: string
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          estimated_minutes?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          is_popular?: boolean
+          points?: number
+          subtitle?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routine_plans_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "routine_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       security_audit_log: {
         Row: {
           action: string
@@ -1812,6 +2021,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_routine_plans: {
+        Row: {
+          added_at: string
+          id: string
+          is_active: boolean
+          plan_id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          id?: string
+          is_active?: boolean
+          plan_id: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          id?: string
+          is_active?: boolean
+          plan_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_routine_plans_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "routine_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_streaks: {
         Row: {

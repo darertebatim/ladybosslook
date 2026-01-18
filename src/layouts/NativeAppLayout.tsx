@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Newspaper, MessageCircle, Headphones, CheckSquare } from 'lucide-react';
+import { Home, Newspaper, MessageCircle, Headphones, CheckSquare, Lightbulb } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
@@ -129,7 +129,7 @@ const NativeAppLayout = () => {
     { path: '/app/home', icon: Home, label: 'Home' },
     { path: '/app/feed', icon: Newspaper, label: 'Community', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount },
     { path: '/app/planner', icon: CheckSquare, label: 'Planner' },
-    { path: '/app/player', icon: Headphones, label: 'Player' },
+    { path: '/app/inspire', icon: Lightbulb, label: 'Inspire' },
     { path: '/app/chat', icon: MessageCircle, label: 'Chat' },
   ];
 
