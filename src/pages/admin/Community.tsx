@@ -4,6 +4,7 @@ import { FeedChannelManager } from '@/components/admin/FeedChannelManager';
 import { FeedChatComposer } from '@/components/admin/FeedChatComposer';
 import { FeedPostsList } from '@/components/admin/FeedPostsList';
 import { SharedJournalsManager } from '@/components/admin/SharedJournalsManager';
+import { RoutineTemplatesManager } from '@/components/admin/RoutineTemplatesManager';
 
 export default function Community() {
   const [activeTab, setActiveTab] = useState('create');
@@ -18,11 +19,12 @@ export default function Community() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="create">New Message</TabsTrigger>
           <TabsTrigger value="posts">History</TabsTrigger>
-          <TabsTrigger value="journals">Shared Journals</TabsTrigger>
+          <TabsTrigger value="journals">Journals</TabsTrigger>
           <TabsTrigger value="channels">Channels</TabsTrigger>
+          <TabsTrigger value="routines">Routines</TabsTrigger>
         </TabsList>
 
         <TabsContent value="create" className="mt-6">
@@ -39,6 +41,10 @@ export default function Community() {
 
         <TabsContent value="channels" className="mt-6">
           <FeedChannelManager />
+        </TabsContent>
+
+        <TabsContent value="routines" className="mt-6">
+          <RoutineTemplatesManager />
         </TabsContent>
       </Tabs>
     </div>
