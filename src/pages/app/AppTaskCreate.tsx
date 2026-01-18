@@ -20,12 +20,7 @@ import {
   RepeatPattern,
   TASK_COLOR_CLASSES,
 } from '@/hooks/useTaskPlanner';
-
-// Emoji picker - common task emojis
-const EMOJI_OPTIONS = [
-  '☀️', '🎯', '💪', '🙏', '✨', '📝', '📖', '🧘', '💧', '🏃‍♀️',
-  '💰', '📧', '📞', '🥗', '😴', '💕', '🌸', '🔥', '⭐', '🎨',
-];
+import { IconPicker, TaskIcon } from '@/components/app/IconPicker';
 
 // Color options
 const COLOR_OPTIONS: TaskColor[] = ['pink', 'peach', 'yellow', 'lime', 'sky', 'mint', 'lavender'];
@@ -48,7 +43,7 @@ const AppTaskCreate = () => {
 
   // Form state
   const [title, setTitle] = useState('');
-  const [emoji, setEmoji] = useState('☀️');
+  const [icon, setIcon] = useState('Sun');
   const [color, setColor] = useState<TaskColor>('yellow');
   const [scheduledDate, setScheduledDate] = useState<Date>(new Date());
   const [scheduledTime, setScheduledTime] = useState<string | null>(null);
@@ -62,7 +57,7 @@ const AppTaskCreate = () => {
   const [newSubtask, setNewSubtask] = useState('');
 
   // Sheet states
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showIconPicker, setShowIconPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showRepeatPicker, setShowRepeatPicker] = useState(false);
@@ -84,7 +79,7 @@ const AppTaskCreate = () => {
   useEffect(() => {
     if (existingTask) {
       setTitle(existingTask.title);
-      setEmoji(existingTask.emoji);
+      setIcon(existingTask.emoji);
       setColor(existingTask.color as TaskColor);
       if (existingTask.scheduled_date) {
         setScheduledDate(new Date(existingTask.scheduled_date));
@@ -120,7 +115,7 @@ const AppTaskCreate = () => {
 
     const taskData = {
       title: title.trim(),
-      emoji,
+      emoji: icon,
       color,
       scheduled_date: format(scheduledDate, 'yyyy-MM-dd'),
       scheduled_time: scheduledTime,
@@ -222,13 +217,13 @@ const AppTaskCreate = () => {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
-        {/* Emoji & Title */}
+        {/* Icon & Title */}
         <div className="p-6 text-center border-b">
           <button
-            onClick={() => setShowEmojiPicker(true)}
-            className="text-5xl mb-4 hover:scale-110 transition-transform active:scale-95"
+            onClick={() => setShowIconPicker(true)}
+            className="w-20 h-20 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4 hover:bg-muted transition-colors active:scale-95"
           >
-            {emoji}
+            <TaskIcon iconName={icon} size={36} className="text-foreground/80" />
           </button>
           <Input
             value={title}
@@ -379,31 +374,13 @@ const AppTaskCreate = () => {
         <div className="pb-safe" />
       </div>
 
-      {/* Emoji Picker Sheet */}
-      <Sheet open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
-        <SheetContent side="bottom" className="h-auto max-h-[50vh]">
-          <SheetHeader>
-            <SheetTitle>Choose an emoji</SheetTitle>
-          </SheetHeader>
-          <div className="grid grid-cols-5 gap-4 p-4">
-            {EMOJI_OPTIONS.map((e) => (
-              <button
-                key={e}
-                onClick={() => {
-                  setEmoji(e);
-                  setShowEmojiPicker(false);
-                }}
-                className={cn(
-                  'text-3xl p-2 rounded-xl hover:bg-muted transition-colors active:scale-95',
-                  emoji === e && 'bg-muted ring-2 ring-violet-500'
-                )}
-              >
-                {e}
-              </button>
-            ))}
-          </div>
-        </SheetContent>
-      </Sheet>
+      {/* Icon Picker */}
+      <IconPicker
+        open={showIconPicker}
+        onOpenChange={setShowIconPicker}
+        selectedIcon={icon}
+        onSelect={setIcon}
+      />
 
       {/* Date Picker Sheet */}
       <Sheet open={showDatePicker} onOpenChange={setShowDatePicker}>

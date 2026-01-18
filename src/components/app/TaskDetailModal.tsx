@@ -11,6 +11,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { TaskIcon } from './IconPicker';
 
 interface TaskDetailModalProps {
   task: UserTask | null;
@@ -100,8 +101,8 @@ export const TaskDetailModal = ({
           </button>
           
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-white/80 flex items-center justify-center text-2xl">
-              {task.emoji}
+            <div className="w-14 h-14 rounded-full bg-white/80 flex items-center justify-center">
+              <TaskIcon iconName={task.emoji} size={28} className="text-foreground/80" />
             </div>
             <div>
               <p className="text-sm text-foreground/60">
