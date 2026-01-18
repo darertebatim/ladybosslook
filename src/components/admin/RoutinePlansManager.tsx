@@ -93,6 +93,9 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
+  const [isAIGenerating, setIsAIGenerating] = useState(false);
+  const [aiTheme, setAiTheme] = useState('');
+  const [showAIDialog, setShowAIDialog] = useState(false);
   const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
   const [formData, setFormData] = useState({
     category_id: '' as string | null,
@@ -315,11 +318,52 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
     }
   };
 
+  const handleAIGeneratePlan = async () => {
+    setIsAIGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-routine-plan-ai', {
+        body: { 
+          categoryId: formData.category_id || null,
+          theme: aiTheme || undefined
+        }
+      });
+
+      if (error) throw error;
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      toast.success(data.message || 'Plan created successfully');
+      queryClient.invalidateQueries({ queryKey: ['admin-routine-plans'] });
+      setShowAIDialog(false);
+      setAiTheme('');
+    } catch (error) {
+      console.error('AI generation error:', error);
+      toast.error('Failed to generate plan');
+    } finally {
+      setIsAIGenerating(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
         <CardTitle>Routine Plans</CardTitle>
         <div className="flex gap-2 flex-wrap">
+          <Button 
+            onClick={() => setShowAIDialog(true)} 
+            size="sm" 
+            variant="outline"
+            disabled={isAIGenerating}
+          >
+            {isAIGenerating ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Wand2 className="h-4 w-4 mr-2" />
+            )}
+            AI Generate Plan
+          </Button>
           {plansWithoutCovers.length > 0 && (
             <Button 
               onClick={() => handleBulkGenerate(true)} 
@@ -332,22 +376,9 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
               ) : (
                 <Wand2 className="h-4 w-4 mr-2" />
               )}
-              AI Generate Missing ({plansWithoutCovers.length})
+              AI Covers ({plansWithoutCovers.length})
             </Button>
           )}
-          <Button 
-            onClick={() => handleBulkGenerate(false)} 
-            size="sm" 
-            variant="outline"
-            disabled={isBulkGenerating || !plans?.length}
-          >
-            {isBulkGenerating ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Wand2 className="h-4 w-4 mr-2" />
-            )}
-            AI Generate All
-          </Button>
           <Button onClick={handleOpenCreate} size="sm">
             <Plus className="h-4 w-4 mr-2" />
             Add Plan
@@ -649,6 +680,71 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* AI Generate Plan Dialog */}
+      <Dialog open={showAIDialog} onOpenChange={setShowAIDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>AI Generate Routine Plan</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Category (optional)</Label>
+              <Select
+                value={formData.category_id || 'none'}
+                onValueChange={(value) => setFormData(prev => ({ 
+                  ...prev, 
+                  category_id: value === 'none' ? null : value 
+                }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Any category</SelectItem>
+                  {categories?.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Theme / Topic (optional)</Label>
+              <Input
+                value={aiTheme}
+                onChange={(e) => setAiTheme(e.target.value)}
+                placeholder="e.g. 5-minute stress relief, productivity boost, evening relaxation..."
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Describe the type of routine you want to generate
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAIDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleAIGeneratePlan}
+              disabled={isAIGenerating}
+            >
+              {isAIGenerating ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Wand2 className="h-4 w-4 mr-2" />
+                  Generate
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
