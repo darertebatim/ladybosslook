@@ -38,6 +38,8 @@ const AppFeed = lazy(() => import("@/pages/app/AppFeed"));
 const AppFeedPost = lazy(() => import("@/pages/app/AppFeedPost"));
 const AppJournal = lazy(() => import("@/pages/app/AppJournal"));
 const AppJournalEntry = lazy(() => import("@/pages/app/AppJournalEntry"));
+const AppPlanner = lazy(() => import("@/pages/app/AppPlanner"));
+const AppTaskCreate = lazy(() => import("@/pages/app/AppTaskCreate"));
 
 // Lazy load admin pages
 const Overview = lazy(() => import("@/pages/admin/Overview"));
@@ -227,6 +229,8 @@ const App = () => (
                 {/* Full-screen pages - Outside of AppLayout so no tab bar */}
                 <Route path="/app/journal/new" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
                 <Route path="/app/journal/:entryId" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
+                <Route path="/app/planner/new" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
+                <Route path="/app/planner/edit/:taskId" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
                 <Route path="/app/feed/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
                 
                 {/* App Routes */}
@@ -242,6 +246,7 @@ const App = () => (
                   <Route path="chat" element={<AppChat />} />
                   <Route path="feed" element={<AppFeed />} />
                   <Route path="journal" element={<AppJournal />} />
+                  <Route path="planner" element={<AppPlanner />} />
                   <Route path="profile" element={<AppProfile />} />
                 </Route>
                 
