@@ -32,7 +32,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Pencil, Trash2, GripVertical, Wand2, Loader2 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 
 interface Category {
@@ -67,6 +67,7 @@ export function RoutineCategoriesManager() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -75,6 +76,29 @@ export function RoutineCategoriesManager() {
     display_order: 0,
     is_active: true,
   });
+
+  const handleAIGenerate = async () => {
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-routine-categories-ai', {
+        body: {}
+      });
+
+      if (error) throw error;
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      toast.success(data.message || `Added ${data.count} new categories`);
+      queryClient.invalidateQueries({ queryKey: ['admin-routine-categories'] });
+    } catch (error) {
+      console.error('AI generation error:', error);
+      toast.error('Failed to generate categories');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const { data: categories, isLoading } = useQuery({
     queryKey: ['admin-routine-categories'],
@@ -187,12 +211,27 @@ export function RoutineCategoriesManager() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
         <CardTitle>Routine Categories</CardTitle>
-        <Button onClick={handleOpenCreate} size="sm">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Category
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleAIGenerate} 
+            size="sm" 
+            variant="outline"
+            disabled={isGenerating}
+          >
+            {isGenerating ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Wand2 className="h-4 w-4 mr-2" />
+            )}
+            AI Generate Categories
+          </Button>
+          <Button onClick={handleOpenCreate} size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Category
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (

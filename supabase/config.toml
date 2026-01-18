@@ -142,3 +142,9 @@ verify_jwt = true
 
 [functions.generate-routine-covers-bulk]
 verify_jwt = true
+
+[functions.generate-routine-plan-ai]
+verify_jwt = true
+
+[functions.generate-routine-categories-ai]
+verify_jwt = true
