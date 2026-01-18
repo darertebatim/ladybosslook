@@ -1,15 +1,12 @@
 import { useState } from 'react';
-import { Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   UserTask, 
-  UserSubtask, 
   TASK_COLOR_CLASSES,
   useSubtasks,
   useCompleteTask,
   useUncompleteTask,
-  useCompleteSubtask,
-  useUncompleteSubtask,
 } from '@/hooks/useTaskPlanner';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
@@ -19,7 +16,7 @@ interface TaskCardProps {
   date: Date;
   isCompleted: boolean;
   completedSubtaskIds: string[];
-  onEdit?: (task: UserTask) => void;
+  onTap?: (task: UserTask) => void;
   onStreakIncrease?: () => void;
 }
 
@@ -28,19 +25,16 @@ export const TaskCard = ({
   date,
   isCompleted,
   completedSubtaskIds,
-  onEdit,
+  onTap,
   onStreakIncrease,
 }: TaskCardProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   
   const { data: subtasks = [] } = useSubtasks(task.id);
   const completeTask = useCompleteTask();
   const uncompleteTask = useUncompleteTask();
-  const completeSubtask = useCompleteSubtask();
-  const uncompleteSubtask = useUncompleteSubtask();
 
-  const completedCount = completedSubtaskIds.length;
+  const completedCount = subtasks.filter(s => completedSubtaskIds.includes(s.id)).length;
   const totalSubtasks = subtasks.length;
   const hasSubtasks = totalSubtasks > 0;
 
@@ -80,23 +74,9 @@ export const TaskCard = ({
     }
   };
 
-  const handleToggleSubtask = async (subtask: UserSubtask) => {
-    const isSubtaskCompleted = completedSubtaskIds.includes(subtask.id);
-    
-    if (Capacitor.isNativePlatform()) {
-      await Haptics.impact({ style: ImpactStyle.Light });
-    }
-
-    if (isSubtaskCompleted) {
-      uncompleteSubtask.mutate({ subtaskId: subtask.id, date });
-    } else {
-      completeSubtask.mutate({ subtaskId: subtask.id, date });
-    }
-  };
-
   const handleCardClick = () => {
-    if (hasSubtasks) {
-      setIsExpanded(!isExpanded);
+    if (onTap) {
+      onTap(task);
     }
   };
 
@@ -106,16 +86,15 @@ export const TaskCard = ({
     <div
       onClick={handleCardClick}
       className={cn(
-        'rounded-2xl p-4 transition-all duration-200 cursor-pointer',
+        'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
         colorClass,
-        isCompleted && 'opacity-60',
-        isExpanded && 'shadow-md'
+        isCompleted && 'opacity-60'
       )}
     >
       {/* Main row */}
       <div className="flex items-center gap-3">
         {/* Emoji circle */}
-        <div className="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center text-lg shrink-0">
+        <div className="w-11 h-11 rounded-full bg-white/90 flex items-center justify-center text-xl shrink-0 shadow-sm">
           {task.emoji}
         </div>
 
@@ -124,7 +103,7 @@ export const TaskCard = ({
           {/* Top line: subtask count + time */}
           <div className="flex items-center gap-2 text-xs text-foreground/60 mb-0.5">
             {hasSubtasks && (
-              <span className="font-medium">
+              <span className="font-semibold text-foreground/70">
                 {completedCount}/{totalSubtasks}
               </span>
             )}
@@ -133,83 +112,27 @@ export const TaskCard = ({
           
           {/* Title */}
           <p className={cn(
-            'font-medium text-foreground truncate transition-all',
+            'font-semibold text-foreground truncate transition-all',
             isCompleted && 'line-through text-foreground/50'
           )}>
             {task.title}
           </p>
         </div>
 
-        {/* Expand indicator */}
-        {hasSubtasks && (
-          <div className="text-foreground/40 mr-2">
-            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </div>
-        )}
-
-        {/* Checkbox */}
+        {/* Checkbox / Badge */}
         <button
           onClick={handleToggleComplete}
           className={cn(
-            'w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200',
+            'w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
             isCompleted
-              ? 'bg-emerald-500 border-emerald-500 text-white'
-              : 'border-foreground/30 hover:border-foreground/50',
+              ? 'bg-emerald-500 text-white shadow-md'
+              : 'border-2 border-foreground/25 hover:border-foreground/40 bg-white/50',
             isAnimating && 'scale-110'
           )}
         >
           {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
         </button>
       </div>
-
-      {/* Expanded subtasks */}
-      {isExpanded && hasSubtasks && (
-        <div className="mt-3 pt-3 border-t border-foreground/10 space-y-2">
-          {subtasks.map((subtask) => {
-            const isSubtaskCompleted = completedSubtaskIds.includes(subtask.id);
-            return (
-              <div
-                key={subtask.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleToggleSubtask(subtask);
-                }}
-                className="flex items-center gap-3 py-1 cursor-pointer"
-              >
-                <div
-                  className={cn(
-                    'w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all',
-                    isSubtaskCompleted
-                      ? 'bg-emerald-500 border-emerald-500 text-white'
-                      : 'border-foreground/30'
-                  )}
-                >
-                  {isSubtaskCompleted && <Check className="h-3 w-3" strokeWidth={3} />}
-                </div>
-                <span className={cn(
-                  'text-sm',
-                  isSubtaskCompleted && 'line-through text-foreground/50'
-                )}>
-                  {subtask.title}
-                </span>
-              </div>
-            );
-          })}
-          
-          {/* Edit button */}
-          {onEdit && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(task);
-              }}
-              className="text-xs text-foreground/50 hover:text-foreground/70 mt-2"
-            >
-              Edit task
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 };

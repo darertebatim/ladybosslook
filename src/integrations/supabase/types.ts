@@ -1907,6 +1907,8 @@ export type Database = {
           reminder_enabled: boolean
           reminder_offset: number
           repeat_days: number[] | null
+          repeat_end_date: string | null
+          repeat_interval: number | null
           repeat_pattern: string
           scheduled_date: string | null
           scheduled_time: string | null
@@ -1925,6 +1927,8 @@ export type Database = {
           reminder_enabled?: boolean
           reminder_offset?: number
           repeat_days?: number[] | null
+          repeat_end_date?: string | null
+          repeat_interval?: number | null
           repeat_pattern?: string
           scheduled_date?: string | null
           scheduled_time?: string | null
@@ -1943,6 +1947,8 @@ export type Database = {
           reminder_enabled?: boolean
           reminder_offset?: number
           repeat_days?: number[] | null
+          repeat_end_date?: string | null
+          repeat_interval?: number | null
           repeat_pattern?: string
           scheduled_date?: string | null
           scheduled_time?: string | null
