@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, Share2, Clock, Star, CheckCircle, Loader2 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { StarRating } from '@/components/app/StarRating';
+import { RoutinePreviewSheet } from '@/components/app/RoutinePreviewSheet';
 import { useRoutinePlan, useAddRoutinePlan, useRateRoutinePlan } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -24,19 +26,28 @@ const colorGradients: Record<string, string> = {
 export default function AppInspireDetail() {
   const { planId } = useParams<{ planId: string }>();
   const navigate = useNavigate();
+  const [showPreviewSheet, setShowPreviewSheet] = useState(false);
   
   const { data: plan, isLoading } = useRoutinePlan(planId);
   const addRoutinePlan = useAddRoutinePlan();
   const rateRoutinePlan = useRateRoutinePlan();
 
-  const handleAddRoutine = async () => {
+  const handleAddClick = () => {
+    if (!plan?.tasks?.length) {
+      toast.error('No tasks in this routine');
+      return;
+    }
+    setShowPreviewSheet(true);
+  };
+
+  const handleSaveRoutine = async (selectedTaskIds: string[]) => {
     if (!planId) return;
     
     try {
-      await addRoutinePlan.mutateAsync(planId);
-      toast.success('Routine added!', {
-        description: 'Check your planner to see your new routine.',
-      });
+      await addRoutinePlan.mutateAsync({ planId, selectedTaskIds });
+      setShowPreviewSheet(false);
+      toast.success(`${selectedTaskIds.length} tasks added!`);
+      navigate('/app/planner');
     } catch (error) {
       toast.error('Failed to add routine');
     }
@@ -246,14 +257,12 @@ export default function AppInspireDetail() {
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
       >
         <Button
-          onClick={handleAddRoutine}
-          disabled={plan.isAdded || addRoutinePlan.isPending}
+          onClick={handleAddClick}
+          disabled={plan.isAdded}
           className="w-full h-12 text-base font-semibold"
           size="lg"
         >
-          {addRoutinePlan.isPending ? (
-            <Loader2 className="w-5 h-5 animate-spin mr-2" />
-          ) : plan.isAdded ? (
+          {plan.isAdded ? (
             <>
               <CheckCircle className="w-5 h-5 mr-2" />
               Already Added
@@ -263,6 +272,18 @@ export default function AppInspireDetail() {
           )}
         </Button>
       </div>
+
+      {/* Preview Sheet */}
+      {plan.tasks && (
+        <RoutinePreviewSheet
+          open={showPreviewSheet}
+          onOpenChange={setShowPreviewSheet}
+          tasks={plan.tasks}
+          routineTitle={plan.title}
+          onSave={handleSaveRoutine}
+          isSaving={addRoutinePlan.isPending}
+        />
+      )}
     </div>
   );
 }
