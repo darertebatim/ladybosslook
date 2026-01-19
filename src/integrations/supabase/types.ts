@@ -1107,6 +1107,33 @@ export type Database = {
         }
         Relationships: []
       }
+      planner_program_completions: {
+        Row: {
+          completed_date: string
+          created_at: string
+          event_id: string
+          event_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          completed_date: string
+          created_at?: string
+          event_id: string
+          event_type: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          completed_date?: string
+          created_at?: string
+          event_id?: string
+          event_type?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       playlist_supplements: {
         Row: {
           audio_id: string | null
