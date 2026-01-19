@@ -978,10 +978,7 @@ const AppTaskCreate = ({
 
   // Page mode - render as full page
   return (
-    <div 
-      className="flex flex-col min-h-screen bg-background"
-      style={{ paddingBottom: isKeyboardOpen ? effectiveInset : 0 }}
-    >
+    <div className="flex flex-col h-full bg-background">
       {/* Header - iOS Standard */}
       <header 
         className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur border-b"
