@@ -18,11 +18,13 @@ export default function AppPlaylistDetail() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [selectedSupplement, setSelectedSupplement] = useState<{
+    id: string;
     title: string;
     type: string;
     url: string;
     description?: string;
   } | null>(null);
+  const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
 
   // Fetch playlist details
   const { data: playlist, isLoading: playlistLoading } = useQuery({
@@ -327,10 +329,14 @@ export default function AppPlaylistDetail() {
     navigate(`/app/player/${audioId}`);
   };
 
-  const handleModuleClick = (module: any) => {
+  const handleModuleClick = (module: any, index?: number) => {
     if (!hasAccess) return;
     const { isAvailable } = getContentAvailability(module.drip_delay_days || 0);
     if (!isAvailable) return;
+
+    // Track which module is currently open
+    const moduleIndex = index ?? modules?.findIndex(m => m.id === module.id) ?? 0;
+    setCurrentModuleIndex(moduleIndex);
 
     switch (module.type) {
       case 'audio':
@@ -341,9 +347,9 @@ export default function AppPlaylistDetail() {
         break;
       case 'video':
       case 'pdf':
-        // Mark as viewed
-        markModuleViewedMutation.mutate(module.id);
+        // Don't auto-complete - user will click "Complete" button in viewer
         setSelectedSupplement({
+          id: module.id,
           title: module.title,
           type: module.type,
           url: module.url,
@@ -351,7 +357,7 @@ export default function AppPlaylistDetail() {
         });
         break;
       case 'link':
-        // Mark as viewed
+        // For links, mark as viewed when opened (can't track external completion)
         markModuleViewedMutation.mutate(module.id);
         window.open(module.url, '_blank', 'noopener,noreferrer');
         break;
@@ -546,7 +552,7 @@ export default function AppPlaylistDetail() {
             return (
               <div
                 key={module.id}
-                onClick={() => handleModuleClick(module)}
+                onClick={() => handleModuleClick(module, index)}
                 className={`flex items-center gap-3 p-3 rounded-lg border ${
                   !isAvailable 
                     ? 'opacity-60 bg-muted/30 cursor-not-allowed' 
@@ -683,6 +689,40 @@ export default function AppPlaylistDetail() {
           isOpen={!!selectedSupplement}
           onClose={() => setSelectedSupplement(null)}
           supplement={selectedSupplement}
+          moduleContext={modules && modules.length > 0 ? {
+            modules: modules.map(m => ({
+              id: m.id,
+              title: m.title,
+              type: m.type,
+              url: m.url,
+              description: m.description || undefined,
+              audio_id: m.audio_id || undefined,
+              sort_order: m.sort_order,
+            })),
+            currentIndex: currentModuleIndex,
+            isCompleted: selectedSupplement ? getModuleProgress(selectedSupplement.id, null).viewed : false,
+            onComplete: (moduleId) => {
+              markModuleViewedMutation.mutate(moduleId);
+            },
+            onNavigate: (module, index) => {
+              // For audio modules, navigate to player
+              if (module.type === 'audio' && module.audio_id) {
+                setSelectedSupplement(null);
+                navigate(`/app/player/${module.audio_id}?moduleMode=true&playlistId=${playlistId}`);
+                return;
+              }
+              // For other modules, update the supplement viewer
+              setCurrentModuleIndex(index);
+              setSelectedSupplement({
+                id: module.id,
+                title: module.title,
+                type: module.type,
+                url: module.url,
+                description: module.description,
+              });
+            },
+            getModuleCompleted: (moduleId) => getModuleProgress(moduleId, null).viewed,
+          } : undefined}
         />
         
         {/* Bottom safe area padding */}

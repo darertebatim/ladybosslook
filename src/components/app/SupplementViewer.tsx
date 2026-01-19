@@ -1,19 +1,41 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Loader2, FileText, Video } from "lucide-react";
+import { ExternalLink, Loader2, FileText, Video, ChevronLeft, ChevronRight, Check, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { isNativeApp } from "@/lib/platform";
 import { Browser } from "@capacitor/browser";
+import { cn } from "@/lib/utils";
+
+interface Module {
+  id: string;
+  title: string;
+  type: string;
+  url: string;
+  description?: string;
+  audio_id?: string;
+  sort_order: number;
+}
+
+interface ModuleContext {
+  modules: Module[];
+  currentIndex: number;
+  isCompleted: boolean;
+  onComplete: (moduleId: string) => void;
+  onNavigate: (module: Module, index: number) => void;
+  getModuleCompleted: (moduleId: string) => boolean;
+}
 
 interface SupplementViewerProps {
   isOpen: boolean;
   onClose: () => void;
   supplement: {
+    id: string;
     title: string;
     type: string;
     url: string;
     description?: string;
   } | null;
+  moduleContext?: ModuleContext;
 }
 
 const extractYouTubeId = (url: string): string | null => {
@@ -38,7 +60,6 @@ const extractVimeoId = (url: string): string | null => {
 const getVideoEmbedUrl = (url: string): string | null => {
   const youtubeId = extractYouTubeId(url);
   if (youtubeId) {
-    // Add required parameters for better embedding compatibility
     const params = new URLSearchParams({
       playsinline: '1',
       rel: '0',
@@ -61,21 +82,26 @@ const getVideoPlatformName = (url: string): string => {
   return 'External Site';
 };
 
-export function SupplementViewer({ isOpen, onClose, supplement }: SupplementViewerProps) {
+export function SupplementViewer({ isOpen, onClose, supplement, moduleContext }: SupplementViewerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [videoError, setVideoError] = useState(false);
+  const [showCompletedFeedback, setShowCompletedFeedback] = useState(false);
 
   // Reset states when supplement changes
   useEffect(() => {
     setIsLoading(true);
     setVideoError(false);
-  }, [supplement?.url]);
+    setShowCompletedFeedback(false);
+  }, [supplement?.url, supplement?.id]);
 
   if (!supplement) return null;
 
-  const handleOpenInNewTab = () => {
-    window.open(supplement.url, '_blank', 'noopener,noreferrer');
-  };
+  const hasModuleContext = !!moduleContext;
+  const currentIndex = moduleContext?.currentIndex ?? 0;
+  const totalModules = moduleContext?.modules.length ?? 1;
+  const isFirstModule = currentIndex === 0;
+  const isLastModule = currentIndex === totalModules - 1;
+  const isCurrentCompleted = moduleContext?.isCompleted ?? false;
 
   const handleOpenExternal = async () => {
     if (isNativeApp()) {
@@ -85,23 +111,62 @@ export function SupplementViewer({ isOpen, onClose, supplement }: SupplementView
     }
   };
 
+  const handleComplete = () => {
+    if (!moduleContext || !supplement) return;
+    
+    // Mark as complete
+    moduleContext.onComplete(supplement.id);
+    
+    // Show feedback
+    setShowCompletedFeedback(true);
+    
+    // Auto-advance after brief delay if not last module
+    if (!isLastModule) {
+      setTimeout(() => {
+        handleNext();
+      }, 600);
+    } else {
+      // On last module, close after showing feedback
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+    }
+  };
+
+  const handleNext = () => {
+    if (!moduleContext || isLastModule) return;
+    const nextModule = moduleContext.modules[currentIndex + 1];
+    if (nextModule) {
+      setShowCompletedFeedback(false);
+      moduleContext.onNavigate(nextModule, currentIndex + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (!moduleContext || isFirstModule) return;
+    const prevModule = moduleContext.modules[currentIndex - 1];
+    if (prevModule) {
+      setShowCompletedFeedback(false);
+      moduleContext.onNavigate(prevModule, currentIndex - 1);
+    }
+  };
+
   const renderContent = () => {
     if (supplement.type === 'video') {
       const embedUrl = getVideoEmbedUrl(supplement.url);
       const platformName = getVideoPlatformName(supplement.url);
       
-      // If embed failed or not available, show fallback
       if (!embedUrl || videoError) {
         return (
-          <div className="flex flex-col items-center justify-center py-12 space-y-4 bg-muted rounded-lg">
+          <div className="flex flex-col items-center justify-center py-12 space-y-4 bg-muted rounded-2xl">
             <Video className="h-16 w-16 text-muted-foreground" />
             <p className="text-center text-muted-foreground px-4">
-              This video needs to be opened externally
+              Tap below to watch the video
             </p>
             <Button 
               size="lg" 
               onClick={handleOpenExternal}
-              className="gap-2"
+              className="gap-2 rounded-full px-6"
             >
               <ExternalLink className="h-4 w-4" />
               Watch on {platformName}
@@ -111,49 +176,47 @@ export function SupplementViewer({ isOpen, onClose, supplement }: SupplementView
       }
 
       return (
-        <div className="relative w-full pt-[56.25%] bg-muted rounded-lg overflow-hidden">
-          {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          )}
-          <iframe
-            src={embedUrl}
-            className="absolute top-0 left-0 w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            onLoad={() => setIsLoading(false)}
-            onError={() => setVideoError(true)}
-          />
-          {/* Fallback link if embed has issues */}
-          <div className="mt-3 text-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleOpenExternal}
-              className="text-xs text-muted-foreground hover:text-foreground gap-1"
-            >
-              <ExternalLink className="h-3 w-3" />
-              Having trouble? Open on {platformName}
-            </Button>
+        <div className="space-y-3">
+          <div className="relative w-full pt-[56.25%] bg-muted rounded-2xl overflow-hidden">
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            )}
+            <iframe
+              src={embedUrl}
+              className="absolute top-0 left-0 w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              onLoad={() => setIsLoading(false)}
+              onError={() => setVideoError(true)}
+            />
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleOpenExternal}
+            className="w-full text-xs text-muted-foreground hover:text-foreground gap-1"
+          >
+            <ExternalLink className="h-3 w-3" />
+            Having trouble? Open on {platformName}
+          </Button>
         </div>
       );
     }
 
     if (supplement.type === 'pdf') {
-      // On native iOS, PDFs in iframes only show first page - use system viewer
       if (isNativeApp()) {
         return (
-          <div className="flex flex-col items-center justify-center py-12 space-y-4 bg-muted rounded-lg">
+          <div className="flex flex-col items-center justify-center py-12 space-y-4 bg-muted rounded-2xl">
             <FileText className="h-16 w-16 text-muted-foreground" />
             <p className="text-center text-muted-foreground px-4">
-              Tap below to view the full PDF document
+              Tap below to view the PDF document
             </p>
             <Button 
               size="lg" 
               onClick={handleOpenExternal}
-              className="gap-2"
+              className="gap-2 rounded-full px-6"
             >
               <ExternalLink className="h-4 w-4" />
               Open PDF
@@ -162,10 +225,9 @@ export function SupplementViewer({ isOpen, onClose, supplement }: SupplementView
         );
       }
 
-      // On web, show iframe with fallback option
       return (
         <div className="space-y-3">
-          <div className="relative w-full h-[60vh] bg-muted rounded-lg overflow-hidden">
+          <div className="relative w-full h-[50vh] bg-muted rounded-2xl overflow-hidden">
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -177,16 +239,34 @@ export function SupplementViewer({ isOpen, onClose, supplement }: SupplementView
               onLoad={() => setIsLoading(false)}
             />
           </div>
-          <p className="text-sm text-center text-muted-foreground">
-            Having trouble viewing?{' '}
-            <Button 
-              variant="link" 
-              className="p-0 h-auto text-sm"
-              onClick={handleOpenInNewTab}
-            >
-              Open in new tab
-            </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleOpenExternal}
+            className="w-full text-xs text-muted-foreground hover:text-foreground gap-1"
+          >
+            <ExternalLink className="h-3 w-3" />
+            Having trouble? Open in new tab
+          </Button>
+        </div>
+      );
+    }
+
+    if (supplement.type === 'link') {
+      return (
+        <div className="flex flex-col items-center justify-center py-12 space-y-4 bg-muted rounded-2xl">
+          <ExternalLink className="h-16 w-16 text-muted-foreground" />
+          <p className="text-center text-muted-foreground px-4">
+            This module opens an external resource
           </p>
+          <Button 
+            size="lg" 
+            onClick={handleOpenExternal}
+            className="gap-2 rounded-full px-6"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Open Link
+          </Button>
         </div>
       );
     }
@@ -195,30 +275,112 @@ export function SupplementViewer({ isOpen, onClose, supplement }: SupplementView
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{supplement.title}</DialogTitle>
-          {supplement.description && (
-            <DialogDescription>{supplement.description}</DialogDescription>
-          )}
-        </DialogHeader>
-        
-        <div className="space-y-4">
-          {renderContent()}
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent 
+        side="bottom" 
+        className="h-[90vh] rounded-t-3xl p-0 flex flex-col"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b bg-background/95 backdrop-blur sticky top-0 z-10">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="gap-1 -ml-2"
+          >
+            <X className="h-5 w-5" />
+          </Button>
           
-          <div className="flex justify-end">
+          {hasModuleContext && (
+            <span className="text-sm font-medium text-muted-foreground">
+              Module {currentIndex + 1} of {totalModules}
+            </span>
+          )}
+          
+          <div className="w-10" /> {/* Spacer for centering */}
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+          {/* Module Title & Description */}
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold">{supplement.title}</h2>
+            {supplement.description && (
+              <p className="text-muted-foreground text-sm">{supplement.description}</p>
+            )}
+          </div>
+
+          {/* Content Area */}
+          {renderContent()}
+        </div>
+
+        {/* Footer Navigation */}
+        <div className="border-t bg-background/95 backdrop-blur p-4 pb-safe space-y-3">
+          {/* Completion Feedback */}
+          {showCompletedFeedback && (
+            <div className="flex items-center justify-center gap-2 py-2 text-primary animate-fade-in">
+              <Check className="h-5 w-5" />
+              <span className="font-medium">
+                {isLastModule ? "Course completed!" : "Completed!"}
+              </span>
+            </div>
+          )}
+
+          {hasModuleContext ? (
+            <div className="flex gap-3">
+              {/* Previous Button */}
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handlePrevious}
+                disabled={isFirstModule}
+                className="flex-1 rounded-full"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Previous
+              </Button>
+
+              {/* Complete/Next Button */}
+              {isCurrentCompleted ? (
+                // Already completed - just show Next
+                <Button
+                  size="lg"
+                  onClick={isLastModule ? onClose : handleNext}
+                  className="flex-1 rounded-full"
+                >
+                  {isLastModule ? "Close" : "Next"}
+                  {!isLastModule && <ChevronRight className="h-4 w-4 ml-1" />}
+                </Button>
+              ) : (
+                // Not completed - show Complete button
+                <Button
+                  size="lg"
+                  onClick={handleComplete}
+                  className={cn(
+                    "flex-1 rounded-full gap-2",
+                    isLastModule 
+                      ? "bg-green-600 hover:bg-green-700" 
+                      : ""
+                  )}
+                >
+                  <Check className="h-4 w-4" />
+                  {isLastModule ? "Complete" : "Complete & Next"}
+                </Button>
+              )}
+            </div>
+          ) : (
+            // No module context - simple close button
             <Button
               variant="outline"
-              onClick={handleOpenInNewTab}
-              className="gap-2"
+              size="lg"
+              onClick={onClose}
+              className="w-full rounded-full"
             >
-              <ExternalLink className="h-4 w-4" />
-              Open in New Tab
+              Close
             </Button>
-          </div>
+          )}
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
