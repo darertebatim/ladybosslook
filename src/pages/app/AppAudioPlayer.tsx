@@ -33,6 +33,7 @@ export default function AppAudioPlayer() {
   // Check if we're in module mode (navigated from modules list)
   const isModuleMode = searchParams.get('moduleMode') === 'true';
   const contextPlaylistId = searchParams.get('playlistId');
+  const moduleIndex = parseInt(searchParams.get('moduleIndex') || '0', 10);
   
   // Use global audio player context
   const {
@@ -336,19 +337,28 @@ export default function AppAudioPlayer() {
     }
   }, [audio, audioId, playlistInfo, playlistTracks, savedProgress, isModuleMode, modulePlaylist, modulePlaylistInfo, contextPlaylistId, currentTrackIndex]);
 
-  // Handle celebration close and auto-play
+  // Handle celebration close - in module mode, return to course page
   const handleCelebrationClose = () => {
     setShowCelebration(false);
+    
+    // In module mode, return to course page so user can see the actual next module
+    if (isModuleMode && contextPlaylistId) {
+      navigate(`/app/player/playlist/${contextPlaylistId}?completedIndex=${moduleIndex}`, { replace: true });
+    }
   };
 
   const handlePlayNext = () => {
+    // In module mode, navigate back to course page to auto-open next module
+    if (isModuleMode && contextPlaylistId) {
+      setShowCelebration(false);
+      navigate(`/app/player/playlist/${contextPlaylistId}?completedIndex=${moduleIndex}`, { replace: true });
+      return;
+    }
+    
+    // Traditional track mode: play next audio directly
     playNextTrack();
-    // Navigate to next track page - preserve module mode if active
     if (nextTrack) {
-      const url = isModuleMode && contextPlaylistId 
-        ? `/app/player/${nextTrack.id}?moduleMode=true&playlistId=${contextPlaylistId}`
-        : `/app/player/${nextTrack.id}`;
-      navigate(url);
+      navigate(`/app/player/${nextTrack.id}`);
     }
   };
 
@@ -554,7 +564,7 @@ export default function AppAudioPlayer() {
                           key={module.id}
                           onClick={() => {
                             if (isAvailable && module.audio_id) {
-                              navigate(`/app/player/${module.audio_id}?moduleMode=true&playlistId=${contextPlaylistId}`);
+                              navigate(`/app/player/${module.audio_id}?moduleMode=true&playlistId=${contextPlaylistId}&moduleIndex=${index}`);
                             }
                           }}
                           disabled={!isAvailable}

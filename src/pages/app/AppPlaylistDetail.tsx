@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ import { useEnrollments } from "@/hooks/useAppData";
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const [selectedSupplement, setSelectedSupplement] = useState<{
     id: string;
@@ -335,14 +337,14 @@ export default function AppPlaylistDetail() {
     if (!isAvailable) return;
 
     // Track which module is currently open
-    const moduleIndex = index ?? modules?.findIndex(m => m.id === module.id) ?? 0;
-    setCurrentModuleIndex(moduleIndex);
+    const moduleIdx = index ?? modules?.findIndex(m => m.id === module.id) ?? 0;
+    setCurrentModuleIndex(moduleIdx);
 
     switch (module.type) {
       case 'audio':
         if (module.audio_id && playlistId) {
-          // Pass module context so player uses modules list for navigation
-          navigate(`/app/player/${module.audio_id}?moduleMode=true&playlistId=${playlistId}`);
+          // Pass module context AND index so player can return to correct position
+          navigate(`/app/player/${module.audio_id}?moduleMode=true&playlistId=${playlistId}&moduleIndex=${moduleIdx}`);
         }
         break;
       case 'video':
@@ -363,6 +365,30 @@ export default function AppPlaylistDetail() {
         break;
     }
   };
+
+  // Handle return from audio player with completedIndex param
+  useEffect(() => {
+    const completedIndexParam = searchParams.get('completedIndex');
+    if (completedIndexParam !== null && modules && modules.length > 0) {
+      const completedIndex = parseInt(completedIndexParam, 10);
+      const nextIndex = completedIndex + 1;
+      
+      // Clear the param immediately to prevent re-triggering
+      navigate(location.pathname, { replace: true });
+      
+      if (nextIndex < modules.length) {
+        const nextModule = modules[nextIndex];
+        const availability = getContentAvailability(nextModule.drip_delay_days || 0);
+        
+        if (availability.isAvailable) {
+          // Small delay to allow UI to settle before opening next module
+          setTimeout(() => {
+            handleModuleClick(nextModule, nextIndex);
+          }, 300);
+        }
+      }
+    }
+  }, [searchParams, modules]);
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
