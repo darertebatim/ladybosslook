@@ -141,17 +141,18 @@ export const TaskCard = ({
             )}
           </div>
 
-          {/* Quick navigation button */}
+          {/* Quick navigation button - prominent action button */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               navigate(getProTaskNavigationPath(proLinkType!, proLinkValue));
             }}
             className={cn(
-              'px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-colors',
+              'flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold shrink-0 transition-all shadow-sm active:scale-95',
               proConfig.buttonClass
             )}
           >
+            <ProIcon className="h-4 w-4" />
             {proConfig.badgeText}
           </button>
 
