@@ -464,9 +464,9 @@ export default function AppPlaylistDetail() {
         <div className="p-4 space-y-4">
         <div className="flex gap-4">
           <div className="relative h-32 w-32 flex-shrink-0 rounded-lg overflow-hidden">
-            {tracks?.[0]?.audio_content.cover_image_url ? (
+            {playlist.cover_image_url ? (
               <img 
-                src={tracks?.[0]?.audio_content.cover_image_url} 
+                src={playlist.cover_image_url} 
                 alt={playlist.name} 
                 className="w-full h-full object-cover" 
               />
