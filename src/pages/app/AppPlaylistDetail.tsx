@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -334,8 +334,9 @@ export default function AppPlaylistDetail() {
 
     switch (module.type) {
       case 'audio':
-        if (module.audio_id) {
-          navigate(`/app/player/${module.audio_id}`);
+        if (module.audio_id && playlistId) {
+          // Pass module context so player uses modules list for navigation
+          navigate(`/app/player/${module.audio_id}?moduleMode=true&playlistId=${playlistId}`);
         }
         break;
       case 'video':
