@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
-import { Menu, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Menu, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   useTasksForDate, 
@@ -13,7 +13,7 @@ import {
   TaskTemplate,
 } from '@/hooks/useTaskPlanner';
 import { useAuth } from '@/hooks/useAuth';
-import { useProgramEventsForDate } from '@/hooks/usePlannerProgramEvents';
+import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { TaskCard } from '@/components/app/TaskCard';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { MonthCalendar } from '@/components/app/MonthCalendar';
@@ -82,6 +82,9 @@ const AppPlanner = () => {
 
   // Fetch completed dates for the visible range
   const { data: completedDates } = useCompletedDates(dateRange.start, dateRange.end);
+  
+  // Fetch program event dates for the visible range (for star indicators)
+  const { data: programEventDates } = useProgramEventDates(dateRange.start, dateRange.end);
   
   // Debug log
   console.log('completedDates:', completedDates, 'dateRange:', format(dateRange.start, 'yyyy-MM-dd'), 'to', format(dateRange.end, 'yyyy-MM-dd'));
@@ -260,6 +263,7 @@ const AppPlanner = () => {
               currentMonth={currentMonth}
               onDateSelect={handleDateSelect}
               completedDates={completedDates}
+              programEventDates={programEventDates}
             />
           ) : (
             // Collapsed: show just 1 week row
@@ -269,6 +273,7 @@ const AppPlanner = () => {
                 const isTodayDate = isToday(day);
                 const dateStr = format(day, 'yyyy-MM-dd');
                 const hasCompletions = completedDates?.has(dateStr);
+                const hasProgramEvents = programEventDates?.has(dateStr);
                 
                 return (
                   <button
@@ -290,6 +295,12 @@ const AppPlanner = () => {
                         <Flame className={cn(
                           "absolute h-7 w-7",
                           isSelected ? "text-orange-300 opacity-70" : "text-orange-400 opacity-50"
+                        )} />
+                      )}
+                      {hasProgramEvents && (
+                        <Star className={cn(
+                          "absolute -top-0.5 -right-0.5 h-3 w-3",
+                          isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-500 fill-indigo-500"
                         )} />
                       )}
                       <span className="relative z-10">{format(day, 'd')}</span>

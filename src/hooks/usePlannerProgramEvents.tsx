@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { format, isSameDay } from 'date-fns';
+import { format, isSameDay, isWithinInterval, startOfDay, endOfDay, parseISO, addDays } from 'date-fns';
 
 export interface ProgramEvent {
   id: string;
@@ -307,5 +307,113 @@ export function useUncompleteProgramEvent() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-program-events'] });
     },
+  });
+}
+
+/**
+ * Hook to fetch dates that have program events within a given date range
+ * Returns a Set of date strings (yyyy-MM-dd format)
+ */
+export function useProgramEventDates(startDate: Date, endDate: Date) {
+  const { user } = useAuth();
+  const startStr = format(startDate, 'yyyy-MM-dd');
+  const endStr = format(endDate, 'yyyy-MM-dd');
+
+  return useQuery({
+    queryKey: ['planner-program-event-dates', user?.id, startStr, endStr],
+    queryFn: async (): Promise<Set<string>> => {
+      if (!user) return new Set();
+
+      const eventDates = new Set<string>();
+
+      // Get user's active enrollments with round data
+      const { data: enrollments, error: enrollError } = await supabase
+        .from('course_enrollments')
+        .select(`
+          id,
+          program_slug,
+          round_id,
+          program_rounds (
+            id,
+            first_session_date,
+            drip_offset_days,
+            audio_playlist_id
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'active');
+
+      if (enrollError || !enrollments) {
+        console.error('Error fetching enrollments for event dates:', enrollError);
+        return eventDates;
+      }
+
+      // Convert date range to ISO for session queries
+      const rangeStart = startOfDay(startDate);
+      const rangeEnd = endOfDay(endDate);
+      const startIso = rangeStart.toISOString();
+      const endIso = rangeEnd.toISOString();
+
+      for (const enrollment of enrollments) {
+        const round = enrollment.program_rounds as any;
+        if (!round) continue;
+
+        // Get sessions in range
+        const { data: sessions } = await supabase
+          .from('program_sessions')
+          .select('session_date')
+          .eq('round_id', round.id)
+          .gte('session_date', startIso)
+          .lte('session_date', endIso);
+
+        for (const session of sessions || []) {
+          const sessionDate = new Date(session.session_date);
+          eventDates.add(format(sessionDate, 'yyyy-MM-dd'));
+        }
+
+        // Get content unlocks (modules and tracks) in range
+        if (round.audio_playlist_id && round.first_session_date) {
+          // Get modules
+          const { data: modules } = await supabase
+            .from('playlist_supplements')
+            .select('drip_delay_days')
+            .eq('playlist_id', round.audio_playlist_id);
+
+          for (const module of modules || []) {
+            const { unlockDate } = getUnlockDateTime(
+              module.drip_delay_days,
+              round.first_session_date,
+              round.drip_offset_days || 0
+            );
+            
+            if (unlockDate && isWithinInterval(unlockDate, { start: rangeStart, end: rangeEnd })) {
+              eventDates.add(format(unlockDate, 'yyyy-MM-dd'));
+            }
+          }
+
+          // Get tracks
+          const { data: playlistItems } = await supabase
+            .from('audio_playlist_items')
+            .select('drip_delay_days')
+            .eq('playlist_id', round.audio_playlist_id);
+
+          for (const item of playlistItems || []) {
+            const { unlockDate } = getUnlockDateTime(
+              item.drip_delay_days,
+              round.first_session_date,
+              round.drip_offset_days || 0
+            );
+            
+            if (unlockDate && isWithinInterval(unlockDate, { start: rangeStart, end: rangeEnd })) {
+              eventDates.add(format(unlockDate, 'yyyy-MM-dd'));
+            }
+          }
+        }
+      }
+
+      return eventDates;
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
