@@ -41,7 +41,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Sparkles, Wand2, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Sparkles, Wand2, Loader2, Music, BookOpen } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { PRO_LINK_TYPES, PRO_LINK_CONFIGS, ProLinkType } from '@/lib/proTaskTypes';
 
@@ -81,7 +81,7 @@ export function ProTaskTemplatesManager() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatingType, setGeneratingType] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     duration_minutes: 5,
@@ -95,10 +95,12 @@ export function ProTaskTemplatesManager() {
     display_order: 0,
   });
 
-  const handleAIGenerate = async () => {
-    setIsGenerating(true);
+  const handleAIGenerate = async (type: 'playlist' | 'journal') => {
+    setGeneratingType(type);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-pro-task-templates-ai');
+      const { data, error } = await supabase.functions.invoke('generate-pro-task-templates-ai', {
+        body: { type }
+      });
       if (error) throw error;
       if (data?.error) {
         toast.error(data.error);
@@ -110,7 +112,7 @@ export function ProTaskTemplatesManager() {
       console.error('AI generation error:', error);
       toast.error('Failed to generate templates');
     } finally {
-      setIsGenerating(false);
+      setGeneratingType(null);
     }
   };
 
@@ -273,19 +275,32 @@ export function ProTaskTemplatesManager() {
             Reusable Pro Task library for quick addition to routines
           </CardDescription>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button 
-            onClick={handleAIGenerate} 
+            onClick={() => handleAIGenerate('playlist')} 
             size="sm" 
             variant="outline"
-            disabled={isGenerating}
+            disabled={!!generatingType}
           >
-            {isGenerating ? (
+            {generatingType === 'playlist' ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
-              <Wand2 className="h-4 w-4 mr-2" />
+              <Music className="h-4 w-4 mr-2" />
             )}
-            AI Generate
+            AI: All Playlists
+          </Button>
+          <Button 
+            onClick={() => handleAIGenerate('journal')} 
+            size="sm" 
+            variant="outline"
+            disabled={!!generatingType}
+          >
+            {generatingType === 'journal' ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <BookOpen className="h-4 w-4 mr-2" />
+            )}
+            AI: Journal Tasks
           </Button>
           <Button onClick={handleOpenCreate} size="sm">
             <Plus className="h-4 w-4 mr-2" />

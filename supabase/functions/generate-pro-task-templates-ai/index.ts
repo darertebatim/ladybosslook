@@ -21,77 +21,175 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Get the generation type from request body
+    const { type = "general" } = await req.json().catch(() => ({}));
+
     // Fetch existing templates to avoid duplicates
     const { data: existingTemplates } = await supabase
       .from("routine_task_templates")
       .select("title, pro_link_type, pro_link_value");
 
-    // Fetch playlists for context
-    const { data: playlists } = await supabase
-      .from("audio_playlists")
-      .select("id, name, category, description")
-      .eq("is_hidden", false)
-      .order("sort_order");
-
-    // Fetch channels for context
-    const { data: channels } = await supabase
-      .from("feed_channels")
-      .select("id, slug, name, type")
-      .eq("is_archived", false);
-
     const existingTitles = existingTemplates?.map(t => t.title.toLowerCase()) || [];
 
-    const playlistContext = playlists?.map(p => 
-      `- "${p.name}" (${p.category || 'general'}) - ID: ${p.id}${p.description ? ` - ${p.description}` : ''}`
-    ).join('\n') || 'No playlists available';
+    let prompt = "";
+    let playlists: any[] = [];
+    let channels: any[] = [];
 
-    const channelContext = channels?.map(c => 
-      `- "${c.name}" (slug: ${c.slug}, type: ${c.type}) - ID: ${c.id}`
-    ).join('\n') || 'No channels available';
+    if (type === "playlist") {
+      // Fetch all playlists for playlist-specific generation
+      const { data: playlistData } = await supabase
+        .from("audio_playlists")
+        .select("id, name, category, description")
+        .eq("is_hidden", false)
+        .order("sort_order");
+      
+      playlists = playlistData || [];
 
-    const prompt = `You are creating Pro Task templates for a women's personal development app called LadyBoss Academy. These templates will be used to quickly add tasks to daily routines.
+      const playlistContext = playlists.map(p => 
+        `- "${p.name}" (${p.category || 'general'}) - ID: ${p.id}${p.description ? ` - ${p.description}` : ''}`
+      ).join('\n');
 
-Available pro_link_types and their purposes:
-- "playlist": Links to audio content (meditation, workout, podcast, affirmations). REQUIRES linked_playlist_id from the available playlists.
-- "journal": Opens the journal editor for writing/reflection. No value needed.
-- "channel": Links to a community feed channel for engagement. Use the channel slug as pro_link_value.
-- "planner": Opens the daily/weekly planner view. No value needed.
-- "inspire": Opens the routine inspiration browser. No value needed.
+      prompt = `You are creating Pro Task templates for a women's personal development app called LadyBoss Academy. 
 
-Available playlists (use these IDs for playlist type):
+Your task: Create ONE Pro Task template for EACH playlist below. Every single playlist should have a corresponding task template.
+
+Available playlists (create a task for EACH one):
 ${playlistContext}
-
-Available channels (use slug for channel type):
-${channelContext}
 
 Existing template titles to AVOID duplicating: ${existingTitles.join(', ') || 'none'}
 
-Generate 8-10 NEW Pro Task templates with variety across different link types. Focus on:
-- Morning routines (meditation, affirmations, planning)
-- Self-care activities (journaling, reflection)
-- Community engagement
-- Personal growth
+For each playlist, create an engaging task template that:
+1. Has a creative, action-oriented title (not just the playlist name)
+2. Uses an appropriate icon based on the playlist category
+3. Has a brief, motivating description
+4. Sets an appropriate duration (5-30 min based on content type)
+5. Assigns a relevant category
 
-For playlist types, you MUST use real playlist IDs from the list above.
-For channel types, use the channel slug as pro_link_value.
+Available icons: Sun, Moon, Heart, Star, Music, BookOpen, Mic, Dumbbell, Brain, Coffee, Sparkles, Flame, Target, Zap, Clock, Calendar, MessageCircle, Users, Lightbulb, Compass, Headphones
 
-Available icons (use exact names): Sun, Moon, Heart, Star, Music, BookOpen, Mic, Dumbbell, Brain, Coffee, Sparkles, Flame, Target, Zap, Clock, Calendar, MessageCircle, Users, Lightbulb, Compass
+Categories: Morning, Evening, Wellness, Growth, Fitness, Mindset, Learning
 
-Return ONLY a valid JSON array with no additional text:
+Return ONLY a valid JSON array:
+[
+  {
+    "title": "Creative task title",
+    "description": "Motivating description",
+    "duration_minutes": 15,
+    "icon": "Music",
+    "category": "Morning",
+    "pro_link_type": "playlist",
+    "pro_link_value": "playlist-uuid",
+    "linked_playlist_id": "playlist-uuid"
+  }
+]`;
+    } else if (type === "journal") {
+      prompt = `You are creating Journal Pro Task templates for a women's personal development app called LadyBoss Academy.
+
+Your task: Create 10-15 diverse journal writing task templates that encourage self-reflection, growth, and mindfulness.
+
+Existing template titles to AVOID duplicating: ${existingTitles.join(', ') || 'none'}
+
+Create varied journal prompts covering:
+- Morning intentions and goal setting
+- Gratitude practices
+- Evening reflection
+- Self-discovery and values
+- Overcoming challenges
+- Celebrating wins
+- Emotional processing
+- Future visualization
+- Relationship reflection
+- Career/business insights
+- Self-care check-ins
+- Mindset shifts
+
+Each template should have:
+1. An inspiring, specific title
+2. A brief description explaining what to write about
+3. Appropriate duration (5-15 min)
+4. A fitting icon
+5. A relevant category
+
+Available icons: Sun, Moon, Heart, Star, BookOpen, Brain, Coffee, Sparkles, Flame, Target, Lightbulb, Compass, Feather, PenLine, Edit3
+
+Categories: Morning, Evening, Wellness, Growth, Mindset, Reflection
+
+IMPORTANT: All templates must have pro_link_type: "journal" and pro_link_value: null, linked_playlist_id: null
+
+Return ONLY a valid JSON array:
+[
+  {
+    "title": "Morning Intentions",
+    "description": "Set your top 3 intentions for today",
+    "duration_minutes": 5,
+    "icon": "Sun",
+    "category": "Morning",
+    "pro_link_type": "journal",
+    "pro_link_value": null,
+    "linked_playlist_id": null
+  }
+]`;
+    } else {
+      // General generation (original behavior)
+      const { data: playlistData } = await supabase
+        .from("audio_playlists")
+        .select("id, name, category, description")
+        .eq("is_hidden", false)
+        .order("sort_order");
+      
+      const { data: channelData } = await supabase
+        .from("feed_channels")
+        .select("id, slug, name, type")
+        .eq("is_archived", false);
+
+      playlists = playlistData || [];
+      channels = channelData || [];
+
+      const playlistContext = playlists.map(p => 
+        `- "${p.name}" (${p.category || 'general'}) - ID: ${p.id}${p.description ? ` - ${p.description}` : ''}`
+      ).join('\n') || 'No playlists available';
+
+      const channelContext = channels.map(c => 
+        `- "${c.name}" (slug: ${c.slug}, type: ${c.type}) - ID: ${c.id}`
+      ).join('\n') || 'No channels available';
+
+      prompt = `You are creating Pro Task templates for a women's personal development app called LadyBoss Academy.
+
+Available pro_link_types:
+- "playlist": Links to audio content. REQUIRES linked_playlist_id.
+- "journal": Opens journal editor. No value needed.
+- "channel": Links to community feed. Use channel slug as pro_link_value.
+- "planner": Opens planner view. No value needed.
+- "inspire": Opens routine browser. No value needed.
+
+Available playlists:
+${playlistContext}
+
+Available channels:
+${channelContext}
+
+Existing titles to AVOID: ${existingTitles.join(', ') || 'none'}
+
+Generate 8-10 varied Pro Task templates across different link types.
+
+Available icons: Sun, Moon, Heart, Star, Music, BookOpen, Mic, Dumbbell, Brain, Coffee, Sparkles, Flame, Target, Zap, Clock, Calendar, MessageCircle, Users, Lightbulb, Compass
+
+Categories: Morning, Evening, Wellness, Growth, Community, Planning
+
+Return ONLY a valid JSON array:
 [
   {
     "title": "Task title",
-    "description": "Brief description of the task",
+    "description": "Brief description",
     "duration_minutes": 10,
     "icon": "Sun",
     "category": "Morning",
     "pro_link_type": "playlist",
-    "pro_link_value": "playlist-uuid-here",
-    "linked_playlist_id": "playlist-uuid-here"
+    "pro_link_value": "uuid-here",
+    "linked_playlist_id": "uuid-here"
   }
-]
-
-Categories to use: Morning, Evening, Wellness, Growth, Community, Planning`;
+]`;
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -136,7 +234,6 @@ Categories to use: Morning, Evening, Wellness, Growth, Community, Planning`;
     // Parse the JSON from the response
     let templates;
     try {
-      // Try to extract JSON from the response (handle markdown code blocks)
       const jsonMatch = content.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
         templates = JSON.parse(jsonMatch[0]);
@@ -155,9 +252,7 @@ Categories to use: Morning, Evening, Wellness, Growth, Community, Planning`;
     // Validate and filter templates
     const validTemplates = templates
       .filter((t: any) => {
-        // Must have required fields
         if (!t.title || !t.pro_link_type) return false;
-        // Skip if title already exists
         if (existingTitles.includes(t.title.toLowerCase())) return false;
         // For playlist type, must have valid playlist ID
         if (t.pro_link_type === 'playlist') {
@@ -188,7 +283,6 @@ Categories to use: Morning, Evening, Wellness, Growth, Community, Planning`;
       });
     }
 
-    // Insert the templates
     const { data: inserted, error: insertError } = await supabase
       .from("routine_task_templates")
       .insert(validTemplates)
@@ -199,10 +293,11 @@ Categories to use: Morning, Evening, Wellness, Growth, Community, Planning`;
       throw new Error(`Failed to insert templates: ${insertError.message}`);
     }
 
+    const typeLabel = type === "playlist" ? "Playlist" : type === "journal" ? "Journal" : "";
     return new Response(JSON.stringify({ 
       success: true,
       count: inserted?.length || 0,
-      message: `Successfully created ${inserted?.length || 0} new Pro Task templates!`,
+      message: `Successfully created ${inserted?.length || 0} new ${typeLabel} Pro Task templates!`,
       templates: inserted
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
