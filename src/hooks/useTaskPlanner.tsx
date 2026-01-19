@@ -263,6 +263,34 @@ export const useCompletionsForDate = (date: Date) => {
 };
 
 /**
+ * Get dates that have at least one task completion within a date range
+ */
+export const useCompletedDates = (startDate: Date, endDate: Date) => {
+  const { user } = useAuth();
+  const startStr = format(startDate, 'yyyy-MM-dd');
+  const endStr = format(endDate, 'yyyy-MM-dd');
+
+  return useQuery({
+    queryKey: ['planner-completed-dates', user?.id, startStr, endStr],
+    queryFn: async () => {
+      if (!user?.id) return new Set<string>();
+
+      const { data, error } = await supabase
+        .from('task_completions')
+        .select('completed_date')
+        .eq('user_id', user.id)
+        .gte('completed_date', startStr)
+        .lte('completed_date', endStr);
+
+      if (error) throw error;
+      
+      return new Set(data.map(c => c.completed_date));
+    },
+    enabled: !!user?.id,
+  });
+};
+
+/**
  * Get user's current streak
  */
 export const useUserStreak = () => {
