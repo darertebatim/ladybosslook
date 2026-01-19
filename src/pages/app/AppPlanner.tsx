@@ -1,18 +1,20 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, isSameDay, isToday } from 'date-fns';
-import { Menu, Plus, Flame, GripHorizontal } from 'lucide-react';
+import { Menu, Plus, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   useTasksForDate, 
   useCompletionsForDate,
   useUserStreak,
   UserTask,
+  TaskTemplate,
 } from '@/hooks/useTaskPlanner';
 import { TaskCard } from '@/components/app/TaskCard';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
+import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -24,6 +26,18 @@ const AppPlanner = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
+  const [showQuickStart, setShowQuickStart] = useState(false);
+
+  // Handle quick start continue - navigate to task create with name
+  const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
+    if (template) {
+      // Navigate with template data
+      navigate(`/app/planner/new?name=${encodeURIComponent(template.title)}&emoji=${encodeURIComponent(template.emoji)}&color=${template.color}`);
+    } else {
+      // Navigate with just the name
+      navigate(`/app/planner/new?name=${encodeURIComponent(taskName)}`);
+    }
+  }, [navigate]);
 
   // Data queries
   const { data: tasks = [], isLoading: tasksLoading, refetch } = useTasksForDate(selectedDate);
@@ -281,12 +295,19 @@ const AppPlanner = () => {
 
       {/* FAB */}
       <button
-        onClick={() => navigate('/app/planner/new')}
+        onClick={() => setShowQuickStart(true)}
         className="fixed bottom-24 right-4 w-14 h-14 rounded-full bg-violet-600 text-white shadow-lg flex items-center justify-center hover:bg-violet-700 active:scale-95 transition-all z-40"
         style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
       >
         <Plus className="h-6 w-6" />
       </button>
+
+      {/* Quick Start Sheet */}
+      <TaskQuickStartSheet
+        open={showQuickStart}
+        onOpenChange={setShowQuickStart}
+        onContinue={handleQuickStartContinue}
+      />
 
       {/* Task Detail Modal */}
       <TaskDetailModal
