@@ -25,9 +25,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Pencil, Trash2, GripVertical, ChevronUp, ChevronDown, Image } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, GripVertical, ChevronUp, ChevronDown, Image, Music } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+
+interface Playlist {
+  id: string;
+  name: string;
+  category: string | null;
+}
 
 interface Section {
   id: string;
@@ -47,6 +60,11 @@ interface Task {
   icon: string;
   task_order: number;
   is_active: boolean;
+  linked_playlist_id: string | null;
+  linked_playlist?: {
+    id: string;
+    name: string;
+  } | null;
 }
 
 interface Plan {
@@ -92,6 +110,7 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
     icon: 'CheckCircle',
     task_order: 0,
     is_active: true,
+    linked_playlist_id: null as string | null,
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -124,17 +143,34 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
     },
   });
 
-  // Fetch tasks
+  // Fetch tasks with linked playlist info
   const { data: tasks, isLoading: tasksLoading } = useQuery({
     queryKey: ['admin-routine-tasks', planId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('routine_plan_tasks')
-        .select('*')
+        .select(`
+          *,
+          linked_playlist:audio_playlists!linked_playlist_id(id, name)
+        `)
         .eq('plan_id', planId)
         .order('task_order');
       if (error) throw error;
       return data as Task[];
+    },
+  });
+
+  // Fetch playlists for linking
+  const { data: playlists } = useQuery({
+    queryKey: ['admin-playlists-for-linking'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlists')
+        .select('id, name, category')
+        .eq('is_hidden', false)
+        .order('name');
+      if (error) throw error;
+      return data as Playlist[];
     },
   });
 
@@ -336,6 +372,7 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
       icon: 'CheckCircle',
       task_order: (tasks?.length || 0) + 1,
       is_active: true,
+      linked_playlist_id: null,
     });
     setIsTaskDialogOpen(true);
   };
@@ -348,6 +385,7 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
       icon: task.icon,
       task_order: task.task_order,
       is_active: task.is_active,
+      linked_playlist_id: task.linked_playlist_id,
     });
     setIsTaskDialogOpen(true);
   };
@@ -546,13 +584,24 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
                           <ChevronDown className="h-4 w-4" />
                         </Button>
                       </div>
-                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center relative">
                         {renderIcon(task.icon)}
+                        {task.linked_playlist_id && (
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
+                            <Music className="h-2.5 w-2.5 text-white" />
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1">
                         <div className="font-medium">{task.title}</div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-muted-foreground flex items-center gap-2">
                           {task.duration_minutes} min
+                          {task.linked_playlist && (
+                            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                              <Music className="h-3 w-3" />
+                              {task.linked_playlist.name}
+                            </span>
+                          )}
                         </div>
                       </div>
                       <div className="flex gap-1">
@@ -701,6 +750,43 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
                   </button>
                 ))}
               </div>
+            </div>
+            <div>
+              <Label className="flex items-center gap-2">
+                <Music className="h-4 w-4 text-emerald-500" />
+                Link to Playlist (optional)
+              </Label>
+              <Select
+                value={taskForm.linked_playlist_id || 'none'}
+                onValueChange={(value) => setTaskForm(prev => ({ 
+                  ...prev, 
+                  linked_playlist_id: value === 'none' ? null : value 
+                }))}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Select a playlist..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No playlist linked</SelectItem>
+                  {playlists?.map((playlist) => (
+                    <SelectItem key={playlist.id} value={playlist.id}>
+                      <div className="flex items-center gap-2">
+                        <span>{playlist.name}</span>
+                        {playlist.category && (
+                          <span className="text-xs text-muted-foreground">
+                            ({playlist.category})
+                          </span>
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {taskForm.linked_playlist_id && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Users will be able to tap this task to listen to the linked playlist.
+                </p>
+              )}
             </div>
             <div className="flex items-center justify-between">
               <Label>Active</Label>

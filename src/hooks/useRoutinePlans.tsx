@@ -460,3 +460,38 @@ export function useRateRoutinePlan() {
     },
   });
 }
+
+// Fetch routine plans that have audio-linked tasks
+export function useAudioRoutinePlans() {
+  return useQuery({
+    queryKey: ['audio-routine-plans'],
+    queryFn: async () => {
+      // Get plan IDs that have at least one task with linked_playlist_id
+      const { data: plansWithAudio, error: audioError } = await supabase
+        .from('routine_plan_tasks')
+        .select('plan_id')
+        .not('linked_playlist_id', 'is', null)
+        .eq('is_active', true);
+      
+      if (audioError) throw audioError;
+      
+      const planIds = [...new Set(plansWithAudio?.map(t => t.plan_id) || [])];
+      
+      if (planIds.length === 0) return [];
+      
+      const { data: plans, error: plansError } = await supabase
+        .from('routine_plans')
+        .select(`
+          *,
+          category:routine_categories(*)
+        `)
+        .in('id', planIds)
+        .eq('is_active', true)
+        .order('display_order', { ascending: true })
+        .limit(10);
+      
+      if (plansError) throw plansError;
+      return plans as RoutinePlan[];
+    },
+  });
+}
