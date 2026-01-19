@@ -48,6 +48,7 @@ interface ProgramRound {
   google_drive_link: string | null;
   first_session_date: string | null;
   first_session_duration: number | null;
+  first_session_is_google_meet: boolean;
   important_message: string | null;
   whatsapp_support_number: string | null;
   audio_playlist_id: string | null;
@@ -68,6 +69,7 @@ interface RoundFormData {
   first_session_date: string;
   first_session_duration: string;
   first_session_timezone: string;
+  first_session_is_google_meet: boolean;
   important_message: string;
   support_link_url: string;
   support_link_label: string;
@@ -99,6 +101,7 @@ export const ProgramRoundsManager = () => {
     first_session_date: "",
     first_session_duration: "90",
     first_session_timezone: "America/Los_Angeles",
+    first_session_is_google_meet: true,
     important_message: "",
     support_link_url: "",
     support_link_label: "",
@@ -176,6 +179,7 @@ export const ProgramRoundsManager = () => {
         google_drive_link: data.google_drive_link || null,
         first_session_date: firstSessionISO,
         first_session_duration: data.first_session_duration ? parseInt(data.first_session_duration) : 90,
+        first_session_is_google_meet: data.first_session_is_google_meet,
         important_message: data.important_message || null,
         support_link_url: data.support_link_url || null,
         support_link_label: data.support_link_label || null,
@@ -291,6 +295,7 @@ export const ProgramRoundsManager = () => {
       first_session_date: "",
       first_session_duration: "90",
       first_session_timezone: "America/Los_Angeles",
+      first_session_is_google_meet: true,
       important_message: "",
       support_link_url: "",
       support_link_label: "",
@@ -336,6 +341,7 @@ export const ProgramRoundsManager = () => {
       first_session_date: localDateTime,
       first_session_duration: round.first_session_duration?.toString() || "90",
       first_session_timezone: defaultTimezone,
+      first_session_is_google_meet: round.first_session_is_google_meet !== false,
       important_message: round.important_message || "",
       support_link_url: (round as any).support_link_url || "",
       support_link_label: (round as any).support_link_label || "",
@@ -364,6 +370,7 @@ export const ProgramRoundsManager = () => {
       first_session_date: "", // Clear - user should set new date
       first_session_duration: round.first_session_duration?.toString() || "90",
       first_session_timezone: "America/Los_Angeles",
+      first_session_is_google_meet: round.first_session_is_google_meet !== false,
       important_message: round.important_message || "",
       support_link_url: (round as any).support_link_url || "",
       support_link_label: (round as any).support_link_label || "",
@@ -737,6 +744,26 @@ export const ProgramRoundsManager = () => {
                       <SelectItem value="Asia/Dubai">Dubai (GST)</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="first_session_is_google_meet"
+                      checked={formData.first_session_is_google_meet}
+                      onChange={(e) =>
+                        setFormData({ ...formData, first_session_is_google_meet: e.target.checked })
+                      }
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <Label htmlFor="first_session_is_google_meet" className="cursor-pointer">
+                      First session is on Google Meet
+                    </Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    If unchecked, calendar events will link to the course page instead of Google Meet
+                  </p>
                 </div>
 
                 <div className="space-y-2">

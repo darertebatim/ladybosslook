@@ -1,0 +1,1 @@
+ALTER TABLE program_rounds ADD COLUMN first_session_is_google_meet BOOLEAN DEFAULT true;
