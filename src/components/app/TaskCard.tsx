@@ -141,18 +141,16 @@ export const TaskCard = ({
             )}
           </div>
 
-          {/* Quick navigation button */}
+          {/* Quick navigation tag */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               navigate(getProTaskNavigationPath(proLinkType!, proLinkValue));
             }}
-            className={cn(
-              'px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-colors',
-              proConfig.buttonClass
-            )}
+            className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-black/10 text-black/70 hover:bg-black/20 transition-colors"
           >
-            {proConfig.badgeText}
+            <ProIcon className="h-3 w-3" />
+            <span>{proConfig.badgeText}</span>
           </button>
 
           {/* Checkbox */}
