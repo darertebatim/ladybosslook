@@ -9,7 +9,7 @@ export interface ProgramEvent {
   title: string;
   programSlug: string;
   programTitle: string;
-  time?: string;
+  time?: string; // For sessions OR module release time
   isCompleted: boolean;
   
   // Type-specific data
@@ -32,14 +32,15 @@ interface PlannerProgramCompletion {
  * Get the unlock date for drip content
  * drip_delay_days = 0: immediately available
  * drip_delay_days >= 1: firstSession + (drip_delay_days - 1) + offset
+ * Returns both the date and the time from firstSessionDate
  */
-function getUnlockDate(
+function getUnlockDateTime(
   dripDelayDays: number,
   firstSessionDate: string | null | undefined,
   dripOffsetDays: number = 0
-): Date | null {
-  if (dripDelayDays === 0) return null; // Immediately available = not a specific date
-  if (!firstSessionDate) return null;
+): { unlockDate: Date | null; unlockTime: string | null } {
+  if (dripDelayDays === 0) return { unlockDate: null, unlockTime: null };
+  if (!firstSessionDate) return { unlockDate: null, unlockTime: null };
   
   const firstSession = firstSessionDate.includes('T')
     ? new Date(firstSessionDate)
@@ -47,9 +48,15 @@ function getUnlockDate(
   
   const unlockDate = new Date(firstSession);
   unlockDate.setDate(unlockDate.getDate() + (dripDelayDays - 1) + dripOffsetDays);
-  // Set to midnight for date comparison
-  unlockDate.setHours(0, 0, 0, 0);
-  return unlockDate;
+  
+  // Extract the time from the first session date
+  const hours = firstSession.getHours();
+  const minutes = firstSession.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const displayHour = hours % 12 || 12;
+  const unlockTime = `${displayHour}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+  
+  return { unlockDate, unlockTime };
 }
 
 /**
@@ -156,7 +163,7 @@ export function useProgramEventsForDate(date: Date) {
             .eq('playlist_id', round.audio_playlist_id);
 
           for (const module of modules || []) {
-            const unlockDate = getUnlockDate(
+            const { unlockDate, unlockTime } = getUnlockDateTime(
               module.drip_delay_days,
               round.first_session_date,
               round.drip_offset_days || 0
@@ -169,6 +176,7 @@ export function useProgramEventsForDate(date: Date) {
                 title: module.title,
                 programSlug,
                 programTitle,
+                time: unlockTime || undefined,
                 isCompleted: completionSet.has(`module:${module.id}`),
                 moduleId: module.id,
                 playlistId: round.audio_playlist_id,
@@ -190,7 +198,7 @@ export function useProgramEventsForDate(date: Date) {
             .eq('playlist_id', round.audio_playlist_id);
 
           for (const item of playlistItems || []) {
-            const unlockDate = getUnlockDate(
+            const { unlockDate, unlockTime } = getUnlockDateTime(
               item.drip_delay_days,
               round.first_session_date,
               round.drip_offset_days || 0
@@ -204,6 +212,7 @@ export function useProgramEventsForDate(date: Date) {
                 title: audio.title,
                 programSlug,
                 programTitle,
+                time: unlockTime || undefined,
                 isCompleted: completionSet.has(`track:${audio.id}`),
                 trackId: audio.id,
                 playlistId: round.audio_playlist_id,
