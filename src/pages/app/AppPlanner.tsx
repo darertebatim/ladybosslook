@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format, addDays, startOfWeek, isSameDay, isToday } from 'date-fns';
-import { Menu, Plus, Flame, CalendarDays } from 'lucide-react';
+import { format, addDays, startOfWeek, isSameDay, isToday, startOfMonth, addMonths, subMonths } from 'date-fns';
+import { Menu, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   useTasksForDate, 
@@ -29,6 +29,9 @@ const AppPlanner = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
+  
+  // Lifted state for month navigation (used when calendar is expanded)
+  const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
 
   // Handle quick start continue - navigate to task create with name
   const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
@@ -47,11 +50,11 @@ const AppPlanner = () => {
   const { data: streak } = useUserStreak();
   const { data: programEvents = [], isLoading: programEventsLoading } = useProgramEventsForDate(selectedDate);
 
-  // Generate week days centered on current week
+  // Generate week days based on selected date's week
   const weekDays = useMemo(() => {
-    const weekStart = startOfWeek(new Date(), { weekStartsOn: 0 });
+    const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
     return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
-  }, []);
+  }, [selectedDate]);
 
   // Filter tasks by tag
   const filteredTasks = useMemo(() => {
@@ -95,6 +98,23 @@ const AppPlanner = () => {
     setSelectedDate(date);
     setShowCalendar(false);
   }, []);
+
+  const handlePrevMonth = useCallback(() => {
+    setCurrentMonth(prev => subMonths(prev, 1));
+  }, []);
+
+  const handleNextMonth = useCallback(() => {
+    setCurrentMonth(prev => addMonths(prev, 1));
+  }, []);
+
+  // Sync currentMonth when expanding calendar
+  const handleToggleCalendar = useCallback(() => {
+    if (!showCalendar) {
+      // When opening, set month to selected date's month
+      setCurrentMonth(startOfMonth(selectedDate));
+    }
+    setShowCalendar(!showCalendar);
+  }, [showCalendar, selectedDate]);
 
   const isLoading = tasksLoading || completionsLoading || programEventsLoading;
 
@@ -144,10 +164,30 @@ const AppPlanner = () => {
             </SheetContent>
           </Sheet>
 
-          {/* Title */}
-          <h1 className="text-lg font-bold text-foreground">
-            {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
-          </h1>
+          {/* Title - changes to month/year when expanded */}
+          {showCalendar ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePrevMonth}
+                className="p-1.5 rounded-full hover:bg-muted transition-colors"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <h1 className="text-lg font-bold text-foreground min-w-[140px] text-center">
+                {format(currentMonth, 'MMMM yyyy')}
+              </h1>
+              <button
+                onClick={handleNextMonth}
+                className="p-1.5 rounded-full hover:bg-muted transition-colors"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          ) : (
+            <h1 className="text-lg font-bold text-foreground">
+              {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
+            </h1>
+          )}
 
           {/* Streak badge */}
           <button 
@@ -159,10 +199,27 @@ const AppPlanner = () => {
           </button>
         </div>
 
-        {/* Week strip - part of fixed header, only show when calendar is collapsed */}
-        {!showCalendar && (
-          <div className="px-4 py-3 border-b">
-            <div className="flex justify-between">
+        {/* Shared calendar area - same layout whether collapsed (1 week) or expanded (full month) */}
+        <div className="px-4 py-3 border-b">
+          {/* Weekday headers - always visible with same styling */}
+          <div className="flex">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+              <div key={day} className="flex-1 text-center text-xs text-muted-foreground font-medium">
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Day rows */}
+          {showCalendar ? (
+            <MonthCalendar
+              selectedDate={selectedDate}
+              currentMonth={currentMonth}
+              onDateSelect={handleDateSelect}
+            />
+          ) : (
+            // Collapsed: show just 1 week row
+            <div className="flex mt-2">
               {weekDays.map((day) => {
                 const isSelected = isSameDay(day, selectedDate);
                 const isTodayDate = isToday(day);
@@ -171,14 +228,11 @@ const AppPlanner = () => {
                   <button
                     key={day.toISOString()}
                     onClick={() => setSelectedDate(day)}
-                    className="flex flex-col items-center gap-1 flex-1"
+                    className="flex-1 flex justify-center"
                   >
-                    <span className="text-xs text-muted-foreground uppercase font-medium">
-                      {format(day, 'EEE')}
-                    </span>
                     <div
                       className={cn(
-                        'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
+                        'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all',
                         isSelected
                           ? 'bg-violet-600 text-white shadow-md'
                           : isTodayDate
@@ -196,43 +250,30 @@ const AppPlanner = () => {
                 );
               })}
             </div>
+          )}
 
-            {/* Calendar expand handle */}
-            <button 
-              onClick={() => setShowCalendar(true)}
-              className="w-full flex justify-center pt-2 mt-1"
-            >
-              <div className="flex gap-0.5">
-                <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
-                <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
-              </div>
-            </button>
-          </div>
-        )}
-
-        {/* Expanded Month Calendar - replaces week strip */}
-        {showCalendar && (
-          <div className="border-b shadow-lg">
-            <MonthCalendar
-              selectedDate={selectedDate}
-              onDateSelect={handleDateSelect}
-              onClose={() => setShowCalendar(false)}
-            />
-          </div>
-        )}
+          {/* Calendar expand/collapse handle */}
+          <button 
+            onClick={handleToggleCalendar}
+            className="w-full flex justify-center pt-2 mt-1"
+          >
+            <div className="flex gap-0.5">
+              <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+              <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+            </div>
+          </button>
+        </div>
       </header>
 
-      {/* Spacer for fixed header (title bar + week strip) */}
-      <div style={{ height: showCalendar ? 'calc(48px + max(12px, env(safe-area-inset-top)))' : 'calc(48px + 100px + max(12px, env(safe-area-inset-top)))' }} />
-
-      {/* Backdrop when calendar is expanded */}
-      {showCalendar && (
-        <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 animate-in fade-in duration-200"
-          style={{ top: 0 }}
-          onClick={() => setShowCalendar(false)}
-        />
-      )}
+      {/* Spacer for fixed header - dynamic based on calendar state */}
+      <div 
+        className="transition-all duration-200"
+        style={{ 
+          height: showCalendar 
+            ? 'calc(48px + 340px + max(12px, env(safe-area-inset-top)))' 
+            : 'calc(48px + 100px + max(12px, env(safe-area-inset-top)))' 
+        }} 
+      />
 
       {/* Tag filter chips */}
       {taskTags.length > 0 && (
