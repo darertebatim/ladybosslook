@@ -1719,6 +1719,7 @@ export type Database = {
           icon: string
           id: string
           is_active: boolean
+          linked_playlist_id: string | null
           plan_id: string
           task_order: number
           title: string
@@ -1729,6 +1730,7 @@ export type Database = {
           icon?: string
           id?: string
           is_active?: boolean
+          linked_playlist_id?: string | null
           plan_id: string
           task_order?: number
           title: string
@@ -1739,11 +1741,19 @@ export type Database = {
           icon?: string
           id?: string
           is_active?: boolean
+          linked_playlist_id?: string | null
           plan_id?: string
           task_order?: number
           title?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "routine_plan_tasks_linked_playlist_id_fkey"
+            columns: ["linked_playlist_id"]
+            isOneToOne: false
+            referencedRelation: "audio_playlists"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "routine_plan_tasks_plan_id_fkey"
             columns: ["plan_id"]
@@ -2174,6 +2184,7 @@ export type Database = {
           emoji: string
           id: string
           is_active: boolean
+          linked_playlist_id: string | null
           order_index: number
           reminder_enabled: boolean
           reminder_offset: number
@@ -2194,6 +2205,7 @@ export type Database = {
           emoji?: string
           id?: string
           is_active?: boolean
+          linked_playlist_id?: string | null
           order_index?: number
           reminder_enabled?: boolean
           reminder_offset?: number
@@ -2214,6 +2226,7 @@ export type Database = {
           emoji?: string
           id?: string
           is_active?: boolean
+          linked_playlist_id?: string | null
           order_index?: number
           reminder_enabled?: boolean
           reminder_offset?: number
@@ -2228,7 +2241,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_tasks_linked_playlist_id_fkey"
+            columns: ["linked_playlist_id"]
+            isOneToOne: false
+            referencedRelation: "audio_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_wallets: {
         Row: {

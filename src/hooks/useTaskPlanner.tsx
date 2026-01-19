@@ -25,6 +25,13 @@ export interface UserTask {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  linked_playlist_id: string | null;
+  // Joined data (optional, populated by queries)
+  linked_playlist?: {
+    id: string;
+    name: string;
+    cover_image_url: string | null;
+  } | null;
 }
 
 export interface UserSubtask {
@@ -98,12 +105,14 @@ export interface CreateTaskInput {
   reminder_offset?: number;
   tag?: string | null;
   subtasks?: string[];
+  linked_playlist_id?: string | null;
 }
 
 export interface UpdateTaskInput extends Partial<CreateTaskInput> {
   id: string;
   is_active?: boolean;
   order_index?: number;
+  linked_playlist_id?: string | null;
 }
 
 // Color mapping for UI - Me+ style vibrant pastels
@@ -154,10 +163,13 @@ export const useTasksForDate = (date: Date) => {
     queryFn: async () => {
       if (!user?.id) return [];
 
-      // Get all active tasks
+      // Get all active tasks with linked playlist info
       const { data: tasks, error } = await supabase
         .from('user_tasks')
-        .select('*')
+        .select(`
+          *,
+          linked_playlist:audio_playlists!linked_playlist_id(id, name, cover_image_url)
+        `)
         .eq('user_id', user.id)
         .eq('is_active', true)
         .order('order_index', { ascending: true });
@@ -373,7 +385,10 @@ export const useTask = (taskId: string | undefined) => {
 
       const { data, error } = await supabase
         .from('user_tasks')
-        .select('*')
+        .select(`
+          *,
+          linked_playlist:audio_playlists!linked_playlist_id(id, name, cover_image_url)
+        `)
         .eq('id', taskId)
         .single();
 
@@ -416,6 +431,7 @@ export const useCreateTask = () => {
           reminder_enabled: taskData.reminder_enabled || false,
           reminder_offset: taskData.reminder_offset || 0,
           tag: taskData.tag || null,
+          linked_playlist_id: taskData.linked_playlist_id || null,
         })
         .select()
         .single();

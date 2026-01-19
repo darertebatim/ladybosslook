@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
-import { X, ChevronRight, Plus, Trash2 } from 'lucide-react';
+import { X, ChevronRight, Plus, Trash2, Music, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 import {
   useCreateTask,
   useUpdateTask,
@@ -49,6 +52,15 @@ export interface TaskFormData {
   reminderTime: string;
   tag: string | null;
   subtasks: string[];
+  linkedPlaylistId: string | null;
+}
+
+// Playlist type for the picker
+interface PlaylistOption {
+  id: string;
+  name: string;
+  cover_image_url: string | null;
+  category: string | null;
 }
 
 // Props for sheet mode
@@ -93,6 +105,7 @@ const AppTaskCreate = ({
   const [tag, setTag] = useState<string | null>(initialData?.tag ?? null);
   const [subtasks, setSubtasks] = useState<string[]>(initialData?.subtasks || []);
   const [newSubtask, setNewSubtask] = useState('');
+  const [linkedPlaylistId, setLinkedPlaylistId] = useState<string | null>(initialData?.linkedPlaylistId ?? null);
 
   // Sheet states
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -101,6 +114,31 @@ const AppTaskCreate = ({
   const [showRepeatPicker, setShowRepeatPicker] = useState(false);
   const [showReminderPicker, setShowReminderPicker] = useState(false);
   const [showTagPicker, setShowTagPicker] = useState(false);
+  const [showPlaylistPicker, setShowPlaylistPicker] = useState(false);
+  const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
+
+  // Fetch playlists for linking
+  const { data: playlists = [] } = useQuery({
+    queryKey: ['linkable-playlists'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlists')
+        .select('id, name, cover_image_url, category')
+        .eq('is_hidden', false)
+        .order('name', { ascending: true });
+      
+      if (error) throw error;
+      return data as PlaylistOption[];
+    },
+  });
+
+  // Get selected playlist info
+  const selectedPlaylist = playlists.find(p => p.id === linkedPlaylistId);
+
+  // Filter playlists by search
+  const filteredPlaylists = playlists.filter(p =>
+    p.name.toLowerCase().includes(playlistSearchQuery.toLowerCase())
+  );
 
   // Mutations (only used in page mode)
   const createTask = useCreateTask();
@@ -130,6 +168,7 @@ const AppTaskCreate = ({
       setReminderTime(initialData.reminderTime || '09:00');
       setTag(initialData.tag ?? null);
       setSubtasks(initialData.subtasks || []);
+      setLinkedPlaylistId(initialData.linkedPlaylistId ?? null);
     }
   }, [isSheet, initialData, sheetOpen]);
 
@@ -159,6 +198,7 @@ const AppTaskCreate = ({
       }
       
       setTag(existingTask.tag);
+      setLinkedPlaylistId(existingTask.linked_playlist_id ?? null);
     }
   }, [existingTask, isSheet]);
 
@@ -186,6 +226,7 @@ const AppTaskCreate = ({
         reminderTime,
         tag,
         subtasks: subtasks.filter(s => s.trim()),
+        linkedPlaylistId,
       });
       return;
     }
@@ -202,6 +243,7 @@ const AppTaskCreate = ({
       reminder_offset: 0,
       tag,
       subtasks: subtasks.filter(s => s.trim()),
+      linked_playlist_id: linkedPlaylistId,
     };
 
     if (taskId) {
@@ -384,6 +426,25 @@ const AppTaskCreate = ({
             <ChevronRight className="h-4 w-4" />
           </div>
         </button>
+
+        {/* Link to Playlist */}
+        <button
+          onClick={() => setShowPlaylistPicker(true)}
+          className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
+        >
+          <div className="flex items-center gap-3">
+            <Music className="h-5 w-5 text-emerald-600" />
+            <span className="font-medium">Link Audio</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            {selectedPlaylist ? (
+              <span className="truncate max-w-[150px]">{selectedPlaylist.name}</span>
+            ) : (
+              <span>None</span>
+            )}
+            <ChevronRight className="h-4 w-4" />
+          </div>
+        </button>
       </div>
 
       {/* Subtasks */}
@@ -441,6 +502,66 @@ const AppTaskCreate = ({
         selectedIcon={icon}
         onSelect={setIcon}
       />
+
+      {/* Playlist Picker Sheet */}
+      <Sheet open={showPlaylistPicker} onOpenChange={setShowPlaylistPicker}>
+        <SheetContent side="bottom" className="h-[70vh]">
+          <SheetHeader>
+            <SheetTitle>Link to Audio</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <Input
+              value={playlistSearchQuery}
+              onChange={(e) => setPlaylistSearchQuery(e.target.value)}
+              placeholder="Search playlists..."
+              className="mb-2"
+            />
+            {linkedPlaylistId && (
+              <button
+                onClick={() => {
+                  setLinkedPlaylistId(null);
+                  setShowPlaylistPicker(false);
+                }}
+                className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive/20"
+              >
+                <XCircle className="h-5 w-5" />
+                <span>Remove linked audio</span>
+              </button>
+            )}
+            <ScrollArea className="h-[45vh]">
+              <div className="space-y-2 pr-4">
+                {filteredPlaylists.map((playlist) => (
+                  <button
+                    key={playlist.id}
+                    onClick={() => {
+                      setLinkedPlaylistId(playlist.id);
+                      setShowPlaylistPicker(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
+                      linkedPlaylistId === playlist.id && 'bg-emerald-100 dark:bg-emerald-900/30'
+                    )}
+                  >
+                    {playlist.cover_image_url ? (
+                      <img src={playlist.cover_image_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                        <Music className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{playlist.name}</p>
+                      {playlist.category && (
+                        <p className="text-xs text-muted-foreground capitalize">{playlist.category}</p>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Date Picker Sheet */}
       <Sheet open={showDatePicker} onOpenChange={setShowDatePicker}>
