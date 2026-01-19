@@ -41,7 +41,7 @@ export const MonthCalendar = ({ selectedDate, onDateSelect, onClose }: MonthCale
   };
 
   return (
-    <div className="bg-gradient-to-b from-violet-100 to-background px-4 pb-2 animate-in slide-in-from-top-2 duration-200">
+    <div className="bg-gradient-to-b from-violet-100 to-background px-2 pb-2 animate-in slide-in-from-top-2 duration-200">
       {/* Month navigation */}
       <div className="flex items-center justify-between py-3">
         <button
