@@ -43,6 +43,7 @@ const AppTaskCreate = lazy(() => import("@/pages/app/AppTaskCreate"));
 const AppInspire = lazy(() => import("@/pages/app/AppInspire"));
 const AppInspireDetail = lazy(() => import("@/pages/app/AppInspireDetail"));
 const AppNewHome = lazy(() => import("@/pages/app/AppNewHome"));
+const AppHi = lazy(() => import("@/pages/app/AppHi"));
 
 // Lazy load admin pages
 const Overview = lazy(() => import("@/pages/admin/Overview"));
@@ -256,6 +257,7 @@ const App = () => (
                   <Route path="inspire/:planId" element={<AppInspireDetail />} />
                   <Route path="profile" element={<AppProfile />} />
                   <Route path="newhome" element={<AppNewHome />} />
+                  <Route path="hi" element={<AppHi />} />
                 </Route>
                 
                 <Route path="/calendar" element={<CalendarRedirect />} />
