@@ -1,41 +1,72 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
-import { Menu, Flame, ChevronLeft, ChevronRight, Star, CalendarDays, BookOpen, PenLine } from 'lucide-react';
+import { Menu, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useCompletedDates, useUserStreak } from '@/hooks/useTaskPlanner';
-import { useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
+import { 
+  useTasksForDate, 
+  useCompletionsForDate,
+  useCompletedDates,
+  useUserStreak,
+  useResetPlannerData,
+  UserTask,
+  TaskTemplate,
+} from '@/hooks/useTaskPlanner';
+import { useAuth } from '@/hooks/useAuth';
+import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { useNewHomeData } from '@/hooks/useNewHomeData';
+import { TaskCard } from '@/components/app/TaskCard';
+import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
+import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
+import { ProgramEventCard } from '@/components/app/ProgramEventCard';
 import { CompactStatsPills } from '@/components/dashboard/CompactStatsPills';
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
-import { HomeSkeleton } from '@/components/app/skeletons';
 
 const AppHi = () => {
   const navigate = useNavigate();
+  const { user, isAdmin } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
+  const [showQuickStart, setShowQuickStart] = useState(false);
+  
+  // Reset mutation for admin testing
+  const resetPlanner = useResetPlannerData();
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
 
-  // Fetch home data for stats and rounds
+  // Handle quick start continue
+  const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
+    if (template) {
+      navigate(`/app/planner/new?name=${encodeURIComponent(template.title)}&emoji=${encodeURIComponent(template.emoji)}&color=${template.color}`);
+    } else {
+      navigate(`/app/planner/new?name=${encodeURIComponent(taskName)}`);
+    }
+  }, [navigate]);
+
+  // Data queries - Planner data
+  const { data: tasks = [], isLoading: tasksLoading } = useTasksForDate(selectedDate);
+  const { data: completions, isLoading: completionsLoading } = useCompletionsForDate(selectedDate);
+  const { data: streak } = useUserStreak();
+  const { data: programEvents = [], isLoading: programEventsLoading } = useProgramEventsForDate(selectedDate);
+
+  // Home data for stats and rounds
   const { data: homeData, isLoading: homeLoading } = useNewHomeData();
 
-  // Fetch streak data
-  const { data: streak } = useUserStreak();
-
-  // Generate week days based on selected date's week
+  // Generate week days
   const weekDays = useMemo(() => {
     const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
     return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   }, [selectedDate]);
 
-  // Calculate date range for indicators
+  // Calculate date range for completed dates query
   const dateRange = useMemo(() => {
     if (showCalendar) {
       return {
@@ -51,9 +82,47 @@ const AppHi = () => {
     }
   }, [showCalendar, currentMonth, selectedDate]);
 
-  // Fetch completed dates and program event dates for indicators
+  // Fetch completed dates and program event dates
   const { data: completedDates } = useCompletedDates(dateRange.start, dateRange.end);
   const { data: programEventDates } = useProgramEventDates(dateRange.start, dateRange.end);
+
+  // Filter tasks by tag
+  const filteredTasks = useMemo(() => {
+    if (!selectedTag) return tasks;
+    return tasks.filter(task => task.tag === selectedTag);
+  }, [tasks, selectedTag]);
+
+  // Get unique tags from tasks
+  const taskTags = useMemo(() => {
+    const tags = new Set<string>();
+    tasks.forEach(task => {
+      if (task.tag) tags.add(task.tag);
+    });
+    return Array.from(tags);
+  }, [tasks]);
+
+  // Completed task IDs for this date
+  const completedTaskIds = useMemo(() => {
+    return new Set(completions?.tasks.map(c => c.task_id) || []);
+  }, [completions]);
+
+  // Completed subtask IDs for this date
+  const completedSubtaskIds = useMemo(() => {
+    return completions?.subtasks.map(c => c.subtask_id) || [];
+  }, [completions]);
+
+  const handleStreakIncrease = useCallback(() => {
+    setShowStreakModal(true);
+  }, []);
+
+  const handleEditTask = useCallback((task: UserTask) => {
+    setSelectedTask(null);
+    navigate(`/app/planner/edit/${task.id}`);
+  }, [navigate]);
+
+  const handleTaskTap = useCallback((task: UserTask) => {
+    setSelectedTask(task);
+  }, []);
 
   const handleDateSelect = useCallback((date: Date) => {
     setSelectedDate(date);
@@ -75,36 +144,23 @@ const AppHi = () => {
     setShowCalendar(!showCalendar);
   }, [showCalendar, selectedDate]);
 
-  const handleOpenPlanner = useCallback(() => {
-    const dateParam = format(selectedDate, 'yyyy-MM-dd');
-    navigate(`/app/planner?date=${dateParam}`);
-  }, [navigate, selectedDate]);
+  const isLoading = tasksLoading || completionsLoading || programEventsLoading;
 
-  if (homeLoading) {
-    return <HomeSkeleton />;
-  }
-
+  // Home data defaults
   const { 
-    listeningMinutes, 
-    unreadPosts, 
-    completedTracks, 
-    journalStreak,
-    activeRounds,
-    nextSessionMap 
-  } = homeData || {
-    listeningMinutes: 0,
-    unreadPosts: 0,
-    completedTracks: 0,
-    journalStreak: 0,
-    activeRounds: [],
-    nextSessionMap: new Map(),
-  };
+    listeningMinutes = 0, 
+    unreadPosts = 0, 
+    completedTracks = 0, 
+    journalStreak = 0,
+    activeRounds = [],
+    nextSessionMap = new Map(),
+  } = homeData || {};
 
   return (
     <>
       <SEOHead 
         title="Home - LadyBoss" 
-        description="Your personal dashboard"
+        description="Your personal dashboard and planner"
       />
       
       <div className="flex flex-col h-full bg-background">
@@ -124,38 +180,42 @@ const AppHi = () => {
               </SheetTrigger>
               <SheetContent side="left" className="w-[280px] p-0">
                 <div className="p-6" style={{ paddingTop: 'max(24px, env(safe-area-inset-top))' }}>
-                  <h2 className="text-lg font-semibold mb-4">LadyBoss</h2>
+                  <h2 className="text-lg font-semibold mb-4">LadyBoss Planner</h2>
                   <nav className="space-y-2">
                     <button 
                       onClick={() => {
-                        navigate('/app/planner');
+                        navigate('/app/planner/templates');
                         setMenuOpen(false);
                       }}
-                      className="w-full text-left py-2 px-3 rounded-lg hover:bg-muted flex items-center gap-2"
+                      className="w-full text-left py-2 px-3 rounded-lg hover:bg-muted"
                     >
-                      <CalendarDays className="h-4 w-4" />
-                      Full Planner
+                      📋 Browse Templates
                     </button>
                     <button 
                       onClick={() => {
-                        navigate('/app/journal');
+                        navigate('/app/planner/stats');
                         setMenuOpen(false);
                       }}
-                      className="w-full text-left py-2 px-3 rounded-lg hover:bg-muted flex items-center gap-2"
+                      className="w-full text-left py-2 px-3 rounded-lg hover:bg-muted"
                     >
-                      <PenLine className="h-4 w-4" />
-                      Journal
+                      📊 My Stats
                     </button>
-                    <button 
-                      onClick={() => {
-                        navigate('/app/inspire');
-                        setMenuOpen(false);
-                      }}
-                      className="w-full text-left py-2 px-3 rounded-lg hover:bg-muted flex items-center gap-2"
-                    >
-                      <BookOpen className="h-4 w-4" />
-                      Inspire
-                    </button>
+                    {isAdmin && (
+                      <div className="border-t pt-3 mt-3">
+                        <button 
+                          onClick={() => {
+                            if (confirm('Complete reset? This clears ALL your data.')) {
+                              resetPlanner.mutate();
+                              setMenuOpen(false);
+                            }
+                          }}
+                          disabled={resetPlanner.isPending}
+                          className="w-full text-left py-2 px-3 rounded-lg hover:bg-destructive/10 text-destructive"
+                        >
+                          🔄 Complete Reset (Admin)
+                        </button>
+                      </div>
+                    )}
                   </nav>
                 </div>
               </SheetContent>
@@ -217,7 +277,6 @@ const AppHi = () => {
                 programEventDates={programEventDates}
               />
             ) : (
-              // Week row
               <div className="flex mt-2">
                 {weekDays.map((day) => {
                   const isSelected = isSameDay(day, selectedDate);
@@ -285,36 +344,161 @@ const AppHi = () => {
           }} 
         />
 
-        {/* Open Planner Button */}
-        <div className="px-4 py-4">
-          <Button 
-            onClick={handleOpenPlanner}
-            className="w-full bg-violet-600 hover:bg-violet-700 text-white shadow-md"
-            size="lg"
-          >
-            <CalendarDays className="h-5 w-5 mr-2" />
-            Open Planner
-          </Button>
+        {/* Tag filter chips */}
+        {taskTags.length > 0 && (
+          <div className="px-4 py-3 bg-background border-b overflow-x-auto">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSelectedTag(null)}
+                className={cn(
+                  'px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all font-medium',
+                  selectedTag === null
+                    ? 'bg-violet-600 text-white'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                )}
+              >
+                All
+              </button>
+              {taskTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
+                  className={cn(
+                    'px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all capitalize font-medium',
+                    selectedTag === tag
+                      ? 'bg-violet-600 text-white'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  )}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Content area - scrollable with extra padding for fixed bottom dashboard */}
+        <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 pb-[280px]">
+          {isLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-20 rounded-2xl" />
+              ))}
+            </div>
+          ) : (
+            <>
+              {/* Program Events Section */}
+              {programEvents.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <CalendarDays className="h-4 w-4 text-indigo-500" />
+                    <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
+                      Program Events
+                    </h2>
+                  </div>
+                  <div className="space-y-3">
+                    {programEvents.map((event) => (
+                      <ProgramEventCard
+                        key={`${event.type}-${event.id}`}
+                        event={event}
+                        date={selectedDate}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Personal Tasks Section */}
+              {filteredTasks.length === 0 && programEvents.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-4xl mb-3">✨</div>
+                  <p className="text-muted-foreground mb-4">
+                    {selectedTag 
+                      ? `No ${selectedTag} tasks for this day` 
+                      : 'No tasks for this day'}
+                  </p>
+                  <button
+                    onClick={() => navigate('/app/planner/new')}
+                    className="text-violet-600 font-medium"
+                  >
+                    Add your first task
+                  </button>
+                </div>
+              ) : filteredTasks.length > 0 && (
+                <div>
+                  {programEvents.length > 0 && (
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-base">📝</span>
+                      <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
+                        Your Tasks
+                      </h2>
+                    </div>
+                  )}
+                  <div className="space-y-3">
+                    {filteredTasks.map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        date={selectedDate}
+                        isCompleted={completedTaskIds.has(task.id)}
+                        completedSubtaskIds={completedSubtaskIds}
+                        onTap={handleTaskTap}
+                        onStreakIncrease={handleStreakIncrease}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
-        {/* Content area - scrollable */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe space-y-6">
-          {/* Compact Stats Pills */}
-          <CompactStatsPills
-            listeningMinutes={listeningMinutes}
-            unreadPosts={unreadPosts}
-            completedTracks={completedTracks}
-            journalStreak={journalStreak}
-          />
-
-          {/* Active Rounds Carousel */}
-          <ActiveRoundsCarousel
-            activeRounds={activeRounds}
-            nextSessionMap={nextSessionMap}
-          />
+        {/* Fixed Bottom Dashboard */}
+        <div 
+          className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t"
+          style={{ paddingBottom: 'max(80px, calc(64px + env(safe-area-inset-bottom)))' }}
+        >
+          <div className="px-4 py-3 space-y-4">
+            <CompactStatsPills
+              listeningMinutes={listeningMinutes}
+              unreadPosts={unreadPosts}
+              completedTracks={completedTracks}
+              journalStreak={journalStreak}
+            />
+            <ActiveRoundsCarousel
+              activeRounds={activeRounds}
+              nextSessionMap={nextSessionMap}
+            />
+          </div>
         </div>
 
-        {/* Streak Celebration Modal */}
+        {/* FAB - positioned above the fixed bottom dashboard */}
+        <button
+          onClick={() => setShowQuickStart(true)}
+          className="fixed right-4 w-14 h-14 rounded-full bg-violet-600 text-white shadow-lg flex items-center justify-center hover:bg-violet-700 active:scale-95 transition-all z-50"
+          style={{ bottom: 'calc(280px + env(safe-area-inset-bottom))' }}
+        >
+          <Plus className="h-6 w-6" />
+        </button>
+
+        {/* Quick Start Sheet */}
+        <TaskQuickStartSheet
+          open={showQuickStart}
+          onOpenChange={setShowQuickStart}
+          onContinue={handleQuickStartContinue}
+        />
+
+        {/* Task Detail Modal */}
+        <TaskDetailModal
+          task={selectedTask}
+          open={!!selectedTask}
+          onClose={() => setSelectedTask(null)}
+          date={selectedDate}
+          completedSubtaskIds={completedSubtaskIds}
+          onEdit={handleEditTask}
+        />
+
+        {/* Streak celebration modal */}
         <StreakCelebration
           open={showStreakModal}
           onClose={() => setShowStreakModal(false)}
