@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Check, Pencil } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   UserTask, 
@@ -12,7 +11,7 @@ import {
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { TaskIcon } from './IconPicker';
-import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
+import { PRO_LINK_CONFIGS, ProLinkType } from '@/lib/proTaskTypes';
 
 interface TaskCardProps {
   task: UserTask;
@@ -31,7 +30,6 @@ export const TaskCard = ({
   onTap,
   onStreakIncrease,
 }: TaskCardProps) => {
-  const navigate = useNavigate();
   const [isAnimating, setIsAnimating] = useState(false);
   
   const { data: subtasks = [] } = useSubtasks(task.id);
@@ -85,13 +83,7 @@ export const TaskCard = ({
   };
 
   const handleCardClick = () => {
-    // If Pro Task, navigate to the linked feature
-    if (isProTask && proLinkType && proLinkValue !== undefined) {
-      navigate(getProTaskNavigationPath(proLinkType, proLinkValue));
-      return;
-    }
-    
-    // Otherwise open task detail
+    // Always open task detail modal (for both regular and Pro tasks)
     if (onTap) {
       onTap(task);
     }
@@ -147,16 +139,6 @@ export const TaskCard = ({
             )}
           </div>
 
-          {/* Edit button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onTap?.(task);
-            }}
-            className="w-7 h-7 rounded-full bg-white/60 dark:bg-white/20 flex items-center justify-center shrink-0 hover:bg-white/80 dark:hover:bg-white/30 transition-colors"
-          >
-            <Pencil className="h-3.5 w-3.5 text-foreground/60" />
-          </button>
 
           {/* Checkbox */}
           <button

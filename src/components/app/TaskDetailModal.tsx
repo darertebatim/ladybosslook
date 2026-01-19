@@ -1,4 +1,5 @@
 import { Check, X, Pencil } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
   UserTask, 
@@ -12,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { TaskIcon } from './IconPicker';
+import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 
 interface TaskDetailModalProps {
   task: UserTask | null;
@@ -30,11 +32,18 @@ export const TaskDetailModal = ({
   completedSubtaskIds,
   onEdit,
 }: TaskDetailModalProps) => {
+  const navigate = useNavigate();
   const { data: subtasks = [] } = useSubtasks(task?.id);
   const completeSubtask = useCompleteSubtask();
   const uncompleteSubtask = useUncompleteSubtask();
 
   if (!task) return null;
+
+  // Detect if this is a Pro Task
+  const isProTask = !!task.pro_link_type || !!task.linked_playlist_id;
+  const proLinkType: ProLinkType | null = task.pro_link_type as ProLinkType || (task.linked_playlist_id ? 'playlist' : null);
+  const proLinkValue = task.pro_link_value || task.linked_playlist_id;
+  const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
 
   // Format time display
   const formatTime = (time: string | null) => {
@@ -159,19 +168,52 @@ export const TaskDetailModal = ({
           </div>
         )}
 
-        {/* Edit button */}
-        <div className="p-4 pt-2 bg-background">
-          <Button
-            variant="outline"
-            onClick={() => {
-              onClose();
-              onEdit(task);
-            }}
-            className="w-full gap-2"
-          >
-            <Pencil className="h-4 w-4" />
-            Edit Task
-          </Button>
+        {/* Action buttons */}
+        <div className="p-4 pt-2 bg-background space-y-2">
+          {/* Pro Task: Navigation button */}
+          {isProTask && proConfig ? (
+            <>
+              <Button
+                onClick={() => {
+                  onClose();
+                  navigate(getProTaskNavigationPath(proLinkType!, proLinkValue));
+                }}
+                className={cn('w-full gap-2', proConfig.buttonClass)}
+              >
+                {(() => {
+                  const ProIcon = proConfig.icon;
+                  return <ProIcon className="h-4 w-4" />;
+                })()}
+                {proConfig.badgeText}
+              </Button>
+              {/* Small edit link for Pro Tasks */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  onClose();
+                  onEdit(task);
+                }}
+                className="w-full text-muted-foreground"
+              >
+                <Pencil className="h-3.5 w-3.5 mr-1.5" />
+                Edit Task
+              </Button>
+            </>
+          ) : (
+            /* Regular Task: Edit button */
+            <Button
+              variant="outline"
+              onClick={() => {
+                onClose();
+                onEdit(task);
+              }}
+              className="w-full gap-2"
+            >
+              <Pencil className="h-4 w-4" />
+              Edit Task
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
