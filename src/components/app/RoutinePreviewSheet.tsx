@@ -7,7 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
-import { RoutineTaskEditSheet, EditableTask } from './RoutineTaskEditSheet';
+import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 
 // Color cycle for variety in planner
 export const ROUTINE_COLOR_CYCLE: TaskColor[] = [
@@ -32,6 +32,9 @@ export interface EditedTask {
   repeatPattern?: 'daily' | 'weekly' | 'monthly' | 'none';
   scheduledTime?: string | null;
   tag?: string | null;
+  reminderEnabled?: boolean;
+  reminderTime?: string;
+  subtasks?: string[];
 }
 
 interface RoutinePreviewSheetProps {
@@ -55,7 +58,8 @@ export function RoutinePreviewSheet({
     new Set(tasks.map(t => t.id))
   );
   const [editedTasks, setEditedTasks] = useState<Record<string, EditedTask>>({});
-  const [editingTask, setEditingTask] = useState<EditableTask | null>(null);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editingTaskIndex, setEditingTaskIndex] = useState<number>(0);
   const [showEditSheet, setShowEditSheet] = useState(false);
 
   const allSelected = selectedTaskIds.size === tasks.length;
@@ -79,34 +83,31 @@ export function RoutinePreviewSheet({
   };
 
   const openTaskEditor = (task: RoutinePlanTask, index: number) => {
-    const existingEdit = editedTasks[task.id];
-    setEditingTask({
-      id: task.id,
-      title: existingEdit?.title || task.title,
-      icon: existingEdit?.icon || task.icon,
-      color: existingEdit?.color || getTaskColor(index),
-      repeatPattern: existingEdit?.repeatPattern || 'daily',
-      scheduledTime: existingEdit?.scheduledTime ?? null,
-      tag: existingEdit?.tag ?? routineTitle,
-    });
+    setEditingTaskId(task.id);
+    setEditingTaskIndex(index);
     setShowEditSheet(true);
   };
 
-  const handleTaskEditSave = (updated: EditableTask) => {
+  const handleTaskEditSave = (data: TaskFormData) => {
+    if (!editingTaskId) return;
+    
     setEditedTasks(prev => ({
       ...prev,
-      [updated.id]: {
-        id: updated.id,
-        title: updated.title,
-        icon: updated.icon,
-        color: updated.color,
-        repeatPattern: updated.repeatPattern,
-        scheduledTime: updated.scheduledTime,
-        tag: updated.tag,
+      [editingTaskId]: {
+        id: editingTaskId,
+        title: data.title,
+        icon: data.icon,
+        color: data.color,
+        repeatPattern: data.repeatEnabled ? data.repeatPattern : 'none',
+        scheduledTime: data.scheduledTime,
+        tag: data.tag,
+        reminderEnabled: data.reminderEnabled,
+        reminderTime: data.reminderTime,
+        subtasks: data.subtasks,
       },
     }));
     setShowEditSheet(false);
-    setEditingTask(null);
+    setEditingTaskId(null);
   };
 
   const getTaskDisplay = (task: RoutinePlanTask, index: number) => {
@@ -116,6 +117,26 @@ export function RoutinePreviewSheet({
       icon: edited?.icon || task.icon,
       color: edited?.color || getTaskColor(index),
       repeatPattern: edited?.repeatPattern || 'daily',
+    };
+  };
+
+  const getInitialDataForEdit = (task: RoutinePlanTask, index: number): Partial<TaskFormData> => {
+    const existing = editedTasks[task.id];
+    return {
+      title: existing?.title || task.title,
+      icon: existing?.icon || task.icon,
+      color: existing?.color || getTaskColor(index),
+      scheduledDate: new Date(),
+      scheduledTime: existing?.scheduledTime ?? null,
+      repeatEnabled: existing?.repeatPattern ? existing.repeatPattern !== 'none' : true,
+      repeatPattern: (existing?.repeatPattern && existing.repeatPattern !== 'none') 
+        ? existing.repeatPattern as 'daily' | 'weekly' | 'monthly'
+        : 'daily',
+      repeatInterval: 1,
+      reminderEnabled: existing?.reminderEnabled ?? false,
+      reminderTime: existing?.reminderTime || '09:00',
+      tag: existing?.tag ?? routineTitle,
+      subtasks: existing?.subtasks || [],
     };
   };
 
@@ -132,6 +153,9 @@ export function RoutinePreviewSheet({
       default: return 'No repeat';
     }
   };
+
+  // Find the task being edited
+  const editingTask = editingTaskId ? tasks.find(t => t.id === editingTaskId) : null;
 
   return (
     <>
@@ -238,14 +262,16 @@ export function RoutinePreviewSheet({
         </SheetContent>
       </Sheet>
 
-      {/* Full Task Edit Sheet */}
-      <RoutineTaskEditSheet
-        open={showEditSheet}
-        onOpenChange={setShowEditSheet}
-        task={editingTask}
-        routineTag={routineTitle}
-        onSave={handleTaskEditSave}
-      />
+      {/* Full Task Edit Sheet - uses the REAL AppTaskCreate component */}
+      {editingTask && (
+        <AppTaskCreate
+          isSheet={true}
+          sheetOpen={showEditSheet}
+          onSheetOpenChange={setShowEditSheet}
+          initialData={getInitialDataForEdit(editingTask, editingTaskIndex)}
+          onSaveSheet={handleTaskEditSave}
+        />
+      )}
     </>
   );
 }
