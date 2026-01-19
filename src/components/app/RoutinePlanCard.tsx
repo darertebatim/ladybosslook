@@ -72,40 +72,41 @@ export function RoutinePlanCard({ plan, onClick, variant = 'default' }: RoutineP
   return (
     <button
       onClick={onClick}
-      className="flex flex-col rounded-2xl overflow-hidden bg-card shadow-sm border border-border/50 w-full min-w-0 transition-all active:scale-[0.98]"
+      className="relative rounded-2xl overflow-hidden w-full min-w-0 transition-all active:scale-[0.98] aspect-[4/5]"
     >
-      {/* Cover Image or Gradient */}
-      <div className="relative h-32 w-full">
-        {plan.cover_image_url ? (
-          <img
-            src={plan.cover_image_url}
-            alt={plan.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className={cn(
-            'w-full h-full bg-gradient-to-br flex items-center justify-center',
-            gradient
-          )}>
-            <IconComponent className="w-12 h-12 text-white/90" />
-          </div>
-        )}
-        
-        {/* Points badge */}
-        <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1">
-          <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-          <span>{plan.points}</span>
+      {/* Cover Image or Gradient - Full Card */}
+      {plan.cover_image_url ? (
+        <img
+          src={plan.cover_image_url}
+          alt={plan.title}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      ) : (
+        <div className={cn(
+          'absolute inset-0 w-full h-full bg-gradient-to-br flex items-center justify-center',
+          gradient
+        )}>
+          <IconComponent className="w-16 h-16 text-white/30" />
         </div>
+      )}
+      
+      {/* Bottom Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      
+      {/* Points badge - Top Right */}
+      <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1">
+        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+        <span>{plan.points}</span>
       </div>
 
-      {/* Content */}
-      <div className="p-3 text-left">
-        <h3 className="font-semibold text-foreground line-clamp-1">{plan.title}</h3>
+      {/* Content - Overlaid at Bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-3 text-left">
+        <h3 className="font-semibold text-white line-clamp-2 text-sm drop-shadow-md">{plan.title}</h3>
         {plan.subtitle && (
-          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{plan.subtitle}</p>
+          <p className="text-xs text-white/70 line-clamp-1 mt-0.5">{plan.subtitle}</p>
         )}
         
-        <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-3 mt-1.5 text-xs text-white/70">
           <div className="flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />
             <span>{plan.estimated_minutes} min</span>
