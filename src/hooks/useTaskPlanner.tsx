@@ -794,61 +794,33 @@ async function updateStreak(userId: string, completedDateStr: string): Promise<{
  * Complete reset - like day one fresh start (admin testing only)
  */
 export const useResetPlannerData = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error('Not authenticated');
+      if (!isAdmin) throw new Error('Forbidden');
 
-      // First get all task IDs for this user
-      const { data: userTasks } = await supabase
-        .from('user_tasks')
-        .select('id')
-        .eq('user_id', user.id);
-      
-      const taskIds = userTasks?.map(t => t.id) || [];
+      const { data, error } = await supabase.functions.invoke('reset-user-data');
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
 
-      // Delete subtasks first (foreign key constraint)
-      if (taskIds.length > 0) {
-        const { data: subtasks } = await supabase
-          .from('user_subtasks')
-          .select('id')
-          .in('task_id', taskIds);
-        
-        if (subtasks && subtasks.length > 0) {
-          await supabase.from('subtask_completions').delete().in('subtask_id', subtasks.map(s => s.id));
-        }
-        await supabase.from('user_subtasks').delete().in('task_id', taskIds);
-      }
-
-      // Delete ALL user data for complete fresh start
-      await supabase.from('task_completions').delete().eq('user_id', user.id);
-      await supabase.from('user_tasks').delete().eq('user_id', user.id);
-      await supabase.from('user_streaks').delete().eq('user_id', user.id);
-      await supabase.from('user_tags').delete().eq('user_id', user.id);
-      await supabase.from('user_routine_plans').delete().eq('user_id', user.id);
-      await supabase.from('planner_program_completions').delete().eq('user_id', user.id);
-      await supabase.from('audio_progress').delete().eq('user_id', user.id);
-      await supabase.from('audio_bookmarks').delete().eq('user_id', user.id);
-      await supabase.from('journal_entries').delete().eq('user_id', user.id);
-      await supabase.from('journal_reminder_settings').delete().eq('user_id', user.id);
-      await supabase.from('module_progress').delete().eq('user_id', user.id);
-      await supabase.from('user_content_views').delete().eq('user_id', user.id);
-      await supabase.from('user_celebrated_rounds').delete().eq('user_id', user.id);
-      await supabase.from('routine_plan_ratings').delete().eq('user_id', user.id);
-      await supabase.from('feed_post_reads').delete().eq('user_id', user.id);
-      await supabase.from('feed_reactions').delete().eq('user_id', user.id);
-      await supabase.from('feed_comments').delete().eq('user_id', user.id);
+      return data;
     },
     onSuccess: () => {
-      // Clear ALL cached queries for complete fresh start
+      // Clear ALL cached queries and reload to guarantee a true "day one" UI.
       queryClient.clear();
-      toast({ title: 'Complete Reset! 🔄', description: 'Fresh start like day one!' });
+      toast({ title: 'Complete Reset', description: 'Fresh start like day one.' });
+      window.location.reload();
     },
     onError: (error) => {
       console.error('Reset error:', error);
-      toast({ title: 'Failed to reset', variant: 'destructive' });
+      toast({
+        title: 'Reset failed',
+        description: error instanceof Error ? error.message : 'Could not reset',
+        variant: 'destructive',
+      });
     },
   });
 };

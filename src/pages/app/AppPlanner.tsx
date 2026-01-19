@@ -25,7 +25,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const AppPlanner = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
@@ -186,22 +186,22 @@ const AppPlanner = () => {
                   >
                     📊 My Stats
                   </button>
-                  
-                  {/* Admin reset button */}
-                  <div className="border-t pt-3 mt-3">
-                    <button 
-                      onClick={() => {
-                        if (confirm('Reset ALL planner data? This cannot be undone.')) {
-                          resetPlanner.mutate();
-                          setMenuOpen(false);
-                        }
-                      }}
-                      disabled={resetPlanner.isPending}
-                      className="w-full text-left py-2 px-3 rounded-lg hover:bg-destructive/10 text-destructive"
-                    >
-                      🔄 Reset Planner (Admin)
-                    </button>
-                  </div>
+                  {isAdmin && (
+                    <div className="border-t pt-3 mt-3">
+                      <button 
+                        onClick={() => {
+                          if (confirm('Complete reset? This clears ALL your data (planner, streak, routines, journal, audio progress, feed, chat, etc).')) {
+                            resetPlanner.mutate();
+                            setMenuOpen(false);
+                          }
+                        }}
+                        disabled={resetPlanner.isPending}
+                        className="w-full text-left py-2 px-3 rounded-lg hover:bg-destructive/10 text-destructive"
+                      >
+                        🔄 Complete Reset (Admin)
+                      </button>
+                    </div>
+                  )}
                 </nav>
               </div>
             </SheetContent>
