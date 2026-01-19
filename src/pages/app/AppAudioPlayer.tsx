@@ -544,6 +544,9 @@ export default function AppAudioPlayer() {
               </div>
             </button>
           )}
+          
+          {/* Bottom safe area padding */}
+          <div className="pb-safe" />
         </div>
       </div>
     </div>
