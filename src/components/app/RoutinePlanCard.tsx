@@ -72,7 +72,7 @@ export function RoutinePlanCard({ plan, onClick, variant = 'default' }: RoutineP
   return (
     <button
       onClick={onClick}
-      className="flex flex-col rounded-2xl overflow-hidden bg-card shadow-sm border border-border/50 w-full transition-all active:scale-[0.98]"
+      className="flex flex-col rounded-2xl overflow-hidden bg-card shadow-sm border border-border/50 w-full min-w-0 transition-all active:scale-[0.98]"
     >
       {/* Cover Image or Gradient */}
       <div className="relative h-32 w-full">
