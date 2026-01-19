@@ -103,11 +103,12 @@ const AppPlanner = () => {
 
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* Header - iOS Standard */}
+      {/* Fixed header with integrated week strip */}
       <header 
-        className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-b from-violet-100 to-background border-b"
+        className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-violet-100 to-background"
         style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
       >
+        {/* Title bar */}
         <div className="flex items-center justify-between px-4 h-12">
           {/* Menu button */}
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
@@ -157,80 +158,80 @@ const AppPlanner = () => {
             <span className="text-sm font-semibold">{streak?.current_streak || 0}</span>
           </button>
         </div>
-      </header>
 
-      {/* Spacer for fixed header */}
-      <div style={{ height: 'calc(48px + max(12px, env(safe-area-inset-top)))' }} />
-
-      {/* Week strip - only show when calendar is collapsed */}
-      {!showCalendar && (
-        <div className="bg-background border-b px-2 py-3">
-          <div className="flex justify-between">
-            {weekDays.map((day) => {
-              const isSelected = isSameDay(day, selectedDate);
-              const isTodayDate = isToday(day);
-              
-              return (
-                <button
-                  key={day.toISOString()}
-                  onClick={() => setSelectedDate(day)}
-                  className="flex flex-col items-center gap-1 flex-1"
-                >
-                  <span className="text-xs text-muted-foreground uppercase font-medium">
-                    {format(day, 'EEE')}
-                  </span>
-                  <div
-                    className={cn(
-                      'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
-                      isSelected
-                        ? 'bg-violet-600 text-white shadow-md'
-                        : isTodayDate
-                          ? 'bg-violet-100 text-violet-700'
-                          : 'hover:bg-muted/50'
-                    )}
+        {/* Week strip - part of fixed header, only show when calendar is collapsed */}
+        {!showCalendar && (
+          <div className="px-2 py-3 border-b">
+            <div className="flex justify-between">
+              {weekDays.map((day) => {
+                const isSelected = isSameDay(day, selectedDate);
+                const isTodayDate = isToday(day);
+                
+                return (
+                  <button
+                    key={day.toISOString()}
+                    onClick={() => setSelectedDate(day)}
+                    className="flex flex-col items-center gap-1 flex-1"
                   >
-                    {isTodayDate && isSelected ? (
-                      <span className="text-base">{todayEmoji || format(day, 'd')}</span>
-                    ) : (
-                      format(day, 'd')
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Calendar expand handle */}
-          <button 
-            onClick={() => setShowCalendar(true)}
-            className="w-full flex justify-center pt-2 mt-1"
-          >
-            <div className="flex gap-0.5">
-              <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
-              <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+                    <span className="text-xs text-muted-foreground uppercase font-medium">
+                      {format(day, 'EEE')}
+                    </span>
+                    <div
+                      className={cn(
+                        'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
+                        isSelected
+                          ? 'bg-violet-600 text-white shadow-md'
+                          : isTodayDate
+                            ? 'bg-violet-100 text-violet-700'
+                            : 'hover:bg-muted/50'
+                      )}
+                    >
+                      {isTodayDate && isSelected ? (
+                        <span className="text-base">{todayEmoji || format(day, 'd')}</span>
+                      ) : (
+                        format(day, 'd')
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-          </button>
-        </div>
-      )}
 
-      {/* Expandable Month Calendar - inline expansion */}
-      {showCalendar && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 animate-in fade-in duration-200"
-            style={{ top: 'calc(48px + max(12px, env(safe-area-inset-top)))' }}
-            onClick={() => setShowCalendar(false)}
-          />
-          {/* Calendar panel */}
-          <div className="relative z-40 border-b shadow-lg">
+            {/* Calendar expand handle */}
+            <button 
+              onClick={() => setShowCalendar(true)}
+              className="w-full flex justify-center pt-2 mt-1"
+            >
+              <div className="flex gap-0.5">
+                <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+                <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+              </div>
+            </button>
+          </div>
+        )}
+
+        {/* Expanded Month Calendar - replaces week strip */}
+        {showCalendar && (
+          <div className="border-b shadow-lg">
             <MonthCalendar
               selectedDate={selectedDate}
               onDateSelect={handleDateSelect}
               onClose={() => setShowCalendar(false)}
             />
           </div>
-        </>
+        )}
+      </header>
+
+      {/* Spacer for fixed header (title bar + week strip) */}
+      <div style={{ height: showCalendar ? 'calc(48px + max(12px, env(safe-area-inset-top)))' : 'calc(48px + 100px + max(12px, env(safe-area-inset-top)))' }} />
+
+      {/* Backdrop when calendar is expanded */}
+      {showCalendar && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 animate-in fade-in duration-200"
+          style={{ top: 0 }}
+          onClick={() => setShowCalendar(false)}
+        />
       )}
 
       {/* Tag filter chips */}
