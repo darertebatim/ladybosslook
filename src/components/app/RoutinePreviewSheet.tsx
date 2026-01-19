@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Check, Pencil, Clock } from 'lucide-react';
+import { Check, Pencil, Clock, X } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
-import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
-import { RoutineTaskEditSheet, EditableTask } from './RoutineTaskEditSheet';
+import { TASK_COLORS, TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
+import { IconPicker } from './IconPicker';
 
 // Color cycle for variety in planner
 export const ROUTINE_COLOR_CYCLE: TaskColor[] = [
@@ -24,14 +25,14 @@ export const getTaskColor = (index: number): TaskColor => {
   return ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length];
 };
 
+// Available colors for the simple picker
+const COLOR_OPTIONS: TaskColor[] = ['pink', 'peach', 'yellow', 'lime', 'sky', 'mint', 'lavender'];
+
 export interface EditedTask {
   id: string;
   title: string;
   icon?: string;
   color?: TaskColor;
-  repeatPattern?: 'daily' | 'weekly' | 'monthly' | 'none';
-  scheduledTime?: string | null;
-  tag?: string | null;
 }
 
 interface RoutinePreviewSheetProps {
@@ -55,8 +56,13 @@ export function RoutinePreviewSheet({
     new Set(tasks.map(t => t.id))
   );
   const [editedTasks, setEditedTasks] = useState<Record<string, EditedTask>>({});
-  const [editingTask, setEditingTask] = useState<EditableTask | null>(null);
-  const [showEditSheet, setShowEditSheet] = useState(false);
+  
+  // Simple inline edit state
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editIcon, setEditIcon] = useState('');
+  const [editColor, setEditColor] = useState<TaskColor>('peach');
+  const [showIconPicker, setShowIconPicker] = useState(false);
 
   const allSelected = selectedTaskIds.size === tasks.length;
 
@@ -80,33 +86,30 @@ export function RoutinePreviewSheet({
 
   const openTaskEditor = (task: RoutinePlanTask, index: number) => {
     const existingEdit = editedTasks[task.id];
-    setEditingTask({
-      id: task.id,
-      title: existingEdit?.title || task.title,
-      icon: existingEdit?.icon || task.icon,
-      color: existingEdit?.color || getTaskColor(index),
-      repeatPattern: existingEdit?.repeatPattern || 'daily',
-      scheduledTime: existingEdit?.scheduledTime ?? null,
-      tag: existingEdit?.tag ?? routineTitle,
-    });
-    setShowEditSheet(true);
+    setEditingTaskId(task.id);
+    setEditTitle(existingEdit?.title || task.title);
+    setEditIcon(existingEdit?.icon || task.icon);
+    setEditColor(existingEdit?.color || getTaskColor(index));
   };
 
-  const handleTaskEditSave = (updated: EditableTask) => {
+  const closeEditor = () => {
+    setEditingTaskId(null);
+    setShowIconPicker(false);
+  };
+
+  const saveEdit = () => {
+    if (!editingTaskId || !editTitle.trim()) return;
+    
     setEditedTasks(prev => ({
       ...prev,
-      [updated.id]: {
-        id: updated.id,
-        title: updated.title,
-        icon: updated.icon,
-        color: updated.color,
-        repeatPattern: updated.repeatPattern,
-        scheduledTime: updated.scheduledTime,
-        tag: updated.tag,
+      [editingTaskId]: {
+        id: editingTaskId,
+        title: editTitle.trim(),
+        icon: editIcon,
+        color: editColor,
       },
     }));
-    setShowEditSheet(false);
-    setEditingTask(null);
+    closeEditor();
   };
 
   const getTaskDisplay = (task: RoutinePlanTask, index: number) => {
@@ -115,7 +118,6 @@ export function RoutinePreviewSheet({
       title: edited?.title || task.title,
       icon: edited?.icon || task.icon,
       color: edited?.color || getTaskColor(index),
-      repeatPattern: edited?.repeatPattern || 'daily',
     };
   };
 
@@ -124,14 +126,8 @@ export function RoutinePreviewSheet({
     onSave(Array.from(selectedTaskIds), editedTasksList);
   };
 
-  const getRepeatLabel = (pattern: string) => {
-    switch (pattern) {
-      case 'daily': return 'Repeats every day';
-      case 'weekly': return 'Repeats every week';
-      case 'monthly': return 'Repeats every month';
-      default: return 'No repeat';
-    }
-  };
+  // Get selected icon component for display
+  const EditIconComponent = (LucideIcons as any)[editIcon] || LucideIcons.Sparkles;
 
   return (
     <>
@@ -195,12 +191,12 @@ export function RoutinePreviewSheet({
                         <div className="px-3 py-2 bg-black/5 flex items-center gap-1.5">
                           <Clock className="w-3 h-3 text-foreground/60" />
                           <span className="text-xs text-foreground/60">
-                            {getRepeatLabel(display.repeatPattern)}
+                            Repeats every day
                           </span>
                         </div>
                       </div>
 
-                      {/* Edit button - opens full editor */}
+                      {/* Edit button */}
                       <button 
                         className="p-2 mt-2 text-muted-foreground hover:text-foreground"
                         onClick={() => openTaskEditor(task, index)}
@@ -238,13 +234,86 @@ export function RoutinePreviewSheet({
         </SheetContent>
       </Sheet>
 
-      {/* Full Task Edit Sheet */}
-      <RoutineTaskEditSheet
-        open={showEditSheet}
-        onOpenChange={setShowEditSheet}
-        task={editingTask}
-        routineTag={routineTitle}
-        onSave={handleTaskEditSave}
+      {/* Simple Inline Edit Sheet */}
+      <Sheet open={editingTaskId !== null} onOpenChange={(open) => !open && closeEditor()}>
+        <SheetContent 
+          side="bottom" 
+          className="h-auto rounded-t-3xl px-4"
+          hideCloseButton
+        >
+          <div className="flex flex-col gap-6 py-4">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <button onClick={closeEditor} className="p-2 -ml-2">
+                <X className="w-5 h-5" />
+              </button>
+              <h3 className="text-lg font-semibold">Edit Task</h3>
+              <Button 
+                size="sm" 
+                onClick={saveEdit}
+                disabled={!editTitle.trim()}
+              >
+                Save
+              </Button>
+            </div>
+
+            {/* Icon Picker Button */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowIconPicker(true)}
+                className={cn(
+                  'w-16 h-16 rounded-2xl flex items-center justify-center',
+                  TASK_COLOR_CLASSES[editColor]
+                )}
+              >
+                <EditIconComponent className="w-8 h-8 text-foreground/80" />
+              </button>
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground mb-1">Task name</p>
+                <Input
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  placeholder="Enter task name"
+                  className="text-lg font-medium"
+                />
+              </div>
+            </div>
+
+            {/* Color Picker */}
+            <div>
+              <p className="text-sm text-muted-foreground mb-3">Color</p>
+              <div className="flex gap-3">
+                {COLOR_OPTIONS.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => setEditColor(color)}
+                    className={cn(
+                      'w-10 h-10 rounded-full transition-all',
+                      editColor === color && 'ring-2 ring-offset-2 ring-foreground'
+                    )}
+                    style={{ backgroundColor: TASK_COLORS[color] }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Note about advanced editing */}
+            <p className="text-xs text-muted-foreground text-center pb-2">
+              You can edit time, reminders & more from your planner after adding.
+            </p>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Icon Picker Sheet */}
+      <IconPicker
+        open={showIconPicker}
+        onOpenChange={setShowIconPicker}
+        selectedIcon={editIcon}
+        onSelect={(icon) => {
+          setEditIcon(icon);
+          setShowIconPicker(false);
+        }}
       />
     </>
   );
