@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { X, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -69,13 +69,20 @@ const AppTaskCreate = ({
 }: AppTaskCreateProps) => {
   const navigate = useNavigate();
   const { taskId } = useParams<{ taskId?: string }>();
+  const [searchParams] = useSearchParams();
+  
+  // Get URL params for pre-filled data from quick start
+  const urlName = searchParams.get('name') || '';
+  const urlEmoji = searchParams.get('emoji') || '';
+  const urlColor = searchParams.get('color') as TaskColor | null;
+  
   const isEditing = !!taskId || !!initialData;
   const { effectiveInset, isKeyboardOpen } = useKeyboard();
 
-  // Form state
-  const [title, setTitle] = useState(initialData?.title || '');
-  const [icon, setIcon] = useState(initialData?.icon || 'Sun');
-  const [color, setColor] = useState<TaskColor>(initialData?.color || 'yellow');
+  // Form state - prioritize URL params for new tasks
+  const [title, setTitle] = useState(initialData?.title || urlName || '');
+  const [icon, setIcon] = useState(initialData?.icon || urlEmoji || 'Sun');
+  const [color, setColor] = useState<TaskColor>(initialData?.color || urlColor || 'yellow');
   const [scheduledDate, setScheduledDate] = useState<Date>(initialData?.scheduledDate || new Date());
   const [scheduledTime, setScheduledTime] = useState<string | null>(initialData?.scheduledTime ?? null);
   const [repeatEnabled, setRepeatEnabled] = useState(initialData?.repeatEnabled ?? false);
