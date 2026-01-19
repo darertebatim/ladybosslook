@@ -400,9 +400,13 @@ export default function AppPlaylistDetail() {
 
   const getCategoryLabel = () => {
     switch (playlist?.category) {
-      case 'audiobook': return 'Audiobook';
-      case 'course_supplement': return 'Course';
       case 'podcast': return 'Podcast';
+      case 'course_supplement': return 'Course';
+      case 'audiobook': return 'Audiobook';
+      case 'meditate': return 'Meditate';
+      case 'workout': return 'Workout';
+      case 'soundscape': return 'Soundscape';
+      case 'affirmation': return 'Affirmation';
       default: return 'Audio';
     }
   };
