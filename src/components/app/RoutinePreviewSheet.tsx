@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Check, Pencil, Clock } from 'lucide-react';
+import { Check, Pencil, Clock, X } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
@@ -23,12 +24,17 @@ export const getTaskColor = (index: number): TaskColor => {
   return ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length];
 };
 
+export interface EditedTask {
+  id: string;
+  title: string;
+}
+
 interface RoutinePreviewSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   tasks: RoutinePlanTask[];
   routineTitle: string;
-  onSave: (selectedTaskIds: string[]) => void;
+  onSave: (selectedTaskIds: string[], editedTasks: EditedTask[]) => void;
   isSaving?: boolean;
 }
 
@@ -43,6 +49,8 @@ export function RoutinePreviewSheet({
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
     new Set(tasks.map(t => t.id))
   );
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editedTitles, setEditedTitles] = useState<Record<string, string>>({});
 
   const allSelected = selectedTaskIds.size === tasks.length;
 
@@ -64,8 +72,35 @@ export function RoutinePreviewSheet({
     }
   };
 
+  const startEditing = (taskId: string, currentTitle: string) => {
+    setEditingTaskId(taskId);
+    if (!editedTitles[taskId]) {
+      setEditedTitles(prev => ({ ...prev, [taskId]: currentTitle }));
+    }
+  };
+
+  const saveEdit = () => {
+    setEditingTaskId(null);
+  };
+
+  const cancelEdit = (taskId: string, originalTitle: string) => {
+    setEditedTitles(prev => ({ ...prev, [taskId]: originalTitle }));
+    setEditingTaskId(null);
+  };
+
+  const getTaskTitle = (task: RoutinePlanTask) => {
+    return editedTitles[task.id] ?? task.title;
+  };
+
   const handleSave = () => {
-    onSave(Array.from(selectedTaskIds));
+    const editedTasksList = Object.entries(editedTitles)
+      .filter(([id, title]) => {
+        const original = tasks.find(t => t.id === id);
+        return original && title !== original.title;
+      })
+      .map(([id, title]) => ({ id, title }));
+    
+    onSave(Array.from(selectedTaskIds), editedTasksList);
   };
 
   return (
@@ -122,7 +157,28 @@ export function RoutinePreviewSheet({
                           <TaskIcon className="w-4 h-4" />
                           <span>Anytime</span>
                         </div>
-                        <p className="font-medium text-foreground">{task.title}</p>
+                        {editingTaskId === task.id ? (
+                          <div className="flex items-center gap-2">
+                            <Input
+                              value={editedTitles[task.id] ?? task.title}
+                              onChange={(e) => setEditedTitles(prev => ({ ...prev, [task.id]: e.target.value }))}
+                              className="h-8 text-sm bg-white/50"
+                              autoFocus
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') saveEdit();
+                                if (e.key === 'Escape') cancelEdit(task.id, task.title);
+                              }}
+                            />
+                            <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={saveEdit}>
+                              <Check className="w-4 h-4 text-emerald-600" />
+                            </Button>
+                            <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => cancelEdit(task.id, task.title)}>
+                              <X className="w-4 h-4 text-muted-foreground" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <p className="font-medium text-foreground">{getTaskTitle(task)}</p>
+                        )}
                       </div>
                       {/* Footer bar */}
                       <div className="px-3 py-2 bg-black/5 flex items-center gap-1.5">
@@ -131,8 +187,11 @@ export function RoutinePreviewSheet({
                       </div>
                     </div>
 
-                    {/* Edit button placeholder */}
-                    <button className="p-2 mt-2 text-muted-foreground hover:text-foreground">
+                    {/* Edit button */}
+                    <button 
+                      className="p-2 mt-2 text-muted-foreground hover:text-foreground"
+                      onClick={() => startEditing(task.id, getTaskTitle(task))}
+                    >
                       <Pencil className="w-4 h-4" />
                     </button>
                   </div>
