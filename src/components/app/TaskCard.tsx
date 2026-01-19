@@ -115,20 +115,20 @@ export const TaskCard = ({
         <div className="flex items-center gap-3">
           {/* Icon circle */}
           <div className="w-11 h-11 rounded-full bg-white/90 dark:bg-white/20 flex items-center justify-center shrink-0 shadow-sm">
-            <ProIcon className={cn('h-5 w-5', `text-${proConfig.color}-600 dark:text-${proConfig.color}-400`)} />
+            <ProIcon className={cn('h-5 w-5', proConfig.iconColorClass)} />
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            {/* Top line: Badge + time */}
+            {/* Top line: Time + Badge */}
             <div className="flex items-center gap-2 text-xs mb-0.5">
+              <span className="text-foreground/60">{formatTime(task.scheduled_time)}</span>
               <span className={cn(
                 'px-2 py-0.5 rounded-full font-medium',
-                `bg-${proConfig.color}-500/20 text-${proConfig.color}-700 dark:text-${proConfig.color}-300`
+                proConfig.badgeColorClass
               )}>
                 {proConfig.badgeText}
               </span>
-              <span className="text-foreground/60">{formatTime(task.scheduled_time)}</span>
             </div>
             
             {/* Title */}
