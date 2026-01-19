@@ -14,12 +14,15 @@ import {
 } from '@/hooks/useTaskPlanner';
 import { useAuth } from '@/hooks/useAuth';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
+import { useNewHomeData } from '@/hooks/useNewHomeData';
 import { TaskCard } from '@/components/app/TaskCard';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
+import { CompactStatsPills } from '@/components/dashboard/CompactStatsPills';
+import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -55,6 +58,16 @@ const AppPlanner = () => {
   const { data: completions, isLoading: completionsLoading } = useCompletionsForDate(selectedDate);
   const { data: streak } = useUserStreak();
   const { data: programEvents = [], isLoading: programEventsLoading } = useProgramEventsForDate(selectedDate);
+  
+  // Dashboard data for stats and active rounds
+  const { 
+    listeningMinutes, 
+    unreadPosts, 
+    completedTracks, 
+    journalStreak,
+    activeRounds, 
+    nextSessionMap 
+  } = useNewHomeData();
 
   // Generate week days based on selected date's week
   const weekDays = useMemo(() => {
@@ -441,6 +454,23 @@ const AppPlanner = () => {
             )}
           </>
         )}
+
+        {/* Dashboard Section - Stats & Programs */}
+        <div className="mt-8 pt-6 border-t border-border/50 space-y-6">
+          {/* Stats Pills */}
+          <CompactStatsPills
+            listeningMinutes={listeningMinutes}
+            unreadPosts={unreadPosts}
+            completedTracks={completedTracks}
+            journalStreak={journalStreak}
+          />
+          
+          {/* Active Rounds Carousel */}
+          <ActiveRoundsCarousel
+            activeRounds={activeRounds}
+            nextSessionMap={nextSessionMap}
+          />
+        </div>
 
         {/* Extra bottom padding for FAB */}
         <div className="h-20" />
