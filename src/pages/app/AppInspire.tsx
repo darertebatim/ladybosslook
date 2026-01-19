@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Heart, Lightbulb, Loader2, Sparkles } from 'lucide-react';
+import { Search, Heart, Lightbulb, Loader2, Sparkles, Zap } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
+import { QuickActionCard } from '@/components/app/QuickActionCard';
 import { InspireBanner } from '@/components/app/InspireBanner';
 import {
   useRoutineCategories,
@@ -13,6 +14,7 @@ import {
   usePopularPlans,
   useProRoutinePlans,
 } from '@/hooks/useRoutinePlans';
+import { useProTaskTemplates } from '@/hooks/useProTaskTemplates';
 
 export default function AppInspire() {
   const navigate = useNavigate();
@@ -24,6 +26,7 @@ export default function AppInspire() {
   const { data: featuredPlans } = useFeaturedPlans();
   const { data: popularPlans, isLoading: popularLoading } = usePopularPlans();
   const { data: proPlans } = useProRoutinePlans();
+  const { data: proTaskTemplates } = useProTaskTemplates();
   const { data: filteredPlans, isLoading: plansLoading } = useRoutinePlans(
     selectedCategory || undefined
   );
@@ -86,6 +89,30 @@ export default function AppInspire() {
           {featuredPlans && featuredPlans.length > 0 && !selectedCategory && !searchQuery && (
             <div className="px-4 pt-4">
               <InspireBanner plans={featuredPlans} />
+            </div>
+          )}
+
+          {/* Quick Actions Section */}
+          {proTaskTemplates && proTaskTemplates.length > 0 && !selectedCategory && !searchQuery && (
+            <div className="mt-5">
+              <div className="flex items-center gap-2 px-4 mb-3">
+                <Zap className="w-4 h-4 text-amber-500" />
+                <h2 className="text-sm font-semibold text-muted-foreground">
+                  QUICK ACTIONS
+                </h2>
+              </div>
+              <ScrollArea className="w-full">
+                <div className="flex gap-3 px-4 pb-2">
+                  {proTaskTemplates.map((template) => (
+                    <QuickActionCard
+                      key={template.id}
+                      template={template}
+                      onClick={() => navigate(`/app/quick-action/${template.id}`)}
+                    />
+                  ))}
+                </div>
+                <ScrollBar orientation="horizontal" className="invisible" />
+              </ScrollArea>
             </div>
           )}
 

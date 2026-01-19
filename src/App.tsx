@@ -42,6 +42,7 @@ const AppPlanner = lazy(() => import("@/pages/app/AppPlanner"));
 const AppTaskCreate = lazy(() => import("@/pages/app/AppTaskCreate"));
 const AppInspire = lazy(() => import("@/pages/app/AppInspire"));
 const AppInspireDetail = lazy(() => import("@/pages/app/AppInspireDetail"));
+const AppQuickActionDetail = lazy(() => import("@/pages/app/AppQuickActionDetail"));
 
 // Lazy load admin pages
 const Overview = lazy(() => import("@/pages/admin/Overview"));
@@ -251,8 +252,9 @@ const App = () => (
                   <Route path="feed" element={<AppFeed />} />
                   <Route path="journal" element={<AppJournal />} />
                   <Route path="planner" element={<AppPlanner />} />
-                  <Route path="inspire" element={<AppInspire />} />
+                <Route path="inspire" element={<AppInspire />} />
                   <Route path="inspire/:planId" element={<AppInspireDetail />} />
+                  <Route path="quick-action/:templateId" element={<AppQuickActionDetail />} />
                   <Route path="profile" element={<AppProfile />} />
                 </Route>
                 
