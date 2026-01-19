@@ -318,7 +318,15 @@ export function useAddRoutinePlan() {
   const { user } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ planId, selectedTaskIds }: { planId: string; selectedTaskIds?: string[] }) => {
+    mutationFn: async ({ 
+      planId, 
+      selectedTaskIds, 
+      editedTasks 
+    }: { 
+      planId: string; 
+      selectedTaskIds?: string[]; 
+      editedTasks?: { id: string; title: string }[];
+    }) => {
       if (!user) throw new Error('Must be logged in');
 
       // Get plan details
@@ -345,6 +353,9 @@ export function useAddRoutinePlan() {
         ? allTasks?.filter(t => selectedTaskIds.includes(t.id)) || []
         : allTasks || [];
 
+      // Create a map of edited titles
+      const editedTitlesMap = new Map(editedTasks?.map(t => [t.id, t.title]) || []);
+
       // Get current max order_index for user's tasks
       const { data: existingTasks } = await supabase
         .from('user_tasks')
@@ -359,7 +370,7 @@ export function useAddRoutinePlan() {
       if (tasks && tasks.length > 0) {
         const userTasks = tasks.map((task, index) => ({
           user_id: user.id,
-          title: task.title,
+          title: editedTitlesMap.get(task.id) || task.title,
           emoji: task.icon || plan.icon,
           color: ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
           repeat_pattern: 'daily',

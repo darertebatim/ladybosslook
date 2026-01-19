@@ -5,7 +5,7 @@ import * as LucideIcons from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { StarRating } from '@/components/app/StarRating';
-import { RoutinePreviewSheet } from '@/components/app/RoutinePreviewSheet';
+import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { useRoutinePlan, useAddRoutinePlan, useRateRoutinePlan } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -40,11 +40,11 @@ export default function AppInspireDetail() {
     setShowPreviewSheet(true);
   };
 
-  const handleSaveRoutine = async (selectedTaskIds: string[]) => {
+  const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
     if (!planId) return;
     
     try {
-      await addRoutinePlan.mutateAsync({ planId, selectedTaskIds });
+      await addRoutinePlan.mutateAsync({ planId, selectedTaskIds, editedTasks });
       setShowPreviewSheet(false);
       toast.success(`${selectedTaskIds.length} tasks added!`);
       navigate('/app/planner');
