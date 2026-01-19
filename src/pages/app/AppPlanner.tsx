@@ -162,62 +162,75 @@ const AppPlanner = () => {
       {/* Spacer for fixed header */}
       <div style={{ height: 'calc(48px + max(12px, env(safe-area-inset-top)))' }} />
 
-      {/* Week strip */}
-      <div className="bg-background border-b px-2 py-3">
-        <div className="flex justify-between">
-          {weekDays.map((day) => {
-            const isSelected = isSameDay(day, selectedDate);
-            const isTodayDate = isToday(day);
-            
-            return (
-              <button
-                key={day.toISOString()}
-                onClick={() => setSelectedDate(day)}
-                className="flex flex-col items-center gap-1 flex-1"
-              >
-                <span className="text-xs text-muted-foreground uppercase font-medium">
-                  {format(day, 'EEE')}
-                </span>
-                <div
-                  className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
-                    isSelected
-                      ? 'bg-violet-600 text-white shadow-md'
-                      : isTodayDate
-                        ? 'bg-violet-100 text-violet-700'
-                        : 'hover:bg-muted/50'
-                  )}
+      {/* Week strip - only show when calendar is collapsed */}
+      {!showCalendar && (
+        <div className="bg-background border-b px-2 py-3">
+          <div className="flex justify-between">
+            {weekDays.map((day) => {
+              const isSelected = isSameDay(day, selectedDate);
+              const isTodayDate = isToday(day);
+              
+              return (
+                <button
+                  key={day.toISOString()}
+                  onClick={() => setSelectedDate(day)}
+                  className="flex flex-col items-center gap-1 flex-1"
                 >
-                  {isTodayDate && isSelected ? (
-                    <span className="text-base">{todayEmoji || format(day, 'd')}</span>
-                  ) : (
-                    format(day, 'd')
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Calendar expand handle */}
-        <button 
-          onClick={() => setShowCalendar(!showCalendar)}
-          className="w-full flex justify-center pt-2 mt-1"
-        >
-          <div className="flex gap-0.5">
-            <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
-            <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+                  <span className="text-xs text-muted-foreground uppercase font-medium">
+                    {format(day, 'EEE')}
+                  </span>
+                  <div
+                    className={cn(
+                      'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
+                      isSelected
+                        ? 'bg-violet-600 text-white shadow-md'
+                        : isTodayDate
+                          ? 'bg-violet-100 text-violet-700'
+                          : 'hover:bg-muted/50'
+                    )}
+                  >
+                    {isTodayDate && isSelected ? (
+                      <span className="text-base">{todayEmoji || format(day, 'd')}</span>
+                    ) : (
+                      format(day, 'd')
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
-        </button>
-      </div>
 
-      {/* Expandable Month Calendar */}
+          {/* Calendar expand handle */}
+          <button 
+            onClick={() => setShowCalendar(true)}
+            className="w-full flex justify-center pt-2 mt-1"
+          >
+            <div className="flex gap-0.5">
+              <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+              <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+            </div>
+          </button>
+        </div>
+      )}
+
+      {/* Expandable Month Calendar - inline expansion */}
       {showCalendar && (
-        <MonthCalendar
-          selectedDate={selectedDate}
-          onDateSelect={handleDateSelect}
-          onClose={() => setShowCalendar(false)}
-        />
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 animate-in fade-in duration-200"
+            style={{ top: 'calc(48px + max(12px, env(safe-area-inset-top)))' }}
+            onClick={() => setShowCalendar(false)}
+          />
+          {/* Calendar panel */}
+          <div className="relative z-40 border-b shadow-lg">
+            <MonthCalendar
+              selectedDate={selectedDate}
+              onDateSelect={handleDateSelect}
+              onClose={() => setShowCalendar(false)}
+            />
+          </div>
+        </>
       )}
 
       {/* Tag filter chips */}
