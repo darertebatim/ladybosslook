@@ -76,13 +76,18 @@ export default function AppPlayer() {
            playlist.description?.toLowerCase().includes(searchQuery.toLowerCase());
   };
 
-  // Get available categories from playlists
-  const availableCategories = ['all', ...new Set(
+  // Define category order
+  const categoryOrder = ['all', 'podcast', 'course_supplement', 'audiobook', 'meditate', 'workout', 'soundscape', 'affirmation'];
+  
+  // Get available categories from playlists, sorted by defined order
+  const availableCategoriesSet = new Set(
     playlists
       ?.filter(p => !p.is_hidden && isPlaylistAvailableOnMobile(p))
       ?.map(p => p.category)
       .filter(Boolean) || []
-  )];
+  );
+  
+  const availableCategories = categoryOrder.filter(cat => cat === 'all' || availableCategoriesSet.has(cat));
 
   // Filter playlists based on selected category
   const filteredPlaylists = playlists

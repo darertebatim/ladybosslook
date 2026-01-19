@@ -47,7 +47,11 @@ export const PlaylistCard = memo(function PlaylistCard({
       case 'audiobook': return 'Audiobook';
       case 'course_supplement': return 'Course';
       case 'podcast': return 'Podcast';
-      default: return 'Audio';
+      case 'meditate': return 'Meditate';
+      case 'workout': return 'Workout';
+      case 'soundscape': return 'Soundscape';
+      case 'affirmation': return 'Affirmations';
+      default: return category ? category.charAt(0).toUpperCase() + category.slice(1) : 'Audio';
     }
   };
 
