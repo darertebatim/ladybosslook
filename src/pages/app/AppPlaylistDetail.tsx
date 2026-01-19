@@ -384,14 +384,29 @@ export default function AppPlaylistDetail() {
 
   if (playlistLoading || tracksLoading) {
     return (
-      <div className="min-h-screen bg-background pb-20">
-        <div className="p-4 space-y-4">
-          <Skeleton className="h-10 w-32" />
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-12 w-full" />
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-20 w-full" />
-          ))}
+      <div className="flex flex-col h-full bg-background overflow-hidden">
+        {/* Fixed Header */}
+        <div 
+          className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
+          <div className="pt-3 pb-2 px-4">
+            <Skeleton className="h-8 w-20" />
+          </div>
+        </div>
+        
+        {/* Header spacer */}
+        <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
+        
+        <div className="flex-1 overflow-y-auto overscroll-contain">
+          <div className="p-4 space-y-4 pb-safe">
+            <Skeleton className="h-32 w-32" />
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-12 w-full" />
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-16 w-full" />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -399,10 +414,24 @@ export default function AppPlaylistDetail() {
 
   if (!playlist) {
     return (
-      <div className="min-h-screen bg-background pb-20 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground mb-4">Playlist not found</p>
-          <Button onClick={() => navigate('/app/player')}>Back to Library</Button>
+      <div className="flex flex-col h-full bg-background overflow-hidden">
+        <div 
+          className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
+          <div className="pt-3 pb-2 px-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/app/player')}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Library
+            </Button>
+          </div>
+        </div>
+        <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-muted-foreground mb-4">Playlist not found</p>
+            <Button onClick={() => navigate('/app/player')}>Back to Library</Button>
+          </div>
         </div>
       </div>
     );
@@ -412,7 +441,7 @@ export default function AppPlaylistDetail() {
   const showModules = displayMode === 'modules' || displayMode === 'both';
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="flex flex-col h-full bg-background overflow-hidden">
       {/* Fixed Header with safe area + visual padding */}
       <div 
         className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
@@ -427,10 +456,12 @@ export default function AppPlaylistDetail() {
       </div>
 
       {/* Header spacer */}
-      <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} />
+      <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
-      {/* Playlist Info */}
-      <div className="p-4 space-y-4">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto overscroll-contain">
+        {/* Playlist Info */}
+        <div className="p-4 space-y-4">
         <div className="flex gap-4">
           <div className="relative h-32 w-32 flex-shrink-0 rounded-lg overflow-hidden">
             {tracks?.[0]?.audio_content.cover_image_url ? (
@@ -647,11 +678,15 @@ export default function AppPlaylistDetail() {
         </div>
       )}
 
-      <SupplementViewer
-        isOpen={!!selectedSupplement}
-        onClose={() => setSelectedSupplement(null)}
-        supplement={selectedSupplement}
-      />
+        <SupplementViewer
+          isOpen={!!selectedSupplement}
+          onClose={() => setSelectedSupplement(null)}
+          supplement={selectedSupplement}
+        />
+        
+        {/* Bottom safe area padding */}
+        <div className="pb-safe" />
+      </div>
     </div>
   );
 }
