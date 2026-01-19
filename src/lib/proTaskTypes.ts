@@ -20,6 +20,7 @@ export interface ProLinkConfig {
   gradientClass: string;
   iconColorClass: string;
   badgeColorClass: string;
+  buttonClass: string;
   description: string;
   requiresValue: boolean;
 }
@@ -34,6 +35,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     gradientClass: 'bg-gradient-to-br from-emerald-100 to-green-100 dark:from-emerald-900/40 dark:to-green-900/40',
     iconColorClass: 'text-emerald-600 dark:text-emerald-400',
     badgeColorClass: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300',
+    buttonClass: 'bg-emerald-500 hover:bg-emerald-600 text-white',
     description: 'Link to an audio playlist',
     requiresValue: true,
   },
@@ -46,6 +48,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     gradientClass: 'bg-gradient-to-br from-purple-100 to-violet-100 dark:from-purple-900/40 dark:to-violet-900/40',
     iconColorClass: 'text-purple-600 dark:text-purple-400',
     badgeColorClass: 'bg-purple-500/20 text-purple-700 dark:text-purple-300',
+    buttonClass: 'bg-purple-500 hover:bg-purple-600 text-white',
     description: 'Open the journal editor',
     requiresValue: false,
   },
@@ -58,6 +61,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     gradientClass: 'bg-gradient-to-br from-blue-100 to-sky-100 dark:from-blue-900/40 dark:to-sky-900/40',
     iconColorClass: 'text-blue-600 dark:text-blue-400',
     badgeColorClass: 'bg-blue-500/20 text-blue-700 dark:text-blue-300',
+    buttonClass: 'bg-blue-500 hover:bg-blue-600 text-white',
     description: 'Link to a community feed channel',
     requiresValue: true,
   },
@@ -70,6 +74,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     gradientClass: 'bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/40 dark:to-amber-900/40',
     iconColorClass: 'text-orange-600 dark:text-orange-400',
     badgeColorClass: 'bg-orange-500/20 text-orange-700 dark:text-orange-300',
+    buttonClass: 'bg-orange-500 hover:bg-orange-600 text-white',
     description: 'Link to a program/course',
     requiresValue: true,
   },
@@ -82,6 +87,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     gradientClass: 'bg-gradient-to-br from-yellow-100 to-amber-100 dark:from-yellow-900/40 dark:to-amber-900/40',
     iconColorClass: 'text-yellow-600 dark:text-yellow-400',
     badgeColorClass: 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300',
+    buttonClass: 'bg-yellow-500 hover:bg-yellow-600 text-white',
     description: 'Open the planner',
     requiresValue: false,
   },
@@ -94,6 +100,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     gradientClass: 'bg-gradient-to-br from-pink-100 to-rose-100 dark:from-pink-900/40 dark:to-rose-900/40',
     iconColorClass: 'text-pink-600 dark:text-pink-400',
     badgeColorClass: 'bg-pink-500/20 text-pink-700 dark:text-pink-300',
+    buttonClass: 'bg-pink-500 hover:bg-pink-600 text-white',
     description: 'Open the Inspire page',
     requiresValue: false,
   },
@@ -106,6 +113,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     gradientClass: 'bg-gradient-to-br from-gray-100 to-slate-100 dark:from-gray-900/40 dark:to-slate-900/40',
     iconColorClass: 'text-gray-600 dark:text-gray-400',
     badgeColorClass: 'bg-gray-500/20 text-gray-700 dark:text-gray-300',
+    buttonClass: 'bg-gray-500 hover:bg-gray-600 text-white',
     description: 'Link to any app page',
     requiresValue: true,
   },
