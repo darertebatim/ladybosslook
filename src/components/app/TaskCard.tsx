@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -11,7 +12,7 @@ import {
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { TaskIcon } from './IconPicker';
-import { PRO_LINK_CONFIGS, ProLinkType } from '@/lib/proTaskTypes';
+import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 
 interface TaskCardProps {
   task: UserTask;
@@ -30,6 +31,7 @@ export const TaskCard = ({
   onTap,
   onStreakIncrease,
 }: TaskCardProps) => {
+  const navigate = useNavigate();
   const [isAnimating, setIsAnimating] = useState(false);
   
   const { data: subtasks = [] } = useSubtasks(task.id);
@@ -139,6 +141,19 @@ export const TaskCard = ({
             )}
           </div>
 
+          {/* Quick navigation button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(getProTaskNavigationPath(proLinkType!, proLinkValue));
+            }}
+            className={cn(
+              'px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-colors',
+              proConfig.buttonClass
+            )}
+          >
+            {proConfig.badgeText}
+          </button>
 
           {/* Checkbox */}
           <button
