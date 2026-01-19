@@ -535,7 +535,7 @@ export default function AppAudioPlayer() {
               currentTime={currentTime}
               duration={duration}
               onSeek={handleSeek}
-              variant={coverImageUrl ? "glass" : "default"}
+              variant="default"
             />
           </div>
 
@@ -548,7 +548,7 @@ export default function AppAudioPlayer() {
               onSkipForward={handleSkipForward}
               playbackRate={playbackRate}
               onPlaybackRateChange={handlePlaybackRateChange}
-              variant={coverImageUrl ? "glass" : "default"}
+              variant="default"
             />
           </div>
 
