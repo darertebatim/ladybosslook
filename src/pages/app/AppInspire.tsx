@@ -38,12 +38,12 @@ export default function AppInspire() {
 
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* Header */}
-      <div 
-        className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 8px)' }}
+      {/* Fixed Header */}
+      <header 
+        className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="flex items-center justify-between px-4 pb-3">
+        <div className="flex items-center justify-between px-4 pt-3 pb-2">
           <div className="flex items-center gap-2">
             <Lightbulb className="w-6 h-6 text-primary" />
             <h1 className="text-xl font-bold text-foreground">Inspire</h1>
@@ -63,7 +63,7 @@ export default function AppInspire() {
 
         {/* Search Bar */}
         {showSearch && (
-          <div className="px-4 pb-3 animate-in slide-in-from-top duration-200">
+          <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
             <Input
               type="search"
               placeholder="Search routines..."
@@ -73,10 +73,13 @@ export default function AppInspire() {
             />
           </div>
         )}
-      </div>
+      </header>
+
+      {/* Header Spacer */}
+      <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} />
 
       <ScrollArea className="flex-1">
-        <div className="pb-24">
+        <div className="pb-safe">
           {/* Featured Banner Carousel */}
           {featuredPlans && featuredPlans.length > 0 && !selectedCategory && !searchQuery && (
             <div className="px-4 pt-4">

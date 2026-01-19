@@ -91,10 +91,10 @@ export default function AppInspireDetail() {
 
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* Header */}
-      <div 
-        className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 8px)' }}
+      {/* Fixed Header */}
+      <header 
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
         <button
           onClick={() => navigate(-1)}
@@ -113,14 +113,14 @@ export default function AppInspireDetail() {
             <Share2 className="w-5 h-5" />
           </button>
         </div>
-      </div>
+      </header>
 
       <ScrollArea className="flex-1">
         {/* Hero Image/Gradient */}
         <div className={cn(
-          'relative h-56 w-full bg-gradient-to-br',
+          'relative w-full bg-gradient-to-br',
           gradient
-        )}>
+        )} style={{ height: 'calc(224px + env(safe-area-inset-top, 0px))' }}>
           {plan.cover_image_url ? (
             <img
               src={plan.cover_image_url}
@@ -128,13 +128,13 @@ export default function AppInspireDetail() {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center pt-12">
               <IconComponent className="w-24 h-24 text-white/30" />
             </div>
           )}
         </div>
 
-        <div className="px-4 pb-32">
+        <div className="px-4 pb-40">
           {/* Title & Badges */}
           <div className="pt-4">
             <h1 className="text-2xl font-bold text-foreground">{plan.title}</h1>
@@ -243,7 +243,7 @@ export default function AppInspireDetail() {
       {/* Sticky Add Button */}
       <div 
         className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
       >
         <Button
           onClick={handleAddRoutine}
