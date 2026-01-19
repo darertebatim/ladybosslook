@@ -789,3 +789,49 @@ async function updateStreak(userId: string, completedDateStr: string): Promise<{
 
   return { increased: true };
 }
+
+/**
+ * Reset all planner data (admin testing only)
+ */
+export const useResetPlannerData = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      // First get all task IDs for this user
+      const { data: userTasks } = await supabase
+        .from('user_tasks')
+        .select('id')
+        .eq('user_id', user.id);
+      
+      const taskIds = userTasks?.map(t => t.id) || [];
+
+      // Delete in order to respect foreign keys
+      if (taskIds.length > 0) {
+        await supabase.from('subtask_completions').delete().in('subtask_id',
+          (await supabase.from('user_subtasks').select('id').in('task_id', taskIds)).data?.map(s => s.id) || []
+        );
+        await supabase.from('user_subtasks').delete().in('task_id', taskIds);
+      }
+      await supabase.from('task_completions').delete().eq('user_id', user.id);
+      await supabase.from('user_tasks').delete().eq('user_id', user.id);
+      await supabase.from('user_streaks').delete().eq('user_id', user.id);
+      await supabase.from('user_tags').delete().eq('user_id', user.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-completions'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-tags'] });
+      toast({ title: 'Planner reset complete! 🔄' });
+    },
+    onError: (error) => {
+      console.error('Reset planner error:', error);
+      toast({ title: 'Failed to reset planner', variant: 'destructive' });
+    },
+  });
+};

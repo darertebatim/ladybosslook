@@ -8,9 +8,11 @@ import {
   useCompletionsForDate,
   useCompletedDates,
   useUserStreak,
+  useResetPlannerData,
   UserTask,
   TaskTemplate,
 } from '@/hooks/useTaskPlanner';
+import { useAuth } from '@/hooks/useAuth';
 import { useProgramEventsForDate } from '@/hooks/usePlannerProgramEvents';
 import { TaskCard } from '@/components/app/TaskCard';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
@@ -23,6 +25,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const AppPlanner = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
@@ -31,6 +34,8 @@ const AppPlanner = () => {
   const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
   
+  // Reset mutation for admin testing
+  const resetPlanner = useResetPlannerData();
   // Lifted state for month navigation (used when calendar is expanded)
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
 
@@ -77,6 +82,9 @@ const AppPlanner = () => {
 
   // Fetch completed dates for the visible range
   const { data: completedDates } = useCompletedDates(dateRange.start, dateRange.end);
+  
+  // Debug log
+  console.log('completedDates:', completedDates, 'dateRange:', format(dateRange.start, 'yyyy-MM-dd'), 'to', format(dateRange.end, 'yyyy-MM-dd'));
 
   // Filter tasks by tag
   const filteredTasks = useMemo(() => {
@@ -178,6 +186,22 @@ const AppPlanner = () => {
                   >
                     📊 My Stats
                   </button>
+                  
+                  {/* Admin reset button */}
+                  <div className="border-t pt-3 mt-3">
+                    <button 
+                      onClick={() => {
+                        if (confirm('Reset ALL planner data? This cannot be undone.')) {
+                          resetPlanner.mutate();
+                          setMenuOpen(false);
+                        }
+                      }}
+                      disabled={resetPlanner.isPending}
+                      className="w-full text-left py-2 px-3 rounded-lg hover:bg-destructive/10 text-destructive"
+                    >
+                      🔄 Reset Planner (Admin)
+                    </button>
+                  </div>
                 </nav>
               </div>
             </SheetContent>
