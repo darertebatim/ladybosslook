@@ -72,94 +72,96 @@ export function RoutinePreviewSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
         side="bottom" 
-        className="h-[85vh] rounded-t-3xl px-4 pb-8"
+        className="h-[85vh] rounded-t-3xl px-4"
         hideCloseButton
       >
-        <SheetHeader className="text-left pb-2">
-          <SheetTitle className="text-xl font-bold">Edit Routine</SheetTitle>
-          <p className="text-sm text-muted-foreground">
-            Edit it to create your personalized routine.
-          </p>
-        </SheetHeader>
+        <div className="flex flex-col h-full">
+          <SheetHeader className="text-left pb-2 flex-shrink-0">
+            <SheetTitle className="text-xl font-bold">Edit Routine</SheetTitle>
+            <p className="text-sm text-muted-foreground">
+              Edit it to create your personalized routine.
+            </p>
+          </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4">
-          <p className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-            Daily Tasks
-          </p>
-          
-          <div className="space-y-3">
-            {tasks.map((task, index) => {
-              const isSelected = selectedTaskIds.has(task.id);
-              const colorClass = TASK_COLOR_CLASSES[getTaskColor(index)];
-              const TaskIcon = (LucideIcons as any)[task.icon] || LucideIcons.Sparkles;
-              
-              return (
-                <div 
-                  key={task.id}
-                  className="flex items-start gap-3"
-                >
-                  {/* Checkbox */}
-                  <button
-                    onClick={() => toggleTask(task.id)}
-                    className={cn(
-                      'w-6 h-6 mt-3 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-                      isSelected 
-                        ? 'bg-emerald-500 border-emerald-500' 
-                        : 'border-muted-foreground/40 bg-transparent'
-                    )}
+          <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
+            <p className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+              Daily Tasks
+            </p>
+            
+            <div className="space-y-3">
+              {tasks.map((task, index) => {
+                const isSelected = selectedTaskIds.has(task.id);
+                const colorClass = TASK_COLOR_CLASSES[getTaskColor(index)];
+                const TaskIcon = (LucideIcons as any)[task.icon] || LucideIcons.Sparkles;
+                
+                return (
+                  <div 
+                    key={task.id}
+                    className="flex items-start gap-3"
                   >
-                    {isSelected && <Check className="w-4 h-4 text-white" />}
-                  </button>
+                    {/* Checkbox */}
+                    <button
+                      onClick={() => toggleTask(task.id)}
+                      className={cn(
+                        'w-6 h-6 mt-3 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors',
+                        isSelected 
+                          ? 'bg-emerald-500 border-emerald-500' 
+                          : 'border-muted-foreground/40 bg-transparent'
+                      )}
+                    >
+                      {isSelected && <Check className="w-4 h-4 text-white" />}
+                    </button>
 
-                  {/* Task Card */}
-                  <div className={cn(
-                    'flex-1 rounded-2xl overflow-hidden',
-                    colorClass
-                  )}>
-                    <div className="p-3">
-                      <div className="flex items-center gap-2 text-xs text-foreground/70 mb-1">
-                        <TaskIcon className="w-4 h-4" />
-                        <span>Anytime</span>
+                    {/* Task Card */}
+                    <div className={cn(
+                      'flex-1 rounded-2xl overflow-hidden',
+                      colorClass
+                    )}>
+                      <div className="p-3">
+                        <div className="flex items-center gap-2 text-xs text-foreground/70 mb-1">
+                          <TaskIcon className="w-4 h-4" />
+                          <span>Anytime</span>
+                        </div>
+                        <p className="font-medium text-foreground">{task.title}</p>
                       </div>
-                      <p className="font-medium text-foreground">{task.title}</p>
+                      {/* Footer bar */}
+                      <div className="px-3 py-2 bg-black/5 flex items-center gap-1.5">
+                        <Clock className="w-3 h-3 text-foreground/60" />
+                        <span className="text-xs text-foreground/60">Repeats every day</span>
+                      </div>
                     </div>
-                    {/* Footer bar */}
-                    <div className="px-3 py-2 bg-black/5 flex items-center gap-1.5">
-                      <Clock className="w-3 h-3 text-foreground/60" />
-                      <span className="text-xs text-foreground/60">Repeats every day</span>
-                    </div>
+
+                    {/* Edit button placeholder */}
+                    <button className="p-2 mt-2 text-muted-foreground hover:text-foreground">
+                      <Pencil className="w-4 h-4" />
+                    </button>
                   </div>
-
-                  {/* Edit button placeholder */}
-                  <button className="p-2 mt-2 text-muted-foreground hover:text-foreground">
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        {/* Footer with toggle and save */}
-        <div 
-          className="flex items-center justify-between pt-4 border-t border-border"
-          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-        >
-          <div className="flex items-center gap-3">
-            <Switch 
-              checked={allSelected} 
-              onCheckedChange={toggleAll}
-            />
-            <span className="text-sm font-medium">Add all</span>
-          </div>
-          
-          <Button
-            onClick={handleSave}
-            disabled={selectedTaskIds.size === 0 || isSaving}
-            className="px-8"
+          {/* Footer with toggle and save */}
+          <div 
+            className="flex-shrink-0 flex items-center justify-between pt-4 border-t border-border"
+            style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
           >
-            {isSaving ? 'Saving...' : 'Save'}
-          </Button>
+            <div className="flex items-center gap-3">
+              <Switch 
+                checked={allSelected} 
+                onCheckedChange={toggleAll}
+              />
+              <span className="text-sm font-medium">Add all</span>
+            </div>
+            
+            <Button
+              onClick={handleSave}
+              disabled={selectedTaskIds.size === 0 || isSaving}
+              className="px-8"
+            >
+              {isSaving ? 'Saving...' : 'Save'}
+            </Button>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
