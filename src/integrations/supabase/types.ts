@@ -1783,6 +1783,7 @@ export type Database = {
           is_active: boolean
           is_featured: boolean
           is_popular: boolean
+          is_pro_routine: boolean
           points: number
           subtitle: string | null
           title: string
@@ -1800,6 +1801,7 @@ export type Database = {
           is_active?: boolean
           is_featured?: boolean
           is_popular?: boolean
+          is_pro_routine?: boolean
           points?: number
           subtitle?: string | null
           title: string
@@ -1817,6 +1819,7 @@ export type Database = {
           is_active?: boolean
           is_featured?: boolean
           is_popular?: boolean
+          is_pro_routine?: boolean
           points?: number
           subtitle?: string | null
           title?: string
@@ -1827,6 +1830,59 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "routine_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      routine_task_templates: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          display_order: number
+          duration_minutes: number
+          icon: string
+          id: string
+          is_active: boolean
+          linked_playlist_id: string | null
+          pro_link_type: string
+          pro_link_value: string | null
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          duration_minutes?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          linked_playlist_id?: string | null
+          pro_link_type: string
+          pro_link_value?: string | null
+          title: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          duration_minutes?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          linked_playlist_id?: string | null
+          pro_link_type?: string
+          pro_link_value?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routine_task_templates_linked_playlist_id_fkey"
+            columns: ["linked_playlist_id"]
+            isOneToOne: false
+            referencedRelation: "audio_playlists"
             referencedColumns: ["id"]
           },
         ]

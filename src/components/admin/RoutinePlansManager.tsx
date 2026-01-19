@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -40,9 +41,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Image, Settings, Wand2, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Image, Settings, Wand2, Loader2, Sparkles, ListTodo } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
 
 interface Plan {
   id: string;
@@ -57,6 +57,7 @@ interface Plan {
   points: number;
   is_featured: boolean;
   is_popular: boolean;
+  is_pro_routine: boolean;
   display_order: number;
   is_active: boolean;
   category?: { name: string } | null;
@@ -86,6 +87,8 @@ const COLOR_OPTIONS = [
   { name: 'Orange', value: 'orange' },
 ];
 
+type TypeFilter = 'all' | 'pro' | 'regular';
+
 export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -96,7 +99,7 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
   const [isAIGenerating, setIsAIGenerating] = useState(false);
   const [aiTheme, setAiTheme] = useState('');
   const [showAIDialog, setShowAIDialog] = useState(false);
-  const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [formData, setFormData] = useState({
     category_id: '' as string | null,
     title: '',
@@ -109,6 +112,7 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
     points: 10,
     is_featured: false,
     is_popular: false,
+    is_pro_routine: false,
     display_order: 0,
     is_active: true,
   });
@@ -136,6 +140,13 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
       if (error) throw error;
       return data as Plan[];
     },
+  });
+
+  // Filter plans based on type
+  const filteredPlans = plans?.filter(plan => {
+    if (typeFilter === 'all') return true;
+    if (typeFilter === 'pro') return plan.is_pro_routine;
+    return !plan.is_pro_routine;
   });
 
   const createMutation = useMutation({
@@ -232,6 +243,7 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
       points: 10,
       is_featured: false,
       is_popular: false,
+      is_pro_routine: typeFilter === 'pro',
       display_order: (plans?.length || 0) + 1,
       is_active: true,
     });
@@ -252,6 +264,7 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
       points: plan.points,
       is_featured: plan.is_featured,
       is_popular: plan.is_popular,
+      is_pro_routine: plan.is_pro_routine,
       display_order: plan.display_order,
       is_active: plan.is_active,
     });
@@ -290,7 +303,6 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
     }
 
     setIsBulkGenerating(true);
-    setBulkProgress({ current: 0, total: targetPlans.length });
     
     try {
       const { data, error } = await supabase.functions.invoke('generate-routine-covers-bulk', {
@@ -314,7 +326,6 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
       toast.error('Failed to generate covers');
     } finally {
       setIsBulkGenerating(false);
-      setBulkProgress({ current: 0, total: 0 });
     }
   };
 
@@ -345,6 +356,9 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
       setIsAIGenerating(false);
     }
   };
+
+  const proCount = plans?.filter(p => p.is_pro_routine).length || 0;
+  const regularCount = plans?.filter(p => !p.is_pro_routine).length || 0;
 
   return (
     <Card>
@@ -386,11 +400,43 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
         </div>
       </CardHeader>
       <CardContent>
+        {/* Type Filter */}
+        <div className="flex gap-2 mb-4">
+          <Button 
+            variant={typeFilter === 'all' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setTypeFilter('all')}
+          >
+            All ({plans?.length || 0})
+          </Button>
+          <Button 
+            variant={typeFilter === 'pro' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setTypeFilter('pro')}
+            className={typeFilter === 'pro' ? '' : 'text-violet-600 border-violet-200 hover:bg-violet-50 dark:text-violet-400 dark:border-violet-800 dark:hover:bg-violet-950'}
+          >
+            <Sparkles className="h-4 w-4 mr-1" />
+            Pro Routines ({proCount})
+          </Button>
+          <Button 
+            variant={typeFilter === 'regular' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setTypeFilter('regular')}
+          >
+            <ListTodo className="h-4 w-4 mr-1" />
+            Regular ({regularCount})
+          </Button>
+        </div>
+
         {isLoading ? (
           <div className="text-center py-8 text-muted-foreground">Loading...</div>
-        ) : !plans?.length ? (
+        ) : !filteredPlans?.length ? (
           <div className="text-center py-8 text-muted-foreground">
-            No plans yet. Create one to get started.
+            {typeFilter === 'all' 
+              ? 'No plans yet. Create one to get started.'
+              : typeFilter === 'pro'
+              ? 'No Pro routines yet. Create a playlist-based routine.'
+              : 'No regular routines yet. Create a simple task routine.'}
           </div>
         ) : (
           <Table>
@@ -398,6 +444,7 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
               <TableRow>
                 <TableHead className="w-16">Cover</TableHead>
                 <TableHead>Title</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>Points</TableHead>
@@ -407,7 +454,7 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
               </TableRow>
             </TableHeader>
             <TableBody>
-              {plans.map((plan) => (
+              {filteredPlans.map((plan) => (
                 <TableRow key={plan.id}>
                   <TableCell>
                     {plan.cover_image_url ? (
@@ -429,6 +476,19 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
                         <div className="text-sm text-muted-foreground">{plan.subtitle}</div>
                       )}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {plan.is_pro_routine ? (
+                      <Badge className="bg-violet-500/20 text-violet-700 dark:text-violet-300 border-0">
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        Pro
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary">
+                        <ListTodo className="h-3 w-3 mr-1" />
+                        Regular
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell>{plan.category?.name || '—'}</TableCell>
                   <TableCell>{plan.estimated_minutes} min</TableCell>
@@ -622,6 +682,24 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
                 onChange={(e) => setFormData(prev => ({ ...prev, display_order: parseInt(e.target.value) || 0 }))}
               />
             </div>
+            
+            {/* Pro Routine Toggle */}
+            <div className="col-span-2 p-3 rounded-lg border border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-950/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-violet-500" />
+                  <div>
+                    <Label className="font-semibold">Pro Routine</Label>
+                    <p className="text-xs text-muted-foreground">Enable for playlist/feature-based routines with app links</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={formData.is_pro_routine}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_pro_routine: checked }))}
+                />
+              </div>
+            </div>
+
             <div className="col-span-2 flex gap-8">
               <div className="flex items-center gap-2">
                 <Switch

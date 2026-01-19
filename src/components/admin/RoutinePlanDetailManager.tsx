@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -33,9 +34,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Pencil, Trash2, GripVertical, ChevronUp, ChevronDown, Image, Music, Sparkles, BookOpen, MessageCircle, GraduationCap, Calendar, Link } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, ChevronUp, ChevronDown, Image, Music, Sparkles, Copy, Eye, ListPlus, Clock } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
-import { PRO_LINK_TYPES, ProLinkType } from '@/lib/proTaskTypes';
+import { PRO_LINK_TYPES, PRO_LINK_CONFIGS, ProLinkType } from '@/lib/proTaskTypes';
 
 interface Playlist {
   id: string;
@@ -74,6 +75,21 @@ interface Plan {
   id: string;
   title: string;
   subtitle: string | null;
+  cover_image_url: string | null;
+  icon: string;
+  color: string;
+  estimated_minutes: number;
+  is_pro_routine: boolean;
+}
+
+interface Template {
+  id: string;
+  title: string;
+  duration_minutes: number;
+  icon: string;
+  pro_link_type: string;
+  pro_link_value: string | null;
+  linked_playlist_id: string | null;
 }
 
 interface Props {
@@ -86,6 +102,15 @@ const ICON_OPTIONS = [
   'Book', 'Star', 'Sparkles', 'Zap', 'Target', 'Clock',
   'CheckCircle', 'Award', 'Flame', 'Leaf', 'Droplet', 'Wind'
 ];
+
+const colorGradients: Record<string, string> = {
+  yellow: 'from-yellow-200 to-amber-300',
+  pink: 'from-pink-200 to-rose-300',
+  blue: 'from-blue-200 to-cyan-300',
+  purple: 'from-purple-200 to-violet-300',
+  green: 'from-green-200 to-emerald-300',
+  orange: 'from-orange-200 to-amber-300',
+};
 
 export function RoutinePlanDetailManager({ planId, onBack }: Props) {
   const queryClient = useQueryClient();
@@ -118,6 +143,10 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
     pro_link_value: null as string | null,
   });
 
+  // Bulk task dialog
+  const [showBulkDialog, setShowBulkDialog] = useState(false);
+  const [bulkTasks, setBulkTasks] = useState('');
+
   const [isUploading, setIsUploading] = useState(false);
 
   // Fetch plan details
@@ -126,7 +155,7 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('routine_plans')
-        .select('id, title, subtitle')
+        .select('id, title, subtitle, cover_image_url, icon, color, estimated_minutes, is_pro_routine')
         .eq('id', planId)
         .single();
       if (error) throw error;
@@ -178,6 +207,24 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
       return data as Playlist[];
     },
   });
+
+  // Fetch Pro Task templates
+  const { data: templates } = useQuery({
+    queryKey: ['admin-pro-task-templates'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routine_task_templates')
+        .select('id, title, duration_minutes, icon, pro_link_type, pro_link_value, linked_playlist_id')
+        .eq('is_active', true)
+        .order('display_order');
+      if (error) throw error;
+      return data as Template[];
+    },
+  });
+
+  // Separate regular tasks and pro tasks
+  const regularTasks = tasks?.filter(t => !t.pro_link_type) || [];
+  const proTasks = tasks?.filter(t => t.pro_link_type) || [];
 
   // Section mutations
   const createSectionMutation = useMutation({
@@ -369,16 +416,16 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
   };
 
   // Task handlers
-  const handleOpenCreateTask = () => {
+  const handleOpenCreateTask = (isPro: boolean = false) => {
     setEditingTask(null);
     setTaskForm({
       title: '',
-      duration_minutes: 1,
-      icon: 'CheckCircle',
+      duration_minutes: isPro ? 5 : 1,
+      icon: isPro ? 'Sparkles' : 'CheckCircle',
       task_order: (tasks?.length || 0) + 1,
       is_active: true,
       linked_playlist_id: null,
-      pro_link_type: null,
+      pro_link_type: isPro ? 'playlist' : null,
       pro_link_value: null,
     });
     setIsTaskDialogOpen(true);
@@ -411,6 +458,73 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
     }
   };
 
+  // Duplicate task
+  const handleDuplicateTask = async (task: Task) => {
+    const newTaskData = {
+      title: `${task.title} (copy)`,
+      duration_minutes: task.duration_minutes,
+      icon: task.icon,
+      task_order: (tasks?.length || 0) + 1,
+      is_active: task.is_active,
+      linked_playlist_id: task.linked_playlist_id,
+      pro_link_type: task.pro_link_type,
+      pro_link_value: task.pro_link_value,
+    };
+    createTaskMutation.mutate(newTaskData);
+  };
+
+  // Add from template
+  const handleAddFromTemplate = async (templateId: string) => {
+    const template = templates?.find(t => t.id === templateId);
+    if (!template) return;
+
+    const newTaskData = {
+      title: template.title,
+      duration_minutes: template.duration_minutes,
+      icon: template.icon,
+      task_order: (tasks?.length || 0) + 1,
+      is_active: true,
+      linked_playlist_id: template.linked_playlist_id,
+      pro_link_type: template.pro_link_type,
+      pro_link_value: template.pro_link_value,
+    };
+    createTaskMutation.mutate(newTaskData);
+  };
+
+  // Bulk create tasks
+  const handleBulkCreate = async () => {
+    const lines = bulkTasks.split('\n').filter(line => line.trim());
+    if (!lines.length) {
+      toast.error('No tasks to create');
+      return;
+    }
+
+    let successCount = 0;
+    for (let i = 0; i < lines.length; i++) {
+      try {
+        const { error } = await supabase.from('routine_plan_tasks').insert({
+          plan_id: planId,
+          title: lines[i].trim(),
+          duration_minutes: 5,
+          icon: 'CheckCircle',
+          task_order: (tasks?.length || 0) + i + 1,
+          is_active: true,
+          pro_link_type: null,
+          pro_link_value: null,
+          linked_playlist_id: null,
+        });
+        if (!error) successCount++;
+      } catch (err) {
+        console.error('Failed to create task:', err);
+      }
+    }
+
+    queryClient.invalidateQueries({ queryKey: ['admin-routine-tasks', planId] });
+    toast.success(`Created ${successCount} tasks`);
+    setShowBulkDialog(false);
+    setBulkTasks('');
+  };
+
   const renderIcon = (iconName: string) => {
     const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[iconName];
     return Icon ? <Icon className="h-4 w-4" /> : null;
@@ -438,14 +552,108 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
     reorderTaskMutation.mutate({ id: targetTask.id, newOrder: task.task_order });
   };
 
+  const getLinkTypeConfig = (type: string) => {
+    return PRO_LINK_CONFIGS[type as ProLinkType];
+  };
+
+  // Render task list
+  const renderTaskList = (taskList: Task[], isPro: boolean) => (
+    <div className="space-y-2">
+      {taskList.map((task, index) => (
+        <div 
+          key={task.id}
+          className="flex items-center gap-3 p-3 border rounded-lg"
+        >
+          <div className="flex flex-col gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => moveTask(task, 'up')}
+              disabled={index === 0}
+            >
+              <ChevronUp className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => moveTask(task, 'down')}
+              disabled={index === taskList.length - 1}
+            >
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center relative">
+            {renderIcon(task.icon)}
+            {task.pro_link_type && (
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-violet-500 flex items-center justify-center">
+                <Sparkles className="h-2.5 w-2.5 text-white" />
+              </div>
+            )}
+          </div>
+          <div className="flex-1">
+            <div className="font-medium">{task.title}</div>
+            <div className="text-sm text-muted-foreground flex items-center gap-2">
+              {task.duration_minutes} min
+              {task.pro_link_type && (
+                <Badge variant="outline" className={getLinkTypeConfig(task.pro_link_type)?.badgeColorClass}>
+                  {getLinkTypeConfig(task.pro_link_type)?.badgeText}
+                </Badge>
+              )}
+              {!task.pro_link_type && task.linked_playlist && (
+                <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                  <Music className="h-3 w-3" />
+                  {task.linked_playlist.name}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleDuplicateTask(task)}
+              title="Duplicate task"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleOpenEditTask(task)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setDeleteTaskId(task.id)}
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div>
-          <h2 className="text-xl font-bold">{plan?.title || 'Loading...'}</h2>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold">{plan?.title || 'Loading...'}</h2>
+            {plan?.is_pro_routine && (
+              <Badge className="bg-violet-500/20 text-violet-700 dark:text-violet-300 border-0">
+                <Sparkles className="h-3 w-3 mr-1" />
+                Pro
+              </Badge>
+            )}
+          </div>
           {plan?.subtitle && (
             <p className="text-muted-foreground">{plan.subtitle}</p>
           )}
@@ -457,11 +665,20 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
           <TabsTrigger value="sections">
             Sections ({sections?.length || 0})
           </TabsTrigger>
-          <TabsTrigger value="tasks">
-            Tasks ({tasks?.length || 0})
+          <TabsTrigger value="regular-tasks">
+            Tasks ({regularTasks.length})
+          </TabsTrigger>
+          <TabsTrigger value="pro-tasks" className="flex items-center gap-1">
+            <Sparkles className="h-3 w-3" />
+            Pro Tasks ({proTasks.length})
+          </TabsTrigger>
+          <TabsTrigger value="preview" className="flex items-center gap-1">
+            <Eye className="h-3 w-3" />
+            Preview
           </TabsTrigger>
         </TabsList>
 
+        {/* Sections Tab */}
         <TabsContent value="sections" className="mt-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -547,99 +764,175 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
           </Card>
         </TabsContent>
 
-        <TabsContent value="tasks" className="mt-4">
+        {/* Regular Tasks Tab */}
+        <TabsContent value="regular-tasks" className="mt-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Routine Tasks</CardTitle>
-                <CardDescription>Tasks added to user's planner when they adopt this routine</CardDescription>
+                <CardTitle>Regular Tasks</CardTitle>
+                <CardDescription>Simple checklist tasks for this routine</CardDescription>
               </div>
-              <Button onClick={handleOpenCreateTask} size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Task
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={() => setShowBulkDialog(true)} size="sm" variant="outline">
+                  <ListPlus className="h-4 w-4 mr-2" />
+                  Bulk Add
+                </Button>
+                <Button onClick={() => handleOpenCreateTask(false)} size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Task
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {tasksLoading ? (
                 <div className="text-center py-8 text-muted-foreground">Loading...</div>
-              ) : !tasks?.length ? (
+              ) : !regularTasks.length ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  No tasks yet. Add the steps users will complete.
+                  No regular tasks yet. Add simple checklist items.
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {tasks.map((task, index) => (
-                    <div 
-                      key={task.id}
-                      className="flex items-center gap-3 p-3 border rounded-lg"
-                    >
-                      <div className="flex flex-col gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => moveTask(task, 'up')}
-                          disabled={index === 0}
-                        >
-                          <ChevronUp className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => moveTask(task, 'down')}
-                          disabled={index === tasks.length - 1}
-                        >
-                          <ChevronDown className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center relative">
-                        {renderIcon(task.icon)}
-                        {(task.pro_link_type || task.linked_playlist_id) && (
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-violet-500 flex items-center justify-center">
-                            <Sparkles className="h-2.5 w-2.5 text-white" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-medium">{task.title}</div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-2">
-                          {task.duration_minutes} min
-                          {task.pro_link_type && (
-                            <span className="inline-flex items-center gap-1 text-violet-600 dark:text-violet-400">
-                              <Sparkles className="h-3 w-3" />
-                              {task.pro_link_type}
-                              {task.pro_link_value && `: ${task.pro_link_value.slice(0, 20)}...`}
-                            </span>
-                          )}
-                          {!task.pro_link_type && task.linked_playlist && (
-                            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                              <Music className="h-3 w-3" />
-                              {task.linked_playlist.name}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleOpenEditTask(task)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setDeleteTaskId(task.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                renderTaskList(regularTasks, false)
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Pro Tasks Tab */}
+        <TabsContent value="pro-tasks" className="mt-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-violet-500" />
+                  Pro Tasks
+                </CardTitle>
+                <CardDescription>Tasks that link to app features like playlists, journal, etc.</CardDescription>
+              </div>
+              <div className="flex gap-2">
+                {templates && templates.length > 0 && (
+                  <Select onValueChange={handleAddFromTemplate}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Add from template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {templates.map(template => {
+                        const config = getLinkTypeConfig(template.pro_link_type);
+                        const Icon = config?.icon;
+                        return (
+                          <SelectItem key={template.id} value={template.id}>
+                            <div className="flex items-center gap-2">
+                              {Icon && <Icon className="h-3 w-3" />}
+                              {template.title}
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                )}
+                <Button onClick={() => handleOpenCreateTask(true)} size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Pro Task
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {tasksLoading ? (
+                <div className="text-center py-8 text-muted-foreground">Loading...</div>
+              ) : !proTasks.length ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No Pro tasks yet. Add tasks that link to app features.
+                </div>
+              ) : (
+                renderTaskList(proTasks, true)
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Preview Tab */}
+        <TabsContent value="preview" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>User Preview</CardTitle>
+              <CardDescription>How this routine appears in the Inspire page</CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <div className="w-full max-w-sm">
+                {/* Routine Card Preview */}
+                <div className="border rounded-2xl overflow-hidden bg-card shadow-lg">
+                  <div className={`relative aspect-[16/10] bg-gradient-to-br ${colorGradients[plan?.color || 'yellow']}`}>
+                    {plan?.cover_image_url ? (
+                      <img 
+                        src={plan.cover_image_url} 
+                        alt={plan?.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        {renderIcon(plan?.icon || 'Sun')}
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-3 left-3 right-3 text-white">
+                      <h3 className="font-bold text-lg">{plan?.title || 'Routine Title'}</h3>
+                      {plan?.subtitle && (
+                        <p className="text-sm text-white/80">{plan.subtitle}</p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 space-y-3">
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        {plan?.estimated_minutes || 0} min
+                      </div>
+                      <span>•</span>
+                      <span>{tasks?.length || 0} tasks</span>
+                      {proTasks.length > 0 && (
+                        <>
+                          <span>•</span>
+                          <span className="flex items-center gap-1 text-violet-600 dark:text-violet-400">
+                            <Sparkles className="h-3 w-3" />
+                            {proTasks.length} pro
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Task preview list */}
+                    <div className="space-y-2">
+                      {tasks?.slice(0, 5).map(task => {
+                        const config = task.pro_link_type ? getLinkTypeConfig(task.pro_link_type) : null;
+                        return (
+                          <div 
+                            key={task.id} 
+                            className={`flex items-center gap-2 p-2 rounded-lg ${
+                              config ? config.gradientClass : 'bg-muted'
+                            }`}
+                          >
+                            <div className="w-6 h-6 rounded-full bg-background/50 flex items-center justify-center">
+                              {renderIcon(task.icon)}
+                            </div>
+                            <span className="text-sm flex-1">{task.title}</span>
+                            {config && (
+                              <Badge variant="secondary" className="text-xs">
+                                {config.badgeText}
+                              </Badge>
+                            )}
+                          </div>
+                        );
+                      })}
+                      {tasks && tasks.length > 5 && (
+                        <p className="text-xs text-muted-foreground text-center py-2">
+                          +{tasks.length - 5} more tasks
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -727,7 +1020,7 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {editingTask ? 'Edit Task' : 'Add Task'}
+              {editingTask ? 'Edit Task' : taskForm.pro_link_type ? 'Add Pro Task' : 'Add Task'}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
@@ -785,7 +1078,6 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
                     ...prev, 
                     pro_link_type: linkType,
                     pro_link_value: null,
-                    // Auto-set linked_playlist_id when playlist is selected
                     linked_playlist_id: null,
                   }));
                 }}
@@ -895,6 +1187,37 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
               disabled={createTaskMutation.isPending || updateTaskMutation.isPending}
             >
               {editingTask ? 'Update' : 'Create'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Task Dialog */}
+      <Dialog open={showBulkDialog} onOpenChange={setShowBulkDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Bulk Add Tasks</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Enter tasks (one per line)</Label>
+              <Textarea
+                value={bulkTasks}
+                onChange={(e) => setBulkTasks(e.target.value)}
+                placeholder={`Wake up with gratitude\nStretch for 5 minutes\nDrink water\nReview daily goals`}
+                rows={8}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Each line will create a 5-minute task with a checkmark icon
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBulkDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleBulkCreate}>
+              Create {bulkTasks.split('\n').filter(l => l.trim()).length} Tasks
             </Button>
           </DialogFooter>
         </DialogContent>
