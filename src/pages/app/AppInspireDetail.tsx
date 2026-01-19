@@ -258,18 +258,10 @@ export default function AppInspireDetail() {
       >
         <Button
           onClick={handleAddClick}
-          disabled={plan.isAdded}
           className="w-full h-12 text-base font-semibold"
           size="lg"
         >
-          {plan.isAdded ? (
-            <>
-              <CheckCircle className="w-5 h-5 mr-2" />
-              Already Added
-            </>
-          ) : (
-            '+ Add to my routine'
-          )}
+          {plan.isAdded ? '+ Add again' : '+ Add to my routine'}
         </Button>
       </div>
 

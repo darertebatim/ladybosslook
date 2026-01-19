@@ -820,6 +820,7 @@ export const useResetPlannerData = () => {
       await supabase.from('user_tasks').delete().eq('user_id', user.id);
       await supabase.from('user_streaks').delete().eq('user_id', user.id);
       await supabase.from('user_tags').delete().eq('user_id', user.id);
+      await supabase.from('user_routine_plans').delete().eq('user_id', user.id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
