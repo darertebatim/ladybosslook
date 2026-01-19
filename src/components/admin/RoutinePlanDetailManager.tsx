@@ -33,8 +33,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Pencil, Trash2, GripVertical, ChevronUp, ChevronDown, Image, Music } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, GripVertical, ChevronUp, ChevronDown, Image, Music, Sparkles, BookOpen, MessageCircle, GraduationCap, Calendar, Link } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { PRO_LINK_TYPES, ProLinkType } from '@/lib/proTaskTypes';
 
 interface Playlist {
   id: string;
@@ -594,9 +595,9 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
                       </div>
                       <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center relative">
                         {renderIcon(task.icon)}
-                        {task.linked_playlist_id && (
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
-                            <Music className="h-2.5 w-2.5 text-white" />
+                        {(task.pro_link_type || task.linked_playlist_id) && (
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-violet-500 flex items-center justify-center">
+                            <Sparkles className="h-2.5 w-2.5 text-white" />
                           </div>
                         )}
                       </div>
@@ -604,7 +605,14 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
                         <div className="font-medium">{task.title}</div>
                         <div className="text-sm text-muted-foreground flex items-center gap-2">
                           {task.duration_minutes} min
-                          {task.linked_playlist && (
+                          {task.pro_link_type && (
+                            <span className="inline-flex items-center gap-1 text-violet-600 dark:text-violet-400">
+                              <Sparkles className="h-3 w-3" />
+                              {task.pro_link_type}
+                              {task.pro_link_value && `: ${task.pro_link_value.slice(0, 20)}...`}
+                            </span>
+                          )}
+                          {!task.pro_link_type && task.linked_playlist && (
                             <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
                               <Music className="h-3 w-3" />
                               {task.linked_playlist.name}
@@ -759,40 +767,114 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
                 ))}
               </div>
             </div>
-            <div>
-              <Label className="flex items-center gap-2">
-                <Music className="h-4 w-4 text-emerald-500" />
-                Link to Playlist (optional)
-              </Label>
+            {/* Pro Task Link Type */}
+            <div className="space-y-3 p-3 bg-muted/30 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-violet-500" />
+                <Label className="font-semibold">Pro Task Link (optional)</Label>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Make this a Pro Task that links to an app feature when tapped.
+              </p>
+              
               <Select
-                value={taskForm.linked_playlist_id || 'none'}
-                onValueChange={(value) => setTaskForm(prev => ({ 
-                  ...prev, 
-                  linked_playlist_id: value === 'none' ? null : value 
-                }))}
+                value={taskForm.pro_link_type || 'none'}
+                onValueChange={(value) => {
+                  const linkType = value === 'none' ? null : value;
+                  setTaskForm(prev => ({ 
+                    ...prev, 
+                    pro_link_type: linkType,
+                    pro_link_value: null,
+                    // Auto-set linked_playlist_id when playlist is selected
+                    linked_playlist_id: null,
+                  }));
+                }}
               >
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="Select a playlist..." />
+                <SelectTrigger>
+                  <SelectValue placeholder="Select link type..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">No playlist linked</SelectItem>
-                  {playlists?.map((playlist) => (
-                    <SelectItem key={playlist.id} value={playlist.id}>
-                      <div className="flex items-center gap-2">
-                        <span>{playlist.name}</span>
-                        {playlist.category && (
-                          <span className="text-xs text-muted-foreground">
-                            ({playlist.category})
-                          </span>
-                        )}
-                      </div>
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="none">No link (regular task)</SelectItem>
+                  {PRO_LINK_TYPES.map((config) => {
+                    const Icon = config.icon;
+                    return (
+                      <SelectItem key={config.value} value={config.value}>
+                        <div className="flex items-center gap-2">
+                          <Icon className="h-4 w-4" />
+                          <span>{config.label}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
-              {taskForm.linked_playlist_id && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Users will be able to tap this task to listen to the linked playlist.
+
+              {/* Value selector based on link type */}
+              {taskForm.pro_link_type === 'playlist' && (
+                <div>
+                  <Label className="text-xs">Select Playlist</Label>
+                  <Select
+                    value={taskForm.pro_link_value || 'none'}
+                    onValueChange={(value) => setTaskForm(prev => ({ 
+                      ...prev, 
+                      pro_link_value: value === 'none' ? null : value,
+                      linked_playlist_id: value === 'none' ? null : value,
+                    }))}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select a playlist..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No playlist</SelectItem>
+                      {playlists?.map((playlist) => (
+                        <SelectItem key={playlist.id} value={playlist.id}>
+                          {playlist.name} {playlist.category && `(${playlist.category})`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {taskForm.pro_link_type === 'channel' && (
+                <div>
+                  <Label className="text-xs">Channel Slug</Label>
+                  <Input
+                    value={taskForm.pro_link_value || ''}
+                    onChange={(e) => setTaskForm(prev => ({ ...prev, pro_link_value: e.target.value || null }))}
+                    placeholder="e.g., general, announcements"
+                    className="mt-1"
+                  />
+                </div>
+              )}
+
+              {taskForm.pro_link_type === 'program' && (
+                <div>
+                  <Label className="text-xs">Program Slug</Label>
+                  <Input
+                    value={taskForm.pro_link_value || ''}
+                    onChange={(e) => setTaskForm(prev => ({ ...prev, pro_link_value: e.target.value || null }))}
+                    placeholder="e.g., courageous-character"
+                    className="mt-1"
+                  />
+                </div>
+              )}
+
+              {taskForm.pro_link_type === 'route' && (
+                <div>
+                  <Label className="text-xs">Custom Route Path</Label>
+                  <Input
+                    value={taskForm.pro_link_value || ''}
+                    onChange={(e) => setTaskForm(prev => ({ ...prev, pro_link_value: e.target.value || null }))}
+                    placeholder="e.g., /app/profile"
+                    className="mt-1"
+                  />
+                </div>
+              )}
+
+              {taskForm.pro_link_type && !['playlist', 'channel', 'program', 'route'].includes(taskForm.pro_link_type) && (
+                <p className="text-xs text-muted-foreground italic">
+                  This link type doesn't require a value - it will open the {taskForm.pro_link_type} page directly.
                 </p>
               )}
             </div>

@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
+import { ProLinkType } from '@/lib/proTaskTypes';
 
 // Color cycle for variety in planner
 export const ROUTINE_COLOR_CYCLE: TaskColor[] = [
@@ -36,6 +37,8 @@ export interface EditedTask {
   reminderTime?: string;
   subtasks?: string[];
   linked_playlist_id?: string | null;
+  pro_link_type?: ProLinkType | null;
+  pro_link_value?: string | null;
 }
 
 interface RoutinePreviewSheetProps {
@@ -92,7 +95,7 @@ export function RoutinePreviewSheet({
   const handleTaskEditSave = (data: TaskFormData) => {
     if (!editingTaskId) return;
     
-    // Find the original task to preserve linked_playlist_id
+    // Find the original task to preserve pro_link fields
     const originalTask = tasks.find(t => t.id === editingTaskId);
     
     setEditedTasks(prev => ({
@@ -108,7 +111,9 @@ export function RoutinePreviewSheet({
         reminderEnabled: data.reminderEnabled,
         reminderTime: data.reminderTime,
         subtasks: data.subtasks,
-        linked_playlist_id: originalTask?.linked_playlist_id ?? null,
+        linked_playlist_id: data.proLinkType === 'playlist' ? data.proLinkValue : originalTask?.linked_playlist_id ?? null,
+        pro_link_type: data.proLinkType ?? originalTask?.pro_link_type ?? null,
+        pro_link_value: data.proLinkValue ?? originalTask?.pro_link_value ?? null,
       },
     }));
     setShowEditSheet(false);
@@ -127,6 +132,10 @@ export function RoutinePreviewSheet({
 
   const getInitialDataForEdit = (task: RoutinePlanTask, index: number): Partial<TaskFormData> => {
     const existing = editedTasks[task.id];
+    // Determine pro_link fields - prefer existing edits, fall back to template
+    const proLinkType = existing?.pro_link_type ?? task.pro_link_type ?? (task.linked_playlist_id ? 'playlist' : null);
+    const proLinkValue = existing?.pro_link_value ?? task.pro_link_value ?? task.linked_playlist_id ?? null;
+    
     return {
       title: existing?.title || task.title,
       icon: existing?.icon || task.icon,
@@ -142,6 +151,9 @@ export function RoutinePreviewSheet({
       reminderTime: existing?.reminderTime || '09:00',
       tag: existing?.tag ?? routineTitle,
       subtasks: existing?.subtasks || [],
+      linkedPlaylistId: proLinkType === 'playlist' ? proLinkValue : null,
+      proLinkType: proLinkType as ProLinkType | null,
+      proLinkValue: proLinkValue,
     };
   };
 
