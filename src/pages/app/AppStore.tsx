@@ -201,7 +201,7 @@ const AppStore = () => {
               <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 {selectedCategory 
                   ? categoryConfig.find(c => c.id === selectedCategory)?.name || 'Programs'
-                  : 'Available Courses'
+                  : 'Available Programs'
                 }
               </h2>
             </div>
