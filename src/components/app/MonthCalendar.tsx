@@ -1,16 +1,17 @@
 import { useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isToday } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Flame } from 'lucide-react';
+import { Flame, Star } from 'lucide-react';
 
 interface MonthCalendarProps {
   selectedDate: Date;
   currentMonth: Date;
   onDateSelect: (date: Date) => void;
   completedDates?: Set<string>;
+  programEventDates?: Set<string>;
 }
 
-export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect, completedDates }: MonthCalendarProps) => {
+export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect, completedDates, programEventDates }: MonthCalendarProps) => {
   // Generate all days for the month grid
   const weeks = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
@@ -44,6 +45,7 @@ export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect, comple
             const isTodayDate = isToday(dateItem);
             const dateStr = format(dateItem, 'yyyy-MM-dd');
             const hasCompletions = completedDates?.has(dateStr);
+            const hasProgramEvents = programEventDates?.has(dateStr);
 
             return (
               <button
@@ -64,6 +66,12 @@ export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect, comple
                     <Flame className={cn(
                       "absolute h-7 w-7",
                       isSelected ? "text-orange-300 opacity-70" : "text-orange-400 opacity-50"
+                    )} />
+                  )}
+                  {hasProgramEvents && isCurrentMonth && (
+                    <Star className={cn(
+                      "absolute -top-0.5 -right-0.5 h-3 w-3",
+                      isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-500 fill-indigo-500"
                     )} />
                   )}
                   <span className="relative z-10">{format(dateItem, 'd')}</span>
