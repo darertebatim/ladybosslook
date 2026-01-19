@@ -114,8 +114,10 @@ const AppTaskCreate = ({
       setColor(initialData.color || 'yellow');
       setScheduledDate(initialData.scheduledDate || new Date());
       setScheduledTime(initialData.scheduledTime ?? null);
-      setRepeatEnabled(initialData.repeatEnabled ?? (initialData.repeatPattern ? initialData.repeatPattern !== 'none' : false));
-      setRepeatPattern(initialData.repeatPattern && initialData.repeatPattern !== 'none' as any ? initialData.repeatPattern : 'daily');
+      const repeatVal = initialData.repeatPattern as string | undefined;
+      const hasRepeat = repeatVal && repeatVal !== 'none';
+      setRepeatEnabled(initialData.repeatEnabled ?? !!hasRepeat);
+      setRepeatPattern(hasRepeat && ['daily', 'weekly', 'monthly'].includes(repeatVal) ? repeatVal as 'daily' | 'weekly' | 'monthly' : 'daily');
       setRepeatInterval(initialData.repeatInterval || 1);
       setReminderEnabled(initialData.reminderEnabled ?? false);
       setReminderTime(initialData.reminderTime || '09:00');
