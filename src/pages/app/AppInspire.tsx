@@ -37,7 +37,7 @@ export default function AppInspire() {
   );
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-background overflow-hidden">
       {/* Fixed Header */}
       <header 
         className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50"
@@ -78,8 +78,8 @@ export default function AppInspire() {
       {/* Header Spacer */}
       <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} />
 
-      <ScrollArea className="flex-1">
-        <div className="pb-safe">
+      <ScrollArea className="flex-1 w-full">
+        <div className="pb-safe overflow-hidden">
           {/* Featured Banner Carousel */}
           {featuredPlans && featuredPlans.length > 0 && !selectedCategory && !searchQuery && (
             <div className="px-4 pt-4">
@@ -121,7 +121,7 @@ export default function AppInspire() {
           )}
 
           {/* Plans Grid */}
-          <div className="mt-5 px-4">
+          <div className="mt-5 px-4 w-full">
             <h2 className="text-sm font-semibold text-muted-foreground mb-3">
               {selectedCategory 
                 ? categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'ROUTINES'
@@ -134,7 +134,7 @@ export default function AppInspire() {
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
               </div>
             ) : searchedPlans && searchedPlans.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 w-full">
                 {searchedPlans.map((plan) => (
                   <RoutinePlanCard
                     key={plan.id}
