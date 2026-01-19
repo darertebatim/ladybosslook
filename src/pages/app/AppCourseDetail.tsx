@@ -171,6 +171,32 @@ const AppCourseDetail = () => {
     enabled: !!round?.audio_playlist_id,
   });
 
+  // Fetch playlist audio tracks for fallback Content Schedule (e.g., audiobook tracks)
+  const { data: playlistTracks } = useQuery({
+    queryKey: ['course-tracks-schedule', round?.audio_playlist_id],
+    queryFn: async () => {
+      if (!round?.audio_playlist_id) return [];
+      
+      const { data, error } = await supabase
+        .from('audio_playlist_items')
+        .select(`
+          id,
+          drip_delay_days,
+          sort_order,
+          audio_content (
+            id,
+            title
+          )
+        `)
+        .eq('playlist_id', round.audio_playlist_id)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!round?.audio_playlist_id,
+  });
+
   // Fetch unread post count for the round's channel
   const { data: channelUnreadCount } = useQuery({
     queryKey: ['channel-unread-count', roundChannel?.id, user?.id],
@@ -561,6 +587,12 @@ const AppCourseDetail = () => {
 
   // Check if there are any drip-scheduled modules (drip_delay_days > 0)
   const hasDripModules = playlistModules && playlistModules.some(m => m.drip_delay_days > 0);
+  
+  // Fallback: Check if there are drip-scheduled tracks (e.g., audiobook chapters)
+  const hasDripTracks = !hasDripModules && playlistTracks && playlistTracks.some(t => t.drip_delay_days > 0);
+  
+  // Determine if we should show any content schedule
+  const showContentSchedule = hasDripModules || hasDripTracks;
 
   // Free enrollment mutation
   const enrollMutation = useMutation({
@@ -1109,21 +1141,25 @@ const AppCourseDetail = () => {
               </Card>
             )}
 
-            {/* Content Schedule Card - shows drip unlock timeline */}
-            {hasDripModules && playlistModules && playlistModules.length > 0 && (
+            {/* Content Schedule Card - shows drip unlock timeline for modules or audio tracks */}
+            {showContentSchedule && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5" />
-                    Content Schedule
+                    {hasDripTracks ? 'Audiobook Schedule' : 'Content Schedule'}
                     <Badge variant="secondary" className="ml-auto">
-                      {playlistModules.length} modules
+                      {hasDripModules 
+                        ? `${playlistModules?.length || 0} modules`
+                        : `${playlistTracks?.length || 0} chapters`
+                      }
                     </Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {playlistModules.map((module, index) => {
+                    {/* Render modules if available */}
+                    {hasDripModules && playlistModules?.map((module) => {
                       const unlockDate = getModuleUnlockDate(module.drip_delay_days);
                       const isAvailable = unlockDate ? new Date() >= unlockDate : true;
                       const isToday = unlockDate && isDateToday(unlockDate);
@@ -1174,6 +1210,60 @@ const AppCourseDetail = () => {
                         </div>
                       );
                     })}
+                    
+                    {/* Render audio tracks as fallback */}
+                    {hasDripTracks && playlistTracks?.map((track) => {
+                      const unlockDate = getModuleUnlockDate(track.drip_delay_days);
+                      const isAvailable = unlockDate ? new Date() >= unlockDate : true;
+                      const isToday = unlockDate && isDateToday(unlockDate);
+                      const trackTitle = track.audio_content?.title || 'Untitled Track';
+                      
+                      return (
+                        <div 
+                          key={track.id}
+                          className={`flex items-center gap-3 p-3 rounded-lg border ${
+                            !isAvailable 
+                              ? 'bg-muted/50 opacity-60' 
+                              : isToday 
+                                ? 'border-primary bg-primary/5' 
+                                : 'bg-card'
+                          }`}
+                        >
+                          {/* Date Column (or "Now" for drip_delay_days=0) */}
+                          <div className="flex flex-col items-center justify-center w-12 shrink-0">
+                            {unlockDate ? (
+                              <>
+                                <span className="text-xs text-muted-foreground uppercase">
+                                  {format(unlockDate, 'MMM')}
+                                </span>
+                                <span className="text-xl font-bold leading-none">
+                                  {format(unlockDate, 'd')}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-sm font-semibold text-primary">Now</span>
+                            )}
+                          </div>
+                          
+                          {/* Track Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <Music className="h-4 w-4 text-primary" />
+                              <p className="font-medium truncate">{trackTitle}</p>
+                              {isToday && (
+                                <Badge variant="default" className="shrink-0 text-xs">Today</Badge>
+                              )}
+                              {!isAvailable && (
+                                <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              Audio
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                   
                   {/* CTA to open playlist */}
@@ -1182,7 +1272,7 @@ const AppCourseDetail = () => {
                     onClick={() => navigate(`/app/player/playlist/${round?.audio_playlist_id}`)}
                   >
                     <Music className="h-5 w-5 mr-2" />
-                    Open Course Modules
+                    {hasDripTracks ? 'Open Audiobook' : 'Open Course Modules'}
                   </Button>
                 </CardContent>
               </Card>
