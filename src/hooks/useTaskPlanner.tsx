@@ -542,6 +542,7 @@ export const useCompleteTask = () => {
     onSuccess: (_, variables) => {
       const dateStr = format(variables.date, 'yyyy-MM-dd');
       queryClient.invalidateQueries({ queryKey: ['planner-completions', user?.id, dateStr] });
+      queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
       queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
     },
     onError: (error) => {
@@ -575,6 +576,7 @@ export const useUncompleteTask = () => {
     onSuccess: (_, variables) => {
       const dateStr = format(variables.date, 'yyyy-MM-dd');
       queryClient.invalidateQueries({ queryKey: ['planner-completions', user?.id, dateStr] });
+      queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
     },
     onError: (error) => {
       console.error('Uncomplete task error:', error);
@@ -611,6 +613,7 @@ export const useCompleteSubtask = () => {
     onSuccess: (_, variables) => {
       const dateStr = format(variables.date, 'yyyy-MM-dd');
       queryClient.invalidateQueries({ queryKey: ['planner-completions', user?.id, dateStr] });
+      queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
     },
     onError: (error) => {
       console.error('Complete subtask error:', error);
@@ -643,6 +646,7 @@ export const useUncompleteSubtask = () => {
     onSuccess: (_, variables) => {
       const dateStr = format(variables.date, 'yyyy-MM-dd');
       queryClient.invalidateQueries({ queryKey: ['planner-completions', user?.id, dateStr] });
+      queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
     },
     onError: (error) => {
       console.error('Uncomplete subtask error:', error);
