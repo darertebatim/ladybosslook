@@ -181,7 +181,7 @@ export default function AppAudioPlayer() {
     enabled: isModuleMode && !!contextPlaylistId,
   });
 
-  // Fetch user's round for drip content calculation (including drip_offset_days)
+  // Fetch user's round for drip content calculation (including first_session_date and drip_offset_days)
   const effectivePlaylistId = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
   
   const { data: userRound } = useQuery({
@@ -197,6 +197,7 @@ export default function AppAudioPlayer() {
           program_rounds!inner (
             id,
             start_date,
+            first_session_date,
             drip_offset_days,
             audio_playlist_id
           )
@@ -232,11 +233,12 @@ export default function AppAudioPlayer() {
     enabled: !!audioId,
   });
 
-  // Check if a track is available based on drip delay - now with countdown and offset
+  // Check if a track is available based on drip delay - uses first_session_date
+  // drip_delay_days=0 = immediate, 1 = at first session, 2 = 1 day after first session, etc.
   const getTrackAvailability = (dripDelayDays: number) => {
     return getTrackAvailabilityWithCountdown(
       dripDelayDays, 
-      userRound?.start_date,
+      userRound?.first_session_date || userRound?.start_date, // Prefer first_session_date
       userRound?.drip_offset_days || 0
     );
   };
@@ -290,7 +292,7 @@ export default function AppAudioPlayer() {
       setPlaylistContext({
         tracks: playlistContextTracks,
         currentIndex: currentTrackIndex,
-        roundStartDate: userRound?.start_date,
+        roundStartDate: userRound?.first_session_date || userRound?.start_date, // Use first_session_date for drip
         roundDripOffset: userRound?.drip_offset_days || 0,
       });
     }

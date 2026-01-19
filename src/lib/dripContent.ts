@@ -1,55 +1,76 @@
-import { differenceInDays, differenceInHours } from "date-fns";
+import { differenceInDays, differenceInHours, differenceInMinutes } from "date-fns";
 
 /**
  * Calculate the availability status and countdown text for a drip content track
- * @param dripDelayDays - Days after round start when the track becomes available
- * @param roundStartDate - The start date of the round (YYYY-MM-DD format)
+ * 
+ * Logic:
+ * - drip_delay_days = 0: Always available immediately upon enrollment
+ * - drip_delay_days >= 1: Available at firstSessionDate + (drip_delay_days - 1) days
+ * 
+ * @param dripDelayDays - Drip delay value (0 = immediate, 1 = at first session, 2 = 1 day after, etc.)
+ * @param firstSessionDate - The first session date/time (YYYY-MM-DD or ISO timestamp)
  * @param roundDripOffset - Additional offset days (positive = delay/freeze, negative = release earlier)
  */
 export function getTrackAvailabilityWithCountdown(
   dripDelayDays: number,
-  roundStartDate: string | null | undefined,
+  firstSessionDate: string | null | undefined,
   roundDripOffset: number = 0
 ): {
   isAvailable: boolean;
   availableDate: Date | null;
   countdownText: string | null;
 } {
-  // No round = all tracks available
-  if (!roundStartDate) {
+  // drip_delay_days = 0 means immediately available (no drip)
+  if (dripDelayDays === 0) {
     return { isAvailable: true, availableDate: null, countdownText: null };
   }
 
-  const roundStart = new Date(roundStartDate + 'T00:00:00');
-  const availableDate = new Date(roundStart);
-  // Include the round's drip offset in the calculation
-  availableDate.setDate(availableDate.getDate() + dripDelayDays + roundDripOffset);
+  // No first session date set = all content available (fallback)
+  if (!firstSessionDate) {
+    return { isAvailable: true, availableDate: null, countdownText: null };
+  }
+
+  // Parse first session date - supports both date-only and ISO timestamp formats
+  const firstSession = firstSessionDate.includes('T') 
+    ? new Date(firstSessionDate)
+    : new Date(firstSessionDate + 'T00:00:00');
+  
+  // Calculate available date: firstSession + (dripDelayDays - 1) + offset
+  // drip_delay_days = 1 means at first session time
+  // drip_delay_days = 2 means 1 day after first session
+  const availableDate = new Date(firstSession);
+  availableDate.setDate(availableDate.getDate() + (dripDelayDays - 1) + roundDripOffset);
   
   const now = new Date();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
 
-  const isAvailable = today >= availableDate;
+  // Compare full datetime (not just date) for more precise timing
+  const isAvailable = now >= availableDate;
 
   if (isAvailable) {
     return { isAvailable: true, availableDate, countdownText: null };
   }
 
-  // Calculate countdown
-  const daysUntil = differenceInDays(availableDate, now);
-  const hoursUntil = differenceInHours(availableDate, now) % 24;
+  // Calculate countdown with time precision
+  const totalMinutesUntil = differenceInMinutes(availableDate, now);
+  const daysUntil = Math.floor(totalMinutesUntil / (60 * 24));
+  const hoursUntil = Math.floor((totalMinutesUntil % (60 * 24)) / 60);
+  const minutesUntil = totalMinutesUntil % 60;
 
   let countdownText: string;
   if (daysUntil > 1) {
     countdownText = `Available in ${daysUntil} days`;
   } else if (daysUntil === 1) {
     countdownText = hoursUntil > 0 
-      ? `Available in 1 day, ${hoursUntil} hours` 
+      ? `Available in 1 day, ${hoursUntil}h` 
       : `Available in 1 day`;
   } else if (hoursUntil > 1) {
     countdownText = `Available in ${hoursUntil} hours`;
   } else if (hoursUntil === 1) {
-    countdownText = `Available in 1 hour`;
+    countdownText = minutesUntil > 0
+      ? `Available in 1h ${minutesUntil}m`
+      : `Available in 1 hour`;
+  } else if (minutesUntil > 0) {
+    countdownText = `Available in ${minutesUntil} minutes`;
   } else {
     countdownText = `Available soon`;
   }

@@ -23,13 +23,14 @@ Deno.serve(async (req) => {
     today.setHours(0, 0, 0, 0);
     const todayStr = today.toISOString().split('T')[0];
 
-    // Find all active rounds with playlists (including drip_offset_days)
+    // Find all active rounds with playlists (including first_session_date and drip_offset_days)
     const { data: activeRounds, error: roundsError } = await supabase
       .from('program_rounds')
       .select(`
         id,
         round_name,
         start_date,
+        first_session_date,
         drip_offset_days,
         audio_playlist_id,
         program_slug,
@@ -38,8 +39,7 @@ Deno.serve(async (req) => {
           name
         )
       `)
-      .not('audio_playlist_id', 'is', null)
-      .lte('start_date', todayStr);
+      .not('audio_playlist_id', 'is', null);
 
     if (roundsError) {
       console.error('Error fetching rounds:', roundsError);
@@ -51,24 +51,39 @@ Deno.serve(async (req) => {
     let notificationsSent = 0;
 
     for (const round of activeRounds || []) {
-      // Calculate days since round start, accounting for drip offset
-      const roundStart = new Date(round.start_date + 'T00:00:00');
-      const dripOffset = round.drip_offset_days || 0;
-      const daysSinceStart = Math.floor((today.getTime() - roundStart.getTime()) / (1000 * 60 * 60 * 24));
-      
-      // The effective day for drip content, accounting for freezes/forwards
-      // If drip_offset_days is +7, we're effectively 7 days behind, so subtract the offset
-      const effectiveDay = daysSinceStart - dripOffset;
-
-      console.log(`Round "${round.round_name}": ${daysSinceStart} days since start, offset: ${dripOffset}, effective day: ${effectiveDay}`);
-
-      // Skip if effective day is negative (round hasn't effectively started yet due to freeze)
-      if (effectiveDay < 0) {
-        console.log(`Skipping round "${round.round_name}" - effective day is negative due to freeze`);
+      // Use first_session_date for drip timing, fallback to start_date
+      const dripBaseDate = round.first_session_date || round.start_date;
+      if (!dripBaseDate) {
+        console.log(`Skipping round "${round.round_name}" - no first_session_date or start_date`);
         continue;
       }
 
-      // Find tracks that unlock today (drip_delay_days === effectiveDay)
+      // Parse the drip base date (may include time)
+      const dripBase = dripBaseDate.includes('T') 
+        ? new Date(dripBaseDate)
+        : new Date(dripBaseDate + 'T00:00:00');
+      
+      const dripOffset = round.drip_offset_days || 0;
+      
+      // Calculate days since drip base date
+      const daysSinceDripBase = Math.floor((today.getTime() - dripBase.getTime()) / (1000 * 60 * 60 * 24));
+      
+      // The effective day for drip content, accounting for freezes/forwards
+      // New logic: drip_delay_days = 1 means at first session, so effective day 0 corresponds to drip_delay_days = 1
+      // effective_drip_day = daysSinceDripBase - dripOffset + 1
+      const effectiveDripDay = daysSinceDripBase - dripOffset + 1;
+
+      console.log(`Round "${round.round_name}": drip base = ${dripBaseDate}, ${daysSinceDripBase} days since, offset: ${dripOffset}, effective drip day: ${effectiveDripDay}`);
+
+      // Skip if first session hasn't happened yet (effective drip day < 1)
+      if (effectiveDripDay < 1) {
+        console.log(`Skipping round "${round.round_name}" - first session hasn't happened yet`);
+        continue;
+      }
+
+      // Find tracks that unlock today (drip_delay_days === effectiveDripDay)
+      // Note: drip_delay_days = 0 is always available (no notification needed)
+      // drip_delay_days = 1 unlocks at first session, = 2 unlocks 1 day after, etc.
       const { data: unlockedTracks, error: tracksError } = await supabase
         .from('audio_playlist_items')
         .select(`
@@ -80,7 +95,7 @@ Deno.serve(async (req) => {
           )
         `)
         .eq('playlist_id', round.audio_playlist_id)
-        .eq('drip_delay_days', effectiveDay);
+        .eq('drip_delay_days', effectiveDripDay);
 
       if (tracksError) {
         console.error('Error fetching tracks:', tracksError);
