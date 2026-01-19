@@ -246,7 +246,7 @@ export function HomeBannerManager() {
                     id="buttonUrl"
                     value={buttonUrl}
                     onChange={(e) => setButtonUrl(e.target.value)}
-                    placeholder="e.g., /app/courses or https://..."
+                    placeholder="e.g., /app/programs or https://..."
                   />
                 </div>
               </div>

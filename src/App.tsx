@@ -26,7 +26,7 @@ const PageLoader = () => (
 
 // Lazy load app pages (most-used pages in native app)
 const AppHome = lazy(() => import("@/pages/app/AppHome"));
-const AppCourses = lazy(() => import("@/pages/app/AppCourses"));
+const AppPrograms = lazy(() => import("@/pages/app/AppPrograms"));
 const AppStore = lazy(() => import("@/pages/app/AppStore"));
 const AppCourseDetail = lazy(() => import("@/pages/app/AppCourseDetail"));
 const AppProfile = lazy(() => import("@/pages/app/AppProfile"));
@@ -241,7 +241,7 @@ const App = () => (
                 <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                   <Route index element={<Navigate to="/app/home" replace />} />
                   <Route path="home" element={<AppHome />} />
-                  <Route path="courses" element={<AppCourses />} />
+                  <Route path="programs" element={<AppPrograms />} />
                   <Route path="browse" element={<AppStore />} />
                   <Route path="course/:slug" element={<AppCourseDetail />} />
                   <Route path="player" element={<AppPlayer />} />

@@ -107,9 +107,9 @@ export function ActiveRound() {
           <div className="text-center py-6">
             <GraduationCap className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
             <p className="text-muted-foreground">No active rounds yet</p>
-            <Link to="/app/courses">
+            <Link to="/app/programs">
               <Button className="mt-4" variant="outline">
-                Browse Courses
+                Browse Programs
               </Button>
             </Link>
           </div>
@@ -336,9 +336,9 @@ export function ActiveRound() {
             <div className="text-center">
               <GraduationCap className="h-10 w-10 mx-auto mb-2 text-muted-foreground opacity-50" />
               <p className="text-sm text-muted-foreground">No active rounds right now</p>
-              <Link to="/app/courses">
+              <Link to="/app/programs">
                 <Button className="mt-3" variant="outline" size="sm">
-                  Browse New Courses
+                  Browse New Programs
                 </Button>
               </Link>
             </div>
