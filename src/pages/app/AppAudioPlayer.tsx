@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Headphones, List, Lock, CheckCircle, Play } from "lucide-react";
 import { AudioControls } from "@/components/audio/AudioControls";
@@ -27,7 +27,12 @@ import { cn } from "@/lib/utils";
 export default function AppAudioPlayer() {
   const { audioId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showCelebration, setShowCelebration] = useState(false);
+  
+  // Check if we're in module mode (navigated from modules list)
+  const isModuleMode = searchParams.get('moduleMode') === 'true';
+  const contextPlaylistId = searchParams.get('playlistId');
   
   // Use global audio player context
   const {
@@ -102,7 +107,7 @@ export default function AppAudioPlayer() {
     enabled: !!audioId,
   });
 
-  // Fetch all tracks in the same playlist
+  // Fetch all tracks in the same playlist (traditional track mode)
   const { data: playlistTracks } = useQuery({
     queryKey: ['playlist-all-tracks', playlistInfo?.playlist_id],
     queryFn: async () => {
@@ -126,12 +131,60 @@ export default function AppAudioPlayer() {
       if (error) throw error;
       return data;
     },
-    enabled: !!playlistInfo?.playlist_id,
+    enabled: !!playlistInfo?.playlist_id && !isModuleMode,
+  });
+
+  // Fetch audio modules from playlist_supplements (module mode)
+  const { data: modulePlaylist } = useQuery({
+    queryKey: ['module-playlist-audio', contextPlaylistId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('playlist_supplements')
+        .select(`
+          id,
+          sort_order,
+          drip_delay_days,
+          audio_id,
+          audio_content (
+            id,
+            title,
+            duration_seconds,
+            cover_image_url,
+            file_url
+          )
+        `)
+        .eq('playlist_id', contextPlaylistId!)
+        .eq('type', 'audio')
+        .not('audio_id', 'is', null)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: isModuleMode && !!contextPlaylistId,
+  });
+
+  // Fetch playlist info for module mode
+  const { data: modulePlaylistInfo } = useQuery({
+    queryKey: ['playlist-info-for-modules', contextPlaylistId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlists')
+        .select('id, name, category, cover_image_url')
+        .eq('id', contextPlaylistId!)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: isModuleMode && !!contextPlaylistId,
   });
 
   // Fetch user's round for drip content calculation (including drip_offset_days)
+  const effectivePlaylistId = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
+  
   const { data: userRound } = useQuery({
-    queryKey: ['user-round-for-playlist', playlistInfo?.playlist_id],
+    queryKey: ['user-round-for-playlist', effectivePlaylistId],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
@@ -148,14 +201,14 @@ export default function AppAudioPlayer() {
           )
         `)
         .eq('user_id', user.id)
-        .eq('program_rounds.audio_playlist_id', playlistInfo!.playlist_id)
+        .eq('program_rounds.audio_playlist_id', effectivePlaylistId!)
         .eq('status', 'active')
         .maybeSingle();
       
       if (error) throw error;
       return data?.program_rounds;
     },
-    enabled: !!playlistInfo?.playlist_id,
+    enabled: !!effectivePlaylistId,
   });
 
   // Fetch saved progress
@@ -187,11 +240,34 @@ export default function AppAudioPlayer() {
     );
   };
 
-  // Calculate current track index
-  const currentTrackIndex = playlistTracks?.findIndex(t => t.audio_id === audioId) ?? -1;
+  // Calculate current track index - works for both module mode and track mode
+  const currentTrackIndex = useMemo(() => {
+    if (isModuleMode && modulePlaylist) {
+      return modulePlaylist.findIndex(m => m.audio_id === audioId);
+    }
+    return playlistTracks?.findIndex(t => t.audio_id === audioId) ?? -1;
+  }, [isModuleMode, modulePlaylist, playlistTracks, audioId]);
 
-  // Build playlist context for auto-play
+  // Build playlist context for auto-play - supports both module and track mode
   const playlistContextTracks: TrackInfo[] = useMemo(() => {
+    // Module mode: use playlist_supplements
+    if (isModuleMode && modulePlaylist && modulePlaylistInfo) {
+      return modulePlaylist
+        .filter(m => m.audio_content) // Only include modules with audio content
+        .map((module, index) => ({
+          id: module.audio_content!.id,
+          title: module.audio_content!.title,
+          coverImageUrl: module.audio_content!.cover_image_url || modulePlaylistInfo.cover_image_url || undefined,
+          playlistId: contextPlaylistId || undefined,
+          playlistName: modulePlaylistInfo.name,
+          trackPosition: `${index + 1}/${modulePlaylist.length}`,
+          fileUrl: module.audio_content!.file_url,
+          duration: module.audio_content!.duration_seconds,
+          dripDelayDays: module.drip_delay_days || 0,
+        }));
+    }
+    
+    // Track mode: use audio_playlist_items
     if (!playlistTracks || !playlistInfo) return [];
     
     return playlistTracks.map((track, index) => ({
@@ -205,7 +281,7 @@ export default function AppAudioPlayer() {
       duration: track.audio_content.duration_seconds,
       dripDelayDays: track.drip_delay_days || 0,
     }));
-  }, [playlistTracks, playlistInfo]);
+  }, [isModuleMode, modulePlaylist, modulePlaylistInfo, contextPlaylistId, playlistTracks, playlistInfo]);
 
   // Set playlist context whenever it changes
   useEffect(() => {
@@ -237,20 +313,28 @@ export default function AppAudioPlayer() {
   // Start playing when audio data is loaded
   useEffect(() => {
     if (audio && audioId && (!currentTrack || currentTrack.id !== audioId)) {
+      // Get appropriate playlist info based on mode
+      const effectiveCoverUrl = isModuleMode 
+        ? (audio.cover_image_url || modulePlaylistInfo?.cover_image_url)
+        : (audio.cover_image_url || playlistInfo?.audio_playlists?.cover_image_url);
+      const effectivePlaylistIdForTrack = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
+      const effectivePlaylistName = isModuleMode ? modulePlaylistInfo?.name : playlistInfo?.audio_playlists?.name;
+      const trackCount = isModuleMode ? modulePlaylist?.length : playlistTracks?.length;
+      
       playTrack({
         id: audio.id,
         title: audio.title,
-        coverImageUrl: audio.cover_image_url || playlistInfo?.audio_playlists?.cover_image_url || undefined,
-        playlistId: playlistInfo?.playlist_id,
-        playlistName: playlistInfo?.audio_playlists?.name,
-        trackPosition: playlistTracks && currentTrackIndex >= 0 
-          ? `${currentTrackIndex + 1}/${playlistTracks.length}` 
+        coverImageUrl: effectiveCoverUrl || undefined,
+        playlistId: effectivePlaylistIdForTrack || undefined,
+        playlistName: effectivePlaylistName || undefined,
+        trackPosition: trackCount && currentTrackIndex >= 0 
+          ? `${currentTrackIndex + 1}/${trackCount}` 
           : undefined,
         fileUrl: audio.file_url,
         duration: audio.duration_seconds,
       }, savedProgress?.current_position_seconds || 0);
     }
-  }, [audio, audioId, playlistInfo, playlistTracks, savedProgress]);
+  }, [audio, audioId, playlistInfo, playlistTracks, savedProgress, isModuleMode, modulePlaylist, modulePlaylistInfo, contextPlaylistId, currentTrackIndex]);
 
   // Handle celebration close and auto-play
   const handleCelebrationClose = () => {
@@ -259,9 +343,12 @@ export default function AppAudioPlayer() {
 
   const handlePlayNext = () => {
     playNextTrack();
-    // Navigate to next track page
+    // Navigate to next track page - preserve module mode if active
     if (nextTrack) {
-      navigate(`/app/player/${nextTrack.id}`);
+      const url = isModuleMode && contextPlaylistId 
+        ? `/app/player/${nextTrack.id}?moduleMode=true&playlistId=${contextPlaylistId}`
+        : `/app/player/${nextTrack.id}`;
+      navigate(url);
     }
   };
 
@@ -402,26 +489,36 @@ export default function AppAudioPlayer() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => playlistInfo?.playlist_id ? navigate(`/app/player/playlist/${playlistInfo.playlist_id}`) : navigate('/app/player')}
+            onClick={() => {
+              const backPlaylistId = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
+              if (backPlaylistId) {
+                navigate(`/app/player/playlist/${backPlaylistId}`);
+              } else {
+                navigate('/app/player');
+              }
+            }}
             className="rounded-full shrink-0"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           
           <div className="flex-1 min-w-0 flex items-center gap-2">
-            {playlistInfo ? (
+            {(isModuleMode ? modulePlaylistInfo : playlistInfo) ? (
               <button
-                onClick={() => navigate(`/app/player/playlist/${playlistInfo.playlist_id}`)}
+                onClick={() => {
+                  const navPlaylistId = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
+                  if (navPlaylistId) navigate(`/app/player/playlist/${navPlaylistId}`);
+                }}
                 className="text-sm font-medium hover:text-primary transition-colors truncate"
               >
-                {playlistInfo.audio_playlists.name}
+                {isModuleMode ? modulePlaylistInfo?.name : playlistInfo?.audio_playlists.name}
               </button>
             ) : (
               <span className="text-sm font-medium">Now Playing</span>
             )}
-            {playlistTracks && currentTrackIndex >= 0 && (
+            {currentTrackIndex >= 0 && (
               <span className="text-xs text-muted-foreground shrink-0">
-                • {currentTrackIndex + 1}/{playlistTracks.length}
+                • {currentTrackIndex + 1}/{isModuleMode ? modulePlaylist?.length : playlistTracks?.length}
               </span>
             )}
           </div>
@@ -433,7 +530,9 @@ export default function AppAudioPlayer() {
             isAdding={isAddingBookmark}
           />
 
-          {playlistTracks && playlistTracks.length > 1 && (
+          {/* Track List Sheet - supports both module mode and track mode */}
+          {((isModuleMode && modulePlaylist && modulePlaylist.length > 1) || 
+            (!isModuleMode && playlistTracks && playlistTracks.length > 1)) && (
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full shrink-0">
@@ -442,50 +541,100 @@ export default function AppAudioPlayer() {
               </SheetTrigger>
               <SheetContent side="bottom" className="h-[70vh]">
                 <SheetHeader>
-                  <SheetTitle>Playlist Tracks</SheetTitle>
+                  <SheetTitle>{isModuleMode ? 'Course Modules' : 'Playlist Tracks'}</SheetTitle>
                 </SheetHeader>
                 <div className="mt-4 space-y-2 overflow-y-auto h-[calc(70vh-80px)]">
-                  {playlistTracks.map((track, index) => {
-                    const { isAvailable, countdownText } = getTrackAvailability(track.drip_delay_days || 0);
-                    
-                    return (
-                      <button
-                        key={track.audio_id}
-                        onClick={() => isAvailable && navigate(`/app/player/${track.audio_id}`)}
-                        disabled={!isAvailable}
-                        className={`w-full text-left p-3 rounded-xl border transition-all ${
-                          !isAvailable
-                            ? 'opacity-60 bg-muted/30 cursor-not-allowed'
-                            : track.audio_id === audioId 
-                              ? 'bg-primary/10 border-primary shadow-sm' 
-                              : 'hover:bg-accent hover:shadow-sm'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          {!isAvailable ? (
-                            <Lock className="h-4 w-4 text-muted-foreground w-6" />
-                          ) : (
-                            <span className="text-sm text-muted-foreground w-6">{index + 1}</span>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-medium truncate ${
-                              track.audio_id === audioId ? 'text-primary' : ''
-                            }`}>
-                              {track.audio_content.title}
-                            </p>
-                            {!isAvailable && countdownText && (
-                              <p className="text-xs text-muted-foreground">
-                                {countdownText}
-                              </p>
+                  {isModuleMode && modulePlaylist ? (
+                    // Module mode track list
+                    modulePlaylist.map((module, index) => {
+                      const { isAvailable, countdownText } = getTrackAvailability(module.drip_delay_days || 0);
+                      
+                      return (
+                        <button
+                          key={module.id}
+                          onClick={() => {
+                            if (isAvailable && module.audio_id) {
+                              navigate(`/app/player/${module.audio_id}?moduleMode=true&playlistId=${contextPlaylistId}`);
+                            }
+                          }}
+                          disabled={!isAvailable}
+                          className={`w-full text-left p-3 rounded-xl border transition-all ${
+                            !isAvailable
+                              ? 'opacity-60 bg-muted/30 cursor-not-allowed'
+                              : module.audio_id === audioId 
+                                ? 'bg-primary/10 border-primary shadow-sm' 
+                                : 'hover:bg-accent hover:shadow-sm'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            {!isAvailable ? (
+                              <Lock className="h-4 w-4 text-muted-foreground w-6" />
+                            ) : (
+                              <span className="text-sm text-muted-foreground w-6">{index + 1}</span>
                             )}
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm font-medium truncate ${
+                                module.audio_id === audioId ? 'text-primary' : ''
+                              }`}>
+                                {module.audio_content?.title}
+                              </p>
+                              {!isAvailable && countdownText && (
+                                <p className="text-xs text-muted-foreground">
+                                  {countdownText}
+                                </p>
+                              )}
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {module.audio_content?.duration_seconds ? formatDuration(module.audio_content.duration_seconds) : '--:--'}
+                            </span>
                           </div>
-                          <span className="text-xs text-muted-foreground">
-                            {formatDuration(track.audio_content.duration_seconds)}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
+                        </button>
+                      );
+                    })
+                  ) : (
+                    // Traditional track mode
+                    playlistTracks?.map((track, index) => {
+                      const { isAvailable, countdownText } = getTrackAvailability(track.drip_delay_days || 0);
+                      
+                      return (
+                        <button
+                          key={track.audio_id}
+                          onClick={() => isAvailable && navigate(`/app/player/${track.audio_id}`)}
+                          disabled={!isAvailable}
+                          className={`w-full text-left p-3 rounded-xl border transition-all ${
+                            !isAvailable
+                              ? 'opacity-60 bg-muted/30 cursor-not-allowed'
+                              : track.audio_id === audioId 
+                                ? 'bg-primary/10 border-primary shadow-sm' 
+                                : 'hover:bg-accent hover:shadow-sm'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            {!isAvailable ? (
+                              <Lock className="h-4 w-4 text-muted-foreground w-6" />
+                            ) : (
+                              <span className="text-sm text-muted-foreground w-6">{index + 1}</span>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm font-medium truncate ${
+                                track.audio_id === audioId ? 'text-primary' : ''
+                              }`}>
+                                {track.audio_content.title}
+                              </p>
+                              {!isAvailable && countdownText && (
+                                <p className="text-xs text-muted-foreground">
+                                  {countdownText}
+                                </p>
+                              )}
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {formatDuration(track.audio_content.duration_seconds)}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })
+                  )}
                 </div>
               </SheetContent>
             </Sheet>
