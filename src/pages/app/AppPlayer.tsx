@@ -162,8 +162,9 @@ export default function AppPlayer() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full bg-background overflow-hidden">
+        {/* Fixed Header Skeleton */}
         <div 
-          className="flex-shrink-0 bg-background/80 backdrop-blur-lg border-b"
+          className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="h-12 flex items-center justify-between px-4">
@@ -180,8 +181,17 @@ export default function AppPlayer() {
               ))}
             </div>
           </div>
+          <div className="px-4 pb-3 flex gap-2">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-7 w-20 rounded-full" />
+            ))}
+          </div>
         </div>
-        <div className="flex-1 overflow-y-auto p-4">
+        
+        {/* Header Spacer */}
+        <div style={{ height: 'calc(160px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
+        
+        <div className="flex-1 overflow-y-auto overscroll-contain p-4">
           <PlayerSkeleton />
         </div>
       </div>
@@ -190,9 +200,9 @@ export default function AppPlayer() {
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
-      {/* Fixed Header - Inspire Style */}
+      {/* Fixed Header */}
       <div 
-        className="flex-shrink-0 bg-background/80 backdrop-blur-lg border-b"
+        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         {/* Header Row */}
@@ -263,6 +273,9 @@ export default function AppPlayer() {
           ))}
         </div>
       </div>
+
+      {/* Header Spacer - accounts for header + categories + filter pills */}
+      <div style={{ height: 'calc(160px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto overscroll-contain">

@@ -304,24 +304,61 @@ export default function AppAudioPlayer() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-4">
-        <Skeleton className="h-8 w-8 mb-6" />
-        <Skeleton className="aspect-square w-full max-w-md mx-auto mb-6" />
-        <Skeleton className="h-8 w-3/4 mx-auto mb-2" />
-        <Skeleton className="h-4 w-1/2 mx-auto mb-8" />
+      <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
+        {/* Fixed Header Skeleton */}
+        <div 
+          className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/50"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
+          <div className="pt-3 pb-2 px-4 flex items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <Skeleton className="h-5 w-32" />
+          </div>
+        </div>
+        
+        {/* Header Spacer */}
+        <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
+        
+        <div className="flex-1 flex flex-col items-center justify-center p-4">
+          <Skeleton className="aspect-square w-full max-w-[220px] rounded-2xl mb-6" />
+          <Skeleton className="h-6 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2 mb-8" />
+        </div>
+        
+        <div className="pb-safe" />
       </div>
     );
   }
 
   if (!audio) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="text-center">
-          <p className="text-muted-foreground mb-4">Audio not found</p>
-          <Button onClick={() => navigate('/app/player')}>
-            Back to Library
-          </Button>
+      <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
+        {/* Fixed Header */}
+        <div 
+          className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/50"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
+          <div className="pt-3 pb-2 px-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/app/player')}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Library
+            </Button>
+          </div>
         </div>
+        
+        {/* Header Spacer */}
+        <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
+        
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="text-center">
+            <p className="text-muted-foreground mb-4">Audio not found</p>
+            <Button onClick={() => navigate('/app/player')}>
+              Back to Library
+            </Button>
+          </div>
+        </div>
+        
+        <div className="pb-safe" />
       </div>
     );
   }
@@ -353,9 +390,9 @@ export default function AppAudioPlayer() {
         </div>
       )}
 
-      {/* Fixed Header with safe area - matching AppHeader padding */}
+      {/* Fixed Header */}
       <div 
-        className="relative z-50 bg-background/60 backdrop-blur-xl border-b border-border/50 shrink-0"
+        className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/50"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="pt-3 pb-2 px-4 flex items-center gap-3">
@@ -452,6 +489,9 @@ export default function AppAudioPlayer() {
           )}
         </div>
       </div>
+
+      {/* Header Spacer */}
+      <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Main Content - Centered vertically */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-3 overflow-hidden">
