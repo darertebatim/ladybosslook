@@ -301,7 +301,7 @@ export function useUserRoutinePlans() {
   });
 }
 
-// Add routine plan to user's planner
+// Add routine plan to user's planner - creates individual tasks (not subtasks) for iOS Reminders sync
 export function useAddRoutinePlan() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -329,36 +329,35 @@ export function useAddRoutinePlan() {
 
       if (tasksError) throw tasksError;
 
-      // Create parent task
-      const { data: parentTask, error: parentError } = await supabase
+      // Get current max order_index for user's tasks
+      const { data: existingTasks } = await supabase
         .from('user_tasks')
-        .insert({
+        .select('order_index')
+        .eq('user_id', user.id)
+        .order('order_index', { ascending: false })
+        .limit(1);
+
+      const startOrderIndex = (existingTasks?.[0]?.order_index ?? -1) + 1;
+
+      // Create individual tasks for each routine plan task
+      if (tasks && tasks.length > 0) {
+        const userTasks = tasks.map((task, index) => ({
           user_id: user.id,
-          title: plan.title,
-          emoji: plan.icon,
+          title: task.title,
+          emoji: task.icon || plan.icon,
           color: plan.color,
           repeat_pattern: 'daily',
-          tag: plan.category?.name || null,
+          tag: plan.category?.name || plan.title,
           is_active: true,
-        })
-        .select()
-        .single();
-
-      if (parentError) throw parentError;
-
-      // Create subtasks
-      if (tasks && tasks.length > 0) {
-        const subtasks = tasks.map((task, index) => ({
-          task_id: parentTask.id,
-          title: `${task.title} (${task.duration_minutes} min)`,
-          order_index: index,
+          order_index: startOrderIndex + index,
+          scheduled_time: null,
         }));
 
-        const { error: subtasksError } = await supabase
-          .from('user_subtasks')
-          .insert(subtasks);
+        const { error: tasksInsertError } = await supabase
+          .from('user_tasks')
+          .insert(userTasks);
 
-        if (subtasksError) throw subtasksError;
+        if (tasksInsertError) throw tasksInsertError;
       }
 
       // Track that user added this plan
@@ -372,7 +371,7 @@ export function useAddRoutinePlan() {
 
       if (trackError) throw trackError;
 
-      return parentTask;
+      return { success: true, taskCount: tasks?.length || 0 };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-routine-plans'] });
