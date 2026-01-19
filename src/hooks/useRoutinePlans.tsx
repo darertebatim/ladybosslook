@@ -325,7 +325,15 @@ export function useAddRoutinePlan() {
     }: { 
       planId: string; 
       selectedTaskIds?: string[]; 
-      editedTasks?: { id: string; title: string }[];
+      editedTasks?: { 
+        id: string; 
+        title?: string; 
+        icon?: string; 
+        color?: string;
+        repeatPattern?: 'daily' | 'weekly' | 'monthly' | 'none';
+        scheduledTime?: string | null;
+        tag?: string | null;
+      }[];
     }) => {
       if (!user) throw new Error('Must be logged in');
 
@@ -353,8 +361,8 @@ export function useAddRoutinePlan() {
         ? allTasks?.filter(t => selectedTaskIds.includes(t.id)) || []
         : allTasks || [];
 
-      // Create a map of edited titles
-      const editedTitlesMap = new Map(editedTasks?.map(t => [t.id, t.title]) || []);
+      // Create a map of edited task data
+      const editedTasksMap = new Map(editedTasks?.map(t => [t.id, t]) || []);
 
       // Get current max order_index for user's tasks
       const { data: existingTasks } = await supabase
@@ -366,19 +374,22 @@ export function useAddRoutinePlan() {
 
       const startOrderIndex = (existingTasks?.[0]?.order_index ?? -1) + 1;
 
-      // Create individual tasks for each routine plan task with cycling colors
+      // Create individual tasks for each routine plan task
       if (tasks && tasks.length > 0) {
-        const userTasks = tasks.map((task, index) => ({
-          user_id: user.id,
-          title: editedTitlesMap.get(task.id) || task.title,
-          emoji: task.icon || plan.icon,
-          color: ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
-          repeat_pattern: 'daily',
-          tag: plan.category?.name || plan.title,
-          is_active: true,
-          order_index: startOrderIndex + index,
-          scheduled_time: null,
-        }));
+        const userTasks = tasks.map((task, index) => {
+          const edited = editedTasksMap.get(task.id);
+          return {
+            user_id: user.id,
+            title: edited?.title || task.title,
+            emoji: edited?.icon || task.icon || plan.icon,
+            color: edited?.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
+            repeat_pattern: edited?.repeatPattern || 'daily',
+            scheduled_time: edited?.scheduledTime || null,
+            tag: edited?.tag ?? plan.category?.name ?? plan.title,
+            is_active: true,
+            order_index: startOrderIndex + index,
+          };
+        });
 
         const { error: tasksInsertError } = await supabase
           .from('user_tasks')

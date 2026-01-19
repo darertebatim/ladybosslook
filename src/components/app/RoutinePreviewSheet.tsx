@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Check, Pencil, Clock, X } from 'lucide-react';
+import { Check, Pencil, Clock } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
+import { RoutineTaskEditSheet, EditableTask } from './RoutineTaskEditSheet';
 
 // Color cycle for variety in planner
 export const ROUTINE_COLOR_CYCLE: TaskColor[] = [
@@ -27,6 +27,11 @@ export const getTaskColor = (index: number): TaskColor => {
 export interface EditedTask {
   id: string;
   title: string;
+  icon?: string;
+  color?: TaskColor;
+  repeatPattern?: 'daily' | 'weekly' | 'monthly' | 'none';
+  scheduledTime?: string | null;
+  tag?: string | null;
 }
 
 interface RoutinePreviewSheetProps {
@@ -49,8 +54,9 @@ export function RoutinePreviewSheet({
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
     new Set(tasks.map(t => t.id))
   );
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
-  const [editedTitles, setEditedTitles] = useState<Record<string, string>>({});
+  const [editedTasks, setEditedTasks] = useState<Record<string, EditedTask>>({});
+  const [editingTask, setEditingTask] = useState<EditableTask | null>(null);
+  const [showEditSheet, setShowEditSheet] = useState(false);
 
   const allSelected = selectedTaskIds.size === tasks.length;
 
@@ -72,157 +78,174 @@ export function RoutinePreviewSheet({
     }
   };
 
-  const startEditing = (taskId: string, currentTitle: string) => {
-    setEditingTaskId(taskId);
-    if (!editedTitles[taskId]) {
-      setEditedTitles(prev => ({ ...prev, [taskId]: currentTitle }));
-    }
+  const openTaskEditor = (task: RoutinePlanTask, index: number) => {
+    const existingEdit = editedTasks[task.id];
+    setEditingTask({
+      id: task.id,
+      title: existingEdit?.title || task.title,
+      icon: existingEdit?.icon || task.icon,
+      color: existingEdit?.color || getTaskColor(index),
+      repeatPattern: existingEdit?.repeatPattern || 'daily',
+      scheduledTime: existingEdit?.scheduledTime ?? null,
+      tag: existingEdit?.tag ?? routineTitle,
+    });
+    setShowEditSheet(true);
   };
 
-  const saveEdit = () => {
-    setEditingTaskId(null);
+  const handleTaskEditSave = (updated: EditableTask) => {
+    setEditedTasks(prev => ({
+      ...prev,
+      [updated.id]: {
+        id: updated.id,
+        title: updated.title,
+        icon: updated.icon,
+        color: updated.color,
+        repeatPattern: updated.repeatPattern,
+        scheduledTime: updated.scheduledTime,
+        tag: updated.tag,
+      },
+    }));
+    setShowEditSheet(false);
+    setEditingTask(null);
   };
 
-  const cancelEdit = (taskId: string, originalTitle: string) => {
-    setEditedTitles(prev => ({ ...prev, [taskId]: originalTitle }));
-    setEditingTaskId(null);
-  };
-
-  const getTaskTitle = (task: RoutinePlanTask) => {
-    return editedTitles[task.id] ?? task.title;
+  const getTaskDisplay = (task: RoutinePlanTask, index: number) => {
+    const edited = editedTasks[task.id];
+    return {
+      title: edited?.title || task.title,
+      icon: edited?.icon || task.icon,
+      color: edited?.color || getTaskColor(index),
+      repeatPattern: edited?.repeatPattern || 'daily',
+    };
   };
 
   const handleSave = () => {
-    const editedTasksList = Object.entries(editedTitles)
-      .filter(([id, title]) => {
-        const original = tasks.find(t => t.id === id);
-        return original && title !== original.title;
-      })
-      .map(([id, title]) => ({ id, title }));
-    
+    const editedTasksList = Object.values(editedTasks);
     onSave(Array.from(selectedTaskIds), editedTasksList);
   };
 
+  const getRepeatLabel = (pattern: string) => {
+    switch (pattern) {
+      case 'daily': return 'Repeats every day';
+      case 'weekly': return 'Repeats every week';
+      case 'monthly': return 'Repeats every month';
+      default: return 'No repeat';
+    }
+  };
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent 
-        side="bottom" 
-        className="h-[85vh] rounded-t-3xl px-4"
-        hideCloseButton
-      >
-        <div className="flex flex-col h-full">
-          <SheetHeader className="text-left pb-2 flex-shrink-0">
-            <SheetTitle className="text-xl font-bold">Edit Routine</SheetTitle>
-            <p className="text-sm text-muted-foreground">
-              Edit it to create your personalized routine.
-            </p>
-          </SheetHeader>
+    <>
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent 
+          side="bottom" 
+          className="h-[85vh] rounded-t-3xl px-4"
+          hideCloseButton
+        >
+          <div className="flex flex-col h-full">
+            <SheetHeader className="text-left pb-2 flex-shrink-0">
+              <SheetTitle className="text-xl font-bold">Edit Routine</SheetTitle>
+              <p className="text-sm text-muted-foreground">
+                Edit it to create your personalized routine.
+              </p>
+            </SheetHeader>
 
-          <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
-            <p className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-              Daily Tasks
-            </p>
-            
-            <div className="space-y-3">
-              {tasks.map((task, index) => {
-                const isSelected = selectedTaskIds.has(task.id);
-                const colorClass = TASK_COLOR_CLASSES[getTaskColor(index)];
-                const TaskIcon = (LucideIcons as any)[task.icon] || LucideIcons.Sparkles;
-                
-                return (
-                  <div 
-                    key={task.id}
-                    className="flex items-start gap-3"
-                  >
-                    {/* Checkbox */}
-                    <button
-                      onClick={() => toggleTask(task.id)}
-                      className={cn(
-                        'w-6 h-6 mt-3 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-                        isSelected 
-                          ? 'bg-emerald-500 border-emerald-500' 
-                          : 'border-muted-foreground/40 bg-transparent'
-                      )}
+            <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
+              <p className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+                Daily Tasks
+              </p>
+              
+              <div className="space-y-3">
+                {tasks.map((task, index) => {
+                  const isSelected = selectedTaskIds.has(task.id);
+                  const display = getTaskDisplay(task, index);
+                  const colorClass = TASK_COLOR_CLASSES[display.color];
+                  const TaskIcon = (LucideIcons as any)[display.icon] || LucideIcons.Sparkles;
+                  
+                  return (
+                    <div 
+                      key={task.id}
+                      className="flex items-start gap-3"
                     >
-                      {isSelected && <Check className="w-4 h-4 text-white" />}
-                    </button>
-
-                    {/* Task Card */}
-                    <div className={cn(
-                      'flex-1 rounded-2xl overflow-hidden',
-                      colorClass
-                    )}>
-                      <div className="p-3">
-                        <div className="flex items-center gap-2 text-xs text-foreground/70 mb-1">
-                          <TaskIcon className="w-4 h-4" />
-                          <span>Anytime</span>
-                        </div>
-                        {editingTaskId === task.id ? (
-                          <div className="flex items-center gap-2">
-                            <Input
-                              value={editedTitles[task.id] ?? task.title}
-                              onChange={(e) => setEditedTitles(prev => ({ ...prev, [task.id]: e.target.value }))}
-                              className="h-8 text-sm bg-white/50"
-                              autoFocus
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') saveEdit();
-                                if (e.key === 'Escape') cancelEdit(task.id, task.title);
-                              }}
-                            />
-                            <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={saveEdit}>
-                              <Check className="w-4 h-4 text-emerald-600" />
-                            </Button>
-                            <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => cancelEdit(task.id, task.title)}>
-                              <X className="w-4 h-4 text-muted-foreground" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <p className="font-medium text-foreground">{getTaskTitle(task)}</p>
+                      {/* Checkbox */}
+                      <button
+                        onClick={() => toggleTask(task.id)}
+                        className={cn(
+                          'w-6 h-6 mt-3 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors',
+                          isSelected 
+                            ? 'bg-emerald-500 border-emerald-500' 
+                            : 'border-muted-foreground/40 bg-transparent'
                         )}
+                      >
+                        {isSelected && <Check className="w-4 h-4 text-white" />}
+                      </button>
+
+                      {/* Task Card */}
+                      <div className={cn(
+                        'flex-1 rounded-2xl overflow-hidden',
+                        colorClass
+                      )}>
+                        <div className="p-3">
+                          <div className="flex items-center gap-2 text-xs text-foreground/70 mb-1">
+                            <TaskIcon className="w-4 h-4" />
+                            <span>Anytime</span>
+                          </div>
+                          <p className="font-medium text-foreground">{display.title}</p>
+                        </div>
+                        {/* Footer bar */}
+                        <div className="px-3 py-2 bg-black/5 flex items-center gap-1.5">
+                          <Clock className="w-3 h-3 text-foreground/60" />
+                          <span className="text-xs text-foreground/60">
+                            {getRepeatLabel(display.repeatPattern)}
+                          </span>
+                        </div>
                       </div>
-                      {/* Footer bar */}
-                      <div className="px-3 py-2 bg-black/5 flex items-center gap-1.5">
-                        <Clock className="w-3 h-3 text-foreground/60" />
-                        <span className="text-xs text-foreground/60">Repeats every day</span>
-                      </div>
+
+                      {/* Edit button - opens full editor */}
+                      <button 
+                        className="p-2 mt-2 text-muted-foreground hover:text-foreground"
+                        onClick={() => openTaskEditor(task, index)}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
                     </div>
-
-                    {/* Edit button */}
-                    <button 
-                      className="p-2 mt-2 text-muted-foreground hover:text-foreground"
-                      onClick={() => startEditing(task.id, getTaskTitle(task))}
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
 
-          {/* Footer with toggle and save */}
-          <div 
-            className="flex-shrink-0 flex items-center justify-between pt-4 border-t border-border"
-            style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
-          >
-            <div className="flex items-center gap-3">
-              <Switch 
-                checked={allSelected} 
-                onCheckedChange={toggleAll}
-              />
-              <span className="text-sm font-medium">Add all</span>
-            </div>
-            
-            <Button
-              onClick={handleSave}
-              disabled={selectedTaskIds.size === 0 || isSaving}
-              className="px-8"
+            {/* Footer with toggle and save */}
+            <div 
+              className="flex-shrink-0 flex items-center justify-between pt-4 border-t border-border"
+              style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
             >
-              {isSaving ? 'Saving...' : 'Save'}
-            </Button>
+              <div className="flex items-center gap-3">
+                <Switch 
+                  checked={allSelected} 
+                  onCheckedChange={toggleAll}
+                />
+                <span className="text-sm font-medium">Add all</span>
+              </div>
+              
+              <Button
+                onClick={handleSave}
+                disabled={selectedTaskIds.size === 0 || isSaving}
+                className="px-8"
+              >
+                {isSaving ? 'Saving...' : 'Save'}
+              </Button>
+            </div>
           </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+        </SheetContent>
+      </Sheet>
+
+      {/* Full Task Edit Sheet */}
+      <RoutineTaskEditSheet
+        open={showEditSheet}
+        onOpenChange={setShowEditSheet}
+        task={editingTask}
+        routineTag={routineTitle}
+        onSave={handleTaskEditSave}
+      />
+    </>
   );
 }
