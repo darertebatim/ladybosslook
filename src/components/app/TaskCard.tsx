@@ -99,7 +99,7 @@ export const TaskCard = ({
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
 
-  // Pro Task - special styling with dynamic config
+  // Pro Task - uses user's chosen color but shows Pro icon and badge
   if (isProTask && proConfig) {
     const ProIcon = proConfig.icon;
     return (
@@ -107,13 +107,13 @@ export const TaskCard = ({
         onClick={handleCardClick}
         className={cn(
           'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-          proConfig.gradientClass,
+          colorClass, // Use user's chosen task color
           isCompleted && 'opacity-60'
         )}
       >
         {/* Main row */}
         <div className="flex items-center gap-3">
-          {/* Icon circle */}
+          {/* Icon circle - shows Pro link type icon */}
           <div className="w-11 h-11 rounded-full bg-white/90 dark:bg-white/20 flex items-center justify-center shrink-0 shadow-sm">
             <ProIcon className={cn('h-5 w-5', proConfig.iconColorClass)} />
           </div>
