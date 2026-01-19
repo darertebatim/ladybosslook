@@ -1,0 +1,300 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { format, isSameDay } from 'date-fns';
+
+export interface ProgramEvent {
+  id: string;
+  type: 'session' | 'module' | 'track';
+  title: string;
+  programSlug: string;
+  programTitle: string;
+  time?: string;
+  isCompleted: boolean;
+  
+  // Type-specific data
+  meetingLink?: string;
+  moduleId?: string;
+  trackId?: string;
+  playlistId?: string;
+  sessionNumber?: number;
+}
+
+interface PlannerProgramCompletion {
+  id: string;
+  user_id: string;
+  event_type: 'session' | 'module' | 'track';
+  event_id: string;
+  completed_date: string;
+}
+
+/**
+ * Get the unlock date for drip content
+ * drip_delay_days = 0: immediately available
+ * drip_delay_days >= 1: firstSession + (drip_delay_days - 1) + offset
+ */
+function getUnlockDate(
+  dripDelayDays: number,
+  firstSessionDate: string | null | undefined,
+  dripOffsetDays: number = 0
+): Date | null {
+  if (dripDelayDays === 0) return null; // Immediately available = not a specific date
+  if (!firstSessionDate) return null;
+  
+  const firstSession = firstSessionDate.includes('T')
+    ? new Date(firstSessionDate)
+    : new Date(firstSessionDate + 'T00:00:00');
+  
+  const unlockDate = new Date(firstSession);
+  unlockDate.setDate(unlockDate.getDate() + (dripDelayDays - 1) + dripOffsetDays);
+  // Set to midnight for date comparison
+  unlockDate.setHours(0, 0, 0, 0);
+  return unlockDate;
+}
+
+/**
+ * Hook to fetch program events (sessions + content unlocks) for a specific date
+ */
+export function useProgramEventsForDate(date: Date) {
+  const { user } = useAuth();
+  const dateStr = format(date, 'yyyy-MM-dd');
+
+  return useQuery({
+    queryKey: ['planner-program-events', dateStr, user?.id],
+    queryFn: async (): Promise<ProgramEvent[]> => {
+      if (!user) return [];
+
+      const events: ProgramEvent[] = [];
+
+      // 1. Get user's active enrollments with round data
+      const { data: enrollments, error: enrollError } = await supabase
+        .from('course_enrollments')
+        .select(`
+          id,
+          program_slug,
+          course_name,
+          round_id,
+          program_rounds (
+            id,
+            program_slug,
+            round_name,
+            first_session_date,
+            drip_offset_days,
+            audio_playlist_id,
+            google_meet_link
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'active');
+
+      if (enrollError || !enrollments) {
+        console.error('Error fetching enrollments:', enrollError);
+        return [];
+      }
+
+      // Get completions for this date
+      const { data: completions } = await supabase
+        .from('planner_program_completions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('completed_date', dateStr);
+
+      const completionSet = new Set(
+        (completions || []).map((c) => `${c.event_type}:${c.event_id}`)
+      );
+
+      // Get program catalog for titles
+      const { data: programs } = await supabase
+        .from('program_catalog')
+        .select('slug, title');
+      
+      const programTitleMap = new Map(
+        (programs || []).map(p => [p.slug, p.title])
+      );
+
+      // Process each enrollment
+      for (const enrollment of enrollments) {
+        const round = enrollment.program_rounds as any;
+        if (!round) continue;
+
+        const programTitle = programTitleMap.get(enrollment.program_slug || '') || enrollment.course_name;
+        const programSlug = enrollment.program_slug || '';
+
+        // 2. Get live sessions for this round on the selected date
+        const { data: sessions } = await supabase
+          .from('program_sessions')
+          .select('*')
+          .eq('round_id', round.id)
+          .gte('session_date', dateStr)
+          .lt('session_date', dateStr + 'T23:59:59');
+
+        for (const session of sessions || []) {
+          const sessionDate = new Date(session.session_date);
+          const sessionDateOnly = format(sessionDate, 'yyyy-MM-dd');
+          
+          if (sessionDateOnly === dateStr) {
+            events.push({
+              id: session.id,
+              type: 'session',
+              title: session.title,
+              programSlug,
+              programTitle,
+              time: format(sessionDate, 'h:mm a'),
+              isCompleted: completionSet.has(`session:${session.id}`),
+              meetingLink: session.meeting_link || round.google_meet_link,
+              sessionNumber: session.session_number,
+            });
+          }
+        }
+
+        // 3. Get content unlocks for this date (modules/supplements)
+        if (round.audio_playlist_id) {
+          // Get modules (supplements)
+          const { data: modules } = await supabase
+            .from('playlist_supplements')
+            .select('*')
+            .eq('playlist_id', round.audio_playlist_id);
+
+          for (const module of modules || []) {
+            const unlockDate = getUnlockDate(
+              module.drip_delay_days,
+              round.first_session_date,
+              round.drip_offset_days || 0
+            );
+            
+            if (unlockDate && isSameDay(unlockDate, date)) {
+              events.push({
+                id: module.id,
+                type: 'module',
+                title: module.title,
+                programSlug,
+                programTitle,
+                isCompleted: completionSet.has(`module:${module.id}`),
+                moduleId: module.id,
+                playlistId: round.audio_playlist_id,
+              });
+            }
+          }
+
+          // Get audio tracks
+          const { data: playlistItems } = await supabase
+            .from('audio_playlist_items')
+            .select(`
+              id,
+              drip_delay_days,
+              audio_content (
+                id,
+                title
+              )
+            `)
+            .eq('playlist_id', round.audio_playlist_id);
+
+          for (const item of playlistItems || []) {
+            const unlockDate = getUnlockDate(
+              item.drip_delay_days,
+              round.first_session_date,
+              round.drip_offset_days || 0
+            );
+            
+            const audio = item.audio_content as any;
+            if (unlockDate && isSameDay(unlockDate, date) && audio) {
+              events.push({
+                id: audio.id,
+                type: 'track',
+                title: audio.title,
+                programSlug,
+                programTitle,
+                isCompleted: completionSet.has(`track:${audio.id}`),
+                trackId: audio.id,
+                playlistId: round.audio_playlist_id,
+              });
+            }
+          }
+        }
+      }
+
+      // Sort: sessions with time first, then by time, then modules/tracks
+      events.sort((a, b) => {
+        if (a.type === 'session' && b.type !== 'session') return -1;
+        if (a.type !== 'session' && b.type === 'session') return 1;
+        if (a.time && b.time) return a.time.localeCompare(b.time);
+        return 0;
+      });
+
+      return events;
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+/**
+ * Hook to complete a program event
+ */
+export function useCompleteProgramEvent() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ 
+      eventType, 
+      eventId, 
+      date 
+    }: { 
+      eventType: 'session' | 'module' | 'track'; 
+      eventId: string; 
+      date: Date;
+    }) => {
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('planner_program_completions')
+        .insert({
+          user_id: user.id,
+          event_type: eventType,
+          event_id: eventId,
+          completed_date: format(date, 'yyyy-MM-dd'),
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planner-program-events'] });
+    },
+  });
+}
+
+/**
+ * Hook to uncomplete a program event
+ */
+export function useUncompleteProgramEvent() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ 
+      eventType, 
+      eventId, 
+      date 
+    }: { 
+      eventType: 'session' | 'module' | 'track'; 
+      eventId: string; 
+      date: Date;
+    }) => {
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('planner_program_completions')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('event_type', eventType)
+        .eq('event_id', eventId)
+        .eq('completed_date', format(date, 'yyyy-MM-dd'));
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planner-program-events'] });
+    },
+  });
+}

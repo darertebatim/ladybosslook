@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, isSameDay, isToday } from 'date-fns';
-import { Menu, Plus, Flame } from 'lucide-react';
+import { Menu, Plus, Flame, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   useTasksForDate, 
@@ -10,11 +10,13 @@ import {
   UserTask,
   TaskTemplate,
 } from '@/hooks/useTaskPlanner';
+import { useProgramEventsForDate } from '@/hooks/usePlannerProgramEvents';
 import { TaskCard } from '@/components/app/TaskCard';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
+import { ProgramEventCard } from '@/components/app/ProgramEventCard';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -43,6 +45,7 @@ const AppPlanner = () => {
   const { data: tasks = [], isLoading: tasksLoading, refetch } = useTasksForDate(selectedDate);
   const { data: completions, isLoading: completionsLoading } = useCompletionsForDate(selectedDate);
   const { data: streak } = useUserStreak();
+  const { data: programEvents = [], isLoading: programEventsLoading } = useProgramEventsForDate(selectedDate);
 
   // Generate week days centered on current week
   const weekDays = useMemo(() => {
@@ -93,7 +96,7 @@ const AppPlanner = () => {
     setShowCalendar(false);
   }, []);
 
-  const isLoading = tasksLoading || completionsLoading;
+  const isLoading = tasksLoading || completionsLoading || programEventsLoading;
 
   // Emoji for current day (decorative)
   const todayEmoji = isToday(selectedDate) ? '💎' : '';
@@ -250,7 +253,7 @@ const AppPlanner = () => {
         </div>
       )}
 
-      {/* Task list */}
+      {/* Content area */}
       <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 pb-safe">
         {isLoading ? (
           <div className="space-y-3">
@@ -258,35 +261,71 @@ const AppPlanner = () => {
               <Skeleton key={i} className="h-20 rounded-2xl" />
             ))}
           </div>
-        ) : filteredTasks.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-4xl mb-3">✨</div>
-            <p className="text-muted-foreground mb-4">
-              {selectedTag 
-                ? `No ${selectedTag} tasks for this day` 
-                : 'No tasks for this day'}
-            </p>
-            <button
-              onClick={() => navigate('/app/planner/new')}
-              className="text-violet-600 font-medium"
-            >
-              Add your first task
-            </button>
-          </div>
         ) : (
-          <div className="space-y-3">
-            {filteredTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                date={selectedDate}
-                isCompleted={completedTaskIds.has(task.id)}
-                completedSubtaskIds={completedSubtaskIds}
-                onTap={handleTaskTap}
-                onStreakIncrease={handleStreakIncrease}
-              />
-            ))}
-          </div>
+          <>
+            {/* Program Events Section */}
+            {programEvents.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <CalendarDays className="h-4 w-4 text-indigo-500" />
+                  <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
+                    Program Events
+                  </h2>
+                </div>
+                <div className="space-y-3">
+                  {programEvents.map((event) => (
+                    <ProgramEventCard
+                      key={`${event.type}-${event.id}`}
+                      event={event}
+                      date={selectedDate}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Personal Tasks Section */}
+            {filteredTasks.length === 0 && programEvents.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-4xl mb-3">✨</div>
+                <p className="text-muted-foreground mb-4">
+                  {selectedTag 
+                    ? `No ${selectedTag} tasks for this day` 
+                    : 'No tasks for this day'}
+                </p>
+                <button
+                  onClick={() => navigate('/app/planner/new')}
+                  className="text-violet-600 font-medium"
+                >
+                  Add your first task
+                </button>
+              </div>
+            ) : filteredTasks.length > 0 && (
+              <div>
+                {programEvents.length > 0 && (
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-base">📝</span>
+                    <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
+                      Your Tasks
+                    </h2>
+                  </div>
+                )}
+                <div className="space-y-3">
+                  {filteredTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      date={selectedDate}
+                      isCompleted={completedTaskIds.has(task.id)}
+                      completedSubtaskIds={completedSubtaskIds}
+                      onTap={handleTaskTap}
+                      onStreakIncrease={handleStreakIncrease}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* Extra bottom padding for FAB */}
