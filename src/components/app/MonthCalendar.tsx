@@ -41,16 +41,16 @@ export const MonthCalendar = ({ selectedDate, onDateSelect, onClose }: MonthCale
   };
 
   return (
-    <div className="bg-card rounded-2xl shadow-lg border p-4 mx-4 mb-4 animate-in slide-in-from-top-2 duration-200">
+    <div className="bg-gradient-to-b from-violet-100 to-background px-4 pb-2 animate-in slide-in-from-top-2 duration-200">
       {/* Month navigation */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between py-3">
         <button
           onClick={handlePrevMonth}
           className="p-2 rounded-full hover:bg-muted transition-colors"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <h3 className="text-lg font-semibold">
+        <h3 className="text-base font-semibold">
           {format(currentMonth, 'MMMM yyyy')}
         </h3>
         <button
@@ -62,7 +62,7 @@ export const MonthCalendar = ({ selectedDate, onDateSelect, onClose }: MonthCale
       </div>
 
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-1 mb-1">
         {weekdays.map((weekday) => (
           <div key={weekday} className="text-center text-xs text-muted-foreground font-medium py-1">
             {weekday}
@@ -83,11 +83,11 @@ export const MonthCalendar = ({ selectedDate, onDateSelect, onClose }: MonthCale
               onClick={() => handleSelectDate(dateItem)}
               disabled={!isCurrentMonth}
               className={cn(
-                'h-10 w-full rounded-full flex items-center justify-center text-sm transition-all',
+                'h-9 w-full rounded-full flex items-center justify-center text-sm transition-all',
                 !isCurrentMonth && 'text-muted-foreground/30 cursor-not-allowed',
                 isCurrentMonth && 'hover:bg-muted',
                 isSelected && 'bg-violet-600 text-white hover:bg-violet-700',
-                !isSelected && isTodayDate && isCurrentMonth && 'bg-muted font-semibold'
+                !isSelected && isTodayDate && isCurrentMonth && 'bg-violet-100 font-semibold text-violet-700'
               )}
             >
               {format(dateItem, 'd')}
@@ -96,21 +96,16 @@ export const MonthCalendar = ({ selectedDate, onDateSelect, onClose }: MonthCale
         })}
       </div>
 
-      {/* Quick actions */}
-      <div className="flex gap-2 mt-4 pt-4 border-t">
-        <button
-          onClick={() => handleSelectDate(new Date())}
-          className="flex-1 py-2 text-sm font-medium text-violet-600 hover:bg-violet-50 rounded-lg transition-colors"
-        >
-          Today
-        </button>
-        <button
-          onClick={() => handleSelectDate(addDays(new Date(), 1))}
-          className="flex-1 py-2 text-sm font-medium text-violet-600 hover:bg-violet-50 rounded-lg transition-colors"
-        >
-          Tomorrow
-        </button>
-      </div>
+      {/* Collapse handle */}
+      <button 
+        onClick={onClose}
+        className="w-full flex justify-center pt-3 pb-1"
+      >
+        <div className="flex gap-0.5">
+          <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+          <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
+      </button>
     </div>
   );
 };
