@@ -302,6 +302,9 @@ export default function AppAudioPlayer() {
   // Check if this is the last track in playlist
   const isPlaylistComplete = !hasNextTrack && playlistTracks && currentTrackIndex === playlistTracks.length - 1;
 
+  // Get cover image with playlist fallback
+  const coverImageUrl = audio?.cover_image_url || playlistInfo?.audio_playlists?.cover_image_url;
+
   if (isLoading) {
     return (
       <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
@@ -379,10 +382,10 @@ export default function AppAudioPlayer() {
       />
 
       {/* Blurred Background with Cover Art */}
-      {audio.cover_image_url && (
+      {coverImageUrl && (
         <div className="fixed inset-0 z-0">
           <img
-            src={audio.cover_image_url}
+            src={coverImageUrl}
             alt=""
             className="w-full h-full object-cover scale-110 blur-3xl opacity-30 dark:opacity-20"
           />
@@ -498,9 +501,9 @@ export default function AppAudioPlayer() {
         <div className="max-w-md w-full flex flex-col gap-3">
           {/* Cover Art - Constrained size */}
           <div className="w-full max-w-[220px] mx-auto rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] shrink-0">
-            {audio.cover_image_url ? (
+            {coverImageUrl ? (
               <img
-                src={audio.cover_image_url}
+                src={coverImageUrl}
                 alt={audio.title}
                 className="w-full h-full object-cover"
               />
@@ -532,7 +535,7 @@ export default function AppAudioPlayer() {
               currentTime={currentTime}
               duration={duration}
               onSeek={handleSeek}
-              variant={audio.cover_image_url ? "glass" : "default"}
+              variant={coverImageUrl ? "glass" : "default"}
             />
           </div>
 
@@ -545,7 +548,7 @@ export default function AppAudioPlayer() {
               onSkipForward={handleSkipForward}
               playbackRate={playbackRate}
               onPlaybackRateChange={handlePlaybackRateChange}
-              variant={audio.cover_image_url ? "glass" : "default"}
+              variant={coverImageUrl ? "glass" : "default"}
             />
           </div>
 
