@@ -106,35 +106,35 @@ export interface UpdateTaskInput extends Partial<CreateTaskInput> {
   order_index?: number;
 }
 
-// Color mapping for UI
+// Color mapping for UI - Me+ style vibrant pastels
 export const TASK_COLORS: Record<TaskColor, string> = {
-  pink: 'hsl(350 80% 90%)',
-  peach: 'hsl(25 90% 88%)',
-  yellow: 'hsl(50 95% 85%)',
-  lime: 'hsl(90 65% 85%)',
-  sky: 'hsl(200 85% 88%)',
-  mint: 'hsl(160 60% 85%)',
-  lavender: 'hsl(270 65% 90%)',
-  purple: 'hsl(280 70% 88%)',
-  blue: 'hsl(220 85% 88%)',
-  red: 'hsl(0 80% 90%)',
-  orange: 'hsl(30 90% 88%)',
-  green: 'hsl(140 60% 85%)',
+  pink: 'hsl(330 100% 85%)',      // Vibrant pink like Me+
+  peach: 'hsl(30 100% 82%)',      // Warm peachy orange
+  yellow: 'hsl(48 100% 72%)',     // Bright sunny yellow
+  lime: 'hsl(85 70% 78%)',        // Fresh lime green
+  sky: 'hsl(210 100% 85%)',       // Soft sky blue
+  mint: 'hsl(155 65% 80%)',       // Cool mint
+  lavender: 'hsl(270 80% 88%)',   // Soft lavender
+  purple: 'hsl(280 75% 85%)',     // Light purple
+  blue: 'hsl(220 90% 85%)',       // Bright blue
+  red: 'hsl(0 85% 85%)',          // Soft coral red
+  orange: 'hsl(25 100% 80%)',     // Warm orange
+  green: 'hsl(140 65% 78%)',      // Fresh green
 };
 
 export const TASK_COLOR_CLASSES: Record<TaskColor, string> = {
-  pink: 'bg-pink-100',
-  peach: 'bg-orange-100',
-  yellow: 'bg-yellow-100',
-  lime: 'bg-lime-100',
-  sky: 'bg-sky-100',
-  mint: 'bg-emerald-100',
-  lavender: 'bg-violet-100',
-  purple: 'bg-purple-100',
-  blue: 'bg-blue-100',
-  red: 'bg-red-100',
-  orange: 'bg-amber-100',
-  green: 'bg-green-100',
+  pink: 'bg-[hsl(330,100%,85%)]',
+  peach: 'bg-[hsl(30,100%,82%)]',
+  yellow: 'bg-[hsl(48,100%,72%)]',
+  lime: 'bg-[hsl(85,70%,78%)]',
+  sky: 'bg-[hsl(210,100%,85%)]',
+  mint: 'bg-[hsl(155,65%,80%)]',
+  lavender: 'bg-[hsl(270,80%,88%)]',
+  purple: 'bg-[hsl(280,75%,85%)]',
+  blue: 'bg-[hsl(220,90%,85%)]',
+  red: 'bg-[hsl(0,85%,85%)]',
+  orange: 'bg-[hsl(25,100%,80%)]',
+  green: 'bg-[hsl(140,65%,78%)]',
 };
 
 // ============================================
