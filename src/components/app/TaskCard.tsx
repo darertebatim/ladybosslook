@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Music } from 'lucide-react';
+import { Check, Music, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   UserTask, 
@@ -139,6 +139,17 @@ export const TaskCard = ({
               </p>
             )}
           </div>
+
+          {/* Edit button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onTap?.(task);
+            }}
+            className="w-7 h-7 rounded-full bg-white/60 dark:bg-white/20 flex items-center justify-center shrink-0 hover:bg-white/80 dark:hover:bg-white/30 transition-colors"
+          >
+            <Pencil className="h-3.5 w-3.5 text-foreground/60" />
+          </button>
 
           {/* Checkbox */}
           <button
