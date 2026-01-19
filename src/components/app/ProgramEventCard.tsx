@@ -129,26 +129,26 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          {/* Top line: badge + time + external indicator */}
-          <div className="flex items-center gap-2 text-xs mb-0.5">
+          {/* Top line: time/release + badge centered + external link */}
+          <div className="flex items-center gap-2 text-xs text-foreground/60 mb-0.5">
+            {/* Left: Time or "Anytime" */}
+            <span className="font-semibold text-foreground/70">
+              {event.time || 'Anytime'}
+            </span>
+            
+            {/* Center: Badge */}
             <span className={cn(
-              'px-2 py-0.5 rounded-full text-white font-medium',
+              'px-2 py-0.5 rounded-full text-white font-medium text-[10px]',
               style.badgeColor
             )}>
               {style.badge}
             </span>
-            {event.time && (
-              <span className="text-foreground/60">{event.time}</span>
-            )}
+            
+            {/* External link indicator for today's sessions */}
             {event.type === 'session' && isToday(date) && event.meetingLink && (
               <ExternalLink className="h-3 w-3 text-foreground/50" />
             )}
           </div>
-          
-          {/* Program name */}
-          <p className="text-xs text-foreground/60 truncate mb-0.5">
-            {event.programTitle}
-          </p>
           
           {/* Title */}
           <p className={cn(
@@ -156,6 +156,11 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             event.isCompleted && 'line-through text-foreground/50'
           )}>
             {event.title}
+          </p>
+          
+          {/* Program name - subtle subtitle */}
+          <p className="text-xs text-foreground/50 truncate">
+            {event.programTitle}
           </p>
         </div>
 
