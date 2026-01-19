@@ -476,6 +476,7 @@ export const useUpdateTask = () => {
     mutationFn: async (input: UpdateTaskInput) => {
       const { id, subtasks, ...updates } = input;
 
+      // Update the task
       const { data, error } = await supabase
         .from('user_tasks')
         .update(updates)
@@ -484,11 +485,39 @@ export const useUpdateTask = () => {
         .single();
 
       if (error) throw error;
+
+      // If subtasks are provided, replace existing subtasks
+      if (subtasks !== undefined) {
+        // Delete existing subtasks
+        const { error: deleteError } = await supabase
+          .from('user_subtasks')
+          .delete()
+          .eq('task_id', id);
+
+        if (deleteError) throw deleteError;
+
+        // Insert new subtasks if any
+        if (subtasks.length > 0) {
+          const subtaskData = subtasks.map((title, index) => ({
+            task_id: id,
+            title,
+            order_index: index,
+          }));
+
+          const { error: subtaskError } = await supabase
+            .from('user_subtasks')
+            .insert(subtaskData);
+
+          if (subtaskError) throw subtaskError;
+        }
+      }
+
       return data as UserTask;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['planner-task', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['planner-subtasks', data.id] });
     },
     onError: (error) => {
       console.error('Update task error:', error);
