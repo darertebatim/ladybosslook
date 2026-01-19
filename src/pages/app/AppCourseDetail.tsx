@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft, CalendarPlus, Loader2, Bell, Clock } from 'lucide-react';
+import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft, CalendarPlus, Loader2, Bell, Clock, Lock, FileText, Play } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { downloadICSFile, generateICSFile } from '@/utils/calendar';
 import { addEventToCalendar, addMultipleEventsToCalendar, isCalendarAvailable, CalendarEvent, checkCalendarPermission } from '@/lib/calendarIntegration';
@@ -151,6 +151,24 @@ const AppCourseDetail = () => {
       return data;
     },
     enabled: !!round?.id,
+  });
+
+  // Fetch playlist modules for Content Schedule
+  const { data: playlistModules } = useQuery({
+    queryKey: ['course-modules-schedule', round?.audio_playlist_id],
+    queryFn: async () => {
+      if (!round?.audio_playlist_id) return [];
+      
+      const { data, error } = await supabase
+        .from('playlist_supplements')
+        .select('id, title, type, drip_delay_days')
+        .eq('playlist_id', round.audio_playlist_id)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!round?.audio_playlist_id,
   });
 
   // Fetch unread post count for the round's channel
@@ -496,6 +514,53 @@ const AppCourseDetail = () => {
       session.getDate() === today.getDate()
     );
   };
+
+  // Helper to determine if a date is today
+  const isDateToday = (date: Date) => {
+    const today = new Date();
+    return (
+      date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth() &&
+      date.getDate() === today.getDate()
+    );
+  };
+
+  // Calculate module unlock date based on first_session_date
+  const getModuleUnlockDate = (dripDelayDays: number): Date | null => {
+    if (dripDelayDays === 0) return null; // Immediate availability
+    
+    const firstSessionDate = round?.first_session_date;
+    if (!firstSessionDate) return null; // No drip if no first session date
+    
+    // Parse first session date - supports both date-only and ISO timestamp formats
+    const firstSession = firstSessionDate.includes('T') 
+      ? new Date(firstSessionDate)
+      : new Date(firstSessionDate + 'T00:00:00');
+    
+    // drip_delay_days = 1 means at first session time
+    // drip_delay_days = 2 means 1 day after first session
+    const unlockDate = new Date(firstSession);
+    unlockDate.setDate(unlockDate.getDate() + (dripDelayDays - 1) + (round?.drip_offset_days || 0));
+    
+    return unlockDate;
+  };
+
+  // Get icon for module type
+  const getModuleIcon = (type: string) => {
+    switch (type) {
+      case 'video':
+        return <Play className="h-4 w-4 text-primary" />;
+      case 'audio':
+        return <Music className="h-4 w-4 text-primary" />;
+      case 'pdf':
+      case 'markdown':
+      default:
+        return <FileText className="h-4 w-4 text-primary" />;
+    }
+  };
+
+  // Check if there are any drip-scheduled modules (drip_delay_days > 0)
+  const hasDripModules = playlistModules && playlistModules.some(m => m.drip_delay_days > 0);
 
   // Free enrollment mutation
   const enrollMutation = useMutation({
@@ -1040,6 +1105,85 @@ const AppCourseDetail = () => {
                       );
                     })}
                   </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Content Schedule Card - shows drip unlock timeline */}
+            {hasDripModules && playlistModules && playlistModules.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5" />
+                    Content Schedule
+                    <Badge variant="secondary" className="ml-auto">
+                      {playlistModules.length} modules
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {playlistModules.map((module, index) => {
+                      const unlockDate = getModuleUnlockDate(module.drip_delay_days);
+                      const isAvailable = unlockDate ? new Date() >= unlockDate : true;
+                      const isToday = unlockDate && isDateToday(unlockDate);
+                      
+                      return (
+                        <div 
+                          key={module.id}
+                          className={`flex items-center gap-3 p-3 rounded-lg border ${
+                            !isAvailable 
+                              ? 'bg-muted/50 opacity-60' 
+                              : isToday 
+                                ? 'border-primary bg-primary/5' 
+                                : 'bg-card'
+                          }`}
+                        >
+                          {/* Date Column (or "Now" for drip_delay_days=0) */}
+                          <div className="flex flex-col items-center justify-center w-12 shrink-0">
+                            {unlockDate ? (
+                              <>
+                                <span className="text-xs text-muted-foreground uppercase">
+                                  {format(unlockDate, 'MMM')}
+                                </span>
+                                <span className="text-xl font-bold leading-none">
+                                  {format(unlockDate, 'd')}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-sm font-semibold text-primary">Now</span>
+                            )}
+                          </div>
+                          
+                          {/* Module Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              {getModuleIcon(module.type)}
+                              <p className="font-medium truncate">{module.title}</p>
+                              {isToday && (
+                                <Badge variant="default" className="shrink-0 text-xs">Today</Badge>
+                              )}
+                              {!isAvailable && (
+                                <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground capitalize">
+                              {module.type}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* CTA to open playlist */}
+                  <Button 
+                    className="w-full mt-4" 
+                    onClick={() => navigate(`/app/player/playlist/${round?.audio_playlist_id}`)}
+                  >
+                    <Music className="h-5 w-5 mr-2" />
+                    Open Course Modules
+                  </Button>
                 </CardContent>
               </Card>
             )}
