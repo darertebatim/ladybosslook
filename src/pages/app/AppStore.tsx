@@ -234,13 +234,7 @@ const AppStore = () => {
                         type={program.type}
                         isFree={program.isFree || program.priceAmount === 0}
                         isEnrolled={enrolled}
-                        onClick={() => {
-                          if (enrolled) {
-                            navigate(`/app/course/${program.slug}`);
-                          } else {
-                            handleEnroll(program);
-                          }
-                        }}
+                        onClick={() => navigate(`/app/course/${program.slug}`)}
                       />
                       {isEnrolling && (
                         <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">
