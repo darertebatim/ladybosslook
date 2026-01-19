@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
-import { X, ChevronRight, Plus, Trash2, Music, XCircle } from 'lucide-react';
+import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +24,7 @@ import {
   TASK_COLOR_CLASSES,
 } from '@/hooks/useTaskPlanner';
 import { IconPicker, TaskIcon } from '@/components/app/IconPicker';
+import { PRO_LINK_TYPES, ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
 
 // Color options
 const COLOR_OPTIONS: TaskColor[] = ['pink', 'peach', 'yellow', 'lime', 'sky', 'mint', 'lavender'];
@@ -53,6 +54,8 @@ export interface TaskFormData {
   tag: string | null;
   subtasks: string[];
   linkedPlaylistId: string | null;
+  proLinkType: ProLinkType | null;
+  proLinkValue: string | null;
 }
 
 // Playlist type for the picker
@@ -106,6 +109,8 @@ const AppTaskCreate = ({
   const [subtasks, setSubtasks] = useState<string[]>(initialData?.subtasks || []);
   const [newSubtask, setNewSubtask] = useState('');
   const [linkedPlaylistId, setLinkedPlaylistId] = useState<string | null>(initialData?.linkedPlaylistId ?? null);
+  const [proLinkType, setProLinkType] = useState<ProLinkType | null>(initialData?.proLinkType ?? null);
+  const [proLinkValue, setProLinkValue] = useState<string | null>(initialData?.proLinkValue ?? null);
 
   // Sheet states
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -114,8 +119,12 @@ const AppTaskCreate = ({
   const [showRepeatPicker, setShowRepeatPicker] = useState(false);
   const [showReminderPicker, setShowReminderPicker] = useState(false);
   const [showTagPicker, setShowTagPicker] = useState(false);
+  const [showProLinkPicker, setShowProLinkPicker] = useState(false);
   const [showPlaylistPicker, setShowPlaylistPicker] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
+  
+  // Determine the current pro link config
+  const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
 
   // Fetch playlists for linking
   const { data: playlists = [] } = useQuery({
@@ -169,6 +178,8 @@ const AppTaskCreate = ({
       setTag(initialData.tag ?? null);
       setSubtasks(initialData.subtasks || []);
       setLinkedPlaylistId(initialData.linkedPlaylistId ?? null);
+      setProLinkType(initialData.proLinkType ?? null);
+      setProLinkValue(initialData.proLinkValue ?? null);
     }
   }, [isSheet, initialData, sheetOpen]);
 
@@ -199,6 +210,8 @@ const AppTaskCreate = ({
       
       setTag(existingTask.tag);
       setLinkedPlaylistId(existingTask.linked_playlist_id ?? null);
+      setProLinkType(existingTask.pro_link_type ?? null);
+      setProLinkValue(existingTask.pro_link_value ?? null);
     }
   }, [existingTask, isSheet]);
 
@@ -227,6 +240,8 @@ const AppTaskCreate = ({
         tag,
         subtasks: subtasks.filter(s => s.trim()),
         linkedPlaylistId,
+        proLinkType,
+        proLinkValue,
       });
       return;
     }
@@ -243,7 +258,9 @@ const AppTaskCreate = ({
       reminder_offset: 0,
       tag,
       subtasks: subtasks.filter(s => s.trim()),
-      linked_playlist_id: linkedPlaylistId,
+      linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : linkedPlaylistId,
+      pro_link_type: proLinkType,
+      pro_link_value: proLinkValue,
     };
 
     if (taskId) {
@@ -427,18 +444,26 @@ const AppTaskCreate = ({
           </div>
         </button>
 
-        {/* Link to Playlist */}
+        {/* Pro Task Link */}
         <button
-          onClick={() => setShowPlaylistPicker(true)}
-          className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
+          onClick={() => setShowProLinkPicker(true)}
+          className={cn(
+            "w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted",
+            proLinkType && "bg-violet-50 dark:bg-violet-900/20"
+          )}
         >
           <div className="flex items-center gap-3">
-            <Music className="h-5 w-5 text-emerald-600" />
-            <span className="font-medium">Link Audio</span>
+            <Sparkles className={cn("h-5 w-5", proLinkType ? "text-violet-600" : "text-muted-foreground")} />
+            <span className="font-medium">Pro Task Link</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
-            {selectedPlaylist ? (
-              <span className="truncate max-w-[150px]">{selectedPlaylist.name}</span>
+            {proConfig ? (
+              <span className="flex items-center gap-1.5">
+                <proConfig.icon className="h-4 w-4" />
+                <span className="truncate max-w-[100px]">
+                  {proConfig.label}
+                </span>
+              </span>
             ) : (
               <span>None</span>
             )}
@@ -503,11 +528,113 @@ const AppTaskCreate = ({
         onSelect={setIcon}
       />
 
-      {/* Playlist Picker Sheet */}
+      {/* Pro Task Link Picker Sheet */}
+      <Sheet open={showProLinkPicker} onOpenChange={setShowProLinkPicker}>
+        <SheetContent side="bottom" className="h-[75vh]">
+          <SheetHeader>
+            <SheetTitle>Pro Task Link</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Make this a Pro Task that links directly to an app feature.
+            </p>
+            
+            {/* Clear option */}
+            {proLinkType && (
+              <button
+                onClick={() => {
+                  setProLinkType(null);
+                  setProLinkValue(null);
+                  setLinkedPlaylistId(null);
+                  setShowProLinkPicker(false);
+                }}
+                className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive/20"
+              >
+                <XCircle className="h-5 w-5" />
+                <span>Remove Pro Task link</span>
+              </button>
+            )}
+
+            <ScrollArea className="h-[50vh]">
+              <div className="space-y-2 pr-4">
+                {/* Link type options */}
+                {PRO_LINK_TYPES.map((config) => {
+                  const Icon = config.icon;
+                  const isSelected = proLinkType === config.value;
+                  
+                  return (
+                    <button
+                      key={config.value}
+                      onClick={() => {
+                        setProLinkType(config.value);
+                        if (!config.requiresValue) {
+                          setProLinkValue(null);
+                          setShowProLinkPicker(false);
+                        } else if (config.value === 'playlist') {
+                          // Show playlist picker
+                          setShowProLinkPicker(false);
+                          setShowPlaylistPicker(true);
+                        }
+                      }}
+                      className={cn(
+                        'w-full flex items-center gap-3 p-4 rounded-xl hover:bg-muted/80 text-left',
+                        isSelected && 'bg-violet-100 dark:bg-violet-900/30 ring-2 ring-violet-500'
+                      )}
+                    >
+                      <div className={cn(
+                        'w-10 h-10 rounded-xl flex items-center justify-center',
+                        config.gradientClass
+                      )}>
+                        <Icon className="h-5 w-5 text-foreground/80" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium">{config.label}</p>
+                        <p className="text-xs text-muted-foreground">{config.description}</p>
+                      </div>
+                      {isSelected && (
+                        <span className={cn(
+                          'px-2 py-1 rounded-full text-xs font-medium',
+                          `bg-${config.color}-500/20 text-${config.color}-700 dark:text-${config.color}-300`
+                        )}>
+                          {config.badgeText}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+
+            {/* Value input for link types that need it */}
+            {proLinkType && ['channel', 'program', 'route'].includes(proLinkType) && (
+              <div className="pt-2 border-t space-y-2">
+                <Input
+                  value={proLinkValue || ''}
+                  onChange={(e) => setProLinkValue(e.target.value || null)}
+                  placeholder={
+                    proLinkType === 'channel' ? 'Channel slug (e.g., general)' :
+                    proLinkType === 'program' ? 'Program slug' :
+                    'Route path (e.g., /app/profile)'
+                  }
+                />
+                <Button
+                  onClick={() => setShowProLinkPicker(false)}
+                  className="w-full"
+                  disabled={!proLinkValue}
+                >
+                  Done
+                </Button>
+              </div>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Playlist Picker Sheet (for Pro Task playlist selection) */}
       <Sheet open={showPlaylistPicker} onOpenChange={setShowPlaylistPicker}>
         <SheetContent side="bottom" className="h-[70vh]">
           <SheetHeader>
-            <SheetTitle>Link to Audio</SheetTitle>
+            <SheetTitle>Select Playlist</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <Input
@@ -516,30 +643,20 @@ const AppTaskCreate = ({
               placeholder="Search playlists..."
               className="mb-2"
             />
-            {linkedPlaylistId && (
-              <button
-                onClick={() => {
-                  setLinkedPlaylistId(null);
-                  setShowPlaylistPicker(false);
-                }}
-                className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive/20"
-              >
-                <XCircle className="h-5 w-5" />
-                <span>Remove linked audio</span>
-              </button>
-            )}
             <ScrollArea className="h-[45vh]">
               <div className="space-y-2 pr-4">
                 {filteredPlaylists.map((playlist) => (
                   <button
                     key={playlist.id}
                     onClick={() => {
+                      setProLinkType('playlist');
+                      setProLinkValue(playlist.id);
                       setLinkedPlaylistId(playlist.id);
                       setShowPlaylistPicker(false);
                     }}
                     className={cn(
                       'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
-                      linkedPlaylistId === playlist.id && 'bg-emerald-100 dark:bg-emerald-900/30'
+                      proLinkValue === playlist.id && 'bg-emerald-100 dark:bg-emerald-900/30'
                     )}
                   >
                     {playlist.cover_image_url ? (
