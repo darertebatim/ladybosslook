@@ -92,17 +92,17 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
           }
         } else {
           // Navigate to course detail
-          navigate(`/app/courses/${event.programSlug}`);
+          navigate(`/app/course/${event.programSlug}`);
         }
         break;
       case 'module':
         // Navigate to course detail (modules section)
-        navigate(`/app/courses/${event.programSlug}`);
+        navigate(`/app/course/${event.programSlug}`);
         break;
       case 'track':
         // Navigate to audio player
         if (event.playlistId) {
-          navigate(`/app/player/${event.playlistId}`);
+          navigate(`/app/player/playlist/${event.playlistId}`);
         }
         break;
     }
