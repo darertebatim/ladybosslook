@@ -161,7 +161,7 @@ const AppPlanner = () => {
 
         {/* Week strip - part of fixed header, only show when calendar is collapsed */}
         {!showCalendar && (
-          <div className="px-2 py-3 border-b">
+          <div className="px-4 py-3 border-b">
             <div className="flex justify-between">
               {weekDays.map((day) => {
                 const isSelected = isSameDay(day, selectedDate);
