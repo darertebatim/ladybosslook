@@ -1,14 +1,16 @@
 import { useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isToday } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { Flame } from 'lucide-react';
 
 interface MonthCalendarProps {
   selectedDate: Date;
   currentMonth: Date;
   onDateSelect: (date: Date) => void;
+  completedDates?: Set<string>;
 }
 
-export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect }: MonthCalendarProps) => {
+export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect, completedDates }: MonthCalendarProps) => {
   // Generate all days for the month grid
   const weeks = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
@@ -40,6 +42,8 @@ export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect }: Mont
             const isCurrentMonth = isSameMonth(dateItem, currentMonth);
             const isSelected = isSameDay(dateItem, selectedDate);
             const isTodayDate = isToday(dateItem);
+            const dateStr = format(dateItem, 'yyyy-MM-dd');
+            const hasCompletions = completedDates?.has(dateStr);
 
             return (
               <button
@@ -49,14 +53,17 @@ export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect }: Mont
               >
                 <div
                   className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all',
+                    'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
                     !isCurrentMonth && 'text-muted-foreground/30',
                     isCurrentMonth && !isSelected && !isTodayDate && 'hover:bg-muted/50',
                     isSelected && 'bg-violet-600 text-white shadow-md',
                     !isSelected && isTodayDate && isCurrentMonth && 'bg-violet-100 text-violet-700'
                   )}
                 >
-                  {format(dateItem, 'd')}
+                  {hasCompletions && isCurrentMonth && !isSelected && (
+                    <Flame className="absolute h-7 w-7 text-orange-400 opacity-50" />
+                  )}
+                  <span className="relative z-10">{format(dateItem, 'd')}</span>
                 </div>
               </button>
             );

@@ -1,11 +1,12 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format, addDays, startOfWeek, isSameDay, isToday, startOfMonth, addMonths, subMonths } from 'date-fns';
+import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
 import { Menu, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   useTasksForDate, 
   useCompletionsForDate,
+  useCompletedDates,
   useUserStreak,
   UserTask,
   TaskTemplate,
@@ -55,6 +56,27 @@ const AppPlanner = () => {
     const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
     return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   }, [selectedDate]);
+
+  // Calculate date range for completed dates query
+  const dateRange = useMemo(() => {
+    if (showCalendar) {
+      // For full month calendar, get entire month range
+      return {
+        start: startOfWeek(startOfMonth(currentMonth), { weekStartsOn: 0 }),
+        end: endOfWeek(endOfMonth(currentMonth), { weekStartsOn: 0 }),
+      };
+    } else {
+      // For week view, just get the week range
+      const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
+      return {
+        start: weekStart,
+        end: addDays(weekStart, 6),
+      };
+    }
+  }, [showCalendar, currentMonth, selectedDate]);
+
+  // Fetch completed dates for the visible range
+  const { data: completedDates } = useCompletedDates(dateRange.start, dateRange.end);
 
   // Filter tasks by tag
   const filteredTasks = useMemo(() => {
@@ -117,9 +139,6 @@ const AppPlanner = () => {
   }, [showCalendar, selectedDate]);
 
   const isLoading = tasksLoading || completionsLoading || programEventsLoading;
-
-  // Emoji for current day (decorative)
-  const todayEmoji = isToday(selectedDate) ? '💎' : '';
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -216,6 +235,7 @@ const AppPlanner = () => {
               selectedDate={selectedDate}
               currentMonth={currentMonth}
               onDateSelect={handleDateSelect}
+              completedDates={completedDates}
             />
           ) : (
             // Collapsed: show just 1 week row
@@ -223,6 +243,8 @@ const AppPlanner = () => {
               {weekDays.map((day) => {
                 const isSelected = isSameDay(day, selectedDate);
                 const isTodayDate = isToday(day);
+                const dateStr = format(day, 'yyyy-MM-dd');
+                const hasCompletions = completedDates?.has(dateStr);
                 
                 return (
                   <button
@@ -232,7 +254,7 @@ const AppPlanner = () => {
                   >
                     <div
                       className={cn(
-                        'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all',
+                        'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
                         isSelected
                           ? 'bg-violet-600 text-white shadow-md'
                           : isTodayDate
@@ -240,11 +262,10 @@ const AppPlanner = () => {
                             : 'hover:bg-muted/50'
                       )}
                     >
-                      {isTodayDate && isSelected ? (
-                        <span className="text-base">{todayEmoji || format(day, 'd')}</span>
-                      ) : (
-                        format(day, 'd')
+                      {hasCompletions && !isSelected && (
+                        <Flame className="absolute h-7 w-7 text-orange-400 opacity-50" />
                       )}
+                      <span className="relative z-10">{format(day, 'd')}</span>
                     </div>
                   </button>
                 );
