@@ -1374,6 +1374,7 @@ export type Database = {
           end_date: string | null
           first_session_date: string | null
           first_session_duration: number | null
+          first_session_is_google_meet: boolean | null
           google_drive_link: string | null
           google_meet_link: string | null
           id: string
@@ -1398,6 +1399,7 @@ export type Database = {
           end_date?: string | null
           first_session_date?: string | null
           first_session_duration?: number | null
+          first_session_is_google_meet?: boolean | null
           google_drive_link?: string | null
           google_meet_link?: string | null
           id?: string
@@ -1422,6 +1424,7 @@ export type Database = {
           end_date?: string | null
           first_session_date?: string | null
           first_session_duration?: number | null
+          first_session_is_google_meet?: boolean | null
           google_drive_link?: string | null
           google_meet_link?: string | null
           id?: string

@@ -281,9 +281,19 @@ const AppCourseDetail = () => {
     checkCalendarPrompt();
   }, [enrollment, dbSessions]);
 
-  // Helper to get event location - only returns meeting link, undefined otherwise
+  // Helper to get course page URL for non-Google Meet sessions
+  const getCoursePageUrl = (programSlug: string): string => {
+    return `https://ladybosslook.com/app/courses/${programSlug}`;
+  };
+
+  // Helper to get event location - uses Google Meet link if enabled, otherwise course page
   const getEventLocation = (meetingLink?: string | null): string | undefined => {
-    return meetingLink || undefined;
+    // If first_session_is_google_meet is true (or undefined for backwards compat), use meeting link
+    if ((round as any)?.first_session_is_google_meet !== false) {
+      return meetingLink || round?.google_meet_link || undefined;
+    }
+    // Otherwise, use course page link
+    return getCoursePageUrl(slug || '');
   };
 
   // Helper to get event description - just returns the base description
@@ -482,7 +492,7 @@ const AppCourseDetail = () => {
       description: session.description || `Session ${session.session_number} of ${program.title}`,
       startDate: new Date(session.session_date),
       endDate: new Date(new Date(session.session_date).getTime() + (session.duration_minutes || 90) * 60000),
-      location: session.meeting_link || round?.google_meet_link || undefined,
+      location: getEventLocation(session.meeting_link),
       reminderMinutes: 60,
     };
 
