@@ -240,7 +240,7 @@ export default function AppAudioPlayer() {
       playTrack({
         id: audio.id,
         title: audio.title,
-        coverImageUrl: audio.cover_image_url || undefined,
+        coverImageUrl: audio.cover_image_url || playlistInfo?.audio_playlists?.cover_image_url || undefined,
         playlistId: playlistInfo?.playlist_id,
         playlistName: playlistInfo?.audio_playlists?.name,
         trackPosition: playlistTracks && currentTrackIndex >= 0 
