@@ -65,7 +65,13 @@ function getUnlockDateTime(
 export function useProgramEventsForDate(date: Date) {
   const { user } = useAuth();
   const dateStr = format(date, 'yyyy-MM-dd');
-
+  
+  // Compute local day boundaries in ISO format for timezone-safe session queries
+  // This ensures a session stored as "2026-01-22 01:30:00+00" (UTC) appears on Jan 21 (local)
+  const startOfDayLocal = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+  const endOfDayLocal = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0, 0, 0, 0);
+  const startIso = startOfDayLocal.toISOString();
+  const endIso = endOfDayLocal.toISOString();
   return useQuery({
     queryKey: ['planner-program-events', dateStr, user?.id],
     queryFn: async (): Promise<ProgramEvent[]> => {
@@ -127,31 +133,27 @@ export function useProgramEventsForDate(date: Date) {
         const programTitle = programTitleMap.get(enrollment.program_slug || '') || enrollment.course_name;
         const programSlug = enrollment.program_slug || '';
 
-        // 2. Get live sessions for this round on the selected date
+        // 2. Get live sessions for this round on the selected date (timezone-safe)
         const { data: sessions } = await supabase
           .from('program_sessions')
           .select('*')
           .eq('round_id', round.id)
-          .gte('session_date', dateStr)
-          .lt('session_date', dateStr + 'T23:59:59');
+          .gte('session_date', startIso)
+          .lt('session_date', endIso);
 
         for (const session of sessions || []) {
           const sessionDate = new Date(session.session_date);
-          const sessionDateOnly = format(sessionDate, 'yyyy-MM-dd');
-          
-          if (sessionDateOnly === dateStr) {
-            events.push({
-              id: session.id,
-              type: 'session',
-              title: session.title,
-              programSlug,
-              programTitle,
-              time: format(sessionDate, 'h:mm a'),
-              isCompleted: completionSet.has(`session:${session.id}`),
-              meetingLink: session.meeting_link || round.google_meet_link,
-              sessionNumber: session.session_number,
-            });
-          }
+          events.push({
+            id: session.id,
+            type: 'session',
+            title: session.title,
+            programSlug,
+            programTitle,
+            time: format(sessionDate, 'h:mm a'),
+            isCompleted: completionSet.has(`session:${session.id}`),
+            meetingLink: session.meeting_link || round.google_meet_link,
+            sessionNumber: session.session_number,
+          });
         }
 
         // 3. Get content unlocks for this date (modules/supplements)
