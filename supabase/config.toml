@@ -149,5 +149,8 @@ verify_jwt = true
 [functions.generate-routine-categories-ai]
 verify_jwt = true
 
+[functions.generate-pro-routines-from-templates]
+verify_jwt = true
+
 [functions.generate-pro-task-templates-ai]
 verify_jwt = true

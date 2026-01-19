@@ -97,6 +97,7 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
   const [isUploading, setIsUploading] = useState(false);
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
   const [isAIGenerating, setIsAIGenerating] = useState(false);
+  const [isGeneratingFromTemplates, setIsGeneratingFromTemplates] = useState(false);
   const [aiTheme, setAiTheme] = useState('');
   const [showAIDialog, setShowAIDialog] = useState(false);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
@@ -357,6 +358,25 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
     }
   };
 
+  const handleGenerateFromTemplates = async () => {
+    setIsGeneratingFromTemplates(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-pro-routines-from-templates');
+      if (error) throw error;
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+      toast.success(data.message || `Created ${data.createdCount} Pro Routines`);
+      queryClient.invalidateQueries({ queryKey: ['admin-routine-plans'] });
+    } catch (error) {
+      console.error('Generation error:', error);
+      toast.error('Failed to generate Pro Routines from templates');
+    } finally {
+      setIsGeneratingFromTemplates(false);
+    }
+  };
+
   const proCount = plans?.filter(p => p.is_pro_routine).length || 0;
   const regularCount = plans?.filter(p => !p.is_pro_routine).length || 0;
 
@@ -365,6 +385,20 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
       <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
         <CardTitle>Routine Plans</CardTitle>
         <div className="flex gap-2 flex-wrap">
+          <Button 
+            onClick={handleGenerateFromTemplates} 
+            size="sm" 
+            variant="outline"
+            disabled={isGeneratingFromTemplates}
+            className="text-violet-600 border-violet-200 hover:bg-violet-50 dark:text-violet-400 dark:border-violet-800 dark:hover:bg-violet-950"
+          >
+            {isGeneratingFromTemplates ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4 mr-2" />
+            )}
+            Pro from Templates
+          </Button>
           <Button 
             onClick={() => setShowAIDialog(true)} 
             size="sm" 
