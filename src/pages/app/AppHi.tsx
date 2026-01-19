@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
 import { Menu, Flame, ChevronLeft, ChevronRight, Star, CalendarDays, BookOpen, PenLine } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -24,15 +24,7 @@ const AppHi = () => {
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
 
   // Fetch home data for stats and rounds
-  const { 
-    isLoading: homeLoading,
-    listeningMinutes, 
-    unreadPosts, 
-    completedTracks, 
-    journalStreak,
-    activeRounds,
-    nextSessionMap 
-  } = useNewHomeData();
+  const { data: homeData, isLoading: homeLoading } = useNewHomeData();
 
   // Fetch streak data
   const { data: streak } = useUserStreak();
@@ -91,6 +83,22 @@ const AppHi = () => {
   if (homeLoading) {
     return <HomeSkeleton />;
   }
+
+  const { 
+    listeningMinutes, 
+    unreadPosts, 
+    completedTracks, 
+    journalStreak,
+    activeRounds,
+    nextSessionMap 
+  } = homeData || {
+    listeningMinutes: 0,
+    unreadPosts: 0,
+    completedTracks: 0,
+    journalStreak: 0,
+    activeRounds: [],
+    nextSessionMap: new Map(),
+  };
 
   return (
     <>
