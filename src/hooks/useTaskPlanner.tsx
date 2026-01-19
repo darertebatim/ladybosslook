@@ -82,7 +82,7 @@ export interface UserTag {
   created_at: string;
 }
 
-export type TaskColor = 'pink' | 'peach' | 'yellow' | 'lime' | 'sky' | 'mint' | 'lavender';
+export type TaskColor = 'pink' | 'peach' | 'yellow' | 'lime' | 'sky' | 'mint' | 'lavender' | 'purple' | 'blue' | 'red' | 'orange' | 'green';
 export type RepeatPattern = 'none' | 'daily' | 'weekly' | 'monthly' | 'weekend' | 'custom';
 export type TemplateCategory = 'morning' | 'evening' | 'selfcare' | 'business' | 'wellness';
 
@@ -115,6 +115,11 @@ export const TASK_COLORS: Record<TaskColor, string> = {
   sky: 'hsl(200 85% 88%)',
   mint: 'hsl(160 60% 85%)',
   lavender: 'hsl(270 65% 90%)',
+  purple: 'hsl(280 70% 88%)',
+  blue: 'hsl(220 85% 88%)',
+  red: 'hsl(0 80% 90%)',
+  orange: 'hsl(30 90% 88%)',
+  green: 'hsl(140 60% 85%)',
 };
 
 export const TASK_COLOR_CLASSES: Record<TaskColor, string> = {
@@ -125,6 +130,11 @@ export const TASK_COLOR_CLASSES: Record<TaskColor, string> = {
   sky: 'bg-sky-100',
   mint: 'bg-emerald-100',
   lavender: 'bg-violet-100',
+  purple: 'bg-purple-100',
+  blue: 'bg-blue-100',
+  red: 'bg-red-100',
+  orange: 'bg-amber-100',
+  green: 'bg-green-100',
 };
 
 // ============================================
