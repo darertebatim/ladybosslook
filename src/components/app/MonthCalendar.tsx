@@ -60,8 +60,11 @@ export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect, comple
                     !isSelected && isTodayDate && isCurrentMonth && 'bg-violet-100 text-violet-700'
                   )}
                 >
-                  {hasCompletions && isCurrentMonth && !isSelected && (
-                    <Flame className="absolute h-7 w-7 text-orange-400 opacity-50" />
+                  {hasCompletions && isCurrentMonth && (
+                    <Flame className={cn(
+                      "absolute h-7 w-7",
+                      isSelected ? "text-orange-300 opacity-70" : "text-orange-400 opacity-50"
+                    )} />
                   )}
                   <span className="relative z-10">{format(dateItem, 'd')}</span>
                 </div>

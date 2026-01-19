@@ -286,8 +286,11 @@ const AppPlanner = () => {
                             : 'hover:bg-muted/50'
                       )}
                     >
-                      {hasCompletions && !isSelected && (
-                        <Flame className="absolute h-7 w-7 text-orange-400 opacity-50" />
+                      {hasCompletions && (
+                        <Flame className={cn(
+                          "absolute h-7 w-7",
+                          isSelected ? "text-orange-300 opacity-70" : "text-orange-400 opacity-50"
+                        )} />
                       )}
                       <span className="relative z-10">{format(day, 'd')}</span>
                     </div>
