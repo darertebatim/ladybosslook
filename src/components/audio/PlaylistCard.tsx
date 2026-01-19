@@ -77,6 +77,9 @@ export const PlaylistCard = memo(function PlaylistCard({
           </div>
         )}
         
+        {/* Bottom Gradient for Title Overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        
         {isLocked && (
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
             <Lock className="h-8 w-8 text-muted-foreground" />
@@ -95,9 +98,14 @@ export const PlaylistCard = memo(function PlaylistCard({
           </Badge>
         )}
         
+        {/* Title Overlay */}
+        <h3 className="absolute bottom-2 left-2 right-2 font-semibold text-sm text-white line-clamp-2 drop-shadow-md z-10">
+          {name}
+        </h3>
+        
         {/* Progress overlay at bottom */}
         {!isLocked && progressPercentage > 0 && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted/30">
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted/30 z-20">
             <div 
               className="h-full bg-primary transition-all duration-300"
               style={{ width: `${progressPercentage}%` }}
@@ -107,7 +115,6 @@ export const PlaylistCard = memo(function PlaylistCard({
       </div>
       
       <div className="p-3 space-y-2">
-        <h3 className="font-semibold text-sm line-clamp-2 min-h-[2.5rem]">{name}</h3>
         
         {description && (
           <p className="text-xs text-muted-foreground line-clamp-2">{description}</p>
