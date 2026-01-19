@@ -145,7 +145,7 @@ export const TaskCard = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              navigate(getProTaskNavigationPath(proLinkType!, proLinkValue));
+              navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
             }}
             className={cn(
               'flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold shrink-0 transition-all shadow-sm active:scale-95',

@@ -205,6 +205,9 @@ export default function AppPlaylistDetail() {
     enabled: !!playlistId && !playlist?.is_free,
   });
 
+  // Check if user came from planner (Pro Task navigation)
+  const cameFromPlanner = (location.state as any)?.from === 'planner';
+
   const displayMode = (playlist as any)?.display_mode || 'tracks';
   const hasAccess = playlist?.is_free || enrollments?.includes(playlist?.program_slug);
 
@@ -487,9 +490,9 @@ export default function AppPlaylistDetail() {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="pt-3 pb-2 px-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/app/player')}>
+          <Button variant="ghost" size="sm" onClick={() => navigate(cameFromPlanner ? '/app/planner' : '/app/player')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Library
+            {cameFromPlanner ? 'Planner' : 'Library'}
           </Button>
         </div>
       </div>
