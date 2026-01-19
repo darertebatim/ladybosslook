@@ -35,6 +35,7 @@ export interface EditedTask {
   reminderEnabled?: boolean;
   reminderTime?: string;
   subtasks?: string[];
+  linked_playlist_id?: string | null;
 }
 
 interface RoutinePreviewSheetProps {
@@ -91,6 +92,9 @@ export function RoutinePreviewSheet({
   const handleTaskEditSave = (data: TaskFormData) => {
     if (!editingTaskId) return;
     
+    // Find the original task to preserve linked_playlist_id
+    const originalTask = tasks.find(t => t.id === editingTaskId);
+    
     setEditedTasks(prev => ({
       ...prev,
       [editingTaskId]: {
@@ -104,6 +108,7 @@ export function RoutinePreviewSheet({
         reminderEnabled: data.reminderEnabled,
         reminderTime: data.reminderTime,
         subtasks: data.subtasks,
+        linked_playlist_id: originalTask?.linked_playlist_id ?? null,
       },
     }));
     setShowEditSheet(false);

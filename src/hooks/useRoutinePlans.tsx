@@ -55,6 +55,12 @@ export interface RoutinePlanTask {
   task_order: number;
   is_active: boolean;
   created_at: string;
+  linked_playlist_id: string | null;
+  // Joined data
+  linked_playlist?: {
+    id: string;
+    name: string;
+  } | null;
 }
 
 export interface RoutinePlanRating {
@@ -226,10 +232,13 @@ export function useRoutinePlan(planId: string | undefined) {
 
       if (sectionsError) throw sectionsError;
 
-      // Fetch tasks
+      // Fetch tasks with linked playlist info
       const { data: tasks, error: tasksError } = await supabase
         .from('routine_plan_tasks')
-        .select('*')
+        .select(`
+          *,
+          linked_playlist:audio_playlists!linked_playlist_id(id, name)
+        `)
         .eq('plan_id', planId)
         .eq('is_active', true)
         .order('task_order', { ascending: true });
@@ -333,6 +342,7 @@ export function useAddRoutinePlan() {
         repeatPattern?: 'daily' | 'weekly' | 'monthly' | 'none';
         scheduledTime?: string | null;
         tag?: string | null;
+        linked_playlist_id?: string | null;
       }[];
     }) => {
       if (!user) throw new Error('Must be logged in');
@@ -346,10 +356,13 @@ export function useAddRoutinePlan() {
 
       if (planError) throw planError;
 
-      // Get plan tasks
+      // Get plan tasks with linked playlist info
       const { data: allTasks, error: tasksError } = await supabase
         .from('routine_plan_tasks')
-        .select('*')
+        .select(`
+          *,
+          linked_playlist:audio_playlists!linked_playlist_id(id, name)
+        `)
         .eq('plan_id', planId)
         .eq('is_active', true)
         .order('task_order', { ascending: true });
@@ -386,6 +399,7 @@ export function useAddRoutinePlan() {
             repeat_pattern: edited?.repeatPattern || 'daily',
             scheduled_time: edited?.scheduledTime || null,
             tag: edited?.tag ?? plan.category?.name ?? plan.title,
+            linked_playlist_id: edited?.linked_playlist_id ?? task.linked_playlist_id ?? null,
             is_active: true,
             order_index: startOrderIndex + index,
           };
