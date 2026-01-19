@@ -35,25 +35,56 @@ const REMINDER_TIMES = Array.from({ length: 24 * 4 }, (_, i) => {
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 });
 
-const AppTaskCreate = () => {
+// Data type for sheet mode callback
+export interface TaskFormData {
+  title: string;
+  icon: string;
+  color: TaskColor;
+  scheduledDate: Date;
+  scheduledTime: string | null;
+  repeatEnabled: boolean;
+  repeatPattern: 'daily' | 'weekly' | 'monthly';
+  repeatInterval: number;
+  reminderEnabled: boolean;
+  reminderTime: string;
+  tag: string | null;
+  subtasks: string[];
+}
+
+// Props for sheet mode
+interface AppTaskCreateProps {
+  isSheet?: boolean;
+  sheetOpen?: boolean;
+  onSheetOpenChange?: (open: boolean) => void;
+  initialData?: Partial<TaskFormData>;
+  onSaveSheet?: (data: TaskFormData) => void;
+}
+
+const AppTaskCreate = ({ 
+  isSheet = false, 
+  sheetOpen = false, 
+  onSheetOpenChange, 
+  initialData,
+  onSaveSheet 
+}: AppTaskCreateProps) => {
   const navigate = useNavigate();
   const { taskId } = useParams<{ taskId?: string }>();
-  const isEditing = !!taskId;
+  const isEditing = !!taskId || !!initialData;
   const { effectiveInset, isKeyboardOpen } = useKeyboard();
 
   // Form state
-  const [title, setTitle] = useState('');
-  const [icon, setIcon] = useState('Sun');
-  const [color, setColor] = useState<TaskColor>('yellow');
-  const [scheduledDate, setScheduledDate] = useState<Date>(new Date());
-  const [scheduledTime, setScheduledTime] = useState<string | null>(null);
-  const [repeatEnabled, setRepeatEnabled] = useState(false);
-  const [repeatPattern, setRepeatPattern] = useState<'daily' | 'weekly' | 'monthly'>('daily');
-  const [repeatInterval, setRepeatInterval] = useState(1);
-  const [reminderEnabled, setReminderEnabled] = useState(false);
-  const [reminderTime, setReminderTime] = useState('09:00');
-  const [tag, setTag] = useState<string | null>(null);
-  const [subtasks, setSubtasks] = useState<string[]>([]);
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [icon, setIcon] = useState(initialData?.icon || 'Sun');
+  const [color, setColor] = useState<TaskColor>(initialData?.color || 'yellow');
+  const [scheduledDate, setScheduledDate] = useState<Date>(initialData?.scheduledDate || new Date());
+  const [scheduledTime, setScheduledTime] = useState<string | null>(initialData?.scheduledTime ?? null);
+  const [repeatEnabled, setRepeatEnabled] = useState(initialData?.repeatEnabled ?? false);
+  const [repeatPattern, setRepeatPattern] = useState<'daily' | 'weekly' | 'monthly'>(initialData?.repeatPattern || 'daily');
+  const [repeatInterval, setRepeatInterval] = useState(initialData?.repeatInterval || 1);
+  const [reminderEnabled, setReminderEnabled] = useState(initialData?.reminderEnabled ?? false);
+  const [reminderTime, setReminderTime] = useState(initialData?.reminderTime || '09:00');
+  const [tag, setTag] = useState<string | null>(initialData?.tag ?? null);
+  const [subtasks, setSubtasks] = useState<string[]>(initialData?.subtasks || []);
   const [newSubtask, setNewSubtask] = useState('');
 
   // Sheet states
@@ -64,20 +95,38 @@ const AppTaskCreate = () => {
   const [showReminderPicker, setShowReminderPicker] = useState(false);
   const [showTagPicker, setShowTagPicker] = useState(false);
 
-  // Mutations
+  // Mutations (only used in page mode)
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
 
-  // Load existing task data for editing
-  const { data: existingTask } = useTask(taskId);
-  const { data: existingSubtasks } = useSubtasks(taskId);
+  // Load existing task data for editing (page mode only)
+  const { data: existingTask } = useTask(isSheet ? undefined : taskId);
+  const { data: existingSubtasks } = useSubtasks(isSheet ? undefined : taskId);
   const { data: userTags = [] } = useUserTags();
   const createTag = useCreateTag();
 
-  // Populate form when editing
+  // Reset form when initialData changes (sheet mode)
   useEffect(() => {
-    if (existingTask) {
+    if (isSheet && initialData) {
+      setTitle(initialData.title || '');
+      setIcon(initialData.icon || 'Sun');
+      setColor(initialData.color || 'yellow');
+      setScheduledDate(initialData.scheduledDate || new Date());
+      setScheduledTime(initialData.scheduledTime ?? null);
+      setRepeatEnabled(initialData.repeatEnabled ?? (initialData.repeatPattern ? initialData.repeatPattern !== 'none' : false));
+      setRepeatPattern(initialData.repeatPattern && initialData.repeatPattern !== 'none' as any ? initialData.repeatPattern : 'daily');
+      setRepeatInterval(initialData.repeatInterval || 1);
+      setReminderEnabled(initialData.reminderEnabled ?? false);
+      setReminderTime(initialData.reminderTime || '09:00');
+      setTag(initialData.tag ?? null);
+      setSubtasks(initialData.subtasks || []);
+    }
+  }, [isSheet, initialData, sheetOpen]);
+
+  // Populate form when editing (page mode)
+  useEffect(() => {
+    if (!isSheet && existingTask) {
       setTitle(existingTask.title);
       setIcon(existingTask.emoji);
       setColor(existingTask.color as TaskColor);
@@ -102,17 +151,37 @@ const AppTaskCreate = () => {
       
       setTag(existingTask.tag);
     }
-  }, [existingTask]);
+  }, [existingTask, isSheet]);
 
   useEffect(() => {
-    if (existingSubtasks) {
+    if (!isSheet && existingSubtasks) {
       setSubtasks(existingSubtasks.map(s => s.title));
     }
-  }, [existingSubtasks]);
+  }, [existingSubtasks, isSheet]);
 
   const handleSubmit = async () => {
     if (!title.trim()) return;
 
+    // Sheet mode - return data via callback
+    if (isSheet && onSaveSheet) {
+      onSaveSheet({
+        title: title.trim(),
+        icon,
+        color,
+        scheduledDate,
+        scheduledTime,
+        repeatEnabled,
+        repeatPattern,
+        repeatInterval,
+        reminderEnabled,
+        reminderTime,
+        tag,
+        subtasks: subtasks.filter(s => s.trim()),
+      });
+      return;
+    }
+
+    // Page mode - save to database
     const taskData = {
       title: title.trim(),
       emoji: icon,
@@ -126,7 +195,7 @@ const AppTaskCreate = () => {
       subtasks: subtasks.filter(s => s.trim()),
     };
 
-    if (isEditing && taskId) {
+    if (taskId) {
       await updateTask.mutateAsync({ id: taskId, ...taskData });
     } else {
       await createTask.mutateAsync(taskData);
@@ -140,6 +209,14 @@ const AppTaskCreate = () => {
     
     if (confirm('Delete this task?')) {
       await deleteTask.mutateAsync(taskId);
+      navigate('/app/planner');
+    }
+  };
+
+  const handleClose = () => {
+    if (isSheet && onSheetOpenChange) {
+      onSheetOpenChange(false);
+    } else {
       navigate('/app/planner');
     }
   };
@@ -184,196 +261,170 @@ const AppTaskCreate = () => {
     return `Every ${intervalText}${patternText}`;
   };
 
-  return (
-    <div 
-      className="flex flex-col min-h-screen bg-background"
-      style={{ paddingBottom: isKeyboardOpen ? effectiveInset : 0 }}
-    >
-      {/* Header - iOS Standard */}
-      <header 
-        className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur border-b"
-        style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
-      >
-        <div className="flex items-center justify-between px-4 h-12">
-          <button onClick={() => navigate('/app/planner')} className="p-2 -ml-2">
-            <X className="h-5 w-5" />
-          </button>
-          <h1 className="text-lg font-semibold">
-            {isEditing ? 'Edit Task' : 'New Task'}
-          </h1>
-          <Button
-            onClick={handleSubmit}
-            disabled={!title.trim() || createTask.isPending || updateTask.isPending}
-            size="sm"
-            className="bg-violet-600 hover:bg-violet-700"
-          >
-            {isEditing ? 'Save' : 'Create'}
-          </Button>
-        </div>
-      </header>
-
-      {/* Spacer for fixed header */}
-      <div style={{ height: 'calc(48px + max(12px, env(safe-area-inset-top)))' }} />
-
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain">
-        {/* Icon & Title */}
-        <div className="p-6 text-center border-b">
-          <button
-            onClick={() => setShowIconPicker(true)}
-            className="w-20 h-20 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4 hover:bg-muted transition-colors active:scale-95"
-          >
-            <TaskIcon iconName={icon} size={36} className="text-foreground/80" />
-          </button>
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value.slice(0, 50))}
-            placeholder="Task name"
-            className="text-center text-lg border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50"
-            maxLength={50}
-          />
-          <span className="text-xs text-muted-foreground">{title.length}/50</span>
-        </div>
-
-        {/* Color picker */}
-        <div className="p-4 border-b">
-          <div className="flex justify-center gap-3">
-            {COLOR_OPTIONS.map((c) => (
-              <button
-                key={c}
-                onClick={() => setColor(c)}
-                className={cn(
-                  'w-8 h-8 rounded-full transition-all',
-                  TASK_COLOR_CLASSES[c],
-                  color === c && 'ring-2 ring-offset-2 ring-foreground scale-110'
-                )}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Settings list */}
-        <div className="divide-y">
-          {/* Date */}
-          <button
-            onClick={() => setShowDatePicker(true)}
-            className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-lg">📅</span>
-              <span className="font-medium">Date</span>
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <span>{format(scheduledDate, 'MMM d, yyyy')}</span>
-              <ChevronRight className="h-4 w-4" />
-            </div>
-          </button>
-
-          {/* Repeat */}
-          <button
-            onClick={() => setShowRepeatPicker(true)}
-            className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-lg">🔄</span>
-              <span className="font-medium">Repeat</span>
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <span>{getRepeatSummary()}</span>
-              <ChevronRight className="h-4 w-4" />
-            </div>
-          </button>
-
-          {/* Time */}
-          <button
-            onClick={() => setShowTimePicker(true)}
-            className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-lg">⏰</span>
-              <span className="font-medium">Time</span>
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <span>{formatTimeDisplay(scheduledTime)}</span>
-              <ChevronRight className="h-4 w-4" />
-            </div>
-          </button>
-
-          {/* Reminder */}
-          <button
-            onClick={() => setShowReminderPicker(true)}
-            className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-lg">🔔</span>
-              <span className="font-medium">Reminder</span>
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <span>{reminderEnabled ? formatReminderTimeDisplay(reminderTime) : 'Off'}</span>
-              <ChevronRight className="h-4 w-4" />
-            </div>
-          </button>
-
-          {/* Tag */}
-          <button
-            onClick={() => setShowTagPicker(true)}
-            className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-lg">🏷️</span>
-              <span className="font-medium">Tag</span>
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <span className="capitalize">{tag || 'None'}</span>
-              <ChevronRight className="h-4 w-4" />
-            </div>
-          </button>
-        </div>
-
-        {/* Subtasks */}
-        <div className="p-4 border-t">
-          <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">Subtasks</h3>
-          
-          {subtasks.map((subtask, index) => (
-            <div key={index} className="flex items-center gap-3 mb-3 bg-muted/50 rounded-xl px-4 py-3">
-              <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 shrink-0" />
-              <span className="flex-1">{subtask}</span>
-              <button onClick={() => removeSubtask(index)} className="p-1">
-                <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-              </button>
-            </div>
-          ))}
-
-          <div className="flex items-center gap-3 bg-muted/30 rounded-xl px-4 py-3">
-            <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
-            <Input
-              value={newSubtask}
-              onChange={(e) => setNewSubtask(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && addSubtask()}
-              placeholder="Add subtask"
-              className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto"
-            />
-          </div>
-        </div>
-
-        {/* Delete button (edit mode only) */}
-        {isEditing && (
-          <div className="p-4 border-t">
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              className="w-full"
-              disabled={deleteTask.isPending}
-            >
-              Delete Task
-            </Button>
-          </div>
-        )}
-
-        {/* Bottom safe area */}
-        <div className="pb-safe" />
+  // The main content (shared between page and sheet modes)
+  const content = (
+    <>
+      {/* Icon & Title */}
+      <div className="p-6 text-center border-b">
+        <button
+          onClick={() => setShowIconPicker(true)}
+          className="w-20 h-20 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4 hover:bg-muted transition-colors active:scale-95"
+        >
+          <TaskIcon iconName={icon} size={36} className="text-foreground/80" />
+        </button>
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value.slice(0, 50))}
+          placeholder="Task name"
+          className="text-center text-lg border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50"
+          maxLength={50}
+        />
+        <span className="text-xs text-muted-foreground">{title.length}/50</span>
       </div>
 
+      {/* Color picker */}
+      <div className="p-4 border-b">
+        <div className="flex justify-center gap-3">
+          {COLOR_OPTIONS.map((c) => (
+            <button
+              key={c}
+              onClick={() => setColor(c)}
+              className={cn(
+                'w-8 h-8 rounded-full transition-all',
+                TASK_COLOR_CLASSES[c],
+                color === c && 'ring-2 ring-offset-2 ring-foreground scale-110'
+              )}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Settings list */}
+      <div className="divide-y">
+        {/* Date */}
+        <button
+          onClick={() => setShowDatePicker(true)}
+          className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-lg">📅</span>
+            <span className="font-medium">Date</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span>{format(scheduledDate, 'MMM d, yyyy')}</span>
+            <ChevronRight className="h-4 w-4" />
+          </div>
+        </button>
+
+        {/* Repeat */}
+        <button
+          onClick={() => setShowRepeatPicker(true)}
+          className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-lg">🔄</span>
+            <span className="font-medium">Repeat</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span>{getRepeatSummary()}</span>
+            <ChevronRight className="h-4 w-4" />
+          </div>
+        </button>
+
+        {/* Time */}
+        <button
+          onClick={() => setShowTimePicker(true)}
+          className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-lg">⏰</span>
+            <span className="font-medium">Time</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span>{formatTimeDisplay(scheduledTime)}</span>
+            <ChevronRight className="h-4 w-4" />
+          </div>
+        </button>
+
+        {/* Reminder */}
+        <button
+          onClick={() => setShowReminderPicker(true)}
+          className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-lg">🔔</span>
+            <span className="font-medium">Reminder</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span>{reminderEnabled ? formatReminderTimeDisplay(reminderTime) : 'Off'}</span>
+            <ChevronRight className="h-4 w-4" />
+          </div>
+        </button>
+
+        {/* Tag */}
+        <button
+          onClick={() => setShowTagPicker(true)}
+          className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-lg">🏷️</span>
+            <span className="font-medium">Tag</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="capitalize">{tag || 'None'}</span>
+            <ChevronRight className="h-4 w-4" />
+          </div>
+        </button>
+      </div>
+
+      {/* Subtasks */}
+      <div className="p-4 border-t">
+        <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">Subtasks</h3>
+        
+        {subtasks.map((subtask, index) => (
+          <div key={index} className="flex items-center gap-3 mb-3 bg-muted/50 rounded-xl px-4 py-3">
+            <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 shrink-0" />
+            <span className="flex-1">{subtask}</span>
+            <button onClick={() => removeSubtask(index)} className="p-1">
+              <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+            </button>
+          </div>
+        ))}
+
+        <div className="flex items-center gap-3 bg-muted/30 rounded-xl px-4 py-3">
+          <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
+          <Input
+            value={newSubtask}
+            onChange={(e) => setNewSubtask(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && addSubtask()}
+            placeholder="Add subtask"
+            className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto"
+          />
+        </div>
+      </div>
+
+      {/* Delete button (edit mode only, page mode only) */}
+      {!isSheet && taskId && (
+        <div className="p-4 border-t">
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            className="w-full"
+            disabled={deleteTask.isPending}
+          >
+            Delete Task
+          </Button>
+        </div>
+      )}
+
+      {/* Bottom safe area */}
+      <div className="pb-safe" />
+    </>
+  );
+
+  // Picker sheets (shared between modes)
+  const pickerSheets = (
+    <>
       {/* Icon Picker */}
       <IconPicker
         open={showIconPicker}
@@ -636,6 +687,86 @@ const AppTaskCreate = () => {
           </div>
         </SheetContent>
       </Sheet>
+    </>
+  );
+
+  // Sheet mode - render inside a Sheet
+  if (isSheet) {
+    return (
+      <>
+        <Sheet open={sheetOpen} onOpenChange={onSheetOpenChange}>
+          <SheetContent 
+            side="bottom" 
+            className="h-[90vh] rounded-t-3xl px-0"
+            hideCloseButton
+          >
+            <div className="flex flex-col h-full">
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
+                <button onClick={handleClose} className="p-2 -ml-2">
+                  <X className="h-5 w-5" />
+                </button>
+                <h1 className="text-lg font-semibold">Edit Task</h1>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!title.trim()}
+                  size="sm"
+                  className="bg-violet-600 hover:bg-violet-700"
+                >
+                  Save
+                </Button>
+              </div>
+
+              {/* Scrollable content */}
+              <div className="flex-1 overflow-y-auto overscroll-contain">
+                {content}
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+        {pickerSheets}
+      </>
+    );
+  }
+
+  // Page mode - render as full page
+  return (
+    <div 
+      className="flex flex-col min-h-screen bg-background"
+      style={{ paddingBottom: isKeyboardOpen ? effectiveInset : 0 }}
+    >
+      {/* Header - iOS Standard */}
+      <header 
+        className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur border-b"
+        style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
+      >
+        <div className="flex items-center justify-between px-4 h-12">
+          <button onClick={handleClose} className="p-2 -ml-2">
+            <X className="h-5 w-5" />
+          </button>
+          <h1 className="text-lg font-semibold">
+            {taskId ? 'Edit Task' : 'New Task'}
+          </h1>
+          <Button
+            onClick={handleSubmit}
+            disabled={!title.trim() || createTask.isPending || updateTask.isPending}
+            size="sm"
+            className="bg-violet-600 hover:bg-violet-700"
+          >
+            {taskId ? 'Save' : 'Create'}
+          </Button>
+        </div>
+      </header>
+
+      {/* Spacer for fixed header */}
+      <div style={{ height: 'calc(48px + max(12px, env(safe-area-inset-top)))' }} />
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto overscroll-contain">
+        {content}
+      </div>
+
+      {pickerSheets}
     </div>
   );
 };
