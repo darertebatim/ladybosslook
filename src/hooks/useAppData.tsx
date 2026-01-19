@@ -61,6 +61,7 @@ interface HomeData {
 
 interface CoursesData {
   enrollments: any[];
+  nextSessionMap: Map<string, string>;
 }
 
 interface PlayerData {
@@ -211,23 +212,61 @@ export function useHomeData() {
 }
 
 // ============ COURSES PAGE DATA ============
-async function fetchCoursesData(userId: string): Promise<CoursesData> {
+interface CoursesDataExtended {
+  enrollments: any[];
+  nextSessionMap: Map<string, string>;
+}
+
+async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
   const { data, error } = await supabase
     .from('course_enrollments')
     .select(`
       *,
       program_rounds (
+        id,
         round_name,
         round_number,
         start_date,
-        status
+        end_date,
+        first_session_date,
+        status,
+        video_url,
+        important_message
       )
     `)
     .eq('user_id', userId)
     .order('enrolled_at', { ascending: false });
 
   if (error) throw error;
-  return { enrollments: data || [] };
+  
+  const enrollments = data || [];
+  
+  // Get all round IDs to fetch next sessions
+  const roundIds = enrollments
+    .map(e => e.program_rounds?.id)
+    .filter((id): id is string => Boolean(id));
+  
+  // Fetch next upcoming session for each round
+  let nextSessionMap = new Map<string, string>();
+  if (roundIds.length > 0) {
+    const { data: sessions } = await supabase
+      .from('program_sessions')
+      .select('round_id, session_date')
+      .in('round_id', roundIds)
+      .gt('session_date', new Date().toISOString())
+      .order('session_date', { ascending: true });
+    
+    // Build map with first (soonest) session per round
+    if (sessions) {
+      for (const session of sessions) {
+        if (!nextSessionMap.has(session.round_id)) {
+          nextSessionMap.set(session.round_id, session.session_date);
+        }
+      }
+    }
+  }
+  
+  return { enrollments, nextSessionMap };
 }
 
 export function useCoursesData() {
@@ -256,6 +295,7 @@ export function useCoursesData() {
   return {
     ...query,
     enrollments: query.data?.enrollments || [],
+    nextSessionMap: query.data?.nextSessionMap || new Map<string, string>(),
   };
 }
 
