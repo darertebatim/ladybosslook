@@ -176,7 +176,7 @@ export const TaskDetailModal = ({
               <Button
                 onClick={() => {
                   onClose();
-                  navigate(getProTaskNavigationPath(proLinkType!, proLinkValue));
+                  navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
                 }}
                 className={cn('w-full gap-2', proConfig.buttonClass)}
               >
