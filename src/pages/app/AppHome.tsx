@@ -204,7 +204,7 @@ const AppHome = () => {
           {hasUnseenCourses && (
             <Alert 
               className="border-primary bg-primary/10 cursor-pointer hover:bg-primary/15 transition-colors" 
-              onClick={() => navigate('/app/courses')}
+              onClick={() => navigate('/app/programs')}
             >
               <div className="flex items-center gap-3">
                 <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
@@ -235,7 +235,7 @@ const AppHome = () => {
               
               {/* My Courses Quick Action */}
               <div 
-                onClick={() => navigate('/app/courses')}
+                onClick={() => navigate('/app/programs')}
                 className="bg-muted/50 border rounded-xl p-4 cursor-pointer hover:bg-muted transition-all"
               >
                 <div className="flex items-center gap-4">
@@ -243,9 +243,9 @@ const AppHome = () => {
                     <BookOpen className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">My Courses</h3>
+                    <h3 className="font-semibold text-foreground">My Programs</h3>
                     <p className="text-sm text-muted-foreground">
-                      {enrollments?.length || 0} enrolled course{(enrollments?.length || 0) !== 1 ? 's' : ''}
+                      {enrollments?.length || 0} enrolled program{(enrollments?.length || 0) !== 1 ? 's' : ''}
                     </p>
                   </div>
                   <ArrowRight className="h-5 w-5 text-muted-foreground" />

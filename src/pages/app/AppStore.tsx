@@ -115,7 +115,7 @@ const AppStore = () => {
         // Invalidate ALL enrollment-related caches atomically
         invalidateAllEnrollmentData();
         
-        navigate('/app/courses');
+        navigate('/app/programs');
       }
     } finally {
       setEnrollingSlug(null);

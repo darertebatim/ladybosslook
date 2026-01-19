@@ -24,7 +24,7 @@ interface NotificationFormProps {
 // Common in-app link options
 const IN_APP_LINKS = [
   { value: '/app/home', label: 'Home' },
-  { value: '/app/courses', label: 'My Courses' },
+  { value: '/app/programs', label: 'My Programs' },
   { value: '/app/browse', label: 'Browse Store' },
   { value: '/app/player', label: 'Audio Player' },
   { value: '/app/chat', label: 'Support Chat' },

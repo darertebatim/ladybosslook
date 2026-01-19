@@ -802,12 +802,12 @@ const AppProfile = () => {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
-                My Courses
+                My Programs
               </CardTitle>
               <CardDescription>Your enrolled programs</CardDescription>
             </div>
             <Button variant="ghost" size="sm" asChild>
-              <Link to="/app/courses">
+              <Link to="/app/programs">
                 View All
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Link>
