@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Heart, Lightbulb, Loader2 } from 'lucide-react';
+import { Search, Heart, Lightbulb, Loader2, Music, Headphones } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
@@ -11,6 +11,7 @@ import {
   useRoutinePlans,
   useFeaturedPlans,
   usePopularPlans,
+  useAudioRoutinePlans,
 } from '@/hooks/useRoutinePlans';
 
 export default function AppInspire() {
@@ -22,6 +23,7 @@ export default function AppInspire() {
   const { data: categories, isLoading: categoriesLoading } = useRoutineCategories();
   const { data: featuredPlans } = useFeaturedPlans();
   const { data: popularPlans, isLoading: popularLoading } = usePopularPlans();
+  const { data: audioPlans } = useAudioRoutinePlans();
   const { data: filteredPlans, isLoading: plansLoading } = useRoutinePlans(
     selectedCategory || undefined
   );
@@ -84,6 +86,34 @@ export default function AppInspire() {
           {featuredPlans && featuredPlans.length > 0 && !selectedCategory && !searchQuery && (
             <div className="px-4 pt-4">
               <InspireBanner plans={featuredPlans} />
+            </div>
+          )}
+
+          {/* Audio Routines Section */}
+          {audioPlans && audioPlans.length > 0 && !selectedCategory && !searchQuery && (
+            <div className="mt-5">
+              <div className="flex items-center gap-2 px-4 mb-3">
+                <Headphones className="w-4 h-4 text-emerald-500" />
+                <h2 className="text-sm font-semibold text-muted-foreground">
+                  AUDIO ROUTINES
+                </h2>
+              </div>
+              <ScrollArea className="w-full">
+                <div className="flex gap-3 px-4 pb-2">
+                  {audioPlans.map((plan) => (
+                    <div key={plan.id} className="w-40 shrink-0 relative">
+                      <div className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shadow-md">
+                        <Music className="h-3 w-3 text-white" />
+                      </div>
+                      <RoutinePlanCard
+                        plan={plan}
+                        onClick={() => navigate(`/app/inspire/${plan.id}`)}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <ScrollBar orientation="horizontal" className="invisible" />
+              </ScrollArea>
             </div>
           )}
 
