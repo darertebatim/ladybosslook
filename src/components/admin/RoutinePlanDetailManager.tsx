@@ -61,6 +61,8 @@ interface Task {
   task_order: number;
   is_active: boolean;
   linked_playlist_id: string | null;
+  pro_link_type: string | null;
+  pro_link_value: string | null;
   linked_playlist?: {
     id: string;
     name: string;
@@ -111,6 +113,8 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
     task_order: 0,
     is_active: true,
     linked_playlist_id: null as string | null,
+    pro_link_type: null as string | null,
+    pro_link_value: null as string | null,
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -373,6 +377,8 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
       task_order: (tasks?.length || 0) + 1,
       is_active: true,
       linked_playlist_id: null,
+      pro_link_type: null,
+      pro_link_value: null,
     });
     setIsTaskDialogOpen(true);
   };
@@ -386,6 +392,8 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
       task_order: task.task_order,
       is_active: task.is_active,
       linked_playlist_id: task.linked_playlist_id,
+      pro_link_type: task.pro_link_type,
+      pro_link_value: task.pro_link_value,
     });
     setIsTaskDialogOpen(true);
   };

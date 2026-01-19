@@ -26,6 +26,9 @@ export interface UserTask {
   created_at: string;
   updated_at: string;
   linked_playlist_id: string | null;
+  // Pro Task fields
+  pro_link_type: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
+  pro_link_value: string | null;
   // Joined data (optional, populated by queries)
   linked_playlist?: {
     id: string;
@@ -106,6 +109,8 @@ export interface CreateTaskInput {
   tag?: string | null;
   subtasks?: string[];
   linked_playlist_id?: string | null;
+  pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
+  pro_link_value?: string | null;
 }
 
 export interface UpdateTaskInput extends Partial<CreateTaskInput> {
@@ -113,6 +118,8 @@ export interface UpdateTaskInput extends Partial<CreateTaskInput> {
   is_active?: boolean;
   order_index?: number;
   linked_playlist_id?: string | null;
+  pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
+  pro_link_value?: string | null;
 }
 
 // Color mapping for UI - Me+ style vibrant pastels
@@ -432,6 +439,8 @@ export const useCreateTask = () => {
           reminder_offset: taskData.reminder_offset || 0,
           tag: taskData.tag || null,
           linked_playlist_id: taskData.linked_playlist_id || null,
+          pro_link_type: taskData.pro_link_type || null,
+          pro_link_value: taskData.pro_link_value || null,
         })
         .select()
         .single();

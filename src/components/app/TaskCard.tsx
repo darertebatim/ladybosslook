@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Music, Pencil } from 'lucide-react';
+import { Check, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   UserTask, 
@@ -12,6 +12,7 @@ import {
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { TaskIcon } from './IconPicker';
+import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 
 interface TaskCardProps {
   task: UserTask;
@@ -41,9 +42,11 @@ export const TaskCard = ({
   const totalSubtasks = subtasks.length;
   const hasSubtasks = totalSubtasks > 0;
   
-  // Check if this task is linked to a playlist
-  const isLinkedTask = !!task.linked_playlist_id;
-  const linkedPlaylist = task.linked_playlist;
+  // Check if this is a Pro Task (has pro_link_type or legacy linked_playlist_id)
+  const isProTask = !!task.pro_link_type || !!task.linked_playlist_id;
+  const proLinkType: ProLinkType | null = task.pro_link_type || (task.linked_playlist_id ? 'playlist' : null);
+  const proLinkValue = task.pro_link_value || task.linked_playlist_id;
+  const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
 
   // Format time display
   const formatTime = (time: string | null) => {
@@ -82,9 +85,9 @@ export const TaskCard = ({
   };
 
   const handleCardClick = () => {
-    // If linked to playlist, navigate to player
-    if (isLinkedTask && task.linked_playlist_id) {
-      navigate(`/app/player/playlist/${task.linked_playlist_id}`);
+    // If Pro Task, navigate to the linked feature
+    if (isProTask && proLinkType && proLinkValue !== undefined) {
+      navigate(getProTaskNavigationPath(proLinkType, proLinkValue));
       return;
     }
     
@@ -96,30 +99,34 @@ export const TaskCard = ({
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
 
-  // Linked playlist task - special styling
-  if (isLinkedTask) {
+  // Pro Task - special styling with dynamic config
+  if (isProTask && proConfig) {
+    const ProIcon = proConfig.icon;
     return (
       <div
         onClick={handleCardClick}
         className={cn(
           'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-          'bg-gradient-to-br from-emerald-100 to-green-100 dark:from-emerald-900/40 dark:to-green-900/40',
+          proConfig.gradientClass,
           isCompleted && 'opacity-60'
         )}
       >
         {/* Main row */}
         <div className="flex items-center gap-3">
-          {/* Music icon circle */}
+          {/* Icon circle */}
           <div className="w-11 h-11 rounded-full bg-white/90 dark:bg-white/20 flex items-center justify-center shrink-0 shadow-sm">
-            <Music className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <ProIcon className={cn('h-5 w-5', `text-${proConfig.color}-600 dark:text-${proConfig.color}-400`)} />
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            {/* Top line: Listen badge + time */}
+            {/* Top line: Badge + time */}
             <div className="flex items-center gap-2 text-xs mb-0.5">
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-medium">
-                Listen
+              <span className={cn(
+                'px-2 py-0.5 rounded-full font-medium',
+                `bg-${proConfig.color}-500/20 text-${proConfig.color}-700 dark:text-${proConfig.color}-300`
+              )}>
+                {proConfig.badgeText}
               </span>
               <span className="text-foreground/60">{formatTime(task.scheduled_time)}</span>
             </div>
@@ -132,10 +139,10 @@ export const TaskCard = ({
               {task.title}
             </p>
             
-            {/* Playlist name subtitle */}
-            {linkedPlaylist?.name && (
+            {/* Linked content name subtitle */}
+            {proLinkType === 'playlist' && task.linked_playlist?.name && (
               <p className="text-xs text-foreground/60 truncate mt-0.5">
-                {linkedPlaylist.name}
+                {task.linked_playlist.name}
               </p>
             )}
           </div>

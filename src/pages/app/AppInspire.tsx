@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Heart, Lightbulb, Loader2, Music, Headphones } from 'lucide-react';
+import { Search, Heart, Lightbulb, Loader2, Sparkles } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
@@ -11,7 +11,7 @@ import {
   useRoutinePlans,
   useFeaturedPlans,
   usePopularPlans,
-  useAudioRoutinePlans,
+  useProRoutinePlans,
 } from '@/hooks/useRoutinePlans';
 
 export default function AppInspire() {
@@ -23,7 +23,7 @@ export default function AppInspire() {
   const { data: categories, isLoading: categoriesLoading } = useRoutineCategories();
   const { data: featuredPlans } = useFeaturedPlans();
   const { data: popularPlans, isLoading: popularLoading } = usePopularPlans();
-  const { data: audioPlans } = useAudioRoutinePlans();
+  const { data: proPlans } = useProRoutinePlans();
   const { data: filteredPlans, isLoading: plansLoading } = useRoutinePlans(
     selectedCategory || undefined
   );
@@ -89,21 +89,21 @@ export default function AppInspire() {
             </div>
           )}
 
-          {/* Audio Routines Section */}
-          {audioPlans && audioPlans.length > 0 && !selectedCategory && !searchQuery && (
+          {/* Pro Routines Section */}
+          {proPlans && proPlans.length > 0 && !selectedCategory && !searchQuery && (
             <div className="mt-5">
               <div className="flex items-center gap-2 px-4 mb-3">
-                <Headphones className="w-4 h-4 text-emerald-500" />
+                <Sparkles className="w-4 h-4 text-violet-500" />
                 <h2 className="text-sm font-semibold text-muted-foreground">
-                  AUDIO ROUTINES
+                  PRO ROUTINES
                 </h2>
               </div>
               <ScrollArea className="w-full">
                 <div className="flex gap-3 px-4 pb-2">
-                  {audioPlans.map((plan) => (
+                  {proPlans.map((plan) => (
                     <div key={plan.id} className="w-40 shrink-0 relative">
-                      <div className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shadow-md">
-                        <Music className="h-3 w-3 text-white" />
+                      <div className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-violet-500 flex items-center justify-center shadow-md">
+                        <Sparkles className="h-3 w-3 text-white" />
                       </div>
                       <RoutinePlanCard
                         plan={plan}
