@@ -301,13 +301,24 @@ export function useUserRoutinePlans() {
   });
 }
 
+// Color cycle for variety in planner
+const ROUTINE_COLOR_CYCLE = [
+  'peach',
+  'sky', 
+  'pink',
+  'yellow',
+  'lavender',
+  'mint',
+  'lime',
+] as const;
+
 // Add routine plan to user's planner - creates individual tasks (not subtasks) for iOS Reminders sync
 export function useAddRoutinePlan() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
   return useMutation({
-    mutationFn: async (planId: string) => {
+    mutationFn: async ({ planId, selectedTaskIds }: { planId: string; selectedTaskIds?: string[] }) => {
       if (!user) throw new Error('Must be logged in');
 
       // Get plan details
@@ -320,7 +331,7 @@ export function useAddRoutinePlan() {
       if (planError) throw planError;
 
       // Get plan tasks
-      const { data: tasks, error: tasksError } = await supabase
+      const { data: allTasks, error: tasksError } = await supabase
         .from('routine_plan_tasks')
         .select('*')
         .eq('plan_id', planId)
@@ -328,6 +339,11 @@ export function useAddRoutinePlan() {
         .order('task_order', { ascending: true });
 
       if (tasksError) throw tasksError;
+
+      // Filter tasks if selectedTaskIds provided
+      const tasks = selectedTaskIds 
+        ? allTasks?.filter(t => selectedTaskIds.includes(t.id)) || []
+        : allTasks || [];
 
       // Get current max order_index for user's tasks
       const { data: existingTasks } = await supabase
@@ -339,13 +355,13 @@ export function useAddRoutinePlan() {
 
       const startOrderIndex = (existingTasks?.[0]?.order_index ?? -1) + 1;
 
-      // Create individual tasks for each routine plan task
+      // Create individual tasks for each routine plan task with cycling colors
       if (tasks && tasks.length > 0) {
         const userTasks = tasks.map((task, index) => ({
           user_id: user.id,
           title: task.title,
           emoji: task.icon || plan.icon,
-          color: plan.color,
+          color: ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
           repeat_pattern: 'daily',
           tag: plan.category?.name || plan.title,
           is_active: true,
