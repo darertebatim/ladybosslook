@@ -174,7 +174,7 @@ export default function AppPlaylistDetail() {
   // Use centralized enrollments hook - single source of truth
   const { data: enrollments } = useEnrollments();
 
-  // Fetch user's round for this playlist (to get start_date and drip_offset_days for drip content)
+  // Fetch user's round for this playlist (to get first_session_date and drip_offset_days for drip content)
   const { data: userRound } = useQuery({
     queryKey: ['user-round-for-playlist', playlistId],
     queryFn: async () => {
@@ -189,6 +189,7 @@ export default function AppPlaylistDetail() {
           program_rounds!inner (
             id,
             start_date,
+            first_session_date,
             drip_offset_days,
             audio_playlist_id
           )
@@ -243,6 +244,7 @@ export default function AppPlaylistDetail() {
   };
 
   // Check if content is available based on drip delay
+  // Uses first_session_date for timing (drip_delay_days=0 = immediate, 1 = at first session, etc.)
   const getContentAvailability = (dripDelayDays: number) => {
     // Free playlists = all content available
     if (playlist?.is_free) {
@@ -251,7 +253,7 @@ export default function AppPlaylistDetail() {
     
     return getTrackAvailabilityWithCountdown(
       dripDelayDays, 
-      userRound?.start_date,
+      userRound?.first_session_date || userRound?.start_date, // Prefer first_session_date, fallback to start_date
       userRound?.drip_offset_days || 0
     );
   };
