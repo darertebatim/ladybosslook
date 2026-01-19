@@ -56,6 +56,9 @@ export interface RoutinePlanTask {
   is_active: boolean;
   created_at: string;
   linked_playlist_id: string | null;
+  // Pro Task fields
+  pro_link_type: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
+  pro_link_value: string | null;
   // Joined data
   linked_playlist?: {
     id: string;
@@ -343,6 +346,8 @@ export function useAddRoutinePlan() {
         scheduledTime?: string | null;
         tag?: string | null;
         linked_playlist_id?: string | null;
+        pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
+        pro_link_value?: string | null;
       }[];
     }) => {
       if (!user) throw new Error('Must be logged in');
@@ -391,6 +396,10 @@ export function useAddRoutinePlan() {
       if (tasks && tasks.length > 0) {
         const userTasks = tasks.map((task, index) => {
           const edited = editedTasksMap.get(task.id);
+          // Determine pro_link fields - prefer edited values, fall back to template
+          const proLinkType = edited?.pro_link_type ?? task.pro_link_type ?? (task.linked_playlist_id ? 'playlist' : null);
+          const proLinkValue = edited?.pro_link_value ?? task.pro_link_value ?? task.linked_playlist_id ?? null;
+          
           return {
             user_id: user.id,
             title: edited?.title || task.title,
@@ -399,7 +408,9 @@ export function useAddRoutinePlan() {
             repeat_pattern: edited?.repeatPattern || 'daily',
             scheduled_time: edited?.scheduledTime || null,
             tag: edited?.tag ?? plan.category?.name ?? plan.title,
-            linked_playlist_id: edited?.linked_playlist_id ?? task.linked_playlist_id ?? null,
+            linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : null,
+            pro_link_type: proLinkType,
+            pro_link_value: proLinkValue,
             is_active: true,
             order_index: startOrderIndex + index,
           };
@@ -461,21 +472,21 @@ export function useRateRoutinePlan() {
   });
 }
 
-// Fetch routine plans that have audio-linked tasks
-export function useAudioRoutinePlans() {
+// Fetch routine plans that have Pro Tasks (any pro_link_type)
+export function useProRoutinePlans() {
   return useQuery({
-    queryKey: ['audio-routine-plans'],
+    queryKey: ['pro-routine-plans'],
     queryFn: async () => {
-      // Get plan IDs that have at least one task with linked_playlist_id
-      const { data: plansWithAudio, error: audioError } = await supabase
+      // Get plan IDs that have at least one task with pro_link_type OR linked_playlist_id
+      const { data: plansWithProTasks, error: proError } = await supabase
         .from('routine_plan_tasks')
         .select('plan_id')
-        .not('linked_playlist_id', 'is', null)
+        .or('pro_link_type.not.is.null,linked_playlist_id.not.is.null')
         .eq('is_active', true);
       
-      if (audioError) throw audioError;
+      if (proError) throw proError;
       
-      const planIds = [...new Set(plansWithAudio?.map(t => t.plan_id) || [])];
+      const planIds = [...new Set(plansWithProTasks?.map(t => t.plan_id) || [])];
       
       if (planIds.length === 0) return [];
       

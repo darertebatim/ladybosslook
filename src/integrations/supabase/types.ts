@@ -1721,6 +1721,8 @@ export type Database = {
           is_active: boolean
           linked_playlist_id: string | null
           plan_id: string
+          pro_link_type: string | null
+          pro_link_value: string | null
           task_order: number
           title: string
         }
@@ -1732,6 +1734,8 @@ export type Database = {
           is_active?: boolean
           linked_playlist_id?: string | null
           plan_id: string
+          pro_link_type?: string | null
+          pro_link_value?: string | null
           task_order?: number
           title: string
         }
@@ -1743,6 +1747,8 @@ export type Database = {
           is_active?: boolean
           linked_playlist_id?: string | null
           plan_id?: string
+          pro_link_type?: string | null
+          pro_link_value?: string | null
           task_order?: number
           title?: string
         }
@@ -2186,6 +2192,8 @@ export type Database = {
           is_active: boolean
           linked_playlist_id: string | null
           order_index: number
+          pro_link_type: string | null
+          pro_link_value: string | null
           reminder_enabled: boolean
           reminder_offset: number
           repeat_days: number[] | null
@@ -2207,6 +2215,8 @@ export type Database = {
           is_active?: boolean
           linked_playlist_id?: string | null
           order_index?: number
+          pro_link_type?: string | null
+          pro_link_value?: string | null
           reminder_enabled?: boolean
           reminder_offset?: number
           repeat_days?: number[] | null
@@ -2228,6 +2238,8 @@ export type Database = {
           is_active?: boolean
           linked_playlist_id?: string | null
           order_index?: number
+          pro_link_type?: string | null
+          pro_link_value?: string | null
           reminder_enabled?: boolean
           reminder_offset?: number
           repeat_days?: number[] | null
