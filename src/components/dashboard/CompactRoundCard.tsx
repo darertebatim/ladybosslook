@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Play, Sparkles } from 'lucide-react';
+import { AlertCircle, ChevronRight, Play, Sparkles } from 'lucide-react';
 import { format, isToday } from 'date-fns';
 import { Link } from 'react-router-dom';
 
@@ -23,6 +23,11 @@ export function CompactRoundCard({
   const isUpcoming = round.status === 'upcoming';
   const displayDate = nextSessionDate || round.first_session_date;
   const isSessionToday = displayDate && isToday(new Date(displayDate));
+
+  // Get first sentence of important_message
+  const importantNote = round.important_message
+    ? round.important_message.split(/[.!?]/)[0]?.trim()
+    : null;
 
   // Get video thumbnail
   let thumbnailUrl = '';
@@ -60,10 +65,10 @@ export function CompactRoundCard({
         )}
         
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
         
         {/* Content */}
-        <div className="absolute inset-0 p-4 flex flex-col justify-between">
+        <div className="absolute inset-0 p-3 flex flex-col justify-between">
           {/* Top: Badges */}
           <div className="flex items-center gap-2">
             {isUnseen && (
@@ -84,27 +89,39 @@ export function CompactRoundCard({
           </div>
           
           {/* Bottom: Info */}
-          <div className="space-y-1">
-            <h3 className="text-white font-semibold text-sm line-clamp-1">
+          <div className="space-y-0.5">
+            {/* Course name */}
+            <h3 className="text-white font-semibold text-[13px] line-clamp-1">
               {enrollment.course_name}
             </h3>
-            <p className="text-white/80 text-xs">
-              {round.round_name}
-            </p>
             
+            {/* Round name + View schedule link */}
+            <div className="flex items-center gap-1 text-[11px] text-white/70">
+              <span className="truncate">{round.round_name}</span>
+              <span>•</span>
+              <span className="flex items-center whitespace-nowrap">
+                View schedule
+                <ChevronRight className="h-3 w-3" />
+              </span>
+            </div>
+            
+            {/* Next session info */}
             {displayDate && (
-              <div className={`flex items-center gap-1.5 text-xs ${
-                isSessionToday ? 'text-green-300' : 'text-white/70'
-              }`}>
-                <Calendar className="h-3 w-3" />
-                <span>
-                  {isSessionToday 
-                    ? `Today at ${format(new Date(displayDate), 'h:mm a')}`
-                    : isUpcoming 
-                      ? `Starts ${format(new Date(displayDate), 'MMM d')}`
-                      : format(new Date(displayDate), 'MMM d • h:mm a')
-                  }
-                </span>
+              <p className={`text-[11px] ${isSessionToday ? 'text-green-300' : 'text-white/80'}`}>
+                {isSessionToday 
+                  ? `Your next session: Today at ${format(new Date(displayDate), 'h:mm a')}`
+                  : isUpcoming 
+                    ? `Starts: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
+                    : `Your next session: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
+                }
+              </p>
+            )}
+            
+            {/* Important note (if exists) */}
+            {importantNote && (
+              <div className="flex items-center gap-1 text-[10px] text-amber-300">
+                <AlertCircle className="h-2.5 w-2.5 flex-shrink-0" />
+                <span className="line-clamp-1">{importantNote}</span>
               </div>
             )}
           </div>
@@ -112,9 +129,9 @@ export function CompactRoundCard({
 
         {/* Play icon overlay */}
         {thumbnailUrl && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-50">
-            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
-              <Play className="h-5 w-5 text-black ml-0.5" fill="black" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-40">
+            <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
+              <Play className="h-4 w-4 text-black ml-0.5" fill="black" />
             </div>
           </div>
         )}
