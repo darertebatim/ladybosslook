@@ -34,21 +34,35 @@ export default function AppInspire() {
   const { data: taskTemplates, isLoading: templatesLoading } = useTaskTemplates();
   const createFromTemplate = useCreateTaskFromTemplate();
 
-  const displayPlans = selectedCategory ? filteredPlans : popularPlans;
-  const isLoading = categoriesLoading || popularLoading || (selectedCategory && plansLoading);
+  // Determine which plans to display based on selected category
+  const displayPlans = useMemo(() => {
+    if (selectedCategory === 'popular') {
+      return popularPlans;
+    }
+    if (selectedCategory) {
+      return filteredPlans;
+    }
+    // "All" shows everything
+    return filteredPlans || popularPlans;
+  }, [selectedCategory, filteredPlans, popularPlans]);
+
+  const isLoading = categoriesLoading || popularLoading || (selectedCategory && selectedCategory !== 'popular' && plansLoading);
 
   // Get selected category name for filtering task templates
   const selectedCategoryName = useMemo(() => {
-    if (!selectedCategory || !categories) return null;
+    if (!selectedCategory || selectedCategory === 'popular' || !categories) return null;
     return categories.find(c => c.slug === selectedCategory)?.name || null;
   }, [selectedCategory, categories]);
 
-  // Filter task templates by selected category (using category name)
+  // Filter task templates by selected category or popular
   const filteredTaskTemplates = useMemo(() => {
     if (!taskTemplates) return [];
+    if (selectedCategory === 'popular') {
+      return taskTemplates.filter(t => t.is_popular);
+    }
     if (!selectedCategoryName) return taskTemplates;
     return taskTemplates.filter(t => t.category === selectedCategoryName);
-  }, [taskTemplates, selectedCategoryName]);
+  }, [taskTemplates, selectedCategory, selectedCategoryName]);
 
   // Filter by search query
   const searchedPlans = displayPlans?.filter(plan => 
@@ -160,11 +174,13 @@ export default function AppInspire() {
               <ScrollArea className="w-full">
                 <div className="flex gap-2 px-4 pb-2">
                   <CategoryCircle
-                    name="All"
-                    icon="LayoutGrid"
-                    color="purple"
-                    isSelected={!selectedCategory}
-                    onClick={() => setSelectedCategory(null)}
+                    name="Popular"
+                    icon="Star"
+                    color="#FBBF24"
+                    isSelected={selectedCategory === 'popular'}
+                    onClick={() => setSelectedCategory(
+                      selectedCategory === 'popular' ? null : 'popular'
+                    )}
                   />
                   {categories.map((category) => (
                     <CategoryCircle
@@ -178,6 +194,13 @@ export default function AppInspire() {
                       )}
                     />
                   ))}
+                  <CategoryCircle
+                    name="All"
+                    icon="LayoutGrid"
+                    color="purple"
+                    isSelected={!selectedCategory}
+                    onClick={() => setSelectedCategory(null)}
+                  />
                 </div>
                 <ScrollBar orientation="horizontal" className="invisible" />
               </ScrollArea>
@@ -187,9 +210,11 @@ export default function AppInspire() {
           {/* Plans Grid */}
           <div className="mt-5 px-4 w-full max-w-full overflow-hidden">
             <h2 className="text-sm font-semibold text-muted-foreground mb-3">
-              {selectedCategory 
-                ? categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'ROUTINES'
-                : 'POPULAR ROUTINES'
+              {selectedCategory === 'popular'
+                ? 'POPULAR ROUTINES'
+                : selectedCategory 
+                  ? categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'ROUTINES'
+                  : 'ALL ROUTINES'
               }
             </h2>
 
@@ -226,7 +251,12 @@ export default function AppInspire() {
               <div className="flex items-center gap-2 mb-3">
                 <ListTodo className="w-4 h-4 text-primary" />
                 <h2 className="text-sm font-semibold text-muted-foreground">
-                  {selectedCategoryName ? `${selectedCategoryName.toUpperCase()} TASKS` : 'TASK IDEAS'}
+                  {selectedCategory === 'popular' 
+                    ? 'POPULAR TASKS'
+                    : selectedCategoryName 
+                      ? `${selectedCategoryName.toUpperCase()} TASKS` 
+                      : 'ALL TASKS'
+                  }
                 </h2>
               </div>
 
