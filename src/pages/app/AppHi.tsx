@@ -456,7 +456,7 @@ const AppHi = () => {
         {/* Fixed Bottom Dashboard */}
         <div 
           className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t"
-          style={{ paddingBottom: 'max(80px, calc(64px + env(safe-area-inset-bottom)))' }}
+          style={{ paddingBottom: 'max(64px, calc(52px + env(safe-area-inset-bottom)))' }}
         >
           <div className="px-4 py-2">
             <ActiveRoundsCarousel
