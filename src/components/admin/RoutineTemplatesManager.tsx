@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, ListTodo } from 'lucide-react';
 import { RoutineCategoriesManager } from './RoutineCategoriesManager';
 import { RoutinePlansManager } from './RoutinePlansManager';
 import { RoutinePlanDetailManager } from './RoutinePlanDetailManager';
 import { RoutineStatisticsManager } from './RoutineStatisticsManager';
 import { ProTaskTemplatesManager } from './ProTaskTemplatesManager';
+import { TaskTemplatesManager } from './TaskTemplatesManager';
 
 export function RoutineTemplatesManager() {
   const [activeTab, setActiveTab] = useState('categories');
@@ -26,7 +27,7 @@ export function RoutineTemplatesManager() {
       <div>
         <h2 className="text-xl font-bold">Routine Templates</h2>
         <p className="text-muted-foreground">
-          Manage routine suggestions and templates for the Inspire page
+          Manage routine suggestions and templates for the Routines page
         </p>
       </div>
 
@@ -37,6 +38,10 @@ export function RoutineTemplatesManager() {
           <TabsTrigger value="pro-templates" className="flex items-center gap-1">
             <Sparkles className="h-3 w-3" />
             Pro Templates
+          </TabsTrigger>
+          <TabsTrigger value="task-templates" className="flex items-center gap-1">
+            <ListTodo className="h-3 w-3" />
+            Task Templates
           </TabsTrigger>
           <TabsTrigger value="statistics">Statistics</TabsTrigger>
         </TabsList>
@@ -51,6 +56,10 @@ export function RoutineTemplatesManager() {
 
         <TabsContent value="pro-templates" className="mt-4">
           <ProTaskTemplatesManager />
+        </TabsContent>
+
+        <TabsContent value="task-templates" className="mt-4">
+          <TaskTemplatesManager />
         </TabsContent>
 
         <TabsContent value="statistics" className="mt-4">
