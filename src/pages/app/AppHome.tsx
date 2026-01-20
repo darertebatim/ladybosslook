@@ -301,7 +301,7 @@ const AppHome = () => {
 
         {/* Tag filter chips */}
         {taskTags.length > 0 && (
-          <div className="px-4 py-3 bg-background border-b overflow-x-auto">
+          <div className="px-4 py-3 bg-background overflow-x-auto">
             <div className="flex gap-2">
               <button
                 onClick={() => setSelectedTag(null)}
