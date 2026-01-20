@@ -253,9 +253,9 @@ const AppHome = () => {
                         className={cn(
                           'w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
                           isSelected
-                            ? 'bg-violet-600 text-white shadow-md'
+                            ? 'bg-[#D8C0F3] text-foreground shadow-md'
                             : isTodayDate
-                              ? 'bg-white/60 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300'
+                              ? 'bg-white/60 text-foreground/80 dark:bg-violet-900/50 dark:text-violet-300'
                               : 'hover:bg-white/40'
                         )}
                       >
@@ -308,7 +308,7 @@ const AppHome = () => {
                 className={cn(
                   'px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all font-medium',
                   selectedTag === null
-                    ? 'bg-violet-600 text-white'
+                    ? 'bg-[#D8C0F3] text-foreground'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 )}
               >
@@ -321,7 +321,7 @@ const AppHome = () => {
                   className={cn(
                     'px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all capitalize font-medium',
                     selectedTag === tag
-                      ? 'bg-violet-600 text-white'
+                      ? 'bg-[#D8C0F3] text-foreground'
                       : 'bg-muted text-muted-foreground hover:bg-muted/80'
                   )}
                 >
