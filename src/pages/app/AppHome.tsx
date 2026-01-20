@@ -24,7 +24,7 @@ import { PromoBanner } from '@/components/app/PromoBanner';
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
-import { useFeaturedPlans, usePopularPlans } from '@/hooks/useRoutinePlans';
+import { usePopularPlans, useUserRoutinePlans } from '@/hooks/useRoutinePlans';
 import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
 
 const AppHome = () => {
@@ -55,9 +55,19 @@ const AppHome = () => {
   // Home data for stats and rounds
   const { data: homeData, isLoading: homeLoading } = useNewHomeData();
   
-  // Featured and popular routines for suggestions
-  const { data: featuredRoutines = [] } = useFeaturedPlans();
+  // Popular routines for suggestions (excluding already added ones)
   const { data: popularRoutines = [] } = usePopularPlans();
+  const { data: userRoutines = [] } = useUserRoutinePlans();
+  
+  const userRoutineIds = useMemo(() => 
+    new Set(userRoutines.map(r => r.plan_id)), 
+    [userRoutines]
+  );
+  
+  const suggestedRoutines = useMemo(() => 
+    popularRoutines.filter(plan => !userRoutineIds.has(plan.id)),
+    [popularRoutines, userRoutineIds]
+  );
 
   // Generate week days
   const weekDays = useMemo(() => {
@@ -428,39 +438,17 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Featured Routines Suggestions */}
-              {featuredRoutines.length > 0 && selectedTag === null && (
+              {/* Popular Routines Suggestions - only show routines user hasn't added */}
+              {suggestedRoutines.length > 0 && selectedTag === null && (
                 <div className="mt-6 pt-4 border-t border-border/50">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="h-4 w-4 text-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
-                      Featured Routines
+                      Try a Routine
                     </h2>
                   </div>
                   <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-                    {featuredRoutines.slice(0, 4).map((plan) => (
-                      <div key={plan.id} className="w-32 shrink-0">
-                        <RoutinePlanCard
-                          plan={plan}
-                          onClick={() => navigate(`/app/routines/${plan.id}`)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Popular Routines Suggestions */}
-              {popularRoutines.length > 0 && selectedTag === null && (
-                <div className="mt-6 pt-4 border-t border-border/50">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Flame className="h-4 w-4 text-orange-500" />
-                    <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
-                      Popular Routines
-                    </h2>
-                  </div>
-                  <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-                    {popularRoutines.slice(0, 4).map((plan) => (
+                    {suggestedRoutines.slice(0, 4).map((plan) => (
                       <div key={plan.id} className="w-32 shrink-0">
                         <RoutinePlanCard
                           plan={plan}
