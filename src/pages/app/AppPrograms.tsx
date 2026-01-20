@@ -2,7 +2,7 @@ import { useCoursesData } from '@/hooks/useAppData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { BookOpen, GraduationCap, CheckCircle2, AlertCircle, ChevronRight, Sparkles } from 'lucide-react';
+import { BookOpen, GraduationCap, CheckCircle2, AlertCircle, ChevronRight, Sparkles, Unlock } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
@@ -11,7 +11,7 @@ import { format, isToday } from 'date-fns';
 
 const AppCourses = () => {
   // Use centralized data hook
-  const { enrollments, nextSessionMap, isLoading } = useCoursesData();
+  const { enrollments, nextSessionMap, nextContentMap, isLoading } = useCoursesData();
   
   // Get unseen content - wrap in try/catch in case provider is missing
   let unseenEnrollments = new Set<string>();
@@ -79,6 +79,9 @@ const AppCourses = () => {
     const nextSessionDate = round?.id ? nextSessionMap.get(round.id) : null;
     const displayDate = nextSessionDate || round?.first_session_date;
     const isSessionToday = displayDate && isToday(new Date(displayDate));
+
+    // Get next content info
+    const nextContent = round?.id ? nextContentMap.get(round.id) : null;
 
     // Get first sentence of important_message
     const importantNote = round?.important_message
@@ -198,9 +201,19 @@ const AppCourses = () => {
                 </p>
               )}
               
+              {/* Next content unlock info */}
+              {!isCompleted && nextContent && (
+                <div className="flex items-center gap-1.5 text-[11px] text-cyan-300">
+                  <Unlock className="h-3 w-3 flex-shrink-0" />
+                  <span className="line-clamp-1">
+                    {nextContent.title} unlocks {nextContent.countdownText}
+                  </span>
+                </div>
+              )}
+              
               {/* Important note (if exists) */}
               {!isCompleted && importantNote && (
-                <div className="flex items-center gap-1.5 text-[11px] text-amber-300 mt-1">
+                <div className="flex items-center gap-1.5 text-[11px] text-amber-300">
                   <AlertCircle className="h-3 w-3 flex-shrink-0" />
                   <span className="line-clamp-1">{importantNote}</span>
                 </div>
