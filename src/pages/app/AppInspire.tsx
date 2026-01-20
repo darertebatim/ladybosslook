@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Heart, Loader2, Sparkles } from 'lucide-react';
+import { Search, Heart, Loader2, Sparkles, ListTodo } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
 import { InspireBanner } from '@/components/app/InspireBanner';
+import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
+import { toast } from 'sonner';
 import {
   useRoutineCategories,
   useRoutinePlans,
@@ -13,12 +15,15 @@ import {
   usePopularPlans,
   useProRoutinePlans,
 } from '@/hooks/useRoutinePlans';
+import { useTaskTemplates, useCreateTaskFromTemplate } from '@/hooks/useTaskPlanner';
 
 export default function AppInspire() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedTaskCategory, setSelectedTaskCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [addingTemplateId, setAddingTemplateId] = useState<string | null>(null);
 
   const { data: categories, isLoading: categoriesLoading } = useRoutineCategories();
   const { data: featuredPlans } = useFeaturedPlans();
@@ -27,9 +32,25 @@ export default function AppInspire() {
   const { data: filteredPlans, isLoading: plansLoading } = useRoutinePlans(
     selectedCategory || undefined
   );
+  const { data: taskTemplates, isLoading: templatesLoading } = useTaskTemplates();
+  const createFromTemplate = useCreateTaskFromTemplate();
 
   const displayPlans = selectedCategory ? filteredPlans : popularPlans;
   const isLoading = categoriesLoading || popularLoading || (selectedCategory && plansLoading);
+
+  // Derive unique task categories
+  const taskCategories = useMemo(() => {
+    if (!taskTemplates) return [];
+    const cats = [...new Set(taskTemplates.map(t => t.category).filter(Boolean))] as string[];
+    return cats.sort();
+  }, [taskTemplates]);
+
+  // Filter task templates by selected category
+  const filteredTaskTemplates = useMemo(() => {
+    if (!taskTemplates) return [];
+    if (!selectedTaskCategory) return taskTemplates;
+    return taskTemplates.filter(t => t.category === selectedTaskCategory);
+  }, [taskTemplates, selectedTaskCategory]);
 
   // Filter by search query
   const searchedPlans = displayPlans?.filter(plan => 
@@ -37,6 +58,21 @@ export default function AppInspire() {
     plan.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     plan.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleAddTemplate = async (template: typeof taskTemplates[0]) => {
+    setAddingTemplateId(template.id);
+    try {
+      await createFromTemplate.mutateAsync({
+        template,
+        date: new Date(),
+      });
+      toast.success('Task added! ✨');
+    } catch (error) {
+      toast.error('Failed to add task');
+    } finally {
+      setAddingTemplateId(null);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
@@ -185,6 +221,72 @@ export default function AppInspire() {
               </div>
             )}
           </div>
+
+          {/* Task Ideas Section */}
+          {taskTemplates && taskTemplates.length > 0 && (
+            <div className="mt-8 px-4 w-full max-w-full overflow-hidden pb-8">
+              <div className="flex items-center gap-2 mb-3">
+                <ListTodo className="w-4 h-4 text-primary" />
+                <h2 className="text-sm font-semibold text-muted-foreground">
+                  TASK IDEAS
+                </h2>
+              </div>
+
+              {/* Task Category Pills */}
+              <ScrollArea className="w-full mb-4">
+                <div className="flex gap-2 pb-2">
+                  <button
+                    onClick={() => setSelectedTaskCategory(null)}
+                    className={`shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                      !selectedTaskCategory
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    All
+                  </button>
+                  {taskCategories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedTaskCategory(
+                        selectedTaskCategory === cat ? null : cat
+                      )}
+                      className={`shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
+                        selectedTaskCategory === cat
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+                <ScrollBar orientation="horizontal" className="invisible" />
+              </ScrollArea>
+
+              {/* Task Templates List */}
+              {templatesLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : filteredTaskTemplates.length > 0 ? (
+                <div className="space-y-2">
+                  {filteredTaskTemplates.map((template) => (
+                    <TaskTemplateCard
+                      key={template.id}
+                      template={template}
+                      onAdd={() => handleAddTemplate(template)}
+                      isAdding={addingTemplateId === template.id}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No tasks in this category</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
