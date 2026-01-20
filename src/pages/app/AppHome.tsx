@@ -279,13 +279,29 @@ const AppHome = () => {
               </div>
             )}
 
-            {/* Calendar expand/collapse handle - single pill */}
-            <button 
-              onClick={handleToggleCalendar}
-              className="w-full flex justify-center pt-1.5 pb-1"
-            >
-              <div className="w-10 h-1 rounded-full bg-foreground/20" />
-            </button>
+            {/* Calendar expand/collapse handle + Today button */}
+            <div className="relative w-full flex justify-center pt-1.5 pb-1">
+              <button 
+                onClick={handleToggleCalendar}
+                className="flex-1 flex justify-center"
+              >
+                <div className="w-10 h-1 rounded-full bg-foreground/20" />
+              </button>
+              
+              {/* Today button - only show when not on today */}
+              {!isToday(selectedDate) && (
+                <button
+                  onClick={() => {
+                    setSelectedDate(new Date());
+                    setCurrentMonth(startOfMonth(new Date()));
+                  }}
+                  className="absolute right-2 top-0 flex items-center gap-0.5 px-2 py-0.5 text-xs font-medium text-violet-600 bg-violet-100 dark:bg-violet-900/50 dark:text-violet-300 rounded-full"
+                >
+                  <ChevronLeft className="h-3 w-3" />
+                  Today
+                </button>
+              )}
+            </div>
           </div>
         </header>
 
