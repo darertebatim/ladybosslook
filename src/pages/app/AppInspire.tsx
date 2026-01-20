@@ -90,7 +90,7 @@ export default function AppInspire() {
     <div className="flex flex-col h-full bg-background overflow-hidden">
       {/* Fixed Header */}
       <header 
-        className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50"
+        className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-2">

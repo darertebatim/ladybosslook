@@ -22,10 +22,10 @@ export function AppHeader({
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 ${
+      className={`fixed top-0 left-0 right-0 z-50 rounded-b-3xl shadow-sm ${
         transparent 
-          ? 'bg-background/80 backdrop-blur-lg' 
-          : 'bg-background border-b border-border'
+          ? 'bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg' 
+          : 'bg-[#F4ECFE] dark:bg-violet-950/90'
       }`}
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >

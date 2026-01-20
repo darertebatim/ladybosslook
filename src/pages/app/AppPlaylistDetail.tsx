@@ -484,7 +484,7 @@ export default function AppPlaylistDetail() {
       <div className="flex flex-col h-full bg-background overflow-hidden">
         {/* Fixed Header */}
         <div 
-          className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
+          className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="pt-3 pb-2 px-4">
@@ -513,7 +513,7 @@ export default function AppPlaylistDetail() {
     return (
       <div className="flex flex-col h-full bg-background overflow-hidden">
         <div 
-          className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
+          className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="pt-3 pb-2 px-4">
@@ -541,7 +541,7 @@ export default function AppPlaylistDetail() {
     <div className="flex flex-col h-full bg-background overflow-hidden">
       {/* Fixed Header with safe area + visual padding */}
       <div 
-        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
+        className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="pt-3 pb-2 px-4">
