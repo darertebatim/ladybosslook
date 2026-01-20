@@ -55,8 +55,9 @@ const AppCourses = () => {
   );
 
   // Separate enrollments into active/upcoming and completed
-  const activeRounds = enrollments?.filter(e => e.program_rounds?.status !== 'completed') || [];
-  const completedRounds = enrollments?.filter(e => e.program_rounds?.status === 'completed') || [];
+  // NOTE: self-paced enrollments have no `program_rounds` and are rendered separately.
+  const activeRounds = enrollments?.filter(e => e.program_rounds && e.program_rounds.status !== 'completed') || [];
+  const completedRounds = enrollments?.filter(e => e.program_rounds && e.program_rounds.status === 'completed') || [];
   
   // Also include enrollments without rounds (self-paced)
   const selfPacedEnrollments = enrollments?.filter(e => !e.program_rounds) || [];
