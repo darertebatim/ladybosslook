@@ -1,14 +1,13 @@
 import { useCoursesData } from '@/hooks/useAppData';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { BookOpen, GraduationCap, Calendar, Users, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
+import { BookOpen, GraduationCap, CheckCircle2, AlertCircle, ChevronRight, Sparkles } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { CoursesSkeleton } from '@/components/app/skeletons';
-import { format } from 'date-fns';
+import { format, isToday } from 'date-fns';
 
 const AppCourses = () => {
   // Use centralized data hook
@@ -67,7 +66,7 @@ const AppCourses = () => {
     return new Date(aDate!).getTime() - new Date(bDate!).getTime();
   });
 
-  const RoundCard = ({ enrollment, isCompleted = false }: { enrollment: typeof enrollments[0], isCompleted?: boolean }) => {
+  const ProgramCard = ({ enrollment, isCompleted = false }: { enrollment: typeof enrollments[0], isCompleted?: boolean }) => {
     const round = enrollment.program_rounds;
 
     const isUpcoming = round?.status === 'upcoming';
@@ -78,6 +77,28 @@ const AppCourses = () => {
     
     // Get actual next session date from our map
     const nextSessionDate = round?.id ? nextSessionMap.get(round.id) : null;
+    const displayDate = nextSessionDate || round?.first_session_date;
+    const isSessionToday = displayDate && isToday(new Date(displayDate));
+
+    // Get first sentence of important_message
+    const importantNote = round?.important_message
+      ? round.important_message.split(/[.!?]/)[0]?.trim()
+      : null;
+
+    // Get video thumbnail
+    let thumbnailUrl = '';
+    if (round?.video_url) {
+      if (round.video_url.includes('youtube.com/watch')) {
+        const videoId = round.video_url.split('v=')[1]?.split('&')[0];
+        thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      } else if (round.video_url.includes('youtu.be/')) {
+        const videoId = round.video_url.split('youtu.be/')[1]?.split('?')[0];
+        thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      } else if (round.video_url.includes('vimeo.com/')) {
+        const videoId = round.video_url.split('vimeo.com/')[1]?.split('?')[0].replace('video/', '');
+        thumbnailUrl = `https://vumbnail.com/${videoId}.jpg`;
+      }
+    }
 
     return (
       <Link 
@@ -91,129 +112,97 @@ const AppCourses = () => {
             markRoundViewed(round.id);
           }
         }}
+        className="block"
       >
-        <Card className={`shadow-sm active:scale-[0.98] transition-transform overflow-hidden ${
-          isCompleted 
-            ? 'border border-border opacity-75' 
-            : hasNotification 
-              ? 'border-primary border-2' 
-              : 'border border-border'
-        }`}>
-          <CardContent className="p-4 pb-0">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  <h3 className={`font-semibold truncate ${isCompleted ? 'text-muted-foreground' : ''}`}>
-                    {enrollment.course_name}
-                  </h3>
-                  {hasNotification && !isCompleted && (
-                    <Badge variant="default" className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 h-auto shrink-0">
-                      <Sparkles className="h-3 w-3 mr-0.5" />
-                      New
-                    </Badge>
-                  )}
-                  {isCompleted ? (
-                    <Badge variant="secondary" className="bg-muted text-muted-foreground shrink-0">
-                      <CheckCircle2 className="h-3 w-3 mr-1" />
-                      Completed
-                    </Badge>
-                  ) : round ? (
-                    <Badge 
-                      variant={isActive ? 'default' : 'secondary'}
-                      className={`shrink-0 ${isActive ? 'bg-green-500' : ''}`}
-                    >
-                      {round.status}
-                    </Badge>
-                  ) : (
-                    <Badge variant="secondary" className="shrink-0">
-                      Self-Paced
-                    </Badge>
-                  )}
-                </div>
-                
-                <div className="space-y-1.5 text-sm text-muted-foreground">
-                  {round && (
-                    <div className="flex items-center gap-2">
-                      <Users className="h-3.5 w-3.5" />
-                      <span className="font-medium">{round.round_name}</span>
-                    </div>
-                  )}
-                  
-                  {!isCompleted && round && (nextSessionDate || round.first_session_date) && (
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-3.5 w-3.5" />
-                      <span>
-                        {isUpcoming ? 'Starts ' : 'Next session: '}
-                        {format(new Date(nextSessionDate || round.first_session_date!), 'MMM d, yyyy • h:mm a')}
-                      </span>
-                    </div>
-                  )}
-                  
-                  {round?.start_date && (
-                    <div className="flex items-center gap-2 text-xs">
-                      <span>
-                        {format(new Date(round.start_date), 'MMM d')}
-                        {round.end_date && ` - ${format(new Date(round.end_date), 'MMM d, yyyy')}`}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
+        <div className={`relative w-full h-[100px] rounded-xl overflow-hidden shadow-md transition-transform active:scale-[0.98] ${
+          hasNotification && !isCompleted ? 'ring-2 ring-primary ring-offset-2' : ''
+        } ${isCompleted ? 'opacity-70' : ''}`}>
+          {/* Background */}
+          {thumbnailUrl ? (
+            <img 
+              src={thumbnailUrl} 
+              alt={enrollment.course_name}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className={`absolute inset-0 ${
+              isCompleted 
+                ? 'bg-gradient-to-br from-gray-400 to-gray-500' 
+                : 'bg-gradient-to-br from-violet-500 to-indigo-600'
+            }`} />
+          )}
+          
+          {/* Overlay - stronger gradient from bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/30" />
+          
+          {/* Content - all bottom aligned */}
+          <div className="absolute inset-0 p-3 flex flex-col justify-end">
+            {/* Course name with badges inline */}
+            <div className="flex items-center gap-1.5 mb-0.5">
+              {hasNotification && !isCompleted && (
+                <Badge className="bg-primary text-primary-foreground text-[9px] px-1.5 py-0 h-4">
+                  <Sparkles className="h-2.5 w-2.5 mr-0.5" />
+                  New
+                </Badge>
+              )}
+              {isCompleted ? (
+                <Badge className="bg-white/20 text-white backdrop-blur-sm text-[9px] px-1.5 py-0 h-4">
+                  <CheckCircle2 className="h-2.5 w-2.5 mr-0.5" />
+                  Completed
+                </Badge>
+              ) : round ? (
+                <Badge 
+                  className={`text-[9px] px-1.5 py-0 h-4 ${
+                    isActive 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-white/20 text-white backdrop-blur-sm'
+                  }`}
+                >
+                  {round.status}
+                </Badge>
+              ) : (
+                <Badge className="bg-white/20 text-white backdrop-blur-sm text-[9px] px-1.5 py-0 h-4">
+                  Self-Paced
+                </Badge>
+              )}
+              <h3 className="text-white font-semibold text-sm line-clamp-1 flex-1">
+                {enrollment.course_name}
+              </h3>
             </div>
-
-            {!isCompleted && round?.video_url && (() => {
-              let thumbnailUrl = '';
-              
-              if (round.video_url.includes('youtube.com/watch')) {
-                const videoId = round.video_url.split('v=')[1]?.split('&')[0];
-                thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-              } else if (round.video_url.includes('youtu.be/')) {
-                const videoId = round.video_url.split('youtu.be/')[1]?.split('?')[0];
-                thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-              } else if (round.video_url.includes('vimeo.com/')) {
-                const videoId = round.video_url.split('vimeo.com/')[1]?.split('?')[0].replace('video/', '');
-                thumbnailUrl = `https://vumbnail.com/${videoId}.jpg`;
-              }
-              
-              return (
-                <div className="mt-3 relative aspect-video rounded-md overflow-hidden bg-muted group">
-                  {thumbnailUrl && (
-                    <img 
-                      src={thumbnailUrl} 
-                      alt="Video preview" 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
-                    <div className="w-16 h-16 rounded-full bg-background/90 flex items-center justify-center">
-                      <div className="w-0 h-0 border-l-[16px] border-l-primary border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent ml-1" />
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {!isCompleted && round?.important_message && (
-              <div className="mt-3 p-2 bg-primary/5 rounded-md border border-primary/20">
-                <p className="text-xs text-foreground line-clamp-2">
-                  {round.important_message}
-                </p>
+            
+            {/* Round name + View schedule link */}
+            {round && (
+              <div className="flex items-center gap-1 text-[11px] text-white/70">
+                <span className="truncate">{round.round_name}</span>
+                <span>•</span>
+                <span className="flex items-center whitespace-nowrap">
+                  View schedule
+                  <ChevronRight className="h-3 w-3" />
+                </span>
               </div>
             )}
-          </CardContent>
-          
-          <div className={`mt-3 px-4 py-3 flex items-center justify-between ${
-            isCompleted ? 'bg-muted' : 'bg-foreground'
-          }`}>
-            <span className={`text-sm font-medium ${isCompleted ? 'text-muted-foreground' : 'text-background'}`}>
-              {isCompleted ? 'View Materials' : 'View Schedule & Materials'}
-            </span>
-            <ArrowRight className={`h-4 w-4 ${isCompleted ? 'text-muted-foreground' : 'text-background'}`} />
+            
+            {/* Next session info */}
+            {!isCompleted && displayDate && (
+              <p className={`text-[11px] ${isSessionToday ? 'text-green-300' : 'text-white/80'}`}>
+                {isSessionToday 
+                  ? `Next: Today at ${format(new Date(displayDate), 'h:mm a')}`
+                  : isUpcoming 
+                    ? `Starts: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
+                    : `Next: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
+                }
+              </p>
+            )}
+            
+            {/* Important note (if exists) */}
+            {!isCompleted && importantNote && (
+              <div className="flex items-center gap-1 text-[10px] text-amber-300 mt-0.5">
+                <AlertCircle className="h-2.5 w-2.5 flex-shrink-0" />
+                <span className="line-clamp-1">{importantNote}</span>
+              </div>
+            )}
           </div>
-        </Card>
+        </div>
       </Link>
     );
   };
@@ -236,38 +225,36 @@ const AppCourses = () => {
       
       <div className="container max-w-4xl py-4 px-4 space-y-6">
         {hasNoPrograms ? (
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground mb-4">
-                No programs enrolled yet
-              </p>
-              <Link to="/app/browse">
-                <Button variant="outline">
-                  Browse Programs
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          <div className="text-center py-12">
+            <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground mb-4">
+              No programs enrolled yet
+            </p>
+            <Link to="/app/browse">
+              <Button variant="outline">
+                Browse Programs
+              </Button>
+            </Link>
+          </div>
         ) : (
           <>
             {/* Active Rounds Section */}
             {(sortedActiveRounds.length > 0 || selfPacedEnrollments.length > 0) && (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold flex items-center gap-2">
-                    <GraduationCap className="h-5 w-5 text-primary" />
+                  <h2 className="text-base font-semibold flex items-center gap-2">
+                    <GraduationCap className="h-4 w-4 text-primary" />
                     Your Active Programs
                   </h2>
-                  <Badge variant="secondary">{sortedActiveRounds.length + selfPacedEnrollments.length}</Badge>
+                  <Badge variant="secondary" className="text-xs">{sortedActiveRounds.length + selfPacedEnrollments.length}</Badge>
                 </div>
 
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                   {sortedActiveRounds.map((enrollment) => (
-                    <RoundCard key={enrollment.id} enrollment={enrollment} />
+                    <ProgramCard key={enrollment.id} enrollment={enrollment} />
                   ))}
                   {selfPacedEnrollments.map((enrollment) => (
-                    <RoundCard key={enrollment.id} enrollment={enrollment} />
+                    <ProgramCard key={enrollment.id} enrollment={enrollment} />
                   ))}
                 </div>
               </div>
@@ -275,18 +262,18 @@ const AppCourses = () => {
 
             {/* Completed Rounds Section */}
             {completedRounds.length > 0 && (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold flex items-center gap-2 text-muted-foreground">
-                    <CheckCircle2 className="h-5 w-5" />
+                  <h2 className="text-base font-semibold flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4" />
                     Completed Programs
                   </h2>
-                  <Badge variant="outline" className="text-muted-foreground">{completedRounds.length}</Badge>
+                  <Badge variant="outline" className="text-muted-foreground text-xs">{completedRounds.length}</Badge>
                 </div>
 
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                   {completedRounds.map((enrollment) => (
-                    <RoundCard key={enrollment.id} enrollment={enrollment} isCompleted />
+                    <ProgramCard key={enrollment.id} enrollment={enrollment} isCompleted />
                   ))}
                 </div>
               </div>
@@ -294,19 +281,15 @@ const AppCourses = () => {
 
             {/* Empty state if no active rounds but has completed */}
             {sortedActiveRounds.length === 0 && selfPacedEnrollments.length === 0 && completedRounds.length > 0 && (
-              <Card className="mb-4">
-                <CardContent className="py-6">
-                  <div className="text-center">
-                    <GraduationCap className="h-10 w-10 mx-auto mb-2 text-muted-foreground opacity-50" />
-                    <p className="text-sm text-muted-foreground">No active programs right now</p>
-                    <Link to="/app/browse">
-                      <Button className="mt-3" variant="outline" size="sm">
-                        Browse New Programs
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="text-center py-8">
+                <GraduationCap className="h-10 w-10 mx-auto mb-2 text-muted-foreground opacity-50" />
+                <p className="text-sm text-muted-foreground">No active programs right now</p>
+                <Link to="/app/browse">
+                  <Button className="mt-3" variant="outline" size="sm">
+                    Browse New Programs
+                  </Button>
+                </Link>
+              </div>
             )}
           </>
         )}
