@@ -247,8 +247,18 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
     .order('enrolled_at', { ascending: false });
 
   if (error) throw error;
-  
-  const enrollments = data || [];
+
+  // Dedupe enrollments (prevents duplicate cards if the DB contains duplicates)
+  // Keep the most recent enrollment per (program_slug + round_id) since we order by enrolled_at DESC.
+  const rawEnrollments = data || [];
+  const enrollments: any[] = [];
+  const seenKeys = new Set<string>();
+  for (const e of rawEnrollments) {
+    const key = `${e.program_slug || e.course_name || 'unknown'}::${e.round_id || 'self'}`;
+    if (seenKeys.has(key)) continue;
+    seenKeys.add(key);
+    enrollments.push(e);
+  }
   
   // Get all round IDs and playlist IDs
   const roundIds = enrollments
