@@ -645,7 +645,7 @@ const AppCourseDetail = () => {
     <>
       {/* Fixed Header with safe area */}
       <div 
-        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
+        className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="pt-6 pb-3 px-4 flex items-center gap-3">

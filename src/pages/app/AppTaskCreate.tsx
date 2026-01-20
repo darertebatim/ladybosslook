@@ -981,7 +981,7 @@ const AppTaskCreate = ({
     <div className="flex flex-col h-full bg-background">
       {/* Header - iOS Standard */}
       <header 
-        className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur border-b"
+        className="fixed top-0 left-0 right-0 z-40 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
       >
         <div className="flex items-center justify-between px-4 h-12">

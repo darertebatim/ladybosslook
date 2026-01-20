@@ -131,7 +131,7 @@ const AppStore = () => {
 
       {/* Fixed Header */}
       <div 
-        className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/50"
+        className="fixed top-0 left-0 right-0 z-40 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="h-12 px-4 flex items-center justify-between">

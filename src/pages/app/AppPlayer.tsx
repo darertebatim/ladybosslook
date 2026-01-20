@@ -169,7 +169,7 @@ export default function AppPlayer() {
       <div className="flex flex-col h-full bg-background overflow-hidden">
         {/* Fixed Header Skeleton */}
         <div 
-          className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
+          className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="h-12 flex items-center justify-between px-4">
@@ -207,7 +207,7 @@ export default function AppPlayer() {
     <div className="flex flex-col h-full bg-background overflow-hidden">
       {/* Fixed Header */}
       <div 
-        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b"
+        className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         {/* Header Row */}

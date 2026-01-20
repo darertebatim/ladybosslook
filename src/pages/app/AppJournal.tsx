@@ -42,7 +42,7 @@ const AppJournal = () => {
     return (
       <div className="min-h-screen bg-background">
         <div 
-          className="fixed top-0 left-0 right-0 z-10 bg-background border-b"
+          className="fixed top-0 left-0 right-0 z-10 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="flex items-center justify-between px-4 pt-3 pb-2">
@@ -66,7 +66,7 @@ const AppJournal = () => {
       
       {/* Header */}
       <div 
-        className="fixed top-0 left-0 right-0 z-10 bg-background border-b"
+        className="fixed top-0 left-0 right-0 z-10 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
