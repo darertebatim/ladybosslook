@@ -114,9 +114,9 @@ const AppCourses = () => {
         }}
         className="block"
       >
-        <div className={`relative w-full h-[100px] rounded-xl overflow-hidden shadow-md transition-transform active:scale-[0.98] ${
+        <div className={`relative w-full rounded-2xl overflow-hidden shadow-lg transition-transform active:scale-[0.98] ${
           hasNotification && !isCompleted ? 'ring-2 ring-primary ring-offset-2' : ''
-        } ${isCompleted ? 'opacity-70' : ''}`}>
+        } ${isCompleted ? 'opacity-75' : ''}`}>
           {/* Background */}
           {thumbnailUrl ? (
             <img 
@@ -128,31 +128,31 @@ const AppCourses = () => {
             <div className={`absolute inset-0 ${
               isCompleted 
                 ? 'bg-gradient-to-br from-gray-400 to-gray-500' 
-                : 'bg-gradient-to-br from-violet-500 to-indigo-600'
+                : 'bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-700'
             }`} />
           )}
           
           {/* Overlay - stronger gradient from bottom */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
           
-          {/* Content - all bottom aligned */}
-          <div className="absolute inset-0 p-3 flex flex-col justify-end">
-            {/* Course name with badges inline */}
-            <div className="flex items-center gap-1.5 mb-0.5">
+          {/* Content */}
+          <div className="relative p-4 min-h-[120px] flex flex-col justify-between">
+            {/* Top row: Badges */}
+            <div className="flex items-center gap-2 flex-wrap">
               {hasNotification && !isCompleted && (
-                <Badge className="bg-primary text-primary-foreground text-[9px] px-1.5 py-0 h-4">
-                  <Sparkles className="h-2.5 w-2.5 mr-0.5" />
+                <Badge className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 h-5">
+                  <Sparkles className="h-3 w-3 mr-1" />
                   New
                 </Badge>
               )}
               {isCompleted ? (
-                <Badge className="bg-white/20 text-white backdrop-blur-sm text-[9px] px-1.5 py-0 h-4">
-                  <CheckCircle2 className="h-2.5 w-2.5 mr-0.5" />
+                <Badge className="bg-white/20 text-white backdrop-blur-sm text-[10px] px-2 py-0.5 h-5">
+                  <CheckCircle2 className="h-3 w-3 mr-1" />
                   Completed
                 </Badge>
               ) : round ? (
                 <Badge 
-                  className={`text-[9px] px-1.5 py-0 h-4 ${
+                  className={`text-[10px] px-2 py-0.5 h-5 ${
                     isActive 
                       ? 'bg-green-500 text-white' 
                       : 'bg-white/20 text-white backdrop-blur-sm'
@@ -161,46 +161,51 @@ const AppCourses = () => {
                   {round.status}
                 </Badge>
               ) : (
-                <Badge className="bg-white/20 text-white backdrop-blur-sm text-[9px] px-1.5 py-0 h-4">
+                <Badge className="bg-white/20 text-white backdrop-blur-sm text-[10px] px-2 py-0.5 h-5">
                   Self-Paced
                 </Badge>
               )}
-              <h3 className="text-white font-semibold text-sm line-clamp-1 flex-1">
-                {enrollment.course_name}
-              </h3>
             </div>
             
-            {/* Round name + View schedule link */}
-            {round && (
-              <div className="flex items-center gap-1 text-[11px] text-white/70">
-                <span className="truncate">{round.round_name}</span>
-                <span>•</span>
-                <span className="flex items-center whitespace-nowrap">
-                  View schedule
-                  <ChevronRight className="h-3 w-3" />
-                </span>
-              </div>
-            )}
-            
-            {/* Next session info */}
-            {!isCompleted && displayDate && (
-              <p className={`text-[11px] ${isSessionToday ? 'text-green-300' : 'text-white/80'}`}>
-                {isSessionToday 
-                  ? `Next: Today at ${format(new Date(displayDate), 'h:mm a')}`
-                  : isUpcoming 
-                    ? `Starts: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
-                    : `Next: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
-                }
-              </p>
-            )}
-            
-            {/* Important note (if exists) */}
-            {!isCompleted && importantNote && (
-              <div className="flex items-center gap-1 text-[10px] text-amber-300 mt-0.5">
-                <AlertCircle className="h-2.5 w-2.5 flex-shrink-0" />
-                <span className="line-clamp-1">{importantNote}</span>
-              </div>
-            )}
+            {/* Bottom content */}
+            <div className="space-y-1">
+              {/* Course name */}
+              <h3 className="text-white font-bold text-base leading-tight line-clamp-1">
+                {enrollment.course_name}
+              </h3>
+              
+              {/* Round name + View schedule link */}
+              {round && (
+                <div className="flex items-center gap-1.5 text-xs text-white/80">
+                  <span className="truncate">{round.round_name}</span>
+                  <span>•</span>
+                  <span className="flex items-center whitespace-nowrap font-medium">
+                    View schedule
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </span>
+                </div>
+              )}
+              
+              {/* Next session info */}
+              {!isCompleted && displayDate && (
+                <p className={`text-xs font-medium ${isSessionToday ? 'text-green-400' : 'text-white/90'}`}>
+                  {isSessionToday 
+                    ? `Next: Today at ${format(new Date(displayDate), 'h:mm a')}`
+                    : isUpcoming 
+                      ? `Starts: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
+                      : `Next: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
+                  }
+                </p>
+              )}
+              
+              {/* Important note (if exists) */}
+              {!isCompleted && importantNote && (
+                <div className="flex items-center gap-1.5 text-[11px] text-amber-300 mt-1">
+                  <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                  <span className="line-clamp-1">{importantNote}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </Link>
