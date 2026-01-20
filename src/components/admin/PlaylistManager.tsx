@@ -42,7 +42,7 @@ interface PlaylistFormData {
   description: string;
   program_slug: string;
   is_free: boolean;
-  category: 'audiobook' | 'course_supplement' | 'podcast' | 'meditate' | 'workout' | 'soundscape' | 'affirmations';
+  category: 'audiobook' | 'course' | 'podcast' | 'meditate' | 'workout' | 'soundscape' | 'affirmations';
   sort_order: number;
   display_mode: DisplayMode;
   cover_image_url: string;
@@ -171,7 +171,7 @@ const PlaylistForm = ({
       <Label htmlFor="playlist_category">Category *</Label>
       <Select
         value={formData.category}
-        onValueChange={(value: 'audiobook' | 'course_supplement' | 'podcast' | 'meditate' | 'workout' | 'soundscape' | 'affirmations') => 
+        onValueChange={(value: 'audiobook' | 'course' | 'podcast' | 'meditate' | 'workout' | 'soundscape' | 'affirmations') => 
           setFormData({ ...formData, category: value })
         }
       >
@@ -180,7 +180,7 @@ const PlaylistForm = ({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="audiobook">📚 Audiobook</SelectItem>
-          <SelectItem value="course_supplement">📖 Course Supplement</SelectItem>
+          <SelectItem value="course">📖 Course</SelectItem>
           <SelectItem value="podcast">🎙️ Podcast</SelectItem>
           <SelectItem value="meditate">🧘 Meditate</SelectItem>
           <SelectItem value="workout">💪 Workout</SelectItem>
@@ -643,7 +643,7 @@ export const PlaylistManager = () => {
           workout: 'workout',
           soundscape: 'soundscape',
           affirmations: 'affirmations',
-          course_supplement: 'course',
+          course: 'course',
         };
         const programType = categoryToType[playlist.category] || 'audiobook';
 
