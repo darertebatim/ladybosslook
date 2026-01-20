@@ -26,8 +26,8 @@ export function QuickActionsGrid() {
     },
     {
       icon: Sparkles,
-      label: 'Inspire',
-      to: '/app/inspire',
+      label: 'Routines',
+      to: '/app/routines',
       bgColor: 'bg-[#D3F2EA]', // mint
       iconColor: 'text-teal-600',
     },

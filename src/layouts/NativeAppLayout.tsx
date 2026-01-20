@@ -130,7 +130,7 @@ const NativeAppLayout = () => {
     { path: '/app/feed', icon: Newspaper, label: 'Community', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount },
     { path: '/app/browse', icon: ShoppingBag, label: 'Browse' },
     { path: '/app/player', icon: Music, label: 'Listen' },
-    { path: '/app/inspire', icon: Lightbulb, label: 'Inspire' },
+    { path: '/app/routines', icon: Lightbulb, label: 'Routines' },
     { path: '/app/chat', icon: MessageCircle, label: 'Chat' },
   ];
 

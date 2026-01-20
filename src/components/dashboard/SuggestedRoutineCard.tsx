@@ -35,7 +35,7 @@ export function SuggestedRoutineCard({ routine }: SuggestedRoutineCardProps) {
           </div>
         </div>
 
-        <Link to={`/app/inspire/${routine.id}`}>
+        <Link to={`/app/routines/${routine.id}`}>
           <Button 
             size="sm" 
             className="bg-violet-600 hover:bg-violet-700 text-white shrink-0"

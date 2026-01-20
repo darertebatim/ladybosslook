@@ -90,8 +90,8 @@ export default function AppInspireDetail() {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
         <p className="text-muted-foreground">Routine not found</p>
-        <Button variant="outline" onClick={() => navigate('/app/inspire')}>
-          Back to Inspire
+        <Button variant="outline" onClick={() => navigate('/app/routines')}>
+          Back to Routines
         </Button>
       </div>
     );
