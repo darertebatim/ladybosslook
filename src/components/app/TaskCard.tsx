@@ -100,16 +100,16 @@ export const TaskCard = ({
       <div
         onClick={handleCardClick}
         className={cn(
-          'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+          'rounded-2xl px-3 py-2.5 transition-all duration-200 cursor-pointer active:scale-[0.98]',
           colorClass, // Use user's chosen task color
           isCompleted && 'opacity-60'
         )}
       >
         {/* Main row */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {/* Icon circle - shows Pro link type icon */}
-          <div className="w-11 h-11 rounded-full bg-white/90 dark:bg-white/20 flex items-center justify-center shrink-0 shadow-sm">
-            <ProIcon className={cn('h-5 w-5', proConfig.iconColorClass)} />
+          <div className="w-10 h-10 rounded-full bg-white/90 dark:bg-white/20 flex items-center justify-center shrink-0 shadow-sm">
+            <ProIcon className={cn('h-4.5 w-4.5', proConfig.iconColorClass)} />
           </div>
 
           {/* Content */}
@@ -148,11 +148,11 @@ export const TaskCard = ({
               navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
             }}
             className={cn(
-              'flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold shrink-0 transition-all shadow-sm active:scale-95',
+              'flex items-center justify-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all shadow-sm active:scale-95',
               proConfig.buttonClass
             )}
           >
-            <ProIcon className="h-4 w-4" />
+            <ProIcon className="h-3.5 w-3.5" />
             {proConfig.badgeText}
           </button>
 
@@ -160,14 +160,14 @@ export const TaskCard = ({
           <button
             onClick={handleToggleComplete}
             className={cn(
-              'w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+              'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
               isCompleted
                 ? 'bg-emerald-500 text-white shadow-md'
                 : 'border-2 border-foreground/25 hover:border-foreground/40 bg-white/50',
               isAnimating && 'scale-110'
             )}
           >
-            {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
+            {isCompleted && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
           </button>
         </div>
       </div>
@@ -179,16 +179,16 @@ export const TaskCard = ({
     <div
       onClick={handleCardClick}
       className={cn(
-        'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+        'rounded-2xl px-3 py-2.5 transition-all duration-200 cursor-pointer active:scale-[0.98]',
         colorClass,
         isCompleted && 'opacity-60'
       )}
     >
       {/* Main row */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
         {/* Icon circle */}
-        <div className="w-11 h-11 rounded-full bg-white/90 flex items-center justify-center shrink-0 shadow-sm">
-          <TaskIcon iconName={task.emoji} size={22} className="text-foreground/80" />
+        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shrink-0 shadow-sm">
+          <TaskIcon iconName={task.emoji} size={20} className="text-foreground/80" />
         </div>
 
         {/* Content */}
@@ -216,14 +216,14 @@ export const TaskCard = ({
         <button
           onClick={handleToggleComplete}
           className={cn(
-            'w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+            'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
             isCompleted
               ? 'bg-emerald-500 text-white shadow-md'
               : 'border-2 border-foreground/25 hover:border-foreground/40 bg-white/50',
             isAnimating && 'scale-110'
           )}
         >
-          {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
+          {isCompleted && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
         </button>
       </div>
     </div>
