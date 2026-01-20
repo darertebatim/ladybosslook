@@ -636,13 +636,24 @@ export const PlaylistManager = () => {
         // Generate description based on playlist info
         const description = generateProgramDescription(playlist);
 
-        // Create new free program with type 'playlist'
+        // Map playlist category to program type
+        const categoryToType: Record<string, string> = {
+          audiobook: 'audiobook',
+          meditate: 'meditate',
+          workout: 'workout',
+          soundscape: 'soundscape',
+          affirmations: 'affirmations',
+          course_supplement: 'course',
+        };
+        const programType = categoryToType[playlist.category] || 'audiobook';
+
+        // Create new free program with matching type
         const { error: programError } = await supabase
           .from('program_catalog')
           .insert({
             title: playlist.name,
             slug: slug,
-            type: 'playlist',
+            type: programType,
             payment_type: 'free',
             price_amount: 0,
             description: description,

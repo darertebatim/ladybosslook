@@ -520,7 +520,10 @@ export function ProgramsManager() {
                       <SelectItem value="webinar">Webinar</SelectItem>
                       <SelectItem value="event">Event</SelectItem>
                       <SelectItem value="audiobook">🎧 Audiobook</SelectItem>
-                      <SelectItem value="playlist">🎵 Playlist</SelectItem>
+                      <SelectItem value="meditate">🧘 Meditate</SelectItem>
+                      <SelectItem value="workout">💪 Workout</SelectItem>
+                      <SelectItem value="soundscape">🌊 Soundscape</SelectItem>
+                      <SelectItem value="affirmations">✨ Affirmations</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
