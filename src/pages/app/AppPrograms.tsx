@@ -296,14 +296,44 @@ const AppCourses = () => {
           </div>
         )}
 
-        {/* Browse Programs Section - Horizontal Carousel like Home */}
-        {browsePrograms.length > 0 && (
-          <div className="space-y-2 -mx-4">
+        {/* Empty state if no programs at all */}
+        {totalPrograms === 0 && browsePrograms.length === 0 && (
+          <div className="text-center py-12">
+            <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground mb-4">
+              No programs available
+            </p>
+          </div>
+        )}
+
+        {/* Empty enrolled state with browse below */}
+        {totalPrograms === 0 && browsePrograms.length > 0 && (
+          <div className="text-center py-8 mb-4">
+            <GraduationCap className="h-10 w-10 mx-auto mb-2 text-muted-foreground opacity-50" />
+            <p className="text-sm text-muted-foreground">No programs enrolled yet</p>
+            <p className="text-xs text-muted-foreground mt-1">Browse and enroll in programs below</p>
+          </div>
+        )}
+
+        {/* Spacer for fixed bottom section */}
+        {browsePrograms.length > 0 && <div className="h-[140px]" />}
+      </div>
+
+      {/* Fixed Browse Programs Section - Bottom Dashboard Style */}
+      {browsePrograms.length > 0 && (
+        <div 
+          className="fixed bottom-[72px] left-0 right-0 z-30 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+          style={{ 
+            backgroundColor: '#F4ECFE',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+          }}
+        >
+          <div className="py-3 space-y-2">
             {/* Header */}
             <div className="flex items-center justify-between px-5">
               <div className="flex items-center gap-1.5">
                 <h2 className="text-sm font-semibold text-foreground">Browse Programs</h2>
-                <Badge variant="secondary" className="h-4 px-1 text-[10px]">
+                <Badge variant="secondary" className="h-4 px-1 text-[10px] bg-white/60">
                   {browsePrograms.length}
                 </Badge>
               </div>
@@ -340,27 +370,9 @@ const AppCourses = () => {
               </CarouselContent>
             </Carousel>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Empty state if no programs at all */}
-        {totalPrograms === 0 && browsePrograms.length === 0 && (
-          <div className="text-center py-12">
-            <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground mb-4">
-              No programs available
-            </p>
-          </div>
-        )}
-
-        {/* Empty enrolled state with browse below */}
-        {totalPrograms === 0 && browsePrograms.length > 0 && (
-          <div className="text-center py-8 mb-4">
-            <GraduationCap className="h-10 w-10 mx-auto mb-2 text-muted-foreground opacity-50" />
-            <p className="text-sm text-muted-foreground">No programs enrolled yet</p>
-            <p className="text-xs text-muted-foreground mt-1">Browse and enroll in programs below</p>
-          </div>
-        )}
-      </div>
     </>
   );
 };
