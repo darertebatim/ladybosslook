@@ -20,7 +20,6 @@ import { useTaskTemplates, useCreateTaskFromTemplate } from '@/hooks/useTaskPlan
 export default function AppInspire() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedTaskCategory, setSelectedTaskCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [addingTemplateId, setAddingTemplateId] = useState<string | null>(null);
@@ -38,19 +37,18 @@ export default function AppInspire() {
   const displayPlans = selectedCategory ? filteredPlans : popularPlans;
   const isLoading = categoriesLoading || popularLoading || (selectedCategory && plansLoading);
 
-  // Derive unique task categories
-  const taskCategories = useMemo(() => {
-    if (!taskTemplates) return [];
-    const cats = [...new Set(taskTemplates.map(t => t.category).filter(Boolean))] as string[];
-    return cats.sort();
-  }, [taskTemplates]);
+  // Get selected category name for filtering task templates
+  const selectedCategoryName = useMemo(() => {
+    if (!selectedCategory || !categories) return null;
+    return categories.find(c => c.slug === selectedCategory)?.name || null;
+  }, [selectedCategory, categories]);
 
-  // Filter task templates by selected category
+  // Filter task templates by selected category (using category name)
   const filteredTaskTemplates = useMemo(() => {
     if (!taskTemplates) return [];
-    if (!selectedTaskCategory) return taskTemplates;
-    return taskTemplates.filter(t => t.category === selectedTaskCategory);
-  }, [taskTemplates, selectedTaskCategory]);
+    if (!selectedCategoryName) return taskTemplates;
+    return taskTemplates.filter(t => t.category === selectedCategoryName);
+  }, [taskTemplates, selectedCategoryName]);
 
   // Filter by search query
   const searchedPlans = displayPlans?.filter(plan => 
@@ -228,41 +226,9 @@ export default function AppInspire() {
               <div className="flex items-center gap-2 mb-3">
                 <ListTodo className="w-4 h-4 text-primary" />
                 <h2 className="text-sm font-semibold text-muted-foreground">
-                  TASK IDEAS
+                  {selectedCategoryName ? `${selectedCategoryName.toUpperCase()} TASKS` : 'TASK IDEAS'}
                 </h2>
               </div>
-
-              {/* Task Category Pills */}
-              <ScrollArea className="w-full mb-4">
-                <div className="flex gap-2 pb-2">
-                  <button
-                    onClick={() => setSelectedTaskCategory(null)}
-                    className={`shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                      !selectedTaskCategory
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                    }`}
-                  >
-                    All
-                  </button>
-                  {taskCategories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedTaskCategory(
-                        selectedTaskCategory === cat ? null : cat
-                      )}
-                      className={`shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
-                        selectedTaskCategory === cat
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-                <ScrollBar orientation="horizontal" className="invisible" />
-              </ScrollArea>
 
               {/* Task Templates List */}
               {templatesLoading ? (
