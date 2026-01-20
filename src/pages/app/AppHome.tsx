@@ -295,9 +295,9 @@ const AppHome = () => {
                     setSelectedDate(new Date());
                     setCurrentMonth(startOfMonth(new Date()));
                   }}
-                  className="absolute right-2 top-0 flex items-center gap-0.5 px-2 py-0.5 text-xs font-medium text-violet-600 bg-violet-100 dark:bg-violet-900/50 dark:text-violet-300 rounded-full"
+                  className="absolute right-3 -top-0.5 flex items-center gap-1 px-3 py-1.5 text-sm font-semibold text-violet-700 bg-violet-200 dark:bg-violet-800 dark:text-violet-200 rounded-l-full shadow-sm active:scale-95 transition-transform"
                 >
-                  <ChevronLeft className="h-3 w-3" />
+                  <ChevronLeft className="h-4 w-4" />
                   Today
                 </button>
               )}
