@@ -19,6 +19,7 @@ import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
+import { PromoBanner } from '@/components/app/PromoBanner';
 
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -314,6 +315,9 @@ const AppHome = () => {
               : 'calc(48px + 72px + max(12px, env(safe-area-inset-top)))' 
           }} 
         />
+
+        {/* Promo Banner */}
+        <PromoBanner />
 
         {/* Tag filter chips */}
         {taskTags.length > 0 && (
