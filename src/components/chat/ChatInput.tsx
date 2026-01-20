@@ -4,8 +4,17 @@ import { Keyboard } from "@capacitor/keyboard";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, X, Loader2, FileText, Image as ImageIcon, Mic, Square, Play, Pause, Trash2 } from "lucide-react";
+import { Send, X, Loader2, FileText, Image as ImageIcon, Mic, Square, Play, Pause, Trash2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { 
+  showAttachmentActionSheet, 
+  takePhoto, 
+  pickFromPhotos, 
+  pickFile, 
+  isNativeFilePicker,
+  type PickedAttachment 
+} from "@/lib/nativeFilePicker";
+import { toast } from "sonner";
 interface Attachment {
   file: File;
   preview?: string;
@@ -202,8 +211,62 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
     }
   };
 
-  // NOTE: File attachment temporarily disabled for this version
-  // Will be re-enabled in next version with proper implementation
+  // Handle native attachment picking (camera, photos, files)
+  const handleNativeAttachment = async () => {
+    try {
+      setError(null);
+      
+      const option = await showAttachmentActionSheet();
+      
+      if (option === 'cancel') return;
+      
+      let result: PickedAttachment | null = null;
+      
+      if (option === 'camera') {
+        result = await takePhoto();
+      } else if (option === 'photos') {
+        result = await pickFromPhotos();
+      } else if (option === 'files') {
+        if (isNativeFilePicker()) {
+          result = await pickFile();
+        } else {
+          // Web fallback - trigger file input
+          fileInputRef.current?.click();
+          return;
+        }
+      }
+      
+      if (result) {
+        // Validate file size
+        if (result.size > MAX_FILE_SIZE) {
+          setError("File size must be less than 10MB");
+          return;
+        }
+        
+        // Create preview for images
+        if (result.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setAttachment({ 
+              file: result!.file, 
+              preview: reader.result as string 
+            });
+          };
+          reader.onerror = () => {
+            setAttachment({ file: result!.file });
+          };
+          reader.readAsDataURL(result.file);
+        } else {
+          setAttachment({ file: result.file });
+        }
+      }
+    } catch (error: any) {
+      console.error('[ChatInput] Attachment error:', error);
+      const errorMessage = error?.message || 'Failed to add attachment. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
+  };
 
   const removeAttachment = () => {
     setAttachment(null);
@@ -578,7 +641,16 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           className="hidden"
         />
         
-        {/* Attachment button - HIDDEN for this version, coming in next release */}
+        {/* Attachment button - Re-enabled with Capacitor 8 */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="shrink-0 h-11 w-11 rounded-full text-foreground/70 hover:text-foreground hover:bg-muted/80"
+          onClick={handleNativeAttachment}
+          disabled={disabled || uploading || isRecording || !!attachment}
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
 
         {/* Telegram-style pill input - CENTER */}
         <div className="flex-1 flex items-center bg-muted/50 rounded-full border border-border/30 pl-4 pr-1">
