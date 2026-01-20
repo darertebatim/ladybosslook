@@ -47,7 +47,7 @@ export default function AppInspireDetail() {
       await addRoutinePlan.mutateAsync({ planId, selectedTaskIds, editedTasks });
       setShowPreviewSheet(false);
       toast.success(`${selectedTaskIds.length} tasks added!`);
-      navigate('/app/planner');
+      navigate('/app/home');
     } catch (error) {
       toast.error('Failed to add routine');
     }

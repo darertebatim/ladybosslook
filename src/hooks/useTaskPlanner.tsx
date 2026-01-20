@@ -122,36 +122,36 @@ export interface UpdateTaskInput extends Partial<CreateTaskInput> {
   pro_link_value?: string | null;
 }
 
-// Color mapping for UI - Me+ style soft pastels
-// Palette: F8DAF7, FAE5C5, FCF18D, E2F7BC, D6E6FC, D3F2EA, E6D9FC
+// Color mapping for UI - Me+ style brighter pastels
+// Palette: FFD6E8, FFE4C4, FFF59D, E8F5A3, C5E8FA, B8F5E4, E8D4F8
 export const TASK_COLORS: Record<TaskColor, string> = {
-  pink: '#F8DAF7',      // Soft lavender-pink
-  peach: '#FAE5C5',     // Warm cream/peach
-  yellow: '#FCF18D',    // Soft sunny yellow
-  lime: '#E2F7BC',      // Fresh soft lime
-  sky: '#D6E6FC',       // Soft sky blue
-  mint: '#D3F2EA',      // Cool mint teal
-  lavender: '#E6D9FC',  // Soft lavender purple
-  purple: '#E6D9FC',    // Same as lavender
-  blue: '#D6E6FC',      // Same as sky
-  red: '#F8DAF7',       // Use pink for red
-  orange: '#FAE5C5',    // Use peach for orange
-  green: '#E2F7BC',     // Use lime for green
+  pink: '#FFD6E8',      // Bright pink
+  peach: '#FFE4C4',     // Warm peach
+  yellow: '#FFF59D',    // Bright sunny yellow
+  lime: '#E8F5A3',      // Fresh lime
+  sky: '#C5E8FA',       // Cyan sky blue
+  mint: '#B8F5E4',      // Vibrant mint
+  lavender: '#E8D4F8',  // Soft lavender
+  purple: '#E8D4F8',    // Same as lavender
+  blue: '#C5E8FA',      // Same as sky
+  red: '#FFD6E8',       // Use pink for red
+  orange: '#FFE4C4',    // Use peach for orange
+  green: '#E8F5A3',     // Use lime for green
 };
 
 export const TASK_COLOR_CLASSES: Record<TaskColor, string> = {
-  pink: 'bg-[#F8DAF7]',
-  peach: 'bg-[#FAE5C5]',
-  yellow: 'bg-[#FCF18D]',
-  lime: 'bg-[#E2F7BC]',
-  sky: 'bg-[#D6E6FC]',
-  mint: 'bg-[#D3F2EA]',
-  lavender: 'bg-[#E6D9FC]',
-  purple: 'bg-[#E6D9FC]',
-  blue: 'bg-[#D6E6FC]',
-  red: 'bg-[#F8DAF7]',
-  orange: 'bg-[#FAE5C5]',
-  green: 'bg-[#E2F7BC]',
+  pink: 'bg-[#FFD6E8]',
+  peach: 'bg-[#FFE4C4]',
+  yellow: 'bg-[#FFF59D]',
+  lime: 'bg-[#E8F5A3]',
+  sky: 'bg-[#C5E8FA]',
+  mint: 'bg-[#B8F5E4]',
+  lavender: 'bg-[#E8D4F8]',
+  purple: 'bg-[#E8D4F8]',
+  blue: 'bg-[#C5E8FA]',
+  red: 'bg-[#FFD6E8]',
+  orange: 'bg-[#FFE4C4]',
+  green: 'bg-[#E8F5A3]',
 };
 
 // ============================================

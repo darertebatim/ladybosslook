@@ -490,9 +490,9 @@ export default function AppPlaylistDetail() {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="pt-3 pb-2 px-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate(cameFromPlanner ? '/app/planner' : '/app/player')}>
+          <Button variant="ghost" size="sm" onClick={() => navigate(cameFromPlanner ? '/app/home' : '/app/player')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {cameFromPlanner ? 'Planner' : 'Library'}
+            {cameFromPlanner ? 'Home' : 'Library'}
           </Button>
         </div>
       </div>
