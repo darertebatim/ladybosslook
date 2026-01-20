@@ -41,7 +41,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Sparkles, Wand2, Loader2, Music, BookOpen } from 'lucide-react';
+import { Plus, Pencil, Trash2, Sparkles, Wand2, Loader2, Music, BookOpen, Star } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { PRO_LINK_TYPES, PRO_LINK_CONFIGS, ProLinkType } from '@/lib/proTaskTypes';
 
@@ -56,6 +56,7 @@ interface Template {
   description: string | null;
   category: string | null;
   is_active: boolean;
+  is_popular: boolean;
   display_order: number;
   linked_playlist?: { id: string; name: string } | null;
 }
@@ -92,6 +93,7 @@ export function ProTaskTemplatesManager() {
     description: '',
     category: null as string | null,
     is_active: true,
+    is_popular: false,
     display_order: 0,
   });
 
@@ -203,6 +205,7 @@ export function ProTaskTemplatesManager() {
       description: '',
       category: null,
       is_active: true,
+      is_popular: false,
       display_order: (templates?.length || 0) + 1,
     });
     setIsDialogOpen(true);
@@ -220,6 +223,7 @@ export function ProTaskTemplatesManager() {
       description: template.description || '',
       category: template.category,
       is_active: template.is_active,
+      is_popular: template.is_popular,
       display_order: template.display_order,
     });
     setIsDialogOpen(true);
@@ -325,6 +329,7 @@ export function ProTaskTemplatesManager() {
                 <TableHead>Target</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Popular</TableHead>
                 <TableHead>Active</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -361,6 +366,13 @@ export function ProTaskTemplatesManager() {
                     <TableCell>
                       {template.category && (
                         <Badge variant="secondary">{template.category}</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {template.is_popular ? (
+                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -579,6 +591,17 @@ export function ProTaskTemplatesManager() {
                   This link type doesn't require a value.
                 </p>
               )}
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label className="flex items-center gap-1">
+                <Star className="h-4 w-4 text-yellow-500" />
+                Popular
+              </Label>
+              <Switch
+                checked={formData.is_popular}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_popular: checked }))}
+              />
             </div>
 
             <div className="flex items-center justify-between">

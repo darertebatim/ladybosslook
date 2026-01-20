@@ -1889,6 +1889,7 @@ export type Database = {
           icon: string
           id: string
           is_active: boolean
+          is_popular: boolean
           linked_playlist_id: string | null
           pro_link_type: string
           pro_link_value: string | null
@@ -1903,6 +1904,7 @@ export type Database = {
           icon?: string
           id?: string
           is_active?: boolean
+          is_popular?: boolean
           linked_playlist_id?: string | null
           pro_link_type: string
           pro_link_value?: string | null
@@ -1917,6 +1919,7 @@ export type Database = {
           icon?: string
           id?: string
           is_active?: boolean
+          is_popular?: boolean
           linked_playlist_id?: string | null
           pro_link_type?: string
           pro_link_value?: string | null
@@ -2036,6 +2039,7 @@ export type Database = {
           emoji: string
           id: string
           is_active: boolean
+          is_popular: boolean
           repeat_pattern: string
           suggested_time: string | null
           title: string
@@ -2049,6 +2053,7 @@ export type Database = {
           emoji?: string
           id?: string
           is_active?: boolean
+          is_popular?: boolean
           repeat_pattern?: string
           suggested_time?: string | null
           title: string
@@ -2062,6 +2067,7 @@ export type Database = {
           emoji?: string
           id?: string
           is_active?: boolean
+          is_popular?: boolean
           repeat_pattern?: string
           suggested_time?: string | null
           title?: string

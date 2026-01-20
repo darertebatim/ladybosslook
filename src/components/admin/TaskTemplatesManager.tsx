@@ -41,7 +41,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, ListTodo } from 'lucide-react';
+import { Plus, Pencil, Trash2, ListTodo, Star } from 'lucide-react';
 import { TASK_COLOR_CLASSES } from '@/hooks/useTaskPlanner';
 
 interface Template {
@@ -54,6 +54,7 @@ interface Template {
   repeat_pattern: string;
   suggested_time: string | null;
   is_active: boolean;
+  is_popular: boolean;
   display_order: number;
 }
 
@@ -85,6 +86,7 @@ export function TaskTemplatesManager() {
     repeat_pattern: 'none' as string,
     suggested_time: null as string | null,
     is_active: true,
+    is_popular: false,
     display_order: 0,
   });
 
@@ -165,6 +167,7 @@ export function TaskTemplatesManager() {
       repeat_pattern: 'none',
       suggested_time: null,
       is_active: true,
+      is_popular: false,
       display_order: (templates?.length || 0) + 1,
     });
     setIsDialogOpen(true);
@@ -181,6 +184,7 @@ export function TaskTemplatesManager() {
       repeat_pattern: template.repeat_pattern,
       suggested_time: template.suggested_time,
       is_active: template.is_active,
+      is_popular: template.is_popular,
       display_order: template.display_order,
     });
     setIsDialogOpen(true);
@@ -244,6 +248,7 @@ export function TaskTemplatesManager() {
                 <TableHead>Category</TableHead>
                 <TableHead>Color</TableHead>
                 <TableHead>Repeat</TableHead>
+                <TableHead>Popular</TableHead>
                 <TableHead>Active</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -276,6 +281,13 @@ export function TaskTemplatesManager() {
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground capitalize">
                       {template.repeat_pattern === 'none' ? 'One-time' : template.repeat_pattern}
+                    </TableCell>
+                    <TableCell>
+                      {template.is_popular ? (
+                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <span className={template.is_active ? 'text-green-600' : 'text-muted-foreground'}>
@@ -417,6 +429,17 @@ export function TaskTemplatesManager() {
                 value={formData.suggested_time || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, suggested_time: e.target.value || null }))}
               />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={formData.is_popular}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_popular: checked }))}
+              />
+              <Label className="flex items-center gap-1">
+                <Star className="h-4 w-4 text-yellow-500" />
+                Popular
+              </Label>
             </div>
 
             <div className="flex items-center gap-2">
