@@ -93,29 +93,38 @@ export const TaskQuickStartSheet = ({
               <p className="text-sm text-muted-foreground mb-3">
                 Need some idea? 💡
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                {suggestions.map((template, index) => (
-                  <button
-                    key={template.id}
-                    onClick={() => handleTemplateSelect(template)}
-                    className={cn(
-                      'flex items-center gap-3 p-4 rounded-2xl text-left transition-all active:scale-[0.98]',
-                      TASK_COLOR_CLASSES[SUGGESTION_COLORS[index % SUGGESTION_COLORS.length]]
-                    )}
-                  >
-                    <span className="text-2xl">{template.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <span className="font-medium text-foreground/90 line-clamp-1">
+              <div className="space-y-2">
+                {suggestions.map((template, index) => {
+                  // Format time nicely (e.g., "07:00:00" -> "7:00 AM")
+                  const formatTime = (time: string | null) => {
+                    if (!time) return null;
+                    const [hours, minutes] = time.split(':').map(Number);
+                    const period = hours >= 12 ? 'PM' : 'AM';
+                    const displayHour = hours % 12 || 12;
+                    return `${displayHour}:${minutes.toString().padStart(2, '0')} ${period}`;
+                  };
+
+                  return (
+                    <button
+                      key={template.id}
+                      onClick={() => handleTemplateSelect(template)}
+                      className={cn(
+                        'flex items-center gap-3 w-full p-4 rounded-2xl text-left transition-all active:scale-[0.98]',
+                        TASK_COLOR_CLASSES[SUGGESTION_COLORS[index % SUGGESTION_COLORS.length]]
+                      )}
+                    >
+                      <span className="text-2xl flex-shrink-0">{template.emoji}</span>
+                      <span className="font-medium text-foreground/90 flex-1">
                         {template.title}
                       </span>
                       {template.suggested_time && (
-                        <span className="text-xs text-foreground/60">
-                          {template.suggested_time}
+                        <span className="text-sm text-foreground/50 flex-shrink-0">
+                          {formatTime(template.suggested_time)}
                         </span>
                       )}
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
