@@ -440,7 +440,7 @@ const AppHome = () => {
 
               {/* Popular Routines Suggestions - only show routines user hasn't added */}
               {suggestedRoutines.length > 0 && selectedTag === null && (
-                <div className="mt-6 pt-4 border-t border-border/50">
+                <div className="mt-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="h-4 w-4 text-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
@@ -461,7 +461,7 @@ const AppHome = () => {
               )}
 
               {/* Bottom Action Buttons */}
-              <div className="mt-6 pt-4 border-t border-border/50 space-y-3">
+              <div className="mt-6 space-y-3">
                 {/* Explore Routines Button */}
                 <button
                   onClick={() => navigate('/app/routines')}
