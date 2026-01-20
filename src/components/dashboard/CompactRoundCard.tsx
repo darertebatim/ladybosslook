@@ -61,7 +61,7 @@ export function CompactRoundCard({
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-indigo-600" />
+          <div className="absolute inset-0 bg-primary" />
         )}
         
         {/* Overlay - stronger gradient from bottom */}

@@ -148,8 +148,8 @@ const AppCourses = () => {
           ) : (
             <div className={`absolute inset-0 ${
               isCompleted 
-                ? 'bg-gradient-to-br from-gray-400 to-gray-500' 
-                : 'bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-700'
+                ? 'bg-gray-500' 
+                : 'bg-primary'
             }`} />
           )}
           
