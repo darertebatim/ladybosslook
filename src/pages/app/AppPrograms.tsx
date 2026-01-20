@@ -9,7 +9,6 @@ import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { CoursesSkeleton } from '@/components/app/skeletons';
 import { format, isToday } from 'date-fns';
 import { usePrograms } from '@/hooks/usePrograms';
-import { ProgramCard } from '@/components/app/ProgramCard';
 import {
   Carousel,
   CarouselContent,
@@ -49,8 +48,11 @@ const AppCourses = () => {
   // Get enrolled program slugs
   const enrolledSlugs = new Set(enrollments?.map(e => e.program_slug) || []);
   
-  // Filter browse programs to exclude enrolled ones
-  const browsePrograms = programs.filter(p => !enrolledSlugs.has(p.slug));
+  // Filter browse programs: only free/free-on-iOS programs that aren't enrolled
+  const browsePrograms = programs.filter(p => 
+    !enrolledSlugs.has(p.slug) && 
+    (p.isFree || p.priceAmount === 0 || p.is_free_on_ios === true)
+  );
 
   // Separate enrollments into active/upcoming and completed
   const activeRounds = enrollments?.filter(e => e.program_rounds?.status !== 'completed') || [];
@@ -316,54 +318,55 @@ const AppCourses = () => {
         )}
 
         {/* Spacer for fixed bottom section */}
-        {browsePrograms.length > 0 && <div className="h-[140px]" />}
+        {browsePrograms.length > 0 && <div className="h-[100px]" />}
       </div>
 
       {/* Fixed Browse Programs Section - Bottom Dashboard Style */}
       {browsePrograms.length > 0 && (
         <div 
-          className="fixed bottom-[72px] left-0 right-0 z-30 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
-          style={{ 
-            backgroundColor: '#F4ECFE',
-            paddingBottom: 'env(safe-area-inset-bottom, 0px)'
-          }}
+          className="fixed bottom-[70px] left-0 right-0 z-30 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+          style={{ backgroundColor: '#F4ECFE' }}
         >
-          <div className="py-3 space-y-2">
+          <div className="py-2 space-y-1">
             {/* Header */}
-            <div className="flex items-center justify-between px-5">
+            <div className="flex items-center justify-between px-4">
               <div className="flex items-center gap-1.5">
-                <h2 className="text-sm font-semibold text-foreground">Browse Programs</h2>
-                <Badge variant="secondary" className="h-4 px-1 text-[10px] bg-white/60">
+                <h2 className="text-xs font-semibold text-foreground">Browse Programs</h2>
+                <Badge variant="secondary" className="h-3.5 px-1 text-[9px] bg-white/60">
                   {browsePrograms.length}
                 </Badge>
               </div>
               <Link 
                 to="/app/browse"
-                className="text-xs text-primary font-medium flex items-center gap-0.5"
+                className="text-[10px] text-primary font-medium flex items-center gap-0.5"
               >
                 View All
-                <ChevronRight className="h-3.5 w-3.5" />
+                <ChevronRight className="h-3 w-3" />
               </Link>
             </div>
 
-            {/* Carousel */}
+            {/* Carousel - Compact cards */}
             <Carousel
-              opts={{
-                align: 'start',
-                loop: false,
-              }}
+              opts={{ align: 'start', loop: false }}
               className="w-full"
             >
-              <CarouselContent className="-ml-3 px-4">
+              <CarouselContent className="-ml-2 px-3">
                 {browsePrograms.map((program) => (
-                  <CarouselItem key={program.slug} className="pl-3 basis-[140px]">
-                    <Link to={`/app/browse/${program.slug}`}>
-                      <ProgramCard 
-                        title={program.title}
-                        image={program.image}
-                        type={program.type}
-                        isFree={program.isFree}
-                      />
+                  <CarouselItem key={program.slug} className="pl-2 basis-[100px]">
+                    <Link to={`/app/course/${program.slug}`}>
+                      <div className="relative aspect-[3/4] rounded-lg overflow-hidden">
+                        <img 
+                          src={program.image} 
+                          alt={program.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 p-1.5">
+                          <p className="text-[9px] font-medium text-white line-clamp-2 leading-tight">
+                            {program.title}
+                          </p>
+                        </div>
+                      </div>
                     </Link>
                   </CarouselItem>
                 ))}
