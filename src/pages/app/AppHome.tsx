@@ -1,298 +1,460 @@
-import { useAuth } from '@/hooks/useAuth';
-import { useHomeData } from '@/hooks/useAppData';
-import { StatsCards } from '@/components/dashboard/StatsCards';
-import { ActiveRound } from '@/components/dashboard/ActiveRound';
-import { WelcomeSection } from '@/components/dashboard/WelcomeSection';
-import { SEOHead } from '@/components/SEOHead';
-import { Button } from '@/components/ui/button';
-import { MessageCircle, Bell, ArrowRight, User, Send, Mail, Sparkles, BookOpen, NotebookPen } from 'lucide-react';
-import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
-import { useState, useEffect } from 'react';
-import { Capacitor } from '@capacitor/core';
-import { checkPermissionStatus } from '@/lib/pushNotifications';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
-import { CompletionCelebration } from '@/components/app/CompletionCelebration';
-import { useCompletedRoundCelebration } from '@/hooks/useCompletedRoundCelebration';
-import { HomeSkeleton } from '@/components/app/skeletons';
-import { supabase } from '@/integrations/supabase/client';
-import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
-import { HomeBanner } from '@/components/app/HomeBanner';
-import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
+import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
+import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { 
+  useTasksForDate, 
+  useCompletionsForDate,
+  useCompletedDates,
+  useUserStreak,
+  UserTask,
+  TaskTemplate,
+} from '@/hooks/useTaskPlanner';
+import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
+import { useNewHomeData } from '@/hooks/useNewHomeData';
+import { TaskCard } from '@/components/app/TaskCard';
+import { TaskDetailModal } from '@/components/app/TaskDetailModal';
+import { MonthCalendar } from '@/components/app/MonthCalendar';
+import { StreakCelebration } from '@/components/app/StreakCelebration';
+import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
+import { ProgramEventCard } from '@/components/app/ProgramEventCard';
 
+import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
+import { Skeleton } from '@/components/ui/skeleton';
+import { SEOHead } from '@/components/SEOHead';
 
 const AppHome = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const [showNotificationBanner, setShowNotificationBanner] = useState(false);
-  
-  // Use centralized data hook with parallel fetching
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [showStreakModal, setShowStreakModal] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
+  const [showQuickStart, setShowQuickStart] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
+
+  // Handle quick start continue
+  const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
+    if (template) {
+      navigate(`/app/planner/new?name=${encodeURIComponent(template.title)}&emoji=${encodeURIComponent(template.emoji)}&color=${template.color}`);
+    } else {
+      navigate(`/app/planner/new?name=${encodeURIComponent(taskName)}`);
+    }
+  }, [navigate]);
+
+  // Data queries - Planner data
+  const { data: tasks = [], isLoading: tasksLoading } = useTasksForDate(selectedDate);
+  const { data: completions, isLoading: completionsLoading } = useCompletionsForDate(selectedDate);
+  const { data: streak } = useUserStreak();
+  const { data: programEvents = [], isLoading: programEventsLoading } = useProgramEventsForDate(selectedDate);
+
+  // Home data for stats and rounds
+  const { data: homeData, isLoading: homeLoading } = useNewHomeData();
+
+  // Generate week days
+  const weekDays = useMemo(() => {
+    const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
+    return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  }, [selectedDate]);
+
+  // Calculate date range for completed dates query
+  const dateRange = useMemo(() => {
+    if (showCalendar) {
+      return {
+        start: startOfWeek(startOfMonth(currentMonth), { weekStartsOn: 0 }),
+        end: endOfWeek(endOfMonth(currentMonth), { weekStartsOn: 0 }),
+      };
+    } else {
+      const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
+      return {
+        start: weekStart,
+        end: addDays(weekStart, 6),
+      };
+    }
+  }, [showCalendar, currentMonth, selectedDate]);
+
+  // Fetch completed dates and program event dates
+  const { data: completedDates } = useCompletedDates(dateRange.start, dateRange.end);
+  const { data: programEventDates } = useProgramEventDates(dateRange.start, dateRange.end);
+
+  // Filter tasks by tag
+  const filteredTasks = useMemo(() => {
+    if (!selectedTag) return tasks;
+    return tasks.filter(task => task.tag === selectedTag);
+  }, [tasks, selectedTag]);
+
+  // Get unique tags from tasks
+  const taskTags = useMemo(() => {
+    const tags = new Set<string>();
+    tasks.forEach(task => {
+      if (task.tag) tags.add(task.tag);
+    });
+    return Array.from(tags);
+  }, [tasks]);
+
+  // Completed task IDs for this date
+  const completedTaskIds = useMemo(() => {
+    return new Set(completions?.tasks.map(c => c.task_id) || []);
+  }, [completions]);
+
+  // Completed subtask IDs for this date
+  const completedSubtaskIds = useMemo(() => {
+    return completions?.subtasks.map(c => c.subtask_id) || [];
+  }, [completions]);
+
+  const handleStreakIncrease = useCallback(() => {
+    setShowStreakModal(true);
+  }, []);
+
+  const handleEditTask = useCallback((task: UserTask) => {
+    setSelectedTask(null);
+    navigate(`/app/planner/edit/${task.id}`);
+  }, [navigate]);
+
+  const handleTaskTap = useCallback((task: UserTask) => {
+    setSelectedTask(task);
+  }, []);
+
+  const handleDateSelect = useCallback((date: Date) => {
+    setSelectedDate(date);
+    setShowCalendar(false);
+  }, []);
+
+  const handlePrevMonth = useCallback(() => {
+    setCurrentMonth(prev => subMonths(prev, 1));
+  }, []);
+
+  const handleNextMonth = useCallback(() => {
+    setCurrentMonth(prev => addMonths(prev, 1));
+  }, []);
+
+  const handleToggleCalendar = useCallback(() => {
+    if (!showCalendar) {
+      setCurrentMonth(startOfMonth(selectedDate));
+    }
+    setShowCalendar(!showCalendar);
+  }, [showCalendar, selectedDate]);
+
+  const isLoading = tasksLoading || completionsLoading || programEventsLoading;
+
+  // Home data defaults
   const { 
-    profile, 
-    enrollments, 
-    hasActiveRounds, 
-    isLoading,
-    listeningMinutes,
-    completedTracks,
-    unreadPosts,
-    journalStreak
-  } = useHomeData();
-  
-  // Get unseen content for new course notification
-  const { hasUnseenCourses, unseenEnrollments } = useUnseenContentContext();
-  const unseenCount = unseenEnrollments.size;
-  
-  
-  // Celebration for completed rounds
-  const { celebrationData, closeCelebration, showCelebration } = useCompletedRoundCelebration();
-  
-  // Track app installation (first open)
-  useAppInstallTracking();
-
-  // Check notification status for banner (permission AND database subscription)
-  useEffect(() => {
-    const checkNotificationStatus = async () => {
-      if (!Capacitor.isNativePlatform() || !user?.id) return;
-      
-      // Check permission
-      const permission = await checkPermissionStatus();
-      
-      // Check database subscription
-      const { data } = await supabase
-        .from('push_subscriptions')
-        .select('id')
-        .eq('user_id', user.id)
-        .like('endpoint', 'native:%')
-        .maybeSingle();
-      
-      const hasSubscription = !!data;
-      
-      // Show banner if either permission not granted OR no subscription in DB
-      if (permission !== 'granted' || !hasSubscription) {
-        const dismissed = localStorage.getItem('notificationBannerDismissed');
-        if (dismissed) {
-          const daysSince = (Date.now() - parseInt(dismissed)) / (1000 * 60 * 60 * 24);
-          if (daysSince < 3) return;
-        }
-        setShowNotificationBanner(true);
-      } else {
-        setShowNotificationBanner(false);
-      }
-    };
-
-    checkNotificationStatus();
-    
-    // Re-check when window gains focus (user returns to app)
-    const handleFocus = () => checkNotificationStatus();
-    window.addEventListener('focus', handleFocus);
-    
-    return () => window.removeEventListener('focus', handleFocus);
-  }, [user?.id]);
-
-  const handleContactSupport = () => {
-    const message = `Hi! I need support.\n\nName: ${profile?.full_name || 'N/A'}\nEmail: ${profile?.email || user?.email || 'N/A'}\nPhone: ${profile?.phone || 'N/A'}\nCity: ${profile?.city || 'N/A'}`;
-    const telegramUrl = `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
-    window.open(telegramUrl, '_blank');
-  };
-
-  const handleEmailSupport = () => {
-    const subject = 'Support Request';
-    const body = `Hi! I need support.\n\nName: ${profile?.full_name || 'N/A'}\nEmail: ${profile?.email || user?.email || 'N/A'}\nPhone: ${profile?.phone || 'N/A'}\nCity: ${profile?.city || 'N/A'}`;
-    window.location.href = `mailto:support@ladybosslook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
-
-  // Show skeleton while loading
-  if (isLoading) {
-    return (
-      <>
-        <AppHeader
-          title="Welcome back!" 
-          subtitle="Loading..."
-          rightAction={
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full h-10 w-10 border-2"
-              >
-                <NotebookPen className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full h-10 w-10 border-2"
-              >
-                <User className="h-5 w-5" />
-              </Button>
-            </div>
-          }
-        />
-        <AppHeaderSpacer />
-        <HomeSkeleton />
-      </>
-    );
-  }
+    listeningMinutes = 0, 
+    unreadPosts = 0, 
+    completedTracks = 0, 
+    journalStreak = 0,
+    activeRounds = [],
+    nextSessionMap = new Map(),
+  } = homeData || {};
 
   return (
     <>
       <SEOHead 
-        title="Dashboard - LadyBoss Academy"
-        description="Your LadyBoss Academy dashboard"
+        title="Home - LadyBoss" 
+        description="Your personal dashboard and planner"
       />
       
-      {/* Completion Celebration Modal */}
-      <CompletionCelebration
-        isOpen={showCelebration}
-        onClose={closeCelebration}
-        courseName={celebrationData?.courseName || ''}
-        roundName={celebrationData?.roundName || ''}
-      />
-      
-      <AppHeader
-        title="Welcome back!" 
-        subtitle={user?.email}
-        rightAction={
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => navigate('/app/journal')}
-              className="rounded-full h-10 w-10 border-2"
+      <div className="flex flex-col h-full bg-background">
+        {/* Fixed header with integrated week strip */}
+        <header 
+          className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-violet-100 to-background dark:from-violet-950/50"
+          style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
+        >
+          {/* Title bar */}
+          <div className="flex items-center justify-between px-4 h-12">
+            {/* Left: Journal + Profile buttons */}
+            <div className="flex items-center gap-1">
+              <button 
+                onClick={() => navigate('/app/journal')}
+                className="p-2 -ml-2 text-foreground/70 hover:text-foreground transition-colors"
+              >
+                <NotebookPen className="h-5 w-5" />
+              </button>
+              <button 
+                onClick={() => navigate('/app/profile')}
+                className="p-2 text-foreground/70 hover:text-foreground transition-colors"
+              >
+                <User className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Title - changes to month/year when expanded */}
+            {showCalendar ? (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handlePrevMonth}
+                  className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <h1 className="text-lg font-bold text-foreground min-w-[140px] text-center">
+                  {format(currentMonth, 'MMMM yyyy')}
+                </h1>
+                <button
+                  onClick={handleNextMonth}
+                  className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
+            ) : (
+              <h1 className="text-lg font-bold text-foreground">
+                {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
+              </h1>
+            )}
+
+            {/* Streak badge */}
+            <button 
+              onClick={() => setShowStreakModal(true)}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-sm"
             >
-              <NotebookPen className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => navigate('/app/profile')}
-              className="rounded-full h-10 w-10 border-2"
-            >
-              <User className="h-5 w-5" />
-            </Button>
+              <Flame className="h-4 w-4 fill-current" />
+              <span className="text-sm font-semibold">{streak?.current_streak || 0}</span>
+            </button>
           </div>
-        }
-      />
-      <AppHeaderSpacer />
-      
-      <div className="container max-w-7xl py-4 px-4">
-        <div className="space-y-6">
-          {/* App Update Banner - shown first, highest priority */}
-          <AppUpdateBanner />
-          
-          {/* Admin Banners */}
-          <HomeBanner />
-          
-          {showNotificationBanner && (
-            <Alert className="border-primary/50 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors" onClick={() => navigate('/app/profile')}>
-              <div className="flex items-center gap-3">
-                <Bell className="h-5 w-5 text-primary" />
-                <div className="flex-1">
-                  <AlertDescription className="text-sm font-medium text-foreground">
-                    Enable notifications to get course reminders
-                  </AlertDescription>
-                </div>
-                <Button size="sm" variant="ghost" className="gap-2">
-                  Go to Settings
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </Alert>
-          )}
 
-          {/* New Courses Banner */}
-          {hasUnseenCourses && (
-            <Alert 
-              className="border-primary bg-primary/10 cursor-pointer hover:bg-primary/15 transition-colors" 
-              onClick={() => navigate('/app/programs')}
+          {/* Calendar area */}
+          <div className="px-4 py-3 border-b">
+            {/* Weekday headers */}
+            <div className="flex">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                <div key={day} className="flex-1 text-center text-xs text-muted-foreground font-medium">
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            {/* Day rows */}
+            {showCalendar ? (
+              <MonthCalendar
+                selectedDate={selectedDate}
+                currentMonth={currentMonth}
+                onDateSelect={handleDateSelect}
+                completedDates={completedDates}
+                programEventDates={programEventDates}
+              />
+            ) : (
+              <div className="flex mt-2">
+                {weekDays.map((day) => {
+                  const isSelected = isSameDay(day, selectedDate);
+                  const isTodayDate = isToday(day);
+                  const dateStr = format(day, 'yyyy-MM-dd');
+                  const hasCompletions = completedDates?.has(dateStr);
+                  const hasProgramEvents = programEventDates?.has(dateStr);
+                  
+                  return (
+                    <button
+                      key={day.toISOString()}
+                      onClick={() => setSelectedDate(day)}
+                      className="flex-1 flex justify-center"
+                    >
+                      <div
+                        className={cn(
+                          'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
+                          isSelected
+                            ? 'bg-violet-600 text-white shadow-md'
+                            : isTodayDate
+                              ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300'
+                              : 'hover:bg-muted/50'
+                        )}
+                      >
+                        {hasCompletions && (
+                          <Flame className={cn(
+                            "absolute h-7 w-7",
+                            isSelected ? "text-orange-300 opacity-70" : "text-orange-400 opacity-50"
+                          )} />
+                        )}
+                        {hasProgramEvents && (
+                          <Star className={cn(
+                            "absolute -top-0.5 -right-0.5 h-3 w-3",
+                            isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-500 fill-indigo-500"
+                          )} />
+                        )}
+                        <span className="relative z-10">{format(day, 'd')}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Calendar expand/collapse handle */}
+            <button 
+              onClick={handleToggleCalendar}
+              className="w-full flex justify-center pt-2 mt-1"
             >
-              <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="h-4 w-4 text-primary-foreground" />
-                </div>
-                <div className="flex-1">
-                  <AlertDescription className="text-sm font-semibold text-foreground">
-                    You have {unseenCount} new course{unseenCount > 1 ? 's' : ''}!
-                  </AlertDescription>
-                  <p className="text-xs text-muted-foreground">Tap to view your courses</p>
-                </div>
-                <BookOpen className="h-5 w-5 text-primary" />
+              <div className="flex gap-0.5">
+                <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+                <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
               </div>
-            </Alert>
-          )}
+            </button>
+          </div>
+        </header>
 
-          {enrollments?.length === 0 ? (
-            <WelcomeSection />
+        {/* Spacer for fixed header */}
+        <div 
+          className="transition-all duration-200"
+          style={{ 
+            height: showCalendar 
+              ? 'calc(48px + 340px + max(12px, env(safe-area-inset-top)))' 
+              : 'calc(48px + 100px + max(12px, env(safe-area-inset-top)))' 
+          }} 
+        />
+
+        {/* Tag filter chips */}
+        {taskTags.length > 0 && (
+          <div className="px-4 py-3 bg-background border-b overflow-x-auto">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSelectedTag(null)}
+                className={cn(
+                  'px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all font-medium',
+                  selectedTag === null
+                    ? 'bg-violet-600 text-white'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                )}
+              >
+                All
+              </button>
+              {taskTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
+                  className={cn(
+                    'px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all capitalize font-medium',
+                    selectedTag === tag
+                      ? 'bg-violet-600 text-white'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  )}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Content area - scrollable with extra padding for fixed bottom dashboard */}
+        <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 pb-[280px]">
+          {isLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-20 rounded-2xl" />
+              ))}
+            </div>
           ) : (
             <>
-              <StatsCards 
-                listeningMinutes={listeningMinutes}
-                unreadPosts={unreadPosts}
-                completedTracks={completedTracks}
-                journalStreak={journalStreak}
-              />
-              {hasActiveRounds && <ActiveRound />}
-              
-              {/* My Courses Quick Action */}
-              <div 
-                onClick={() => navigate('/app/programs')}
-                className="bg-muted/50 border rounded-xl p-4 cursor-pointer hover:bg-muted transition-all"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <BookOpen className="h-6 w-6 text-primary" />
+              {/* Program Events Section */}
+              {programEvents.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <CalendarDays className="h-4 w-4 text-indigo-500" />
+                    <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
+                      Program Events
+                    </h2>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">My Programs</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {enrollments?.length || 0} enrolled program{(enrollments?.length || 0) !== 1 ? 's' : ''}
-                    </p>
+                  <div className="space-y-3">
+                    {programEvents.map((event) => (
+                      <ProgramEventCard
+                        key={`${event.type}-${event.id}`}
+                        event={event}
+                        date={selectedDate}
+                      />
+                    ))}
                   </div>
-                  <ArrowRight className="h-5 w-5 text-muted-foreground" />
                 </div>
-              </div>
-              
-              {/* In-App Chat Banner */}
-              <div 
-                onClick={() => navigate('/app/chat')}
-                className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-xl p-4 cursor-pointer hover:from-primary/15 hover:to-primary/10 transition-all"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <MessageCircle className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">Need Help?</h3>
-                    <p className="text-sm text-muted-foreground">Chat with our support team</p>
-                  </div>
-                  <ArrowRight className="h-5 w-5 text-primary" />
+              )}
+
+              {/* Personal Tasks Section */}
+              {filteredTasks.length === 0 && programEvents.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-4xl mb-3">✨</div>
+                  <p className="text-muted-foreground mb-4">
+                    {selectedTag 
+                      ? `No ${selectedTag} tasks for this day` 
+                      : 'No tasks for this day'}
+                  </p>
+                  <button
+                    onClick={() => navigate('/app/planner/new')}
+                    className="text-violet-600 font-medium"
+                  >
+                    Add your first task
+                  </button>
                 </div>
-              </div>
+              ) : filteredTasks.length > 0 && (
+                <div>
+                  {programEvents.length > 0 && (
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-base">📝</span>
+                      <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
+                        Your Tasks
+                      </h2>
+                    </div>
+                  )}
+                  <div className="space-y-3">
+                    {filteredTasks.map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        date={selectedDate}
+                        isCompleted={completedTaskIds.has(task.id)}
+                        completedSubtaskIds={completedSubtaskIds}
+                        onTap={handleTaskTap}
+                        onStreakIncrease={handleStreakIncrease}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
-          
-          {/* External Support Options */}
-          <div className="flex flex-col items-center gap-3">
-            <Button
-              size="lg"
-              onClick={handleContactSupport}
-              className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
-            >
-              <Send className="mr-2 h-5 w-5" />
-              Contact Support on Telegram
-            </Button>
-            
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={handleEmailSupport}
-              className="w-full sm:w-auto"
-            >
-              <Mail className="mr-2 h-5 w-5" />
-              Email Support (if no Telegram)
-            </Button>
+        </div>
+
+        {/* Fixed Bottom Dashboard */}
+        <div 
+          className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t"
+          style={{ paddingBottom: 'max(64px, calc(52px + env(safe-area-inset-bottom)))' }}
+        >
+          <div className="px-4 py-2">
+            <ActiveRoundsCarousel
+              activeRounds={activeRounds}
+              nextSessionMap={nextSessionMap}
+            />
           </div>
         </div>
+
+        {/* FAB - positioned above the fixed bottom dashboard */}
+        <button
+          onClick={() => setShowQuickStart(true)}
+          className="fixed right-4 w-14 h-14 rounded-full bg-violet-600 text-white shadow-lg flex items-center justify-center hover:bg-violet-700 active:scale-95 transition-all z-50"
+          style={{ bottom: 'calc(280px + env(safe-area-inset-bottom))' }}
+        >
+          <Plus className="h-6 w-6" />
+        </button>
+
+        {/* Quick Start Sheet */}
+        <TaskQuickStartSheet
+          open={showQuickStart}
+          onOpenChange={setShowQuickStart}
+          onContinue={handleQuickStartContinue}
+        />
+
+        {/* Task Detail Modal */}
+        <TaskDetailModal
+          task={selectedTask}
+          open={!!selectedTask}
+          onClose={() => setSelectedTask(null)}
+          date={selectedDate}
+          completedSubtaskIds={completedSubtaskIds}
+          onEdit={handleEditTask}
+        />
+
+        {/* Streak celebration modal */}
+        <StreakCelebration
+          open={showStreakModal}
+          onClose={() => setShowStreakModal(false)}
+        />
       </div>
     </>
   );
