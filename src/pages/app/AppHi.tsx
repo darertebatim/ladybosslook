@@ -21,7 +21,7 @@ import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
-import { CompactStatsPills } from '@/components/dashboard/CompactStatsPills';
+
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -458,13 +458,7 @@ const AppHi = () => {
           className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t"
           style={{ paddingBottom: 'max(80px, calc(64px + env(safe-area-inset-bottom)))' }}
         >
-          <div className="px-4 py-3 space-y-4">
-            <CompactStatsPills
-              listeningMinutes={listeningMinutes}
-              unreadPosts={unreadPosts}
-              completedTracks={completedTracks}
-              journalStreak={journalStreak}
-            />
+          <div className="px-4 py-3">
             <ActiveRoundsCarousel
               activeRounds={activeRounds}
               nextSessionMap={nextSessionMap}
