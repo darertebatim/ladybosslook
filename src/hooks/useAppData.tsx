@@ -212,9 +212,16 @@ export function useHomeData() {
 }
 
 // ============ COURSES PAGE DATA ============
+interface NextContentInfo {
+  title: string;
+  type: 'module' | 'track';
+  countdownText: string | null;
+}
+
 interface CoursesDataExtended {
   enrollments: any[];
   nextSessionMap: Map<string, string>;
+  nextContentMap: Map<string, NextContentInfo>;
 }
 
 async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
@@ -231,7 +238,9 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
         first_session_date,
         status,
         video_url,
-        important_message
+        important_message,
+        audio_playlist_id,
+        drip_offset_days
       )
     `)
     .eq('user_id', userId)
@@ -241,9 +250,13 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
   
   const enrollments = data || [];
   
-  // Get all round IDs to fetch next sessions
+  // Get all round IDs and playlist IDs
   const roundIds = enrollments
     .map(e => e.program_rounds?.id)
+    .filter((id): id is string => Boolean(id));
+  
+  const playlistIds = enrollments
+    .map(e => e.program_rounds?.audio_playlist_id)
     .filter((id): id is string => Boolean(id));
   
   // Fetch next upcoming session for each round
@@ -266,7 +279,104 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
     }
   }
   
-  return { enrollments, nextSessionMap };
+  // Fetch next content (modules/tracks) for each playlist
+  let nextContentMap = new Map<string, NextContentInfo>();
+  if (playlistIds.length > 0) {
+    // Fetch modules (playlist_supplements)
+    const { data: modules } = await supabase
+      .from('playlist_supplements')
+      .select('playlist_id, title, drip_delay_days')
+      .in('playlist_id', playlistIds)
+      .order('drip_delay_days', { ascending: true });
+    
+    // Fetch tracks (audio_playlist_items)
+    const { data: tracks } = await supabase
+      .from('audio_playlist_items')
+      .select('playlist_id, drip_delay_days, audio_content(title)')
+      .in('playlist_id', playlistIds)
+      .order('drip_delay_days', { ascending: true });
+    
+    const now = new Date();
+    
+    // For each enrollment, find the next upcoming content
+    for (const enrollment of enrollments) {
+      const round = enrollment.program_rounds;
+      if (!round?.audio_playlist_id || !round?.first_session_date) continue;
+      
+      const playlistId = round.audio_playlist_id;
+      const firstSession = round.first_session_date.includes('T') 
+        ? new Date(round.first_session_date)
+        : new Date(round.first_session_date + 'T00:00:00');
+      const dripOffset = round.drip_offset_days || 0;
+      
+      // Check modules first
+      const playlistModules = (modules || []).filter(m => m.playlist_id === playlistId);
+      for (const mod of playlistModules) {
+        if (mod.drip_delay_days === 0) continue; // Skip immediate content
+        
+        const availableDate = new Date(firstSession);
+        availableDate.setDate(availableDate.getDate() + (mod.drip_delay_days - 1) + dripOffset);
+        
+        if (now < availableDate) {
+          // Calculate countdown
+          const diffMs = availableDate.getTime() - now.getTime();
+          const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+          const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          
+          let countdownText = '';
+          if (diffDays > 0) {
+            countdownText = `in ${diffDays}d`;
+          } else if (diffHours > 0) {
+            countdownText = `in ${diffHours}h`;
+          } else {
+            countdownText = 'soon';
+          }
+          
+          nextContentMap.set(round.id, {
+            title: mod.title,
+            type: 'module',
+            countdownText,
+          });
+          break;
+        }
+      }
+      
+      // If no module found, check tracks
+      if (!nextContentMap.has(round.id)) {
+        const playlistTracks = (tracks || []).filter(t => t.playlist_id === playlistId);
+        for (const track of playlistTracks) {
+          if (track.drip_delay_days === 0) continue;
+          
+          const availableDate = new Date(firstSession);
+          availableDate.setDate(availableDate.getDate() + (track.drip_delay_days - 1) + dripOffset);
+          
+          if (now < availableDate) {
+            const diffMs = availableDate.getTime() - now.getTime();
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            
+            let countdownText = '';
+            if (diffDays > 0) {
+              countdownText = `in ${diffDays}d`;
+            } else if (diffHours > 0) {
+              countdownText = `in ${diffHours}h`;
+            } else {
+              countdownText = 'soon';
+            }
+            
+            nextContentMap.set(round.id, {
+              title: (track.audio_content as any)?.title || 'New Track',
+              type: 'track',
+              countdownText,
+            });
+            break;
+          }
+        }
+      }
+    }
+  }
+  
+  return { enrollments, nextSessionMap, nextContentMap };
 }
 
 export function useCoursesData() {
@@ -296,6 +406,7 @@ export function useCoursesData() {
     ...query,
     enrollments: query.data?.enrollments || [],
     nextSessionMap: query.data?.nextSessionMap || new Map<string, string>(),
+    nextContentMap: query.data?.nextContentMap || new Map<string, { title: string; type: 'module' | 'track'; countdownText: string | null }>(),
   };
 }
 
