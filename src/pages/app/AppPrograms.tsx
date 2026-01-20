@@ -85,6 +85,7 @@ const AppCourses = () => {
 
   const EnrolledProgramCard = ({ enrollment, isCompleted = false }: { enrollment: typeof enrollments[0], isCompleted?: boolean }) => {
     const round = enrollment.program_rounds;
+    const isSelfPaced = !round;
 
     const isUpcoming = round?.status === 'upcoming';
     const isActive = round?.status === 'active';
@@ -155,8 +156,8 @@ const AppCourses = () => {
           {/* Overlay - stronger gradient from bottom */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
           
-          {/* Content */}
-          <div className="relative p-4 min-h-[120px] flex flex-col justify-between">
+          {/* Content - compact for self-paced */}
+          <div className={`relative p-4 flex flex-col justify-between ${isSelfPaced ? 'min-h-[72px]' : 'min-h-[120px]'}`}>
             {/* Top row: Badges */}
             <div className="flex items-center gap-2 flex-wrap">
               {hasNotification && !isCompleted && (
@@ -194,7 +195,7 @@ const AppCourses = () => {
                 {enrollment.course_name}
               </h3>
               
-              {/* Round name + View schedule link */}
+              {/* Round name + View schedule link - only for cohort-based */}
               {round && (
                 <div className="flex items-center gap-1.5 text-xs text-white/80">
                   <span className="truncate">{round.round_name}</span>
@@ -206,7 +207,7 @@ const AppCourses = () => {
                 </div>
               )}
               
-              {/* Next session info */}
+              {/* Next session info - only for cohort-based */}
               {!isCompleted && displayDate && (
                 <p className={`text-xs font-medium ${isSessionToday ? 'text-green-400' : 'text-white/90'}`}>
                   {isSessionToday 
@@ -218,7 +219,7 @@ const AppCourses = () => {
                 </p>
               )}
               
-              {/* Next content unlock info */}
+              {/* Next content unlock info - only for cohort-based */}
               {!isCompleted && nextContent && (
                 <div className="flex items-center gap-1.5 text-[11px] text-cyan-300">
                   <Unlock className="h-3 w-3 flex-shrink-0" />
@@ -228,7 +229,7 @@ const AppCourses = () => {
                 </div>
               )}
               
-              {/* Important note (if exists) */}
+              {/* Important note (if exists) - only for cohort-based */}
               {!isCompleted && importantNote && (
                 <div className="flex items-center gap-1.5 text-[11px] text-amber-300">
                   <AlertCircle className="h-3 w-3 flex-shrink-0" />
