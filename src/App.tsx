@@ -249,8 +249,8 @@ const App = () => (
                   <Route path="chat" element={<AppChat />} />
                   <Route path="feed" element={<AppFeed />} />
                   <Route path="journal" element={<AppJournal />} />
-                  <Route path="inspire" element={<AppInspire />} />
-                  <Route path="inspire/:planId" element={<AppInspireDetail />} />
+                  <Route path="routines" element={<AppInspire />} />
+                  <Route path="routines/:planId" element={<AppInspireDetail />} />
                   <Route path="profile" element={<AppProfile />} />
                   {/* Legacy routes - redirect to home */}
                 </Route>

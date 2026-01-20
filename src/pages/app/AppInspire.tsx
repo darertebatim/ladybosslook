@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Heart, Lightbulb, Loader2, Sparkles } from 'lucide-react';
+import { Search, Heart, Loader2, Sparkles } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
@@ -47,8 +47,8 @@ export default function AppInspire() {
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
           <div className="flex items-center gap-2">
-            <Lightbulb className="w-6 h-6 text-primary" />
-            <h1 className="text-xl font-bold text-foreground">Inspire</h1>
+            <Sparkles className="w-6 h-6 text-primary" />
+            <h1 className="text-xl font-bold text-foreground">Routines</h1>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -107,7 +107,7 @@ export default function AppInspire() {
                       </div>
                       <RoutinePlanCard
                         plan={plan}
-                        onClick={() => navigate(`/app/inspire/${plan.id}`)}
+                        onClick={() => navigate(`/app/routines/${plan.id}`)}
                       />
                     </div>
                   ))}
@@ -169,13 +169,13 @@ export default function AppInspire() {
                   <RoutinePlanCard
                     key={plan.id}
                     plan={plan}
-                    onClick={() => navigate(`/app/inspire/${plan.id}`)}
+                    onClick={() => navigate(`/app/routines/${plan.id}`)}
                   />
                 ))}
               </div>
             ) : (
               <div className="text-center py-12">
-                <Lightbulb className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
+                <Sparkles className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
                 <p className="text-muted-foreground">
                   {searchQuery ? 'No routines found' : 'No routines available yet'}
                 </p>
