@@ -81,6 +81,7 @@ export interface TaskTemplate {
   repeat_pattern: RepeatPattern;
   display_order: number;
   is_active: boolean;
+  is_popular: boolean;
   created_at: string;
 }
 
