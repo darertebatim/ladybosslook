@@ -19,7 +19,7 @@ import { useTaskTemplates, useCreateTaskFromTemplate } from '@/hooks/useTaskPlan
 
 export default function AppInspire() {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>('popular');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [addingTemplateId, setAddingTemplateId] = useState<string | null>(null);
