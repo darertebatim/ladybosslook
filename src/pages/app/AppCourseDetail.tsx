@@ -658,7 +658,7 @@ const AppCourseDetail = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="min-w-0">
-            <h1 className="font-semibold text-lg truncate">{program?.title || 'Course Details'}</h1>
+            <h1 className="font-semibold text-lg truncate">{program?.title || 'Program Details'}</h1>
             {round && (
               <p className="text-xs text-muted-foreground truncate">
                 {round.round_name}
@@ -673,8 +673,8 @@ const AppCourseDetail = () => {
 
       <div className="container max-w-4xl py-4 px-4">
         <SEOHead 
-          title={`${program?.title || 'Course'} Details - LadyBoss Academy`}
-          description="Course details and materials"
+          title={`${program?.title || 'Program'} Details - LadyBoss Academy`}
+          description="Program details and materials"
         />
         
         <div className="space-y-6">
@@ -682,7 +682,7 @@ const AppCourseDetail = () => {
         {enrollmentLoading ? (
           <Card>
             <CardContent className="py-8">
-              <p className="text-center text-muted-foreground">Loading course details...</p>
+              <p className="text-center text-muted-foreground">Loading program details...</p>
             </CardContent>
           </Card>
         ) : !enrollment ? (
@@ -821,7 +821,7 @@ const AppCourseDetail = () => {
             {program && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Course Details</CardTitle>
+                  <CardTitle>Program Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -918,18 +918,18 @@ const AppCourseDetail = () => {
               </Alert>
             )}
 
-            {/* Course Playlist Card */}
+            {/* Program Playlist Card */}
             {(program as any)?.audio_playlist_id && enrollment && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Music className="h-5 w-5" />
-                    Course Playlist
+                    Program Playlist
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Content for this course
+                    Content for this program
                   </p>
                   <Button 
                     className="w-full" 
@@ -1291,7 +1291,7 @@ const AppCourseDetail = () => {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Course Information</CardTitle>
+                  <CardTitle>Program Information</CardTitle>
                   <Badge>{enrollment.status}</Badge>
                 </div>
               </CardHeader>
@@ -1318,6 +1318,38 @@ const AppCourseDetail = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Complete Program Button - Only for self-paced (no round) */}
+            {!round && enrollment?.status === 'active' && (
+              <Card>
+                <CardContent className="pt-6">
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    variant="outline"
+                    onClick={async () => {
+                      try {
+                        const { error } = await supabase
+                          .from('course_enrollments')
+                          .update({ status: 'completed' })
+                          .eq('id', enrollment.id);
+                        
+                        if (error) throw error;
+                        
+                        queryClient.invalidateQueries({ queryKey: ['course-enrollment', slug] });
+                        queryClient.invalidateQueries({ queryKey: ['courses-data'] });
+                        toast.success('Program marked as completed!');
+                      } catch (err) {
+                        toast.error('Failed to mark as completed');
+                      }
+                    }}
+                  >
+                    <CheckCircle2 className="h-5 w-5 mr-2" />
+                    Mark as Completed
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </>
         )}
         </div>
