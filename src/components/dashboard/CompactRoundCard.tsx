@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, ChevronRight, Play, Sparkles } from 'lucide-react';
+import { AlertCircle, ChevronRight, Sparkles } from 'lucide-react';
 import { format, isToday } from 'date-fns';
 import { Link } from 'react-router-dom';
 
@@ -50,7 +50,7 @@ export function CompactRoundCard({
       onClick={onView}
       className="block"
     >
-      <div className={`relative w-[280px] h-[140px] rounded-xl overflow-hidden shadow-md transition-transform active:scale-[0.98] ${
+      <div className={`relative w-[260px] h-[88px] rounded-xl overflow-hidden shadow-md transition-transform active:scale-[0.98] ${
         isUnseen ? 'ring-2 ring-primary ring-offset-2' : ''
       }`}>
         {/* Background */}
@@ -64,21 +64,21 @@ export function CompactRoundCard({
           <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-indigo-600" />
         )}
         
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
+        {/* Overlay - stronger gradient from bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/30" />
         
-        {/* Content */}
-        <div className="absolute inset-0 p-3 flex flex-col justify-between">
-          {/* Top: Badges */}
-          <div className="flex items-center gap-2">
+        {/* Content - all bottom aligned */}
+        <div className="absolute inset-0 p-2.5 flex flex-col justify-end">
+          {/* Course name with badges inline */}
+          <div className="flex items-center gap-1.5 mb-0.5">
             {isUnseen && (
-              <Badge className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5">
-                <Sparkles className="h-2.5 w-2.5 mr-0.5" />
+              <Badge className="bg-primary text-primary-foreground text-[9px] px-1 py-0 h-4">
+                <Sparkles className="h-2 w-2 mr-0.5" />
                 New
               </Badge>
             )}
             <Badge 
-              className={`text-[10px] px-1.5 py-0.5 ${
+              className={`text-[9px] px-1 py-0 h-4 ${
                 isActive 
                   ? 'bg-green-500 text-white' 
                   : 'bg-white/20 text-white backdrop-blur-sm'
@@ -86,55 +86,41 @@ export function CompactRoundCard({
             >
               {round.status}
             </Badge>
-          </div>
-          
-          {/* Bottom: Info */}
-          <div className="space-y-0.5">
-            {/* Course name */}
-            <h3 className="text-white font-semibold text-[13px] line-clamp-1">
+            <h3 className="text-white font-semibold text-[12px] line-clamp-1 flex-1">
               {enrollment.course_name}
             </h3>
-            
-            {/* Round name + View schedule link */}
-            <div className="flex items-center gap-1 text-[11px] text-white/70">
-              <span className="truncate">{round.round_name}</span>
-              <span>•</span>
-              <span className="flex items-center whitespace-nowrap">
-                View schedule
-                <ChevronRight className="h-3 w-3" />
-              </span>
-            </div>
-            
-            {/* Next session info */}
-            {displayDate && (
-              <p className={`text-[11px] ${isSessionToday ? 'text-green-300' : 'text-white/80'}`}>
-                {isSessionToday 
-                  ? `Your next session: Today at ${format(new Date(displayDate), 'h:mm a')}`
-                  : isUpcoming 
-                    ? `Starts: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
-                    : `Your next session: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
-                }
-              </p>
-            )}
-            
-            {/* Important note (if exists) */}
-            {importantNote && (
-              <div className="flex items-center gap-1 text-[10px] text-amber-300">
-                <AlertCircle className="h-2.5 w-2.5 flex-shrink-0" />
-                <span className="line-clamp-1">{importantNote}</span>
-              </div>
-            )}
           </div>
+          
+          {/* Round name + View schedule link */}
+          <div className="flex items-center gap-1 text-[10px] text-white/70">
+            <span className="truncate">{round.round_name}</span>
+            <span>•</span>
+            <span className="flex items-center whitespace-nowrap">
+              View schedule
+              <ChevronRight className="h-3 w-3" />
+            </span>
+          </div>
+          
+          {/* Next session info */}
+          {displayDate && (
+            <p className={`text-[10px] ${isSessionToday ? 'text-green-300' : 'text-white/80'}`}>
+              {isSessionToday 
+                ? `Next: Today at ${format(new Date(displayDate), 'h:mm a')}`
+                : isUpcoming 
+                  ? `Starts: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
+                  : `Next: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
+              }
+            </p>
+          )}
+          
+          {/* Important note (if exists) */}
+          {importantNote && (
+            <div className="flex items-center gap-1 text-[9px] text-amber-300">
+              <AlertCircle className="h-2 w-2 flex-shrink-0" />
+              <span className="line-clamp-1">{importantNote}</span>
+            </div>
+          )}
         </div>
-
-        {/* Play icon overlay */}
-        {thumbnailUrl && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-40">
-            <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
-              <Play className="h-4 w-4 text-black ml-0.5" fill="black" />
-            </div>
-          </div>
-        )}
       </div>
     </Link>
   );

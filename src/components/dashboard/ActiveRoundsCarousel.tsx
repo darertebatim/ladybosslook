@@ -50,21 +50,21 @@ export function ActiveRoundsCarousel({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Header */}
       <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2">
-          <h2 className="text-base font-semibold text-foreground">Your Programs</h2>
-          <Badge variant="secondary" className="h-5 px-1.5 text-xs">
+        <div className="flex items-center gap-1.5">
+          <h2 className="text-sm font-semibold text-foreground">Your Programs</h2>
+          <Badge variant="secondary" className="h-4 px-1 text-[10px]">
             {activeRounds.length}
           </Badge>
         </div>
         <Link 
           to="/app/programs"
-          className="text-sm text-primary font-medium flex items-center gap-0.5"
+          className="text-xs text-primary font-medium flex items-center gap-0.5"
         >
           View All
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
