@@ -37,9 +37,9 @@ const AppHome = () => {
   // Handle quick start continue
   const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
     if (template) {
-      navigate(`/app/planner/new?name=${encodeURIComponent(template.title)}&emoji=${encodeURIComponent(template.emoji)}&color=${template.color}`);
+      navigate(`/app/home/new?name=${encodeURIComponent(template.title)}&emoji=${encodeURIComponent(template.emoji)}&color=${template.color}`);
     } else {
-      navigate(`/app/planner/new?name=${encodeURIComponent(taskName)}`);
+      navigate(`/app/home/new?name=${encodeURIComponent(taskName)}`);
     }
   }, [navigate]);
 
@@ -109,7 +109,7 @@ const AppHome = () => {
 
   const handleEditTask = useCallback((task: UserTask) => {
     setSelectedTask(null);
-    navigate(`/app/planner/edit/${task.id}`);
+    navigate(`/app/home/edit/${task.id}`);
   }, [navigate]);
 
   const handleTaskTap = useCallback((task: UserTask) => {
@@ -378,7 +378,7 @@ const AppHome = () => {
                       : 'No tasks for this day'}
                   </p>
                   <button
-                    onClick={() => navigate('/app/planner/new')}
+                    onClick={() => navigate('/app/home/new')}
                     className="text-violet-600 font-medium"
                   >
                     Add your first task

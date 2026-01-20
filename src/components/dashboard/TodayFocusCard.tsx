@@ -85,12 +85,12 @@ export function TodayFocusCard({
         </div>
 
         {/* CTA Button */}
-        <Link to="/app/planner">
+        <Link to="/app/home">
           <Button 
             className="w-full mt-4 bg-violet-600 hover:bg-violet-700 text-white"
             size="lg"
           >
-            Open Planner
+            Open Home
             <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
         </Link>
