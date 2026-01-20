@@ -428,7 +428,7 @@ const AppHome = () => {
         <button
           onClick={() => setShowQuickStart(true)}
           className="fixed right-4 w-14 h-14 rounded-full bg-violet-600 text-white shadow-lg flex items-center justify-center hover:bg-violet-700 active:scale-95 transition-all z-50"
-          style={{ bottom: 'calc(280px + env(safe-area-inset-bottom))' }}
+          style={{ bottom: 'calc(180px + env(safe-area-inset-bottom))' }}
         >
           <Plus className="h-6 w-6" />
         </button>
