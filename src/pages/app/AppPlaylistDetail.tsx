@@ -605,8 +605,8 @@ export default function AppPlaylistDetail() {
         {/* Continue Button */}
         {hasAccess && totalItems > 0 && (
           <div className="flex gap-2">
-            <Button onClick={handleContinue} className="flex-1" size="lg">
-              <Play className="h-5 w-5 mr-2" />
+            <Button onClick={handleContinue} size="lg" className="shrink-0">
+              <Play className="h-5 w-5 mr-1" />
               {getNextPlayableItem() ? 'Continue' : 'Play'}
             </Button>
             <Button 
@@ -614,13 +614,14 @@ export default function AppPlaylistDetail() {
               size="lg"
               onClick={handleAddToRoutine}
               disabled={quickAddTask.isPending}
-              className="gap-2"
+              className="flex-1 gap-2 bg-[#F4ECFE] border-[#D8C0F3] hover:bg-[#E8DCF8]"
             >
               {existingTask ? (
-                <Check className="h-5 w-5 text-green-500" />
+                <Check className="h-4 w-4 text-green-600" />
               ) : (
-                <CalendarPlus className="h-5 w-5" />
+                <CalendarPlus className="h-4 w-4" />
               )}
+              <span className="text-sm">Add to My Routine</span>
             </Button>
           </div>
         )}
