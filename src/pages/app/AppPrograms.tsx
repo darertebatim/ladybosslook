@@ -10,6 +10,11 @@ import { CoursesSkeleton } from '@/components/app/skeletons';
 import { format, isToday } from 'date-fns';
 import { usePrograms } from '@/hooks/usePrograms';
 import { ProgramCard } from '@/components/app/ProgramCard';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from '@/components/ui/carousel';
 
 const AppCourses = () => {
   // Use centralized data hook
@@ -291,34 +296,49 @@ const AppCourses = () => {
           </div>
         )}
 
-        {/* Browse Programs Section */}
+        {/* Browse Programs Section - Horizontal Carousel like Home */}
         {browsePrograms.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold flex items-center gap-2">
-                <Compass className="h-4 w-4 text-primary" />
-                Browse Programs
-              </h2>
-              <Link to="/app/browse">
-                <Button variant="ghost" size="sm" className="text-xs h-7 px-2">
-                  View All
-                  <ChevronRight className="h-3.5 w-3.5 ml-0.5" />
-                </Button>
+          <div className="space-y-2 -mx-4">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5">
+              <div className="flex items-center gap-1.5">
+                <h2 className="text-sm font-semibold text-foreground">Browse Programs</h2>
+                <Badge variant="secondary" className="h-4 px-1 text-[10px]">
+                  {browsePrograms.length}
+                </Badge>
+              </div>
+              <Link 
+                to="/app/browse"
+                className="text-xs text-primary font-medium flex items-center gap-0.5"
+              >
+                View All
+                <ChevronRight className="h-3.5 w-3.5" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              {browsePrograms.slice(0, 4).map((program) => (
-                <Link key={program.slug} to={`/app/browse/${program.slug}`}>
-                  <ProgramCard 
-                    title={program.title}
-                    image={program.image}
-                    type={program.type}
-                    isFree={program.isFree}
-                  />
-                </Link>
-              ))}
-            </div>
+            {/* Carousel */}
+            <Carousel
+              opts={{
+                align: 'start',
+                loop: false,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-3 px-4">
+                {browsePrograms.map((program) => (
+                  <CarouselItem key={program.slug} className="pl-3 basis-[140px]">
+                    <Link to={`/app/browse/${program.slug}`}>
+                      <ProgramCard 
+                        title={program.title}
+                        image={program.image}
+                        type={program.type}
+                        isFree={program.isFree}
+                      />
+                    </Link>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
           </div>
         )}
 
