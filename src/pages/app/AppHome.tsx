@@ -363,11 +363,6 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Separator line between program events and tasks */}
-              {programEvents.length > 0 && selectedTag === null && filteredTasks.length > 0 && (
-                <div className="h-px bg-border mb-4" />
-              )}
-
               {/* Personal Tasks Section */}
               {filteredTasks.length === 0 && (selectedTag !== null || programEvents.length === 0) ? (
                 <div className="text-center py-12">
@@ -386,6 +381,15 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 && (
                 <div className="space-y-3">
+                  {/* My Tasks header */}
+                  {programEvents.length > 0 && selectedTag === null && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+                      <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
+                        My Tasks
+                      </h2>
+                    </div>
+                  )}
                   {filteredTasks.map((task) => (
                     <TaskCard
                       key={task.id}
@@ -420,7 +424,7 @@ const AppHome = () => {
         <button
           onClick={() => setShowQuickStart(true)}
           className="fixed right-4 w-14 h-14 rounded-full bg-violet-600 text-white shadow-lg flex items-center justify-center hover:bg-violet-700 active:scale-95 transition-all z-50"
-          style={{ bottom: 'calc(180px + env(safe-area-inset-bottom))' }}
+          style={{ bottom: 'calc(200px + env(safe-area-inset-bottom))' }}
         >
           <Plus className="h-6 w-6" />
         </button>
