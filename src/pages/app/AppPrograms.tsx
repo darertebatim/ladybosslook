@@ -2,16 +2,19 @@ import { useCoursesData } from '@/hooks/useAppData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { BookOpen, GraduationCap, CheckCircle2, AlertCircle, ChevronRight, Sparkles, Unlock } from 'lucide-react';
+import { BookOpen, GraduationCap, CheckCircle2, AlertCircle, ChevronRight, Sparkles, Unlock, Compass } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { CoursesSkeleton } from '@/components/app/skeletons';
 import { format, isToday } from 'date-fns';
+import { usePrograms } from '@/hooks/usePrograms';
+import { ProgramCard } from '@/components/app/ProgramCard';
 
 const AppCourses = () => {
   // Use centralized data hook
   const { enrollments, nextSessionMap, nextContentMap, isLoading } = useCoursesData();
+  const { programs, isLoading: programsLoading } = usePrograms();
   
   // Get unseen content - wrap in try/catch in case provider is missing
   let unseenEnrollments = new Set<string>();
@@ -37,6 +40,12 @@ const AppCourses = () => {
       </>
     );
   }
+
+  // Get enrolled program slugs
+  const enrolledSlugs = new Set(enrollments?.map(e => e.program_slug) || []);
+  
+  // Filter browse programs to exclude enrolled ones
+  const browsePrograms = programs.filter(p => !enrolledSlugs.has(p.slug));
 
   // Separate enrollments into active/upcoming and completed
   const activeRounds = enrollments?.filter(e => e.program_rounds?.status !== 'completed') || [];
@@ -66,7 +75,7 @@ const AppCourses = () => {
     return new Date(aDate!).getTime() - new Date(bDate!).getTime();
   });
 
-  const ProgramCard = ({ enrollment, isCompleted = false }: { enrollment: typeof enrollments[0], isCompleted?: boolean }) => {
+  const EnrolledProgramCard = ({ enrollment, isCompleted = false }: { enrollment: typeof enrollments[0], isCompleted?: boolean }) => {
     const round = enrollment.program_rounds;
 
     const isUpcoming = round?.status === 'upcoming';
@@ -226,7 +235,6 @@ const AppCourses = () => {
   };
 
   const totalPrograms = (enrollments?.length || 0);
-  const hasNoPrograms = totalPrograms === 0;
 
   return (
     <>
@@ -236,80 +244,101 @@ const AppCourses = () => {
       />
 
       <AppHeader 
-        title="My Programs" 
-        subtitle={`${totalPrograms} program${totalPrograms !== 1 ? 's' : ''}`}
+        title="Programs" 
+        subtitle={totalPrograms > 0 ? `${totalPrograms} enrolled` : undefined}
       />
       <AppHeaderSpacer />
       
-      <div className="container max-w-4xl py-4 px-4 space-y-6">
-        {hasNoPrograms ? (
+      <div className="container max-w-4xl py-4 px-4 space-y-6 pb-24">
+        {/* Active Rounds Section */}
+        {(sortedActiveRounds.length > 0 || selfPacedEnrollments.length > 0) && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold flex items-center gap-2">
+                <GraduationCap className="h-4 w-4 text-primary" />
+                Your Active Programs
+              </h2>
+              <Badge variant="secondary" className="text-xs">{sortedActiveRounds.length + selfPacedEnrollments.length}</Badge>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              {sortedActiveRounds.map((enrollment) => (
+                <EnrolledProgramCard key={enrollment.id} enrollment={enrollment} />
+              ))}
+              {selfPacedEnrollments.map((enrollment) => (
+                <EnrolledProgramCard key={enrollment.id} enrollment={enrollment} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Completed Rounds Section */}
+        {completedRounds.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold flex items-center gap-2 text-muted-foreground">
+                <CheckCircle2 className="h-4 w-4" />
+                Completed Programs
+              </h2>
+              <Badge variant="outline" className="text-muted-foreground text-xs">{completedRounds.length}</Badge>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              {completedRounds.map((enrollment) => (
+                <EnrolledProgramCard key={enrollment.id} enrollment={enrollment} isCompleted />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Browse Programs Section */}
+        {browsePrograms.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold flex items-center gap-2">
+                <Compass className="h-4 w-4 text-primary" />
+                Browse Programs
+              </h2>
+              <Link to="/app/browse">
+                <Button variant="ghost" size="sm" className="text-xs h-7 px-2">
+                  View All
+                  <ChevronRight className="h-3.5 w-3.5 ml-0.5" />
+                </Button>
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {browsePrograms.slice(0, 4).map((program) => (
+                <Link key={program.slug} to={`/app/browse/${program.slug}`}>
+                  <ProgramCard 
+                    title={program.title}
+                    image={program.image}
+                    type={program.type}
+                    isFree={program.isFree}
+                  />
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty state if no programs at all */}
+        {totalPrograms === 0 && browsePrograms.length === 0 && (
           <div className="text-center py-12">
             <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <p className="text-muted-foreground mb-4">
-              No programs enrolled yet
+              No programs available
             </p>
-            <Link to="/app/browse">
-              <Button variant="outline">
-                Browse Programs
-              </Button>
-            </Link>
           </div>
-        ) : (
-          <>
-            {/* Active Rounds Section */}
-            {(sortedActiveRounds.length > 0 || selfPacedEnrollments.length > 0) && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-base font-semibold flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-primary" />
-                    Your Active Programs
-                  </h2>
-                  <Badge variant="secondary" className="text-xs">{sortedActiveRounds.length + selfPacedEnrollments.length}</Badge>
-                </div>
+        )}
 
-                <div className="flex flex-col gap-3">
-                  {sortedActiveRounds.map((enrollment) => (
-                    <ProgramCard key={enrollment.id} enrollment={enrollment} />
-                  ))}
-                  {selfPacedEnrollments.map((enrollment) => (
-                    <ProgramCard key={enrollment.id} enrollment={enrollment} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Completed Rounds Section */}
-            {completedRounds.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-base font-semibold flex items-center gap-2 text-muted-foreground">
-                    <CheckCircle2 className="h-4 w-4" />
-                    Completed Programs
-                  </h2>
-                  <Badge variant="outline" className="text-muted-foreground text-xs">{completedRounds.length}</Badge>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  {completedRounds.map((enrollment) => (
-                    <ProgramCard key={enrollment.id} enrollment={enrollment} isCompleted />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Empty state if no active rounds but has completed */}
-            {sortedActiveRounds.length === 0 && selfPacedEnrollments.length === 0 && completedRounds.length > 0 && (
-              <div className="text-center py-8">
-                <GraduationCap className="h-10 w-10 mx-auto mb-2 text-muted-foreground opacity-50" />
-                <p className="text-sm text-muted-foreground">No active programs right now</p>
-                <Link to="/app/browse">
-                  <Button className="mt-3" variant="outline" size="sm">
-                    Browse New Programs
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </>
+        {/* Empty enrolled state with browse below */}
+        {totalPrograms === 0 && browsePrograms.length > 0 && (
+          <div className="text-center py-8 mb-4">
+            <GraduationCap className="h-10 w-10 mx-auto mb-2 text-muted-foreground opacity-50" />
+            <p className="text-sm text-muted-foreground">No programs enrolled yet</p>
+            <p className="text-xs text-muted-foreground mt-1">Browse and enroll in programs below</p>
+          </div>
         )}
       </div>
     </>
