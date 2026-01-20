@@ -345,9 +345,9 @@ const AppHome = () => {
             </div>
           ) : (
             <>
-              {/* Program Events Section */}
-              {programEvents.length > 0 && (
-                <div className="mb-6">
+              {/* Program Events Section - only show when "All" tag is selected */}
+              {programEvents.length > 0 && selectedTag === null && (
+                <div className="mb-4">
                   <div className="flex items-center gap-2 mb-3">
                     <CalendarDays className="h-4 w-4 text-indigo-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
@@ -366,8 +366,13 @@ const AppHome = () => {
                 </div>
               )}
 
+              {/* Separator line between program events and tasks */}
+              {programEvents.length > 0 && selectedTag === null && filteredTasks.length > 0 && (
+                <div className="h-px bg-border mb-4" />
+              )}
+
               {/* Personal Tasks Section */}
-              {filteredTasks.length === 0 && programEvents.length === 0 ? (
+              {filteredTasks.length === 0 && (selectedTag !== null || programEvents.length === 0) ? (
                 <div className="text-center py-12">
                   <div className="text-4xl mb-3">✨</div>
                   <p className="text-muted-foreground mb-4">
@@ -383,28 +388,18 @@ const AppHome = () => {
                   </button>
                 </div>
               ) : filteredTasks.length > 0 && (
-                <div>
-                  {programEvents.length > 0 && (
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-base">📝</span>
-                      <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
-                        Your Tasks
-                      </h2>
-                    </div>
-                  )}
-                  <div className="space-y-3">
-                    {filteredTasks.map((task) => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        date={selectedDate}
-                        isCompleted={completedTaskIds.has(task.id)}
-                        completedSubtaskIds={completedSubtaskIds}
-                        onTap={handleTaskTap}
-                        onStreakIncrease={handleStreakIncrease}
-                      />
-                    ))}
-                  </div>
+                <div className="space-y-3">
+                  {filteredTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      date={selectedDate}
+                      isCompleted={completedTaskIds.has(task.id)}
+                      completedSubtaskIds={completedSubtaskIds}
+                      onTap={handleTaskTap}
+                      onStreakIncrease={handleStreakIncrease}
+                    />
+                  ))}
                 </div>
               )}
             </>
