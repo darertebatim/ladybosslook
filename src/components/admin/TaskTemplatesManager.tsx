@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -57,9 +57,7 @@ interface Template {
   display_order: number;
 }
 
-const CATEGORY_OPTIONS = [
-  'morning', 'productivity', 'health', 'learning', 'evening', 'wellness'
-];
+
 
 const REPEAT_PATTERN_OPTIONS = [
   { value: 'none', label: 'One-time' },
@@ -103,6 +101,13 @@ export function TaskTemplatesManager() {
       return data as Template[];
     },
   });
+
+  // Derive unique categories from existing templates
+  const categoryOptions = useMemo(() => {
+    if (!templates) return [];
+    const uniqueCategories = [...new Set(templates.map(t => t.category).filter(Boolean))];
+    return uniqueCategories.sort();
+  }, [templates]);
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -337,11 +342,11 @@ export function TaskTemplatesManager() {
                   onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {CATEGORY_OPTIONS.map((cat) => (
-                      <SelectItem key={cat} value={cat} className="capitalize">{cat}</SelectItem>
+                    {categoryOptions.map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
