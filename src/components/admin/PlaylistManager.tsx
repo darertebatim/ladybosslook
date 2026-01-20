@@ -14,7 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Trash2, Plus, Pencil, List, Layers, Eye, EyeOff, Upload, X, Sparkles, RefreshCw } from "lucide-react";
+import { Loader2, Trash2, Plus, Pencil, List, Layers, Eye, EyeOff, Upload, X, Sparkles, RefreshCw, Wand2 } from "lucide-react";
 import { PlaylistTracksManager } from "./PlaylistTracksManager";
 import { PlaylistModulesManager } from "./PlaylistModulesManager";
 import { usePrograms } from "@/hooks/usePrograms";
@@ -279,6 +279,7 @@ export const PlaylistManager = () => {
   const [selectedPlaylist, setSelectedPlaylist] = useState<any>(null);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
+  const [isGeneratingPrograms, setIsGeneratingPrograms] = useState(false);
   const createFileInputRef = useRef<HTMLInputElement>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -561,6 +562,103 @@ export const PlaylistManager = () => {
     setIsCreateDialogOpen(true);
   };
 
+  // Auto-generate free programs for unlinked free playlists (excluding podcasts)
+  const handleGenerateFreePrograms = async () => {
+    if (!playlists) return;
+
+    // Find free playlists without a program_slug and not podcasts
+    const unlinkedFreePlaylists = playlists.filter(
+      (p) => p.is_free && !p.program_slug && p.category !== 'podcast'
+    );
+
+    if (unlinkedFreePlaylists.length === 0) {
+      toast.info('No unlinked free playlists found (excluding podcasts)');
+      return;
+    }
+
+    setIsGeneratingPrograms(true);
+    let created = 0;
+    let errors = 0;
+
+    try {
+      for (const playlist of unlinkedFreePlaylists) {
+        // Generate a slug from the playlist name
+        const slug = playlist.name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .substring(0, 50);
+
+        // Check if program with this slug already exists
+        const { data: existing } = await supabase
+          .from('program_catalog')
+          .select('id')
+          .eq('slug', slug)
+          .single();
+
+        if (existing) {
+          // Just link the playlist to the existing program
+          await supabase
+            .from('audio_playlists')
+            .update({ program_slug: slug })
+            .eq('id', playlist.id);
+          created++;
+          continue;
+        }
+
+        // Create new free program
+        const { error: programError } = await supabase
+          .from('program_catalog')
+          .insert({
+            title: playlist.name,
+            slug: slug,
+            type: 'course',
+            payment_type: 'free',
+            price_amount: 0,
+            description: playlist.description || `Free audio content: ${playlist.name}`,
+            is_active: true,
+            available_on_mobile: true,
+            available_on_web: false,
+            cover_image_url: playlist.cover_image_url,
+          });
+
+        if (programError) {
+          console.error('Error creating program:', programError);
+          errors++;
+          continue;
+        }
+
+        // Link playlist to the new program
+        const { error: linkError } = await supabase
+          .from('audio_playlists')
+          .update({ program_slug: slug })
+          .eq('id', playlist.id);
+
+        if (linkError) {
+          console.error('Error linking playlist:', linkError);
+          errors++;
+        } else {
+          created++;
+        }
+      }
+
+      if (created > 0) {
+        toast.success(`Created ${created} free program(s) for playlists`);
+        queryClient.invalidateQueries({ queryKey: ['audio-playlists-with-count'] });
+        queryClient.invalidateQueries({ queryKey: ['programs'] });
+      }
+      if (errors > 0) {
+        toast.error(`${errors} error(s) occurred during generation`);
+      }
+    } catch (error: any) {
+      console.error('Error generating programs:', error);
+      toast.error(error.message || 'Failed to generate programs');
+    } finally {
+      setIsGeneratingPrograms(false);
+    }
+  };
+
   const handleEdit = (playlist: any) => {
     setEditingPlaylist(playlist);
     setEditFormData({
@@ -630,10 +728,25 @@ export const PlaylistManager = () => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Playlists/Albums</CardTitle>
-        <Button onClick={handleOpenCreate} size="sm">
-          <Plus className="mr-2 h-4 w-4" />
-          New Playlist
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={handleGenerateFreePrograms} 
+            size="sm" 
+            variant="outline"
+            disabled={isGeneratingPrograms}
+          >
+            {isGeneratingPrograms ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Wand2 className="mr-2 h-4 w-4" />
+            )}
+            AI: Free Programs
+          </Button>
+          <Button onClick={handleOpenCreate} size="sm">
+            <Plus className="mr-2 h-4 w-4" />
+            New Playlist
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <Table>
