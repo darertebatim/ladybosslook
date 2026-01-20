@@ -477,6 +477,55 @@ export const useCreateTask = () => {
 };
 
 /**
+ * Quick-add a playlist task directly (no Pro Routine needed)
+ */
+export const useQuickAddPlaylistTask = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ 
+      playlistId, 
+      playlistName,
+    }: { 
+      playlistId: string; 
+      playlistName: string;
+    }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('user_tasks')
+        .insert({
+          user_id: user.id,
+          title: playlistName,
+          emoji: '🎧',
+          color: 'sky' as TaskColor,
+          repeat_pattern: 'daily' as RepeatPattern,
+          repeat_days: [],
+          pro_link_type: 'playlist' as const,
+          pro_link_value: playlistId,
+          linked_playlist_id: playlistId,
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as UserTask;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['playlist-task-exists'] });
+      toast({ title: 'Added to your routine! 🎧' });
+    },
+    onError: (error) => {
+      console.error('Quick add playlist task error:', error);
+      toast({ title: 'Failed to add to routine', variant: 'destructive' });
+    },
+  });
+};
+
+/**
  * Update a task
  */
 export const useUpdateTask = () => {

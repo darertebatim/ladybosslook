@@ -6,13 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink } from "lucide-react";
+import { ArrowLeft, Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink, CalendarPlus, Check } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { SupplementViewer } from "@/components/app/SupplementViewer";
 import { isNativeApp } from "@/lib/platform";
 import { getTrackAvailabilityWithCountdown } from "@/lib/dripContent";
 import { useEnrollments } from "@/hooks/useAppData";
-
+import { usePlaylistRoutine, useExistingPlaylistTask } from "@/hooks/usePlaylistRoutine";
+import { useRoutinePlan, useAddRoutinePlan } from "@/hooks/useRoutinePlans";
+import { useQuickAddPlaylistTask } from "@/hooks/useTaskPlanner";
+import { RoutinePreviewSheet } from "@/components/app/RoutinePreviewSheet";
+import { toast } from "sonner";
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
   const navigate = useNavigate();
@@ -27,6 +31,14 @@ export default function AppPlaylistDetail() {
     description?: string;
   } | null>(null);
   const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
+  const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+
+  // Routine-related hooks
+  const { data: linkedRoutine } = usePlaylistRoutine(playlistId);
+  const { data: fullRoutinePlan } = useRoutinePlan(linkedRoutine?.id);
+  const { data: existingTask } = useExistingPlaylistTask(playlistId);
+  const quickAddTask = useQuickAddPlaylistTask();
+  const addRoutinePlan = useAddRoutinePlan();
 
   // Fetch playlist details
   const { data: playlist, isLoading: playlistLoading } = useQuery({
@@ -329,6 +341,49 @@ export default function AppPlaylistDetail() {
     }
   };
 
+  const handleAddToRoutine = () => {
+    if (!playlist || !playlistId) return;
+
+    // If there's a linked Pro Routine with tasks, show the preview sheet
+    if (fullRoutinePlan?.tasks && fullRoutinePlan.tasks.length > 0) {
+      setShowRoutineSheet(true);
+    } else {
+      // Quick-add directly as a playlist task
+      quickAddTask.mutate({ 
+        playlistId, 
+        playlistName: playlist.name 
+      });
+    }
+  };
+
+  const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: Record<string, any>) => {
+    if (!fullRoutinePlan?.tasks) return;
+    
+    // Transform edited tasks to the format expected by useAddRoutinePlan
+    const transformedEditedTasks = Object.entries(editedTasks).map(([id, edits]) => ({
+      id,
+      title: edits.title,
+      icon: edits.emoji,
+      color: edits.color,
+      repeatPattern: edits.repeatPattern,
+      scheduledTime: edits.scheduledTime,
+      tag: edits.tag,
+    }));
+
+    try {
+      await addRoutinePlan.mutateAsync({
+        planId: fullRoutinePlan.id,
+        selectedTaskIds,
+        editedTasks: transformedEditedTasks,
+      });
+      setShowRoutineSheet(false);
+      toast.success('Added to your routine!');
+    } catch (error) {
+      console.error('Failed to add routine:', error);
+      toast.error('Failed to add to routine');
+    }
+  };
+
   const handleTrackClick = (audioId: string, dripDelayDays: number) => {
     if (!hasAccess) return;
     const { isAvailable } = getContentAvailability(dripDelayDays);
@@ -549,10 +604,25 @@ export default function AppPlaylistDetail() {
 
         {/* Continue Button */}
         {hasAccess && totalItems > 0 && (
-          <Button onClick={handleContinue} className="w-full" size="lg">
-            <Play className="h-5 w-5 mr-2" />
-            {getNextPlayableItem() ? 'Continue' : 'Play from Start'}
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleContinue} className="flex-1" size="lg">
+              <Play className="h-5 w-5 mr-2" />
+              {getNextPlayableItem() ? 'Continue' : 'Play'}
+            </Button>
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={handleAddToRoutine}
+              disabled={quickAddTask.isPending}
+              className="gap-2"
+            >
+              {existingTask ? (
+                <Check className="h-5 w-5 text-green-500" />
+              ) : (
+                <CalendarPlus className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
         )}
 
         {!hasAccess && (
@@ -759,6 +829,18 @@ export default function AppPlaylistDetail() {
             getModuleCompleted: (moduleId) => getModuleProgress(moduleId, null).viewed,
           } : undefined}
         />
+
+        {/* Routine Preview Sheet */}
+        {fullRoutinePlan?.tasks && (
+          <RoutinePreviewSheet
+            open={showRoutineSheet}
+            onOpenChange={setShowRoutineSheet}
+            tasks={fullRoutinePlan.tasks}
+            routineTitle={fullRoutinePlan.title}
+            onSave={handleSaveRoutine}
+            isSaving={addRoutinePlan.isPending}
+          />
+        )}
         
         {/* Bottom safe area padding */}
         <div className="pb-safe" />
