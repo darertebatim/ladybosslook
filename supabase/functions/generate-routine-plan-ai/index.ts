@@ -174,6 +174,55 @@ Return ONLY valid JSON in this exact format:
         .insert(tasksToInsert);
 
       if (tasksError) console.error('Error inserting tasks:', tasksError);
+
+      // Also add tasks to task_templates for the Task Ideas section
+      // Map icon to emoji (simple mapping for common icons)
+      const iconToEmoji: Record<string, string> = {
+        Sun: '☀️', Moon: '🌙', Heart: '❤️', Brain: '🧠', Dumbbell: '💪',
+        Briefcase: '💼', Coffee: '☕', Book: '📚', Star: '⭐', Sparkles: '✨',
+        Zap: '⚡', Target: '🎯', Clock: '⏰', Calendar: '📅', CheckCircle: '✅',
+        Award: '🏆', Flame: '🔥', Leaf: '🍃', Wind: '💨', Eye: '👁️',
+        Smile: '😊', Music: '🎵', Bed: '🛏️', Water: '💧', Apple: '🍎',
+      };
+
+      // Map routine color to task color
+      const colorMap: Record<string, string> = {
+        yellow: 'yellow', pink: 'pink', blue: 'sky', 
+        purple: 'lavender', green: 'mint', orange: 'peach',
+      };
+
+      // Get next display order for task_templates
+      const { data: existingTemplates } = await supabase
+        .from('task_templates')
+        .select('display_order')
+        .order('display_order', { ascending: false })
+        .limit(1);
+      
+      let templateOrder = (existingTemplates?.[0]?.display_order || 0) + 1;
+
+      const templatesToInsert = planData.tasks.map((task: any) => {
+        const template = {
+          title: task.title,
+          emoji: iconToEmoji[task.icon] || '📝',
+          color: colorMap[planData.color] || 'blue',
+          category: categoryName,
+          description: `From routine: ${planData.title}`,
+          repeat_pattern: 'daily',
+          display_order: templateOrder++,
+          is_active: true,
+        };
+        return template;
+      });
+
+      const { error: templatesError } = await supabase
+        .from('task_templates')
+        .insert(templatesToInsert);
+
+      if (templatesError) {
+        console.error('Error inserting task templates:', templatesError);
+      } else {
+        console.log(`Added ${templatesToInsert.length} task templates for category: ${categoryName}`);
+      }
     }
 
     return new Response(
