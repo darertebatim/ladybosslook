@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
-import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star } from 'lucide-react';
+import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   useTasksForDate, 
@@ -24,6 +24,8 @@ import { PromoBanner } from '@/components/app/PromoBanner';
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
+import { useFeaturedPlans } from '@/hooks/useRoutinePlans';
+import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
 
 const AppHome = () => {
   const navigate = useNavigate();
@@ -52,6 +54,9 @@ const AppHome = () => {
 
   // Home data for stats and rounds
   const { data: homeData, isLoading: homeLoading } = useNewHomeData();
+  
+  // Featured routines for suggestions
+  const { data: featuredRoutines = [] } = useFeaturedPlans();
 
   // Generate week days
   const weekDays = useMemo(() => {
@@ -419,6 +424,28 @@ const AppHome = () => {
                       onStreakIncrease={handleStreakIncrease}
                     />
                   ))}
+                </div>
+              )}
+
+              {/* Featured Routines Suggestions */}
+              {featuredRoutines.length > 0 && selectedTag === null && (
+                <div className="mt-6 pt-4 border-t border-border/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles className="h-4 w-4 text-violet-500" />
+                    <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
+                      Try a Routine
+                    </h2>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+                    {featuredRoutines.slice(0, 4).map((plan) => (
+                      <div key={plan.id} className="w-32 shrink-0">
+                        <RoutinePlanCard
+                          plan={plan}
+                          onClick={() => navigate(`/app/routines/${plan.id}`)}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </>
