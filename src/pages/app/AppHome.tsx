@@ -156,9 +156,9 @@ const AppHome = () => {
       />
       
       <div className="flex flex-col h-full bg-background">
-        {/* Fixed header with integrated week strip */}
+        {/* Fixed header with integrated week strip - Me+ style */}
         <header 
-          className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-violet-100 to-background dark:from-violet-950/50"
+          className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
           style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
         >
           {/* Title bar */}
@@ -184,7 +184,7 @@ const AppHome = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePrevMonth}
-                  className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                  className="p-1.5 rounded-full hover:bg-white/50 transition-colors"
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </button>
@@ -193,7 +193,7 @@ const AppHome = () => {
                 </h1>
                 <button
                   onClick={handleNextMonth}
-                  className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                  className="p-1.5 rounded-full hover:bg-white/50 transition-colors"
                 >
                   <ChevronRight className="h-5 w-5" />
                 </button>
@@ -214,18 +214,18 @@ const AppHome = () => {
             </button>
           </div>
 
-          {/* Calendar area */}
-          <div className="px-4 py-3 border-b">
-            {/* Weekday headers */}
+          {/* Calendar area - compact spacing */}
+          <div className="px-4 pt-1 pb-1">
+            {/* Weekday headers - tighter */}
             <div className="flex">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                <div key={day} className="flex-1 text-center text-xs text-muted-foreground font-medium">
+                <div key={day} className="flex-1 text-center text-[11px] text-foreground/50 font-medium leading-tight">
                   {day}
                 </div>
               ))}
             </div>
 
-            {/* Day rows */}
+            {/* Day rows - reduced gap */}
             {showCalendar ? (
               <MonthCalendar
                 selectedDate={selectedDate}
@@ -235,7 +235,7 @@ const AppHome = () => {
                 programEventDates={programEventDates}
               />
             ) : (
-              <div className="flex mt-2">
+              <div className="flex mt-1">
                 {weekDays.map((day) => {
                   const isSelected = isSameDay(day, selectedDate);
                   const isTodayDate = isToday(day);
@@ -251,17 +251,17 @@ const AppHome = () => {
                     >
                       <div
                         className={cn(
-                          'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
+                          'w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
                           isSelected
                             ? 'bg-violet-600 text-white shadow-md'
                             : isTodayDate
-                              ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300'
-                              : 'hover:bg-muted/50'
+                              ? 'bg-white/60 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300'
+                              : 'hover:bg-white/40'
                         )}
                       >
                         {hasCompletions && (
                           <Flame className={cn(
-                            "absolute h-7 w-7",
+                            "absolute h-6 w-6",
                             isSelected ? "text-orange-300 opacity-70" : "text-orange-400 opacity-50"
                           )} />
                         )}
@@ -279,26 +279,23 @@ const AppHome = () => {
               </div>
             )}
 
-            {/* Calendar expand/collapse handle */}
+            {/* Calendar expand/collapse handle - single pill */}
             <button 
               onClick={handleToggleCalendar}
-              className="w-full flex justify-center pt-2 mt-1"
+              className="w-full flex justify-center pt-1.5 pb-1"
             >
-              <div className="flex gap-0.5">
-                <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
-                <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
-              </div>
+              <div className="w-10 h-1 rounded-full bg-foreground/20" />
             </button>
           </div>
         </header>
 
-        {/* Spacer for fixed header */}
+        {/* Spacer for fixed header - adjusted for compact calendar */}
         <div 
           className="transition-all duration-200"
           style={{ 
             height: showCalendar 
-              ? 'calc(48px + 340px + max(12px, env(safe-area-inset-top)))' 
-              : 'calc(48px + 100px + max(12px, env(safe-area-inset-top)))' 
+              ? 'calc(48px + 320px + max(12px, env(safe-area-inset-top)))' 
+              : 'calc(48px + 72px + max(12px, env(safe-area-inset-top)))' 
           }} 
         />
 
