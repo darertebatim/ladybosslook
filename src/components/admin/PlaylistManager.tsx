@@ -562,6 +562,32 @@ export const PlaylistManager = () => {
     setIsCreateDialogOpen(true);
   };
 
+  // Generate program description based on playlist info
+  const generateProgramDescription = (playlist: any): string => {
+    const categoryDescriptions: Record<string, string> = {
+      audiobook: 'An immersive audiobook experience',
+      course_supplement: 'Supplementary audio content to enhance your learning',
+      meditate: 'Guided meditation sessions for inner peace and mindfulness',
+      workout: 'Energizing audio to power your workout sessions',
+      soundscape: 'Relaxing ambient sounds for focus and relaxation',
+      affirmations: 'Powerful affirmations to transform your mindset',
+    };
+    
+    const categoryText = categoryDescriptions[playlist.category] || 'Premium audio content';
+    const trackCount = playlist.audio_playlist_items?.[0]?.count || 0;
+    
+    let description = playlist.description || '';
+    if (!description) {
+      description = `${categoryText}: "${playlist.name}".`;
+      if (trackCount > 0) {
+        description += ` Includes ${trackCount} track${trackCount > 1 ? 's' : ''} of curated content.`;
+      }
+      description += ' Listen anytime, anywhere in the Ladyboss Look app.';
+    }
+    
+    return description;
+  };
+
   // Auto-generate free programs for unlinked free playlists (excluding podcasts)
   const handleGenerateFreePrograms = async () => {
     if (!playlists) return;
@@ -598,29 +624,33 @@ export const PlaylistManager = () => {
           .single();
 
         if (existing) {
-          // Just link the playlist to the existing program
+          // Link the playlist to the existing program and mark as not free
           await supabase
             .from('audio_playlists')
-            .update({ program_slug: slug })
+            .update({ program_slug: slug, is_free: false })
             .eq('id', playlist.id);
           created++;
           continue;
         }
 
-        // Create new free program
+        // Generate description based on playlist info
+        const description = generateProgramDescription(playlist);
+
+        // Create new free program with type 'playlist'
         const { error: programError } = await supabase
           .from('program_catalog')
           .insert({
             title: playlist.name,
             slug: slug,
-            type: 'course',
+            type: 'playlist',
             payment_type: 'free',
             price_amount: 0,
-            description: playlist.description || `Free audio content: ${playlist.name}`,
+            description: description,
             is_active: true,
             available_on_mobile: true,
             available_on_web: false,
             cover_image_url: playlist.cover_image_url,
+            audio_playlist_id: playlist.id,
           });
 
         if (programError) {
@@ -629,10 +659,10 @@ export const PlaylistManager = () => {
           continue;
         }
 
-        // Link playlist to the new program
+        // Link playlist to the new program and mark as NOT free
         const { error: linkError } = await supabase
           .from('audio_playlists')
-          .update({ program_slug: slug })
+          .update({ program_slug: slug, is_free: false })
           .eq('id', playlist.id);
 
         if (linkError) {
