@@ -107,9 +107,9 @@ export const TaskCard = ({
       >
         {/* Main row */}
         <div className="flex items-center gap-2.5">
-          {/* Icon circle - shows Pro link type icon */}
-          <div className="w-10 h-10 rounded-full bg-white/90 dark:bg-white/20 flex items-center justify-center shrink-0 shadow-sm">
-            <ProIcon className={cn('h-4.5 w-4.5', proConfig.iconColorClass)} />
+          {/* Icon - shows Pro link type icon */}
+          <div className="w-10 h-10 flex items-center justify-center shrink-0">
+            <ProIcon className={cn('h-5 w-5', proConfig.iconColorClass)} />
           </div>
 
           {/* Content */}
@@ -186,9 +186,9 @@ export const TaskCard = ({
     >
       {/* Main row */}
       <div className="flex items-center gap-2.5">
-        {/* Icon circle */}
-        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shrink-0 shadow-sm">
-          <TaskIcon iconName={task.emoji} size={20} className="text-foreground/80" />
+        {/* Icon */}
+        <div className="w-10 h-10 flex items-center justify-center shrink-0">
+          <TaskIcon iconName={task.emoji} size={24} className="text-foreground/80" />
         </div>
 
         {/* Content */}
