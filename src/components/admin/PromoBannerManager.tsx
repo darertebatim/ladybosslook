@@ -1,0 +1,414 @@
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { toast } from 'sonner';
+import { Trash2, Plus, Upload, ExternalLink } from 'lucide-react';
+import { format } from 'date-fns';
+
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'custom_url';
+type DisplayFrequency = 'once' | 'daily' | 'weekly';
+
+interface PromoBanner {
+  id: string;
+  cover_image_url: string;
+  destination_type: DestinationType;
+  destination_id: string | null;
+  custom_url: string | null;
+  display_frequency: DisplayFrequency;
+  is_active: boolean;
+  priority: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  created_at: string;
+}
+
+export function PromoBannerManager() {
+  const queryClient = useQueryClient();
+  const [isCreating, setIsCreating] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  
+  // Form state
+  const [coverImageUrl, setCoverImageUrl] = useState('');
+  const [destinationType, setDestinationType] = useState<DestinationType>('routine');
+  const [destinationId, setDestinationId] = useState('');
+  const [customUrl, setCustomUrl] = useState('');
+  const [displayFrequency, setDisplayFrequency] = useState<DisplayFrequency>('once');
+  const [isActive, setIsActive] = useState(true);
+  const [priority, setPriority] = useState(0);
+  const [startsAt, setStartsAt] = useState('');
+  const [endsAt, setEndsAt] = useState('');
+
+  // Fetch banners
+  const { data: banners, isLoading } = useQuery({
+    queryKey: ['promo-banners'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('promo_banners')
+        .select('*')
+        .order('priority', { ascending: false })
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data as PromoBanner[];
+    },
+  });
+
+  // Fetch routines for destination selector
+  const { data: routines } = useQuery({
+    queryKey: ['routine-plans-for-promo'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routine_plans')
+        .select('id, title')
+        .eq('is_active', true)
+        .order('title');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch playlists for destination selector
+  const { data: playlists } = useQuery({
+    queryKey: ['playlists-for-promo'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlists')
+        .select('id, name')
+        .eq('is_hidden', false)
+        .order('name');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Upload image
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('promo-banners')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('promo-banners')
+        .getPublicUrl(fileName);
+
+      setCoverImageUrl(urlData.publicUrl);
+      toast.success('Image uploaded');
+    } catch (error: any) {
+      toast.error('Upload failed: ' + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Create banner mutation
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from('promo_banners').insert({
+        cover_image_url: coverImageUrl,
+        destination_type: destinationType,
+        destination_id: destinationType === 'routine' || destinationType === 'playlist' ? destinationId || null : null,
+        custom_url: destinationType === 'custom_url' ? customUrl : null,
+        display_frequency: displayFrequency,
+        is_active: isActive,
+        priority,
+        starts_at: startsAt || null,
+        ends_at: endsAt || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['promo-banners'] });
+      toast.success('Banner created');
+      resetForm();
+    },
+    onError: (error: any) => {
+      toast.error('Failed to create banner: ' + error.message);
+    },
+  });
+
+  // Delete banner mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('promo_banners').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['promo-banners'] });
+      toast.success('Banner deleted');
+    },
+    onError: (error: any) => {
+      toast.error('Failed to delete: ' + error.message);
+    },
+  });
+
+  // Toggle active mutation
+  const toggleActiveMutation = useMutation({
+    mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
+      const { error } = await supabase
+        .from('promo_banners')
+        .update({ is_active })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['promo-banners'] });
+    },
+  });
+
+  const resetForm = () => {
+    setIsCreating(false);
+    setCoverImageUrl('');
+    setDestinationType('routine');
+    setDestinationId('');
+    setCustomUrl('');
+    setDisplayFrequency('once');
+    setIsActive(true);
+    setPriority(0);
+    setStartsAt('');
+    setEndsAt('');
+  };
+
+  const getDestinationLabel = (banner: PromoBanner) => {
+    switch (banner.destination_type) {
+      case 'routine':
+        const routine = routines?.find(r => r.id === banner.destination_id);
+        return routine?.title || 'Unknown Routine';
+      case 'playlist':
+        const playlist = playlists?.find(p => p.id === banner.destination_id);
+        return playlist?.name || 'Unknown Playlist';
+      case 'journal':
+        return 'Journal';
+      case 'programs':
+        return 'Programs Page';
+      case 'custom_url':
+        return banner.custom_url || 'Custom URL';
+      default:
+        return 'Unknown';
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Promo Banners</CardTitle>
+          {!isCreating && (
+            <Button onClick={() => setIsCreating(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Banner
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent>
+          {isCreating && (
+            <div className="space-y-4 mb-6 p-4 border rounded-lg bg-muted/50">
+              <h3 className="font-semibold">Create New Banner</h3>
+              
+              {/* Image Upload */}
+              <div className="space-y-2">
+                <Label>Cover Image</Label>
+                <div className="flex items-center gap-4">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                  />
+                  {uploading && <span className="text-sm text-muted-foreground">Uploading...</span>}
+                </div>
+                {coverImageUrl && (
+                  <img
+                    src={coverImageUrl}
+                    alt="Preview"
+                    className="h-24 rounded-lg object-cover"
+                  />
+                )}
+              </div>
+
+              {/* Destination Type */}
+              <div className="space-y-2">
+                <Label>Destination Type</Label>
+                <Select value={destinationType} onValueChange={(v) => setDestinationType(v as DestinationType)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="routine">Routine</SelectItem>
+                    <SelectItem value="playlist">Playlist</SelectItem>
+                    <SelectItem value="journal">Journal</SelectItem>
+                    <SelectItem value="programs">Programs Page</SelectItem>
+                    <SelectItem value="custom_url">Custom URL</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Destination ID - for routine/playlist */}
+              {(destinationType === 'routine' || destinationType === 'playlist') && (
+                <div className="space-y-2">
+                  <Label>{destinationType === 'routine' ? 'Select Routine' : 'Select Playlist'}</Label>
+                  <Select value={destinationId} onValueChange={setDestinationId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={`Choose a ${destinationType}`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {destinationType === 'routine'
+                        ? routines?.map(r => (
+                            <SelectItem key={r.id} value={r.id}>{r.title}</SelectItem>
+                          ))
+                        : playlists?.map(p => (
+                            <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                          ))
+                      }
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Custom URL */}
+              {destinationType === 'custom_url' && (
+                <div className="space-y-2">
+                  <Label>Custom URL (e.g., /app/inspire)</Label>
+                  <Input
+                    value={customUrl}
+                    onChange={(e) => setCustomUrl(e.target.value)}
+                    placeholder="/app/..."
+                  />
+                </div>
+              )}
+
+              {/* Display Frequency */}
+              <div className="space-y-2">
+                <Label>Display Frequency</Label>
+                <Select value={displayFrequency} onValueChange={(v) => setDisplayFrequency(v as DisplayFrequency)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="once">Once (never show again after dismiss)</SelectItem>
+                    <SelectItem value="daily">Daily (show again after 24 hours)</SelectItem>
+                    <SelectItem value="weekly">Weekly (show again after 7 days)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Priority */}
+              <div className="space-y-2">
+                <Label>Priority (higher = shown first)</Label>
+                <Input
+                  type="number"
+                  value={priority}
+                  onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
+                />
+              </div>
+
+              {/* Scheduling */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Starts At (optional)</Label>
+                  <Input
+                    type="datetime-local"
+                    value={startsAt}
+                    onChange={(e) => setStartsAt(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Ends At (optional)</Label>
+                  <Input
+                    type="datetime-local"
+                    value={endsAt}
+                    onChange={(e) => setEndsAt(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Active Toggle */}
+              <div className="flex items-center gap-2">
+                <Switch checked={isActive} onCheckedChange={setIsActive} />
+                <Label>Active</Label>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => createMutation.mutate()}
+                  disabled={!coverImageUrl || createMutation.isPending}
+                >
+                  Create Banner
+                </Button>
+                <Button variant="outline" onClick={resetForm}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Banners List */}
+          {isLoading ? (
+            <p className="text-muted-foreground">Loading...</p>
+          ) : banners?.length === 0 ? (
+            <p className="text-muted-foreground">No promo banners yet</p>
+          ) : (
+            <div className="space-y-4">
+              {banners?.map((banner) => (
+                <div
+                  key={banner.id}
+                  className="flex items-center gap-4 p-4 border rounded-lg"
+                >
+                  <img
+                    src={banner.cover_image_url}
+                    alt="Banner"
+                    className="h-16 w-28 rounded object-cover"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium capitalize">
+                        {banner.destination_type.replace('_', ' ')}
+                      </span>
+                      <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground truncate">
+                        {getDestinationLabel(banner)}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {banner.display_frequency} • Priority: {banner.priority}
+                      {banner.starts_at && ` • From: ${format(new Date(banner.starts_at), 'MMM d')}`}
+                      {banner.ends_at && ` • Until: ${format(new Date(banner.ends_at), 'MMM d')}`}
+                    </div>
+                  </div>
+                  <Switch
+                    checked={banner.is_active}
+                    onCheckedChange={(checked) => 
+                      toggleActiveMutation.mutate({ id: banner.id, is_active: checked })
+                    }
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => deleteMutation.mutate(banner.id)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

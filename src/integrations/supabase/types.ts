@@ -1529,6 +1529,51 @@ export type Database = {
           },
         ]
       }
+      promo_banners: {
+        Row: {
+          cover_image_url: string
+          created_at: string
+          custom_url: string | null
+          destination_id: string | null
+          destination_type: string
+          display_frequency: string
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          priority: number
+          starts_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          cover_image_url: string
+          created_at?: string
+          custom_url?: string | null
+          destination_id?: string | null
+          destination_type: string
+          display_frequency?: string
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          priority?: number
+          starts_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cover_image_url?: string
+          created_at?: string
+          custom_url?: string | null
+          destination_id?: string | null
+          destination_type?: string
+          display_frequency?: string
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          priority?: number
+          starts_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       push_notification_logs: {
         Row: {
           created_at: string
