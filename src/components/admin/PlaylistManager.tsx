@@ -42,6 +42,7 @@ interface PlaylistFormData {
   description: string;
   program_slug: string;
   is_free: boolean;
+  available_on_mobile: boolean;
   category: 'audiobook' | 'course' | 'podcast' | 'meditate' | 'workout' | 'soundscape' | 'affirmations';
   sort_order: number;
   display_mode: DisplayMode;
@@ -240,6 +241,15 @@ const PlaylistForm = ({
       <Label htmlFor="playlist_is_free">Free for everyone</Label>
     </div>
 
+    <div className="flex items-center space-x-2">
+      <Switch
+        id="playlist_available_mobile"
+        checked={formData.available_on_mobile}
+        onCheckedChange={(checked) => setFormData({ ...formData, available_on_mobile: checked })}
+      />
+      <Label htmlFor="playlist_available_mobile">Show in iOS app (Player tab)</Label>
+    </div>
+
     <div>
       <Label htmlFor="playlist_sort_order">Sort Order</Label>
       <Input
@@ -288,6 +298,7 @@ export const PlaylistManager = () => {
     description: "",
     program_slug: "",
     is_free: true,
+    available_on_mobile: true,
     category: "audiobook",
     sort_order: 0,
     display_mode: "tracks",
@@ -299,6 +310,7 @@ export const PlaylistManager = () => {
     description: "",
     program_slug: "",
     is_free: true,
+    available_on_mobile: true,
     category: "audiobook",
     sort_order: 0,
     display_mode: "tracks",
@@ -447,6 +459,7 @@ export const PlaylistManager = () => {
           category: createFormData.category,
           program_slug: createFormData.program_slug || null,
           is_free: createFormData.is_free,
+          available_on_mobile: createFormData.available_on_mobile,
           sort_order: createFormData.sort_order,
           display_mode: createFormData.display_mode,
           cover_image_url: createFormData.cover_image_url || null,
@@ -532,6 +545,7 @@ export const PlaylistManager = () => {
       description: "",
       program_slug: "",
       is_free: true,
+      available_on_mobile: true,
       category: "audiobook",
       sort_order: 0,
       display_mode: "tracks",
@@ -545,6 +559,7 @@ export const PlaylistManager = () => {
       description: "",
       program_slug: "",
       is_free: true,
+      available_on_mobile: true,
       category: "audiobook",
       sort_order: 0,
       display_mode: "tracks",
@@ -714,6 +729,7 @@ export const PlaylistManager = () => {
       description: playlist.description || "",
       program_slug: playlist.program_slug || "",
       is_free: playlist.is_free,
+      available_on_mobile: playlist.available_on_mobile ?? true,
       category: playlist.category || "audiobook",
       sort_order: playlist.sort_order,
       display_mode: playlist.display_mode || "tracks",
@@ -745,6 +761,7 @@ export const PlaylistManager = () => {
         category: editFormData.category,
         program_slug: editFormData.program_slug || null,
         is_free: editFormData.is_free,
+        available_on_mobile: editFormData.available_on_mobile,
         sort_order: editFormData.sort_order,
         display_mode: editFormData.display_mode,
         cover_image_url: editFormData.cover_image_url || null,

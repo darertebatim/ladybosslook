@@ -52,33 +52,11 @@ export default function AppPlayer() {
   };
 
   const isPlaylistAvailableOnMobile = (playlist: any) => {
-    // No program linked = always show
-    if (!playlist.program_slug) return true;
-    
-    // User is enrolled = always show
-    if (enrollments?.includes(playlist.program_slug)) return true;
-    
-    // Find the program to check if it's free or available on mobile
-    const program = programs?.find(p => p.slug === playlist.program_slug);
-    
-    // If program not found, hide it (safety)
-    if (!program) return false;
-    
-    // Free playlists should always show
-    if (playlist.is_free) return true;
-    
-    // For native iOS: check if program is available on mobile AND (free on iOS OR free program)
-    if (isNativeApp()) {
-      // If program is explicitly unavailable on mobile, hide it
-      if (program.available_on_mobile === false) return false;
-      
-      // If program is free (price 0 or is_free_on_ios), show it
-      if (program.price_amount === 0 || program.is_free_on_ios) return true;
-      
-      // Paid program, user not enrolled = hide
+    // Simple: use the available_on_mobile flag directly from playlist settings
+    // Default to true for backwards compatibility (column defaults to true)
+    if (isNativeApp() && playlist.available_on_mobile === false) {
       return false;
     }
-    
     return true;
   };
 

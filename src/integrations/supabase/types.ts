@@ -248,6 +248,7 @@ export type Database = {
       }
       audio_playlists: {
         Row: {
+          available_on_mobile: boolean
           category: string | null
           cover_image_url: string | null
           created_at: string
@@ -261,6 +262,7 @@ export type Database = {
           sort_order: number
         }
         Insert: {
+          available_on_mobile?: boolean
           category?: string | null
           cover_image_url?: string | null
           created_at?: string
@@ -274,6 +276,7 @@ export type Database = {
           sort_order?: number
         }
         Update: {
+          available_on_mobile?: boolean
           category?: string | null
           cover_image_url?: string | null
           created_at?: string
