@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Trash2, Plus, Upload, ExternalLink } from 'lucide-react';
+import { Trash2, Plus, Upload, ExternalLink, Sparkles, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'custom_url';
@@ -32,6 +32,7 @@ export function PromoBannerManager() {
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [generating, setGenerating] = useState(false);
   
   // Form state
   const [coverImageUrl, setCoverImageUrl] = useState('');
@@ -41,6 +42,10 @@ export function PromoBannerManager() {
   const [displayFrequency, setDisplayFrequency] = useState<DisplayFrequency>('once');
   const [isActive, setIsActive] = useState(true);
   const [priority, setPriority] = useState(0);
+  
+  // AI generation state
+  const [bannerTitle, setBannerTitle] = useState('');
+  const [bannerSubtitle, setBannerSubtitle] = useState('');
   const [startsAt, setStartsAt] = useState('');
   const [endsAt, setEndsAt] = useState('');
 
@@ -115,6 +120,59 @@ export function PromoBannerManager() {
     }
   };
 
+  // AI Generate banner image
+  const handleGenerateBanner = async () => {
+    if (!bannerTitle.trim()) {
+      toast.error('Please enter a title for the banner');
+      return;
+    }
+
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-promo-banner', {
+        body: {
+          title: bannerTitle.trim(),
+          subtitle: bannerSubtitle.trim() || undefined,
+        },
+      });
+
+      if (error) throw error;
+      
+      if (data?.imageData) {
+        // Upload the base64 image to storage
+        const base64Data = data.imageData.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/png' });
+        
+        const fileName = `ai-${Date.now()}.png`;
+        const { error: uploadError } = await supabase.storage
+          .from('promo-banners')
+          .upload(fileName, blob);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from('promo-banners')
+          .getPublicUrl(fileName);
+
+        setCoverImageUrl(urlData.publicUrl);
+        toast.success('Banner generated successfully!');
+      } else {
+        throw new Error('No image returned');
+      }
+    } catch (error: any) {
+      console.error('Generation error:', error);
+      toast.error('Failed to generate banner: ' + (error.message || 'Unknown error'));
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   // Create banner mutation
   const createMutation = useMutation({
     mutationFn: async () => {
@@ -181,6 +239,8 @@ export function PromoBannerManager() {
     setPriority(0);
     setStartsAt('');
     setEndsAt('');
+    setBannerTitle('');
+    setBannerSubtitle('');
   };
 
   const getDestinationLabel = (banner: PromoBanner) => {
@@ -219,24 +279,71 @@ export function PromoBannerManager() {
             <div className="space-y-4 mb-6 p-4 border rounded-lg bg-muted/50">
               <h3 className="font-semibold">Create New Banner</h3>
               
+              {/* AI Generation Section */}
+              <div className="space-y-3 p-4 bg-gradient-to-br from-violet-50 to-pink-50 dark:from-violet-950/30 dark:to-pink-950/30 rounded-lg border border-violet-200 dark:border-violet-800">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-violet-500" />
+                  <Label className="text-sm font-medium">Generate with AI</Label>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Enter a title and optional subtitle to generate a 1200×400 banner image
+                </p>
+                <div className="grid gap-2">
+                  <Input
+                    placeholder="Banner Title (e.g., 'New Year Sale')"
+                    value={bannerTitle}
+                    onChange={(e) => setBannerTitle(e.target.value)}
+                    disabled={generating}
+                  />
+                  <Input
+                    placeholder="Subtitle (optional)"
+                    value={bannerSubtitle}
+                    onChange={(e) => setBannerSubtitle(e.target.value)}
+                    disabled={generating}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleGenerateBanner}
+                    disabled={generating || !bannerTitle.trim()}
+                    className="gap-2"
+                  >
+                    {generating ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4" />
+                        Generate Banner
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
               {/* Image Upload */}
               <div className="space-y-2">
-                <Label>Cover Image</Label>
+                <Label>Or Upload Image</Label>
                 <div className="flex items-center gap-4">
                   <Input
                     type="file"
                     accept="image/*"
                     onChange={handleImageUpload}
-                    disabled={uploading}
+                    disabled={uploading || generating}
                   />
                   {uploading && <span className="text-sm text-muted-foreground">Uploading...</span>}
                 </div>
                 {coverImageUrl && (
-                  <img
-                    src={coverImageUrl}
-                    alt="Preview"
-                    className="h-24 rounded-lg object-cover"
-                  />
+                  <div className="space-y-1">
+                    <img
+                      src={coverImageUrl}
+                      alt="Preview"
+                      className="w-full aspect-[3/1] rounded-lg object-cover border"
+                    />
+                    <p className="text-xs text-muted-foreground">Recommended: 1200×400 pixels (3:1 ratio)</p>
+                  </div>
                 )}
               </div>
 
