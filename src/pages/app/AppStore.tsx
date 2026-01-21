@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { usePrograms } from '@/hooks/usePrograms';
 import { SEOHead } from '@/components/SEOHead';
-import { Search, ShoppingBag, X, Loader2 } from 'lucide-react';
+import { Search, ShoppingBag, X, Loader2, Sparkles, Dumbbell, Waves, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -18,6 +18,10 @@ const categoryConfig = [
   { id: 'group-coaching', name: 'Coaching', icon: 'Users', color: 'pink' },
   { id: '1o1-session', name: '1-on-1', icon: 'UserCheck', color: 'blue' },
   { id: 'audiobook', name: 'Audio', icon: 'Headphones', color: 'orange' },
+  { id: 'meditate', name: 'Meditate', icon: 'Sparkles', color: 'teal' },
+  { id: 'workout', name: 'Workout', icon: 'Dumbbell', color: 'rose' },
+  { id: 'soundscape', name: 'Soundscape', icon: 'Waves', color: 'blue' },
+  { id: 'affirmations', name: 'Affirm', icon: 'Heart', color: 'pink' },
   { id: 'webinar', name: 'Webinar', icon: 'Video', color: 'green' },
   { id: 'event', name: 'Events', icon: 'Calendar', color: 'rose' },
 ];

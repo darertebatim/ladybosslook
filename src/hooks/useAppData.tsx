@@ -18,7 +18,7 @@ export function useEnrollments() {
         .from('course_enrollments')
         .select('program_slug')
         .eq('user_id', user!.id)
-        .eq('status', 'active');
+        .in('status', ['active', 'completed']);
       
       if (error) throw error;
       return (data || []).map(e => e.program_slug).filter(Boolean) as string[];
