@@ -155,91 +155,108 @@ const AppCourses = () => {
         }}
         className="block"
       >
-        <div className={`relative w-full rounded-xl overflow-hidden shadow-sm transition-transform active:scale-[0.98] border border-border/50 ${
-          isCompleted 
-            ? 'bg-muted/50 dark:bg-muted/30' 
-            : isActive 
-              ? 'bg-violet-50 dark:bg-violet-950/30' 
-              : 'bg-muted/50 dark:bg-muted/30'
-        } ${hasNotification && !isCompleted ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
+        <div className={`relative w-full rounded-2xl overflow-hidden shadow-lg transition-transform active:scale-[0.98] ${
+          hasNotification && !isCompleted ? 'ring-2 ring-primary ring-offset-2' : ''
+        } ${isCompleted ? 'opacity-75' : ''}`}>
+          {/* Background */}
+          {thumbnailUrl ? (
+            <img 
+              src={thumbnailUrl} 
+              alt={enrollment.course_name}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className={`absolute inset-0 ${
+              isCompleted 
+                ? 'bg-gray-500' 
+                : 'bg-primary'
+            }`} />
+          )}
+          
+          {/* Overlay - stronger gradient from bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
           
           {/* Content - compact for self-paced */}
-          <div className={`p-3 flex flex-col justify-end ${isSelfPaced ? 'min-h-[72px]' : 'min-h-[100px]'}`}>
-            {/* Badges row */}
-            <div className="flex items-center gap-1.5 mb-1">
+          <div className={`relative p-4 flex flex-col justify-between ${isSelfPaced ? 'min-h-[72px]' : 'min-h-[120px]'}`}>
+            {/* Top row: Badges */}
+            <div className="flex items-center gap-2 flex-wrap">
               {hasNotification && !isCompleted && (
-                <Badge className="bg-primary text-primary-foreground text-[9px] px-1 py-0 h-4">
-                  <Sparkles className="h-2 w-2 mr-0.5" />
+                <Badge className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 h-5">
+                  <Sparkles className="h-3 w-3 mr-1" />
                   New
                 </Badge>
               )}
               {isCompleted ? (
-                <Badge className="bg-muted-foreground/20 text-muted-foreground text-[9px] px-1 py-0 h-4">
-                  <CheckCircle2 className="h-2 w-2 mr-0.5" />
+                <Badge className="bg-white/20 text-white backdrop-blur-sm text-[10px] px-2 py-0.5 h-5">
+                  <CheckCircle2 className="h-3 w-3 mr-1" />
                   Completed
                 </Badge>
               ) : round ? (
                 <Badge 
-                  className={`text-[9px] px-1 py-0 h-4 ${
+                  className={`text-[10px] px-2 py-0.5 h-5 ${
                     isActive 
                       ? 'bg-green-500 text-white' 
-                      : 'bg-muted-foreground/20 text-muted-foreground'
+                      : 'bg-white/20 text-white backdrop-blur-sm'
                   }`}
                 >
                   {round.status}
                 </Badge>
               ) : (
-                <Badge className="bg-muted-foreground/20 text-muted-foreground text-[9px] px-1 py-0 h-4">
+                <Badge className="bg-white/20 text-white backdrop-blur-sm text-[10px] px-2 py-0.5 h-5">
                   Self-Paced
                 </Badge>
               )}
-              {/* Course name inline with badges */}
-              <h3 className="text-foreground font-semibold text-[12px] line-clamp-1 flex-1">
-                {enrollment.course_name}
-              </h3>
             </div>
             
-            {/* Round name + View schedule link - only for cohort-based */}
-            {round && (
-              <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                <span className="truncate">{round.round_name}</span>
-                <span>•</span>
-                <span className="flex items-center whitespace-nowrap text-primary">
-                  View schedule
-                  <ChevronRight className="h-3 w-3" />
-                </span>
-              </div>
-            )}
-            
-            {/* Next session info - only for cohort-based */}
-            {!isCompleted && displayDate && (
-              <p className={`text-[10px] ${isSessionToday ? 'text-green-600 dark:text-green-400 font-medium' : 'text-muted-foreground'}`}>
-                {isSessionToday 
-                  ? `Next: Today at ${format(new Date(displayDate), 'h:mm a')}`
-                  : isUpcoming 
-                    ? `Starts: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
-                    : `Next: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
-                }
-              </p>
-            )}
-            
-            {/* Next content unlock info - only for cohort-based */}
-            {!isCompleted && nextContent && (
-              <div className="flex items-center gap-1 text-[9px] text-cyan-600 dark:text-cyan-400">
-                <Unlock className="h-2 w-2 flex-shrink-0" />
-                <span className="line-clamp-1">
-                  {nextContent.title} unlocks {nextContent.countdownText}
-                </span>
-              </div>
-            )}
-            
-            {/* Important note (if exists) - only for cohort-based */}
-            {!isCompleted && importantNote && (
-              <div className="flex items-center gap-1 text-[9px] text-amber-600 dark:text-amber-400">
-                <AlertCircle className="h-2 w-2 flex-shrink-0" />
-                <span className="line-clamp-1">{importantNote}</span>
-              </div>
-            )}
+            {/* Bottom content */}
+            <div className="space-y-1">
+              {/* Course name */}
+              <h3 className="text-white font-bold text-base leading-tight line-clamp-1">
+                {enrollment.course_name}
+              </h3>
+              
+              {/* Round name + View schedule link - only for cohort-based */}
+              {round && (
+                <div className="flex items-center gap-1.5 text-xs text-white/80">
+                  <span className="truncate">{round.round_name}</span>
+                  <span>•</span>
+                  <span className="flex items-center whitespace-nowrap font-medium">
+                    View schedule
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </span>
+                </div>
+              )}
+              
+              {/* Next session info - only for cohort-based */}
+              {!isCompleted && displayDate && (
+                <p className={`text-xs font-medium ${isSessionToday ? 'text-green-400' : 'text-white/90'}`}>
+                  {isSessionToday 
+                    ? `Next: Today at ${format(new Date(displayDate), 'h:mm a')}`
+                    : isUpcoming 
+                      ? `Starts: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
+                      : `Next: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
+                  }
+                </p>
+              )}
+              
+              {/* Next content unlock info - only for cohort-based */}
+              {!isCompleted && nextContent && (
+                <div className="flex items-center gap-1.5 text-[11px] text-cyan-300">
+                  <Unlock className="h-3 w-3 flex-shrink-0" />
+                  <span className="line-clamp-1">
+                    {nextContent.title} unlocks {nextContent.countdownText}
+                  </span>
+                </div>
+              )}
+              
+              {/* Important note (if exists) - only for cohort-based */}
+              {!isCompleted && importantNote && (
+                <div className="flex items-center gap-1.5 text-[11px] text-amber-300">
+                  <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                  <span className="line-clamp-1">{importantNote}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </Link>
