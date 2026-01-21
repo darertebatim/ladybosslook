@@ -157,3 +157,6 @@ verify_jwt = true
 
 [functions.generate-promo-banner]
 verify_jwt = true
+
+[functions.improve-playlist-description]
+verify_jwt = true

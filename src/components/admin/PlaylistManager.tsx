@@ -59,9 +59,11 @@ interface PlaylistFormProps {
   programs: any[];
   isUploadingCover: boolean;
   isGeneratingCover: boolean;
+  isImprovingDescription: boolean;
   onUploadCover: (file: File) => void;
   onRemoveCover: () => void;
   onGenerateCover: () => void;
+  onImproveDescription: () => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
 }
 
@@ -75,9 +77,11 @@ const PlaylistForm = ({
   programs,
   isUploadingCover,
   isGeneratingCover,
+  isImprovingDescription,
   onUploadCover,
   onRemoveCover,
   onGenerateCover,
+  onImproveDescription,
   fileInputRef,
 }: PlaylistFormProps) => (
   <form onSubmit={onSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
@@ -92,7 +96,24 @@ const PlaylistForm = ({
     </div>
 
     <div>
-      <Label htmlFor="playlist_description">Description</Label>
+      <div className="flex items-center justify-between mb-1">
+        <Label htmlFor="playlist_description">Description</Label>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onImproveDescription}
+          disabled={isImprovingDescription || !formData.name}
+          className="h-7 text-xs"
+        >
+          {isImprovingDescription ? (
+            <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+          ) : (
+            <Wand2 className="h-3 w-3 mr-1" />
+          )}
+          Improve with AI
+        </Button>
+      </div>
       <Textarea
         id="playlist_description"
         value={formData.description}
@@ -290,6 +311,7 @@ export const PlaylistManager = () => {
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const [isGeneratingPrograms, setIsGeneratingPrograms] = useState(false);
+  const [isImprovingDescription, setIsImprovingDescription] = useState(false);
   const createFileInputRef = useRef<HTMLInputElement>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -445,6 +467,72 @@ export const PlaylistManager = () => {
       toast.error(error.message || 'Failed to generate cover');
     } finally {
       setIsGeneratingCover(false);
+    }
+  };
+
+  // Improve description with AI for create form
+  const handleCreateImproveDescription = async () => {
+    if (!createFormData.name) {
+      toast.error('Please enter a playlist name first');
+      return;
+    }
+
+    setIsImprovingDescription(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('improve-playlist-description', {
+        body: {
+          playlistName: createFormData.name,
+          currentDescription: createFormData.description,
+          category: createFormData.category,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.description) {
+        setCreateFormData({ ...createFormData, description: data.description });
+        toast.success('Description improved!');
+      } else {
+        throw new Error(data?.error || 'Failed to improve description');
+      }
+    } catch (error: any) {
+      console.error('Improve description error:', error);
+      toast.error(error.message || 'Failed to improve description');
+    } finally {
+      setIsImprovingDescription(false);
+    }
+  };
+
+  // Improve description with AI for edit form
+  const handleEditImproveDescription = async () => {
+    if (!editFormData.name) {
+      toast.error('Please enter a playlist name first');
+      return;
+    }
+
+    setIsImprovingDescription(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('improve-playlist-description', {
+        body: {
+          playlistName: editFormData.name,
+          currentDescription: editFormData.description,
+          category: editFormData.category,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.description) {
+        setEditFormData({ ...editFormData, description: data.description });
+        toast.success('Description improved!');
+      } else {
+        throw new Error(data?.error || 'Failed to improve description');
+      }
+    } catch (error: any) {
+      console.error('Improve description error:', error);
+      toast.error(error.message || 'Failed to improve description');
+    } finally {
+      setIsImprovingDescription(false);
     }
   };
 
@@ -931,9 +1019,11 @@ export const PlaylistManager = () => {
             programs={programs}
             isUploadingCover={isUploadingCover}
             isGeneratingCover={isGeneratingCover}
+            isImprovingDescription={isImprovingDescription}
             onUploadCover={handleCreateCoverUpload}
             onRemoveCover={() => setCreateFormData({ ...createFormData, cover_image_url: "" })}
             onGenerateCover={handleCreateGenerateCover}
+            onImproveDescription={handleCreateImproveDescription}
             fileInputRef={createFileInputRef}
           />
         </DialogContent>
@@ -954,9 +1044,11 @@ export const PlaylistManager = () => {
             programs={programs}
             isUploadingCover={isUploadingCover}
             isGeneratingCover={isGeneratingCover}
+            isImprovingDescription={isImprovingDescription}
             onUploadCover={handleEditCoverUpload}
             onRemoveCover={() => setEditFormData({ ...editFormData, cover_image_url: "" })}
             onGenerateCover={handleEditGenerateCover}
+            onImproveDescription={handleEditImproveDescription}
             fileInputRef={editFileInputRef}
           />
         </DialogContent>
