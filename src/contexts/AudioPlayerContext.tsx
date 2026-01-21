@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useRef, useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { updateMusicControls, destroyMusicControls, setupMusicControlsListeners } from "@/lib/musicControls";
@@ -53,9 +54,11 @@ const AudioPlayerContext = createContext<AudioPlayerContextType | null>(null);
 export function AudioPlayerProvider({ children }: { children: React.ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { user } = useAuth();
+  const navigate = useNavigate();
   const saveProgressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastTimeUpdateRef = useRef<number>(0);
   const onTrackCompleteRef = useRef<(() => void) | null>(null);
+  const currentTrackRef = useRef<TrackInfo | null>(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -157,6 +160,13 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         onPause: () => audio.pause(),
         onSeekForward: () => { audio.currentTime = Math.min(audio.currentTime + 15, audio.duration); },
         onSeekBackward: () => { audio.currentTime = Math.max(audio.currentTime - 15, 0); },
+        onTap: () => {
+          // Navigate to the audio player when user taps Now Playing widget
+          const track = currentTrackRef.current;
+          if (track) {
+            navigate(`/app/player/${track.id}`);
+          }
+        },
       });
     }
     
@@ -231,6 +241,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     
     // Load new track
     setCurrentTrack(track);
+    currentTrackRef.current = track;
     audio.src = track.fileUrl;
     audio.playbackRate = playbackRate;
     
@@ -287,6 +298,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       audioRef.current.src = "";
     }
     setCurrentTrack(null);
+    currentTrackRef.current = null;
     setCurrentTime(0);
     setDuration(0);
     setIsPlaying(false);
