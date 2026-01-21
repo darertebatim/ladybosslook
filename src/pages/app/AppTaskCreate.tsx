@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles } from 'lucide-react';
@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -122,6 +123,10 @@ const AppTaskCreate = ({
   const [showProLinkPicker, setShowProLinkPicker] = useState(false);
   const [showPlaylistPicker, setShowPlaylistPicker] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
+  
+  // Refs for subtask inputs to scroll into view
+  const newSubtaskInputRef = useRef<HTMLInputElement>(null);
+  const subtaskRefs = useRef<(HTMLInputElement | null)[]>([]);
   
   // Determine the current pro link config
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
@@ -293,6 +298,22 @@ const AppTaskCreate = ({
     if (newSubtask.trim()) {
       setSubtasks([...subtasks, newSubtask.trim()]);
       setNewSubtask('');
+      // Keep focus on the new subtask input and scroll it into view
+      setTimeout(() => {
+        if (newSubtaskInputRef.current) {
+          newSubtaskInputRef.current.focus();
+          newSubtaskInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
+  };
+
+  // Scroll input into view when focused (for iOS keyboard handling)
+  const handleSubtaskInputFocus = (element: HTMLInputElement | null) => {
+    if (element && Capacitor.isNativePlatform()) {
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300); // Wait for keyboard to appear
     }
   };
 
@@ -489,9 +510,11 @@ const AppTaskCreate = ({
         <div className="flex items-center gap-3 bg-muted/30 rounded-xl px-4 py-3">
           <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
           <Input
+            ref={newSubtaskInputRef}
             value={newSubtask}
             onChange={(e) => setNewSubtask(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addSubtask()}
+            onFocus={(e) => handleSubtaskInputFocus(e.target as HTMLInputElement)}
             placeholder="Add subtask"
             className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto"
           />

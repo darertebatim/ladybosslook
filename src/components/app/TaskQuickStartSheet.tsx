@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useTaskTemplates, TaskTemplate, TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
 import { cn } from '@/lib/utils';
-
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 interface TaskQuickStartSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -67,7 +68,21 @@ export const TaskQuickStartSheet = ({
                 className="text-xl font-medium text-center border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/40"
                 maxLength={50}
                 autoFocus
-                onKeyDown={(e) => e.key === 'Enter' && handleContinue()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // If there's text, continue; otherwise just dismiss keyboard to show suggestions
+                    if (taskName.trim()) {
+                      handleContinue();
+                    } else {
+                      // Blur to dismiss keyboard and show suggestions
+                      (e.target as HTMLInputElement).blur();
+                      if (Capacitor.isNativePlatform()) {
+                        Keyboard.hide();
+                      }
+                    }
+                  }
+                }}
               />
               <div className="text-xs text-muted-foreground text-center mt-1">
                 {taskName.length}/50
