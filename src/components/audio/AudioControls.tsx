@@ -1,6 +1,7 @@
 import { Play, Pause, RotateCcw, RotateCw } from "lucide-react";
 import { GlassButton } from "./GlassButton";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
 
 interface AudioControlsProps {
   isPlaying: boolean;
@@ -27,13 +28,33 @@ export const AudioControls = ({
   const currentRateIndex = playbackRates.indexOf(playbackRate);
   const nextRate = playbackRates[(currentRateIndex + 1) % playbackRates.length];
 
+  const handlePlayPause = () => {
+    haptic.light();
+    onPlayPause();
+  };
+
+  const handleSkipBack = () => {
+    haptic.selection();
+    onSkipBack();
+  };
+
+  const handleSkipForward = () => {
+    haptic.selection();
+    onSkipForward();
+  };
+
+  const handleRateChange = () => {
+    haptic.selection();
+    onPlaybackRateChange(nextRate);
+  };
+
   if (isGlass) {
     return (
       <div className="flex items-center justify-center gap-6 py-4">
-        {/* Skip Back */}
+      {/* Skip Back */}
         <div className="flex flex-col items-center gap-1">
           <GlassButton
-            onClick={onSkipBack}
+            onClick={handleSkipBack}
             size="md"
             className="bg-white/10 hover:bg-white/20"
           >
@@ -44,7 +65,7 @@ export const AudioControls = ({
 
         {/* Play/Pause - Large Central Button */}
         <GlassButton
-          onClick={onPlayPause}
+          onClick={handlePlayPause}
           size="xl"
           variant="primary"
           className="h-20 w-20 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
@@ -59,7 +80,7 @@ export const AudioControls = ({
         {/* Skip Forward */}
         <div className="flex flex-col items-center gap-1">
           <GlassButton
-            onClick={onSkipForward}
+            onClick={handleSkipForward}
             size="md"
             className="bg-white/10 hover:bg-white/20"
           >
@@ -71,7 +92,7 @@ export const AudioControls = ({
         {/* Speed Button */}
         <div className="flex flex-col items-center gap-1">
           <GlassButton
-            onClick={() => onPlaybackRateChange(nextRate)}
+            onClick={handleRateChange}
             size="md"
             className="bg-white/10 hover:bg-white/20 font-semibold text-sm"
           >
@@ -87,7 +108,7 @@ export const AudioControls = ({
     <div className="flex items-center justify-center gap-6 py-4">
       {/* Skip Back */}
       <button
-        onClick={onSkipBack}
+        onClick={handleSkipBack}
         className={cn(
           "flex flex-col items-center gap-1 p-3 rounded-2xl",
           "bg-secondary/50 hover:bg-secondary transition-colors",
@@ -100,7 +121,7 @@ export const AudioControls = ({
 
       {/* Play/Pause - Large Central Button */}
       <button
-        onClick={onPlayPause}
+        onClick={handlePlayPause}
         className={cn(
           "h-20 w-20 rounded-full flex items-center justify-center",
           "bg-primary text-primary-foreground",
@@ -117,7 +138,7 @@ export const AudioControls = ({
 
       {/* Skip Forward */}
       <button
-        onClick={onSkipForward}
+        onClick={handleSkipForward}
         className={cn(
           "flex flex-col items-center gap-1 p-3 rounded-2xl",
           "bg-secondary/50 hover:bg-secondary transition-colors",
@@ -130,7 +151,7 @@ export const AudioControls = ({
 
       {/* Speed Button */}
       <button
-        onClick={() => onPlaybackRateChange(nextRate)}
+        onClick={handleRateChange}
         className={cn(
           "flex flex-col items-center gap-1 p-3 rounded-2xl min-w-[52px]",
           "bg-secondary/50 hover:bg-secondary transition-colors",

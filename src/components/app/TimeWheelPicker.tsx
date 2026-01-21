@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { haptic } from '@/lib/haptics';
 
 interface TimeWheelPickerProps {
   value: string; // "HH:mm" format
@@ -50,6 +51,7 @@ const WheelColumn = ({ items, selectedIndex, onSelect, formatItem }: WheelColumn
     const newIndex = Math.max(0, Math.min(items.length - 1, rawIndex));
     setScrollOffset(-newIndex * ITEM_HEIGHT);
     if (newIndex !== selectedIndex) {
+      haptic.selection();
       onSelect(newIndex);
     }
   };
@@ -72,11 +74,13 @@ const WheelColumn = ({ items, selectedIndex, onSelect, formatItem }: WheelColumn
     const newIndex = Math.max(0, Math.min(items.length - 1, rawIndex));
     setScrollOffset(-newIndex * ITEM_HEIGHT);
     if (newIndex !== selectedIndex) {
+      haptic.selection();
       onSelect(newIndex);
     }
   };
 
   const handleItemClick = (index: number) => {
+    haptic.selection();
     onSelect(index);
   };
 

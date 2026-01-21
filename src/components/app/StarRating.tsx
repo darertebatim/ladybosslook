@@ -1,6 +1,7 @@
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { haptic } from '@/lib/haptics';
 
 interface StarRatingProps {
   rating?: number;
@@ -27,6 +28,11 @@ export function StarRating({ rating = 0, onRate, readonly = false, size = 'md' }
     lg: 'gap-1.5',
   };
 
+  const handleStarClick = (star: number) => {
+    haptic.selection();
+    onRate?.(star);
+  };
+
   return (
     <div className="flex flex-col items-center gap-2">
       <div className={cn('flex items-center', gapClasses[size])}>
@@ -41,7 +47,7 @@ export function StarRating({ rating = 0, onRate, readonly = false, size = 'md' }
             )}
             onMouseEnter={() => !readonly && setHoverRating(star)}
             onMouseLeave={() => !readonly && setHoverRating(0)}
-            onClick={() => onRate?.(star)}
+            onClick={() => handleStarClick(star)}
           >
             <Star
               className={cn(

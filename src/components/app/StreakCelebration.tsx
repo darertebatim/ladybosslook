@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { format, subDays, addDays, startOfWeek, isSameDay } from 'date-fns';
 import { useUserStreak } from '@/hooks/useTaskPlanner';
 import { Button } from '@/components/ui/button';
+import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 
 interface StreakCelebrationProps {
@@ -16,6 +17,7 @@ export const StreakCelebration = ({ open, onClose }: StreakCelebrationProps) => 
   useEffect(() => {
     if (open) {
       setIsAnimating(true);
+      haptic.success();
     }
   }, [open]);
 

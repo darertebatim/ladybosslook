@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { haptic } from "@/lib/haptics";
 
 interface BookmarkButtonProps {
   currentTime: number;
@@ -33,17 +34,20 @@ export function BookmarkButton({
   };
 
   const handleClick = () => {
+    haptic.medium();
     setSavedTime(Math.floor(currentTime));
     setShowDialog(true);
   };
 
   const handleSave = () => {
+    haptic.success();
     onAddBookmark(savedTime, note.trim() || undefined);
     setShowDialog(false);
     setNote("");
   };
 
   const handleQuickSave = () => {
+    haptic.success();
     onAddBookmark(Math.floor(currentTime));
   };
 

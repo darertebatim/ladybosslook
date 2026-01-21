@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Music, Lock, CheckCircle2, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { haptic } from '@/lib/haptics';
 
 interface PlaylistCardProps {
   id: string;
@@ -56,6 +57,7 @@ export const PlaylistCard = memo(function PlaylistCard({
   };
 
   const handleClick = () => {
+    haptic.light();
     if (isLocked && programSlug) {
       // Navigate to course detail page where user can enroll
       navigate(`/app/course/${programSlug}`);
