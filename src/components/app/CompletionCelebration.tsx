@@ -3,6 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, Trophy, Star, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { haptic } from '@/lib/haptics';
 
 interface CompletionCelebrationProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export function CompletionCelebration({
   useEffect(() => {
     if (isOpen && !hasTriggeredConfetti) {
       setHasTriggeredConfetti(true);
+      haptic.success();
       
       // Fire confetti from both sides
       const duration = 3000;

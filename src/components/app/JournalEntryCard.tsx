@@ -3,6 +3,7 @@ import { format, isToday, isYesterday } from 'date-fns';
 import { getMoodEmoji } from './MoodSelector';
 import { Card, CardContent } from '@/components/ui/card';
 import { Share2 } from 'lucide-react';
+import { haptic } from '@/lib/haptics';
 
 interface JournalEntryCardProps {
   id: string;
@@ -53,10 +54,15 @@ export const JournalEntryCard = memo(function JournalEntryCard({
   const preview = plainContent.length > 100 ? plainContent.slice(0, 100) + '...' : plainContent;
   const moodEmoji = getMoodEmoji(mood);
 
+  const handleClick = () => {
+    haptic.light();
+    onClick();
+  };
+
   return (
     <Card 
       className="cursor-pointer hover:bg-accent/50 transition-colors active:scale-[0.98]"
-      onClick={onClick}
+      onClick={handleClick}
     >
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-2">

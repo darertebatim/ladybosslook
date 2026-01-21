@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { haptic } from '@/lib/haptics';
 
 const MOODS = [
   { value: 'happy', emoji: '😊', label: 'Happy' },
@@ -17,6 +18,7 @@ interface MoodSelectorProps {
 
 export const MoodSelector = ({ value, onChange, className }: MoodSelectorProps) => {
   const handleClick = (mood: string) => {
+    haptic.selection();
     if (value === mood) {
       onChange(null);
     } else {

@@ -1,6 +1,7 @@
 import * as LucideIcons from 'lucide-react';
 import { Clock, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { haptic } from '@/lib/haptics';
 import { RoutinePlan } from '@/hooks/useRoutinePlans';
 
 interface RoutinePlanCardProps {
@@ -40,10 +41,15 @@ export function RoutinePlanCard({ plan, onClick, variant = 'default' }: RoutineP
   const gradient = colorGradients[plan.color] || colorGradients.yellow;
   const bgColor = colorBackgrounds[plan.color] || colorBackgrounds.yellow;
 
+  const handleClick = () => {
+    haptic.light();
+    onClick?.();
+  };
+
   if (variant === 'compact') {
     return (
       <button
-        onClick={onClick}
+        onClick={handleClick}
         className={cn(
           'flex items-center gap-3 p-3 rounded-2xl w-full text-left transition-all active:scale-[0.98]',
           bgColor
@@ -71,7 +77,7 @@ export function RoutinePlanCard({ plan, onClick, variant = 'default' }: RoutineP
 
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       className="relative rounded-2xl overflow-hidden w-full min-w-0 transition-all active:scale-[0.98] aspect-[4/5]"
     >
       {/* Cover Image or Gradient - Full Card */}
