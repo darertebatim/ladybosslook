@@ -172,17 +172,27 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     }
   }
 
-  // Sort active rounds by next session
+  // Sort active rounds: prioritize those with actual scheduled sessions, then by nearest date
   activeRounds.sort((a, b) => {
     const aRoundId = a.program_rounds?.id;
     const bRoundId = b.program_rounds?.id;
+    
+    // Get next session from map (actual scheduled sessions)
     const aNextSession = aRoundId ? nextSessionMap.get(aRoundId) : null;
     const bNextSession = bRoundId ? nextSessionMap.get(bRoundId) : null;
+    
+    // Programs with scheduled sessions come first
+    if (aNextSession && !bNextSession) return -1;
+    if (!aNextSession && bNextSession) return 1;
+    
+    // Finally sort by nearest date
     const aDate = aNextSession || a.program_rounds?.first_session_date || a.program_rounds?.start_date;
     const bDate = bNextSession || b.program_rounds?.first_session_date || b.program_rounds?.start_date;
+    
     if (aDate && !bDate) return -1;
     if (!aDate && bDate) return 1;
     if (!aDate && !bDate) return 0;
+    
     return new Date(aDate!).getTime() - new Date(bDate!).getTime();
   });
 
