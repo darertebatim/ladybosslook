@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Bell, X, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { checkPermissionStatus } from '@/lib/pushNotifications';
-import { Capacitor } from '@capacitor/core';
+import { shouldShowPushUI } from '@/hooks/usePushNotificationFlow';
 
 interface NotificationBannerProps {
   onEnableClick: () => void;
@@ -18,17 +17,20 @@ export function NotificationBanner({ onEnableClick }: NotificationBannerProps) {
 
   useEffect(() => {
     const checkVisibility = async () => {
-      // Only show on native
-      if (!Capacitor.isNativePlatform()) {
+      // Only show on native OR debug mode
+      if (!shouldShowPushUI()) {
         setIsVisible(false);
         return;
       }
 
-      // Check if already enabled
-      const permission = await checkPermissionStatus();
-      if (permission === 'granted') {
-        setIsVisible(false);
-        return;
+      // In debug mode, skip permission check
+      const isDebug = new URLSearchParams(window.location.search).get('debugPush') === 'true';
+      if (!isDebug) {
+        const permission = await checkPermissionStatus();
+        if (permission === 'granted') {
+          setIsVisible(false);
+          return;
+        }
       }
 
       // Check if pre-enrolled (special tracking)
