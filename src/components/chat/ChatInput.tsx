@@ -111,50 +111,69 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
     animationFrameRef.current = requestAnimationFrame(updateWaveform);
   }, [isRecording]);
 
-  const handleSend = () => {
+  const handleSend = useCallback(() => {
     if ((message.trim() || attachment) && !disabled && !uploading) {
       // Haptic feedback on iOS/Android
       if (Capacitor.isNativePlatform()) {
         Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
       }
       
-      // Store textarea reference before any state changes
-      const textarea = textareaRef.current;
+      // CRITICAL: Store the message content BEFORE clearing state
+      const messageToSend = message.trim();
+      const attachmentToSend = attachment ? {
+        file: attachment.file,
+        name: attachment.file.name,
+        type: attachment.file.type,
+        size: attachment.file.size
+      } : undefined;
       
-      onSend(
-        message.trim(),
-        attachment ? {
-          file: attachment.file,
-          name: attachment.file.name,
-          type: attachment.file.type,
-          size: attachment.file.size
-        } : undefined
-      );
+      // For iOS, explicitly tell the keyboard to stay open BEFORE any state changes
+      if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios') {
+        Keyboard.show().catch(() => {});
+      }
+      
+      // Clear state
       setMessage("");
       setAttachment(null);
       setError(null);
       
-      // Keep keyboard open - multiple strategies for iOS reliability
-      const keepKeyboardOpen = () => {
+      // Send the message (async, but we don't await)
+      onSend(messageToSend, attachmentToSend);
+      
+      // Multi-stage focus retention strategy for iOS
+      // The key insight: we need to re-focus AFTER React's re-render cycle completes
+      const restoreFocus = () => {
+        const textarea = textareaRef.current;
         if (textarea) {
+          // Directly set focus
           textarea.focus();
-        }
-        
-        if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios') {
-          Keyboard.show().catch(() => {});
+          
+          // On iOS native, also explicitly show keyboard
+          if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios') {
+            Keyboard.show().catch(() => {});
+          }
         }
       };
       
-      // Use requestAnimationFrame for paint-sync timing, then multiple delays
-      // to handle async operations (message send, refetch, re-render)
+      // Strategy: multiple attempts at different timings to catch various async scenarios
+      // 1. Immediate - before React starts re-render
+      restoreFocus();
+      
+      // 2. After microtask queue (React batched updates)
+      queueMicrotask(restoreFocus);
+      
+      // 3. After paint frame
       requestAnimationFrame(() => {
-        keepKeyboardOpen();
-        setTimeout(keepKeyboardOpen, 50);
-        setTimeout(keepKeyboardOpen, 150);
-        setTimeout(keepKeyboardOpen, 300);
+        restoreFocus();
+        // 4. After React's commit phase (typical timing)
+        setTimeout(restoreFocus, 0);
+        // 5. After any async operations from parent component
+        setTimeout(restoreFocus, 50);
+        setTimeout(restoreFocus, 150);
+        setTimeout(restoreFocus, 300);
       });
     }
-  };
+  }, [message, attachment, disabled, uploading, onSend]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
