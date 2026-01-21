@@ -130,7 +130,6 @@ const NativeAppLayout = () => {
     { path: '/app/feed', icon: Newspaper, label: 'Community', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount },
     { path: '/app/browse', icon: ShoppingBag, label: 'Browse' },
     { path: '/app/player', icon: Music, label: 'Listen' },
-    { path: '/app/routines', icon: Lightbulb, label: 'Routines' },
     { path: '/app/chat', icon: MessageCircle, label: 'Chat' },
   ];
 
@@ -155,7 +154,7 @@ const NativeAppLayout = () => {
         {/* Bottom Navigation - hidden on chat page for full-screen experience */}
         {!isOnChatPage && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg pb-safe">
-          <div className="grid grid-cols-6 pt-2 pb-2">
+          <div className="grid grid-cols-5 pt-2 pb-2">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               const Icon = item.icon;
