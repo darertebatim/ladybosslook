@@ -65,24 +65,41 @@ const AppCourses = () => {
   // Self-paced enrollments that are still active (not completed)
   const selfPacedEnrollments = enrollments?.filter(e => !e.program_rounds && e.status !== 'completed') || [];
 
-  // Sort active rounds by next session date (soonest first)
+  // Sort active rounds: prioritize those with actual scheduled sessions, then by nearest date
   const sortedActiveRounds = [...activeRounds].sort((a, b) => {
     const aRoundId = a.program_rounds?.id;
     const bRoundId = b.program_rounds?.id;
     
-    // Get next session or fallback to first_session_date
+    // Get next session from map (actual scheduled sessions)
     const aNextSession = aRoundId ? nextSessionMap.get(aRoundId) : null;
     const bNextSession = bRoundId ? nextSessionMap.get(bRoundId) : null;
     
+    // Check if program has actual content drip schedule
+    const aNextContent = aRoundId ? nextContentMap.get(aRoundId) : null;
+    const bNextContent = bRoundId ? nextContentMap.get(bRoundId) : null;
+    
+    // Priority scoring: programs with scheduled sessions get highest priority
+    const aHasScheduledSession = !!aNextSession;
+    const bHasScheduledSession = !!bNextSession;
+    const aHasContentSchedule = !!aNextContent;
+    const bHasContentSchedule = !!bNextContent;
+    
+    // Programs with scheduled sessions come first
+    if (aHasScheduledSession && !bHasScheduledSession) return -1;
+    if (!aHasScheduledSession && bHasScheduledSession) return 1;
+    
+    // If both have sessions OR both don't, check content schedule
+    if (aHasContentSchedule && !bHasContentSchedule) return -1;
+    if (!aHasContentSchedule && bHasContentSchedule) return 1;
+    
+    // Finally sort by nearest date
     const aDate = aNextSession || a.program_rounds?.first_session_date || a.program_rounds?.start_date;
     const bDate = bNextSession || b.program_rounds?.first_session_date || b.program_rounds?.start_date;
     
-    // Rounds with dates come first
     if (aDate && !bDate) return -1;
     if (!aDate && bDate) return 1;
     if (!aDate && !bDate) return 0;
     
-    // Sort by soonest date first
     return new Date(aDate!).getTime() - new Date(bDate!).getTime();
   });
 
