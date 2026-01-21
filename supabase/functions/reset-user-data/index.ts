@@ -73,18 +73,30 @@ Deno.serve(async (req) => {
     const auth = await requireAuthUser(req);
     if ('error' in auth) return json({ error: auth.error }, 401);
 
-    const userId = auth.user.id;
+    const callerUserId = auth.user.id;
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    const isAdmin = await requireAdmin(userId, supabaseAdmin);
+    const isAdmin = await requireAdmin(callerUserId, supabaseAdmin);
     if (!isAdmin) return json({ error: 'Forbidden' }, 403);
+
+    // Check if a target user ID is provided (admin resetting another user)
+    let targetUserId = callerUserId;
+    
+    try {
+      const body = await req.json();
+      if (body?.targetUserId) {
+        targetUserId = body.targetUserId;
+      }
+    } catch {
+      // No body or invalid JSON - reset the admin's own data
+    }
 
     // -------- Planner (tasks/subtasks/completions/streak/tags) --------
     const { data: tasks, error: tasksErr } = await supabaseAdmin
       .from('user_tasks')
       .select('id')
-      .eq('user_id', userId);
+      .eq('user_id', targetUserId);
     if (tasksErr) throw tasksErr;
 
     const taskIds = (tasks ?? []).map((t) => t.id as string);
@@ -102,57 +114,57 @@ Deno.serve(async (req) => {
       await mustDeleteIn(supabaseAdmin, 'user_subtasks', 'task_id', taskIds);
     }
 
-    await mustDelete(supabaseAdmin, 'task_completions', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'user_tasks', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'user_streaks', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'user_tags', 'user_id', userId);
+    await mustDelete(supabaseAdmin, 'task_completions', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'user_tasks', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'user_streaks', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'user_tags', 'user_id', targetUserId);
 
     // -------- Routines / planner extras --------
-    await mustDelete(supabaseAdmin, 'user_routine_plans', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'planner_program_completions', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'routine_plan_ratings', 'user_id', userId);
+    await mustDelete(supabaseAdmin, 'user_routine_plans', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'planner_program_completions', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'routine_plan_ratings', 'user_id', targetUserId);
 
     // -------- Feed --------
-    await mustDelete(supabaseAdmin, 'feed_post_reads', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'feed_reactions', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'feed_comments', 'user_id', userId);
+    await mustDelete(supabaseAdmin, 'feed_post_reads', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'feed_reactions', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'feed_comments', 'user_id', targetUserId);
 
     // -------- Audio --------
-    await mustDelete(supabaseAdmin, 'audio_bookmarks', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'audio_progress', 'user_id', userId);
+    await mustDelete(supabaseAdmin, 'audio_bookmarks', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'audio_progress', 'user_id', targetUserId);
 
     // -------- Journal --------
-    await mustDelete(supabaseAdmin, 'journal_entries', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'journal_reminder_settings', 'user_id', userId);
+    await mustDelete(supabaseAdmin, 'journal_entries', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'journal_reminder_settings', 'user_id', targetUserId);
 
     // -------- Courses / content tracking --------
-    await mustDelete(supabaseAdmin, 'course_enrollments', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'module_progress', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'user_content_views', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'user_celebrated_rounds', 'user_id', userId);
+    await mustDelete(supabaseAdmin, 'course_enrollments', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'module_progress', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'user_content_views', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'user_celebrated_rounds', 'user_id', targetUserId);
 
     // -------- Push / installs --------
-    await mustDelete(supabaseAdmin, 'push_subscriptions', 'user_id', userId);
-    await mustDelete(supabaseAdmin, 'app_installations', 'user_id', userId);
+    await mustDelete(supabaseAdmin, 'push_subscriptions', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'app_installations', 'user_id', targetUserId);
 
     // -------- Wallet --------
-    await mustDelete(supabaseAdmin, 'credit_transactions', 'user_id', userId);
+    await mustDelete(supabaseAdmin, 'credit_transactions', 'user_id', targetUserId);
     const { error: walletErr } = await supabaseAdmin
       .from('user_wallets')
       .update({ credits_balance: 0 })
-      .eq('user_id', userId);
+      .eq('user_id', targetUserId);
     if (walletErr) throw new Error(`[reset-user-data] update user_wallets: ${walletErr.message}`);
 
     // -------- Chat --------
     const { data: convs, error: convErr } = await supabaseAdmin
       .from('chat_conversations')
       .select('id')
-      .eq('user_id', userId);
+      .eq('user_id', targetUserId);
     if (convErr) throw convErr;
 
     const convIds = (convs ?? []).map((c) => c.id as string);
     await mustDeleteIn(supabaseAdmin, 'chat_messages', 'conversation_id', convIds);
-    await mustDelete(supabaseAdmin, 'chat_conversations', 'user_id', userId);
+    await mustDelete(supabaseAdmin, 'chat_conversations', 'user_id', targetUserId);
 
     return json({ success: true });
   } catch (error) {

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key, Edit2, Trash2, UserPlus, Smartphone, Send } from 'lucide-react';
+import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key, Edit2, Trash2, UserPlus, Smartphone, Send, RotateCcw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -98,6 +98,7 @@ export function LeadsManager() {
   const [selectedEnrollRound, setSelectedEnrollRound] = useState('');
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const [sendingTestTo, setSendingTestTo] = useState<string | null>(null);
   const [deletingSubscription, setDeletingSubscription] = useState<string | null>(null);
   const { toast } = useToast();
@@ -441,6 +442,43 @@ export function LeadsManager() {
     }
   };
 
+  const handleResetUserData = async () => {
+    if (!searchResults?.profile?.id) return;
+
+    setIsResetting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { error } = await supabase.functions.invoke('reset-user-data', {
+        body: {
+          targetUserId: searchResults.profile.id
+        },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Data Reset Complete",
+        description: `All app data for ${searchResults.profile.email} has been reset`
+      });
+
+      // Refresh search results
+      handleSearch();
+    } catch (error: any) {
+      console.error('Reset user data error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reset user data",
+        variant: "destructive"
+      });
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   const handleSendTestNotification = async (email: string, subscriptionId: string) => {
     setSendingTestTo(subscriptionId);
     try {
@@ -669,6 +707,43 @@ export function LeadsManager() {
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" size="sm" disabled={isResetting}>
+                            <RotateCcw className="h-4 w-4 mr-2" />
+                            Reset Data
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Reset User Data?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will reset all app data for <strong>{searchResults.profile.email}</strong> including:
+                              <ul className="mt-2 list-disc list-inside space-y-1 text-sm">
+                                <li>Tasks, subtasks, and completions</li>
+                                <li>Streaks and routine progress</li>
+                                <li>Journal entries</li>
+                                <li>Audio progress and bookmarks</li>
+                                <li>Chat conversations</li>
+                                <li>Enrollments and course progress</li>
+                                <li>Push notification subscriptions</li>
+                              </ul>
+                              <p className="mt-2">The user account will remain but with a fresh start.</p>
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleResetUserData}
+                              disabled={isResetting}
+                              className="bg-orange-600 text-white hover:bg-orange-700"
+                            >
+                              {isResetting ? 'Resetting...' : 'Reset Data'}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
 
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
