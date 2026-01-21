@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DeviceManagementPanel } from '@/components/admin/DeviceManagementPanel';
 import SecurityAuditLog from '@/components/SecurityAuditLog';
@@ -6,10 +7,42 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useResetPlannerData } from '@/hooks/useTaskPlanner';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, UserCheck, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export default function System() {
   const resetPlanner = useResetPlannerData();
+  const [enrollingAll, setEnrollingAll] = useState(false);
+
+  const handleEnrollAllPrograms = async () => {
+    setEnrollingAll(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Please sign in first');
+        return;
+      }
+
+      const response = await supabase.functions.invoke('admin-enroll-all-programs', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      const result = response.data;
+      toast.success(result.message);
+    } catch (error: any) {
+      console.error('Error enrolling in all programs:', error);
+      toast.error(error.message || 'Failed to enroll in programs');
+    } finally {
+      setEnrollingAll(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -38,7 +71,37 @@ export default function System() {
           <SecurityAuditLog />
         </TabsContent>
 
-        <TabsContent value="tools">
+        <TabsContent value="tools" className="space-y-4">
+          {/* Enroll in All Programs */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UserCheck className="h-5 w-5" />
+                Enroll in All Programs
+              </CardTitle>
+              <CardDescription>
+                Enroll yourself in all active programs with all available rounds. Useful for testing and reviewing all content.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                onClick={handleEnrollAllPrograms} 
+                disabled={enrollingAll}
+                variant="default"
+              >
+                {enrollingAll ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Enrolling...
+                  </>
+                ) : (
+                  'Enroll in All Programs'
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Complete Reset */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
