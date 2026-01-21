@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { X, Play, ExternalLink } from 'lucide-react';
+import { X, Play, ExternalLink, Megaphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { detectVideoType, extractYouTubeId, extractVimeoId, getVideoEmbedUrl, getVideoPlatformLabel } from '@/lib/videoUtils';
+import { detectVideoType, extractYouTubeId, getVideoEmbedUrl, getVideoPlatformLabel } from '@/lib/videoUtils';
 
 interface HomeBannerData {
   id: string;
@@ -14,6 +14,7 @@ interface HomeBannerData {
   video_url: string | null;
   background_color: string | null;
 }
+
 const DISMISSED_BANNERS_KEY = 'dismissedBannerIds';
 
 export function HomeBanner() {
@@ -54,7 +55,8 @@ export function HomeBanner() {
     }
   };
 
-  const handleDismiss = (id: string) => {
+  const handleDismiss = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
     setDismissedIds(prev => {
       const updated = new Set([...prev, id]);
       try {
@@ -79,7 +81,7 @@ export function HomeBanner() {
   if (visibleBanners.length === 0) return null;
 
   return (
-    <div className="space-y-3">
+    <div className="px-4 py-2 space-y-3">
       {visibleBanners.map((banner) => {
         const videoType = banner.video_url ? detectVideoType(banner.video_url) : null;
         const isVideoExpanded = expandedVideoId === banner.id;
@@ -87,25 +89,25 @@ export function HomeBanner() {
         return (
           <div
             key={banner.id}
-            className="relative bg-primary/10 border border-primary/20 rounded-xl p-4 overflow-hidden"
+            className="relative bg-white dark:bg-card rounded-2xl shadow-sm border border-border/50 overflow-hidden"
           >
             {/* Dismiss button */}
             <button
-              onClick={() => handleDismiss(banner.id)}
-              className="absolute top-3 right-3 p-2 rounded-full bg-black/60 hover:bg-black/80 transition-colors z-10 shadow-lg"
+              onClick={(e) => handleDismiss(e, banner.id)}
+              className="absolute top-3 right-3 p-1.5 rounded-full bg-black/40 hover:bg-black/60 transition-colors z-10"
               aria-label="Dismiss banner"
             >
-              <X className="h-5 w-5 text-white" />
+              <X className="h-4 w-4 text-white" />
             </button>
 
             {/* Video Section */}
             {banner.video_url && videoType && (
-              <div className="mb-3">
+              <div className="w-full">
                 {/* YouTube with embed */}
                 {videoType === 'youtube' && (
                   <>
                     {isVideoExpanded ? (
-                      <div className="relative aspect-video rounded-lg overflow-hidden">
+                      <div className="relative aspect-video">
                         <iframe
                           src={getVideoEmbedUrl(banner.video_url, 'youtube', true) || ''}
                           title={banner.title}
@@ -117,7 +119,7 @@ export function HomeBanner() {
                     ) : (
                       <button
                         onClick={() => setExpandedVideoId(banner.id)}
-                        className="relative w-full aspect-video rounded-lg overflow-hidden group"
+                        className="relative w-full aspect-video group"
                       >
                         <img
                           src={`https://img.youtube.com/vi/${extractYouTubeId(banner.video_url)}/maxresdefault.jpg`}
@@ -131,7 +133,7 @@ export function HomeBanner() {
                           }}
                         />
                         <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
-                          <div className="bg-primary text-primary-foreground rounded-full p-3">
+                          <div className="bg-white/90 text-foreground rounded-full p-3 shadow-lg">
                             <Play className="h-6 w-6 fill-current" />
                           </div>
                         </div>
@@ -144,7 +146,7 @@ export function HomeBanner() {
                 {videoType === 'vimeo' && (
                   <>
                     {isVideoExpanded ? (
-                      <div className="relative aspect-video rounded-lg overflow-hidden">
+                      <div className="relative aspect-video">
                         <iframe
                           src={getVideoEmbedUrl(banner.video_url, 'vimeo', true) || ''}
                           title={banner.title}
@@ -156,10 +158,10 @@ export function HomeBanner() {
                     ) : (
                       <button
                         onClick={() => setExpandedVideoId(banner.id)}
-                        className="relative w-full aspect-video rounded-lg overflow-hidden group bg-muted flex items-center justify-center"
+                        className="relative w-full aspect-video bg-muted flex items-center justify-center group"
                       >
                         <div className="text-center">
-                          <div className="bg-primary text-primary-foreground rounded-full p-3 mx-auto mb-2">
+                          <div className="bg-white/90 text-foreground rounded-full p-3 mx-auto mb-2 shadow-lg">
                             <Play className="h-6 w-6 fill-current" />
                           </div>
                           <span className="text-sm text-muted-foreground">Play Vimeo Video</span>
@@ -175,46 +177,55 @@ export function HomeBanner() {
                     src={banner.video_url}
                     controls
                     playsInline
-                    className="w-full aspect-video rounded-lg object-cover"
+                    className="w-full aspect-video object-cover"
                   />
                 )}
 
                 {/* Instagram/TikTok - external link */}
                 {(videoType === 'instagram' || videoType === 'tiktok') && (
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => window.open(banner.video_url!, '_blank')}
-                  >
-                    <Play className="h-4 w-4 mr-2" />
-                    Watch on {getVideoPlatformLabel(videoType)}
-                    <ExternalLink className="h-3 w-3 ml-2" />
-                  </Button>
+                  <div className="p-4">
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => window.open(banner.video_url!, '_blank')}
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      Watch on {getVideoPlatformLabel(videoType)}
+                      <ExternalLink className="h-3 w-3 ml-2" />
+                    </Button>
+                  </div>
                 )}
               </div>
             )}
 
             {/* Content */}
-            <div className="pr-6">
-              <h3 className="font-semibold text-foreground">{banner.title}</h3>
-              {banner.description && (
-                <p className="text-sm text-muted-foreground mt-1">{banner.description}</p>
+            <div className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center flex-shrink-0">
+                  <Megaphone className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+                </div>
+                <div className="flex-1 min-w-0 pr-6">
+                  <h3 className="font-semibold text-foreground">{banner.title}</h3>
+                  {banner.description && (
+                    <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{banner.description}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Button */}
+              {banner.button_text && banner.button_url && (
+                <Button
+                  size="sm"
+                  className="mt-3 w-full bg-violet-600 hover:bg-violet-700"
+                  onClick={() => handleButtonClick(banner.button_url!)}
+                >
+                  {banner.button_text}
+                  {banner.button_url.startsWith('http') && (
+                    <ExternalLink className="h-3 w-3 ml-1" />
+                  )}
+                </Button>
               )}
             </div>
-
-            {/* Button */}
-            {banner.button_text && banner.button_url && (
-              <Button
-                size="sm"
-                className="mt-3"
-                onClick={() => handleButtonClick(banner.button_url!)}
-              >
-                {banner.button_text}
-                {banner.button_url.startsWith('http') && (
-                  <ExternalLink className="h-3 w-3 ml-1" />
-                )}
-              </Button>
-            )}
           </div>
         );
       })}

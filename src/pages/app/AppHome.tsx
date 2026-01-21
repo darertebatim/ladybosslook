@@ -20,6 +20,7 @@ import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
 import { PromoBanner } from '@/components/app/PromoBanner';
+import { HomeBanner } from '@/components/app/HomeBanner';
 
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -334,6 +335,9 @@ const AppHome = () => {
 
         {/* Promo Banner */}
         <PromoBanner />
+
+        {/* Home Banners (announcements with videos/CTAs) */}
+        <HomeBanner />
 
         {/* Tag filter chips */}
         {taskTags.length > 0 && (
