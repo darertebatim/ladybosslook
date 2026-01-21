@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { format, addDays, nextMonday } from 'date-fns';
+import { format, addDays, nextMonday, startOfDay } from 'date-fns';
 import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -738,6 +738,7 @@ const AppTaskCreate = ({
                 mode="single"
                 selected={scheduledDate}
                 onSelect={(date) => date && setScheduledDate(date)}
+                disabled={(date) => date < startOfDay(new Date())}
                 className="rounded-lg border-0 w-full pointer-events-auto"
               />
 

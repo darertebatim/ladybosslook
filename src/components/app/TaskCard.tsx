@@ -13,6 +13,7 @@ import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
+import { isToday, isBefore, startOfDay } from 'date-fns';
 
 interface TaskCardProps {
   task: UserTask;
@@ -48,6 +49,8 @@ export const TaskCard = ({
   const proLinkValue = task.pro_link_value || task.linked_playlist_id;
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
 
+  // Check if this is a future date (after today)
+  const isFutureDate = !isToday(date) && !isBefore(startOfDay(date), startOfDay(new Date()));
   // Format time display
   const formatTime = (time: string | null) => {
     if (!time) return 'Anytime';
@@ -60,6 +63,11 @@ export const TaskCard = ({
 
   const handleToggleComplete = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Prevent completing tasks for future dates
+    if (isFutureDate) {
+      return;
+    }
     
     // Haptic feedback
     if (Capacitor.isNativePlatform()) {
@@ -156,14 +164,17 @@ export const TaskCard = ({
             {proConfig.badgeText}
           </button>
 
-          {/* Checkbox */}
+          {/* Checkbox - disabled for future dates */}
           <button
             onClick={handleToggleComplete}
+            disabled={isFutureDate}
             className={cn(
               'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
               isCompleted
                 ? 'bg-emerald-500 text-white shadow-md'
-                : 'border-2 border-foreground/25 hover:border-foreground/40 bg-white/50',
+                : isFutureDate
+                  ? 'border-2 border-foreground/15 bg-white/30 cursor-not-allowed opacity-50'
+                  : 'border-2 border-foreground/25 hover:border-foreground/40 bg-white/50',
               isAnimating && 'scale-110'
             )}
           >
@@ -212,14 +223,17 @@ export const TaskCard = ({
           </p>
         </div>
 
-        {/* Checkbox / Badge */}
+        {/* Checkbox / Badge - disabled for future dates */}
         <button
           onClick={handleToggleComplete}
+          disabled={isFutureDate}
           className={cn(
             'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
             isCompleted
               ? 'bg-emerald-500 text-white shadow-md'
-              : 'border-2 border-foreground/25 hover:border-foreground/40 bg-white/50',
+              : isFutureDate
+                ? 'border-2 border-foreground/15 bg-white/30 cursor-not-allowed opacity-50'
+                : 'border-2 border-foreground/25 hover:border-foreground/40 bg-white/50',
             isAnimating && 'scale-110'
           )}
         >
