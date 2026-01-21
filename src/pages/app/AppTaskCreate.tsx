@@ -26,6 +26,7 @@ import {
   TASK_COLORS,
 } from '@/hooks/useTaskPlanner';
 import { IconPicker, TaskIcon } from '@/components/app/IconPicker';
+import { TimeWheelPicker } from '@/components/app/TimeWheelPicker';
 import { PRO_LINK_TYPES, ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
 
 // Me+ style pastel color options with hex values
@@ -751,50 +752,76 @@ const AppTaskCreate = ({
         </SheetContent>
       </Sheet>
 
-      {/* Time Picker Sheet */}
+      {/* Time Picker Sheet - Me+ Style with Wheel */}
       <Sheet open={showTimePicker} onOpenChange={setShowTimePicker}>
-        <SheetContent side="bottom" className="h-auto max-h-[50vh] rounded-t-3xl" hideCloseButton>
-          <div className="flex items-center justify-between px-4 py-3 border-b">
-            <button onClick={() => setShowTimePicker(false)} className="p-2 -ml-2">
-              <X className="h-5 w-5" />
-            </button>
-            <span className="text-base font-medium">Select time</span>
-            <div className="w-9" />
-          </div>
-          <div className="p-4">
-            <button
-              onClick={() => {
-                setScheduledTime(null);
-                setShowTimePicker(false);
-              }}
-              className={cn(
-                "w-full text-left p-4 rounded-xl mb-2 flex items-center justify-between",
-                scheduledTime === null ? "bg-[#E8F4FD]" : "hover:bg-muted/50"
-              )}
-            >
-              <span className="font-medium">Anytime</span>
-              {scheduledTime === null && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
-            </button>
-            <ScrollArea className="h-48">
-              <div className="space-y-1">
-                {REMINDER_TIMES.filter((_, i) => i % 2 === 0).map((time) => (
-                  <button
-                    key={time}
-                    onClick={() => {
-                      setScheduledTime(time);
-                      setShowTimePicker(false);
-                    }}
-                    className={cn(
-                      "w-full text-left p-4 rounded-xl flex items-center justify-between",
-                      scheduledTime === time ? "bg-[#E8F4FD]" : "hover:bg-muted/50"
-                    )}
-                  >
-                    <span className="font-medium">{formatTimeDisplay(time)}</span>
-                    {scheduledTime === time && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
-                  </button>
-                ))}
+        <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
+          <div className="flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
+              <button onClick={() => setShowTimePicker(false)} className="p-2 -ml-2">
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <span className="text-lg font-medium">Time</span>
+              <Button
+                variant="ghost"
+                onClick={() => setShowTimePicker(false)}
+                className="text-primary font-medium"
+              >
+                Save
+              </Button>
+            </div>
+
+            {/* Dynamic title */}
+            <div className="text-center pb-4 px-6">
+              <h2 className="text-2xl font-bold">
+                {scheduledTime ? `Do it at ${formatTimeDisplay(scheduledTime)} of the day` : 'Anytime'}
+              </h2>
+            </div>
+
+            {/* Toggle */}
+            <div className="flex items-center justify-between px-6 py-4 border-t border-b">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-foreground flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-background" />
+                </div>
+                <div>
+                  <p className="font-medium">Specified time</p>
+                  <p className="text-sm text-muted-foreground">Set a specific time to do it</p>
+                </div>
               </div>
-            </ScrollArea>
+              <Switch
+                checked={scheduledTime !== null}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setScheduledTime('09:00');
+                  } else {
+                    setScheduledTime(null);
+                  }
+                }}
+              />
+            </div>
+
+            {scheduledTime && (
+              <>
+                {/* Time type selector */}
+                <div className="flex gap-1 p-1 mx-6 mt-6 bg-muted rounded-xl">
+                  <button className="flex-1 py-3 rounded-lg text-sm font-medium bg-[#C5F5E3] text-foreground">
+                    Point time
+                  </button>
+                  <button className="flex-1 py-3 rounded-lg text-sm font-medium text-muted-foreground">
+                    Time period
+                  </button>
+                </div>
+
+                {/* Scroll wheel picker */}
+                <TimeWheelPicker
+                  value={scheduledTime}
+                  onChange={setScheduledTime}
+                />
+              </>
+            )}
+
+            <div className="pb-safe h-4" />
           </div>
         </SheetContent>
       </Sheet>
@@ -1078,42 +1105,73 @@ const AppTaskCreate = ({
         </SheetContent>
       </Sheet>
 
-      {/* Custom Reminder Time Picker */}
+      {/* Custom Reminder Time Picker - Me+ Style with Wheel */}
       <Sheet open={showReminderCustom} onOpenChange={setShowReminderCustom}>
-        <SheetContent side="bottom" className="h-[50vh] rounded-t-3xl" hideCloseButton>
-          <div className="flex items-center justify-between px-4 py-3 border-b">
-            <button onClick={() => setShowReminderCustom(false)} className="p-2 -ml-2">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <span className="text-lg font-medium">Custom time</span>
-            <Button
-              variant="ghost"
-              onClick={() => setShowReminderCustom(false)}
-              className="text-primary font-medium"
-            >
-              Save
-            </Button>
-          </div>
-          <ScrollArea className="h-[calc(50vh-60px)]">
-            <div className="p-4 space-y-1">
-              {REMINDER_TIMES.filter((_, i) => i % 2 === 0).map((time) => (
-                <button
-                  key={time}
-                  onClick={() => {
-                    setReminderTime(time);
-                    setShowReminderCustom(false);
-                  }}
-                  className={cn(
-                    "w-full text-left p-4 rounded-xl flex items-center justify-between",
-                    reminderTime === time ? "bg-[#E8F4FD]" : "hover:bg-muted/50"
-                  )}
-                >
-                  <span className="font-medium">{formatTimeDisplay(time)}</span>
-                  {reminderTime === time && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
-                </button>
-              ))}
+        <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
+          <div className="flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
+              <button onClick={() => setShowReminderCustom(false)} className="p-2 -ml-2">
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <span className="text-lg font-medium">Reminder</span>
+              <Button
+                variant="ghost"
+                onClick={() => setShowReminderCustom(false)}
+                className="text-primary font-medium"
+              >
+                Save
+              </Button>
             </div>
-          </ScrollArea>
+
+            {/* Dynamic title */}
+            <div className="text-center pb-4 px-6">
+              <h2 className="text-2xl font-bold">
+                Remind me at {formatTimeDisplay(reminderTime)}
+              </h2>
+            </div>
+
+            {/* Toggle */}
+            <div className="flex items-center justify-between px-6 py-4 border-t border-b">
+              <div className="flex items-center gap-3">
+                <Bell className="h-6 w-6" />
+                <div>
+                  <p className="font-medium">Reminder</p>
+                  <p className="text-sm text-muted-foreground">Set a specific time to remind me</p>
+                </div>
+              </div>
+              <Switch
+                checked={reminderEnabled}
+                onCheckedChange={setReminderEnabled}
+              />
+            </div>
+
+            {reminderEnabled && (
+              <>
+                {/* Scroll wheel picker */}
+                <TimeWheelPicker
+                  value={reminderTime}
+                  onChange={setReminderTime}
+                />
+
+                {/* Quick action buttons */}
+                <div className="flex gap-2 px-6 pb-4">
+                  <button
+                    className="px-4 py-2.5 rounded-full text-sm font-medium bg-[#C5F5E3] text-foreground"
+                  >
+                    At time of event
+                  </button>
+                  <button
+                    className="px-4 py-2.5 rounded-full text-sm font-medium bg-muted/50 text-muted-foreground"
+                  >
+                    10 mins before
+                  </button>
+                </div>
+              </>
+            )}
+
+            <div className="pb-safe h-4" />
+          </div>
         </SheetContent>
       </Sheet>
 
