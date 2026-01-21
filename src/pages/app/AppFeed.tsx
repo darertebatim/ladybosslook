@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,8 @@ export default function AppFeed() {
   const initialChannel = searchParams.get('channel');
   
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const hasScrolledRef = useRef(false);
   
   const { data: channels, isLoading: channelsLoading } = useChannels();
   const { data: posts, isLoading: postsLoading } = useFeedPosts(selectedChannelId || undefined);
@@ -28,6 +30,25 @@ export default function AppFeed() {
 
   // Subscribe to real-time updates
   useFeedRealtime(selectedChannelId || undefined);
+
+  // Scroll to bottom when posts load (only first time)
+  useEffect(() => {
+    if (posts && posts.length > 0 && !postsLoading && !hasScrolledRef.current) {
+      hasScrolledRef.current = true;
+      // Multi-stage scroll for reliability
+      requestAnimationFrame(() => {
+        bottomRef.current?.scrollIntoView({ behavior: 'auto' });
+      });
+      setTimeout(() => {
+        bottomRef.current?.scrollIntoView({ behavior: 'auto' });
+      }, 100);
+    }
+  }, [posts, postsLoading]);
+
+  // Reset scroll flag when channel changes
+  useEffect(() => {
+    hasScrolledRef.current = false;
+  }, [selectedChannelId]);
 
   // Set initial channel from URL params
   useEffect(() => {
@@ -167,6 +188,9 @@ export default function AppFeed() {
             </p>
           </div>
         )}
+        
+        {/* Scroll anchor for auto-scroll to bottom */}
+        <div ref={bottomRef} />
       </main>
     </div>
   );
