@@ -506,6 +506,13 @@ const AppTaskCreate = ({
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value.slice(0, 50))}
+          onFocus={(e) => {
+            if (Capacitor.isNativePlatform()) {
+              setTimeout(() => {
+                e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }, 300);
+            }
+          }}
           placeholder="Task name"
           className="text-center text-xl font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1"
           maxLength={50}

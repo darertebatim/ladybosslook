@@ -125,7 +125,7 @@ export default function Auth() {
   return (
     <>
       <SEOHead />
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-primary/20 via-primary/10 to-background">
+      <div className="h-[100dvh] flex flex-col bg-gradient-to-b from-primary/20 via-primary/10 to-background overflow-hidden">
         {/* Back button - only show when in email form */}
         {showEmailForm && (
           <div className="absolute top-4 left-4 z-10">
@@ -155,7 +155,7 @@ export default function Auth() {
         </div>
 
         {/* Main Content Card */}
-        <div className="flex-1 bg-background rounded-t-[2.5rem] px-6 py-8 shadow-[0_-4px_30px_rgba(0,0,0,0.1)]">
+        <div className="flex-1 bg-background rounded-t-[2.5rem] px-6 py-8 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] overflow-y-auto">
           <div className="max-w-md mx-auto space-y-6">
             {/* Title */}
             <div className="text-center space-y-2">
@@ -254,6 +254,11 @@ export default function Auth() {
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onFocus={(e) => {
+                      setTimeout(() => {
+                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 300);
+                    }}
                     required
                     className="h-12 rounded-xl"
                   />
@@ -267,6 +272,11 @@ export default function Auth() {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      onFocus={(e) => {
+                        setTimeout(() => {
+                          e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 300);
+                      }}
                       required
                       className="h-12 rounded-xl"
                     />
