@@ -448,6 +448,54 @@ Implement a robust native iOS push notification system to keep users engaged wit
 - Improved search functionality
 - Offline mode improvements
 
+### 📱 iOS Lock Screen Widgets & Live Activities
+**Priority: MEDIUM**
+**Complexity: Intermediate (requires native SwiftUI)**
+**Inspiration:** Me+ app-style widgets
+
+**Widget Types:**
+- Streak counter widget (small/medium sizes)
+- Daily motivation quote widget
+- Next session reminder widget
+- Live Activity for active streak countdown
+
+**Technical Requirements:**
+
+**Lovable Side (Data Infrastructure):**
+- [ ] Create `widget-data` edge function returning widget-friendly JSON
+- [ ] Add streak expiration timestamps to database
+- [ ] Prepare motivational message rotation system
+- [ ] Document App Group data sync approach
+
+**Native Side (Xcode - requires SwiftUI):**
+- [ ] Add Widget Extension target to Xcode project
+- [ ] Configure App Groups capability for data sharing
+- [ ] Implement SwiftUI widget UI (~50-100 lines)
+- [ ] Optional: Add Live Activity for streak countdown
+- [ ] App Store update required
+
+**Widget Data Schema:**
+```typescript
+interface WidgetData {
+  streakCount: number;
+  streakExpiresAt: string;
+  motivationMessage: string;
+  hasUncompletedTasks: boolean;
+  nextSessionTitle?: string;
+  nextSessionTime?: string;
+}
+```
+
+**Implementation Options:**
+1. Use `capacitor-widgetkit` community plugin (partial bridge)
+2. Hire iOS developer for SwiftUI widget code
+3. Follow Apple's WidgetKit tutorials (intermediate difficulty)
+
+**Estimated Effort:**
+- Data API (Lovable): 2-3 hours
+- Native widget extension (Xcode): 8-16 hours
+- Live Activities (optional): 8-12 hours
+
 ---
 
 ## 💰 Phase 6: Monetization & IAP
