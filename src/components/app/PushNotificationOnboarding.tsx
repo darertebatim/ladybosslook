@@ -87,17 +87,18 @@ export function PushNotificationOnboarding({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-gradient-to-b from-primary/20 via-background to-background flex flex-col">
-      {/* Skip button */}
+    <div className="fixed inset-0 z-[100] bg-gradient-to-b from-primary/20 via-background to-background flex flex-col overflow-hidden">
+      {/* Skip button - increased touch target and z-index */}
       <div 
-        className="flex justify-end px-4"
+        className="flex justify-end px-4 relative z-10"
         style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}
       >
         <button
           onClick={handleSkip}
-          className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+          className="p-3 -mr-1 text-muted-foreground hover:text-foreground transition-colors active:scale-95"
+          aria-label="Close"
         >
-          <X className="h-6 w-6" />
+          <X className="h-7 w-7" />
         </button>
       </div>
 
@@ -166,10 +167,10 @@ export function PushNotificationOnboarding({
         </div>
       </div>
 
-      {/* Bottom Actions */}
+      {/* Bottom Actions - increased padding to clear tab bar */}
       <div 
         className="px-6 pb-6"
-        style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: 'max(100px, calc(80px + env(safe-area-inset-bottom)))' }}
       >
         {showFallback ? (
           <div className="space-y-3">
