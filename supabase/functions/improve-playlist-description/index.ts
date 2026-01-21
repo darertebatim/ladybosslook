@@ -32,22 +32,30 @@ serve(async (req) => {
       affirmations: 'an empowering affirmations collection',
     }[category] || 'audio content';
 
-    const prompt = `You are a professional copywriter for a women's personal development and empowerment brand. 
+    const prompt = `Write a short description for "${playlistName}" (${categoryContext}).
 
-Write a compelling, engaging description for a playlist called "${playlistName}" which is ${categoryContext}.
+${currentDescription ? `Current text to improve: "${currentDescription}"` : ''}
 
-${currentDescription ? `Current description to improve:\n"${currentDescription}"` : 'No current description provided - create one from scratch.'}
+STRICT RULES:
+- Maximum 40 words total
+- 1-2 short sentences only
+- Be specific about what they'll hear or experience
+- Use simple, everyday language
+- Speak directly to the listener ("you")
 
-Requirements:
-- Keep it concise (2-4 sentences max)
-- Use empowering, warm, and aspirational language
-- Speak directly to the listener ("you" language)
-- Highlight the transformation or benefit they'll experience
-- Make it feel personal and inviting, not corporate
-- Do NOT use clichés like "unlock your potential" or "journey to success"
-- Write in a conversational, authentic tone
+FORBIDDEN PHRASES (never use these):
+- "fuel your ambition", "quiet the noise", "step into your day"
+- "reclaim your power", "own your power", "find your flow"
+- "unlock", "journey", "transform", "curation", "dedicated space"
+- "resilient version of yourself", "what you're capable of"
 
-Return ONLY the description text, no quotes, no preamble.`;
+GOOD EXAMPLE:
+"Quick morning affirmations to start your day with confidence. Just 5 minutes to feel ready for anything."
+
+BAD EXAMPLE (too wordy, too abstract):
+"Own your power and find your flow with a curation designed to fuel your ambition and quiet the noise..."
+
+Return ONLY the description, nothing else.`;
 
     console.log('Improving description for:', playlistName);
 
