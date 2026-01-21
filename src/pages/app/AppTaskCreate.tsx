@@ -138,6 +138,8 @@ const AppTaskCreate = ({
   const [color, setColor] = useState<TaskColor>(initialData?.color || urlColor || 'yellow');
   const [scheduledDate, setScheduledDate] = useState<Date>(initialData?.scheduledDate || new Date());
   const [scheduledTime, setScheduledTime] = useState<string | null>(initialData?.scheduledTime ?? null);
+  const [scheduledEndTime, setScheduledEndTime] = useState<string | null>(null);
+  const [timeMode, setTimeMode] = useState<'point' | 'period'>('point');
   const [repeatEnabled, setRepeatEnabled] = useState(initialData?.repeatEnabled ?? false);
   const [repeatPattern, setRepeatPattern] = useState<'daily' | 'weekly' | 'monthly'>(initialData?.repeatPattern || 'daily');
   const [repeatInterval, setRepeatInterval] = useState(initialData?.repeatInterval || 1);
@@ -372,13 +374,24 @@ const AppTaskCreate = ({
     const hour = parseInt(hours);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+    return `${displayHour.toString().padStart(2, '0')}:${minutes} ${ampm}`;
   };
 
   const formatReminderTimeDisplay = (time: string) => {
     const [hours, minutes] = time.split(':');
     const hour = parseInt(hours);
-    return `${hour}:${minutes}`;
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+  };
+
+  // Calculate time offset (e.g., 10 mins before)
+  const getTimeOffset = (time: string, offsetMinutes: number): string => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes - offsetMinutes;
+    const newHours = Math.floor((totalMinutes + 1440) % 1440 / 60);
+    const newMinutes = (totalMinutes + 1440) % 60;
+    return `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
   };
 
   const getRepeatSummary = () => {
@@ -402,11 +415,36 @@ const AppTaskCreate = ({
 
   const getReminderSummary = () => {
     if (!reminderEnabled) return 'No Reminder';
-    const preset = REMINDER_PRESETS.find(p => p.time === reminderTime);
-    if (preset) {
-      return `${preset.label.replace(' reminder', '')} (${formatReminderTimeDisplay(reminderTime)})`;
+    // If time is set and reminder matches certain offsets, show friendly names
+    if (scheduledTime) {
+      if (reminderTime === scheduledTime) return `At time of event (${formatReminderTimeDisplay(reminderTime)})`;
+      if (reminderTime === getTimeOffset(scheduledTime, 10)) return `10 minutes early (${formatReminderTimeDisplay(reminderTime)})`;
+      if (reminderTime === getTimeOffset(scheduledTime, 30)) return `30 minutes early (${formatReminderTimeDisplay(reminderTime)})`;
+      if (reminderTime === getTimeOffset(scheduledTime, 60)) return `1 hour early (${formatReminderTimeDisplay(reminderTime)})`;
     }
-    return formatTimeDisplay(reminderTime);
+    return `Custom (${formatReminderTimeDisplay(reminderTime)})`;
+  };
+
+  // Get color hex for background
+  const getColorHex = (colorName: TaskColor): string => {
+    const colorOption = COLOR_OPTIONS.find(c => c.name === colorName);
+    return colorOption?.hex || '#E8F4FD';
+  };
+
+  // Darken color for cards/containers
+  const getDarkenedColor = (hex: string, amount: number = 0.15): string => {
+    // Convert hex to HSL and reduce lightness
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    // Return slightly darker version
+    const factor = 1 - amount;
+    const newR = Math.round(r * factor * 255);
+    const newG = Math.round(g * factor * 255);
+    const newB = Math.round(b * factor * 255);
+    return `rgb(${newR}, ${newG}, ${newB})`;
   };
 
   const getRepeatTitle = () => {
@@ -453,9 +491,10 @@ const AppTaskCreate = ({
   // All tags combined (defaults + user created)
   const allTags = [...DEFAULT_TAGS, ...userTags.filter(t => !DEFAULT_TAGS.includes(t.name)).map(t => t.name)];
 
-  // The main content (Me+ style with light blue background)
+  // The main content (Me+ style with dynamic background color)
+  const bgColor = getColorHex(color);
   const content = (
-    <div className="bg-[#E8F4FD] dark:bg-slate-900 min-h-full">
+    <div className="min-h-full transition-colors duration-300" style={{ backgroundColor: bgColor }}>
       {/* Icon & Title - Centered large emoji */}
       <div className="px-6 pt-6 pb-4 text-center">
         <button
@@ -585,7 +624,7 @@ const AppTaskCreate = ({
         >
           <div className="flex items-center gap-3">
             <Sparkles className={cn("h-5 w-5", proLinkType ? "text-violet-600" : "text-foreground/70")} />
-            <span className="font-medium">Goal</span>
+            <span className="font-medium">Pro Task Link</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             {proConfig ? (
@@ -774,7 +813,11 @@ const AppTaskCreate = ({
             {/* Dynamic title */}
             <div className="text-center pb-4 px-6">
               <h2 className="text-2xl font-bold">
-                {scheduledTime ? `Do it at ${formatTimeDisplay(scheduledTime)} of the day` : 'Anytime'}
+                {scheduledTime 
+                  ? timeMode === 'period' && scheduledEndTime
+                    ? `Do it at ${formatTimeDisplay(scheduledTime)} ~ ${formatTimeDisplay(scheduledEndTime)} of the day`
+                    : `Do it at ${formatTimeDisplay(scheduledTime)} of the day`
+                  : 'Anytime'}
               </h2>
             </div>
 
@@ -794,8 +837,10 @@ const AppTaskCreate = ({
                 onCheckedChange={(checked) => {
                   if (checked) {
                     setScheduledTime('09:00');
+                    setScheduledEndTime('10:00');
                   } else {
                     setScheduledTime(null);
+                    setScheduledEndTime(null);
                   }
                 }}
               />
@@ -805,19 +850,44 @@ const AppTaskCreate = ({
               <>
                 {/* Time type selector */}
                 <div className="flex gap-1 p-1 mx-6 mt-6 bg-muted rounded-xl">
-                  <button className="flex-1 py-3 rounded-lg text-sm font-medium bg-[#C5F5E3] text-foreground">
+                  <button 
+                    onClick={() => setTimeMode('point')}
+                    className={cn(
+                      "flex-1 py-3 rounded-lg text-sm font-medium transition-colors",
+                      timeMode === 'point' ? "bg-[#FFF59D] text-foreground" : "text-muted-foreground"
+                    )}
+                  >
                     Point time
                   </button>
-                  <button className="flex-1 py-3 rounded-lg text-sm font-medium text-muted-foreground">
+                  <button 
+                    onClick={() => setTimeMode('period')}
+                    className={cn(
+                      "flex-1 py-3 rounded-lg text-sm font-medium transition-colors",
+                      timeMode === 'period' ? "bg-[#FFF59D] text-foreground" : "text-muted-foreground"
+                    )}
+                  >
                     Time period
                   </button>
                 </div>
 
-                {/* Scroll wheel picker */}
+                {/* Scroll wheel picker(s) */}
                 <TimeWheelPicker
                   value={scheduledTime}
                   onChange={setScheduledTime}
                 />
+
+                {/* Time period - show second picker with TO label */}
+                {timeMode === 'period' && (
+                  <>
+                    <div className="text-center py-2">
+                      <span className="text-lg font-bold text-foreground">TO</span>
+                    </div>
+                    <TimeWheelPicker
+                      value={scheduledEndTime || '10:00'}
+                      onChange={setScheduledEndTime}
+                    />
+                  </>
+                )}
               </>
             )}
 
@@ -1042,7 +1112,7 @@ const AppTaskCreate = ({
         </SheetContent>
       </Sheet>
 
-      {/* Reminder Picker Sheet - Me+ Style */}
+      {/* Reminder Picker Sheet - Me+ Style with dynamic options based on time */}
       <Sheet open={showReminderPicker} onOpenChange={setShowReminderPicker}>
         <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
           <div className="flex items-center justify-between px-4 py-3 border-b">
@@ -1061,33 +1131,110 @@ const AppTaskCreate = ({
               }}
               className={cn(
                 "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
-                !reminderEnabled && "bg-[#E8F4FD]"
+                !reminderEnabled && "bg-[#FFF59D]"
               )}
             >
               <span className="font-medium">No reminder</span>
               {!reminderEnabled && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
             </button>
 
-            {/* Preset reminders */}
-            {REMINDER_PRESETS.map((preset) => (
-              <button
-                key={preset.time}
-                onClick={() => {
-                  setReminderEnabled(true);
-                  setReminderTime(preset.time);
-                  setShowReminderPicker(false);
-                }}
-                className={cn(
-                  "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
-                  reminderEnabled && reminderTime === preset.time && "bg-[#E8F4FD]"
-                )}
-              >
-                <span className="font-medium">
-                  {preset.label} <span className="text-muted-foreground">({formatReminderTimeDisplay(preset.time)})</span>
-                </span>
-                {reminderEnabled && reminderTime === preset.time && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
-              </button>
-            ))}
+            {/* Dynamic reminder options when time is set */}
+            {scheduledTime ? (
+              <>
+                {/* At time of event */}
+                <button
+                  onClick={() => {
+                    setReminderEnabled(true);
+                    setReminderTime(scheduledTime);
+                    setShowReminderPicker(false);
+                  }}
+                  className={cn(
+                    "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                    reminderEnabled && reminderTime === scheduledTime && "bg-[#FFF59D]"
+                  )}
+                >
+                  <span className="font-medium">
+                    At time of event <span className="text-muted-foreground">({formatReminderTimeDisplay(scheduledTime)})</span>
+                  </span>
+                  {reminderEnabled && reminderTime === scheduledTime && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+                </button>
+
+                {/* 10 minutes early */}
+                <button
+                  onClick={() => {
+                    setReminderEnabled(true);
+                    setReminderTime(getTimeOffset(scheduledTime, 10));
+                    setShowReminderPicker(false);
+                  }}
+                  className={cn(
+                    "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                    reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 10) && "bg-[#FFF59D]"
+                  )}
+                >
+                  <span className="font-medium">
+                    10 minutes early <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 10))})</span>
+                  </span>
+                  {reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 10) && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+                </button>
+
+                {/* 30 minutes early */}
+                <button
+                  onClick={() => {
+                    setReminderEnabled(true);
+                    setReminderTime(getTimeOffset(scheduledTime, 30));
+                    setShowReminderPicker(false);
+                  }}
+                  className={cn(
+                    "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                    reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 30) && "bg-[#FFF59D]"
+                  )}
+                >
+                  <span className="font-medium">
+                    30 minutes early <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 30))})</span>
+                  </span>
+                  {reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 30) && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+                </button>
+
+                {/* 1 hour early */}
+                <button
+                  onClick={() => {
+                    setReminderEnabled(true);
+                    setReminderTime(getTimeOffset(scheduledTime, 60));
+                    setShowReminderPicker(false);
+                  }}
+                  className={cn(
+                    "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                    reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 60) && "bg-[#FFF59D]"
+                  )}
+                >
+                  <span className="font-medium">
+                    1 hour early <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 60))})</span>
+                  </span>
+                  {reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 60) && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+                </button>
+              </>
+            ) : (
+              /* Preset reminders when no time is set */
+              REMINDER_PRESETS.map((preset) => (
+                <button
+                  key={preset.time}
+                  onClick={() => {
+                    setReminderEnabled(true);
+                    setReminderTime(preset.time);
+                    setShowReminderPicker(false);
+                  }}
+                  className={cn(
+                    "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                    reminderEnabled && reminderTime === preset.time && "bg-[#FFF59D]"
+                  )}
+                >
+                  <span className="font-medium">
+                    {preset.label} <span className="text-muted-foreground">({formatReminderTimeDisplay(preset.time)})</span>
+                  </span>
+                  {reminderEnabled && reminderTime === preset.time && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+                </button>
+              ))
+            )}
 
             {/* Custom */}
             <button
@@ -1096,10 +1243,19 @@ const AppTaskCreate = ({
                 setShowReminderPicker(false);
                 setShowReminderCustom(true);
               }}
-              className="w-full text-left px-6 py-4 flex items-center justify-between"
+              className={cn(
+                "w-full text-left px-6 py-4 flex items-center justify-between",
+                reminderEnabled && !REMINDER_PRESETS.some(p => p.time === reminderTime) && 
+                  (scheduledTime ? reminderTime !== scheduledTime && reminderTime !== getTimeOffset(scheduledTime, 10) && reminderTime !== getTimeOffset(scheduledTime, 30) && reminderTime !== getTimeOffset(scheduledTime, 60) : true) && "bg-[#FFF59D]"
+              )}
             >
-              <span className="font-medium">Custom</span>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">
+                Custom {reminderEnabled && <span className="text-muted-foreground">(Remind me at {formatReminderTimeDisplay(reminderTime)})</span>}
+              </span>
+              {reminderEnabled && !REMINDER_PRESETS.some(p => p.time === reminderTime) && 
+                (scheduledTime ? reminderTime !== scheduledTime && reminderTime !== getTimeOffset(scheduledTime, 10) && reminderTime !== getTimeOffset(scheduledTime, 30) && reminderTime !== getTimeOffset(scheduledTime, 60) : true) && (
+                <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>
+              )}
             </button>
           </div>
         </SheetContent>
@@ -1154,19 +1310,33 @@ const AppTaskCreate = ({
                   onChange={setReminderTime}
                 />
 
-                {/* Quick action buttons */}
-                <div className="flex gap-2 px-6 pb-4">
-                  <button
-                    className="px-4 py-2.5 rounded-full text-sm font-medium bg-[#C5F5E3] text-foreground"
-                  >
-                    At time of event
-                  </button>
-                  <button
-                    className="px-4 py-2.5 rounded-full text-sm font-medium bg-muted/50 text-muted-foreground"
-                  >
-                    10 mins before
-                  </button>
-                </div>
+                {/* Quick action buttons - functional */}
+                {scheduledTime && (
+                  <div className="flex gap-2 px-6 pb-4">
+                    <button
+                      onClick={() => setReminderTime(scheduledTime)}
+                      className={cn(
+                        "px-4 py-2.5 rounded-full text-sm font-medium border transition-colors",
+                        reminderTime === scheduledTime 
+                          ? "bg-foreground text-background border-foreground" 
+                          : "bg-white border-muted-foreground/30 text-foreground"
+                      )}
+                    >
+                      At time of event
+                    </button>
+                    <button
+                      onClick={() => setReminderTime(getTimeOffset(scheduledTime, 10))}
+                      className={cn(
+                        "px-4 py-2.5 rounded-full text-sm font-medium border transition-colors",
+                        reminderTime === getTimeOffset(scheduledTime, 10) 
+                          ? "bg-foreground text-background border-foreground" 
+                          : "bg-white border-muted-foreground/30 text-foreground"
+                      )}
+                    >
+                      10 mins before
+                    </button>
+                  </div>
+                )}
               </>
             )}
 
@@ -1423,8 +1593,11 @@ const AppTaskCreate = ({
             hideCloseButton
           >
             <div className="flex flex-col h-full">
-              {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 bg-[#E8F4FD] dark:bg-slate-900 flex-shrink-0">
+              {/* Header - dynamic color */}
+              <div 
+                className="flex items-center justify-between px-4 py-3 flex-shrink-0 transition-colors duration-300"
+                style={{ backgroundColor: bgColor }}
+              >
                 <button onClick={handleClose} className="p-2 -ml-2">
                   <X className="h-5 w-5" />
                 </button>
@@ -1453,11 +1626,14 @@ const AppTaskCreate = ({
 
   // Page mode - render as full page
   return (
-    <div className="flex flex-col h-full bg-[#E8F4FD] dark:bg-slate-900">
-      {/* Header - Me+ Style */}
+    <div className="flex flex-col h-full transition-colors duration-300" style={{ backgroundColor: bgColor }}>
+      {/* Header - Me+ Style with dynamic color */}
       <header 
-        className="fixed top-0 left-0 right-0 z-40 bg-[#E8F4FD] dark:bg-slate-900"
-        style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
+        className="fixed top-0 left-0 right-0 z-40 transition-colors duration-300"
+        style={{ 
+          paddingTop: 'max(12px, env(safe-area-inset-top))',
+          backgroundColor: bgColor 
+        }}
       >
         <div className="flex items-center justify-between px-4 h-12">
           <button onClick={handleClose} className="p-2 -ml-2">
