@@ -203,8 +203,9 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     if (!currentTrack || !Capacitor.isNativePlatform()) return;
     
     updateMusicControls({
+      trackId: currentTrack.id,
       track: currentTrack.title,
-      artist: currentTrack.playlistName || "",
+      artist: currentTrack.playlistName || "LadyBoss Academy",
       cover: currentTrack.coverImageUrl || "",
       isPlaying,
       duration: Math.floor(duration),
