@@ -17,7 +17,7 @@ const categoryConfig: Record<string, { name: string; icon: string; color: string
   soundscape: { name: 'Soundscape', icon: 'Waves', color: 'teal' },
   affirmation: { name: 'Affirmations', icon: 'Heart', color: 'pink' },
   audiobook: { name: 'Audiobooks', icon: 'BookOpen', color: 'blue' },
-  course_supplement: { name: 'Courses', icon: 'GraduationCap', color: 'green' },
+  course: { name: 'Course', icon: 'GraduationCap', color: 'green' },
   podcast: { name: 'Podcast', icon: 'Podcast', color: 'rose' },
 };
 
@@ -80,7 +80,7 @@ export default function AppPlayer() {
   };
 
   // Define category order
-  const categoryOrder = ['all', 'podcast', 'course_supplement', 'audiobook', 'meditate', 'workout', 'soundscape', 'affirmation'];
+  const categoryOrder = ['all', 'podcast', 'course', 'audiobook', 'meditate', 'workout', 'soundscape', 'affirmation'];
   
   // Get available categories from playlists, sorted by defined order
   const availableCategoriesSet = new Set(
