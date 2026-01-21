@@ -23,6 +23,8 @@ import { subscribeToPushNotifications, checkPermissionStatus } from '@/lib/pushN
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { CalendarPermissionPrompt } from '@/components/app/CalendarPermissionPrompt';
+import { CourseNotificationPrompt } from '@/components/app/CourseNotificationPrompt';
+import { shouldShowCourseNotificationPrompt } from '@/hooks/usePushNotificationFlow';
 import DOMPurify from 'dompurify';
 
 const AppCourseDetail = () => {
@@ -36,6 +38,7 @@ const AppCourseDetail = () => {
   const [hasNewSessions, setHasNewSessions] = useState(false);
   const [addingSessionId, setAddingSessionId] = useState<string | null>(null);
   const [showCalendarPrompt, setShowCalendarPrompt] = useState(false);
+  const [showCourseNotificationPrompt, setShowCourseNotificationPrompt] = useState(false);
   
   // Get unseen content functions for view tracking
   let markEnrollmentViewed: ((id: string) => Promise<void>) | null = null;
@@ -280,6 +283,23 @@ const AppCourseDetail = () => {
     
     checkCalendarPrompt();
   }, [enrollment, dbSessions]);
+
+  // Show push notification prompt for enrolled users
+  useEffect(() => {
+    const checkNotificationPrompt = async () => {
+      // Only for enrolled users
+      if (!enrollment || !user?.id) return;
+      
+      // Check if we should show
+      const shouldShow = await shouldShowCourseNotificationPrompt();
+      if (shouldShow) {
+        // Delay slightly to not overwhelm user
+        setTimeout(() => setShowCourseNotificationPrompt(true), 2500);
+      }
+    };
+    
+    checkNotificationPrompt();
+  }, [enrollment, user?.id]);
 
   // Helper to get course page URL for non-Google Meet sessions
   const getCoursePageUrl = (programSlug: string): string => {
@@ -1420,6 +1440,16 @@ const AppCourseDetail = () => {
           handleSyncAllSessions();
         }}
       />
+
+      {/* Push Notification Prompt for Course */}
+      {user && program && (
+        <CourseNotificationPrompt
+          userId={user.id}
+          programTitle={program.title}
+          open={showCourseNotificationPrompt}
+          onClose={() => setShowCourseNotificationPrompt(false)}
+        />
+      )}
     </>
   );
 };

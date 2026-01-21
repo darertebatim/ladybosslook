@@ -21,7 +21,9 @@ import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
 import { PromoBanner } from '@/components/app/PromoBanner';
 import { HomeBanner } from '@/components/app/HomeBanner';
-
+import { NotificationBanner } from '@/components/app/NotificationBanner';
+import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
+import { useAuth } from '@/hooks/useAuth';
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
@@ -30,6 +32,7 @@ import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
 
 const AppHome = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
@@ -37,6 +40,7 @@ const AppHome = () => {
   const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
+  const [showNotificationFlow, setShowNotificationFlow] = useState(false);
 
   // Handle quick start continue
   const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
@@ -333,6 +337,9 @@ const AppHome = () => {
           }} 
         />
 
+        {/* Notification Banner - prompts users to enable notifications */}
+        <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
+
         {/* Promo Banner */}
         <PromoBanner />
 
@@ -532,6 +539,15 @@ const AppHome = () => {
           open={showStreakModal}
           onClose={() => setShowStreakModal(false)}
         />
+
+        {/* Push notification onboarding (triggered from banner) */}
+        {user && showNotificationFlow && (
+          <PushNotificationOnboarding
+            userId={user.id}
+            onComplete={() => setShowNotificationFlow(false)}
+            onSkip={() => setShowNotificationFlow(false)}
+          />
+        )}
       </div>
     </>
   );

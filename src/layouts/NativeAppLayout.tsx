@@ -1,18 +1,17 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Newspaper, MessageCircle, Lightbulb, ShoppingBag, Music } from 'lucide-react';
+import { Home, Newspaper, MessageCircle, ShoppingBag, Music } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useState, useEffect } from 'react';
-import { Capacitor } from '@capacitor/core';
-import { checkPermissionStatus } from '@/lib/pushNotifications';
-import { PushNotificationPrompt } from '@/components/app/PushNotificationPrompt';
-import { useUnreadChat } from '@/hooks/useUnreadChat';
-import { useChatNotifications } from '@/hooks/useChatNotifications';
+import { useEffect } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { AudioPlayerProvider, useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { MiniPlayer } from '@/components/audio/MiniPlayer';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
+import { useUnreadChat } from '@/hooks/useUnreadChat';
+import { useChatNotifications } from '@/hooks/useChatNotifications';
+import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
+import { usePushNotificationFlow } from '@/hooks/usePushNotificationFlow';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
@@ -31,7 +30,13 @@ const NativeAppLayout = () => {
   // All hooks must be called unconditionally at the top
   const location = useLocation();
   const { user } = useAuth();
-  const [showPrompt, setShowPrompt] = useState(false);
+  
+  // Push notification flow - handles full-screen onboarding
+  const { 
+    flowState, 
+    completeOnboarding, 
+    dismissOnboarding 
+  } = usePushNotificationFlow(user?.id);
   
   // Custom hooks after useState declarations
   const { unreadCount } = useUnreadChat();
@@ -39,7 +44,6 @@ const NativeAppLayout = () => {
   const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
 
   // Realtime subscription for enrollment changes - auto-refresh when enrollments change
-  // This handles Stripe webhook enrollments and any external enrollment changes
   useEffect(() => {
     if (!user?.id) return;
 
@@ -48,7 +52,7 @@ const NativeAppLayout = () => {
       .on(
         'postgres_changes',
         {
-          event: '*', // INSERT, UPDATE, DELETE
+          event: '*',
           schema: 'public',
           table: 'course_enrollments',
           filter: `user_id=eq.${user.id}`
@@ -78,28 +82,6 @@ const NativeAppLayout = () => {
   useEffect(() => {
     resetViewportZoom();
   }, [location.pathname]);
-
-  useEffect(() => {
-    const checkPrompt = async () => {
-      if (!Capacitor.isNativePlatform() || !user?.id) return;
-
-      // Check if already enabled
-      const permission = await checkPermissionStatus();
-      if (permission === 'granted') return;
-
-      // Check if dismissed recently (within 3 days)
-      const dismissed = localStorage.getItem('pushNotificationPromptDismissed');
-      if (dismissed) {
-        const daysSince = (Date.now() - parseInt(dismissed)) / (1000 * 60 * 60 * 24);
-        if (daysSince < 3) return;
-      }
-
-      // Show prompt after 2 seconds
-      setTimeout(() => setShowPrompt(true), 2000);
-    };
-
-    checkPrompt();
-  }, [user?.id]);
 
   // Get unseen content - wrap in try/catch in case provider is missing
   let hasUnseenCourses = false;
@@ -134,13 +116,12 @@ const NativeAppLayout = () => {
   ];
 
   // Tab bar actual height: grid content (~56px) + safe area inset
-  const TAB_BAR_CONTENT_HEIGHT = 56; // pt-2 pb-2 + icons + labels
+  const TAB_BAR_CONTENT_HEIGHT = 56;
 
   return (
     <>
       <div className="flex flex-col h-full bg-background app-theme font-farsi">
         {/* Main Content - scrollable container for iOS */}
-        {/* Bottom padding = tab bar content height only, safe-area handled by nav */}
         <main 
           className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
           style={{ paddingBottom: isOnChatPage ? 0 : TAB_BAR_CONTENT_HEIGHT + 8 }}
@@ -195,47 +176,49 @@ const NativeAppLayout = () => {
         )}
       </div>
 
-    {user && (
-      <PushNotificationPrompt 
-        userId={user.id}
-        open={showPrompt}
-        onClose={() => setShowPrompt(false)}
-      />
-    )}
+      {/* Full-screen Push Notification Onboarding */}
+      {user && flowState.showOnboarding && (
+        <PushNotificationOnboarding 
+          userId={user.id}
+          onComplete={completeOnboarding}
+          onSkip={dismissOnboarding}
+          isPreEnrolled={flowState.isPreEnrolled}
+        />
+      )}
 
-    {/* Unread Messages Popup - iOS Style */}
-    <AlertDialog open={showUnreadPopup} onOpenChange={dismissPopup}>
-      <AlertDialogContent className="max-w-[280px] p-0 rounded-2xl border border-border/50 shadow-xl overflow-hidden">
-        <AlertDialogHeader className="pt-5 pb-4 px-4">
-          <div className="flex justify-center mb-3">
-            <div className="rounded-full bg-primary/10 p-3">
-              <MessageCircle className="h-6 w-6 text-primary" />
+      {/* Unread Messages Popup - iOS Style */}
+      <AlertDialog open={showUnreadPopup} onOpenChange={dismissPopup}>
+        <AlertDialogContent className="max-w-[280px] p-0 rounded-2xl border border-border/50 shadow-xl overflow-hidden">
+          <AlertDialogHeader className="pt-5 pb-4 px-4">
+            <div className="flex justify-center mb-3">
+              <div className="rounded-full bg-primary/10 p-3">
+                <MessageCircle className="h-6 w-6 text-primary" />
+              </div>
             </div>
-          </div>
-          <AlertDialogTitle className="text-center text-[17px] font-semibold leading-tight">
-            {unreadMessageCount} New Message{unreadMessageCount > 1 ? 's' : ''}
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-center text-[13px] text-muted-foreground mt-1">
-            Support has replied to you
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="flex-col gap-0 sm:flex-col p-0 border-t border-border/50">
-          <AlertDialogAction 
-            onClick={goToChat} 
-            className="w-full h-11 rounded-none border-0 bg-transparent text-primary hover:bg-muted/50 text-[17px] font-normal"
-          >
-            View
-          </AlertDialogAction>
-          <AlertDialogCancel 
-            onClick={dismissPopup} 
-            className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent hover:bg-muted/50 text-[17px] font-normal text-muted-foreground"
-          >
-            Later
-          </AlertDialogCancel>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  </>
+            <AlertDialogTitle className="text-center text-[17px] font-semibold leading-tight">
+              {unreadMessageCount} New Message{unreadMessageCount > 1 ? 's' : ''}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-[13px] text-muted-foreground mt-1">
+              Support has replied to you
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-0 sm:flex-col p-0 border-t border-border/50">
+            <AlertDialogAction 
+              onClick={goToChat} 
+              className="w-full h-11 rounded-none border-0 bg-transparent text-primary hover:bg-muted/50 text-[17px] font-normal"
+            >
+              View
+            </AlertDialogAction>
+            <AlertDialogCancel 
+              onClick={dismissPopup} 
+              className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent hover:bg-muted/50 text-[17px] font-normal text-muted-foreground"
+            >
+              Later
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
