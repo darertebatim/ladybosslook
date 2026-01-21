@@ -50,6 +50,7 @@ const AppProfile = () => {
   const [contactMessage, setContactMessage] = useState('');
   const [notificationPermission, setNotificationPermission] = useState<'granted' | 'denied' | 'default'>('default');
   const [isEnablingNotifications, setIsEnablingNotifications] = useState(false);
+  const [isTestingNotification, setIsTestingNotification] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState<'checking' | 'active' | 'none'>('checking');
   const [calendarPermission, setCalendarPermission] = useState<'granted' | 'denied' | 'prompt'>('prompt');
   const [isRequestingCalendar, setIsRequestingCalendar] = useState(false);
@@ -61,7 +62,60 @@ const AppProfile = () => {
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  
+
+  // Test push notification - sends a test notification to the user's device
+  const handleTestNotification = async () => {
+    if (!user?.id) {
+      toast({
+        title: 'Error',
+        description: 'You must be logged in to test notifications',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsTestingNotification(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-push-notification', {
+        body: {
+          userIds: [user.id],
+          title: '🔔 Test Notification',
+          body: 'Your push notifications are working correctly!',
+          url: '/app/profile',
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.sent > 0) {
+        toast({
+          title: 'Test Sent!',
+          description: 'Check your notifications in a moment',
+        });
+      } else if (data?.failed > 0) {
+        toast({
+          title: 'Delivery Issue',
+          description: 'Test was sent but delivery failed. Try re-registering.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'No Device Found',
+          description: 'No registered device found. Try re-registering notifications.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error: any) {
+      console.error('Test notification error:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to send test notification',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsTestingNotification(false);
+    }
+  };
 
   // Editable profile state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -1115,6 +1169,14 @@ const AppProfile = () => {
                       {isEnablingNotifications ? 'Re-registering...' : 'Re-register'}
                     </Button>
                   </div>
+                  <Button 
+                    onClick={handleTestNotification}
+                    disabled={isTestingNotification}
+                    className="w-full"
+                  >
+                    <Bell className="mr-2 h-4 w-4" />
+                    {isTestingNotification ? 'Sending...' : 'Send Test Notification'}
+                  </Button>
                   <Button 
                     variant="ghost" 
                     onClick={handleOpenAppSettings}
