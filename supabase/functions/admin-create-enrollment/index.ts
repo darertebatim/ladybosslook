@@ -90,7 +90,7 @@ const handler = async (req: Request): Promise<Response> => {
       const { data: userData, error: userError } = await supabase.auth.admin.createUser({
         email: email,
         email_confirm: true,
-        password: email,
+        password: generateSecurePassword(),
         user_metadata: {
           full_name: fullName || ''
         }
