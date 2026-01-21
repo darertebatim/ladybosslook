@@ -140,6 +140,10 @@ export default function AppFeedPost() {
   useFeedRealtime();
   usePostCommentsRealtime(postId || '');
 
+  // Bilingual support - MUST be called before any early returns
+  const { direction: contentDirection, className: contentBilingualClassName } = useBilingualText(post?.content || '');
+  const { direction: titleDirection, className: titleBilingualClassName } = useBilingualText(post?.title || '');
+
   // Mark post as read
   useEffect(() => {
     if (post) {
@@ -229,10 +233,6 @@ export default function AppFeedPost() {
 
   const Icon = POST_TYPE_ICONS[post.post_type as keyof typeof POST_TYPE_ICONS] || Megaphone;
   const senderName = post.display_name || post.author?.full_name || 'Admin';
-  
-  // Bilingual support for post content
-  const { direction: contentDirection, className: contentBilingualClassName } = useBilingualText(post.content);
-  const { direction: titleDirection, className: titleBilingualClassName } = useBilingualText(post.title || '');
 
   // Group comments by date for chat-style display
   const groupedComments = comments?.reduce((acc, comment, index, arr) => {
