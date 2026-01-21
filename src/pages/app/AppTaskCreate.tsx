@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { format } from 'date-fns';
-import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles } from 'lucide-react';
+import { format, addDays, nextMonday } from 'date-fns';
+import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { useKeyboard } from '@/hooks/useKeyboard';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import {
   useCreateTask,
   useUpdateTask,
@@ -22,13 +23,47 @@ import {
   useCreateTag,
   TaskColor,
   RepeatPattern,
-  TASK_COLOR_CLASSES,
+  TASK_COLORS,
 } from '@/hooks/useTaskPlanner';
 import { IconPicker, TaskIcon } from '@/components/app/IconPicker';
 import { PRO_LINK_TYPES, ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
 
-// Color options
-const COLOR_OPTIONS: TaskColor[] = ['pink', 'peach', 'yellow', 'lime', 'sky', 'mint', 'lavender'];
+// Me+ style pastel color options with hex values
+const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
+  { name: 'pink', hex: '#FFD6E8' },
+  { name: 'peach', hex: '#FFE4C4' },
+  { name: 'yellow', hex: '#FFF59D' },
+  { name: 'lime', hex: '#E8F5A3' },
+  { name: 'sky', hex: '#C5E8FA' },
+  { name: 'mint', hex: '#B8F5E4' },
+  { name: 'lavender', hex: '#E8D4F8' },
+];
+
+// Default tag categories (expanded from Me+ screenshot)
+const DEFAULT_TAGS = [
+  'Morning Routine',
+  'Workout',
+  'Clean Room',
+  'Healthy Lifestyle',
+  'Sleep Better',
+  'Relationship',
+  'Morning Routines',
+  'Night Reset',
+  'The Green Plan',
+  'Take Care of Myself',
+  'Business',
+  'Self Care',
+  'Wellness',
+  'Evening',
+];
+
+// Reminder presets (Me+ style)
+const REMINDER_PRESETS = [
+  { label: 'Morning reminder', time: '09:00' },
+  { label: 'Midday reminder', time: '12:00' },
+  { label: 'Afternoon reminder', time: '16:00' },
+  { label: 'Evening reminder', time: '19:00' },
+];
 
 // Repeat intervals
 const REPEAT_INTERVALS = [1, 2, 3, 4, 5, 6, 7, 14, 21, 30];
@@ -50,6 +85,7 @@ export interface TaskFormData {
   repeatEnabled: boolean;
   repeatPattern: 'daily' | 'weekly' | 'monthly';
   repeatInterval: number;
+  repeatDays: number[];
   reminderEnabled: boolean;
   reminderTime: string;
   tag: string | null;
@@ -104,6 +140,7 @@ const AppTaskCreate = ({
   const [repeatEnabled, setRepeatEnabled] = useState(initialData?.repeatEnabled ?? false);
   const [repeatPattern, setRepeatPattern] = useState<'daily' | 'weekly' | 'monthly'>(initialData?.repeatPattern || 'daily');
   const [repeatInterval, setRepeatInterval] = useState(initialData?.repeatInterval || 1);
+  const [repeatDays, setRepeatDays] = useState<number[]>(initialData?.repeatDays || []);
   const [reminderEnabled, setReminderEnabled] = useState(initialData?.reminderEnabled ?? false);
   const [reminderTime, setReminderTime] = useState(initialData?.reminderTime || '09:00');
   const [tag, setTag] = useState<string | null>(initialData?.tag ?? null);
@@ -112,13 +149,16 @@ const AppTaskCreate = ({
   const [linkedPlaylistId, setLinkedPlaylistId] = useState<string | null>(initialData?.linkedPlaylistId ?? null);
   const [proLinkType, setProLinkType] = useState<ProLinkType | null>(initialData?.proLinkType ?? null);
   const [proLinkValue, setProLinkValue] = useState<string | null>(initialData?.proLinkValue ?? null);
+  const [newTagName, setNewTagName] = useState('');
 
   // Sheet states
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showRepeatPicker, setShowRepeatPicker] = useState(false);
+  const [showRepeatCustom, setShowRepeatCustom] = useState(false);
   const [showReminderPicker, setShowReminderPicker] = useState(false);
+  const [showReminderCustom, setShowReminderCustom] = useState(false);
   const [showTagPicker, setShowTagPicker] = useState(false);
   const [showProLinkPicker, setShowProLinkPicker] = useState(false);
   const [showPlaylistPicker, setShowPlaylistPicker] = useState(false);
@@ -178,6 +218,7 @@ const AppTaskCreate = ({
       setRepeatEnabled(initialData.repeatEnabled ?? !!hasRepeat);
       setRepeatPattern(hasRepeat && ['daily', 'weekly', 'monthly'].includes(repeatVal) ? repeatVal as 'daily' | 'weekly' | 'monthly' : 'daily');
       setRepeatInterval(initialData.repeatInterval || 1);
+      setRepeatDays(initialData.repeatDays || []);
       setReminderEnabled(initialData.reminderEnabled ?? false);
       setReminderTime(initialData.reminderTime || '09:00');
       setTag(initialData.tag ?? null);
@@ -240,6 +281,7 @@ const AppTaskCreate = ({
         repeatEnabled,
         repeatPattern,
         repeatInterval,
+        repeatDays,
         reminderEnabled,
         reminderTime,
         tag,
@@ -259,6 +301,7 @@ const AppTaskCreate = ({
       scheduled_date: format(scheduledDate, 'yyyy-MM-dd'),
       scheduled_time: scheduledTime,
       repeat_pattern: (repeatEnabled ? repeatPattern : 'none') as RepeatPattern,
+      repeat_days: repeatDays,
       reminder_enabled: reminderEnabled,
       reminder_offset: 0,
       tag,
@@ -334,73 +377,137 @@ const AppTaskCreate = ({
   const formatReminderTimeDisplay = (time: string) => {
     const [hours, minutes] = time.split(':');
     const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+    return `${hour}:${minutes}`;
   };
 
   const getRepeatSummary = () => {
-    if (!repeatEnabled) return 'Off';
-    const intervalText = repeatInterval === 1 ? '' : `${repeatInterval} `;
-    const patternText = {
-      daily: repeatInterval === 1 ? 'day' : 'days',
-      weekly: repeatInterval === 1 ? 'week' : 'weeks', 
-      monthly: repeatInterval === 1 ? 'month' : 'months',
-    }[repeatPattern];
-    return `Every ${intervalText}${patternText}`;
+    if (!repeatEnabled) return 'No repeat';
+    
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    
+    if (repeatPattern === 'weekly' && repeatDays.length > 0) {
+      const days = repeatDays.map(d => dayNames[d]).join(', ');
+      return `Weekly (${days})`;
+    }
+    
+    if (repeatPattern === 'monthly') {
+      const dayOfMonth = scheduledDate.getDate();
+      const suffix = dayOfMonth === 1 ? 'st' : dayOfMonth === 2 ? 'nd' : dayOfMonth === 3 ? 'rd' : 'th';
+      return `Monthly (On ${dayOfMonth}${suffix})`;
+    }
+    
+    return repeatPattern.charAt(0).toUpperCase() + repeatPattern.slice(1);
   };
 
-  // The main content (shared between page and sheet modes)
+  const getReminderSummary = () => {
+    if (!reminderEnabled) return 'No Reminder';
+    const preset = REMINDER_PRESETS.find(p => p.time === reminderTime);
+    if (preset) {
+      return `${preset.label.replace(' reminder', '')} (${formatReminderTimeDisplay(reminderTime)})`;
+    }
+    return formatTimeDisplay(reminderTime);
+  };
+
+  const getRepeatTitle = () => {
+    if (!repeatEnabled) return 'No repeat';
+    
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    
+    if (repeatPattern === 'weekly' && repeatDays.length > 0) {
+      const days = repeatDays.map(d => dayNames[d]).join(', ');
+      return `Repeats every week on ${days}`;
+    }
+    
+    if (repeatPattern === 'monthly') {
+      const dayOfMonth = scheduledDate.getDate();
+      const suffix = dayOfMonth === 1 ? 'st' : dayOfMonth === 2 ? 'nd' : dayOfMonth === 3 ? 'rd' : 'th';
+      return `Repeats every month on the ${dayOfMonth}${suffix}`;
+    }
+    
+    if (repeatInterval === 1) {
+      return `Repeats every ${repeatPattern === 'daily' ? 'day' : repeatPattern}`;
+    }
+    
+    const unit = repeatPattern === 'daily' ? 'days' : repeatPattern === 'weekly' ? 'weeks' : 'months';
+    return `Repeats every ${repeatInterval} ${unit}`;
+  };
+
+  const toggleRepeatDay = (day: number) => {
+    if (repeatDays.includes(day)) {
+      setRepeatDays(repeatDays.filter(d => d !== day));
+    } else {
+      setRepeatDays([...repeatDays, day].sort());
+    }
+  };
+
+  const handleAddTag = async () => {
+    if (newTagName.trim()) {
+      await createTag.mutateAsync(newTagName.trim());
+      setTag(newTagName.trim());
+      setNewTagName('');
+      setShowTagPicker(false);
+    }
+  };
+
+  // All tags combined (defaults + user created)
+  const allTags = [...DEFAULT_TAGS, ...userTags.filter(t => !DEFAULT_TAGS.includes(t.name)).map(t => t.name)];
+
+  // The main content (Me+ style with light blue background)
   const content = (
-    <>
-      {/* Icon & Title */}
-      <div className="p-6 text-center border-b">
+    <div className="bg-[#E8F4FD] dark:bg-slate-900 min-h-full">
+      {/* Icon & Title - Centered large emoji */}
+      <div className="px-6 pt-6 pb-4 text-center">
         <button
           onClick={() => setShowIconPicker(true)}
-          className="w-20 h-20 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4 hover:bg-muted transition-colors active:scale-95"
+          className="mx-auto mb-3 active:scale-95 transition-transform"
         >
-          <TaskIcon iconName={icon} size={36} className="text-foreground/80" />
+          <TaskIcon iconName={icon} size={64} className="text-foreground/70" />
         </button>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value.slice(0, 50))}
           placeholder="Task name"
-          className="text-center text-lg border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50"
+          className="text-center text-xl font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1"
           maxLength={50}
         />
-        <span className="text-xs text-muted-foreground">{title.length}/50</span>
+        <p className="text-sm text-muted-foreground mt-1">Tap to rename</p>
       </div>
 
-      {/* Color picker */}
-      <div className="p-4 border-b">
-        <div className="flex justify-center gap-3">
+      {/* Color picker - Horizontal circles with checkmark */}
+      <div className="px-6 pb-6">
+        <div className="flex justify-center gap-4">
           {COLOR_OPTIONS.map((c) => (
             <button
-              key={c}
-              onClick={() => setColor(c)}
+              key={c.name}
+              onClick={() => setColor(c.name)}
               className={cn(
-                'w-8 h-8 rounded-full transition-all',
-                TASK_COLOR_CLASSES[c],
-                color === c && 'ring-2 ring-offset-2 ring-foreground scale-110'
+                'w-12 h-12 rounded-full transition-all flex items-center justify-center',
+                'border-2 border-transparent',
+                color === c.name && 'ring-2 ring-foreground/20 ring-offset-2'
               )}
-            />
+              style={{ backgroundColor: c.hex }}
+            >
+              {color === c.name && (
+                <Check className="h-5 w-5 text-foreground/70" />
+              )}
+            </button>
           ))}
         </div>
       </div>
 
-      {/* Settings list */}
-      <div className="divide-y">
+      {/* Settings Card - White rounded card with list */}
+      <div className="mx-4 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
         {/* Date */}
         <button
           onClick={() => setShowDatePicker(true)}
-          className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
+          className="w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
-            <span className="text-lg">📅</span>
-            <span className="font-medium">Date</span>
+            <Calendar className="h-5 w-5 text-foreground/70" />
+            <span className="font-medium">{repeatEnabled ? 'Starting from' : 'Date'}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
-            <span>{format(scheduledDate, 'MMM d, yyyy')}</span>
+            <span>{format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? 'Today' : format(scheduledDate, 'MMM d, yyyy')}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
         </button>
@@ -408,10 +515,10 @@ const AppTaskCreate = ({
         {/* Repeat */}
         <button
           onClick={() => setShowRepeatPicker(true)}
-          className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
+          className="w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
-            <span className="text-lg">🔄</span>
+            <Repeat className="h-5 w-5 text-foreground/70" />
             <span className="font-medium">Repeat</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
@@ -423,10 +530,10 @@ const AppTaskCreate = ({
         {/* Time */}
         <button
           onClick={() => setShowTimePicker(true)}
-          className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
+          className="w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
-            <span className="text-lg">⏰</span>
+            <Clock className="h-5 w-5 text-foreground/70" />
             <span className="font-medium">Time</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
@@ -438,14 +545,14 @@ const AppTaskCreate = ({
         {/* Reminder */}
         <button
           onClick={() => setShowReminderPicker(true)}
-          className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
+          className="w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
-            <span className="text-lg">🔔</span>
+            <Bell className="h-5 w-5 text-foreground/70" />
             <span className="font-medium">Reminder</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
-            <span>{reminderEnabled ? formatReminderTimeDisplay(reminderTime) : 'Off'}</span>
+            <span>{getReminderSummary()}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
         </button>
@@ -453,61 +560,64 @@ const AppTaskCreate = ({
         {/* Tag */}
         <button
           onClick={() => setShowTagPicker(true)}
-          className="w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted"
+          className="w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50"
         >
           <div className="flex items-center gap-3">
-            <span className="text-lg">🏷️</span>
+            <Tag className="h-5 w-5 text-foreground/70" />
             <span className="font-medium">Tag</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
-            <span className="capitalize">{tag || 'None'}</span>
+            <span>{tag || 'No tag'}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
         </button>
+      </div>
 
-        {/* Pro Task Link */}
+      {/* Pro Task Link - Separate card */}
+      <div className="mx-4 mt-3 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
         <button
           onClick={() => setShowProLinkPicker(true)}
           className={cn(
-            "w-full flex items-center justify-between p-4 hover:bg-muted/50 active:bg-muted",
+            "w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50",
             proLinkType && "bg-violet-50 dark:bg-violet-900/20"
           )}
         >
           <div className="flex items-center gap-3">
-            <Sparkles className={cn("h-5 w-5", proLinkType ? "text-violet-600" : "text-muted-foreground")} />
-            <span className="font-medium">Pro Task Link</span>
+            <Sparkles className={cn("h-5 w-5", proLinkType ? "text-violet-600" : "text-foreground/70")} />
+            <span className="font-medium">Goal</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             {proConfig ? (
               <span className="flex items-center gap-1.5">
                 <proConfig.icon className="h-4 w-4" />
-                <span className="truncate max-w-[100px]">
-                  {proConfig.label}
-                </span>
+                <span className="truncate max-w-[100px]">{proConfig.label}</span>
               </span>
             ) : (
-              <span>None</span>
+              <span>Off</span>
             )}
             <ChevronRight className="h-4 w-4" />
           </div>
         </button>
       </div>
 
-      {/* Subtasks */}
-      <div className="p-4 border-t">
-        <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">Subtasks</h3>
-        
+      {/* Subtasks Card */}
+      <div className="mx-4 mt-3 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
         {subtasks.map((subtask, index) => (
-          <div key={index} className="flex items-center gap-3 mb-3 bg-muted/50 rounded-xl px-4 py-3">
-            <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 shrink-0" />
-            <span className="flex-1">{subtask}</span>
-            <button onClick={() => removeSubtask(index)} className="p-1">
+          <div key={index} className="flex items-center gap-3 px-4 py-3 border-b border-muted/30">
+            <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center shrink-0">
+              <div className="w-2 h-0.5 bg-muted-foreground/50 rounded-full" />
+            </div>
+            <span className="flex-1 text-foreground">{subtask}</span>
+            <button 
+              onClick={() => removeSubtask(index)} 
+              className="p-1.5 rounded-full hover:bg-muted/50"
+            >
               <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
             </button>
           </div>
         ))}
 
-        <div className="flex items-center gap-3 bg-muted/30 rounded-xl px-4 py-3">
+        <div className="flex items-center gap-3 px-4 py-3">
           <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
           <Input
             ref={newSubtaskInputRef}
@@ -515,19 +625,24 @@ const AppTaskCreate = ({
             onChange={(e) => setNewSubtask(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addSubtask()}
             onFocus={(e) => handleSubtaskInputFocus(e.target as HTMLInputElement)}
-            placeholder="Add subtask"
-            className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto"
+            placeholder="Subtasks"
+            className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base placeholder:text-muted-foreground/50"
           />
         </div>
       </div>
 
+      {/* Subtasks hint text */}
+      <p className="text-center text-sm text-muted-foreground mt-3 px-6">
+        Subtasks can be set as your daily routine or checklist
+      </p>
+
       {/* Delete button (edit mode only, page mode only) */}
       {!isSheet && taskId && (
-        <div className="p-4 border-t">
+        <div className="p-4 mt-4">
           <Button
             variant="destructive"
             onClick={handleDelete}
-            className="w-full"
+            className="w-full rounded-2xl"
             disabled={deleteTask.isPending}
           >
             Delete Task
@@ -536,11 +651,11 @@ const AppTaskCreate = ({
       )}
 
       {/* Bottom safe area */}
-      <div className="pb-safe" />
-    </>
+      <div className="pb-safe h-8" />
+    </div>
   );
 
-  // Picker sheets (shared between modes)
+  // Picker sheets (Me+ style)
   const pickerSheets = (
     <>
       {/* Icon Picker */}
@@ -551,9 +666,543 @@ const AppTaskCreate = ({
         onSelect={setIcon}
       />
 
+      {/* Date Picker Sheet - Me+ Full Page Style */}
+      <Sheet open={showDatePicker} onOpenChange={setShowDatePicker}>
+        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl" hideCloseButton>
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
+              <button onClick={() => setShowDatePicker(false)} className="p-2 -ml-2">
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <span className="text-lg font-medium">Date</span>
+              <Button
+                variant="ghost"
+                onClick={() => setShowDatePicker(false)}
+                className="text-primary font-medium"
+              >
+                Save
+              </Button>
+            </div>
+
+            {/* Title */}
+            <div className="text-center pb-4">
+              <h2 className="text-2xl font-bold">
+                {format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? 'Today' : format(scheduledDate, 'EEEE, MMM d')}
+              </h2>
+            </div>
+
+            {/* Calendar */}
+            <div className="flex-1 overflow-y-auto px-4">
+              <CalendarComponent
+                mode="single"
+                selected={scheduledDate}
+                onSelect={(date) => date && setScheduledDate(date)}
+                className="rounded-lg border-0 w-full pointer-events-auto"
+              />
+
+              {/* Quick select buttons */}
+              <div className="flex gap-2 mt-6 pb-4">
+                <button
+                  onClick={() => {
+                    setScheduledDate(new Date());
+                    setShowDatePicker(false);
+                  }}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-sm font-medium transition-all",
+                    format(scheduledDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
+                      ? "bg-[#E8F4FD] text-foreground"
+                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  Today
+                </button>
+                <button
+                  onClick={() => {
+                    setScheduledDate(addDays(new Date(), 1));
+                    setShowDatePicker(false);
+                  }}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-sm font-medium transition-all",
+                    format(scheduledDate, 'yyyy-MM-dd') === format(addDays(new Date(), 1), 'yyyy-MM-dd')
+                      ? "bg-[#E8F4FD] text-foreground"
+                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  Tomorrow
+                </button>
+                <button
+                  onClick={() => {
+                    setScheduledDate(nextMonday(new Date()));
+                    setShowDatePicker(false);
+                  }}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-sm font-medium transition-all",
+                    format(scheduledDate, 'yyyy-MM-dd') === format(nextMonday(new Date()), 'yyyy-MM-dd')
+                      ? "bg-[#E8F4FD] text-foreground"
+                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  Next Monday
+                </button>
+              </div>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Time Picker Sheet */}
+      <Sheet open={showTimePicker} onOpenChange={setShowTimePicker}>
+        <SheetContent side="bottom" className="h-auto max-h-[50vh] rounded-t-3xl" hideCloseButton>
+          <div className="flex items-center justify-between px-4 py-3 border-b">
+            <button onClick={() => setShowTimePicker(false)} className="p-2 -ml-2">
+              <X className="h-5 w-5" />
+            </button>
+            <span className="text-base font-medium">Select time</span>
+            <div className="w-9" />
+          </div>
+          <div className="p-4">
+            <button
+              onClick={() => {
+                setScheduledTime(null);
+                setShowTimePicker(false);
+              }}
+              className={cn(
+                "w-full text-left p-4 rounded-xl mb-2 flex items-center justify-between",
+                scheduledTime === null ? "bg-[#E8F4FD]" : "hover:bg-muted/50"
+              )}
+            >
+              <span className="font-medium">Anytime</span>
+              {scheduledTime === null && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+            </button>
+            <ScrollArea className="h-48">
+              <div className="space-y-1">
+                {REMINDER_TIMES.filter((_, i) => i % 2 === 0).map((time) => (
+                  <button
+                    key={time}
+                    onClick={() => {
+                      setScheduledTime(time);
+                      setShowTimePicker(false);
+                    }}
+                    className={cn(
+                      "w-full text-left p-4 rounded-xl flex items-center justify-between",
+                      scheduledTime === time ? "bg-[#E8F4FD]" : "hover:bg-muted/50"
+                    )}
+                  >
+                    <span className="font-medium">{formatTimeDisplay(time)}</span>
+                    {scheduledTime === time && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Repeat Picker Sheet - Me+ Style Bottom Sheet */}
+      <Sheet open={showRepeatPicker} onOpenChange={setShowRepeatPicker}>
+        <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
+          <div className="flex items-center justify-between px-4 py-3 border-b">
+            <button onClick={() => setShowRepeatPicker(false)} className="p-2 -ml-2">
+              <X className="h-5 w-5" />
+            </button>
+            <span className="text-base font-medium">Set task repeat</span>
+            <div className="w-9" />
+          </div>
+          <div className="py-2">
+            {/* No repeat */}
+            <button
+              onClick={() => {
+                setRepeatEnabled(false);
+                setShowRepeatPicker(false);
+              }}
+              className={cn(
+                "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                !repeatEnabled && "bg-[#E8F4FD]"
+              )}
+            >
+              <span className="font-medium">No repeat</span>
+              {!repeatEnabled && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+            </button>
+
+            {/* Daily */}
+            <button
+              onClick={() => {
+                setRepeatEnabled(true);
+                setRepeatPattern('daily');
+                setRepeatInterval(1);
+                setShowRepeatPicker(false);
+              }}
+              className={cn(
+                "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                repeatEnabled && repeatPattern === 'daily' && repeatInterval === 1 && "bg-[#E8F4FD]"
+              )}
+            >
+              <span className="font-medium">Daily</span>
+              {repeatEnabled && repeatPattern === 'daily' && repeatInterval === 1 && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+            </button>
+
+            {/* Weekly */}
+            <button
+              onClick={() => {
+                setRepeatEnabled(true);
+                setRepeatPattern('weekly');
+                setRepeatDays([scheduledDate.getDay()]);
+                setShowRepeatPicker(false);
+              }}
+              className={cn(
+                "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                repeatEnabled && repeatPattern === 'weekly' && "bg-[#E8F4FD]"
+              )}
+            >
+              <span className="font-medium">
+                Weekly <span className="text-muted-foreground">({format(scheduledDate, 'EEEE')})</span>
+              </span>
+              {repeatEnabled && repeatPattern === 'weekly' && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+            </button>
+
+            {/* Monthly */}
+            <button
+              onClick={() => {
+                setRepeatEnabled(true);
+                setRepeatPattern('monthly');
+                setShowRepeatPicker(false);
+              }}
+              className={cn(
+                "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                repeatEnabled && repeatPattern === 'monthly' && "bg-[#E8F4FD]"
+              )}
+            >
+              <span className="font-medium">
+                Monthly <span className="text-muted-foreground">(On {scheduledDate.getDate()}{scheduledDate.getDate() === 1 ? 'st' : scheduledDate.getDate() === 2 ? 'nd' : scheduledDate.getDate() === 3 ? 'rd' : 'th'})</span>
+              </span>
+              {repeatEnabled && repeatPattern === 'monthly' && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+            </button>
+
+            {/* Weekend */}
+            <button
+              onClick={() => {
+                setRepeatEnabled(true);
+                setRepeatPattern('weekly');
+                setRepeatDays([0, 6]);
+                setShowRepeatPicker(false);
+              }}
+              className={cn(
+                "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                repeatEnabled && repeatPattern === 'weekly' && repeatDays.length === 2 && repeatDays.includes(0) && repeatDays.includes(6) && "bg-[#E8F4FD]"
+              )}
+            >
+              <span className="font-medium">
+                Weekend <span className="text-muted-foreground">(Sat, Sun)</span>
+              </span>
+            </button>
+
+            {/* Custom */}
+            <button
+              onClick={() => {
+                setRepeatEnabled(true);
+                setShowRepeatPicker(false);
+                setShowRepeatCustom(true);
+              }}
+              className="w-full text-left px-6 py-4 flex items-center justify-between"
+            >
+              <span className="font-medium">Custom</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Custom Repeat Sheet - Me+ Full Page Style */}
+      <Sheet open={showRepeatCustom} onOpenChange={setShowRepeatCustom}>
+        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl" hideCloseButton>
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
+              <button onClick={() => setShowRepeatCustom(false)} className="p-2 -ml-2">
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <span className="text-lg font-medium">Repeat</span>
+              <Button
+                variant="ghost"
+                onClick={() => setShowRepeatCustom(false)}
+                className="text-primary font-medium"
+              >
+                Save
+              </Button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-6">
+              {/* Dynamic title */}
+              <h2 className="text-2xl font-bold text-center mb-8">
+                {getRepeatTitle()}
+              </h2>
+
+              {/* Repeat toggle */}
+              <div className="flex items-center justify-between py-4 border-b">
+                <div className="flex items-center gap-3">
+                  <Repeat className="h-6 w-6" />
+                  <div>
+                    <p className="font-medium">Repeat</p>
+                    <p className="text-sm text-muted-foreground">Set a cycle for your plan</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={repeatEnabled}
+                  onCheckedChange={setRepeatEnabled}
+                />
+              </div>
+
+              {repeatEnabled && (
+                <>
+                  {/* Pattern selector */}
+                  <div className="flex gap-1 p-1 bg-muted rounded-xl mt-6">
+                    {(['daily', 'weekly', 'monthly'] as const).map((pattern) => (
+                      <button
+                        key={pattern}
+                        onClick={() => setRepeatPattern(pattern)}
+                        className={cn(
+                          'flex-1 py-3 rounded-lg text-sm font-medium transition-all capitalize',
+                          repeatPattern === pattern
+                            ? 'bg-[#E8F4FD] text-foreground shadow-sm'
+                            : 'text-muted-foreground'
+                        )}
+                      >
+                        {pattern}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Day selector for weekly */}
+                  {repeatPattern === 'weekly' && (
+                    <div className="flex justify-center gap-2 mt-6">
+                      {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => toggleRepeatDay(idx)}
+                          className={cn(
+                            'w-10 h-10 rounded-full text-sm font-medium transition-all',
+                            repeatDays.includes(idx)
+                              ? 'bg-[#E8F4FD] text-foreground'
+                              : 'bg-muted/50 text-muted-foreground'
+                          )}
+                        >
+                          {day}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Interval selector */}
+                  <div className="flex items-center justify-between py-4 border-t border-b mt-6">
+                    <span className="font-medium">Interval</span>
+                    <select
+                      value={repeatInterval}
+                      onChange={(e) => setRepeatInterval(parseInt(e.target.value))}
+                      className="bg-transparent text-right font-medium"
+                    >
+                      {[1, 2, 3, 4, 5, 6].map((n) => (
+                        <option key={n} value={n}>
+                          Every {n} {repeatPattern === 'daily' ? (n === 1 ? 'day' : 'days') : repeatPattern === 'weekly' ? (n === 1 ? 'week' : 'weeks') : (n === 1 ? 'month' : 'months')}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Reminder Picker Sheet - Me+ Style */}
+      <Sheet open={showReminderPicker} onOpenChange={setShowReminderPicker}>
+        <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
+          <div className="flex items-center justify-between px-4 py-3 border-b">
+            <button onClick={() => setShowReminderPicker(false)} className="p-2 -ml-2">
+              <X className="h-5 w-5" />
+            </button>
+            <span className="text-base font-medium">Set reminder</span>
+            <div className="w-9" />
+          </div>
+          <div className="py-2">
+            {/* No reminder */}
+            <button
+              onClick={() => {
+                setReminderEnabled(false);
+                setShowReminderPicker(false);
+              }}
+              className={cn(
+                "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                !reminderEnabled && "bg-[#E8F4FD]"
+              )}
+            >
+              <span className="font-medium">No reminder</span>
+              {!reminderEnabled && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+            </button>
+
+            {/* Preset reminders */}
+            {REMINDER_PRESETS.map((preset) => (
+              <button
+                key={preset.time}
+                onClick={() => {
+                  setReminderEnabled(true);
+                  setReminderTime(preset.time);
+                  setShowReminderPicker(false);
+                }}
+                className={cn(
+                  "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                  reminderEnabled && reminderTime === preset.time && "bg-[#E8F4FD]"
+                )}
+              >
+                <span className="font-medium">
+                  {preset.label} <span className="text-muted-foreground">({formatReminderTimeDisplay(preset.time)})</span>
+                </span>
+                {reminderEnabled && reminderTime === preset.time && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+              </button>
+            ))}
+
+            {/* Custom */}
+            <button
+              onClick={() => {
+                setReminderEnabled(true);
+                setShowReminderPicker(false);
+                setShowReminderCustom(true);
+              }}
+              className="w-full text-left px-6 py-4 flex items-center justify-between"
+            >
+              <span className="font-medium">Custom</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Custom Reminder Time Picker */}
+      <Sheet open={showReminderCustom} onOpenChange={setShowReminderCustom}>
+        <SheetContent side="bottom" className="h-[50vh] rounded-t-3xl" hideCloseButton>
+          <div className="flex items-center justify-between px-4 py-3 border-b">
+            <button onClick={() => setShowReminderCustom(false)} className="p-2 -ml-2">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <span className="text-lg font-medium">Custom time</span>
+            <Button
+              variant="ghost"
+              onClick={() => setShowReminderCustom(false)}
+              className="text-primary font-medium"
+            >
+              Save
+            </Button>
+          </div>
+          <ScrollArea className="h-[calc(50vh-60px)]">
+            <div className="p-4 space-y-1">
+              {REMINDER_TIMES.filter((_, i) => i % 2 === 0).map((time) => (
+                <button
+                  key={time}
+                  onClick={() => {
+                    setReminderTime(time);
+                    setShowReminderCustom(false);
+                  }}
+                  className={cn(
+                    "w-full text-left p-4 rounded-xl flex items-center justify-between",
+                    reminderTime === time ? "bg-[#E8F4FD]" : "hover:bg-muted/50"
+                  )}
+                >
+                  <span className="font-medium">{formatTimeDisplay(time)}</span>
+                  {reminderTime === time && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+                </button>
+              ))}
+            </div>
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
+
+      {/* Tag Picker Sheet - Me+ Full Page Style */}
+      <Sheet open={showTagPicker} onOpenChange={setShowTagPicker}>
+        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl" hideCloseButton>
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
+              <button onClick={() => setShowTagPicker(false)} className="p-2 -ml-2">
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <span className="text-lg font-medium">Tag</span>
+              <Button
+                variant="ghost"
+                onClick={() => setShowTagPicker(false)}
+                className="text-primary font-medium"
+              >
+                Save
+              </Button>
+            </div>
+
+            {/* Title */}
+            <div className="px-6 pb-2">
+              <h2 className="text-3xl font-bold">Tag</h2>
+            </div>
+
+            {/* Tag list */}
+            <ScrollArea className="flex-1">
+              <div className="px-0">
+                {/* No tag option */}
+                <button
+                  onClick={() => {
+                    setTag(null);
+                    setShowTagPicker(false);
+                  }}
+                  className={cn(
+                    "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                    tag === null && "bg-[#E8F4FD]"
+                  )}
+                >
+                  <span className="font-medium">No tag</span>
+                  {tag === null && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+                </button>
+
+                {/* All tags */}
+                {allTags.map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => {
+                      setTag(t);
+                      setShowTagPicker(false);
+                    }}
+                    className={cn(
+                      "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
+                      tag === t && "bg-[#E8F4FD]"
+                    )}
+                  >
+                    <span className="font-medium">{t}</span>
+                    {tag === t && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+
+            {/* Add New button */}
+            <div className="p-4 flex-shrink-0" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
+              <Button
+                onClick={() => {
+                  const name = prompt('Enter new tag name:');
+                  if (name?.trim()) {
+                    createTag.mutateAsync(name.trim()).then(() => {
+                      setTag(name.trim());
+                      setShowTagPicker(false);
+                    });
+                  }
+                }}
+                className="w-full bg-foreground text-background hover:bg-foreground/90 rounded-full py-6 text-base font-medium"
+              >
+                Add New
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       {/* Pro Task Link Picker Sheet */}
       <Sheet open={showProLinkPicker} onOpenChange={setShowProLinkPicker}>
-        <SheetContent side="bottom" className="h-[75vh]">
+        <SheetContent side="bottom" className="h-[75vh] rounded-t-3xl">
           <SheetHeader>
             <SheetTitle>Pro Task Link</SheetTitle>
           </SheetHeader>
@@ -655,7 +1304,7 @@ const AppTaskCreate = ({
 
       {/* Playlist Picker Sheet (for Pro Task playlist selection) */}
       <Sheet open={showPlaylistPicker} onOpenChange={setShowPlaylistPicker}>
-        <SheetContent side="bottom" className="h-[70vh]">
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
           <SheetHeader>
             <SheetTitle>Select Playlist</SheetTitle>
           </SheetHeader>
@@ -702,261 +1351,6 @@ const AppTaskCreate = ({
           </div>
         </SheetContent>
       </Sheet>
-
-      {/* Date Picker Sheet */}
-      <Sheet open={showDatePicker} onOpenChange={setShowDatePicker}>
-        <SheetContent side="bottom" className="h-auto">
-          <SheetHeader>
-            <SheetTitle>Select date</SheetTitle>
-          </SheetHeader>
-          <div className="p-4 space-y-2">
-            <button
-              onClick={() => {
-                setScheduledDate(new Date());
-                setShowDatePicker(false);
-              }}
-              className="w-full text-left p-3 rounded-xl hover:bg-muted active:bg-muted/80"
-            >
-              Today
-            </button>
-            <button
-              onClick={() => {
-                setScheduledDate(new Date(Date.now() + 86400000));
-                setShowDatePicker(false);
-              }}
-              className="w-full text-left p-3 rounded-xl hover:bg-muted active:bg-muted/80"
-            >
-              Tomorrow
-            </button>
-            <input
-              type="date"
-              value={format(scheduledDate, 'yyyy-MM-dd')}
-              onChange={(e) => {
-                setScheduledDate(new Date(e.target.value));
-                setShowDatePicker(false);
-              }}
-              className="w-full p-3 rounded-xl border bg-background"
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Time Picker Sheet */}
-      <Sheet open={showTimePicker} onOpenChange={setShowTimePicker}>
-        <SheetContent side="bottom" className="h-auto max-h-[50vh]">
-          <SheetHeader>
-            <SheetTitle>Select time</SheetTitle>
-          </SheetHeader>
-          <div className="p-4">
-            <button
-              onClick={() => {
-                setScheduledTime(null);
-                setShowTimePicker(false);
-              }}
-              className={cn(
-                "w-full text-left p-3 rounded-xl hover:bg-muted mb-2",
-                scheduledTime === null && "bg-violet-100 text-violet-700 font-medium"
-              )}
-            >
-              Anytime
-            </button>
-            <div className="h-48 overflow-y-auto space-y-1">
-              {REMINDER_TIMES.filter((_, i) => i % 2 === 0).map((time) => (
-                <button
-                  key={time}
-                  onClick={() => {
-                    setScheduledTime(time);
-                    setShowTimePicker(false);
-                  }}
-                  className={cn(
-                    "w-full text-left p-3 rounded-xl hover:bg-muted",
-                    scheduledTime === time && "bg-violet-100 text-violet-700 font-medium"
-                  )}
-                >
-                  {formatTimeDisplay(time)}
-                </button>
-              ))}
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Repeat Picker Sheet - Enhanced Me+ Style */}
-      <Sheet open={showRepeatPicker} onOpenChange={setShowRepeatPicker}>
-        <SheetContent side="bottom" className="h-auto">
-          <SheetHeader>
-            <SheetTitle>Repeat</SheetTitle>
-          </SheetHeader>
-          <div className="p-4 space-y-6">
-            {/* Toggle */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">Repeat</p>
-                <p className="text-sm text-muted-foreground">Set a cycle for your plan</p>
-              </div>
-              <Switch
-                checked={repeatEnabled}
-                onCheckedChange={setRepeatEnabled}
-              />
-            </div>
-
-            {repeatEnabled && (
-              <>
-                {/* Pattern selector */}
-                <div className="flex gap-2 p-1 bg-muted rounded-xl">
-                  {(['daily', 'weekly', 'monthly'] as const).map((pattern) => (
-                    <button
-                      key={pattern}
-                      onClick={() => setRepeatPattern(pattern)}
-                      className={cn(
-                        'flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all capitalize',
-                        repeatPattern === pattern
-                          ? 'bg-background shadow-sm text-foreground'
-                          : 'text-muted-foreground'
-                      )}
-                    >
-                      {pattern}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Interval selector */}
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Every {repeatInterval} {repeatPattern === 'daily' ? (repeatInterval === 1 ? 'day' : 'days') : repeatPattern === 'weekly' ? (repeatInterval === 1 ? 'week' : 'weeks') : (repeatInterval === 1 ? 'month' : 'months')}
-                  </p>
-                  <div className="flex gap-2 overflow-x-auto pb-2">
-                    {REPEAT_INTERVALS.slice(0, 7).map((interval) => (
-                      <button
-                        key={interval}
-                        onClick={() => setRepeatInterval(interval)}
-                        className={cn(
-                          'w-10 h-10 rounded-full text-sm font-medium transition-all shrink-0',
-                          repeatInterval === interval
-                            ? 'bg-violet-600 text-white'
-                            : 'bg-muted hover:bg-muted/80'
-                        )}
-                      >
-                        {interval}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-
-            <Button
-              onClick={() => setShowRepeatPicker(false)}
-              className="w-full bg-violet-600 hover:bg-violet-700"
-            >
-              Done
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Reminder Picker Sheet - Enhanced Me+ Style */}
-      <Sheet open={showReminderPicker} onOpenChange={setShowReminderPicker}>
-        <SheetContent side="bottom" className="h-auto max-h-[60vh]">
-          <SheetHeader>
-            <SheetTitle>
-              {reminderEnabled ? `Remind me at ${formatReminderTimeDisplay(reminderTime)}` : 'Reminder'}
-            </SheetTitle>
-          </SheetHeader>
-          <div className="p-4 space-y-4">
-            {/* Toggle */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">Reminder</p>
-                <p className="text-sm text-muted-foreground">Set a specific time to remind me</p>
-              </div>
-              <Switch
-                checked={reminderEnabled}
-                onCheckedChange={setReminderEnabled}
-              />
-            </div>
-
-            {reminderEnabled && (
-              <div className="h-48 overflow-y-auto space-y-1 bg-muted/30 rounded-xl p-2">
-                {REMINDER_TIMES.filter((_, i) => i % 2 === 0).map((time) => (
-                  <button
-                    key={time}
-                    onClick={() => setReminderTime(time)}
-                    className={cn(
-                      "w-full text-left p-3 rounded-xl transition-all",
-                      reminderTime === time 
-                        ? "bg-violet-100 text-violet-700 font-medium" 
-                        : "hover:bg-muted"
-                    )}
-                  >
-                    {formatReminderTimeDisplay(time)}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <Button
-              onClick={() => setShowReminderPicker(false)}
-              className="w-full bg-violet-600 hover:bg-violet-700"
-            >
-              Done
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Tag Picker Sheet */}
-      <Sheet open={showTagPicker} onOpenChange={setShowTagPicker}>
-        <SheetContent side="bottom" className="h-auto max-h-[60vh]">
-          <SheetHeader>
-            <SheetTitle>Select tag</SheetTitle>
-          </SheetHeader>
-          <div className="p-4 space-y-2">
-            <button
-              onClick={() => {
-                setTag(null);
-                setShowTagPicker(false);
-              }}
-              className={cn(
-                "w-full text-left p-3 rounded-xl hover:bg-muted",
-                tag === null && "bg-violet-100 text-violet-700 font-medium"
-              )}
-            >
-              None
-            </button>
-            {['morning', 'business', 'selfcare', 'evening', 'wellness'].map((t) => (
-              <button
-                key={t}
-                onClick={() => {
-                  setTag(t);
-                  setShowTagPicker(false);
-                }}
-                className={cn(
-                  "w-full text-left p-3 rounded-xl hover:bg-muted capitalize",
-                  tag === t && "bg-violet-100 text-violet-700 font-medium"
-                )}
-              >
-                {t}
-              </button>
-            ))}
-            {userTags.filter(t => !['morning', 'business', 'selfcare', 'evening', 'wellness'].includes(t.name)).map((t) => (
-              <button
-                key={t.id}
-                onClick={() => {
-                  setTag(t.name);
-                  setShowTagPicker(false);
-                }}
-                className={cn(
-                  "w-full text-left p-3 rounded-xl hover:bg-muted capitalize",
-                  tag === t.name && "bg-violet-100 text-violet-700 font-medium"
-                )}
-              >
-                {t.name}
-              </button>
-            ))}
-          </div>
-        </SheetContent>
-      </Sheet>
     </>
   );
 
@@ -972,7 +1366,7 @@ const AppTaskCreate = ({
           >
             <div className="flex flex-col h-full">
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
+              <div className="flex items-center justify-between px-4 py-3 bg-[#E8F4FD] dark:bg-slate-900 flex-shrink-0">
                 <button onClick={handleClose} className="p-2 -ml-2">
                   <X className="h-5 w-5" />
                 </button>
@@ -980,8 +1374,8 @@ const AppTaskCreate = ({
                 <Button
                   onClick={handleSubmit}
                   disabled={!title.trim()}
-                  size="sm"
-                  className="bg-violet-600 hover:bg-violet-700"
+                  variant="ghost"
+                  className="text-primary font-semibold"
                 >
                   Save
                 </Button>
@@ -1001,24 +1395,22 @@ const AppTaskCreate = ({
 
   // Page mode - render as full page
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Header - iOS Standard */}
+    <div className="flex flex-col h-full bg-[#E8F4FD] dark:bg-slate-900">
+      {/* Header - Me+ Style */}
       <header 
-        className="fixed top-0 left-0 right-0 z-40 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
+        className="fixed top-0 left-0 right-0 z-40 bg-[#E8F4FD] dark:bg-slate-900"
         style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
       >
         <div className="flex items-center justify-between px-4 h-12">
           <button onClick={handleClose} className="p-2 -ml-2">
             <X className="h-5 w-5" />
           </button>
-          <h1 className="text-lg font-semibold">
-            {taskId ? 'Edit Task' : 'New Task'}
-          </h1>
+          <div className="flex-1" />
           <Button
             onClick={handleSubmit}
             disabled={!title.trim() || createTask.isPending || updateTask.isPending}
-            size="sm"
-            className="bg-violet-600 hover:bg-violet-700"
+            variant="ghost"
+            className="text-primary font-semibold"
           >
             {taskId ? 'Save' : 'Create'}
           </Button>
