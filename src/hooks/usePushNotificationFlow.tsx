@@ -3,6 +3,17 @@ import { Capacitor } from '@capacitor/core';
 import { checkPermissionStatus } from '@/lib/pushNotifications';
 import { supabase } from '@/integrations/supabase/client';
 
+// Debug mode: add ?debugPush=true to URL to test on web
+const isDebugMode = () => {
+  if (typeof window === 'undefined') return false;
+  return new URLSearchParams(window.location.search).get('debugPush') === 'true';
+};
+
+// Check if we should show push UI (native OR debug mode)
+export const shouldShowPushUI = () => {
+  return Capacitor.isNativePlatform() || isDebugMode();
+};
+
 export type PushFlowState = {
   // Full-screen onboarding (after login)
   showOnboarding: boolean;
@@ -66,16 +77,18 @@ export const usePushNotificationFlow = (userId: string | undefined) => {
   // Initialize flow state on mount
   useEffect(() => {
     const initializeFlow = async () => {
-      if (!userId || !Capacitor.isNativePlatform()) {
+      // Show on native OR debug mode
+      if (!userId || !shouldShowPushUI()) {
         return;
       }
 
-      // Check if notifications already enabled
-      const permission = await checkPermissionStatus();
-      if (permission === 'granted') {
-        // Clean up flags
-        localStorage.removeItem('preEnrolledNeedsPush');
-        return;
+      // In debug mode, skip permission check
+      if (!isDebugMode()) {
+        const permission = await checkPermissionStatus();
+        if (permission === 'granted') {
+          localStorage.removeItem('preEnrolledNeedsPush');
+          return;
+        }
       }
 
       // Check pre-enrolled status
@@ -104,8 +117,8 @@ export const usePushNotificationFlow = (userId: string | undefined) => {
 
       setFlowState({
         showOnboarding,
-        showBanner: false, // Banner shown by component itself
-        showCoursePrompt: false, // Triggered by course page
+        showBanner: false,
+        showCoursePrompt: false,
         isPreEnrolled,
         promptCount,
       });
@@ -133,10 +146,12 @@ export const usePushNotificationFlow = (userId: string | undefined) => {
 
   // Trigger course access prompt
   const triggerCoursePrompt = useCallback(async () => {
-    if (!Capacitor.isNativePlatform()) return false;
+    if (!shouldShowPushUI()) return false;
     
-    const permission = await checkPermissionStatus();
-    if (permission === 'granted') return false;
+    if (!isDebugMode()) {
+      const permission = await checkPermissionStatus();
+      if (permission === 'granted') return false;
+    }
 
     // Check if recently skipped (within 2 hours for course prompt)
     const skippedAt = localStorage.getItem('courseNotificationSkipped');
@@ -168,16 +183,18 @@ export const usePushNotificationFlow = (userId: string | undefined) => {
  * Called from course detail page
  */
 export const shouldShowCourseNotificationPrompt = async (): Promise<boolean> => {
-  if (!Capacitor.isNativePlatform()) return false;
+  if (!shouldShowPushUI()) return false;
   
-  const permission = await checkPermissionStatus();
-  if (permission === 'granted') return false;
+  if (!isDebugMode()) {
+    const permission = await checkPermissionStatus();
+    if (permission === 'granted') return false;
+  }
 
   // Check if skipped recently
   const skippedAt = localStorage.getItem('courseNotificationSkipped');
   if (skippedAt) {
     const hoursSince = (Date.now() - parseInt(skippedAt)) / (1000 * 60 * 60);
-    if (hoursSince < 2) return false; // Don't show if skipped within 2 hours
+    if (hoursSince < 2) return false;
   }
 
   return true;
