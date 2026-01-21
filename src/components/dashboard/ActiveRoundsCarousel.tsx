@@ -37,14 +37,16 @@ export function ActiveRoundsCarousel({
 
   if (activeRounds.length === 0) {
     return (
-      <div className="text-center py-8 px-4">
-        <GraduationCap className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
-        <p className="text-muted-foreground text-sm mb-3">No active programs</p>
-        <Link to="/app/browse">
-          <Button variant="outline" size="sm">
-            Browse Programs
-          </Button>
-        </Link>
+      <div className="h-[88px] flex items-center justify-center gap-3 px-4">
+        <GraduationCap className="h-8 w-8 text-muted-foreground/50 flex-shrink-0" />
+        <div className="flex flex-col items-start gap-1">
+          <p className="text-muted-foreground text-sm">No active programs</p>
+          <Link to="/app/browse">
+            <Button variant="outline" size="sm" className="h-7 text-xs">
+              Browse Programs
+            </Button>
+          </Link>
+        </div>
       </div>
     );
   }
