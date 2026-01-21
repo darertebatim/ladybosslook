@@ -184,10 +184,23 @@ export default function AppChat() {
     if (messages.length === 0) return;
     
     if (!initialScrollDone) {
-      setTimeout(() => {
+      // Use multiple attempts with increasing delays to ensure DOM is ready
+      const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
-        setInitialScrollDone(true);
-      }, 50);
+      };
+      
+      // Immediate attempt
+      scrollToBottom();
+      // After React commit
+      requestAnimationFrame(() => {
+        scrollToBottom();
+        // After layout calculations
+        setTimeout(scrollToBottom, 100);
+        setTimeout(() => {
+          scrollToBottom();
+          setInitialScrollDone(true);
+        }, 300);
+      });
     } else {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
@@ -529,16 +542,18 @@ export default function AppChat() {
             )}
           </div>
           
-          {/* Scroll to bottom button */}
-          {showScrollButton && (
-            <button
-              onClick={scrollToBottomSmooth}
-              className="absolute bottom-4 right-4 h-10 w-10 rounded-full bg-background border border-border shadow-lg flex items-center justify-center z-10 transition-all hover:scale-105 active:scale-95"
-            >
-              <ChevronDown className="h-5 w-5 text-muted-foreground" />
-            </button>
-          )}
         </div>
+
+        {/* Scroll to bottom button - positioned outside scroll container for visibility */}
+        {showScrollButton && (
+          <button
+            onClick={scrollToBottomSmooth}
+            className="absolute bottom-20 right-4 h-11 w-11 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center z-20 transition-all hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-bottom-2"
+            style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+          >
+            <ChevronDown className="h-6 w-6" />
+          </button>
+        )}
 
         {/* Input Area - shrink-0 so it stays at its natural height */}
         <div 
