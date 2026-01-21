@@ -664,7 +664,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
         <Button
           variant="ghost"
           size="icon"
-          className="shrink-0 h-12 w-12 rounded-full text-foreground bg-muted/60 active:bg-muted"
+          className="shrink-0 h-12 w-12 rounded-full text-foreground bg-[#F4ECFE] dark:bg-violet-950/50 active:bg-[#E8DCFA] dark:active:bg-violet-900/50"
           onClick={handleNativeAttachment}
           disabled={disabled || uploading || isRecording || !!attachment}
         >
@@ -694,7 +694,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
               "shrink-0 h-9 w-9 rounded-full transition-all duration-200 ml-1",
               (message.trim() || attachment) 
                 ? "bg-primary text-primary-foreground active:bg-primary/90 scale-100 opacity-100" 
-                : "bg-primary/50 text-primary-foreground/80 scale-100 opacity-100"
+                : "bg-[#F4ECFE] dark:bg-violet-950/50 text-primary scale-100 opacity-100 active:bg-[#E8DCFA]"
             )}
           >
             {uploading ? (
@@ -711,7 +711,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
           size="icon"
           className={cn(
             "shrink-0 h-12 w-12 rounded-full transition-colors",
-            !isRecording && "text-foreground bg-muted/60 active:bg-muted"
+            !isRecording && "text-foreground bg-[#F4ECFE] dark:bg-violet-950/50 active:bg-[#E8DCFA] dark:active:bg-violet-900/50"
           )}
           onClick={isRecording ? stopRecording : startRecording}
           disabled={disabled || uploading || !!attachment}
