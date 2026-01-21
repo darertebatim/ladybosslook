@@ -484,10 +484,10 @@ const AppHome = () => {
                   Explore More Routines
                 </button>
 
-                {/* Chat With Us Button */}
+{/* Chat With Us Button */}
                 <button
                   onClick={() => navigate('/app/chat')}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-primary/10 text-primary font-medium transition-colors hover:bg-primary/20"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-primary text-primary-foreground font-medium transition-colors hover:bg-primary/90"
                 >
                   <MessageCircle className="h-5 w-5" />
                   Chat With Us
