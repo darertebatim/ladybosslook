@@ -56,11 +56,14 @@ const AppCourseDetail = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Get the most recent enrollment for this program (handles multiple enrollments for different rounds)
       const { data, error } = await supabase
         .from('course_enrollments')
         .select('*, program_rounds(*)')
         .eq('user_id', user.id)
         .eq('program_slug', slug)
+        .order('enrolled_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (error) throw error;
