@@ -52,8 +52,12 @@ export default function AppPlayer() {
   };
 
   const isPlaylistAvailableOnMobile = (playlist: any) => {
-    // Simple: use the available_on_mobile flag directly from playlist settings
-    // Default to true for backwards compatibility (column defaults to true)
+    // Enrolled users always see their playlists
+    if (playlist.program_slug && enrollments?.includes(playlist.program_slug)) {
+      return true;
+    }
+    
+    // For non-enrolled users: respect the available_on_mobile toggle
     if (isNativeApp() && playlist.available_on_mobile === false) {
       return false;
     }
