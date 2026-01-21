@@ -409,7 +409,7 @@ const AppHome = () => {
                       : 'No tasks for this day'}
                   </p>
                   <button
-                    onClick={() => navigate('/app/home/new')}
+                    onClick={() => setShowQuickStart(true)}
                     className="text-violet-600 font-medium"
                   >
                     Add your first task
