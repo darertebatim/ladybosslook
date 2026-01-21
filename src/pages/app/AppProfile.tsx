@@ -598,7 +598,7 @@ const AppProfile = () => {
       <div className="space-y-6">
 
         {/* Quick Navigation */}
-        <div className="grid gap-2 grid-cols-4 sm:grid-cols-8">
+        <div className="grid gap-2 grid-cols-4 sm:grid-cols-5">
           <Button
             variant="outline"
             size="sm"
@@ -615,7 +615,7 @@ const AppProfile = () => {
             className="flex flex-col h-auto py-3 gap-1"
           >
             <BookOpen className="h-4 w-4" />
-            <span className="text-xs">Courses</span>
+            <span className="text-xs">Programs</span>
           </Button>
           <Button
             variant="outline"
@@ -680,6 +680,15 @@ const AppProfile = () => {
               </Button>
             </>
           )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => scrollToSection('password-section')}
+            className="flex flex-col h-auto py-3 gap-1"
+          >
+            <Lock className="h-4 w-4" />
+            <span className="text-xs">Password</span>
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -1265,22 +1274,28 @@ const AppProfile = () => {
                         : 'Allow calendar access to add course sessions directly to your iPhone calendar with automatic reminders'}
                     </p>
                   </div>
-                  <Button 
-                    onClick={handleEnableCalendar} 
-                    className="w-full"
-                    disabled={isRequestingCalendar || calendarPermission === 'denied'}
-                  >
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {isRequestingCalendar 
-                      ? 'Requesting...' 
-                      : calendarPermission === 'denied'
-                      ? 'Open Settings to Enable'
-                      : 'Enable Calendar Access'}
-                  </Button>
-                  {calendarPermission === 'denied' && (
-                    <p className="text-xs text-muted-foreground text-center">
-                      Tap Settings app → LadyBoss Academy → Calendars → Enable
-                    </p>
+                  {calendarPermission === 'denied' ? (
+                    <>
+                      <Button 
+                        onClick={handleOpenAppSettings} 
+                        className="w-full"
+                      >
+                        <Settings className="mr-2 h-4 w-4" />
+                        Open Settings
+                      </Button>
+                      <p className="text-xs text-muted-foreground text-center">
+                        Tap Calendars → Enable calendar access
+                      </p>
+                    </>
+                  ) : (
+                    <Button 
+                      onClick={handleEnableCalendar} 
+                      className="w-full"
+                      disabled={isRequestingCalendar}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {isRequestingCalendar ? 'Requesting...' : 'Enable Calendar Access'}
+                    </Button>
                   )}
                 </div>
               )}
