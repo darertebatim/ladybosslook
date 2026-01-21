@@ -645,7 +645,13 @@ const AppCourseDetail = () => {
     },
     onSuccess: async () => {
       toast.success('Enrolled successfully!');
-      queryClient.invalidateQueries({ queryKey: ['course-enrollment', slug] });
+      
+      // Immediately invalidate all enrollment-related caches for instant unlock
+      queryClient.invalidateQueries({ queryKey: ['course-enrollment', slug], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: ['player-data'], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: ['enrollments'], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: ['courses-data'], refetchType: 'active' });
+      queryClient.invalidateQueries({ queryKey: ['home-data'], refetchType: 'active' });
       
       // Auto-sync calendar if preference enabled
       await autoSyncCalendarOnEnrollment();
