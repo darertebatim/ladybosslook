@@ -7,9 +7,83 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useResetPlannerData } from '@/hooks/useTaskPlanner';
-import { RotateCcw, UserCheck, Loader2 } from 'lucide-react';
+import { RotateCcw, UserCheck, Loader2, Smartphone, Copy, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { BUILD_INFO, getDisplayBuildInfo } from '@/lib/buildInfo';
+
+// Build Info Card Component
+function BuildInfoCard() {
+  const [copied, setCopied] = useState(false);
+  const displayInfo = getDisplayBuildInfo();
+  
+  const handleCopy = () => {
+    const fullInfo = `Version: ${BUILD_INFO.version}\nBuild ID: ${BUILD_INFO.buildId}\nBuild Time: ${BUILD_INFO.buildTime}\nMode: ${BUILD_INFO.mode}`;
+    navigator.clipboard.writeText(fullInfo);
+    setCopied(true);
+    toast.success('Build info copied!');
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Card className="border-primary/20 bg-primary/5">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Smartphone className="h-5 w-5" />
+          Current Build Info
+        </CardTitle>
+        <CardDescription>
+          Compare this with your iOS app to verify the build is up-to-date
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Main display info - what user sees on auth screen */}
+        <div className="bg-background rounded-lg p-4 border">
+          <p className="text-xs text-muted-foreground mb-1">Expected on Auth Screen:</p>
+          <code className="text-lg font-mono font-semibold text-primary">{displayInfo}</code>
+        </div>
+        
+        {/* Detailed breakdown */}
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="bg-background rounded-lg p-3 border">
+            <p className="text-xs text-muted-foreground">Version</p>
+            <p className="font-mono font-medium">{BUILD_INFO.version}</p>
+          </div>
+          <div className="bg-background rounded-lg p-3 border">
+            <p className="text-xs text-muted-foreground">Build ID</p>
+            <p className="font-mono font-medium text-primary">{BUILD_INFO.buildId}</p>
+          </div>
+          <div className="bg-background rounded-lg p-3 border">
+            <p className="text-xs text-muted-foreground">Build Time</p>
+            <p className="font-mono font-medium text-xs">{BUILD_INFO.buildTime}</p>
+          </div>
+          <div className="bg-background rounded-lg p-3 border">
+            <p className="text-xs text-muted-foreground">Mode</p>
+            <p className="font-mono font-medium">{BUILD_INFO.mode}</p>
+          </div>
+        </div>
+
+        <Button variant="outline" size="sm" onClick={handleCopy} className="w-full">
+          {copied ? (
+            <>
+              <Check className="h-4 w-4 mr-2" />
+              Copied!
+            </>
+          ) : (
+            <>
+              <Copy className="h-4 w-4 mr-2" />
+              Copy Build Info
+            </>
+          )}
+        </Button>
+        
+        <p className="text-xs text-muted-foreground text-center">
+          💡 If iOS app shows a different Build ID, run: <code className="bg-muted px-1 rounded">npm run build && npx cap sync ios</code>
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function System() {
   const resetPlanner = useResetPlannerData();
@@ -72,6 +146,8 @@ export default function System() {
         </TabsContent>
 
         <TabsContent value="tools" className="space-y-4">
+          {/* Build Info Card */}
+          <BuildInfoCard />
           {/* Enroll in All Programs */}
           <Card>
             <CardHeader>
