@@ -229,6 +229,10 @@ export default function AppFeedPost() {
 
   const Icon = POST_TYPE_ICONS[post.post_type as keyof typeof POST_TYPE_ICONS] || Megaphone;
   const senderName = post.display_name || post.author?.full_name || 'Admin';
+  
+  // Bilingual support for post content
+  const { direction: contentDirection, className: contentBilingualClassName } = useBilingualText(post.content);
+  const { direction: titleDirection, className: titleBilingualClassName } = useBilingualText(post.title || '');
 
   // Group comments by date for chat-style display
   const groupedComments = comments?.reduce((acc, comment, index, arr) => {
@@ -320,11 +324,19 @@ export default function AppFeedPost() {
 
           {/* Title */}
           {post.title && (
-            <h2 className="font-bold text-xl mb-2">{post.title}</h2>
+            <h2 
+              className={cn("font-bold text-xl mb-2", titleBilingualClassName)}
+              dir={titleDirection}
+            >
+              {post.title}
+            </h2>
           )}
 
           {/* Content */}
-          <p className="text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">
+          <p 
+            className={cn("text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed", contentBilingualClassName)}
+            dir={contentDirection}
+          >
             {post.content}
           </p>
 
