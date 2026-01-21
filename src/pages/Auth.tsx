@@ -3,18 +3,19 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
-import { Separator } from '@/components/ui/separator';
 import { BrandedSplash } from '@/components/app/BrandedSplash';
 import { getDisplayBuildInfo } from '@/lib/buildInfo';
+import { ArrowLeft, Mail } from 'lucide-react';
+import appIcon from '@/assets/app-icon.png';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -57,6 +58,7 @@ export default function Auth() {
             description: "We've sent you a password reset link.",
           });
           setIsForgotPassword(false);
+          setShowEmailForm(false);
         }
       } else {
         const { error } = isLogin 
@@ -113,64 +115,87 @@ export default function Auth() {
     }
   };
 
+  const handleBack = () => {
+    if (showEmailForm) {
+      setShowEmailForm(false);
+      setIsForgotPassword(false);
+    }
+  };
+
   return (
     <>
       <SEOHead />
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
-            {isForgotPassword ? 'Reset Password' : (isLogin ? 'Welcome back' : 'Create account')}
-          </CardTitle>
-          <CardDescription className="text-center">
-            {isForgotPassword 
-              ? 'Enter your email to receive a password reset link'
-              : (isLogin 
-                ? 'Enter your credentials to access your account'
-                : 'Enter your information to create an account')
-            }
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* OAuth Buttons - only show when not in forgot password mode */}
-          {!isForgotPassword && (
-            <>
-              <div className="grid gap-3">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-primary/20 via-primary/10 to-background">
+        {/* Back button - only show when in email form */}
+        {showEmailForm && (
+          <div className="absolute top-4 left-4 z-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleBack}
+              className="rounded-full"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </div>
+        )}
+
+        {/* Hero Section with Logo */}
+        <div className="flex-shrink-0 pt-16 pb-8 px-6 flex flex-col items-center">
+          {/* Decorative hearts pattern could be added via CSS */}
+          <div className="relative">
+            <div className="w-32 h-32 rounded-3xl overflow-hidden shadow-xl bg-white p-2">
+              <img 
+                src={appIcon} 
+                alt="LadyBoss Academy" 
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Card */}
+        <div className="flex-1 bg-background rounded-t-[2.5rem] px-6 py-8 shadow-[0_-4px_30px_rgba(0,0,0,0.1)]">
+          <div className="max-w-md mx-auto space-y-6">
+            {/* Title */}
+            <div className="text-center space-y-2">
+              <h1 className="text-2xl font-bold">
+                {isForgotPassword 
+                  ? 'Reset Password' 
+                  : showEmailForm 
+                    ? (isLogin ? 'Sign in with Email' : 'Sign up with Email')
+                    : (isLogin ? 'Welcome back!' : 'Sign up for LadyBoss')
+                }
+              </h1>
+              <p className="text-muted-foreground text-sm">
+                {isForgotPassword 
+                  ? 'Enter your email to receive a password reset link'
+                  : showEmailForm
+                    ? (isLogin ? 'Enter your credentials to continue' : 'Create your account to get started')
+                    : 'Create an account to save your progress and access it on different devices!'
+                }
+              </p>
+            </div>
+
+            {/* Show either social buttons or email form */}
+            {!showEmailForm ? (
+              /* Social Login Buttons */
+              <div className="space-y-3">
+                {/* Google Button */}
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 font-medium"
-                  onClick={handleAppleSignIn}
-                  disabled={oauthLoading !== null || loading}
-                >
-                  {oauthLoading === 'apple' ? (
-                    <span className="flex items-center gap-2">
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      Connecting...
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                      </svg>
-                      Continue with Apple
-                    </span>
-                  )}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full h-12 font-medium"
+                  className="w-full h-14 font-medium text-base rounded-full border-2"
                   onClick={handleGoogleSignIn}
                   disabled={oauthLoading !== null || loading}
                 >
                   {oauthLoading === 'google' ? (
-                    <span className="flex items-center gap-2">
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    <span className="flex items-center gap-3">
+                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
                       Connecting...
                     </span>
                   ) : (
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-3">
                       <svg className="h-5 w-5" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -181,89 +206,137 @@ export default function Auth() {
                     </span>
                   )}
                 </Button>
-              </div>
 
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <Separator className="w-full" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">
-                    or continue with email
+                {/* Apple Button */}
+                <Button
+                  type="button"
+                  className="w-full h-14 font-medium text-base rounded-full bg-black hover:bg-black/90 text-white"
+                  onClick={handleAppleSignIn}
+                  disabled={oauthLoading !== null || loading}
+                >
+                  {oauthLoading === 'apple' ? (
+                    <span className="flex items-center gap-3">
+                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Connecting...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-3">
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                      </svg>
+                      Continue with Apple
+                    </span>
+                  )}
+                </Button>
+
+                {/* Email Button */}
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="w-full h-14 font-medium text-base rounded-full"
+                  onClick={() => setShowEmailForm(true)}
+                  disabled={oauthLoading !== null || loading}
+                >
+                  <span className="flex items-center gap-3">
+                    <Mail className="h-5 w-5" />
+                    Continue with Email
                   </span>
+                </Button>
+              </div>
+            ) : (
+              /* Email Form */
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="h-12 rounded-xl"
+                  />
                 </div>
-              </div>
-            </>
-          )}
+                {!isForgotPassword && (
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="h-12 rounded-xl"
+                    />
+                  </div>
+                )}
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 rounded-full font-medium text-base" 
+                  disabled={loading || oauthLoading !== null}
+                >
+                  {loading ? 'Loading...' : (isForgotPassword ? 'Send Reset Link' : (isLogin ? 'Sign In' : 'Sign Up'))}
+                </Button>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+                {/* Forgot password link */}
+                {!isForgotPassword && isLogin && (
+                  <div className="text-center">
+                    <Button
+                      type="button"
+                      variant="link"
+                      onClick={() => setIsForgotPassword(true)}
+                      className="text-sm text-muted-foreground"
+                    >
+                      Forgot password?
+                    </Button>
+                  </div>
+                )}
+
+                {/* Back to sign in from forgot password */}
+                {isForgotPassword && (
+                  <div className="text-center">
+                    <Button
+                      type="button"
+                      variant="link"
+                      onClick={() => setIsForgotPassword(false)}
+                      className="text-sm"
+                    >
+                      Back to sign in
+                    </Button>
+                  </div>
+                )}
+              </form>
+            )}
+
+            {/* Toggle Login/Signup */}
+            <div className="text-center pt-4">
+              <p className="text-muted-foreground text-sm">
+                {isLogin ? "Don't have an account? " : "Already have an account? "}
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => {
+                    setIsLogin(!isLogin);
+                    setIsForgotPassword(false);
+                  }}
+                  className="text-primary font-semibold p-0 h-auto"
+                >
+                  {isLogin ? 'Sign up!' : 'Log in!'}
+                </Button>
+              </p>
             </div>
-            {!isForgotPassword && (
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-            )}
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={loading || oauthLoading !== null}
-            >
-              {loading ? 'Loading...' : (isForgotPassword ? 'Send Reset Link' : (isLogin ? 'Sign In' : 'Sign Up'))}
-            </Button>
-          </form>
-          <div className="mt-4 text-center space-y-2">
-            {!isForgotPassword && isLogin && (
-              <Button
-                type="button"
-                variant="link"
-                onClick={() => setIsForgotPassword(true)}
-                className="text-sm"
-              >
-                Forgot password?
-              </Button>
-            )}
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => {
-                setIsForgotPassword(false);
-                setIsLogin(!isLogin);
-              }}
-              className="text-sm block w-full"
-            >
-              {isForgotPassword 
-                ? "Back to sign in"
-                : (isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in")
-              }
-            </Button>
           </div>
-          {/* Build ID - helps diagnose which code version is running */}
-          <div className="fixed bottom-2 left-0 right-0 flex justify-center pointer-events-none">
-            <p className="text-xs text-muted-foreground font-mono bg-background/80 backdrop-blur px-2 py-1 rounded">
-              {getDisplayBuildInfo()}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+
+        {/* Build ID */}
+        <div className="fixed bottom-2 left-0 right-0 flex justify-center pointer-events-none">
+          <p className="text-xs text-muted-foreground font-mono bg-background/80 backdrop-blur px-2 py-1 rounded">
+            {getDisplayBuildInfo()}
+          </p>
+        </div>
+      </div>
     </>
   );
 }
