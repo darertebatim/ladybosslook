@@ -592,21 +592,28 @@ export const PlaylistManager = () => {
   const handleGenerateFreePrograms = async () => {
     if (!playlists) return;
 
-    // Find free playlists without a program_slug and not podcasts
-    const unlinkedFreePlaylists = playlists.filter(
-      (p) => p.is_free && !p.program_slug && p.category !== 'podcast'
-    );
-
-    if (unlinkedFreePlaylists.length === 0) {
-      toast.info('No unlinked free playlists found (excluding podcasts)');
-      return;
-    }
-
     setIsGeneratingPrograms(true);
     let created = 0;
     let errors = 0;
 
     try {
+      // Get all existing program slugs to check which playlists are truly unlinked
+      const { data: existingPrograms } = await supabase
+        .from('program_catalog')
+        .select('slug');
+      
+      const existingSlugs = new Set(existingPrograms?.map(p => p.slug) || []);
+
+      // Find free playlists that don't have a matching program (not podcasts)
+      const unlinkedFreePlaylists = playlists.filter(
+        (p) => p.is_free && p.category !== 'podcast' && (!p.program_slug || !existingSlugs.has(p.program_slug))
+      );
+
+      if (unlinkedFreePlaylists.length === 0) {
+        toast.info('No unlinked free playlists found (excluding podcasts)');
+        return;
+      }
+
       for (const playlist of unlinkedFreePlaylists) {
         // Generate a slug from the playlist name
         const slug = playlist.name
