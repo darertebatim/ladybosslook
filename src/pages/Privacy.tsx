@@ -9,7 +9,7 @@ const Privacy = () => {
         <header className="mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4">Privacy Policy</h1>
           <p className="text-muted-foreground text-lg">
-            <strong>Effective:</strong> August 28, 2025
+            <strong>Effective:</strong> January 21, 2026
           </p>
         </header>
 
@@ -49,6 +49,41 @@ const Privacy = () => {
               <div>
                 <h3 className="text-xl font-medium text-foreground mb-2">Survey information.</h3>
                 <p className="text-foreground/80">You may provide us with other personal information when you fill in a form, respond to our surveys or questionnaires, provide us with feedback, participate in promotions, or use other features of the Services.</p>
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-medium text-foreground mb-2">User-generated content.</h3>
+                <p className="text-foreground/80">When you use our mobile app or website, you may create and share content including:</p>
+                <ul className="list-disc pl-6 mt-2 space-y-1 text-foreground/80">
+                  <li><strong>Journal entries:</strong> Private mood tracking and personal reflections stored securely in your account.</li>
+                  <li><strong>Community posts:</strong> Content you share in the community feed, which may be visible to other enrolled users.</li>
+                  <li><strong>Chat messages:</strong> Text and voice messages you send to our support team.</li>
+                  <li><strong>Attachments:</strong> Photos, files, and voice recordings you upload through the app.</li>
+                  <li><strong>Tasks and routines:</strong> Personal productivity data including tasks, habits, and routine completions.</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">Device Permissions</h2>
+            <p className="text-foreground/80 mb-4">Our mobile app may request the following device permissions to provide specific features:</p>
+            <div className="space-y-4 mb-6">
+              <div>
+                <h3 className="text-xl font-medium text-foreground mb-2">Camera and Photo Library.</h3>
+                <p className="text-foreground/80">Used to attach photos to chat messages and community posts. We only access photos you explicitly select or capture.</p>
+              </div>
+              <div>
+                <h3 className="text-xl font-medium text-foreground mb-2">Microphone.</h3>
+                <p className="text-foreground/80">Used to record voice messages in chat support. Audio is only recorded when you actively press and hold the record button.</p>
+              </div>
+              <div>
+                <h3 className="text-xl font-medium text-foreground mb-2">Calendar.</h3>
+                <p className="text-foreground/80">Used to add course sessions and tasks to your device calendar. We request write-only access and do not read your existing calendar events.</p>
+              </div>
+              <div>
+                <h3 className="text-xl font-medium text-foreground mb-2">Push Notifications.</h3>
+                <p className="text-foreground/80">Used to send you course updates, session reminders, and important announcements. You can manage notification preferences in your profile settings.</p>
               </div>
             </div>
           </section>
@@ -102,6 +137,27 @@ const Privacy = () => {
             </p>
             <p className="text-foreground/80 mb-6">
               The foregoing will, however, not prevent us from retaining any personal information if it is necessary to comply with our legal obligations, in order to file a legal claim or defend ourselves against a legal claim, or for evidential purposes.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">Account Deletion</h2>
+            <p className="text-foreground/80 mb-4">
+              You can delete your account at any time through the app by going to <strong>Profile → Actions → Delete Account</strong>. When you delete your account:
+            </p>
+            <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-4">
+              <li><strong>Permanently deleted:</strong> Your profile information, journal entries, chat history, community posts, course enrollments, tasks, routines, and push notification subscriptions.</li>
+              <li><strong>Retained for legal compliance:</strong> Anonymized payment and order records may be retained for tax, legal, and financial audit purposes. These records are disassociated from your personal identity.</li>
+            </ul>
+            <p className="text-foreground/80 mb-6">
+              Account deletion is immediate and irreversible. You will need to create a new account if you wish to use our Services again.
+            </p>
+          </section>
+
+          <section className="mb-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">Children's Privacy</h2>
+            <p className="text-foreground/80 mb-6">
+              Our Services are not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us at <a href="mailto:hi@ladybosslook.com" className="text-primary hover:underline">hi@ladybosslook.com</a> so we can take appropriate action.
             </p>
           </section>
 
