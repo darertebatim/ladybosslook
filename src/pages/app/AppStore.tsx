@@ -17,7 +17,7 @@ const categoryConfig = [
   { id: 'course', name: 'Courses', icon: 'BookOpen', color: 'purple' },
   { id: 'group-coaching', name: 'Coaching', icon: 'Users', color: 'pink' },
   { id: '1o1-session', name: '1-on-1', icon: 'UserCheck', color: 'blue' },
-  { id: 'audiobook', name: 'Audio', icon: 'Headphones', color: 'orange' },
+  { id: 'audiobook', name: 'Audiobook', icon: 'Headphones', color: 'orange' },
   { id: 'meditate', name: 'Meditate', icon: 'Sparkles', color: 'teal' },
   { id: 'workout', name: 'Workout', icon: 'Dumbbell', color: 'rose' },
   { id: 'soundscape', name: 'Soundscape', icon: 'Waves', color: 'blue' },

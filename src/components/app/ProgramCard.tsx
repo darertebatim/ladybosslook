@@ -1,4 +1,4 @@
-import { CheckCircle2, BookOpen, Users, UserCheck, Headphones, Video, Calendar, Sparkles } from 'lucide-react';
+import { CheckCircle2, BookOpen, Users, UserCheck, Headphones, Video, Calendar, Sparkles, Dumbbell, Waves, Heart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface ProgramCardProps {
@@ -14,7 +14,11 @@ const typeConfig: Record<string, { label: string; icon: typeof BookOpen; color: 
   'course': { label: 'Course', icon: BookOpen, color: 'bg-purple-500' },
   'group-coaching': { label: 'Coaching', icon: Users, color: 'bg-pink-500' },
   '1o1-session': { label: '1-on-1', icon: UserCheck, color: 'bg-blue-500' },
-  'audiobook': { label: 'Audio', icon: Headphones, color: 'bg-amber-500' },
+  'audiobook': { label: 'Audiobook', icon: Headphones, color: 'bg-amber-500' },
+  'meditate': { label: 'Meditate', icon: Sparkles, color: 'bg-teal-500' },
+  'workout': { label: 'Workout', icon: Dumbbell, color: 'bg-rose-500' },
+  'soundscape': { label: 'Soundscape', icon: Waves, color: 'bg-blue-400' },
+  'affirmations': { label: 'Affirmations', icon: Heart, color: 'bg-pink-400' },
   'webinar': { label: 'Webinar', icon: Video, color: 'bg-green-500' },
   'event': { label: 'Event', icon: Calendar, color: 'bg-rose-500' },
 };
