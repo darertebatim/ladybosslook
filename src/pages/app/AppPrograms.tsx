@@ -183,11 +183,15 @@ const AppCourses = () => {
               {hasNotification && !isCompleted && (
                 <Badge className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 h-5">
                   <Sparkles className="h-3 w-3 mr-1" />
-                  New
+                  Updated
                 </Badge>
               )}
               {isCompleted ? (
-                <Badge className="bg-white/20 text-white backdrop-blur-sm text-[10px] px-2 py-0.5 h-5">
+                <Badge className={`text-[10px] px-2 py-0.5 h-5 ${
+                  thumbnailUrl 
+                    ? 'bg-white/20 text-white backdrop-blur-sm' 
+                    : 'bg-muted text-muted-foreground'
+                }`}>
                   <CheckCircle2 className="h-3 w-3 mr-1" />
                   Completed
                 </Badge>
@@ -196,13 +200,19 @@ const AppCourses = () => {
                   className={`text-[10px] px-2 py-0.5 h-5 ${
                     isActive 
                       ? 'bg-green-500 text-white' 
-                      : 'bg-white/20 text-white backdrop-blur-sm'
+                      : thumbnailUrl
+                        ? 'bg-white/20 text-white backdrop-blur-sm'
+                        : 'bg-muted text-muted-foreground'
                   }`}
                 >
                   {round.status}
                 </Badge>
               ) : (
-                <Badge className="bg-white/20 text-white backdrop-blur-sm text-[10px] px-2 py-0.5 h-5">
+                <Badge className={`text-[10px] px-2 py-0.5 h-5 ${
+                  thumbnailUrl 
+                    ? 'bg-white/20 text-white backdrop-blur-sm' 
+                    : 'bg-muted text-muted-foreground'
+                }`}>
                   Self-Paced
                 </Badge>
               )}
