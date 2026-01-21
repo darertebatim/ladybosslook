@@ -155,7 +155,7 @@ const AppCourses = () => {
         }}
         className="block"
       >
-        <div className={`relative w-full rounded-2xl overflow-hidden shadow-lg transition-transform active:scale-[0.98] ${
+        <div className={`relative w-full rounded-2xl overflow-hidden shadow-sm border border-border/50 transition-transform active:scale-[0.98] ${
           hasNotification && !isCompleted ? 'ring-2 ring-primary ring-offset-2' : ''
         } ${isCompleted ? 'opacity-75' : ''}`}>
           {/* Background */}
@@ -168,13 +168,13 @@ const AppCourses = () => {
           ) : (
             <div className={`absolute inset-0 ${
               isCompleted 
-                ? 'bg-gray-500' 
-                : 'bg-primary'
+                ? 'bg-muted/50 dark:bg-muted/30' 
+                : 'bg-violet-50 dark:bg-violet-950/30'
             }`} />
           )}
           
-          {/* Overlay - stronger gradient from bottom */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
+          {/* Overlay - only for thumbnails */}
+          {thumbnailUrl && <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />}
           
           {/* Content - compact for self-paced */}
           <div className={`relative p-4 flex flex-col justify-between ${isSelfPaced ? 'min-h-[72px]' : 'min-h-[120px]'}`}>
@@ -211,16 +211,16 @@ const AppCourses = () => {
             {/* Bottom content */}
             <div className="space-y-1">
               {/* Course name */}
-              <h3 className="text-white font-bold text-base leading-tight line-clamp-1">
+              <h3 className={`font-bold text-base leading-tight line-clamp-1 ${thumbnailUrl ? 'text-white' : 'text-foreground'}`}>
                 {enrollment.course_name}
               </h3>
               
               {/* Round name + View schedule link - only for cohort-based */}
               {round && (
-                <div className="flex items-center gap-1.5 text-xs text-white/80">
+                <div className={`flex items-center gap-1.5 text-xs ${thumbnailUrl ? 'text-white/80' : 'text-muted-foreground'}`}>
                   <span className="truncate">{round.round_name}</span>
                   <span>•</span>
-                  <span className="flex items-center whitespace-nowrap font-medium">
+                  <span className={`flex items-center whitespace-nowrap font-medium ${thumbnailUrl ? 'text-white' : 'text-primary'}`}>
                     View schedule
                     <ChevronRight className="h-3.5 w-3.5" />
                   </span>
@@ -229,7 +229,11 @@ const AppCourses = () => {
               
               {/* Next session info - only for cohort-based */}
               {!isCompleted && displayDate && (
-                <p className={`text-xs font-medium ${isSessionToday ? 'text-green-400' : 'text-white/90'}`}>
+                <p className={`text-xs font-medium ${
+                  isSessionToday 
+                    ? (thumbnailUrl ? 'text-green-400' : 'text-green-600 dark:text-green-400')
+                    : (thumbnailUrl ? 'text-white/90' : 'text-muted-foreground')
+                }`}>
                   {isSessionToday 
                     ? `Next: Today at ${format(new Date(displayDate), 'h:mm a')}`
                     : isUpcoming 
@@ -241,7 +245,7 @@ const AppCourses = () => {
               
               {/* Next content unlock info - only for cohort-based */}
               {!isCompleted && nextContent && (
-                <div className="flex items-center gap-1.5 text-[11px] text-cyan-300">
+                <div className={`flex items-center gap-1.5 text-[11px] ${thumbnailUrl ? 'text-cyan-300' : 'text-cyan-600 dark:text-cyan-400'}`}>
                   <Unlock className="h-3 w-3 flex-shrink-0" />
                   <span className="line-clamp-1">
                     {nextContent.title} unlocks {nextContent.countdownText}
@@ -251,7 +255,7 @@ const AppCourses = () => {
               
               {/* Important note (if exists) - only for cohort-based */}
               {!isCompleted && importantNote && (
-                <div className="flex items-center gap-1.5 text-[11px] text-amber-300">
+                <div className={`flex items-center gap-1.5 text-[11px] ${thumbnailUrl ? 'text-amber-300' : 'text-amber-600 dark:text-amber-400'}`}>
                   <AlertCircle className="h-3 w-3 flex-shrink-0" />
                   <span className="line-clamp-1">{importantNote}</span>
                 </div>
