@@ -15,7 +15,7 @@ interface Channel {
   id: string;
   name: string;
   slug: string;
-  type: 'general' | 'program' | 'round';
+  type: 'general' | 'program' | 'round' | 'all_enrolled' | 'all_paid';
   program_slug: string | null;
   round_id: string | null;
   allow_reactions: boolean;
@@ -32,7 +32,7 @@ export function FeedChannelManager() {
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
-    type: 'general' as 'general' | 'program' | 'round',
+    type: 'general' as 'general' | 'program' | 'round' | 'all_enrolled' | 'all_paid',
     program_slug: '',
     round_id: '',
     allow_reactions: true,
@@ -223,7 +223,7 @@ export function FeedChannelManager() {
                 <Label>Type</Label>
                 <Select
                   value={formData.type}
-                  onValueChange={(value: 'general' | 'program' | 'round') => 
+                  onValueChange={(value: 'general' | 'program' | 'round' | 'all_enrolled' | 'all_paid') => 
                     setFormData({ ...formData, type: value })
                   }
                 >
@@ -232,8 +232,10 @@ export function FeedChannelManager() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="general">General (All Users)</SelectItem>
-                    <SelectItem value="program">Program (Enrolled Users)</SelectItem>
-                    <SelectItem value="round">Round (Specific Round)</SelectItem>
+                    <SelectItem value="all_enrolled">All Enrolled (Any Program)</SelectItem>
+                    <SelectItem value="all_paid">All Paid Users</SelectItem>
+                    <SelectItem value="program">Specific Program</SelectItem>
+                    <SelectItem value="round">Specific Round</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
