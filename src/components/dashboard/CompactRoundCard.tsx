@@ -50,24 +50,10 @@ export function CompactRoundCard({
       onClick={onView}
       className="block"
     >
-      <div className={`relative w-[260px] h-[88px] rounded-xl overflow-hidden shadow-md transition-transform active:scale-[0.98] ${
+      <div className={`relative w-[260px] h-[88px] rounded-xl overflow-hidden shadow-md transition-transform active:scale-[0.98] bg-white ${
         isUnseen ? 'ring-2 ring-primary ring-offset-2' : ''
       }`}>
-        {/* Background */}
-        {thumbnailUrl ? (
-          <img 
-            src={thumbnailUrl} 
-            alt={enrollment.course_name}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-primary" />
-        )}
-        
-        {/* Overlay - stronger gradient from bottom */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/30" />
-        
-        {/* Content - all bottom aligned */}
+        {/* Content */}
         <div className="absolute inset-0 p-2.5 flex flex-col justify-end">
           {/* Course name with badges inline */}
           <div className="flex items-center gap-1.5 mb-0.5">
@@ -81,18 +67,18 @@ export function CompactRoundCard({
               className={`text-[9px] px-1 py-0 h-4 ${
                 isActive 
                   ? 'bg-green-500 text-white' 
-                  : 'bg-white/20 text-white backdrop-blur-sm'
+                  : 'bg-gray-200 text-gray-700'
               }`}
             >
               {round.status}
             </Badge>
-            <h3 className="text-white font-semibold text-[12px] line-clamp-1 flex-1">
+            <h3 className="text-black font-semibold text-[12px] line-clamp-1 flex-1">
               {enrollment.course_name}
             </h3>
           </div>
           
           {/* Round name + View schedule link */}
-          <div className="flex items-center gap-1 text-[10px] text-white/70">
+          <div className="flex items-center gap-1 text-[10px] text-gray-500">
             <span className="truncate">{round.round_name}</span>
             <span>•</span>
             <span className="flex items-center whitespace-nowrap">
@@ -103,7 +89,7 @@ export function CompactRoundCard({
           
           {/* Next session info */}
           {displayDate && (
-            <p className={`text-[10px] ${isSessionToday ? 'text-green-300' : 'text-white/80'}`}>
+            <p className={`text-[10px] ${isSessionToday ? 'text-green-600' : 'text-gray-600'}`}>
               {isSessionToday 
                 ? `Next: Today at ${format(new Date(displayDate), 'h:mm a')}`
                 : isUpcoming 
@@ -115,7 +101,7 @@ export function CompactRoundCard({
           
           {/* Important note (if exists) */}
           {importantNote && (
-            <div className="flex items-center gap-1 text-[9px] text-amber-300">
+            <div className="flex items-center gap-1 text-[9px] text-amber-600">
               <AlertCircle className="h-2 w-2 flex-shrink-0" />
               <span className="line-clamp-1">{importantNote}</span>
             </div>
