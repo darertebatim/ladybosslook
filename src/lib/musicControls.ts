@@ -138,17 +138,20 @@ export async function destroyMusicControls() {
   try {
     await controls.destroy();
     controlsCreated = false;
+    lastTrackId = "";
   } catch (error) {
     console.error("Error destroying music controls:", error);
   }
 }
 
-export async function setupMusicControlsListeners(callbacks: MusicControlsCallbacks) {
+export async function setupMusicControlsListeners(callbacks: MusicControlsCallbacks & { onTap?: () => void }) {
   const controls = await getMusicControls();
   if (!controls) return;
   
   try {
     controls.addListener("controlsNotification", (info: { message: string }) => {
+      console.log("[MusicControls] Notification:", info.message);
+      
       switch (info.message) {
         case "music-controls-play":
           callbacks.onPlay();
@@ -167,6 +170,12 @@ export async function setupMusicControlsListeners(callbacks: MusicControlsCallba
           break;
         case "music-controls-seek-backward":
           callbacks.onSeekBackward();
+          break;
+        case "music-controls-media-button":
+        case "music-controls-headset-plug":
+        case "music-controls-headset-unplug":
+          // User tapped the Now Playing widget or media button
+          callbacks.onTap?.();
           break;
         case "music-controls-destroy":
           // Handle destroy
