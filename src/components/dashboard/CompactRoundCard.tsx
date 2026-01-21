@@ -50,9 +50,11 @@ export function CompactRoundCard({
       onClick={onView}
       className="block"
     >
-      <div className={`relative w-[260px] h-[88px] rounded-xl overflow-hidden shadow-md transition-transform active:scale-[0.98] bg-indigo-500 ${
-        isUnseen ? 'ring-2 ring-primary ring-offset-2' : ''
-      }`}>
+      <div className={`relative w-[260px] h-[88px] rounded-xl overflow-hidden shadow-sm transition-transform active:scale-[0.98] border border-border/50 ${
+        isActive 
+          ? 'bg-violet-50 dark:bg-violet-950/30' 
+          : 'bg-muted/50 dark:bg-muted/30'
+      } ${isUnseen ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
         {/* Content */}
         <div className="absolute inset-0 p-2.5 flex flex-col justify-end">
           {/* Course name with badges inline */}
@@ -67,21 +69,21 @@ export function CompactRoundCard({
               className={`text-[9px] px-1 py-0 h-4 ${
                 isActive 
                   ? 'bg-green-500 text-white' 
-                  : 'bg-white/20 text-white backdrop-blur-sm'
+                  : 'bg-muted-foreground/20 text-muted-foreground'
               }`}
             >
               {round.status}
             </Badge>
-            <h3 className="text-white font-semibold text-[12px] line-clamp-1 flex-1">
+            <h3 className="text-foreground font-semibold text-[12px] line-clamp-1 flex-1">
               {enrollment.course_name}
             </h3>
           </div>
           
           {/* Round name + View schedule link */}
-          <div className="flex items-center gap-1 text-[10px] text-white/70">
+          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
             <span className="truncate">{round.round_name}</span>
             <span>•</span>
-            <span className="flex items-center whitespace-nowrap">
+            <span className="flex items-center whitespace-nowrap text-primary">
               View schedule
               <ChevronRight className="h-3 w-3" />
             </span>
@@ -89,7 +91,7 @@ export function CompactRoundCard({
           
           {/* Next session info */}
           {displayDate && (
-            <p className={`text-[10px] ${isSessionToday ? 'text-green-300' : 'text-white/80'}`}>
+            <p className={`text-[10px] ${isSessionToday ? 'text-green-600 dark:text-green-400 font-medium' : 'text-muted-foreground'}`}>
               {isSessionToday 
                 ? `Next: Today at ${format(new Date(displayDate), 'h:mm a')}`
                 : isUpcoming 
@@ -101,7 +103,7 @@ export function CompactRoundCard({
           
           {/* Important note (if exists) */}
           {importantNote && (
-            <div className="flex items-center gap-1 text-[9px] text-amber-300">
+            <div className="flex items-center gap-1 text-[9px] text-amber-600 dark:text-amber-400">
               <AlertCircle className="h-2 w-2 flex-shrink-0" />
               <span className="line-clamp-1">{importantNote}</span>
             </div>
