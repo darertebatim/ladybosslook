@@ -7,56 +7,53 @@ const corsHeaders = {
 };
 
 // Category-based visual style mapping for unique, diverse covers
-const categoryStyles: Record<string, { theme: string; elements: string; colors: string; typography: string }> = {
+const categoryStyles: Record<string, { theme: string; elements: string; colors: string }> = {
   audiobook: {
     theme: 'Editorial book photography, literary aesthetic',
     elements: 'Open book with pages gently turning, warm reading lamp glow, cozy library corner, leather textures, vintage bookshelf background, reading glasses, cup of tea',
-    colors: 'Warm amber, deep burgundy, cream, rich brown, golden lamplight',
-    typography: 'Elegant serif font, classic book cover style, centered or bottom placement'
+    colors: 'Warm amber, deep burgundy, cream, rich brown, golden lamplight'
   },
   podcast: {
     theme: 'Modern studio broadcast aesthetic',
     elements: 'Professional microphone silhouette, subtle sound waves, intimate podcast studio, soft acoustic panels, warm studio lighting, headphones',
-    colors: 'Deep navy, soft coral, warm gray, rose gold accents, soft white',
-    typography: 'Clean modern sans-serif, bold and confident, left-aligned or centered'
+    colors: 'Deep navy, soft coral, warm gray, rose gold accents, soft white'
   },
   course_supplement: {
     theme: 'Clean minimalist educational design',
     elements: 'Modern architectural interior, structured geometric shapes, professional workspace, notebook and pen, clean desk setup, natural light through windows',
-    colors: 'Soft sage green, warm white, light wood tones, muted gold, soft blush',
-    typography: 'Modern sans-serif, professional and clean, balanced placement'
+    colors: 'Soft sage green, warm white, light wood tones, muted gold, soft blush'
+  },
+  course: {
+    theme: 'Clean minimalist educational design',
+    elements: 'Modern architectural interior, structured geometric shapes, professional workspace, notebook and pen, clean desk setup, natural light through windows',
+    colors: 'Soft sage green, warm white, light wood tones, muted gold, soft blush'
   },
   meditate: {
     theme: 'Serene nature and zen aesthetic',
     elements: 'Calm water reflection, lotus flower on still pond, misty mountain peaks at dawn, zen garden with raked sand, soft morning fog, single candle flame',
-    colors: 'Soft lavender, pale blue, sage green, warm sunrise gold, peaceful white',
-    typography: 'Light, airy sans-serif or elegant thin serif, plenty of breathing room'
+    colors: 'Soft lavender, pale blue, sage green, warm sunrise gold, peaceful white'
   },
   workout: {
     theme: 'Dynamic motion and energy',
     elements: 'Abstract motion blur, bold geometric shapes in motion, energetic brush strokes, athletic silhouette mid-movement, dynamic light trails',
-    colors: 'Electric coral, vibrant magenta, energetic orange, bold teal, powerful purple',
-    typography: 'Bold condensed sans-serif, impactful and strong, diagonal or dynamic placement'
+    colors: 'Electric coral, vibrant magenta, energetic orange, bold teal, powerful purple'
   },
   soundscape: {
     theme: 'Immersive atmospheric landscapes',
     elements: 'Ocean waves at golden hour, deep forest with light filtering through, starry night sky, rain on window, natural textures close-up, flowing water',
-    colors: 'Deep ocean blue, forest green, twilight purple, earthy brown, sunset orange',
-    typography: 'Subtle, integrated typography, lowercase or minimal, blends with scene'
+    colors: 'Deep ocean blue, forest green, twilight purple, earthy brown, sunset orange'
   },
   affirmations: {
     theme: 'Ethereal and uplifting spiritual',
     elements: 'Golden light rays through clouds, celestial elements, soft ethereal glow, floating feathers, gentle sun flare, abstract angel wing forms',
-    colors: 'Warm gold, soft peach, celestial white, gentle rose, light champagne',
-    typography: 'Graceful script or elegant serif, centered, warm and inviting'
+    colors: 'Warm gold, soft peach, celestial white, gentle rose, light champagne'
   }
 };
 
 const defaultStyle = {
   theme: 'Modern artistic album cover',
   elements: 'Abstract flowing shapes, elegant curves, modern artistic interpretation, sophisticated design elements',
-  colors: 'Rich jewel tones, warm amber, soft rose, deep purple, elegant gold',
-  typography: 'Modern elegant font, balanced and refined placement'
+  colors: 'Rich jewel tones, warm amber, soft rose, deep purple, elegant gold'
 };
 
 function buildCategoryPrompt(playlistName: string, category: string, description: string): string {
@@ -65,22 +62,18 @@ function buildCategoryPrompt(playlistName: string, category: string, description
   
   return `Create a professional, high-quality playlist cover image.
 
-PLAYLIST TITLE: "${playlistName}"
-${cleanDescription ? `CONTEXT: ${cleanDescription}` : ''}
+CONTEXT: "${playlistName}"
+${cleanDescription ? `DESCRIPTION: ${cleanDescription}` : ''}
 
 VISUAL THEME: ${style.theme}
 
-SCENE ELEMENTS (choose 2-3 that fit the title):
+SCENE ELEMENTS (choose 2-3 that fit the context):
 ${style.elements}
 
 COLOR PALETTE:
 ${style.colors}
 
-TITLE ON COVER:
-- Render the text "${playlistName}" prominently on the cover
-- Typography style: ${style.typography}
-- Ensure high contrast and readability against the background
-- The title should feel integrated, not stamped on
+IMPORTANT: Do NOT include any text, titles, or typography on the cover. This should be a pure visual/photographic image only.
 
 TECHNICAL REQUIREMENTS:
 - Square format (1:1 aspect ratio)
@@ -89,8 +82,9 @@ TECHNICAL REQUIREMENTS:
 - NOT a generic stock photo look
 - Evoke sophistication and intentional design
 - The overall mood should feel aspirational and empowering
+- NO TEXT OR WORDS on the image
 
-Create a unique, artistic cover that stands out and captures the essence of "${playlistName}".`;
+Create a unique, artistic cover that stands out and captures the essence of the content.`;
 }
 
 serve(async (req) => {
