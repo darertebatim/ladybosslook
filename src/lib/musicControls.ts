@@ -40,26 +40,68 @@ interface MusicControlsCallbacks {
 }
 
 let controlsCreated = false;
+let lastTrackId = "";
 let lastUpdateTime = 0;
 const UPDATE_THROTTLE = 1000; // Update at most once per second
 
-export async function updateMusicControls(options: MusicControlsOptions) {
+/**
+ * Convert relative URLs to absolute URLs for iOS lock screen artwork
+ */
+function getAbsoluteCoverUrl(cover: string): string {
+  if (!cover) return "";
+  
+  // Already absolute URL
+  if (cover.startsWith("http://") || cover.startsWith("https://")) {
+    return cover;
+  }
+  
+  // Supabase storage URL - already absolute
+  if (cover.includes("supabase.co")) {
+    return cover;
+  }
+  
+  // For relative URLs, convert to absolute using the app's origin
+  // On native, we'll use the production URL
+  const baseUrl = "https://ladybosslook.lovable.app";
+  
+  // Handle leading slash
+  const path = cover.startsWith("/") ? cover : `/${cover}`;
+  
+  return `${baseUrl}${path}`;
+}
+
+export async function updateMusicControls(options: MusicControlsOptions & { trackId?: string }) {
   const controls = await getMusicControls();
   if (!controls) return;
   
-  // Throttle updates to prevent excessive calls
   const now = Date.now();
-  if (now - lastUpdateTime < UPDATE_THROTTLE && controlsCreated) {
+  const trackChanged = options.trackId && options.trackId !== lastTrackId;
+  
+  // Throttle updates unless track changed
+  if (!trackChanged && now - lastUpdateTime < UPDATE_THROTTLE && controlsCreated) {
     return;
   }
   lastUpdateTime = now;
   
+  // Convert cover URL to absolute
+  const absoluteCover = getAbsoluteCoverUrl(options.cover);
+  
   try {
-    if (!controlsCreated) {
+    // Always recreate controls when track changes to update all metadata including artwork
+    if (!controlsCreated || trackChanged) {
+      // Destroy existing controls first if track changed
+      if (controlsCreated && trackChanged) {
+        try {
+          await controls.destroy();
+        } catch (e) {
+          // Ignore destroy errors
+        }
+      }
+      
       await controls.create({
         track: options.track,
         artist: options.artist,
-        cover: options.cover,
+        cover: absoluteCover,
         isPlaying: options.isPlaying,
         dismissable: true,
         hasPrev: options.hasPrev,
@@ -74,8 +116,13 @@ export async function updateMusicControls(options: MusicControlsOptions) {
         closeIcon: "media_close",
         notificationIcon: "notification",
       });
+      
       controlsCreated = true;
+      if (options.trackId) {
+        lastTrackId = options.trackId;
+      }
     } else {
+      // Just update playback state for existing track
       await controls.updateIsPlaying({ isPlaying: options.isPlaying });
       await controls.updateElapsed({ elapsed: options.elapsed, isPlaying: options.isPlaying });
     }
