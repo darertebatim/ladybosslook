@@ -12,8 +12,9 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell,
-  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, NotebookPen, Trash2, AlertTriangle
+  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, NotebookPen, Trash2, AlertTriangle, Settings
 } from 'lucide-react';
+import { NativeSettings, IOSSettings, AndroidSettings } from 'capacitor-native-settings';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -530,6 +531,23 @@ const AppProfile = () => {
       toast({
         title: 'Error',
         description: 'Failed to disable notifications',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Open native app settings
+  const handleOpenAppSettings = async () => {
+    try {
+      await NativeSettings.open({
+        optionAndroid: AndroidSettings.ApplicationDetails,
+        optionIOS: IOSSettings.App,
+      });
+    } catch (error) {
+      console.error('Failed to open settings:', error);
+      toast({
+        title: 'Error',
+        description: 'Could not open settings',
         variant: 'destructive',
       });
     }
@@ -1088,6 +1106,14 @@ const AppProfile = () => {
                       {isEnablingNotifications ? 'Re-registering...' : 'Re-register'}
                     </Button>
                   </div>
+                  <Button 
+                    variant="ghost" 
+                    onClick={handleOpenAppSettings}
+                    className="w-full text-muted-foreground"
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    Open Settings
+                  </Button>
                   <p className="text-xs text-muted-foreground">
                     💡 Use "Re-register" if you're not receiving notifications
                   </p>
@@ -1129,22 +1155,28 @@ const AppProfile = () => {
                         : 'Get notified about new courses, content updates, and important announcements'}
                     </p>
                   </div>
-                  <Button 
-                    onClick={handleEnableNotifications} 
-                    className="w-full"
-                    disabled={isEnablingNotifications || notificationPermission === 'denied'}
-                  >
-                    <Bell className="mr-2 h-4 w-4" />
-                    {isEnablingNotifications 
-                      ? 'Enabling...' 
-                      : notificationPermission === 'denied'
-                      ? 'Open Settings to Enable'
-                      : 'Enable Notifications'}
-                  </Button>
-                  {notificationPermission === 'denied' && (
-                    <p className="text-xs text-muted-foreground text-center">
-                      Tap your Settings app → LadyBoss Academy → Notifications → Allow Notifications
-                    </p>
+                  {notificationPermission === 'denied' ? (
+                    <>
+                      <Button 
+                        onClick={handleOpenAppSettings} 
+                        className="w-full"
+                      >
+                        <Settings className="mr-2 h-4 w-4" />
+                        Open Settings
+                      </Button>
+                      <p className="text-xs text-muted-foreground text-center">
+                        Tap Notifications → Enable "Allow Notifications"
+                      </p>
+                    </>
+                  ) : (
+                    <Button 
+                      onClick={handleEnableNotifications} 
+                      className="w-full"
+                      disabled={isEnablingNotifications}
+                    >
+                      <Bell className="mr-2 h-4 w-4" />
+                      {isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
+                    </Button>
                   )}
                 </div>
               )}
