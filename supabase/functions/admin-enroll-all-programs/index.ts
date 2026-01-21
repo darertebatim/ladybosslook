@@ -70,45 +70,43 @@ serve(async (req) => {
     // Get existing enrollments for this user
     const { data: existingEnrollments } = await supabase
       .from("course_enrollments")
-      .select("program_slug, round_id")
+      .select("course_name")
       .eq("user_id", user.id);
 
-    const existingSet = new Set(
-      (existingEnrollments || []).map(e => `${e.program_slug}-${e.round_id || 'null'}`)
+    const existingNames = new Set(
+      (existingEnrollments || []).map(e => e.course_name)
     );
 
     const enrollmentsToCreate: any[] = [];
 
     // For each program, create enrollments
     for (const program of programs || []) {
+      // Skip if already enrolled by course_name
+      if (existingNames.has(program.title)) {
+        continue;
+      }
+
       const programRounds = (rounds || []).filter(r => r.program_slug === program.slug);
 
       if (programRounds.length > 0) {
-        // Enroll in each round
-        for (const round of programRounds) {
-          const key = `${program.slug}-${round.id}`;
-          if (!existingSet.has(key)) {
-            enrollmentsToCreate.push({
-              user_id: user.id,
-              course_name: program.title,
-              program_slug: program.slug,
-              round_id: round.id,
-              status: "active",
-            });
-          }
-        }
+        // Enroll in the first/latest round only (due to unique constraint on course_name)
+        const latestRound = programRounds[programRounds.length - 1];
+        enrollmentsToCreate.push({
+          user_id: user.id,
+          course_name: program.title,
+          program_slug: program.slug,
+          round_id: latestRound.id,
+          status: "active",
+        });
       } else {
         // No rounds - enroll without round_id
-        const key = `${program.slug}-null`;
-        if (!existingSet.has(key)) {
-          enrollmentsToCreate.push({
-            user_id: user.id,
-            course_name: program.title,
-            program_slug: program.slug,
-            round_id: null,
-            status: "active",
-          });
-        }
+        enrollmentsToCreate.push({
+          user_id: user.id,
+          course_name: program.title,
+          program_slug: program.slug,
+          round_id: null,
+          status: "active",
+        });
       }
     }
 
