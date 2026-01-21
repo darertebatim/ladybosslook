@@ -929,3 +929,38 @@ export const useResetPlannerData = () => {
     },
   });
 };
+
+/**
+ * Reorder tasks (update order_index for multiple tasks)
+ */
+export const useReorderTasks = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (tasks: { id: string; order_index: number }[]) => {
+      // Update each task's order_index
+      const updates = tasks.map(({ id, order_index }) =>
+        supabase
+          .from('user_tasks')
+          .update({ order_index })
+          .eq('id', id)
+      );
+
+      const results = await Promise.all(updates);
+      
+      const errors = results.filter(r => r.error);
+      if (errors.length > 0) {
+        throw errors[0].error;
+      }
+
+      return tasks;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
+    },
+    onError: (error) => {
+      console.error('Reorder tasks error:', error);
+      toast({ title: 'Failed to reorder tasks', variant: 'destructive' });
+    },
+  });
+};

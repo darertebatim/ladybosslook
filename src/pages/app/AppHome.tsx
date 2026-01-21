@@ -14,6 +14,7 @@ import {
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { useNewHomeData } from '@/hooks/useNewHomeData';
 import { TaskCard } from '@/components/app/TaskCard';
+import { SortableTaskList } from '@/components/app/SortableTaskList';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
@@ -430,25 +431,23 @@ const AppHome = () => {
                   </button>
                 </div>
               ) : filteredTasks.length > 0 && (
-                <div className="space-y-3">
+                <div>
                   {/* My Tasks header - always show */}
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-3">
                     <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
                       My Tasks
                     </h2>
+                    <span className="text-xs text-foreground/40 ml-auto">Hold to reorder</span>
                   </div>
-                  {filteredTasks.map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      task={task}
-                      date={selectedDate}
-                      isCompleted={completedTaskIds.has(task.id)}
-                      completedSubtaskIds={completedSubtaskIds}
-                      onTap={handleTaskTap}
-                      onStreakIncrease={handleStreakIncrease}
-                    />
-                  ))}
+                  <SortableTaskList
+                    tasks={filteredTasks}
+                    date={selectedDate}
+                    completedTaskIds={completedTaskIds}
+                    completedSubtaskIds={completedSubtaskIds}
+                    onTaskTap={handleTaskTap}
+                    onStreakIncrease={handleStreakIncrease}
+                  />
                 </div>
               )}
 
