@@ -383,18 +383,6 @@ const AppHome = () => {
 
         {/* Content area - scrollable with extra padding for fixed bottom dashboard */}
         <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 pb-[280px]">
-          {/* Future date banner */}
-          {isFutureDate && filteredTasks.length > 0 && (
-            <button
-              onClick={() => {
-                setSelectedDate(new Date());
-                setCurrentMonth(startOfMonth(new Date()));
-              }}
-              className="w-full mb-4 flex items-center justify-center gap-2 px-4 py-3.5 bg-violet-500 text-white rounded-2xl font-medium shadow-lg active:scale-[0.98] transition-transform"
-            >
-              <span>Let's focus on today's routine.</span>
-            </button>
-          )}
 
           {isLoading ? (
             <div className="space-y-3">

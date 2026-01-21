@@ -14,6 +14,7 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 import { isToday, isBefore, startOfDay } from 'date-fns';
+import { toast } from 'sonner';
 
 interface TaskCardProps {
   task: UserTask;
@@ -64,8 +65,15 @@ export const TaskCard = ({
   const handleToggleComplete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Prevent completing tasks for future dates
+    // Prevent completing tasks for future dates - show toast message
     if (isFutureDate) {
+      if (Capacitor.isNativePlatform()) {
+        await Haptics.impact({ style: ImpactStyle.Light });
+      }
+      toast("Let's focus on today's routine.", {
+        description: "You can complete this task when the day comes.",
+        duration: 3000,
+      });
       return;
     }
     
