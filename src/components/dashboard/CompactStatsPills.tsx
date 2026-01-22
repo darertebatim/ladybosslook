@@ -33,7 +33,7 @@ export function CompactStatsPills({
       icon: MessageCircle,
       value: unreadPosts > 0 ? `${unreadPosts} new` : '0 new',
       label: 'posts',
-      to: '/app/feed',
+      to: '/app/channels',
       color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300',
       highlight: unreadPosts > 0,
     },

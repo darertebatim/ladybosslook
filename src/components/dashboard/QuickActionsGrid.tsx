@@ -19,8 +19,8 @@ export function QuickActionsGrid() {
     },
     {
       icon: Users,
-      label: 'Community',
-      to: '/app/feed',
+      label: 'Channels',
+      to: '/app/channels',
       bgColor: 'bg-[#E6D9FC]', // lavender
       iconColor: 'text-violet-600',
     },

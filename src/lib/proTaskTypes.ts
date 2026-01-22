@@ -129,7 +129,7 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
     case 'journal':
       return '/app/journal/new';
     case 'channel':
-      return `/app/feed?channel=${linkValue}`;
+      return `/app/channels?channel=${linkValue}`;
     case 'program':
       return `/app/course/${linkValue}`;
     case 'planner':

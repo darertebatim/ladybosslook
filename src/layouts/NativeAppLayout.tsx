@@ -109,7 +109,7 @@ const NativeAppLayout = () => {
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home' },
-    { path: '/app/feed', icon: Newspaper, label: 'Community', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount },
+    { path: '/app/channels', icon: Newspaper, label: 'Channels', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount },
     { path: '/app/programs', icon: GraduationCap, label: 'Programs' },
     { path: '/app/browse', icon: ShoppingBag, label: 'Browse' },
     { path: '/app/routines', icon: Sparkles, label: 'Routines' },
@@ -117,8 +117,8 @@ const NativeAppLayout = () => {
     { path: '/app/chat', icon: MessageCircle, label: 'Chat' },
   ];
 
-  // Tab bar actual height: grid content (~56px) + safe area inset
-  const TAB_BAR_CONTENT_HEIGHT = 56;
+  // Tab bar actual height: grid content (~48px for compact) + safe area inset
+  const TAB_BAR_CONTENT_HEIGHT = 48;
 
   return (
     <>
@@ -137,9 +137,10 @@ const NativeAppLayout = () => {
         {/* Bottom Navigation - hidden on chat page for full-screen experience */}
         {!isOnChatPage && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg pb-safe">
-          <div className="grid grid-cols-7 pt-2 pb-2">
+          <div className="grid grid-cols-7 pt-1.5 pb-1.5">
             {navItems.map((item) => {
-              const isActive = location.pathname === item.path;
+              const isActive = location.pathname === item.path || 
+                (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
               const Icon = item.icon;
               const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
               const showBadge = showChatBadge || item.showBadge;
@@ -147,29 +148,29 @@ const NativeAppLayout = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex flex-col items-center justify-center gap-1.5 transition-colors min-h-[48px] ${
+                  className={`flex flex-col items-center justify-center gap-0.5 transition-colors min-h-[44px] ${
                     isActive
                       ? 'text-primary'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <div className="relative">
-                    <Icon className={`h-6 w-6 ${isActive ? 'fill-current' : ''}`} />
+                    <Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''}`} />
                     {showChatBadge && (
-                      <span className="absolute -top-1 -right-2 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                      <span className="absolute -top-1 -right-2 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
                     )}
                     {item.showBadge && !showChatBadge && item.badgeCount && (
-                      <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                      <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
                         {item.badgeCount > 9 ? '9+' : item.badgeCount}
                       </span>
                     )}
                     {item.showBadge && !showChatBadge && !item.badgeCount && (
-                      <span className="absolute -top-0.5 -right-0.5 bg-primary w-2.5 h-2.5 rounded-full" />
+                      <span className="absolute -top-0.5 -right-0.5 bg-primary w-2 h-2 rounded-full" />
                     )}
                   </div>
-                  <span className="text-xs font-medium">{item.label}</span>
+                  <span className="text-[10px] font-medium">{item.label}</span>
                 </Link>
               );
             })}
