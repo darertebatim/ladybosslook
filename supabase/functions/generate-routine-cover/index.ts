@@ -6,74 +6,74 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Creative visual concepts for routine covers - artistic and unique
+// Creative visual concepts for routine covers - designed graphics, not photos
 const categoryStyles: Record<string, { concept: string; mood: string; technique: string }> = {
   morning: {
-    concept: 'Golden hour magic - woman silhouette stretching at window with dramatic sunbeams, or hands wrapped around steaming ceramic mug with light dancing on the surface',
-    mood: 'Hopeful awakening, fresh starts, quiet power before the world wakes',
-    technique: 'Cinematic lighting with lens flare, shallow depth of field, warm film grain'
+    concept: 'Minimalist vector sunrise with geometric mountains and soft gradient sky, abstract sun rays as clean lines',
+    mood: 'Fresh, energetic, optimistic awakening',
+    technique: 'Flat design, warm orange-to-gold gradients, bold geometric shapes, high-end editorial illustration'
   },
   evening: {
-    concept: 'Intimate twilight moments - soft candlelit scene with silk textures, or moonlight streaming through sheer curtains onto rumpled bedding',
-    mood: 'Sanctuary, unwinding, sacred pause from the chaos',
-    technique: 'Chiaroscuro lighting, rich shadows, moody color grading like a Sofia Coppola film'
+    concept: 'Layered abstract moonscape with flowing curves and deep indigo-to-purple gradients, stylized stars as geometric dots',
+    mood: 'Peaceful unwinding, sanctuary, gentle transition',
+    technique: 'Soft gradients, organic flowing shapes, minimalist night palette, dreamy illustration style'
   },
   wellness: {
-    concept: 'Elevated self-care editorial - artful arrangement of natural textures (marble, eucalyptus, linen), or close-up of water droplets on skin catching light',
-    mood: 'Luxurious slowness, intentional living, treating yourself as worthy',
-    technique: 'Clean editorial photography, negative space, soft natural light'
+    concept: 'Organic abstract shapes resembling leaves and water droplets, flowing botanical silhouettes with soft grain texture',
+    mood: 'Balanced, holistic, natural harmony',
+    technique: 'Modern digital art, soft pastel palette, Japanese-inspired minimalism, ethereal gradients'
   },
   mindfulness: {
-    concept: 'Abstract zen - ripples expanding on still water, single lotus floating, or misty mountain peaks emerging from clouds at dawn',
-    mood: 'Stillness within chaos, centered calm, expansive awareness',
-    technique: 'Minimalist composition, soft focus, muted tones with one accent color'
+    concept: 'Concentric circles expanding like ripples, zen-inspired geometric composition with breathing space',
+    mood: 'Centered calm, expansive awareness, stillness',
+    technique: 'Swiss design style, muted tones with one accent color, clean minimalist composition'
   },
   productivity: {
-    concept: 'Curated workspace poetry - architectural details in warm light, or single hand writing in leather journal with perfect shadows',
-    mood: 'Focused ambition, elegant efficiency, quiet determination',
-    technique: 'Sharp lines, modern architecture aesthetic, warm wood and brass tones'
+    concept: 'Clean isometric 3D shapes suggesting organized workspace, abstract geometric blocks in warm neutrals',
+    mood: 'Focused, structured, elegant efficiency',
+    technique: 'Soft clay-style 3D render, Bauhaus-inspired layout, warm wood and brass tones'
   },
   fitness: {
-    concept: 'Movement as art - abstract motion blur of a dancing figure, or powerful silhouette mid-leap against dramatic sky',
-    mood: 'Fierce energy, liberation through movement, unapologetic strength',
-    technique: 'Dynamic angles, motion blur, bold saturated colors, high contrast'
+    concept: 'Dynamic abstract composition with flowing motion lines and energetic shapes suggesting movement',
+    mood: 'Powerful rhythm, liberation, fierce energy',
+    technique: 'Bold color blocking, dynamic angles, high-contrast vibrant palette, motion-inspired vectors'
   },
   self_care: {
-    concept: 'Intimate beauty rituals - close-up of hands massaging face with golden serum, or rose petals floating in milky bath water',
-    mood: 'Radical self-love, tender moments alone, beauty as self-respect',
-    technique: 'Soft glow, creamy skin tones, romantic lighting like a perfume ad'
+    concept: 'Soft organic blobs and flowing abstract forms in rosy and cream tones, gentle overlapping shapes',
+    mood: 'Tender self-love, nurturing, gentle warmth',
+    technique: 'Soft glow gradients, romantic pastel palette, organic fluid shapes, premium app aesthetic'
   },
   creativity: {
-    concept: 'Creative explosion - paint-stained hands holding fresh artwork, or colorful ink drops blooming in water captured mid-motion',
-    mood: 'Uninhibited expression, joyful mess, playing like nobody is watching',
-    technique: 'Bold colors, artistic chaos, macro photography, unexpected compositions'
+    concept: 'Colorful abstract explosion of geometric and organic shapes, playful composition with bold colors',
+    mood: 'Uninhibited expression, joyful play, creative freedom',
+    technique: 'Bold saturated colors, unexpected compositions, artistic chaos, modern illustration'
   },
   sleep: {
-    concept: 'Dream state visuals - clouds viewed from above at golden hour, or soft billowing white fabric floating in wind',
-    mood: 'Deep rest, floating between worlds, surrendering to softness',
-    technique: 'Dreamy soft focus, ethereal lighting, lavender and midnight blue palette'
+    concept: 'Dreamy abstract clouds and soft flowing forms in lavender and midnight blue, floating geometric shapes',
+    mood: 'Deep rest, floating serenity, surrendering to softness',
+    technique: 'Ethereal gradients, soft blur effects, calming cool palette, dreamy illustration'
   },
   gratitude: {
-    concept: 'Golden abundance - warm light streaming through autumn leaves, or hands cupped open receiving light',
-    mood: 'Overflowing appreciation, finding magic in ordinary, heart wide open',
-    technique: 'Warm golden hour photography, bokeh, rich amber and honey tones'
+    concept: 'Warm abstract forms suggesting golden light and abundance, overlapping organic shapes in honey tones',
+    mood: 'Overflowing appreciation, warmth, heart open',
+    technique: 'Rich amber gradients, soft bokeh-like circles, warm golden palette'
   },
   work: {
-    concept: 'Power moves - sleek laptop on marble desk with coffee and fresh flowers, or confident woman silhouette in modern glass office',
-    mood: 'Boss energy, commanding your space, success on your terms',
-    technique: 'Editorial fashion photography style, clean lines, sophisticated neutral palette'
+    concept: 'Sophisticated geometric composition with clean lines and professional neutral palette, abstract desk elements',
+    mood: 'Boss energy, commanding confidence, refined success',
+    technique: 'Editorial fashion illustration style, clean lines, sophisticated monochrome with accent'
   },
   health: {
-    concept: 'Vibrant living - colorful smoothie bowl as art from above, or woman laughing mid-movement in natural light',
-    mood: 'Radiant vitality, body as temple, celebrating aliveness',
-    technique: 'Bright natural light, fresh colors, lifestyle editorial feel'
+    concept: 'Vibrant abstract fruits and botanical shapes in fresh colors, energetic organic composition',
+    mood: 'Radiant vitality, celebration of aliveness',
+    technique: 'Bright fresh colors, playful organic shapes, lifestyle editorial illustration'
   }
 };
 
 const defaultStyle = {
-  concept: 'Elevated feminine aesthetic - abstract flowing forms in rich colors, botanical shadows on linen, or woman in powerful pose with dramatic lighting',
-  mood: 'Aspirational but attainable, elegant self-improvement, quiet confidence',
-  technique: 'Fashion editorial meets wellness, premium textures, intentional composition'
+  concept: 'Abstract flowing forms with elegant gradients, organic shapes meeting geometric elements in rich colors',
+  mood: 'Aspirational, elegant self-improvement, quiet confidence',
+  technique: 'Premium app UI aesthetic, soft gradients, minimalist vector art, high-end digital illustration'
 };
 
 function getCategoryStyle(categoryName: string): typeof defaultStyle {
@@ -98,38 +98,47 @@ function buildCreativePrompt(title: string, subtitle: string, description: strin
   const style = getCategoryStyle(categoryName);
   const cleanDesc = description?.replace(/<[^>]*>/g, '').substring(0, 100) || '';
   
-  return `Create a stunning, gallery-worthy cover image for a wellness routine.
+  return `Create a professional graphic design cover for a wellness routine app.
 
 ROUTINE: "${title}"
-${subtitle ? `VIBE: "${subtitle}"` : ''}
+${subtitle ? `THEME: "${subtitle}"` : ''}
 ${cleanDesc ? `CONTEXT: ${cleanDesc}` : ''}
 
-VISUAL DIRECTION:
+VISUAL CONCEPT:
 ${style.concept}
 
-EMOTIONAL TONE:
+MOOD:
 ${style.mood}
 
-PHOTOGRAPHY STYLE:
+DESIGN STYLE:
 ${style.technique}
 
-ESSENTIAL REQUIREMENTS:
+CRITICAL REQUIREMENTS:
+- This MUST be a designed graphic, NOT a realistic photograph
 - NO text, words, letters, or typography of any kind
+- NO realistic human faces or body parts
+- NO stock photo aesthetics or photographic realism
 - Square format, perfectly composed
-- Premium magazine-quality aesthetic
-- Evocative and artistic, NOT generic stock photography
-- Should feel like it belongs on a high-end lifestyle brand
-- Rich textures and intentional use of light/shadow
-- The kind of image that makes someone pause and feel something
+- Use clean vector-like shapes, gradients, and artistic composition
+- Premium app UI aesthetic like Headspace, Calm, or Nike Training Club
+- High-end digital illustration quality
+
+DESIGN APPROACH:
+- Use abstract shapes, geometric forms, or stylized organic elements
+- Apply beautiful color gradients and color blocking
+- Create depth through layered shapes and soft shadows
+- Think modern mobile app cover art, not photography
+- Minimalist but visually striking
 
 AVOID:
-- Cheesy wellness clichés (basic yoga poses, obvious meditation imagery)
-- Flat or boring compositions
-- Overprocessed or artificial looking
-- Generic motivational poster vibes
-- Clip art or illustration style
+- Realistic photography of any kind
+- Human figures or faces (even silhouettes unless very abstract)
+- Stock photo aesthetic
+- Busy or cluttered compositions
+- Generic clip art style
+- Hyper-realistic rendering
 
-This should be the kind of cover that elevates the entire routine. Make it beautiful.`;
+Create a beautiful, modern graphic that would look premium in a wellness app.`;
 }
 
 serve(async (req) => {
