@@ -98,6 +98,7 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
   const [isAIGenerating, setIsAIGenerating] = useState(false);
   const [isGeneratingFromTemplates, setIsGeneratingFromTemplates] = useState(false);
+  const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const [isGeneratingFromTaskTemplates, setIsGeneratingFromTaskTemplates] = useState(false);
   const [aiTheme, setAiTheme] = useState('');
   const [showAIDialog, setShowAIDialog] = useState(false);
@@ -228,6 +229,45 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
       toast.error('Failed to upload image');
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleGenerateCover = async () => {
+    if (!editingPlan) {
+      toast.error('Save the plan first before generating a cover');
+      return;
+    }
+
+    const categoryName = categories?.find(c => c.id === formData.category_id)?.name || '';
+
+    setIsGeneratingCover(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-routine-cover', {
+        body: {
+          planId: editingPlan.id,
+          planTitle: formData.title,
+          planSubtitle: formData.subtitle,
+          planDescription: formData.description,
+          categoryName
+        }
+      });
+
+      if (error) throw error;
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      if (data?.coverUrl) {
+        setFormData(prev => ({ ...prev, cover_image_url: data.coverUrl }));
+        toast.success('Cover generated!');
+        queryClient.invalidateQueries({ queryKey: ['admin-routine-plans'] });
+      }
+    } catch (error) {
+      console.error('Cover generation error:', error);
+      toast.error('Failed to generate cover');
+    } finally {
+      setIsGeneratingCover(false);
     }
   };
 
@@ -679,6 +719,22 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
                     <span><Image className="h-4 w-4" /></span>
                   </Button>
                 </label>
+                {editingPlan && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="icon"
+                    onClick={handleGenerateCover}
+                    disabled={isGeneratingCover}
+                    title="Generate AI cover"
+                  >
+                    {isGeneratingCover ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Wand2 className="h-4 w-4" />
+                    )}
+                  </Button>
+                )}
               </div>
               {formData.cover_image_url && (
                 <img 
