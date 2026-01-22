@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Search, BookOpen, Sparkles, TrendingUp, Flame, Calendar, NotebookPen } from 'lucide-react';
+import { ArrowLeft, Plus, Search, BookOpen, NotebookPen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { useJournalEntries } from '@/hooks/useJournal';
 import { JournalEntryCard, formatDateGroup } from '@/components/app/JournalEntryCard';
 import { JournalSkeleton } from '@/components/app/skeletons/JournalSkeleton';
 import { JournalReminderSettings } from '@/components/app/JournalReminderSettings';
+import { JournalHeaderStats } from '@/components/app/JournalHeaderStats';
 import { SEOHead } from '@/components/SEOHead';
 import { format, startOfDay, differenceInDays, subDays, isAfter } from 'date-fns';
 
@@ -124,6 +125,11 @@ const AppJournal = () => {
             <h1 className="text-xl font-semibold">My Journal</h1>
           </div>
           <div className="flex items-center gap-1">
+            <JournalHeaderStats 
+              totalEntries={stats.totalEntries}
+              streak={stats.streak}
+              thisMonth={stats.thisMonth}
+            />
             <Button 
               variant="ghost" 
               size="icon"
@@ -160,34 +166,9 @@ const AppJournal = () => {
 
       {/* Content */}
       <div className="p-4 space-y-4">
-        {/* Stats Card */}
+        {/* Quick Actions Card */}
         <Card>
-          <CardContent className="p-4 space-y-4">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-muted/50 rounded-lg p-3 text-center">
-                <div className="flex items-center justify-center text-primary mb-1">
-                  <TrendingUp className="h-4 w-4" />
-                </div>
-                <p className="text-xl font-bold">{stats.totalEntries}</p>
-                <p className="text-xs text-muted-foreground">Total Entries</p>
-              </div>
-              <div className="bg-muted/50 rounded-lg p-3 text-center">
-                <div className="flex items-center justify-center text-orange-500 mb-1">
-                  <Flame className="h-4 w-4" />
-                </div>
-                <p className="text-xl font-bold">{stats.streak}</p>
-                <p className="text-xs text-muted-foreground">Day Streak</p>
-              </div>
-              <div className="bg-muted/50 rounded-lg p-3 text-center">
-                <div className="flex items-center justify-center text-blue-500 mb-1">
-                  <Calendar className="h-4 w-4" />
-                </div>
-                <p className="text-xl font-bold">{stats.thisMonth}</p>
-                <p className="text-xs text-muted-foreground">This Month</p>
-              </div>
-            </div>
-
+          <CardContent className="p-4 space-y-3">
             {/* Write Today's Entry Button */}
             <Button 
               className="w-full" 
