@@ -2032,6 +2032,30 @@ export type Database = {
           },
         ]
       }
+      task_reminder_logs: {
+        Row: {
+          id: string
+          reminder_date: string
+          sent_at: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          reminder_date: string
+          sent_at?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          reminder_date?: string
+          sent_at?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       task_templates: {
         Row: {
           category: string
