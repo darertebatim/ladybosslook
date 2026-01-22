@@ -474,26 +474,6 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Bottom Action Buttons */}
-              <div className="mt-6 space-y-3">
-                {/* Explore Routines Button */}
-                <button
-                  onClick={() => navigate('/app/routines')}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 font-medium transition-colors hover:bg-violet-200 dark:hover:bg-violet-900/50"
-                >
-                  <Sparkles className="h-5 w-5" />
-                  Explore More Routines
-                </button>
-
-{/* Chat With Us Button */}
-                <button
-                  onClick={() => navigate('/app/chat')}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-primary text-primary-foreground font-medium transition-colors hover:bg-primary/90"
-                >
-                  <MessageCircle className="h-5 w-5" />
-                  Chat With Us
-                </button>
-              </div>
             </>
           )}
         </div>
