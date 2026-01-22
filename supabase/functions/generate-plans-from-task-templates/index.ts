@@ -6,12 +6,115 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+interface TaskTemplate {
+  id: string;
+  title: string;
+  emoji: string;
+  color: string;
+  category: string | null;
+  suggested_time: string | null;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  icon: string;
+  color: string;
+}
+
+// Emoji to Lucide icon mapping
+const emojiToIcon: Record<string, string> = {
+  '☀️': 'Sun', '🌙': 'Moon', '❤️': 'Heart', '🧠': 'Brain', '💪': 'Dumbbell',
+  '💼': 'Briefcase', '☕': 'Coffee', '📚': 'Book', '⭐': 'Star', '✨': 'Sparkles',
+  '⚡': 'Zap', '🎯': 'Target', '⏰': 'Clock', '📅': 'Calendar', '✅': 'CheckCircle',
+  '🏆': 'Award', '🔥': 'Flame', '🍃': 'Leaf', '💨': 'Wind', '👁️': 'Eye',
+  '😊': 'Smile', '🎵': 'Music', '🛏️': 'Bed', '💧': 'Droplet', '🍎': 'Apple',
+  '📝': 'FileText', '🏃': 'Activity', '🧘': 'Heart', '💭': 'MessageCircle',
+  '🌿': 'Leaf', '🌸': 'Flower', '🧴': 'Sparkles', '💅': 'Sparkles', '🪷': 'Flower2',
+  '🕯️': 'Flame', '🛁': 'Droplet', '💆': 'Heart', '🌊': 'Waves', '🎧': 'Headphones',
+};
+
+async function generatePlanWithAI(
+  category: Category,
+  tasks: TaskTemplate[],
+  apiKey: string
+): Promise<{
+  title: string;
+  subtitle: string;
+  description: string;
+  sections: { title: string; content: string }[];
+} | null> {
+  const taskList = tasks.map(t => `- ${t.emoji} ${t.title}`).join('\n');
+
+  const prompt = `Create a compelling routine plan for the "${category.name}" category.
+
+The routine includes these tasks:
+${taskList}
+
+Generate ONLY valid JSON (no markdown, no explanation) with:
+{
+  "title": "A catchy, inspiring title (5-8 words max, not generic)",
+  "subtitle": "One punchy phrase about the benefit (under 10 words)",
+  "description": "2-3 short sentences about why this routine matters. Be specific and warm, not corporate.",
+  "sections": [
+    {"title": "Why This Works", "content": "1-2 sentences explaining the science or psychology behind it"},
+    {"title": "Best Time", "content": "When to do this routine for best results"},
+    {"title": "Pro Tip", "content": "One actionable tip to get the most out of it"}
+  ]
+}
+
+RULES:
+- Be warm and encouraging, speak to "you"
+- NO clichés like "unlock your potential", "transform your life", "journey"
+- Keep it simple and real
+- Title should feel fresh, not generic`;
+
+  try {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-preview-05-20',
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('AI error:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+
+    if (!content) return null;
+
+    // Parse JSON from response
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+
+    return JSON.parse(jsonMatch[0]);
+  } catch (error) {
+    console.error('AI generation failed:', error);
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -48,11 +151,11 @@ serve(async (req) => {
     }
 
     // Group templates by category
-    const templatesByCategory: Record<string, typeof templates> = {};
-    const uncategorized: typeof templates = [];
-    
+    const templatesByCategory: Record<string, TaskTemplate[]> = {};
+    const uncategorized: TaskTemplate[] = [];
+
     for (const template of templates) {
-      const cat = template.category?.toLowerCase() || '';
+      const cat = template.category?.toLowerCase().trim() || '';
       if (cat) {
         if (!templatesByCategory[cat]) {
           templatesByCategory[cat] = [];
@@ -63,14 +166,14 @@ serve(async (req) => {
       }
     }
 
-    // Get existing plan titles to avoid duplicates
+    // Get existing plan titles
     const { data: existingPlans } = await supabase
       .from("routine_plans")
       .select("title");
-    
+
     const existingTitles = new Set(existingPlans?.map(p => p.title.toLowerCase()) || []);
 
-    // Get current max display_order
+    // Get max display_order
     const { data: maxOrderData } = await supabase
       .from("routine_plans")
       .select("display_order")
@@ -79,37 +182,20 @@ serve(async (req) => {
 
     let currentOrder = (maxOrderData?.[0]?.display_order || 0) + 1;
 
-    // Emoji to Lucide icon mapping
-    const emojiToIcon: Record<string, string> = {
-      '☀️': 'Sun', '🌙': 'Moon', '❤️': 'Heart', '🧠': 'Brain', '💪': 'Dumbbell',
-      '💼': 'Briefcase', '☕': 'Coffee', '📚': 'Book', '⭐': 'Star', '✨': 'Sparkles',
-      '⚡': 'Zap', '🎯': 'Target', '⏰': 'Clock', '📅': 'Calendar', '✅': 'CheckCircle',
-      '🏆': 'Award', '🔥': 'Flame', '🍃': 'Leaf', '💨': 'Wind', '👁️': 'Eye',
-      '😊': 'Smile', '🎵': 'Music', '🛏️': 'Bed', '💧': 'Droplet', '🍎': 'Apple',
-      '📝': 'FileText', '🏃': 'Activity', '🧘': 'Heart', '💭': 'MessageCircle',
-    };
-
-    // Color mapping
-    const colorMap: Record<string, string> = {
-      'yellow': 'yellow', 'pink': 'pink', 'blue': 'blue',
-      'purple': 'purple', 'green': 'green', 'orange': 'orange',
-      'lavender': 'purple', 'mint': 'green', 'peach': 'orange', 'sky': 'blue',
-    };
-
     let createdCount = 0;
     let skippedCount = 0;
 
     for (const category of categories) {
-      // Find templates matching this category
+      // Find templates for this category
       const catSlug = category.slug.toLowerCase();
       const catName = category.name.toLowerCase();
-      
+
       let matchingTemplates = templatesByCategory[catSlug] || templatesByCategory[catName] || [];
-      
-      // If no direct match, try partial matching
+
+      // Try partial matching
       if (!matchingTemplates.length) {
         for (const [key, temps] of Object.entries(templatesByCategory)) {
-          if (key.includes(catSlug) || catSlug.includes(key) || 
+          if (key.includes(catSlug) || catSlug.includes(key) ||
               key.includes(catName) || catName.includes(key)) {
             matchingTemplates = temps;
             break;
@@ -117,51 +203,55 @@ serve(async (req) => {
         }
       }
 
-      // If still no match, use some uncategorized templates
+      // Use uncategorized if nothing found
       if (!matchingTemplates.length && uncategorized.length) {
-        matchingTemplates = uncategorized.slice(0, 4);
+        matchingTemplates = uncategorized.slice(0, 5);
       }
 
-      // Skip if no templates for this category
       if (!matchingTemplates.length) {
-        console.log(`No templates found for category: ${category.name}`);
+        console.log(`No templates for: ${category.name}`);
         skippedCount++;
         continue;
       }
 
-      // Generate plan title
-      const planTitle = `${category.name} Routine`;
-      
-      // Skip if plan with this title already exists
-      if (existingTitles.has(planTitle.toLowerCase())) {
-        console.log(`Plan already exists: ${planTitle}`);
+      // Select 3-5 tasks
+      const selectedTasks = matchingTemplates.slice(0, Math.min(5, matchingTemplates.length));
+
+      // Generate plan content with AI
+      console.log(`Generating AI content for: ${category.name}`);
+      const aiContent = await generatePlanWithAI(category, selectedTasks, LOVABLE_API_KEY);
+
+      if (!aiContent) {
+        console.log(`AI generation failed for: ${category.name}`);
         skippedCount++;
         continue;
       }
 
-      // Select 3-5 tasks for the routine
-      const selectedTemplates = matchingTemplates.slice(0, Math.min(5, matchingTemplates.length));
-      
+      // Check for duplicate title
+      if (existingTitles.has(aiContent.title.toLowerCase())) {
+        console.log(`Title already exists: ${aiContent.title}`);
+        skippedCount++;
+        continue;
+      }
+
       // Calculate total duration
-      const totalMinutes = selectedTemplates.reduce((sum, t) => {
-        // Estimate duration from suggested_time or default to 5 mins
-        const time = t.suggested_time;
-        if (time) {
-          const match = time.match(/(\d+)/);
+      const totalMinutes = selectedTasks.reduce((sum, t) => {
+        if (t.suggested_time) {
+          const match = t.suggested_time.match(/(\d+)/);
           return sum + (match ? parseInt(match[1]) : 5);
         }
         return sum + 5;
       }, 0);
 
-      // Create the routine plan
+      // Create routine plan
       const { data: newPlan, error: planError } = await supabase
         .from("routine_plans")
         .insert({
-          title: planTitle,
-          subtitle: `A curated ${category.name.toLowerCase()} routine`,
-          description: `Start your ${category.name.toLowerCase()} journey with these hand-picked tasks.`,
+          title: aiContent.title,
+          subtitle: aiContent.subtitle,
+          description: aiContent.description,
           icon: category.icon || 'Star',
-          color: colorMap[category.color] || 'purple',
+          color: category.color || 'purple',
           estimated_minutes: totalMinutes || 15,
           points: Math.max(5, Math.round(totalMinutes / 2)),
           is_pro_routine: false,
@@ -175,14 +265,32 @@ serve(async (req) => {
         .single();
 
       if (planError) {
-        console.error(`Failed to create plan for ${category.name}:`, planError);
+        console.error(`Plan creation failed for ${category.name}:`, planError);
         continue;
+      }
+
+      // Create sections
+      if (aiContent.sections?.length) {
+        const sectionsToInsert = aiContent.sections.map((section, index) => ({
+          plan_id: newPlan.id,
+          title: section.title,
+          content: section.content,
+          section_order: index + 1,
+          is_active: true,
+        }));
+
+        const { error: sectionsError } = await supabase
+          .from("routine_plan_sections")
+          .insert(sectionsToInsert);
+
+        if (sectionsError) {
+          console.error('Sections error:', sectionsError);
+        }
       }
 
       // Create tasks from templates
       let taskOrder = 1;
-      for (const template of selectedTemplates) {
-        // Parse duration from suggested_time
+      for (const template of selectedTasks) {
         let durationMinutes = 5;
         if (template.suggested_time) {
           const match = template.suggested_time.match(/(\d+)/);
@@ -203,25 +311,28 @@ serve(async (req) => {
           });
 
         if (taskError) {
-          console.error(`Failed to create task for template ${template.id}:`, taskError);
+          console.error(`Task error for ${template.title}:`, taskError);
         }
       }
 
       createdCount++;
-      existingTitles.add(planTitle.toLowerCase());
-      console.log(`Created plan: ${planTitle} with ${selectedTemplates.length} tasks`);
+      existingTitles.add(aiContent.title.toLowerCase());
+      console.log(`Created: ${aiContent.title} with ${selectedTasks.length} tasks and ${aiContent.sections?.length || 0} sections`);
+
+      // Small delay between AI calls
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     return new Response(
       JSON.stringify({
-        message: `Created ${createdCount} plans, skipped ${skippedCount}`,
+        message: `Created ${createdCount} plans with AI content, skipped ${skippedCount}`,
         createdCount,
         skippedCount
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error generating plans from templates:", error);
+    console.error("Error:", error);
     return new Response(
       JSON.stringify({ error: error.message || "Failed to generate plans" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
