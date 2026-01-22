@@ -72,22 +72,21 @@ export function ActiveRoundsCarousel({
 
   return (
     <div className="space-y-2">
-      {/* Header - always visible */}
-      <div 
-        className="flex items-center justify-between px-1 cursor-pointer"
+      {/* Header - always visible, acts as expand/collapse toggle */}
+      <button 
+        className={`w-full flex items-center justify-between px-2 py-1.5 rounded-xl transition-colors active:bg-black/5 ${
+          isCollapsed ? 'bg-muted/50' : ''
+        }`}
         onClick={toggleCollapse}
+        aria-label={isCollapsed ? 'Expand programs' : 'Collapse programs'}
+        aria-expanded={!isCollapsed}
       >
         <div className="flex items-center gap-1.5">
-          <button 
-            className="p-0.5 -ml-1 rounded-full hover:bg-black/5 transition-colors"
-            aria-label={isCollapsed ? 'Expand programs' : 'Collapse programs'}
-          >
-            <ChevronDown 
-              className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
-                isCollapsed ? '-rotate-90' : ''
-              }`} 
-            />
-          </button>
+          <ChevronDown 
+            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
+              isCollapsed ? '-rotate-90' : ''
+            }`} 
+          />
           <h2 className="text-sm font-semibold text-foreground">Your Programs</h2>
           <Badge variant="secondary" className="h-4 px-1 text-[10px]">
             {activeRounds.length}
@@ -101,7 +100,7 @@ export function ActiveRoundsCarousel({
           View All
           <ChevronRight className="h-3.5 w-3.5" />
         </Link>
-      </div>
+      </button>
 
       {/* Carousel - collapsible */}
       <div 
