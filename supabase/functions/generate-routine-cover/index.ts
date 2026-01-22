@@ -6,74 +6,61 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Cinematic fantasy concepts for routine covers - designed art, not photos
-const categoryStyles: Record<string, { concept: string; mood: string; technique: string }> = {
+// Clean, minimal visual concepts for routine covers
+const categoryStyles: Record<string, { concept: string; colors: string }> = {
   morning: {
-    concept: 'A celestial figure awakening amidst swirling cosmic dust and golden nebulae, a radiant sun rising through impossible floating architecture of glass and light',
-    mood: 'Transcendent, epic, hopeful, divine awakening',
-    technique: 'Cinematic concept art, volumetric god rays, vibrant gold and deep teal palette, Unreal Engine 5 render style'
+    concept: 'Soft gradient sky at golden hour, gentle warm light, simple horizon line',
+    colors: 'warm peach, soft gold, cream white'
   },
   evening: {
-    concept: 'A mystical twilight realm with floating lanterns and bioluminescent flowers, soft aurora dancing through crystalline structures in an enchanted sanctuary',
-    mood: 'Magical sanctuary, dreamlike peace, otherworldly calm',
-    technique: 'Fantasy matte painting, soft ethereal glow, deep purple and rose gold palette, Studio Ghibli-inspired lighting'
+    concept: 'Calm twilight gradient, soft purple to deep blue transition, single moon',
+    colors: 'lavender, dusty rose, deep indigo'
   },
   wellness: {
-    concept: 'An ancient healing temple floating among clouds, with waterfalls of pure light cascading into pools of liquid starlight, sacred geometry patterns glowing softly',
-    mood: 'Sacred rejuvenation, timeless wisdom, spiritual luxury',
-    technique: 'Surrealist digital illustration, iridescent highlights, soft focus backgrounds, premium art direction'
+    concept: 'Smooth abstract curves suggesting calm water or gentle waves, soft light',
+    colors: 'sage green, soft white, warm beige'
   },
   mindfulness: {
-    concept: 'A serene floating island with a single luminous ancient tree, surrounded by a sea of clouds and perfectly balanced zen stones orbiting in gentle motion',
-    mood: 'Mystical peace, ethereal calm, infinite stillness',
-    technique: 'Surrealist matte painting, pastel iridescent colors, atmospheric perspective, cinematic depth'
+    concept: 'Single zen stone or ripple in still water, vast negative space',
+    colors: 'soft gray, pale blue, off-white'
   },
   productivity: {
-    concept: 'An intricate clockwork cosmos made of starlight and translucent glass, gears of pure energy turning in perfect harmony within a cathedral of geometric light',
-    mood: 'Focused mastery, elegant precision, infinite order',
-    technique: 'Detailed 3D concept art, glowing fiber-optic accents, deep indigo and gold palette, premium metallic textures'
+    concept: 'Clean geometric shapes, simple lines suggesting upward motion',
+    colors: 'navy blue, crisp white, subtle gold accent'
   },
   fitness: {
-    concept: 'An abstract figure of pure kinetic energy breaking through crystalline barriers, shards of prismatic light and geometric patterns exploding outward in dynamic motion',
-    mood: 'Explosive power, unstoppable momentum, fierce transformation',
-    technique: 'High-contrast digital illustration, neon energy trails, motion blur effects, bold saturated colors'
+    concept: 'Dynamic single brushstroke or abstract motion arc, energetic but simple',
+    colors: 'coral, warm orange, soft cream'
   },
   self_care: {
-    concept: 'A secret garden of impossible flowers made of soft light and silk, floating crystals reflecting rainbow spectrums, petals drifting in an eternal gentle breeze',
-    mood: 'Tender magic, self-love sanctuary, precious solitude',
-    technique: 'Romantic fantasy art, dreamy bokeh, rose quartz and champagne palette, soft diffused lighting'
+    concept: 'Soft abstract petals or gentle organic curves, dreamy and light',
+    colors: 'blush pink, soft peach, cream'
   },
   creativity: {
-    concept: 'An explosion of liquid color and light forming abstract constellations, paint becoming galaxies, imagination manifesting as visible aurora of pure possibility',
-    mood: 'Uninhibited expression, joyful chaos, creative ecstasy',
-    technique: 'Abstract expressionist digital art, vibrant color splashes, dynamic composition, artistic spontaneity'
+    concept: 'Simple color field with one bold accent element, artistic negative space',
+    colors: 'terracotta, mustard yellow, off-white'
   },
   sleep: {
-    concept: 'A dreamscape of soft clouds forming gentle spirals around a crescent moon, stars dissolving into stardust, the boundary between waking and dreams beautifully blurred',
-    mood: 'Deep surrender, floating peace, entering the dream realm',
-    technique: 'Ethereal fantasy illustration, ultra-soft focus, midnight blue and silver palette, luminous highlights'
+    concept: 'Deep gradient fading to darkness, subtle stars, peaceful emptiness',
+    colors: 'midnight blue, soft silver, deep purple'
   },
   gratitude: {
-    concept: 'Hands cupped open receiving cascading golden light that transforms into butterflies and flower petals, abundance flowing like a visible river of warmth',
-    mood: 'Overflowing appreciation, magical abundance, heart expansion',
-    technique: 'Warm fantasy art, volumetric golden light, amber and honey tones with soft particle effects'
+    concept: 'Warm light source with soft glow, simple and uplifting',
+    colors: 'warm amber, soft gold, cream'
   },
   work: {
-    concept: 'A futuristic command center of flowing holographic interfaces and crystalline data streams, elegant power emanating from a throne of pure focused intention',
-    mood: 'Commanding presence, visionary leadership, elegant power',
-    technique: 'Sci-fi concept art, sleek holographic elements, sophisticated dark palette with accent lighting'
+    concept: 'Clean minimal lines, subtle grid or structure, professional calm',
+    colors: 'charcoal gray, soft white, muted blue'
   },
   health: {
-    concept: 'A figure radiating visible life force energy, surrounded by orbiting symbols of vitality - glowing fruits, flowing water, pulsing hearts of pure light',
-    mood: 'Radiant vitality, body as temple, celebrating aliveness',
-    technique: 'Vibrant fantasy illustration, energy aura effects, fresh greens and warm highlights'
+    concept: 'Fresh, airy composition with soft organic shapes suggesting vitality',
+    colors: 'fresh green, soft white, warm yellow'
   }
 };
 
 const defaultStyle = {
-  concept: 'Abstract flowing forms of pure light and color, feminine energy manifesting as visible aurora, sacred geometry softly glowing in an ethereal void',
-  mood: 'Aspirational magic, elegant transformation, quiet power',
-  technique: 'Cinematic fantasy concept art, premium digital illustration, intentional artistic composition'
+  concept: 'Soft abstract gradient with gentle curves, calming and minimal',
+  colors: 'soft purple, warm pink, cream white'
 };
 
 function getCategoryStyle(categoryName: string): typeof defaultStyle {
@@ -85,7 +72,6 @@ function getCategoryStyle(categoryName: string): typeof defaultStyle {
     }
   }
   
-  // Try word matching
   const words = lowerName.split(/[\s&]+/);
   for (const word of words) {
     if (categoryStyles[word]) return categoryStyles[word];
@@ -96,41 +82,38 @@ function getCategoryStyle(categoryName: string): typeof defaultStyle {
 
 function buildCreativePrompt(title: string, subtitle: string, description: string, categoryName: string): string {
   const style = getCategoryStyle(categoryName);
-  const cleanDesc = description?.replace(/<[^>]*>/g, '').substring(0, 100) || '';
   
-  return `Create a premium, CINEMATIC FANTASY cover for a wellness routine app.
+  return `Create a MINIMAL, CLEAN cover image for a wellness app.
 
-ROUTINE: "${title}"
-${subtitle ? `THEME: "${subtitle}"` : ''}
-${cleanDesc ? `CONTEXT: ${cleanDesc}` : ''}
+THEME: "${title}"
 
-VISUAL CONCEPT:
+VISUAL DIRECTION:
 ${style.concept}
 
-EMOTIONAL TONE:
-${style.mood}
+COLOR PALETTE:
+${style.colors}
 
-ARTISTIC TECHNIQUE:
-${style.technique}
+STYLE REQUIREMENTS:
+- EXTREMELY MINIMAL and CLEAN - lots of empty space
+- Soft, calming, premium aesthetic
+- Abstract or very simple imagery only
+- Maximum 1-2 visual elements
+- Smooth gradients and soft edges
+- High-end editorial magazine quality
+- Square format, perfectly balanced composition
+- Think Apple product photography meets meditation app
 
-CRITICAL STYLE REQUIREMENTS:
-- This is NOT a realistic photograph - it's DESIGNED FANTASY ART
-- Cinematic concept art aesthetic, like a movie poster or game art
-- Ethereal, magical, otherworldly atmosphere
-- Professional graphic design composition with strong focal point
-- Rich volumetric lighting and atmospheric depth
-- Premium app interface quality - this should feel like $1000 design
-- Square format, perfectly composed
+ABSOLUTELY FORBIDDEN:
+- Text, words, letters, typography of any kind
+- Busy or crowded compositions
+- Fantasy elements, magical effects, sparkles
+- Detailed illustrations or complex scenes
+- People, faces, hands, or body parts
+- Multiple objects or cluttered imagery
+- Harsh contrasts or neon colors
+- Cliché wellness imagery (lotus, chakras, yin-yang)
 
-ABSOLUTELY NO:
-- Text, words, letters, typography, titles, or labels of any kind
-- Realistic stock photography
-- Generic wellness clichés (yoga poses, meditation silhouettes, hands holding coffee)
-- Flat, boring, or corporate looking imagery
-- Clip art, cartoons, or simple illustrations
-- UI elements or overlays
-
-Create something that looks like it belongs in a premium fantasy art gallery. Make it magical.`;
+Create something that feels like a premium, calming, almost empty visual. Less is more.`;
 }
 
 serve(async (req) => {
