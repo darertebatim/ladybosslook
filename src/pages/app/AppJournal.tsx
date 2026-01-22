@@ -1,16 +1,46 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Search, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowLeft, Plus, Search, BookOpen, Sparkles, TrendingUp, Flame, Calendar, NotebookPen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
 import { useJournalEntries } from '@/hooks/useJournal';
 import { JournalEntryCard, formatDateGroup } from '@/components/app/JournalEntryCard';
 import { JournalSkeleton } from '@/components/app/skeletons/JournalSkeleton';
 import { JournalReminderSettings } from '@/components/app/JournalReminderSettings';
 import { SEOHead } from '@/components/SEOHead';
-import { format, startOfDay } from 'date-fns';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter, SheetClose } from '@/components/ui/sheet';
-import { Capacitor } from '@capacitor/core';
+import { format, startOfDay, differenceInDays, subDays, isAfter } from 'date-fns';
+
+// Calculate streak from entries
+const calculateStreak = (entries: any[]): number => {
+  if (!entries || entries.length === 0) return 0;
+
+  const sortedDates = entries
+    .map(e => startOfDay(new Date(e.created_at)))
+    .sort((a, b) => b.getTime() - a.getTime());
+
+  const uniqueDates = sortedDates.filter((date, index, self) => 
+    index === 0 || self[index - 1].getTime() !== date.getTime()
+  );
+
+  const today = startOfDay(new Date());
+  const mostRecent = uniqueDates[0];
+  if (differenceInDays(today, mostRecent) > 1) {
+    return 0;
+  }
+
+  let streak = 1;
+  for (let i = 1; i < uniqueDates.length; i++) {
+    const diff = differenceInDays(uniqueDates[i - 1], uniqueDates[i]);
+    if (diff === 1) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+};
 
 const AppJournal = () => {
   const navigate = useNavigate();
@@ -18,6 +48,24 @@ const AppJournal = () => {
   const [showSearch, setShowSearch] = useState(false);
   
   const { data: entries, isLoading } = useJournalEntries(searchQuery);
+
+  // Calculate stats
+  const stats = useMemo(() => {
+    if (!entries) return { totalEntries: 0, streak: 0, thisMonth: 0 };
+
+    const today = startOfDay(new Date());
+    const thirtyDaysAgo = subDays(today, 30);
+    
+    const thisMonth = entries.filter(e => 
+      isAfter(new Date(e.created_at), thirtyDaysAgo)
+    ).length;
+
+    return {
+      totalEntries: entries.length,
+      streak: calculateStreak(entries),
+      thisMonth,
+    };
+  }, [entries]);
 
   // Group entries by date
   const groupedEntries = useMemo(() => {
@@ -36,7 +84,6 @@ const AppJournal = () => {
   }, [entries]);
 
   const dateKeys = Object.keys(groupedEntries).sort((a, b) => b.localeCompare(a));
-  const isNative = Capacitor.isNativePlatform();
 
   if (isLoading) {
     return (
@@ -84,33 +131,6 @@ const AppJournal = () => {
             >
               <Search className="h-5 w-5" />
             </Button>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Sparkles className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent 
-                side="bottom" 
-                className="h-auto"
-                style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
-              >
-                <SheetHeader>
-                  <SheetTitle>Build a Journaling Habit</SheetTitle>
-                </SheetHeader>
-                <div className="py-4 space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Add journaling to your daily routine and get reminded at your preferred time.
-                  </p>
-                  <JournalReminderSettings />
-                </div>
-                <SheetFooter className="pt-2">
-                  <SheetClose asChild>
-                    <Button variant="outline" className="w-full">Close</Button>
-                  </SheetClose>
-                </SheetFooter>
-              </SheetContent>
-            </Sheet>
             <Button 
               variant="ghost" 
               size="icon"
@@ -139,9 +159,53 @@ const AppJournal = () => {
       <div style={{ height: 'calc(56px + env(safe-area-inset-top, 0px))' }} />
 
       {/* Content */}
-      <div className="p-4 space-y-6">
+      <div className="p-4 space-y-4">
+        {/* Stats Card */}
+        <Card>
+          <CardContent className="p-4 space-y-4">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-muted/50 rounded-lg p-3 text-center">
+                <div className="flex items-center justify-center text-primary mb-1">
+                  <TrendingUp className="h-4 w-4" />
+                </div>
+                <p className="text-xl font-bold">{stats.totalEntries}</p>
+                <p className="text-xs text-muted-foreground">Total Entries</p>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-3 text-center">
+                <div className="flex items-center justify-center text-orange-500 mb-1">
+                  <Flame className="h-4 w-4" />
+                </div>
+                <p className="text-xl font-bold">{stats.streak}</p>
+                <p className="text-xs text-muted-foreground">Day Streak</p>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-3 text-center">
+                <div className="flex items-center justify-center text-blue-500 mb-1">
+                  <Calendar className="h-4 w-4" />
+                </div>
+                <p className="text-xl font-bold">{stats.thisMonth}</p>
+                <p className="text-xs text-muted-foreground">This Month</p>
+              </div>
+            </div>
+
+            {/* Write Today's Entry Button */}
+            <Button 
+              className="w-full" 
+              variant="outline"
+              onClick={() => navigate('/app/journal/new')}
+            >
+              <NotebookPen className="h-4 w-4 mr-2" />
+              Write Today's Entry
+            </Button>
+
+            {/* Add to Routine Button */}
+            <JournalReminderSettings />
+          </CardContent>
+        </Card>
+
+        {/* Entries List */}
         {entries && entries.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <BookOpen className="h-8 w-8 text-primary" />
             </div>
@@ -155,27 +219,29 @@ const AppJournal = () => {
             </Button>
           </div>
         ) : (
-          dateKeys.map((dateKey) => (
-            <div key={dateKey} className="space-y-3">
-              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                {formatDateGroup(dateKey)}
-              </h2>
-              <div className="space-y-3">
-                {groupedEntries[dateKey].map((entry) => (
-                  <JournalEntryCard
-                    key={entry.id}
-                    id={entry.id}
-                    title={entry.title}
-                    content={entry.content}
-                    mood={entry.mood}
-                    createdAt={entry.created_at}
-                    sharedWithAdmin={entry.shared_with_admin}
-                    onClick={() => navigate(`/app/journal/${entry.id}`)}
-                  />
-                ))}
+          <div className="space-y-6">
+            {dateKeys.map((dateKey) => (
+              <div key={dateKey} className="space-y-3">
+                <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  {formatDateGroup(dateKey)}
+                </h2>
+                <div className="space-y-3">
+                  {groupedEntries[dateKey].map((entry) => (
+                    <JournalEntryCard
+                      key={entry.id}
+                      id={entry.id}
+                      title={entry.title}
+                      content={entry.content}
+                      mood={entry.mood}
+                      createdAt={entry.created_at}
+                      sharedWithAdmin={entry.shared_with_admin}
+                      onClick={() => navigate(`/app/journal/${entry.id}`)}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
 
