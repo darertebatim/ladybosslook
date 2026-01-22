@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import {
   Dialog,
   DialogContent,
@@ -41,7 +42,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Sparkles, Wand2, Loader2, Music, BookOpen, Star } from 'lucide-react';
+import { Plus, Pencil, Trash2, Sparkles, Loader2, Music, BookOpen, Star, CheckCircle, AlertCircle } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { PRO_LINK_TYPES, PRO_LINK_CONFIGS, ProLinkType } from '@/lib/proTaskTypes';
 
@@ -67,6 +68,18 @@ interface Playlist {
   category: string | null;
 }
 
+interface GenerationResult {
+  success: boolean;
+  message: string;
+  tasksCreated: number;
+  tasksSkipped: number;
+  routinesCreated: number;
+  routinesSkipped: number;
+  errors: string[];
+  totalPlaylists: number;
+  processedPlaylists: number;
+}
+
 const ICON_OPTIONS = [
   'Sun', 'Moon', 'Heart', 'Brain', 'Dumbbell', 'Coffee', 
   'Book', 'Star', 'Sparkles', 'Zap', 'Target', 'Clock',
@@ -83,6 +96,13 @@ export function ProTaskTemplatesManager() {
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [generatingType, setGeneratingType] = useState<string | null>(null);
+  
+  // Progress tracking state
+  const [isGeneratingAll, setIsGeneratingAll] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const [generationStatus, setGenerationStatus] = useState<'idle' | 'running' | 'complete' | 'error'>('idle');
+  const [generationResult, setGenerationResult] = useState<GenerationResult | null>(null);
+  
   const [formData, setFormData] = useState({
     title: '',
     duration_minutes: 5,
@@ -97,7 +117,53 @@ export function ProTaskTemplatesManager() {
     display_order: 0,
   });
 
-  const handleAIGenerate = async (type: 'playlist' | 'journal') => {
+  // Handle AI: All Playlists - Creates Pro Tasks AND Pro Routines for all playlists
+  const handleGenerateAllPlaylists = async () => {
+    setIsGeneratingAll(true);
+    setGenerationProgress(10);
+    setGenerationStatus('running');
+    setGenerationResult(null);
+
+    try {
+      // Start progress animation
+      const progressInterval = setInterval(() => {
+        setGenerationProgress(prev => {
+          if (prev >= 85) return prev;
+          return prev + Math.random() * 5;
+        });
+      }, 500);
+
+      const { data, error } = await supabase.functions.invoke('generate-all-playlist-pro-content');
+
+      clearInterval(progressInterval);
+
+      if (error) throw error;
+      if (data?.error) {
+        setGenerationStatus('error');
+        setGenerationProgress(100);
+        toast.error(data.error);
+        return;
+      }
+
+      setGenerationProgress(100);
+      setGenerationStatus('complete');
+      setGenerationResult(data as GenerationResult);
+      
+      toast.success(data.message || 'Generation complete!');
+      queryClient.invalidateQueries({ queryKey: ['admin-pro-task-templates'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-routine-plans'] });
+      
+    } catch (error) {
+      console.error('Generation error:', error);
+      setGenerationStatus('error');
+      setGenerationProgress(100);
+      toast.error('Failed to generate Pro Tasks and Routines');
+    } finally {
+      setIsGeneratingAll(false);
+    }
+  };
+
+  const handleAIGenerate = async (type: 'journal') => {
     setGeneratingType(type);
     try {
       const { data, error } = await supabase.functions.invoke('generate-pro-task-templates-ai', {
@@ -281,12 +347,13 @@ export function ProTaskTemplatesManager() {
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button 
-            onClick={() => handleAIGenerate('playlist')} 
+            onClick={handleGenerateAllPlaylists} 
             size="sm" 
             variant="outline"
-            disabled={!!generatingType}
+            disabled={isGeneratingAll || !!generatingType}
+            className="bg-gradient-to-r from-violet-500/10 to-purple-500/10 border-violet-500/30 hover:bg-violet-500/20"
           >
-            {generatingType === 'playlist' ? (
+            {isGeneratingAll ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
               <Music className="h-4 w-4 mr-2" />
@@ -297,7 +364,7 @@ export function ProTaskTemplatesManager() {
             onClick={() => handleAIGenerate('journal')} 
             size="sm" 
             variant="outline"
-            disabled={!!generatingType}
+            disabled={isGeneratingAll || !!generatingType}
           >
             {generatingType === 'journal' ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -306,13 +373,76 @@ export function ProTaskTemplatesManager() {
             )}
             AI: Journal Tasks
           </Button>
-          <Button onClick={handleOpenCreate} size="sm">
+          <Button onClick={handleOpenCreate} size="sm" disabled={isGeneratingAll}>
             <Plus className="h-4 w-4 mr-2" />
             Add Template
           </Button>
         </div>
       </CardHeader>
       <CardContent>
+        {/* Progress Bar for All Playlists Generation */}
+        {(isGeneratingAll || generationStatus !== 'idle') && (
+          <div className="mb-6 p-4 rounded-lg border bg-muted/30">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                {generationStatus === 'running' && (
+                  <Loader2 className="h-4 w-4 animate-spin text-violet-500" />
+                )}
+                {generationStatus === 'complete' && (
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                )}
+                {generationStatus === 'error' && (
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                )}
+                <span className="font-medium">
+                  {generationStatus === 'running' && 'Generating Pro Tasks & Routines...'}
+                  {generationStatus === 'complete' && 'Generation Complete!'}
+                  {generationStatus === 'error' && 'Generation Failed'}
+                </span>
+              </div>
+              <span className="text-sm text-muted-foreground">{Math.round(generationProgress)}%</span>
+            </div>
+            <Progress value={generationProgress} className="h-2" />
+            
+            {generationResult && (
+              <div className="mt-3 space-y-2 text-sm">
+                <div className="flex flex-wrap gap-3">
+                  <Badge variant="secondary" className="bg-violet-500/20 text-violet-700 dark:text-violet-300">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    {generationResult.tasksCreated} Pro Tasks Created
+                  </Badge>
+                  <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    {generationResult.routinesCreated} Pro Routines Created
+                  </Badge>
+                  {generationResult.tasksSkipped > 0 && (
+                    <Badge variant="outline" className="text-muted-foreground">
+                      {generationResult.tasksSkipped} Already Existed
+                    </Badge>
+                  )}
+                </div>
+                {generationResult.errors.length > 0 && (
+                  <div className="text-xs text-destructive mt-2">
+                    {generationResult.errors.length} errors occurred. Check console for details.
+                  </div>
+                )}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    setGenerationStatus('idle');
+                    setGenerationProgress(0);
+                    setGenerationResult(null);
+                  }}
+                  className="mt-2"
+                >
+                  Dismiss
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
         {isLoading ? (
           <div className="text-center py-8 text-muted-foreground">Loading...</div>
         ) : !templates?.length ? (
