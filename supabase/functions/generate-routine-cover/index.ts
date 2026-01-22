@@ -6,113 +6,130 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Category-based visual style mapping for routine covers
-const categoryStyles: Record<string, { theme: string; elements: string; colors: string }> = {
+// Creative visual concepts for routine covers - artistic and unique
+const categoryStyles: Record<string, { concept: string; mood: string; technique: string }> = {
   morning: {
-    theme: 'Fresh sunrise and new beginnings aesthetic',
-    elements: 'Golden sunrise through window, steaming coffee cup, soft morning light, cozy bedroom scene, stretching silhouette, fresh flowers',
-    colors: 'Warm gold, soft peach, cream white, gentle orange, light coral'
+    concept: 'Golden hour magic - woman silhouette stretching at window with dramatic sunbeams, or hands wrapped around steaming ceramic mug with light dancing on the surface',
+    mood: 'Hopeful awakening, fresh starts, quiet power before the world wakes',
+    technique: 'Cinematic lighting with lens flare, shallow depth of field, warm film grain'
   },
   evening: {
-    theme: 'Calm twilight and wind-down aesthetic',
-    elements: 'Soft candlelight, cozy blanket, moon through window, warm bath setting, book and tea, dimmed ambient lighting',
-    colors: 'Deep indigo, soft lavender, warm amber, dusty rose, midnight blue'
+    concept: 'Intimate twilight moments - soft candlelit scene with silk textures, or moonlight streaming through sheer curtains onto rumpled bedding',
+    mood: 'Sanctuary, unwinding, sacred pause from the chaos',
+    technique: 'Chiaroscuro lighting, rich shadows, moody color grading like a Sofia Coppola film'
   },
   wellness: {
-    theme: 'Holistic health and self-care aesthetic',
-    elements: 'Spa setting with natural elements, essential oils, eucalyptus sprigs, smooth stones, soft towels, botanical touches',
-    colors: 'Sage green, soft white, natural beige, blush pink, seafoam'
+    concept: 'Elevated self-care editorial - artful arrangement of natural textures (marble, eucalyptus, linen), or close-up of water droplets on skin catching light',
+    mood: 'Luxurious slowness, intentional living, treating yourself as worthy',
+    technique: 'Clean editorial photography, negative space, soft natural light'
   },
   mindfulness: {
-    theme: 'Zen meditation and inner peace aesthetic',
-    elements: 'Zen garden with raked sand, lotus flower, still water reflection, incense smoke wisps, meditation cushion, nature harmony',
-    colors: 'Soft sage, pale lavender, cream, muted gold, peaceful blue'
+    concept: 'Abstract zen - ripples expanding on still water, single lotus floating, or misty mountain peaks emerging from clouds at dawn',
+    mood: 'Stillness within chaos, centered calm, expansive awareness',
+    technique: 'Minimalist composition, soft focus, muted tones with one accent color'
   },
   productivity: {
-    theme: 'Focused work and achievement aesthetic',
-    elements: 'Clean minimalist desk, natural light workspace, organized notebook, modern architecture, focused energy, clean lines',
-    colors: 'Crisp white, forest green, warm wood tones, navy blue, soft gray'
+    concept: 'Curated workspace poetry - architectural details in warm light, or single hand writing in leather journal with perfect shadows',
+    mood: 'Focused ambition, elegant efficiency, quiet determination',
+    technique: 'Sharp lines, modern architecture aesthetic, warm wood and brass tones'
   },
   fitness: {
-    theme: 'Dynamic energy and movement aesthetic',
-    elements: 'Athletic silhouette in motion, dynamic light trails, abstract energy flow, powerful stance, nature workout setting',
-    colors: 'Vibrant coral, electric teal, energetic orange, bold magenta, deep purple'
+    concept: 'Movement as art - abstract motion blur of a dancing figure, or powerful silhouette mid-leap against dramatic sky',
+    mood: 'Fierce energy, liberation through movement, unapologetic strength',
+    technique: 'Dynamic angles, motion blur, bold saturated colors, high contrast'
   },
   self_care: {
-    theme: 'Nurturing self-love and relaxation aesthetic',
-    elements: 'Luxurious skincare products, soft robe and slippers, fresh roses, gentle bubble bath, facial mask moment',
-    colors: 'Blush pink, cream, soft gold, lavender, warm white'
+    concept: 'Intimate beauty rituals - close-up of hands massaging face with golden serum, or rose petals floating in milky bath water',
+    mood: 'Radical self-love, tender moments alone, beauty as self-respect',
+    technique: 'Soft glow, creamy skin tones, romantic lighting like a perfume ad'
   },
   creativity: {
-    theme: 'Artistic inspiration and expression aesthetic',
-    elements: 'Artist palette and brushes, colorful paint splashes, open sketchbook, creative mess, golden hour light',
-    colors: 'Vibrant yellow, coral, turquoise, warm orange, bright purple'
+    concept: 'Creative explosion - paint-stained hands holding fresh artwork, or colorful ink drops blooming in water captured mid-motion',
+    mood: 'Uninhibited expression, joyful mess, playing like nobody is watching',
+    technique: 'Bold colors, artistic chaos, macro photography, unexpected compositions'
   },
   sleep: {
-    theme: 'Peaceful rest and dream aesthetic',
-    elements: 'Soft clouds, starry night sky, cozy bed linens, moonlight glow, dreamy atmosphere, floating feathers',
-    colors: 'Deep midnight blue, soft silver, lavender, dusty purple, gentle white'
+    concept: 'Dream state visuals - clouds viewed from above at golden hour, or soft billowing white fabric floating in wind',
+    mood: 'Deep rest, floating between worlds, surrendering to softness',
+    technique: 'Dreamy soft focus, ethereal lighting, lavender and midnight blue palette'
   },
   gratitude: {
-    theme: 'Warmth and appreciation aesthetic',
-    elements: 'Golden light rays, heart shapes in nature, warm embrace silhouette, autumn leaves, sunset glow',
-    colors: 'Warm gold, burnt orange, rich amber, soft rose, cream'
+    concept: 'Golden abundance - warm light streaming through autumn leaves, or hands cupped open receiving light',
+    mood: 'Overflowing appreciation, finding magic in ordinary, heart wide open',
+    technique: 'Warm golden hour photography, bokeh, rich amber and honey tones'
+  },
+  work: {
+    concept: 'Power moves - sleek laptop on marble desk with coffee and fresh flowers, or confident woman silhouette in modern glass office',
+    mood: 'Boss energy, commanding your space, success on your terms',
+    technique: 'Editorial fashion photography style, clean lines, sophisticated neutral palette'
+  },
+  health: {
+    concept: 'Vibrant living - colorful smoothie bowl as art from above, or woman laughing mid-movement in natural light',
+    mood: 'Radiant vitality, body as temple, celebrating aliveness',
+    technique: 'Bright natural light, fresh colors, lifestyle editorial feel'
   }
 };
 
 const defaultStyle = {
-  theme: 'Modern wellness and personal growth aesthetic',
-  elements: 'Abstract flowing shapes, elegant curves, botanical touches, soft natural light, premium minimalist design',
-  colors: 'Rich jewel tones, warm amber, soft rose, sage green, elegant gold'
+  concept: 'Elevated feminine aesthetic - abstract flowing forms in rich colors, botanical shadows on linen, or woman in powerful pose with dramatic lighting',
+  mood: 'Aspirational but attainable, elegant self-improvement, quiet confidence',
+  technique: 'Fashion editorial meets wellness, premium textures, intentional composition'
 };
 
 function getCategoryStyle(categoryName: string): typeof defaultStyle {
   const lowerName = categoryName.toLowerCase();
   
-  // Try direct match first
-  if (categoryStyles[lowerName]) {
-    return categoryStyles[lowerName];
-  }
-  
-  // Try partial matches
   for (const [key, style] of Object.entries(categoryStyles)) {
-    if (lowerName.includes(key) || key.includes(lowerName)) {
+    if (lowerName.includes(key) || key.includes(lowerName.split(' ')[0])) {
       return style;
     }
+  }
+  
+  // Try word matching
+  const words = lowerName.split(/[\s&]+/);
+  for (const word of words) {
+    if (categoryStyles[word]) return categoryStyles[word];
   }
   
   return defaultStyle;
 }
 
-function buildRoutinePrompt(title: string, subtitle: string, description: string, categoryName: string): string {
+function buildCreativePrompt(title: string, subtitle: string, description: string, categoryName: string): string {
   const style = getCategoryStyle(categoryName);
-  const cleanDescription = description ? description.replace(/<[^>]*>/g, '').substring(0, 150) : '';
+  const cleanDesc = description?.replace(/<[^>]*>/g, '').substring(0, 100) || '';
   
-  return `Create a professional, high-quality routine cover image.
+  return `Create a stunning, gallery-worthy cover image for a wellness routine.
 
 ROUTINE: "${title}"
-${subtitle ? `TAGLINE: "${subtitle}"` : ''}
-${cleanDescription ? `ABOUT: ${cleanDescription}` : ''}
-${categoryName ? `CATEGORY: ${categoryName}` : ''}
+${subtitle ? `VIBE: "${subtitle}"` : ''}
+${cleanDesc ? `CONTEXT: ${cleanDesc}` : ''}
 
-VISUAL THEME: ${style.theme}
+VISUAL DIRECTION:
+${style.concept}
 
-SCENE ELEMENTS (choose 2-3 that best fit):
-${style.elements}
+EMOTIONAL TONE:
+${style.mood}
 
-COLOR PALETTE:
-${style.colors}
+PHOTOGRAPHY STYLE:
+${style.technique}
 
-CRITICAL REQUIREMENTS:
-- Do NOT include any text, titles, words, or typography
-- Square format (1:1 aspect ratio)
-- Professional quality, premium aesthetic
-- NOT generic stock photo look
-- Evoke aspiration and empowerment
-- Photographic or artistic quality
-- Rich, intentional composition
+ESSENTIAL REQUIREMENTS:
+- NO text, words, letters, or typography of any kind
+- Square format, perfectly composed
+- Premium magazine-quality aesthetic
+- Evocative and artistic, NOT generic stock photography
+- Should feel like it belongs on a high-end lifestyle brand
+- Rich textures and intentional use of light/shadow
+- The kind of image that makes someone pause and feel something
 
-Create a unique, beautiful cover that captures the essence of this routine.`;
+AVOID:
+- Cheesy wellness clichés (basic yoga poses, obvious meditation imagery)
+- Flat or boring compositions
+- Overprocessed or artificial looking
+- Generic motivational poster vibes
+- Clip art or illustration style
+
+This should be the kind of cover that elevates the entire routine. Make it beautiful.`;
 }
 
 serve(async (req) => {
@@ -132,14 +149,14 @@ serve(async (req) => {
       throw new Error('Plan ID is required');
     }
 
-    const prompt = buildRoutinePrompt(
+    const prompt = buildCreativePrompt(
       planTitle || 'Wellness Routine',
       planSubtitle || '',
       planDescription || '',
       categoryName || ''
     );
 
-    console.log('Generating routine cover for:', planTitle, planId);
+    console.log('Generating creative routine cover for:', planTitle);
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -148,7 +165,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-image-preview',
+        model: 'google/gemini-3-pro-image-preview',
         messages: [{ role: 'user', content: prompt }],
         modalities: ['image', 'text'],
       }),
@@ -173,21 +190,17 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('AI response received');
-
     const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
     
     if (!imageData) {
-      console.error('No image in response:', JSON.stringify(data));
+      console.error('No image in response');
       throw new Error('No image was generated');
     }
 
-    // Upload to Supabase Storage
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Convert base64 to blob
     const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
     const imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
 
@@ -209,7 +222,6 @@ serve(async (req) => {
       .from('routine-covers')
       .getPublicUrl(fileName);
 
-    // Update the plan with the new cover
     const { error: updateError } = await supabase
       .from('routine_plans')
       .update({ cover_image_url: publicUrl })
@@ -219,13 +231,13 @@ serve(async (req) => {
       console.error('Update error:', updateError);
     }
 
-    console.log('Routine cover uploaded successfully:', publicUrl);
+    console.log('Creative cover generated:', publicUrl);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         coverUrl: publicUrl,
-        message: 'Routine cover generated successfully' 
+        message: 'Cover generated successfully' 
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
