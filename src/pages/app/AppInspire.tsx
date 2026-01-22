@@ -241,8 +241,8 @@ export default function AppInspire() {
             )}
           </div>
 
-          {/* Task Ideas Section */}
-          {taskTemplates && taskTemplates.length > 0 && (
+          {/* Task Ideas Section - hide for Pro category since it has no standalone templates */}
+          {taskTemplates && taskTemplates.length > 0 && selectedCategory !== 'pro' && (
             <div className="mt-8 px-4 w-full max-w-full overflow-hidden pb-8">
               <div className="flex items-center gap-2 mb-3">
                 <ListTodo className="w-4 h-4 text-primary" />
