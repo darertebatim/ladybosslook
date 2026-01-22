@@ -18,9 +18,13 @@ Deno.serve(async (req) => {
 
     console.log('Starting drip notification check...');
 
-    // Get today's date (midnight)
+    const now = new Date();
+    const currentHour = now.getUTCHours();
+    const currentMinute = now.getUTCMinutes();
+
+    // Get today's date (midnight UTC for date comparison)
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setUTCHours(0, 0, 0, 0);
     const todayStr = today.toISOString().split('T')[0];
 
     // Find all active rounds with playlists (including first_session_date and drip_offset_days)
@@ -49,6 +53,7 @@ Deno.serve(async (req) => {
     console.log(`Found ${activeRounds?.length || 0} rounds with playlists`);
 
     let notificationsSent = 0;
+    let roundsProcessed = 0;
 
     for (const round of activeRounds || []) {
       // Use first_session_date for drip timing, fallback to start_date
@@ -63,10 +68,28 @@ Deno.serve(async (req) => {
         ? new Date(dripBaseDate)
         : new Date(dripBaseDate + 'T00:00:00');
       
+      // Extract the hour and minute from first_session_date for time-based triggering
+      const sessionHour = dripBase.getUTCHours();
+      const sessionMinute = dripBase.getUTCMinutes();
+      
+      // Check if current time matches the session time (within 30-minute window)
+      // This ensures drip content is released at the same time as the first session
+      const hourMatches = currentHour === sessionHour;
+      const minuteWithinWindow = Math.abs(currentMinute - sessionMinute) < 30;
+      
+      if (!hourMatches || !minuteWithinWindow) {
+        console.log(`Skipping round "${round.round_name}" - not time yet (session time: ${sessionHour}:${sessionMinute.toString().padStart(2, '0')} UTC, current: ${currentHour}:${currentMinute.toString().padStart(2, '0')} UTC)`);
+        continue;
+      }
+      
+      console.log(`Round "${round.round_name}" - time matches! (session time: ${sessionHour}:${sessionMinute.toString().padStart(2, '0')} UTC)`);
+
       const dripOffset = round.drip_offset_days || 0;
       
-      // Calculate days since drip base date
-      const daysSinceDripBase = Math.floor((today.getTime() - dripBase.getTime()) / (1000 * 60 * 60 * 24));
+      // Calculate days since drip base date (using date only, not time)
+      const dripBaseDateOnly = new Date(dripBase);
+      dripBaseDateOnly.setUTCHours(0, 0, 0, 0);
+      const daysSinceDripBase = Math.floor((today.getTime() - dripBaseDateOnly.getTime()) / (1000 * 60 * 60 * 24));
       
       // The effective day for drip content, accounting for freezes/forwards
       // New logic: drip_delay_days = 1 means at first session, so effective day 0 corresponds to drip_delay_days = 1
@@ -80,6 +103,8 @@ Deno.serve(async (req) => {
         console.log(`Skipping round "${round.round_name}" - first session hasn't happened yet`);
         continue;
       }
+
+      roundsProcessed++;
 
       // Find tracks that unlock today (drip_delay_days === effectiveDripDay)
       // Note: drip_delay_days = 0 is always available (no notification needed)
@@ -219,12 +244,31 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log(`Drip notification check complete. Sent ${notificationsSent} notifications.`);
+    // Log the run
+    await supabase.from('pn_schedule_logs').insert({
+      function_name: 'send-drip-notifications',
+      sent_count: notificationsSent,
+      failed_count: 0,
+      status: 'success',
+    });
+
+    // Update schedule last run
+    await supabase
+      .from('push_notification_schedules')
+      .update({ 
+        last_run_at: new Date().toISOString(),
+        last_run_status: 'success',
+        last_run_count: notificationsSent
+      })
+      .eq('function_name', 'send-drip-notifications');
+
+    console.log(`Drip notification check complete. Processed ${roundsProcessed} rounds, sent ${notificationsSent} notifications.`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         notificationsSent,
+        roundsProcessed,
         message: `Sent ${notificationsSent} drip notifications` 
       }),
       { 
