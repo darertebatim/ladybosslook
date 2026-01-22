@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DeviceManagementPanel } from '@/components/admin/DeviceManagementPanel';
 import SecurityAuditLog from '@/components/SecurityAuditLog';
@@ -6,11 +7,13 @@ import { StaffPermissionsManager } from '@/components/admin/StaffPermissionsMana
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import { useResetPlannerData } from '@/hooks/useTaskPlanner';
-import { RotateCcw, UserCheck, Loader2, Smartphone, Copy, Check } from 'lucide-react';
+import { RotateCcw, UserCheck, Loader2, Smartphone, Copy, Check, RefreshCw, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BUILD_INFO, getDisplayBuildInfo } from '@/lib/buildInfo';
+import { format } from 'date-fns';
 
 // Build Info Card Component
 function BuildInfoCard() {
@@ -85,6 +88,109 @@ function BuildInfoCard() {
   );
 }
 
+// App Update Logs Card
+function AppUpdateLogsCard() {
+  const { data: logs, isLoading, refetch } = useQuery({
+    queryKey: ['app-update-logs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('app_update_logs')
+        .select(`
+          id,
+          device_version,
+          latest_version,
+          update_available,
+          platform,
+          checked_at,
+          user_id,
+          profiles:user_id (full_name, email)
+        `)
+        .order('checked_at', { ascending: false })
+        .limit(50);
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const updateNeededCount = logs?.filter(l => l.update_available).length || 0;
+  const uniqueUsers = new Set(logs?.map(l => l.user_id)).size;
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Download className="h-5 w-5" />
+              App Update Checks
+            </CardTitle>
+            <CardDescription>
+              Recent version checks from native iOS app users
+            </CardDescription>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => refetch()}>
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Summary stats */}
+        <div className="grid grid-cols-3 gap-3 text-sm">
+          <div className="bg-muted rounded-lg p-3 text-center">
+            <p className="text-2xl font-bold">{logs?.length || 0}</p>
+            <p className="text-xs text-muted-foreground">Total Checks</p>
+          </div>
+          <div className="bg-muted rounded-lg p-3 text-center">
+            <p className="text-2xl font-bold text-orange-500">{updateNeededCount}</p>
+            <p className="text-xs text-muted-foreground">Need Update</p>
+          </div>
+          <div className="bg-muted rounded-lg p-3 text-center">
+            <p className="text-2xl font-bold text-primary">{uniqueUsers}</p>
+            <p className="text-xs text-muted-foreground">Unique Users</p>
+          </div>
+        </div>
+
+        {/* Recent logs */}
+        {isLoading ? (
+          <div className="text-center py-4 text-muted-foreground">Loading...</div>
+        ) : logs && logs.length > 0 ? (
+          <div className="max-h-64 overflow-y-auto space-y-2">
+            {logs.map((log) => (
+              <div 
+                key={log.id} 
+                className="flex items-center justify-between p-2 rounded-lg bg-muted/50 text-sm"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <Badge 
+                    variant={log.update_available ? "destructive" : "secondary"}
+                    className="shrink-0"
+                  >
+                    v{log.device_version}
+                  </Badge>
+                  <span className="text-muted-foreground truncate">
+                    {(log.profiles as any)?.full_name || (log.profiles as any)?.email?.split('@')[0] || 'Unknown'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+                  {log.update_available && (
+                    <span className="text-orange-500">→ v{log.latest_version}</span>
+                  )}
+                  <span>{format(new Date(log.checked_at), 'MMM d, HH:mm')}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-4 text-muted-foreground">
+            No update checks logged yet
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function System() {
   const resetPlanner = useResetPlannerData();
   const [enrollingAll, setEnrollingAll] = useState(false);
@@ -146,6 +252,9 @@ export default function System() {
         </TabsContent>
 
         <TabsContent value="tools" className="space-y-4">
+          {/* App Update Logs */}
+          <AppUpdateLogsCard />
+          
           {/* Build Info Card */}
           <BuildInfoCard />
           {/* Enroll in All Programs */}
