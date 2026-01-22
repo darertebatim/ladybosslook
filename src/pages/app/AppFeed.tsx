@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { BackButton } from '@/components/app/BackButton';
 import { useChannels, useFeedPosts, useMarkPostRead, FeedPost } from '@/hooks/useFeed';
 import { useFeedRealtime } from '@/hooks/useFeedRealtime';
 import { FeedChannelTabs } from '@/components/feed/FeedChannelTabs';
@@ -127,9 +127,7 @@ export default function AppFeed() {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center gap-3 px-4 pt-3 pb-2">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/app/home')}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+          <BackButton to="/app/home" />
           <h1 className="text-lg font-semibold">Community</h1>
         </div>
 

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Search, BookOpen, NotebookPen } from 'lucide-react';
+import { Plus, Search, BookOpen, NotebookPen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,6 +9,7 @@ import { JournalEntryCard, formatDateGroup } from '@/components/app/JournalEntry
 import { JournalSkeleton } from '@/components/app/skeletons/JournalSkeleton';
 import { JournalReminderSettings } from '@/components/app/JournalReminderSettings';
 import { JournalHeaderStats } from '@/components/app/JournalHeaderStats';
+import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
 import { format, startOfDay, differenceInDays, subDays, isAfter } from 'date-fns';
 
@@ -95,9 +96,7 @@ const AppJournal = () => {
         >
           <div className="flex items-center justify-between px-4 pt-3 pb-2">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate('/app/home')}>
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
+              <BackButton to="/app/home" />
               <h1 className="text-xl font-semibold">My Journal</h1>
             </div>
           </div>
@@ -119,9 +118,7 @@ const AppJournal = () => {
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-1">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/app/home')}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
+            <BackButton to="/app/home" />
             <h1 className="text-xl font-semibold">My Journal</h1>
           </div>
           <div className="flex items-center gap-1">
