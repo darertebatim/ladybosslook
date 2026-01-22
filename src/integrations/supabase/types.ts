@@ -1194,6 +1194,47 @@ export type Database = {
           },
         ]
       }
+      pn_schedule_logs: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          failed_count: number | null
+          function_name: string
+          id: string
+          schedule_id: string | null
+          sent_count: number | null
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          failed_count?: number | null
+          function_name: string
+          id?: string
+          schedule_id?: string | null
+          sent_count?: number | null
+          status: string
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          failed_count?: number | null
+          function_name?: string
+          id?: string
+          schedule_id?: string | null
+          sent_count?: number | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pn_schedule_logs_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "push_notification_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1626,6 +1667,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      push_notification_schedules: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          function_name: string
+          id: string
+          is_active: boolean | null
+          last_run_at: string | null
+          last_run_count: number | null
+          last_run_status: string | null
+          name: string
+          schedule: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          function_name: string
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          last_run_count?: number | null
+          last_run_status?: string | null
+          name: string
+          schedule: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          function_name?: string
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          last_run_count?: number | null
+          last_run_status?: string | null
+          name?: string
+          schedule?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       push_subscriptions: {
         Row: {
