@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Search, BookOpen, Bell, Settings } from 'lucide-react';
+import { ArrowLeft, Plus, Search, BookOpen, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useJournalEntries } from '@/hooks/useJournal';
@@ -88,7 +88,7 @@ const AppJournal = () => {
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon">
-                    <Bell className="h-5 w-5" />
+                    <Sparkles className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent 
@@ -97,14 +97,17 @@ const AppJournal = () => {
                   style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
                 >
                   <SheetHeader>
-                    <SheetTitle>Daily Reminder</SheetTitle>
+                    <SheetTitle>Build a Journaling Habit</SheetTitle>
                   </SheetHeader>
-                  <div className="py-4">
+                  <div className="py-4 space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Add journaling to your daily routine and get reminded at your preferred time.
+                    </p>
                     <JournalReminderSettings />
                   </div>
                   <SheetFooter className="pt-2">
                     <SheetClose asChild>
-                      <Button className="w-full">Done</Button>
+                      <Button variant="outline" className="w-full">Close</Button>
                     </SheetClose>
                   </SheetFooter>
                 </SheetContent>
