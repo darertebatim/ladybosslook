@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, GraduationCap } from 'lucide-react';
+import { ChevronRight, ChevronDown, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -9,16 +10,34 @@ import {
 } from '@/components/ui/carousel';
 import { CompactRoundCard } from './CompactRoundCard';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
+import { haptic } from '@/lib/haptics';
 
 interface ActiveRoundsCarouselProps {
   activeRounds: any[];
   nextSessionMap: Map<string, string>;
 }
 
+const COLLAPSED_KEY = 'programsCarouselCollapsed';
+
 export function ActiveRoundsCarousel({ 
   activeRounds, 
   nextSessionMap 
 }: ActiveRoundsCarouselProps) {
+  // Persist collapsed state
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem(COLLAPSED_KEY);
+    return saved === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem(COLLAPSED_KEY, isCollapsed.toString());
+  }, [isCollapsed]);
+
+  const toggleCollapse = () => {
+    haptic.light();
+    setIsCollapsed(!isCollapsed);
+  };
+
   // Get unseen content
   let unseenEnrollments = new Set<string>();
   let unseenRounds = new Set<string>();
@@ -53,9 +72,22 @@ export function ActiveRoundsCarousel({
 
   return (
     <div className="space-y-2">
-      {/* Header */}
-      <div className="flex items-center justify-between px-1">
+      {/* Header - always visible */}
+      <div 
+        className="flex items-center justify-between px-1 cursor-pointer"
+        onClick={toggleCollapse}
+      >
         <div className="flex items-center gap-1.5">
+          <button 
+            className="p-0.5 -ml-1 rounded-full hover:bg-black/5 transition-colors"
+            aria-label={isCollapsed ? 'Expand programs' : 'Collapse programs'}
+          >
+            <ChevronDown 
+              className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
+                isCollapsed ? '-rotate-90' : ''
+              }`} 
+            />
+          </button>
           <h2 className="text-sm font-semibold text-foreground">Your Programs</h2>
           <Badge variant="secondary" className="h-4 px-1 text-[10px]">
             {activeRounds.length}
@@ -64,47 +96,54 @@ export function ActiveRoundsCarousel({
         <Link 
           to="/app/programs"
           className="text-xs text-primary font-medium flex items-center gap-0.5"
+          onClick={(e) => e.stopPropagation()}
         >
           View All
           <ChevronRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
-      {/* Carousel */}
-      <Carousel
-        opts={{
-          align: 'start',
-          loop: false,
-        }}
-        className="w-full"
+      {/* Carousel - collapsible */}
+      <div 
+        className={`overflow-hidden transition-all duration-200 ease-out ${
+          isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[120px] opacity-100'
+        }`}
       >
-        <CarouselContent className="-ml-3">
-          {activeRounds.map((enrollment) => {
-            const roundId = enrollment.program_rounds?.id;
-            const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
-            const isRoundUnseen = roundId ? unseenRounds.has(roundId) : false;
-            const hasNotification = isEnrollmentUnseen || isRoundUnseen;
+        <Carousel
+          opts={{
+            align: 'start',
+            loop: false,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-3">
+            {activeRounds.map((enrollment) => {
+              const roundId = enrollment.program_rounds?.id;
+              const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
+              const isRoundUnseen = roundId ? unseenRounds.has(roundId) : false;
+              const hasNotification = isEnrollmentUnseen || isRoundUnseen;
 
-            return (
-              <CarouselItem key={enrollment.id} className="pl-3 basis-auto">
-                <CompactRoundCard
-                  enrollment={enrollment}
-                  nextSessionDate={roundId ? nextSessionMap.get(roundId) : null}
-                  isUnseen={hasNotification}
-                  onView={() => {
-                    if (isEnrollmentUnseen && markEnrollmentViewed) {
-                      markEnrollmentViewed(enrollment.id);
-                    }
-                    if (isRoundUnseen && roundId && markRoundViewed) {
-                      markRoundViewed(roundId);
-                    }
-                  }}
-                />
-              </CarouselItem>
-            );
-          })}
-        </CarouselContent>
-      </Carousel>
+              return (
+                <CarouselItem key={enrollment.id} className="pl-3 basis-auto">
+                  <CompactRoundCard
+                    enrollment={enrollment}
+                    nextSessionDate={roundId ? nextSessionMap.get(roundId) : null}
+                    isUnseen={hasNotification}
+                    onView={() => {
+                      if (isEnrollmentUnseen && markEnrollmentViewed) {
+                        markEnrollmentViewed(enrollment.id);
+                      }
+                      if (isRoundUnseen && roundId && markRoundViewed) {
+                        markRoundViewed(roundId);
+                      }
+                    }}
+                  />
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+        </Carousel>
+      </div>
     </div>
   );
 }
