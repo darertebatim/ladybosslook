@@ -98,6 +98,7 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
   const [isAIGenerating, setIsAIGenerating] = useState(false);
   const [isGeneratingFromTemplates, setIsGeneratingFromTemplates] = useState(false);
+  const [isGeneratingFromTaskTemplates, setIsGeneratingFromTaskTemplates] = useState(false);
   const [aiTheme, setAiTheme] = useState('');
   const [showAIDialog, setShowAIDialog] = useState(false);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
@@ -377,6 +378,25 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
     }
   };
 
+  const handleGenerateFromTaskTemplates = async () => {
+    setIsGeneratingFromTaskTemplates(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-plans-from-task-templates');
+      if (error) throw error;
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+      toast.success(data.message || `Created ${data.createdCount} plans`);
+      queryClient.invalidateQueries({ queryKey: ['admin-routine-plans'] });
+    } catch (error) {
+      console.error('Generation error:', error);
+      toast.error('Failed to generate plans from task templates');
+    } finally {
+      setIsGeneratingFromTaskTemplates(false);
+    }
+  };
+
   const proCount = plans?.filter(p => p.is_pro_routine).length || 0;
   const regularCount = plans?.filter(p => !p.is_pro_routine).length || 0;
 
@@ -398,6 +418,20 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
               <Sparkles className="h-4 w-4 mr-2" />
             )}
             Pro from Templates
+          </Button>
+          <Button 
+            onClick={handleGenerateFromTaskTemplates} 
+            size="sm" 
+            variant="outline"
+            disabled={isGeneratingFromTaskTemplates}
+            className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-950"
+          >
+            {isGeneratingFromTaskTemplates ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <ListTodo className="h-4 w-4 mr-2" />
+            )}
+            Plans from Tasks
           </Button>
           <Button 
             onClick={() => setShowAIDialog(true)} 
