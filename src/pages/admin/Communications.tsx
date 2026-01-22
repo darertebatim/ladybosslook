@@ -3,6 +3,7 @@ import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
 import { BroadcastHistory } from '@/components/admin/BroadcastHistory';
 import { PushNotificationSender } from '@/components/admin/PushNotificationSender';
 import { PushNotificationsHistory } from '@/components/admin/PushNotificationsHistory';
+import { PushNotificationCenter } from '@/components/admin/PushNotificationCenter';
 import { HomeBannerManager } from '@/components/admin/HomeBannerManager';
 import { MailchimpTagManager } from '@/components/admin/MailchimpTagManager';
 import { EmailGenerator } from '@/components/admin/EmailGenerator';
@@ -16,8 +17,9 @@ export default function Communications() {
         <p className="text-muted-foreground">Manage broadcasts, push notifications, banners, and Mailchimp</p>
       </div>
 
-      <Tabs defaultValue="broadcasts">
-        <TabsList className="grid w-full grid-cols-6">
+      <Tabs defaultValue="pn-center">
+        <TabsList className="grid w-full grid-cols-7">
+          <TabsTrigger value="pn-center">PN Center</TabsTrigger>
           <TabsTrigger value="broadcasts">Broadcasts</TabsTrigger>
           <TabsTrigger value="push">Push Only</TabsTrigger>
           <TabsTrigger value="promo">Promo</TabsTrigger>
@@ -25,6 +27,10 @@ export default function Communications() {
           <TabsTrigger value="banners">Banners</TabsTrigger>
           <TabsTrigger value="mailchimp">Mailchimp</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="pn-center" className="space-y-6">
+          <PushNotificationCenter />
+        </TabsContent>
 
         <TabsContent value="broadcasts" className="space-y-6">
           <AnnouncementCreator />

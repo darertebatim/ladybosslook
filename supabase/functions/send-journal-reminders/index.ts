@@ -118,9 +118,9 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const apnsKeyId = Deno.env.get('APNS_KEY_ID');
     const apnsTeamId = Deno.env.get('APNS_TEAM_ID');
-    const apnsPrivateKey = Deno.env.get('APNS_PRIVATE_KEY');
+    const apnsPrivateKey = Deno.env.get('APNS_AUTH_KEY'); // Fixed: was APNS_PRIVATE_KEY
     const apnsEnvironment = Deno.env.get('APNS_ENVIRONMENT') || 'production';
-    const bundleId = 'app.lovable.9d54663c1af540669ceb1723206ae5f8';
+    const bundleId = Deno.env.get('APNS_TOPIC') || 'app.lovable.9d54663c1af540669ceb1723206ae5f8';
     
     if (!apnsKeyId || !apnsTeamId || !apnsPrivateKey) {
       console.error('[Journal Reminder] Missing APNs credentials');
