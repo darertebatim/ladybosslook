@@ -234,7 +234,9 @@ const App = () => (
                 <Route path="/app/journal/:entryId" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
                 <Route path="/app/home/new" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
                 <Route path="/app/home/edit/:taskId" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
-                <Route path="/app/feed/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
+                <Route path="/app/channels/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
+                {/* Redirect old feed post route */}
+                <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
                 
                 {/* App Routes */}
                 <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
@@ -247,7 +249,9 @@ const App = () => (
                   <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />
                   <Route path="player/:audioId" element={<AppAudioPlayer />} />
                   <Route path="chat" element={<AppChat />} />
-                  <Route path="feed" element={<AppFeed />} />
+                  <Route path="channels" element={<AppFeed />} />
+                  {/* Redirect old feed route */}
+                  <Route path="feed" element={<Navigate to="/app/channels" replace />} />
                   <Route path="journal" element={<AppJournal />} />
                   <Route path="routines" element={<AppInspire />} />
                   <Route path="routines/:planId" element={<AppInspireDetail />} />

@@ -49,7 +49,7 @@ export function StatsCards({
       {/* Unread Posts */}
       <Card 
         className="overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors"
-        onClick={() => navigate('/app/feed')}
+        onClick={() => navigate('/app/channels')}
       >
         <CardContent className="p-3 lg:pt-6">
           <div className="flex items-center justify-between">

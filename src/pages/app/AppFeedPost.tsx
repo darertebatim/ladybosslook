@@ -173,7 +173,7 @@ export default function AppFeedPost() {
   };
 
   const handleBack = () => {
-    navigate('/app/feed');
+    navigate('/app/channels');
   };
 
   // Simple scroll padding - input bar is ~80px, plus buffer

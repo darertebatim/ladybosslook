@@ -42,7 +42,7 @@ export const FeedMessage = memo(function FeedMessage({
     if (target.closest('button') || target.closest('a') || target.closest('audio')) {
       return;
     }
-    navigate(`/app/feed/post/${post.id}`);
+    navigate(`/app/channels/post/${post.id}`);
   };
 
   return (

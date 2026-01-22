@@ -982,7 +982,7 @@ const AppCourseDetail = () => {
                       variant="default" 
                       size="lg" 
                       className="w-full relative"
-                      onClick={() => navigate(`/app/feed?channel=${roundChannel.id}`)}
+                      onClick={() => navigate(`/app/channels?channel=${roundChannel.id}`)}
                     >
                       <MessageCircle className="h-5 w-5 mr-2" />
                       Visit Community
