@@ -157,12 +157,76 @@ serve(async (req) => {
                               playlist.description?.toLowerCase().includes('deep') ? 30 : 15;
 
       try {
-        // Step 1: Create Pro Task Template
+        // Step 1: Generate AI content for Pro Task
+        let taskDescription = `Listen to ${playlist.name}`;
+        let routineDescription = `A focused routine featuring ${playlist.name}`;
+        let routineSubtitle = "";
+        let sections: Array<{ title: string; description: string }> = [];
+
+        try {
+          const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "google/gemini-2.5-flash",
+              messages: [
+                { 
+                  role: "system", 
+                  content: "You are a helpful assistant creating wellness and personal development content for a women's empowerment app. Return only valid JSON. Be inspiring, practical, and supportive in tone." 
+                },
+                { 
+                  role: "user", 
+                  content: `Create content for a playlist called "${playlist.name}" in the ${playlist.category || 'wellness'} category.
+${playlist.description ? `Context: ${playlist.description}` : ''}
+
+Generate:
+1. A concise Pro Task description (1 sentence, what the user will do - e.g., "Immerse yourself in guided meditation for inner peace")
+2. A compelling Pro Routine subtitle (short tagline, 5-8 words)
+3. A Pro Routine description (2-3 sentences explaining benefits)
+4. 2-3 sections that guide the user through the routine experience
+
+Return JSON:
+{
+  "taskDescription": "Action-oriented description of what to do",
+  "routineSubtitle": "Short inspiring tagline",
+  "routineDescription": "Benefits and what to expect from this routine",
+  "sections": [
+    { "title": "Section Title", "description": "What happens in this section" }
+  ]
+}`
+                },
+              ],
+            }),
+          });
+
+          if (aiResponse.ok) {
+            const aiData = await aiResponse.json();
+            const content = aiData.choices?.[0]?.message?.content;
+            if (content) {
+              const jsonMatch = content.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                taskDescription = parsed.taskDescription || taskDescription;
+                routineSubtitle = parsed.routineSubtitle || "";
+                routineDescription = parsed.routineDescription || routineDescription;
+                sections = parsed.sections || [];
+              }
+            }
+          }
+        } catch (aiError) {
+          console.error(`AI generation failed for ${playlist.name}:`, aiError);
+          // Continue with default values
+        }
+
+        // Step 2: Create Pro Task Template
         const { data: newTemplate, error: templateError } = await supabase
           .from("routine_task_templates")
           .insert({
             title: playlist.name,
-            description: playlist.description || `Listen to ${playlist.name}`,
+            description: taskDescription,
             duration_minutes: durationMinutes,
             icon: icon,
             category: playlist.category || null,
@@ -182,67 +246,10 @@ serve(async (req) => {
         }
         results.tasksCreated++;
 
-        // Step 2: Check if routine already exists
+        // Step 3: Check if routine already exists
         if (existingRoutineTitles.has(playlist.name.toLowerCase())) {
           results.routinesSkipped++;
           continue;
-        }
-
-        // Step 3: Generate AI routine description and sections
-        let routineDescription = playlist.description || `A focused routine for ${playlist.name}`;
-        let sections: Array<{ title: string; description: string }> = [];
-
-        try {
-          const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${LOVABLE_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: "google/gemini-2.5-flash",
-              messages: [
-                { 
-                  role: "system", 
-                  content: "You are a helpful assistant creating routine content for a women's personal development app. Return only valid JSON." 
-                },
-                { 
-                  role: "user", 
-                  content: `Create a routine for "${playlist.name}" (${playlist.category || 'general'} category).
-${playlist.description ? `Description: ${playlist.description}` : ''}
-
-Generate:
-1. A compelling 1-2 sentence routine description
-2. 2-3 sections that guide the user through the routine
-
-Return JSON:
-{
-  "description": "Compelling description here",
-  "sections": [
-    { "title": "Section 1 Title", "description": "What to do in this section" },
-    { "title": "Section 2 Title", "description": "What to do in this section" }
-  ]
-}`
-                },
-              ],
-            }),
-          });
-
-          if (aiResponse.ok) {
-            const aiData = await aiResponse.json();
-            const content = aiData.choices?.[0]?.message?.content;
-            if (content) {
-              const jsonMatch = content.match(/\{[\s\S]*\}/);
-              if (jsonMatch) {
-                const parsed = JSON.parse(jsonMatch[0]);
-                routineDescription = parsed.description || routineDescription;
-                sections = parsed.sections || [];
-              }
-            }
-          }
-        } catch (aiError) {
-          console.error(`AI generation failed for ${playlist.name}:`, aiError);
-          // Continue with default values
         }
 
         // Step 4: Create Pro Routine (routine_plan)
@@ -250,7 +257,7 @@ Return JSON:
           .from("routine_plans")
           .insert({
             title: playlist.name,
-            subtitle: playlist.description || null,
+            subtitle: routineSubtitle || null,
             description: routineDescription,
             icon: icon,
             color: color,
@@ -286,7 +293,7 @@ Return JSON:
           }
         }
 
-        // Step 6: Create Pro Task for the routine
+        // Step 6: Create Pro Task for the routine (linked to playlist)
         const { error: taskError } = await supabase
           .from("routine_plan_tasks")
           .insert({
@@ -304,7 +311,6 @@ Return JSON:
 
         if (taskError) {
           results.errors.push(`Task for routine "${playlist.name}": ${taskError.message}`);
-          // Don't delete the plan, it's still usable
         }
 
         results.routinesCreated++;
