@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { isNativeApp, isIOSApp } from '@/lib/platform';
 import { BUILD_INFO } from '@/lib/buildInfo';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UpdateStatus {
   updateAvailable: boolean;
@@ -18,6 +19,7 @@ const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const DISMISS_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 export function useAppUpdateChecker(): UpdateStatus {
+  const { user } = useAuth();
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [storeUrl, setStoreUrl] = useState('https://apps.apple.com/app/id6746970920');
@@ -70,6 +72,19 @@ export function useAppUpdateChecker(): UpdateStatus {
           
           setLatestVersion(data.latestVersion);
           setStoreUrl(data.storeUrl || 'https://apps.apple.com/app/id6746970920');
+          
+          // Log the check to database if user is authenticated
+          if (user?.id) {
+            supabase.from('app_update_logs').insert({
+              user_id: user.id,
+              device_version: BUILD_INFO.version,
+              latest_version: data.latestVersion,
+              update_available: data.updateAvailable,
+              platform: 'ios',
+            }).then(({ error: logError }) => {
+              if (logError) console.error('[useAppUpdateChecker] Failed to log check:', logError);
+            });
+          }
           
           if (data.updateAvailable) {
             // Check if user dismissed this specific version

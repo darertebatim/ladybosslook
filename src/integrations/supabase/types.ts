@@ -115,6 +115,36 @@ export type Database = {
         }
         Relationships: []
       }
+      app_update_logs: {
+        Row: {
+          checked_at: string
+          device_version: string
+          id: string
+          latest_version: string
+          platform: string
+          update_available: boolean
+          user_id: string | null
+        }
+        Insert: {
+          checked_at?: string
+          device_version: string
+          id?: string
+          latest_version: string
+          platform?: string
+          update_available?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          checked_at?: string
+          device_version?: string
+          id?: string
+          latest_version?: string
+          platform?: string
+          update_available?: boolean
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       audio_bookmarks: {
         Row: {
           audio_id: string
