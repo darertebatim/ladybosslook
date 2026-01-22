@@ -352,12 +352,12 @@ const AppHome = () => {
 
         {/* Tag filter chips */}
         {taskTags.length > 0 && (
-          <div className="px-4 py-3 bg-background overflow-x-auto">
+          <div className="px-4 py-2 bg-background overflow-x-auto">
             <div className="flex gap-2">
               <button
                 onClick={() => setSelectedTag(null)}
                 className={cn(
-                  'px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all font-medium',
+                  'px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all font-medium',
                   selectedTag === null
                     ? 'bg-[#D8C0F3] text-foreground'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
@@ -370,7 +370,7 @@ const AppHome = () => {
                   key={tag}
                   onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
                   className={cn(
-                    'px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all capitalize font-medium',
+                    'px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all capitalize font-medium',
                     selectedTag === tag
                       ? 'bg-[#D8C0F3] text-foreground'
                       : 'bg-muted text-muted-foreground hover:bg-muted/80'
