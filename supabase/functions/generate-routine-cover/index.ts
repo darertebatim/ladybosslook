@@ -6,74 +6,74 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Creative visual concepts for routine covers - artistic and unique
+// Cinematic fantasy concepts for routine covers - designed art, not photos
 const categoryStyles: Record<string, { concept: string; mood: string; technique: string }> = {
   morning: {
-    concept: 'Golden hour magic - woman silhouette stretching at window with dramatic sunbeams, or hands wrapped around steaming ceramic mug with light dancing on the surface',
-    mood: 'Hopeful awakening, fresh starts, quiet power before the world wakes',
-    technique: 'Cinematic lighting with lens flare, shallow depth of field, warm film grain'
+    concept: 'A celestial figure awakening amidst swirling cosmic dust and golden nebulae, a radiant sun rising through impossible floating architecture of glass and light',
+    mood: 'Transcendent, epic, hopeful, divine awakening',
+    technique: 'Cinematic concept art, volumetric god rays, vibrant gold and deep teal palette, Unreal Engine 5 render style'
   },
   evening: {
-    concept: 'Intimate twilight moments - soft candlelit scene with silk textures, or moonlight streaming through sheer curtains onto rumpled bedding',
-    mood: 'Sanctuary, unwinding, sacred pause from the chaos',
-    technique: 'Chiaroscuro lighting, rich shadows, moody color grading like a Sofia Coppola film'
+    concept: 'A mystical twilight realm with floating lanterns and bioluminescent flowers, soft aurora dancing through crystalline structures in an enchanted sanctuary',
+    mood: 'Magical sanctuary, dreamlike peace, otherworldly calm',
+    technique: 'Fantasy matte painting, soft ethereal glow, deep purple and rose gold palette, Studio Ghibli-inspired lighting'
   },
   wellness: {
-    concept: 'Elevated self-care editorial - artful arrangement of natural textures (marble, eucalyptus, linen), or close-up of water droplets on skin catching light',
-    mood: 'Luxurious slowness, intentional living, treating yourself as worthy',
-    technique: 'Clean editorial photography, negative space, soft natural light'
+    concept: 'An ancient healing temple floating among clouds, with waterfalls of pure light cascading into pools of liquid starlight, sacred geometry patterns glowing softly',
+    mood: 'Sacred rejuvenation, timeless wisdom, spiritual luxury',
+    technique: 'Surrealist digital illustration, iridescent highlights, soft focus backgrounds, premium art direction'
   },
   mindfulness: {
-    concept: 'Abstract zen - ripples expanding on still water, single lotus floating, or misty mountain peaks emerging from clouds at dawn',
-    mood: 'Stillness within chaos, centered calm, expansive awareness',
-    technique: 'Minimalist composition, soft focus, muted tones with one accent color'
+    concept: 'A serene floating island with a single luminous ancient tree, surrounded by a sea of clouds and perfectly balanced zen stones orbiting in gentle motion',
+    mood: 'Mystical peace, ethereal calm, infinite stillness',
+    technique: 'Surrealist matte painting, pastel iridescent colors, atmospheric perspective, cinematic depth'
   },
   productivity: {
-    concept: 'Curated workspace poetry - architectural details in warm light, or single hand writing in leather journal with perfect shadows',
-    mood: 'Focused ambition, elegant efficiency, quiet determination',
-    technique: 'Sharp lines, modern architecture aesthetic, warm wood and brass tones'
+    concept: 'An intricate clockwork cosmos made of starlight and translucent glass, gears of pure energy turning in perfect harmony within a cathedral of geometric light',
+    mood: 'Focused mastery, elegant precision, infinite order',
+    technique: 'Detailed 3D concept art, glowing fiber-optic accents, deep indigo and gold palette, premium metallic textures'
   },
   fitness: {
-    concept: 'Movement as art - abstract motion blur of a dancing figure, or powerful silhouette mid-leap against dramatic sky',
-    mood: 'Fierce energy, liberation through movement, unapologetic strength',
-    technique: 'Dynamic angles, motion blur, bold saturated colors, high contrast'
+    concept: 'An abstract figure of pure kinetic energy breaking through crystalline barriers, shards of prismatic light and geometric patterns exploding outward in dynamic motion',
+    mood: 'Explosive power, unstoppable momentum, fierce transformation',
+    technique: 'High-contrast digital illustration, neon energy trails, motion blur effects, bold saturated colors'
   },
   self_care: {
-    concept: 'Intimate beauty rituals - close-up of hands massaging face with golden serum, or rose petals floating in milky bath water',
-    mood: 'Radical self-love, tender moments alone, beauty as self-respect',
-    technique: 'Soft glow, creamy skin tones, romantic lighting like a perfume ad'
+    concept: 'A secret garden of impossible flowers made of soft light and silk, floating crystals reflecting rainbow spectrums, petals drifting in an eternal gentle breeze',
+    mood: 'Tender magic, self-love sanctuary, precious solitude',
+    technique: 'Romantic fantasy art, dreamy bokeh, rose quartz and champagne palette, soft diffused lighting'
   },
   creativity: {
-    concept: 'Creative explosion - paint-stained hands holding fresh artwork, or colorful ink drops blooming in water captured mid-motion',
-    mood: 'Uninhibited expression, joyful mess, playing like nobody is watching',
-    technique: 'Bold colors, artistic chaos, macro photography, unexpected compositions'
+    concept: 'An explosion of liquid color and light forming abstract constellations, paint becoming galaxies, imagination manifesting as visible aurora of pure possibility',
+    mood: 'Uninhibited expression, joyful chaos, creative ecstasy',
+    technique: 'Abstract expressionist digital art, vibrant color splashes, dynamic composition, artistic spontaneity'
   },
   sleep: {
-    concept: 'Dream state visuals - clouds viewed from above at golden hour, or soft billowing white fabric floating in wind',
-    mood: 'Deep rest, floating between worlds, surrendering to softness',
-    technique: 'Dreamy soft focus, ethereal lighting, lavender and midnight blue palette'
+    concept: 'A dreamscape of soft clouds forming gentle spirals around a crescent moon, stars dissolving into stardust, the boundary between waking and dreams beautifully blurred',
+    mood: 'Deep surrender, floating peace, entering the dream realm',
+    technique: 'Ethereal fantasy illustration, ultra-soft focus, midnight blue and silver palette, luminous highlights'
   },
   gratitude: {
-    concept: 'Golden abundance - warm light streaming through autumn leaves, or hands cupped open receiving light',
-    mood: 'Overflowing appreciation, finding magic in ordinary, heart wide open',
-    technique: 'Warm golden hour photography, bokeh, rich amber and honey tones'
+    concept: 'Hands cupped open receiving cascading golden light that transforms into butterflies and flower petals, abundance flowing like a visible river of warmth',
+    mood: 'Overflowing appreciation, magical abundance, heart expansion',
+    technique: 'Warm fantasy art, volumetric golden light, amber and honey tones with soft particle effects'
   },
   work: {
-    concept: 'Power moves - sleek laptop on marble desk with coffee and fresh flowers, or confident woman silhouette in modern glass office',
-    mood: 'Boss energy, commanding your space, success on your terms',
-    technique: 'Editorial fashion photography style, clean lines, sophisticated neutral palette'
+    concept: 'A futuristic command center of flowing holographic interfaces and crystalline data streams, elegant power emanating from a throne of pure focused intention',
+    mood: 'Commanding presence, visionary leadership, elegant power',
+    technique: 'Sci-fi concept art, sleek holographic elements, sophisticated dark palette with accent lighting'
   },
   health: {
-    concept: 'Vibrant living - colorful smoothie bowl as art from above, or woman laughing mid-movement in natural light',
+    concept: 'A figure radiating visible life force energy, surrounded by orbiting symbols of vitality - glowing fruits, flowing water, pulsing hearts of pure light',
     mood: 'Radiant vitality, body as temple, celebrating aliveness',
-    technique: 'Bright natural light, fresh colors, lifestyle editorial feel'
+    technique: 'Vibrant fantasy illustration, energy aura effects, fresh greens and warm highlights'
   }
 };
 
 const defaultStyle = {
-  concept: 'Elevated feminine aesthetic - abstract flowing forms in rich colors, botanical shadows on linen, or woman in powerful pose with dramatic lighting',
-  mood: 'Aspirational but attainable, elegant self-improvement, quiet confidence',
-  technique: 'Fashion editorial meets wellness, premium textures, intentional composition'
+  concept: 'Abstract flowing forms of pure light and color, feminine energy manifesting as visible aurora, sacred geometry softly glowing in an ethereal void',
+  mood: 'Aspirational magic, elegant transformation, quiet power',
+  technique: 'Cinematic fantasy concept art, premium digital illustration, intentional artistic composition'
 };
 
 function getCategoryStyle(categoryName: string): typeof defaultStyle {
@@ -98,38 +98,39 @@ function buildCreativePrompt(title: string, subtitle: string, description: strin
   const style = getCategoryStyle(categoryName);
   const cleanDesc = description?.replace(/<[^>]*>/g, '').substring(0, 100) || '';
   
-  return `Create a stunning, gallery-worthy cover image for a wellness routine.
+  return `Create a premium, CINEMATIC FANTASY cover for a wellness routine app.
 
 ROUTINE: "${title}"
-${subtitle ? `VIBE: "${subtitle}"` : ''}
+${subtitle ? `THEME: "${subtitle}"` : ''}
 ${cleanDesc ? `CONTEXT: ${cleanDesc}` : ''}
 
-VISUAL DIRECTION:
+VISUAL CONCEPT:
 ${style.concept}
 
 EMOTIONAL TONE:
 ${style.mood}
 
-PHOTOGRAPHY STYLE:
+ARTISTIC TECHNIQUE:
 ${style.technique}
 
-ESSENTIAL REQUIREMENTS:
-- NO text, words, letters, or typography of any kind
+CRITICAL STYLE REQUIREMENTS:
+- This is NOT a realistic photograph - it's DESIGNED FANTASY ART
+- Cinematic concept art aesthetic, like a movie poster or game art
+- Ethereal, magical, otherworldly atmosphere
+- Professional graphic design composition with strong focal point
+- Rich volumetric lighting and atmospheric depth
+- Premium app interface quality - this should feel like $1000 design
 - Square format, perfectly composed
-- Premium magazine-quality aesthetic
-- Evocative and artistic, NOT generic stock photography
-- Should feel like it belongs on a high-end lifestyle brand
-- Rich textures and intentional use of light/shadow
-- The kind of image that makes someone pause and feel something
 
-AVOID:
-- Cheesy wellness clichés (basic yoga poses, obvious meditation imagery)
-- Flat or boring compositions
-- Overprocessed or artificial looking
-- Generic motivational poster vibes
-- Clip art or illustration style
+ABSOLUTELY NO:
+- Text, words, letters, typography, titles, or labels of any kind
+- Realistic stock photography
+- Generic wellness clichés (yoga poses, meditation silhouettes, hands holding coffee)
+- Flat, boring, or corporate looking imagery
+- Clip art, cartoons, or simple illustrations
+- UI elements or overlays
 
-This should be the kind of cover that elevates the entire routine. Make it beautiful.`;
+Create something that looks like it belongs in a premium fantasy art gallery. Make it magical.`;
 }
 
 serve(async (req) => {
