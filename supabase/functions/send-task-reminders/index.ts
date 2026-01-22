@@ -197,7 +197,7 @@ Deno.serve(async (req) => {
     // Fetch all tasks with reminders enabled and a scheduled time
     const { data: tasks, error: tasksError } = await supabase
       .from('user_tasks')
-      .select('id, user_id, title, scheduled_time, reminder_enabled, reminder_offset, repeat_pattern, scheduled_date, emoji')
+      .select('id, user_id, title, scheduled_time, reminder_enabled, reminder_offset, repeat_pattern, scheduled_date, emoji, pro_link_type, pro_link_value')
       .eq('reminder_enabled', true)
       .not('scheduled_time', 'is', null);
     
@@ -366,9 +366,30 @@ Deno.serve(async (req) => {
               : `Starting in ${task.reminder_offset} minutes`;
       
       const body = offsetText;
+      
+      // Determine smart URL based on pro_link_type
+      let notificationUrl = '/app/home';
+      if (task.pro_link_type) {
+        switch (task.pro_link_type) {
+          case 'playlist':
+            notificationUrl = task.pro_link_value ? `/app/playlist/${task.pro_link_value}` : '/app/player';
+            break;
+          case 'channel':
+            notificationUrl = '/app/feed';
+            break;
+          case 'journal':
+            notificationUrl = '/app/journal';
+            break;
+          case 'planner':
+          default:
+            notificationUrl = '/app/home';
+            break;
+        }
+      }
+      
       const data = {
         type: 'task_reminder',
-        url: '/app/home',
+        url: notificationUrl,
         taskId: task.id,
       };
       
