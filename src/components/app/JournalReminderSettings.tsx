@@ -42,7 +42,7 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
         size="sm"
         onClick={() => setShowRoutineSheet(true)}
         disabled={isLoading}
-        className="w-full gap-2"
+        className="w-full gap-2 bg-[#F4ECFE] hover:bg-[#E9DCFC] border-[#E9DCFC] text-foreground"
       >
         <Sparkles className="h-4 w-4" />
         Add Journaling to My Routine

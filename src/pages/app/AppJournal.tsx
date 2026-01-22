@@ -173,8 +173,7 @@ const AppJournal = () => {
           <CardContent className="p-4 space-y-3">
             {/* Write Today's Entry Button */}
             <Button 
-              className="w-full" 
-              variant="outline"
+              className="w-full bg-foreground hover:bg-foreground/90 text-background" 
               onClick={() => navigate('/app/journal/new')}
             >
               <NotebookPen className="h-4 w-4 mr-2" />
@@ -228,15 +227,6 @@ const AppJournal = () => {
         )}
       </div>
 
-      {/* FAB */}
-      {entries && entries.length > 0 && (
-        <Button
-          className="fixed bottom-24 right-4 h-14 w-14 rounded-full shadow-lg"
-          onClick={() => navigate('/app/journal/new')}
-        >
-          <Plus className="h-6 w-6" />
-        </Button>
-      )}
     </div>
   );
 };
