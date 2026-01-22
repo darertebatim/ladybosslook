@@ -71,7 +71,7 @@ export function ActiveRoundsCarousel({
   }
 
   return (
-    <div className="space-y-2">
+    <div className={isCollapsed ? '' : 'space-y-2'}>
       {/* Header - always visible, acts as expand/collapse toggle */}
       <button 
         className={`w-full flex items-center justify-between px-2 rounded-xl transition-all active:bg-black/5 ${
