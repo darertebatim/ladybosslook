@@ -160,3 +160,21 @@ verify_jwt = true
 
 [functions.improve-playlist-description]
 verify_jwt = true
+
+[functions.send-task-reminders]
+verify_jwt = false
+
+[functions.generate-routine-cover]
+verify_jwt = true
+
+[functions.generate-plans-from-task-templates]
+verify_jwt = true
+
+[functions.generate-all-playlist-pro-content]
+verify_jwt = true
+
+[functions.reset-user-data]
+verify_jwt = true
+
+[functions.admin-enroll-all-programs]
+verify_jwt = true
