@@ -132,14 +132,17 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    console.log('[Weekly Summary] Running weekly engagement summary');
+    const now = new Date();
+    const currentHour = now.getUTCHours();
+    const currentMinute = now.getUTCMinutes();
+    
+    console.log(`[Weekly Summary] Running at UTC ${currentHour}:${currentMinute.toString().padStart(2, '0')}`);
     
     // Get date range for the past week
-    const now = new Date();
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const weekStart = oneWeekAgo.toISOString();
     
-    // Get users with push subscriptions
+    // Get users with push subscriptions along with their timezone preference
     const { data: subscriptions, error: subsError } = await supabase
       .from('push_subscriptions')
       .select('user_id, endpoint')
@@ -163,33 +166,75 @@ Deno.serve(async (req) => {
     
     const userIds = Array.from(userSubscriptions.keys());
     
-    // Get completed tasks for each user this week
+    // Get timezone preferences from journal_reminder_settings (if available)
+    const { data: timezoneSettings } = await supabase
+      .from('journal_reminder_settings')
+      .select('user_id, timezone')
+      .in('user_id', userIds);
+    
+    const userTimezones = new Map<string, string>();
+    for (const setting of timezoneSettings || []) {
+      if (setting.timezone) {
+        userTimezones.set(setting.user_id, setting.timezone);
+      }
+    }
+    
+    // Filter users whose local time is 9 AM on a Monday
+    const usersToNotify: string[] = [];
+    for (const userId of userIds) {
+      const timezone = userTimezones.get(userId) || 'America/Los_Angeles';
+      
+      try {
+        // Get current time in user's timezone
+        const userTime = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+        const userHour = userTime.getHours();
+        const userDay = userTime.getDay(); // 0 = Sunday, 1 = Monday
+        
+        // Check if it's Monday (day 1) at 9 AM (within 30-minute window)
+        if (userDay === 1 && userHour === 9 && userTime.getMinutes() < 30) {
+          usersToNotify.push(userId);
+          console.log(`[Weekly Summary] User ${userId} in ${timezone} - it's Monday 9 AM for them`);
+        }
+      } catch (e) {
+        console.error(`[Weekly Summary] Invalid timezone for user ${userId}:`, timezone);
+      }
+    }
+    
+    if (usersToNotify.length === 0) {
+      console.log('[Weekly Summary] No users to notify at this time');
+      return new Response(
+        JSON.stringify({ success: true, message: 'No users in Monday 9 AM window', count: 0 }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Get completed tasks for users to notify this week
     const { data: completedTasks } = await supabase
       .from('user_tasks')
       .select('user_id, id')
-      .in('user_id', userIds)
+      .in('user_id', usersToNotify)
       .eq('completed', true)
       .gte('updated_at', weekStart);
     
-    // Get audio progress for each user this week
+    // Get audio progress for users to notify this week
     const { data: audioProgress } = await supabase
       .from('user_audio_progress')
       .select('user_id, audio_id')
-      .in('user_id', userIds)
+      .in('user_id', usersToNotify)
       .eq('completed', true)
       .gte('updated_at', weekStart);
     
-    // Get journal entries for each user this week
+    // Get journal entries for users to notify this week
     const { data: journalEntries } = await supabase
       .from('journal_entries')
       .select('user_id, id')
-      .in('user_id', userIds)
+      .in('user_id', usersToNotify)
       .gte('created_at', weekStart);
     
-    // Aggregate stats per user
+    // Aggregate stats per user (only for users to notify)
     const userStats = new Map<string, { tasks: number; audio: number; journals: number }>();
     
-    for (const userId of userIds) {
+    for (const userId of usersToNotify) {
       userStats.set(userId, { tasks: 0, audio: 0, journals: 0 });
     }
     

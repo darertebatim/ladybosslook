@@ -62,10 +62,10 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 
 const SCHEDULE_LABELS: Record<string, string> = {
   '0 6 * * *': 'Daily at 6 AM UTC',
-  '0 * * * *': 'Every hour',
+  '0 * * * *': 'Hourly (timezone-aware)',
   '*/5 * * * *': 'Every 5 minutes',
   '*/15 * * * *': 'Every 15 minutes',
-  '0 9 * * 1': 'Mondays at 9 AM UTC',
+  '0 9 * * 1': 'Mondays at 9 AM (user timezone)',
   'trigger': 'On-demand (triggered)',
 };
 
