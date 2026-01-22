@@ -11,7 +11,6 @@ import {
   Calendar, 
   BookOpen, 
   CheckSquare, 
-  MessageSquare, 
   TrendingUp,
   Play,
   RefreshCw,
@@ -55,7 +54,6 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   'send-drip-notifications': <BookOpen className="h-5 w-5" />,
   'send-session-reminders': <Calendar className="h-5 w-5" />,
   'send-task-reminders': <CheckSquare className="h-5 w-5" />,
-  'send-journal-reminders': <MessageSquare className="h-5 w-5" />,
   'send-feed-post-notifications': <Bell className="h-5 w-5" />,
   'send-weekly-summary': <TrendingUp className="h-5 w-5" />,
 };
