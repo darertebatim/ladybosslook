@@ -87,7 +87,7 @@ const ICON_OPTIONS = [
 ];
 
 const CATEGORY_OPTIONS = [
-  'Morning', 'Evening', 'Productivity', 'Wellness', 'Learning', 'Community'
+  'Pro', 'Morning', 'Evening', 'Productivity', 'Wellness', 'Learning', 'Community'
 ];
 
 export function ProTaskTemplatesManager() {
