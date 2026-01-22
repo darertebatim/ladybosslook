@@ -84,35 +84,33 @@ const AppJournal = () => {
             >
               <Search className="h-5 w-5" />
             </Button>
-            {isNative && (
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Sparkles className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent 
-                  side="bottom" 
-                  className="h-auto"
-                  style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
-                >
-                  <SheetHeader>
-                    <SheetTitle>Build a Journaling Habit</SheetTitle>
-                  </SheetHeader>
-                  <div className="py-4 space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      Add journaling to your daily routine and get reminded at your preferred time.
-                    </p>
-                    <JournalReminderSettings />
-                  </div>
-                  <SheetFooter className="pt-2">
-                    <SheetClose asChild>
-                      <Button variant="outline" className="w-full">Close</Button>
-                    </SheetClose>
-                  </SheetFooter>
-                </SheetContent>
-              </Sheet>
-            )}
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Sparkles className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent 
+                side="bottom" 
+                className="h-auto"
+                style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+              >
+                <SheetHeader>
+                  <SheetTitle>Build a Journaling Habit</SheetTitle>
+                </SheetHeader>
+                <div className="py-4 space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Add journaling to your daily routine and get reminded at your preferred time.
+                  </p>
+                  <JournalReminderSettings />
+                </div>
+                <SheetFooter className="pt-2">
+                  <SheetClose asChild>
+                    <Button variant="outline" className="w-full">Close</Button>
+                  </SheetClose>
+                </SheetFooter>
+              </SheetContent>
+            </Sheet>
             <Button 
               variant="ghost" 
               size="icon"
