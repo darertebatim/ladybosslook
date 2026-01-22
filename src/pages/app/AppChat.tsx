@@ -11,6 +11,7 @@ import { ChevronLeft, MessageCircle, RefreshCw, ChevronDown } from "lucide-react
 import { ChatSkeleton } from "@/components/app/skeletons";
 import { SEOHead } from "@/components/SEOHead";
 import { format, isToday, isYesterday, isSameDay } from "date-fns";
+import { haptic } from "@/lib/haptics";
 
 interface Message {
   id: string;
@@ -355,6 +356,7 @@ export default function AppChat() {
 
   // Navigate back to app home
   const handleBack = () => {
+    haptic.light();
     navigate('/app/home');
   };
 

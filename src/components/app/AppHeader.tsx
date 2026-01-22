@@ -1,12 +1,11 @@
 import { ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { BackButton } from '@/components/app/BackButton';
 
 interface AppHeaderProps {
   title: string;
   subtitle?: string;
   showBack?: boolean;
+  backTo?: string;
   rightAction?: ReactNode;
   transparent?: boolean;
 }
@@ -14,12 +13,11 @@ interface AppHeaderProps {
 export function AppHeader({ 
   title, 
   subtitle, 
-  showBack = false, 
+  showBack = false,
+  backTo,
   rightAction, 
   transparent = false 
 }: AppHeaderProps) {
-  const navigate = useNavigate();
-
   return (
     <header 
       className={`fixed top-0 left-0 right-0 z-50 rounded-b-3xl shadow-sm ${
@@ -32,14 +30,7 @@ export function AppHeader({
       <div className="flex items-center justify-between pt-3 pb-2 px-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {showBack && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => navigate(-1)}
-              className="shrink-0"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
+            <BackButton to={backTo} className="shrink-0" />
           )}
           <div className="min-w-0">
             <h1 className="font-semibold text-lg truncate">{title}</h1>

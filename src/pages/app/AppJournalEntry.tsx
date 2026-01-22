@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Check, Loader2, Trash2, Share2 } from 'lucide-react';
+import { Check, Loader2, Trash2, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,6 +8,7 @@ import { useJournalEntry, useCreateJournalEntry, useUpdateJournalEntry, useDelet
 import { MoodSelector } from '@/components/app/MoodSelector';
 import { WritingPrompts } from '@/components/app/WritingPrompts';
 import { JournalEntrySkeleton } from '@/components/app/skeletons/JournalSkeleton';
+import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
 import { toast } from 'sonner';
 import { useBilingualText } from '@/components/ui/BilingualText';
@@ -202,9 +203,7 @@ const AppJournalEntry = () => {
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="flex items-center gap-3 px-4 pt-3 pb-2">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/app/journal')}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
+            <BackButton to="/app/journal" />
             <h1 className="text-lg font-medium">Journal Entry</h1>
           </div>
         </header>
@@ -233,9 +232,7 @@ const AppJournalEntry = () => {
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={handleBack}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
+            <BackButton onClick={handleBack} />
             <h1 className="text-lg font-medium">
               {isNewEntry ? 'New Entry' : 'Edit Entry'}
             </h1>

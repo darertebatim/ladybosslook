@@ -5,8 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, ArrowLeft, CalendarPlus, Loader2, Bell, Clock, Lock, FileText, Play } from 'lucide-react';
+import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, CalendarPlus, Loader2, Bell, Clock, Lock, FileText, Play, ArrowLeft } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
+import { BackButton } from '@/components/app/BackButton';
 import { downloadICSFile, generateICSFile } from '@/utils/calendar';
 import { addEventToCalendar, addMultipleEventsToCalendar, isCalendarAvailable, CalendarEvent, checkCalendarPermission } from '@/lib/calendarIntegration';
 import { format, addWeeks } from 'date-fns';
@@ -678,14 +679,7 @@ const AppCourseDetail = () => {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="pt-6 pb-3 px-4 flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => navigate(-1)}
-            className="shrink-0"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+          <BackButton className="shrink-0" />
           <div className="min-w-0">
             <h1 className="font-semibold text-lg truncate">{program?.title || 'Program Details'}</h1>
             {round && (

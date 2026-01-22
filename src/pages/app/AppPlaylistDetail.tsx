@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink, CalendarPlus, Check } from "lucide-react";
+import { Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink, CalendarPlus, Check } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { SupplementViewer } from "@/components/app/SupplementViewer";
+import { BackButton } from "@/components/app/BackButton";
 import { isNativeApp } from "@/lib/platform";
 import { getTrackAvailabilityWithCountdown } from "@/lib/dripContent";
 import { useEnrollments } from "@/hooks/useAppData";
@@ -516,11 +517,9 @@ export default function AppPlaylistDetail() {
           className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="pt-3 pb-2 px-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/app/player')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Library
-            </Button>
+          <div className="pt-3 pb-2 px-4 flex items-center gap-2">
+            <BackButton to="/app/player" />
+            <span className="text-sm text-muted-foreground">Library</span>
           </div>
         </div>
         <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
@@ -544,11 +543,9 @@ export default function AppPlaylistDetail() {
         className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-3 pb-2 px-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate(cameFromPlanner ? '/app/home' : '/app/player')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {cameFromPlanner ? 'Home' : 'Library'}
-          </Button>
+        <div className="pt-3 pb-2 px-4 flex items-center gap-2">
+          <BackButton to={cameFromPlanner ? '/app/home' : '/app/player'} />
+          <span className="text-sm text-muted-foreground">{cameFromPlanner ? 'Home' : 'Library'}</span>
         </div>
       </div>
 
