@@ -131,34 +131,34 @@ function calculateReminderTime(scheduledTime: string, offsetMinutes: number): { 
 
 // Check if task should run on given date based on repeat pattern
 function taskShouldRunOnDate(task: any, date: Date): boolean {
-  const taskStartDate = new Date(task.start_date);
+  const taskScheduledDate = new Date(task.scheduled_date);
   const dayOfWeek = date.getDay();
   
-  // If date is before task start date, skip
-  if (date < new Date(taskStartDate.toDateString())) {
+  // If date is before task scheduled date, skip
+  if (date < new Date(taskScheduledDate.toDateString())) {
     return false;
   }
   
   switch (task.repeat_pattern) {
     case 'none':
-      // One-time task - only on start date
-      return date.toDateString() === taskStartDate.toDateString();
+      // One-time task - only on scheduled date
+      return date.toDateString() === taskScheduledDate.toDateString();
       
     case 'daily':
-      // Every day from start date
+      // Every day from scheduled date
       return true;
       
     case 'weekly':
-      // Same day of week as start date
-      return dayOfWeek === taskStartDate.getDay();
+      // Same day of week as scheduled date
+      return dayOfWeek === taskScheduledDate.getDay();
       
     case 'weekend':
       // Saturday (6) or Sunday (0)
       return dayOfWeek === 0 || dayOfWeek === 6;
       
     case 'monthly':
-      // Same day of month as start date
-      return date.getDate() === taskStartDate.getDate();
+      // Same day of month as scheduled date
+      return date.getDate() === taskScheduledDate.getDate();
       
     default:
       return false;
@@ -197,7 +197,7 @@ Deno.serve(async (req) => {
     // Fetch all tasks with reminders enabled and a scheduled time
     const { data: tasks, error: tasksError } = await supabase
       .from('user_tasks')
-      .select('id, user_id, title, scheduled_time, reminder_enabled, reminder_offset, repeat_pattern, start_date, emoji')
+      .select('id, user_id, title, scheduled_time, reminder_enabled, reminder_offset, repeat_pattern, scheduled_date, emoji')
       .eq('reminder_enabled', true)
       .not('scheduled_time', 'is', null);
     
