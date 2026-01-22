@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => ({
   define: {
     __BUILD_TIME__: JSON.stringify(buildTime),
     __BUILD_ID__: JSON.stringify(buildId),
-    __APP_VERSION__: JSON.stringify('1.0.6'),
+    __APP_VERSION__: JSON.stringify('1.1'),
   },
   server: {
     host: "::",
