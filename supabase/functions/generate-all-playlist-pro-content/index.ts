@@ -53,20 +53,25 @@ serve(async (req) => {
     // Fetch existing Pro Task templates to avoid duplicates
     const { data: existingTemplates } = await supabase
       .from("routine_task_templates")
-      .select("title, linked_playlist_id");
+      .select("id, linked_playlist_id")
+      .not("linked_playlist_id", "is", null);
 
     const existingPlaylistIds = new Set(
-      existingTemplates?.filter(t => t.linked_playlist_id).map(t => t.linked_playlist_id) || []
+      existingTemplates?.map(t => t.linked_playlist_id) || []
     );
 
-    // Fetch existing Pro Routines to avoid duplicates
+    // Fetch existing Pro Routines to avoid duplicates (and to backfill missing tasks)
     const { data: existingRoutines } = await supabase
       .from("routine_plans")
-      .select("title")
+      .select("id, title")
       .eq("is_pro_routine", true);
 
     const existingRoutineTitles = new Set(
       existingRoutines?.map(r => r.title.toLowerCase()) || []
+    );
+
+    const existingRoutineIdByTitle = new Map(
+      (existingRoutines || []).map(r => [r.title.toLowerCase(), r.id])
     );
 
     // Fetch categories for assignment
@@ -81,8 +86,8 @@ serve(async (req) => {
       categoryMap[c.name.toLowerCase()] = c.id;
     });
 
-    // Filter playlists that need Pro Tasks
-    const playlistsToProcess = playlists.filter(p => !existingPlaylistIds.has(p.id));
+    // Process all playlists (skip inserts when already present)
+    const playlistsToProcess = playlists;
 
     // Get current max display orders
     const { data: maxTemplateOrder } = await supabase
@@ -157,7 +162,7 @@ serve(async (req) => {
                               playlist.description?.toLowerCase().includes('deep') ? 30 : 15;
 
       try {
-        // Step 1: Generate AI content for Pro Task
+        // Step 1: Generate AI content for Pro Task / Pro Routine
         let taskDescription = `Listen to ${playlist.name}`;
         let routineDescription = `A focused routine featuring ${playlist.name}`;
         let routineSubtitle = "";
@@ -221,34 +226,144 @@ Return JSON:
           // Continue with default values
         }
 
-        // Step 2: Create Pro Task Template
-        const { data: newTemplate, error: templateError } = await supabase
-          .from("routine_task_templates")
-          .insert({
-            title: playlist.name,
-            description: taskDescription,
-            duration_minutes: durationMinutes,
-            icon: icon,
-            category: playlist.category || null,
-            pro_link_type: 'playlist',
-            pro_link_value: playlist.id,
-            linked_playlist_id: playlist.id,
-            is_active: true,
-            is_popular: false,
-            display_order: templateOrder++,
-          })
-          .select("id")
-          .single();
-
-        if (templateError) {
-          results.errors.push(`Template for "${playlist.name}": ${templateError.message}`);
-          continue;
+        // Hard fallbacks to ensure routines are never created "empty"
+        if (!taskDescription?.trim()) taskDescription = `Listen to ${playlist.name}`;
+        if (!routineDescription?.trim()) routineDescription = `A focused routine featuring ${playlist.name}`;
+        if (!routineSubtitle?.trim()) routineSubtitle = "A simple, supportive reset";
+        if (!Array.isArray(sections) || sections.length === 0) {
+          sections = [
+            {
+              title: "Settle In",
+              description: "Find a comfortable spot, take three slow breaths, and set an intention for this listening session.",
+            },
+            {
+              title: "Listen With Presence",
+              description: "Press play and stay curious—notice what resonates, and gently return your attention whenever your mind wanders.",
+            },
+            {
+              title: "Integrate",
+              description: "Write down one takeaway and one tiny action you can try today to turn insight into momentum.",
+            },
+          ].slice(0, 3);
         }
-        results.tasksCreated++;
 
-        // Step 3: Check if routine already exists
+        // Step 2: Create Pro Task Template (only if missing)
+        if (!existingPlaylistIds.has(playlist.id)) {
+          const { error: templateError } = await supabase
+            .from("routine_task_templates")
+            .insert({
+              title: playlist.name,
+              description: taskDescription,
+              duration_minutes: durationMinutes,
+              icon: icon,
+              category: playlist.category || null,
+              pro_link_type: 'playlist',
+              pro_link_value: playlist.id,
+              linked_playlist_id: playlist.id,
+              is_active: true,
+              is_popular: false,
+              display_order: templateOrder++,
+            });
+
+          if (templateError) {
+            results.errors.push(`Template for "${playlist.name}": ${templateError.message}`);
+            continue;
+          }
+
+          results.tasksCreated++;
+          existingPlaylistIds.add(playlist.id);
+        } else {
+          results.tasksSkipped++;
+        }
+
+        // Step 3: If routine already exists, ensure it has a linked playlist task (backfill)
         if (existingRoutineTitles.has(playlist.name.toLowerCase())) {
           results.routinesSkipped++;
+
+          const existingPlanId = existingRoutineIdByTitle.get(playlist.name.toLowerCase());
+          if (existingPlanId) {
+            const { data: existingPlanTasks, error: existingPlanTasksError } = await supabase
+              .from("routine_plan_tasks")
+              .select("id")
+              .eq("plan_id", existingPlanId)
+              .eq("linked_playlist_id", playlist.id)
+              .limit(1);
+
+            if (existingPlanTasksError) {
+              results.errors.push(`Check existing routine task for "${playlist.name}": ${existingPlanTasksError.message}`);
+              continue;
+            }
+
+            if (!existingPlanTasks || existingPlanTasks.length === 0) {
+              const { data: maxExistingTaskOrder } = await supabase
+                .from("routine_plan_tasks")
+                .select("task_order")
+                .eq("plan_id", existingPlanId)
+                .order("task_order", { ascending: false })
+                .limit(1);
+
+              const nextTaskOrder = (maxExistingTaskOrder?.[0]?.task_order || 0) + 1;
+
+              const { error: backfillTaskError } = await supabase
+                .from("routine_plan_tasks")
+                .insert({
+                  plan_id: existingPlanId,
+                  title: playlist.name,
+                  icon: icon,
+                  duration_minutes: durationMinutes,
+                  task_order: nextTaskOrder,
+                  is_active: true,
+                  pro_link_type: 'playlist',
+                  pro_link_value: playlist.id,
+                  linked_playlist_id: playlist.id,
+                });
+
+              if (backfillTaskError) {
+                results.errors.push(`Backfill task for routine "${playlist.name}": ${backfillTaskError.message}`);
+              }
+            }
+
+            // Backfill sections if missing
+            const { data: existingSections, error: existingSectionsError } = await supabase
+              .from("routine_plan_sections")
+              .select("id")
+              .eq("plan_id", existingPlanId)
+              .limit(1);
+
+            if (existingSectionsError) {
+              results.errors.push(`Check existing routine sections for "${playlist.name}": ${existingSectionsError.message}`);
+              continue;
+            }
+
+            if (!existingSections || existingSections.length === 0) {
+              for (let i = 0; i < sections.length; i++) {
+                const section = sections[i];
+                await supabase
+                  .from("routine_plan_sections")
+                  .insert({
+                    plan_id: existingPlanId,
+                    title: section.title,
+                    content: section.description,
+                    section_order: i + 1,
+                    is_active: true,
+                  });
+              }
+
+              // Only fill description/subtitle if currently null
+              await supabase
+                .from("routine_plans")
+                .update({ description: routineDescription })
+                .eq("id", existingPlanId)
+                .is("description", null);
+
+              await supabase
+                .from("routine_plans")
+                .update({ subtitle: routineSubtitle || null })
+                .eq("id", existingPlanId)
+                .is("subtitle", null);
+            }
+          }
+
           continue;
         }
 
@@ -287,8 +402,9 @@ Return JSON:
               .insert({
                 plan_id: newPlan.id,
                 title: section.title,
-                description: section.description,
+                content: section.description,
                 section_order: i + 1,
+                is_active: true,
               });
           }
         }
@@ -306,7 +422,6 @@ Return JSON:
             pro_link_type: 'playlist',
             pro_link_value: playlist.id,
             linked_playlist_id: playlist.id,
-            section_id: null,
           });
 
         if (taskError) {
@@ -320,9 +435,6 @@ Return JSON:
         results.errors.push(`Processing "${playlist.name}": ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
-
-    // Count skipped templates (already had playlist linked)
-    results.tasksSkipped = playlists.length - playlistsToProcess.length;
 
     return new Response(
       JSON.stringify({
