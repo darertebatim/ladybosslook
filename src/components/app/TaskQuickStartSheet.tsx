@@ -42,8 +42,8 @@ export const TaskQuickStartSheet = ({
     onOpenChange(false);
   };
 
-  // Show first 6 templates as suggestions
-  const suggestions = templates.slice(0, 6);
+  // Show popular templates as suggestions
+  const suggestions = templates.filter(t => t.is_popular).slice(0, 8);
 
   return (
     <Sheet open={open} onOpenChange={handleClose}>
