@@ -19,6 +19,7 @@ import { isNativeApp } from '@/lib/platform';
 import { programImages } from '@/data/programs';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
+import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import { shouldShowEnrollmentReminder } from '@/hooks/useNotificationReminder';
 import { subscribeToPushNotifications, checkPermissionStatus } from '@/lib/pushNotifications';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -628,7 +629,10 @@ const AppCourseDetail = () => {
   // Determine if we should show any content schedule
   const showContentSchedule = hasDripModules || hasDripTracks;
 
-  // Free enrollment mutation
+  // Centralized invalidation for consistent cache clearing
+  const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
+
+  // Free enrollment mutation with optimistic update
   const enrollMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id || !program) throw new Error('Missing required data');
@@ -644,15 +648,33 @@ const AppCourseDetail = () => {
       
       if (error) throw error;
     },
+    // Optimistic update for instant unlock
+    onMutate: async () => {
+      // Cancel any outgoing refetches to prevent overwriting our optimistic update
+      await queryClient.cancelQueries({ queryKey: ['enrollments', user?.id] });
+      await queryClient.cancelQueries({ queryKey: ['player-data', user?.id] });
+      
+      // Snapshot previous value for rollback
+      const previousEnrollments = queryClient.getQueryData<string[]>(['enrollments', user?.id]);
+      
+      // Optimistically add this program to enrollments cache
+      if (program?.slug) {
+        queryClient.setQueryData<string[]>(['enrollments', user?.id], (old = []) => {
+          return [...old, program.slug].filter(Boolean);
+        });
+      }
+      
+      return { previousEnrollments };
+    },
     onSuccess: async () => {
       toast.success('Enrolled successfully!');
       
-      // Immediately invalidate all enrollment-related caches for instant unlock
-      queryClient.invalidateQueries({ queryKey: ['course-enrollment', slug], refetchType: 'active' });
-      queryClient.invalidateQueries({ queryKey: ['player-data'], refetchType: 'active' });
-      queryClient.invalidateQueries({ queryKey: ['enrollments'], refetchType: 'active' });
-      queryClient.invalidateQueries({ queryKey: ['courses-data'], refetchType: 'active' });
-      queryClient.invalidateQueries({ queryKey: ['home-data'], refetchType: 'active' });
+      // Invalidate and refetch with correct user-scoped keys for full data refresh
+      invalidateAllEnrollmentData();
+      
+      // Also invalidate the course-specific query and force immediate refetch
+      await queryClient.invalidateQueries({ queryKey: ['course-enrollment', slug] });
+      await queryClient.refetchQueries({ queryKey: ['course-enrollment', slug], exact: true });
       
       // Auto-sync calendar if preference enabled
       await autoSyncCalendarOnEnrollment();
@@ -665,9 +687,14 @@ const AppCourseDetail = () => {
         }, 1500); // Show after success toast
       }
     },
-    onError: (error) => {
+    onError: (error, variables, context) => {
       console.error('Enrollment error:', error);
       toast.error('Failed to enroll. Please try again.');
+      
+      // Rollback optimistic update on error
+      if (context?.previousEnrollments) {
+        queryClient.setQueryData(['enrollments', user?.id], context.previousEnrollments);
+      }
     }
   });
 
