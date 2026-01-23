@@ -11,7 +11,7 @@ export interface ReminderSettings {
 
 export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
   enabled: true,
-  reminderMinutes: 60,
+  reminderMinutes: 0, // "At the time" is the default
   isUrgent: false,
 };
 
