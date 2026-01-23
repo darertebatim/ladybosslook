@@ -104,12 +104,29 @@ export function TaskTemplatesManager() {
     },
   });
 
-  // Derive unique categories from existing templates
+  // Fetch categories from routine_categories table (source of truth)
+  const { data: routineCategories } = useQuery({
+    queryKey: ['routine-categories-for-templates'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routine_categories')
+        .select('slug, name')
+        .eq('is_active', true)
+        .order('display_order');
+      if (error) throw error;
+      return data as { slug: string; name: string }[];
+    },
+  });
+
+  // Use routine_categories as the source of truth for category options
   const categoryOptions = useMemo(() => {
-    if (!templates) return [];
-    const uniqueCategories = [...new Set(templates.map(t => t.category).filter(Boolean))];
-    return uniqueCategories.sort();
-  }, [templates]);
+    return routineCategories?.map(c => c.slug) || [];
+  }, [routineCategories]);
+
+  // Helper to get category display name
+  const getCategoryName = (slug: string) => {
+    return routineCategories?.find(c => c.slug === slug)?.name || slug;
+  };
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -272,8 +289,8 @@ export function TaskTemplatesManager() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary" className="capitalize">
-                        {template.category}
+                      <Badge variant="secondary">
+                        {getCategoryName(template.category)}
                       </Badge>
                     </TableCell>
                     <TableCell>
