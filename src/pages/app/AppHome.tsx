@@ -424,7 +424,7 @@ const AppHome = () => {
                 />
               </button>
               
-              {/* Right: Today button - compact Me+ style */}
+              {/* Right: Today button - more prominent */}
               {!isToday(selectedDate) && (
                 <button
                   onClick={() => {
@@ -432,9 +432,9 @@ const AppHome = () => {
                     setCurrentMonth(startOfMonth(new Date()));
                     haptic.light();
                   }}
-                  className="absolute right-2 flex items-center gap-0.5 px-2 py-0.5 text-xs font-semibold text-foreground/70 bg-violet-200/80 dark:bg-violet-800 dark:text-violet-200 rounded-full active:scale-95 transition-transform"
+                  className="absolute right-2 flex items-center gap-0.5 px-3 py-1.5 text-sm font-semibold text-violet-700 bg-violet-200 dark:bg-violet-700 dark:text-violet-100 rounded-full shadow-sm active:scale-95 transition-transform"
                 >
-                  <ChevronLeft className="h-3 w-3" />
+                  <ChevronLeft className="h-3.5 w-3.5" />
                   Today
                 </button>
               )}
