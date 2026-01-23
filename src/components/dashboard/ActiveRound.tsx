@@ -159,7 +159,7 @@ export function ActiveRound() {
     return (
       <Link 
         key={enrollment.id} 
-        to={`/app/course/${enrollment.program_slug}`}
+        to={`/app/course/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
         onClick={() => {
           if (isEnrollmentUnseen && markEnrollmentViewed) {
             markEnrollmentViewed(enrollment.id);
