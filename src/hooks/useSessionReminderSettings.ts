@@ -1,19 +1,8 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 
 export interface ReminderSettings {
   reminderMinutes: number;
   isUrgent: boolean;
-}
-
-interface SessionReminderState {
-  [sessionId: string]: ReminderSettings;
-}
-
-interface ContentReminderState {
-  [itemId: string]: {
-    reminderMinutes: number;
-    enabled: boolean;
-  };
 }
 
 const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
@@ -21,128 +10,109 @@ const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
   isUrgent: false,
 };
 
-const DEFAULT_CONTENT_REMINDER = {
-  reminderMinutes: 60,
-  enabled: false,
-};
-
 /**
- * Custom hook to manage reminder settings for sessions and content items.
+ * Custom hook to manage GLOBAL reminder settings for all sessions and content items in a round.
  * Uses localStorage to persist settings per round.
  */
 export function useSessionReminderSettings(roundId: string | undefined) {
-  const [sessionSettings, setSessionSettings] = useState<SessionReminderState>({});
-  const [contentSettings, setContentSettings] = useState<ContentReminderState>({});
+  // Global settings for ALL sessions in this round
+  const [sessionSettings, setSessionSettingsState] = useState<ReminderSettings>(DEFAULT_REMINDER_SETTINGS);
+  // Global settings for ALL content items in this round
+  const [contentSettings, setContentSettingsState] = useState<ReminderSettings>(DEFAULT_REMINDER_SETTINGS);
+  // Track which content items have reminders scheduled
+  const [scheduledContentIds, setScheduledContentIds] = useState<Set<string>>(new Set());
 
   const sessionStorageKey = useMemo(() => roundId ? `sessionReminders_${roundId}` : null, [roundId]);
   const contentStorageKey = useMemo(() => roundId ? `contentReminders_${roundId}` : null, [roundId]);
+  const scheduledStorageKey = useMemo(() => roundId ? `scheduledContent_${roundId}` : null, [roundId]);
 
-  // Load session settings from localStorage on mount or when roundId changes
+  // Load settings from localStorage on mount or when roundId changes
   useEffect(() => {
     if (!sessionStorageKey) return;
     
     try {
       const stored = localStorage.getItem(sessionStorageKey);
       if (stored) {
-        setSessionSettings(JSON.parse(stored));
+        setSessionSettingsState(JSON.parse(stored));
       }
     } catch (error) {
       console.error('Error loading session reminder settings:', error);
     }
   }, [sessionStorageKey]);
 
-  // Load content settings from localStorage
   useEffect(() => {
     if (!contentStorageKey) return;
     
     try {
       const stored = localStorage.getItem(contentStorageKey);
       if (stored) {
-        setContentSettings(JSON.parse(stored));
+        setContentSettingsState(JSON.parse(stored));
       }
     } catch (error) {
       console.error('Error loading content reminder settings:', error);
     }
   }, [contentStorageKey]);
 
-  // Persist session settings to localStorage
-  const persistSessionSettings = useCallback((newState: SessionReminderState) => {
-    if (!sessionStorageKey) return;
+  useEffect(() => {
+    if (!scheduledStorageKey) return;
     
     try {
-      localStorage.setItem(sessionStorageKey, JSON.stringify(newState));
+      const stored = localStorage.getItem(scheduledStorageKey);
+      if (stored) {
+        setScheduledContentIds(new Set(JSON.parse(stored)));
+      }
     } catch (error) {
-      console.error('Error saving session reminder settings:', error);
+      console.error('Error loading scheduled content IDs:', error);
     }
+  }, [scheduledStorageKey]);
+
+  // Save global session settings
+  const setSessionSettings = useCallback((settings: ReminderSettings) => {
+    if (!sessionStorageKey) return;
+    setSessionSettingsState(settings);
+    localStorage.setItem(sessionStorageKey, JSON.stringify(settings));
   }, [sessionStorageKey]);
 
-  // Persist content settings to localStorage
-  const persistContentSettings = useCallback((newState: ContentReminderState) => {
+  // Save global content settings
+  const setContentSettings = useCallback((settings: ReminderSettings) => {
     if (!contentStorageKey) return;
-    
-    try {
-      localStorage.setItem(contentStorageKey, JSON.stringify(newState));
-    } catch (error) {
-      console.error('Error saving content reminder settings:', error);
-    }
+    setContentSettingsState(settings);
+    localStorage.setItem(contentStorageKey, JSON.stringify(settings));
   }, [contentStorageKey]);
 
-  // Get settings for a specific session
-  const getSessionSettings = useCallback((sessionId: string): ReminderSettings => {
-    return sessionSettings[sessionId] || DEFAULT_REMINDER_SETTINGS;
-  }, [sessionSettings]);
-
-  // Update settings for a specific session
-  const setSessionReminderSettings = useCallback((sessionId: string, settings: ReminderSettings) => {
-    setSessionSettings(prev => {
-      const newState = {
-        ...prev,
-        [sessionId]: settings,
-      };
-      persistSessionSettings(newState);
-      return newState;
+  // Track scheduled content reminders
+  const markContentScheduled = useCallback((contentId: string) => {
+    if (!scheduledStorageKey) return;
+    setScheduledContentIds(prev => {
+      const updated = new Set(prev);
+      updated.add(contentId);
+      localStorage.setItem(scheduledStorageKey, JSON.stringify([...updated]));
+      return updated;
     });
-  }, [persistSessionSettings]);
+  }, [scheduledStorageKey]);
 
-  // Get settings for a specific content item
-  const getContentSettings = useCallback((itemId: string) => {
-    return contentSettings[itemId] || DEFAULT_CONTENT_REMINDER;
-  }, [contentSettings]);
-
-  // Update settings for a specific content item
-  const setContentReminderSettings = useCallback((itemId: string, settings: { reminderMinutes: number; enabled: boolean }) => {
-    setContentSettings(prev => {
-      const newState = {
-        ...prev,
-        [itemId]: settings,
-      };
-      persistContentSettings(newState);
-      return newState;
+  const unmarkContentScheduled = useCallback((contentId: string) => {
+    if (!scheduledStorageKey) return;
+    setScheduledContentIds(prev => {
+      const updated = new Set(prev);
+      updated.delete(contentId);
+      localStorage.setItem(scheduledStorageKey, JSON.stringify([...updated]));
+      return updated;
     });
-  }, [persistContentSettings]);
+  }, [scheduledStorageKey]);
 
-  // Check if a content item has a reminder enabled
-  const hasContentReminder = useCallback((itemId: string): boolean => {
-    return contentSettings[itemId]?.enabled || false;
-  }, [contentSettings]);
-
-  // Clear reminder for a content item
-  const clearContentReminder = useCallback((itemId: string) => {
-    setContentSettings(prev => {
-      const newState = { ...prev };
-      delete newState[itemId];
-      persistContentSettings(newState);
-      return newState;
-    });
-  }, [persistContentSettings]);
+  const hasContentReminder = useCallback((contentId: string): boolean => {
+    return scheduledContentIds.has(contentId);
+  }, [scheduledContentIds]);
 
   return {
-    getSessionSettings,
-    setSessionReminderSettings,
-    getContentSettings,
-    setContentReminderSettings,
+    sessionSettings,
+    setSessionSettings,
+    contentSettings,
+    setContentSettings,
     hasContentReminder,
-    clearContentReminder,
+    markContentScheduled,
+    unmarkContentScheduled,
     DEFAULT_REMINDER_SETTINGS,
   };
 }

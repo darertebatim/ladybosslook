@@ -4,18 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { CalendarPlus, Bell, AlertTriangle } from 'lucide-react';
+import { Bell, AlertTriangle } from 'lucide-react';
 import { ReminderSettings } from '@/hooks/useSessionReminderSettings';
 import { isUrgentAlarmAvailable } from '@/lib/taskAlarm';
 
 interface SessionReminderSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  sessionTitle: string;
+  title: string;
+  description: string;
   currentSettings: ReminderSettings;
   onSave: (settings: ReminderSettings) => void;
-  onSaveAndAdd: (settings: ReminderSettings) => void;
-  isAlreadySynced?: boolean;
 }
 
 const REMINDER_OPTIONS = [
@@ -29,11 +28,10 @@ const REMINDER_OPTIONS = [
 export function SessionReminderSheet({
   open,
   onOpenChange,
-  sessionTitle,
+  title,
+  description,
   currentSettings,
   onSave,
-  onSaveAndAdd,
-  isAlreadySynced = false,
 }: SessionReminderSheetProps) {
   const [reminderMinutes, setReminderMinutes] = useState(currentSettings.reminderMinutes.toString());
   const [isUrgent, setIsUrgent] = useState(currentSettings.isUrgent);
@@ -55,25 +53,16 @@ export function SessionReminderSheet({
     onOpenChange(false);
   };
 
-  const handleSaveAndAdd = () => {
-    const settings: ReminderSettings = {
-      reminderMinutes: parseInt(reminderMinutes),
-      isUrgent,
-    };
-    onSaveAndAdd(settings);
-    onOpenChange(false);
-  };
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-2xl">
         <SheetHeader className="text-left">
           <SheetTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5" />
-            Reminder Settings
+            {title}
           </SheetTitle>
-          <SheetDescription className="truncate">
-            {sessionTitle}
+          <SheetDescription>
+            {description}
           </SheetDescription>
         </SheetHeader>
 
@@ -131,14 +120,10 @@ export function SessionReminderSheet({
           )}
         </div>
 
-        {/* Actions */}
-        <div className="flex flex-col gap-2 pb-safe">
-          <Button onClick={handleSaveAndAdd} className="w-full" size="lg">
-            <CalendarPlus className="h-4 w-4 mr-2" />
-            {isAlreadySynced ? 'Update Calendar Event' : 'Add to Calendar'}
-          </Button>
-          <Button onClick={handleSave} variant="outline" className="w-full" size="lg">
-            Save Settings Only
+        {/* Save Button */}
+        <div className="pb-safe">
+          <Button onClick={handleSave} className="w-full" size="lg">
+            Save Settings
           </Button>
         </div>
       </SheetContent>
