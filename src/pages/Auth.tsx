@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,8 @@ import { BrandedSplash } from '@/components/app/BrandedSplash';
 import { getDisplayBuildInfo } from '@/lib/buildInfo';
 import { ArrowLeft, Mail } from 'lucide-react';
 import appIcon from '@/assets/app-icon.png';
+import { useKeyboard } from '@/hooks/useKeyboard';
+import { Capacitor } from '@capacitor/core';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -23,6 +25,24 @@ export default function Auth() {
   const { signIn, signUp, signInWithGoogle, signInWithApple, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isKeyboardOpen } = useKeyboard();
+  
+  // Ref to track focused input for iOS keyboard scroll fix
+  const focusedInputRef = useRef<HTMLInputElement | null>(null);
+  const prevKeyboardOpen = useRef(false);
+  
+  // iOS keyboard scroll fix: scroll focused input into view when keyboard opens
+  useEffect(() => {
+    if (isKeyboardOpen && !prevKeyboardOpen.current && focusedInputRef.current) {
+      setTimeout(() => {
+        focusedInputRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }, 50);
+    }
+    prevKeyboardOpen.current = isKeyboardOpen;
+  }, [isKeyboardOpen]);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -255,9 +275,9 @@ export default function Auth() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     onFocus={(e) => {
-                      setTimeout(() => {
-                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      }, 300);
+                      if (Capacitor.isNativePlatform()) {
+                        focusedInputRef.current = e.target;
+                      }
                     }}
                     required
                     className="h-12 rounded-xl"
@@ -273,9 +293,9 @@ export default function Auth() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       onFocus={(e) => {
-                        setTimeout(() => {
-                          e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }, 300);
+                        if (Capacitor.isNativePlatform()) {
+                          focusedInputRef.current = e.target;
+                        }
                       }}
                       required
                       className="h-12 rounded-xl"
