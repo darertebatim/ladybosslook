@@ -1,11 +1,25 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
 
+/**
+ * Task Reminders Edge Function (FALLBACK ONLY)
+ * 
+ * This is a SERVER-SIDE FALLBACK for task reminders.
+ * Primary reminders are handled by LOCAL NOTIFICATIONS on the device.
+ * 
+ * This function only sends reminders for:
+ * - Users who haven't updated to the new app version with local notifications
+ * - Complex repeat patterns that local notifications can't handle natively
+ * - Tasks where local notification scheduling failed
+ * 
+ * Runs every 5 minutes via cron but skips tasks that:
+ * - Already had a reminder sent today
+ * - Are already completed for today
+ */
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-// Sign JWT for APNs
 async function signJWT(header: Record<string, unknown>, payload: Record<string, unknown>, privateKey: string): Promise<string> {
   const encoder = new TextEncoder();
   
@@ -228,6 +242,19 @@ Deno.serve(async (req) => {
     
     const sentTaskIds = new Set(sentReminders?.map(r => r.task_id) || []);
     
+    // Get completed tasks for today - skip reminders for tasks already done
+    const { data: completedTasks, error: completedError } = await supabase
+      .from('task_completions')
+      .select('task_id')
+      .eq('completed_date', today);
+    
+    if (completedError) {
+      console.error('[Task Reminder] Error fetching completed tasks:', completedError);
+    }
+    
+    const completedTaskIds = new Set(completedTasks?.map(c => c.task_id) || []);
+    console.log(`[Task Reminder] Found ${completedTaskIds.size} tasks already completed today`);
+    
     // Get user profiles for timezone info
     const userIds = [...new Set(tasks.map(t => t.user_id))];
     const { data: profiles, error: profilesError } = await supabase
@@ -243,6 +270,12 @@ Deno.serve(async (req) => {
     for (const task of tasks) {
       // Skip if already sent today
       if (sentTaskIds.has(task.id)) {
+        continue;
+      }
+      
+      // Skip if already completed today - no point reminding about done tasks
+      if (completedTaskIds.has(task.id)) {
+        console.log(`[Task Reminder] Skipping "${task.title}" - already completed today`);
         continue;
       }
       
@@ -412,18 +445,26 @@ Deno.serve(async (req) => {
       }
       
       // Log that we sent this reminder (to prevent duplicates)
+      // Use upsert with ignoreDuplicates to handle the unique constraint
       const { error: logError } = await supabase
         .from('task_reminder_logs')
-        .insert({
-          task_id: task.id,
-          user_id: userId,
-          reminder_date: today,
-        })
-        .onConflict('task_id,reminder_date')
-        .ignore();
+        .upsert(
+          {
+            task_id: task.id,
+            user_id: userId,
+            reminder_date: today,
+            sent_at: new Date().toISOString(),
+          },
+          { 
+            onConflict: 'task_id,reminder_date',
+            ignoreDuplicates: true 
+          }
+        );
       
       if (logError) {
         console.error(`[Task Reminder] Failed to log reminder for task ${task.id}:`, logError);
+      } else {
+        console.log(`[Task Reminder] Logged reminder for task ${task.id} on ${today}`);
       }
     }
     
