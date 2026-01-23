@@ -55,19 +55,22 @@ export function ActiveRoundsCarousel({
     // Provider not available
   }
 
+  // When no programs, show a minimal collapsed state
   if (activeRounds.length === 0) {
     return (
-      <div className="h-[88px] flex items-center justify-center gap-3 px-4">
-        <GraduationCap className="h-8 w-8 text-muted-foreground/50 flex-shrink-0" />
-        <div className="flex flex-col items-start gap-1">
-          <p className="text-muted-foreground text-sm">No active programs</p>
-          <Link to="/app/browse">
-            <Button variant="outline" size="sm" className="h-7 text-xs">
-              Browse Programs
-            </Button>
-          </Link>
+      <Link 
+        to="/app/browse"
+        className="flex items-center justify-between px-3 py-2 rounded-xl bg-muted/60 border border-border/50"
+      >
+        <div className="flex items-center gap-2">
+          <GraduationCap className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">No active programs</span>
         </div>
-      </div>
+        <div className="flex items-center gap-1 text-xs text-primary font-medium">
+          Browse
+          <ChevronRight className="h-3.5 w-3.5" />
+        </div>
+      </Link>
     );
   }
 
