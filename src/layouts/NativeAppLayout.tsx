@@ -108,13 +108,13 @@ const NativeAppLayout = () => {
   const isOnChatPage = location.pathname === '/app/chat';
 
   const navItems = [
-    { path: '/app/home', icon: Home, label: 'Home' },
-    { path: '/app/channels', icon: Newspaper, label: 'Channels', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount },
-    { path: '/app/programs', icon: GraduationCap, label: 'Programs' },
-    { path: '/app/browse', icon: ShoppingBag, label: 'Browse' },
-    { path: '/app/routines', icon: Sparkles, label: 'Routines' },
-    { path: '/app/player', icon: Music, label: 'Listen' },
-    { path: '/app/chat', icon: MessageCircle, label: 'Chat' },
+    { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
+    { path: '/app/channels', icon: Newspaper, label: 'Channels', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
+    { path: '/app/programs', icon: GraduationCap, label: 'Programs', tourClass: 'tour-nav-programs' },
+    { path: '/app/browse', icon: ShoppingBag, label: 'Browse', tourClass: 'tour-nav-browse' },
+    { path: '/app/routines', icon: Sparkles, label: 'Routines', tourClass: 'tour-nav-routines' },
+    { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
+    { path: '/app/chat', icon: MessageCircle, label: 'Chat', tourClass: 'tour-nav-chat' },
   ];
 
   // Tab bar actual height: grid content (~48px for compact) + safe area inset
@@ -145,10 +145,10 @@ const NativeAppLayout = () => {
               const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
               const showBadge = showChatBadge || item.showBadge;
               return (
-                <Link
+              <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex flex-col items-center justify-center gap-0.5 transition-colors min-h-[44px] ${
+                  className={`flex flex-col items-center justify-center gap-0.5 transition-colors min-h-[44px] ${item.tourClass || ''} ${
                     isActive
                       ? 'text-primary'
                       : 'text-muted-foreground hover:text-foreground'

@@ -24,6 +24,8 @@ import { PromoBanner } from '@/components/app/PromoBanner';
 import { HomeBanner } from '@/components/app/HomeBanner';
 import { NotificationBanner } from '@/components/app/NotificationBanner';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
+import { AppTour } from '@/components/app/AppTour';
+import { useAppTour } from '@/hooks/useAppTour';
 import { useAuth } from '@/hooks/useAuth';
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -42,6 +44,9 @@ const AppHome = () => {
   const [showQuickStart, setShowQuickStart] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
   const [showNotificationFlow, setShowNotificationFlow] = useState(false);
+  
+  // App tour hook
+  const { run: runTour, stepIndex, setStepIndex, completeTour, skipTour } = useAppTour();
 
   // Handle quick start continue
   const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
@@ -183,7 +188,7 @@ const AppHome = () => {
       <div className="flex flex-col h-full bg-background">
         {/* Fixed header with integrated week strip - Me+ style */}
         <header 
-          className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
+          className="tour-header fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
           style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
         >
           {/* Title bar */}
@@ -233,7 +238,7 @@ const AppHome = () => {
             {/* Streak badge */}
             <button 
               onClick={() => setShowStreakModal(true)}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-sm"
+              className="tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-sm"
             >
               <Flame className="h-4 w-4 fill-current" />
               <span className="text-sm font-semibold">{streak?.current_streak || 0}</span>
@@ -241,7 +246,7 @@ const AppHome = () => {
           </div>
 
           {/* Calendar area - compact spacing */}
-          <div className="px-4 pt-1 pb-1">
+          <div className="tour-calendar px-4 pt-1 pb-1">
             {/* Weekday headers - tighter */}
             <div className="flex">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
@@ -454,7 +459,7 @@ const AppHome = () => {
 
               {/* Popular Routines Suggestions - only show routines user hasn't added */}
               {suggestedRoutines.length > 0 && selectedTag === null && (
-                <div className="mt-6">
+                <div className="tour-suggestions mt-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="h-4 w-4 text-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
@@ -494,7 +499,7 @@ const AppHome = () => {
         {/* FAB - positioned above the fixed bottom dashboard */}
         <button
           onClick={() => setShowQuickStart(true)}
-          className="fixed right-4 w-14 h-14 rounded-full bg-[#D8C0F3] text-foreground shadow-lg flex items-center justify-center hover:bg-[#CDB0E8] active:scale-95 transition-all z-50"
+          className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-[#D8C0F3] text-foreground shadow-lg flex items-center justify-center hover:bg-[#CDB0E8] active:scale-95 transition-all z-50"
           style={{ bottom: 'calc(200px + env(safe-area-inset-bottom))' }}
         >
           <Plus className="h-6 w-6" />
@@ -531,6 +536,15 @@ const AppHome = () => {
             onSkip={() => setShowNotificationFlow(false)}
           />
         )}
+
+        {/* App Tour - Joyride guided walkthrough */}
+        <AppTour
+          run={runTour}
+          stepIndex={stepIndex}
+          onStepChange={setStepIndex}
+          onComplete={completeTour}
+          onSkip={skipTour}
+        />
       </div>
     </>
   );

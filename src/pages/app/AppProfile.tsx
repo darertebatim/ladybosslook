@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell,
-  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, NotebookPen, Trash2, AlertTriangle, Settings
+  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, NotebookPen, Trash2, AlertTriangle, Settings, PlayCircle
 } from 'lucide-react';
 import { NativeSettings, IOSSettings, AndroidSettings } from 'capacitor-native-settings';
 import {
@@ -33,6 +33,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
 import { useState, useEffect } from 'react';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications, unsubscribeFromPushNotifications } from '@/lib/pushNotifications';
+import { clearTourCompleted } from '@/hooks/useAppTour';
 import { Capacitor } from '@capacitor/core';
 
 import { format } from 'date-fns';
@@ -1412,6 +1413,19 @@ const AppProfile = () => {
             <CardTitle>Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => {
+                clearTourCompleted();
+                navigate('/app/home');
+                toast({ title: 'Tour will restart', description: 'Navigate to the home page to start the app tour.' });
+              }}
+            >
+              <PlayCircle className="mr-2 h-4 w-4" />
+              Replay App Tour
+            </Button>
+            
             <Button
               variant="outline"
               className="w-full justify-start"
