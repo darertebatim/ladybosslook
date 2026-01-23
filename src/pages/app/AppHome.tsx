@@ -376,7 +376,7 @@ const AppHome = () => {
                             className={cn(
                               'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5',
                               isSelected
-                                ? 'border-2 border-foreground/25 text-foreground'
+                                ? 'bg-[#F4ECFE] text-foreground' // Same as header background, no border
                                 : isTodayDate
                                   ? 'bg-white/60 text-foreground/80 dark:bg-violet-900/50 dark:text-violet-300'
                                   : 'text-foreground/70'
