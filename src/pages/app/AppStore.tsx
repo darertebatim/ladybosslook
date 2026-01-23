@@ -127,7 +127,7 @@ const AppStore = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-background overflow-hidden">
       <SEOHead 
         title="Browse Courses - LadyBoss Academy"
         description="Browse our free educational programs and courses"

@@ -108,7 +108,7 @@ const AppJournal = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="flex flex-col h-full bg-background overflow-hidden">
       <SEOHead title="My Journal" description="Your personal journal entries" />
       
       {/* Header */}

@@ -235,7 +235,7 @@ const AppHome = () => {
         description="Your personal dashboard and planner"
       />
       
-      <div className="flex flex-col h-full bg-background">
+      <div className="flex flex-col h-full bg-background overflow-hidden">
         {/* Fixed header with integrated week strip - Me+ style */}
         <header 
           className="tour-header fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
