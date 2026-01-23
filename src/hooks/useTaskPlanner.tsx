@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { format, subDays, isEqual, parseISO } from 'date-fns';
+import { scheduleUrgentAlarm, isUrgentAlarmAvailable } from '@/lib/taskAlarm';
 
 // ============================================
 // TYPES
@@ -20,6 +21,7 @@ export interface UserTask {
   repeat_days: number[];
   reminder_enabled: boolean;
   reminder_offset: number;
+  is_urgent: boolean;
   tag: string | null;
   order_index: number;
   is_active: boolean;
@@ -107,6 +109,7 @@ export interface CreateTaskInput {
   repeat_days?: number[];
   reminder_enabled?: boolean;
   reminder_offset?: number;
+  is_urgent?: boolean;
   tag?: string | null;
   subtasks?: string[];
   linked_playlist_id?: string | null;
@@ -118,6 +121,7 @@ export interface UpdateTaskInput extends Partial<CreateTaskInput> {
   id: string;
   is_active?: boolean;
   order_index?: number;
+  is_urgent?: boolean;
   linked_playlist_id?: string | null;
   pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
   pro_link_value?: string | null;
@@ -439,6 +443,7 @@ export const useCreateTask = () => {
           repeat_days: taskData.repeat_days || [],
           reminder_enabled: taskData.reminder_enabled || false,
           reminder_offset: taskData.reminder_offset || 0,
+          is_urgent: taskData.is_urgent || false,
           tag: taskData.tag || null,
           linked_playlist_id: taskData.linked_playlist_id || null,
           pro_link_type: taskData.pro_link_type || null,
@@ -448,6 +453,22 @@ export const useCreateTask = () => {
         .single();
 
       if (taskError) throw taskError;
+
+      // Schedule urgent alarm if enabled
+      if (taskData.is_urgent && taskData.scheduled_time && taskData.scheduled_date && isUrgentAlarmAvailable()) {
+        const alarmResult = await scheduleUrgentAlarm({
+          taskId: task.id,
+          title: taskData.title,
+          emoji: taskData.emoji || '☀️',
+          scheduledDate: taskData.scheduled_date,
+          scheduledTime: taskData.scheduled_time,
+          reminderOffset: taskData.reminder_offset || 0,
+        });
+        
+        if (!alarmResult.success && alarmResult.error) {
+          console.warn('[CreateTask] Urgent alarm scheduling failed:', alarmResult.error);
+        }
+      }
 
       // Create subtasks if provided
       if (subtasks && subtasks.length > 0) {
