@@ -119,19 +119,28 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Fetch all active categories
-    const { data: categories, error: catError } = await supabase
+    // Get the categoryId from request body
+    const { categoryId } = await req.json();
+    
+    if (!categoryId) {
+      return new Response(
+        JSON.stringify({ error: "categoryId is required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Fetch the selected category
+    const { data: category, error: catError } = await supabase
       .from("routine_categories")
       .select("id, name, slug, icon, color")
+      .eq("id", categoryId)
       .eq("is_active", true)
-      .order("display_order");
+      .single();
 
-    if (catError) throw catError;
-
-    if (!categories?.length) {
+    if (catError || !category) {
       return new Response(
-        JSON.stringify({ error: "No active categories found" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "Category not found" }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -166,12 +175,48 @@ serve(async (req) => {
       }
     }
 
-    // Get existing plan titles
-    const { data: existingPlans } = await supabase
-      .from("routine_plans")
-      .select("title");
+    // Find templates for this category
+    const catSlug = category.slug.toLowerCase();
+    const catName = category.name.toLowerCase();
 
-    const existingTitles = new Set(existingPlans?.map(p => p.title.toLowerCase()) || []);
+    let matchingTemplates = templatesByCategory[catSlug] || templatesByCategory[catName] || [];
+
+    // Try partial matching
+    if (!matchingTemplates.length) {
+      for (const [key, temps] of Object.entries(templatesByCategory)) {
+        if (key.includes(catSlug) || catSlug.includes(key) ||
+            key.includes(catName) || catName.includes(key)) {
+          matchingTemplates = temps;
+          break;
+        }
+      }
+    }
+
+    // Use uncategorized if nothing found
+    if (!matchingTemplates.length && uncategorized.length) {
+      matchingTemplates = uncategorized.slice(0, 5);
+    }
+
+    if (!matchingTemplates.length) {
+      return new Response(
+        JSON.stringify({ error: `No task templates found for category: ${category.name}` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Select 3-5 tasks
+    const selectedTasks = matchingTemplates.slice(0, Math.min(5, matchingTemplates.length));
+
+    // Generate plan content with AI
+    console.log(`Generating AI content for: ${category.name}`);
+    const aiContent = await generatePlanWithAI(category, selectedTasks, LOVABLE_API_KEY);
+
+    if (!aiContent) {
+      return new Response(
+        JSON.stringify({ error: "AI generation failed. Please try again." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Get max display_order
     const { data: maxOrderData } = await supabase
@@ -180,161 +225,103 @@ serve(async (req) => {
       .order("display_order", { ascending: false })
       .limit(1);
 
-    let currentOrder = (maxOrderData?.[0]?.display_order || 0) + 1;
+    const currentOrder = (maxOrderData?.[0]?.display_order || 0) + 1;
 
-    let createdCount = 0;
-    let skippedCount = 0;
-
-    for (const category of categories) {
-      // Find templates for this category
-      const catSlug = category.slug.toLowerCase();
-      const catName = category.name.toLowerCase();
-
-      let matchingTemplates = templatesByCategory[catSlug] || templatesByCategory[catName] || [];
-
-      // Try partial matching
-      if (!matchingTemplates.length) {
-        for (const [key, temps] of Object.entries(templatesByCategory)) {
-          if (key.includes(catSlug) || catSlug.includes(key) ||
-              key.includes(catName) || catName.includes(key)) {
-            matchingTemplates = temps;
-            break;
-          }
-        }
+    // Calculate total duration
+    const totalMinutes = selectedTasks.reduce((sum, t) => {
+      if (t.suggested_time) {
+        const match = t.suggested_time.match(/(\d+)/);
+        return sum + (match ? parseInt(match[1]) : 5);
       }
+      return sum + 5;
+    }, 0);
 
-      // Use uncategorized if nothing found
-      if (!matchingTemplates.length && uncategorized.length) {
-        matchingTemplates = uncategorized.slice(0, 5);
-      }
+    // Create routine plan
+    const { data: newPlan, error: planError } = await supabase
+      .from("routine_plans")
+      .insert({
+        title: aiContent.title,
+        subtitle: aiContent.subtitle,
+        description: aiContent.description,
+        icon: category.icon || 'Star',
+        color: category.color || 'purple',
+        estimated_minutes: totalMinutes || 15,
+        points: Math.max(5, Math.round(totalMinutes / 2)),
+        is_pro_routine: false,
+        is_featured: false,
+        is_popular: false,
+        is_active: true,
+        display_order: currentOrder,
+        category_id: category.id
+      })
+      .select("id")
+      .single();
 
-      if (!matchingTemplates.length) {
-        console.log(`No templates for: ${category.name}`);
-        skippedCount++;
-        continue;
-      }
-
-      // Select 3-5 tasks
-      const selectedTasks = matchingTemplates.slice(0, Math.min(5, matchingTemplates.length));
-
-      // Generate plan content with AI
-      console.log(`Generating AI content for: ${category.name}`);
-      const aiContent = await generatePlanWithAI(category, selectedTasks, LOVABLE_API_KEY);
-
-      if (!aiContent) {
-        console.log(`AI generation failed for: ${category.name}`);
-        skippedCount++;
-        continue;
-      }
-
-      // Check for duplicate title
-      if (existingTitles.has(aiContent.title.toLowerCase())) {
-        console.log(`Title already exists: ${aiContent.title}`);
-        skippedCount++;
-        continue;
-      }
-
-      // Calculate total duration
-      const totalMinutes = selectedTasks.reduce((sum, t) => {
-        if (t.suggested_time) {
-          const match = t.suggested_time.match(/(\d+)/);
-          return sum + (match ? parseInt(match[1]) : 5);
-        }
-        return sum + 5;
-      }, 0);
-
-      // Create routine plan
-      const { data: newPlan, error: planError } = await supabase
-        .from("routine_plans")
-        .insert({
-          title: aiContent.title,
-          subtitle: aiContent.subtitle,
-          description: aiContent.description,
-          icon: category.icon || 'Star',
-          color: category.color || 'purple',
-          estimated_minutes: totalMinutes || 15,
-          points: Math.max(5, Math.round(totalMinutes / 2)),
-          is_pro_routine: false,
-          is_featured: false,
-          is_popular: false,
-          is_active: true,
-          display_order: currentOrder++,
-          category_id: category.id
-        })
-        .select("id")
-        .single();
-
-      if (planError) {
-        console.error(`Plan creation failed for ${category.name}:`, planError);
-        continue;
-      }
-
-      // Create sections
-      if (aiContent.sections?.length) {
-        const sectionsToInsert = aiContent.sections.map((section, index) => ({
-          plan_id: newPlan.id,
-          title: section.title,
-          content: section.content,
-          section_order: index + 1,
-          is_active: true,
-        }));
-
-        const { error: sectionsError } = await supabase
-          .from("routine_plan_sections")
-          .insert(sectionsToInsert);
-
-        if (sectionsError) {
-          console.error('Sections error:', sectionsError);
-        }
-      }
-
-      // Create tasks from templates
-      let taskOrder = 1;
-      for (const template of selectedTasks) {
-        let durationMinutes = 5;
-        if (template.suggested_time) {
-          const match = template.suggested_time.match(/(\d+)/);
-          if (match) durationMinutes = parseInt(match[1]);
-        }
-
-        const icon = emojiToIcon[template.emoji] || 'CheckCircle';
-
-        const { error: taskError } = await supabase
-          .from("routine_plan_tasks")
-          .insert({
-            plan_id: newPlan.id,
-            title: template.title,
-            icon: icon,
-            duration_minutes: durationMinutes,
-            task_order: taskOrder++,
-            is_active: true
-          });
-
-        if (taskError) {
-          console.error(`Task error for ${template.title}:`, taskError);
-        }
-      }
-
-      createdCount++;
-      existingTitles.add(aiContent.title.toLowerCase());
-      console.log(`Created: ${aiContent.title} with ${selectedTasks.length} tasks and ${aiContent.sections?.length || 0} sections`);
-
-      // Small delay between AI calls
-      await new Promise(resolve => setTimeout(resolve, 500));
+    if (planError) {
+      console.error('Plan creation failed:', planError);
+      throw planError;
     }
+
+    // Create sections
+    if (aiContent.sections?.length) {
+      const sectionsToInsert = aiContent.sections.map((section, index) => ({
+        plan_id: newPlan.id,
+        title: section.title,
+        content: section.content,
+        section_order: index + 1,
+        is_active: true,
+      }));
+
+      const { error: sectionsError } = await supabase
+        .from("routine_plan_sections")
+        .insert(sectionsToInsert);
+
+      if (sectionsError) {
+        console.error('Sections error:', sectionsError);
+      }
+    }
+
+    // Create tasks from templates
+    let taskOrder = 1;
+    for (const template of selectedTasks) {
+      let durationMinutes = 5;
+      if (template.suggested_time) {
+        const match = template.suggested_time.match(/(\d+)/);
+        if (match) durationMinutes = parseInt(match[1]);
+      }
+
+      const icon = emojiToIcon[template.emoji] || 'CheckCircle';
+
+      const { error: taskError } = await supabase
+        .from("routine_plan_tasks")
+        .insert({
+          plan_id: newPlan.id,
+          title: template.title,
+          icon: icon,
+          duration_minutes: durationMinutes,
+          task_order: taskOrder++,
+          is_active: true
+        });
+
+      if (taskError) {
+        console.error(`Task error for ${template.title}:`, taskError);
+      }
+    }
+
+    console.log(`Created: ${aiContent.title} with ${selectedTasks.length} tasks and ${aiContent.sections?.length || 0} sections`);
 
     return new Response(
       JSON.stringify({
-        message: `Created ${createdCount} plans with AI content, skipped ${skippedCount}`,
-        createdCount,
-        skippedCount
+        success: true,
+        message: `Created "${aiContent.title}" with ${selectedTasks.length} tasks and ${aiContent.sections?.length || 0} sections`,
+        plan: newPlan
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "Failed to generate plans" }),
+      JSON.stringify({ error: error.message || "Failed to generate plan" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

@@ -100,8 +100,8 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
   const [isGeneratingFromTemplates, setIsGeneratingFromTemplates] = useState(false);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const [isGeneratingFromTaskTemplates, setIsGeneratingFromTaskTemplates] = useState(false);
-  const [aiTheme, setAiTheme] = useState('');
-  const [showAIDialog, setShowAIDialog] = useState(false);
+  const [showCategoryPickerFor, setShowCategoryPickerFor] = useState<'tasks' | 'ai' | null>(null);
+  const [selectedCategoryForGeneration, setSelectedCategoryForGeneration] = useState<string>('');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [formData, setFormData] = useState({
     category_id: '' as string | null,
@@ -372,12 +372,15 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
   };
 
   const handleAIGeneratePlan = async () => {
+    if (!selectedCategoryForGeneration) {
+      toast.error('Please select a category');
+      return;
+    }
     setIsAIGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-routine-plan-ai', {
         body: { 
-          categoryId: formData.category_id || null,
-          theme: aiTheme || undefined
+          categoryId: selectedCategoryForGeneration
         }
       });
 
@@ -389,8 +392,8 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
 
       toast.success(data.message || 'Plan created successfully');
       queryClient.invalidateQueries({ queryKey: ['admin-routine-plans'] });
-      setShowAIDialog(false);
-      setAiTheme('');
+      setShowCategoryPickerFor(null);
+      setSelectedCategoryForGeneration('');
     } catch (error) {
       console.error('AI generation error:', error);
       toast.error('Failed to generate plan');
@@ -419,19 +422,27 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
   };
 
   const handleGenerateFromTaskTemplates = async () => {
+    if (!selectedCategoryForGeneration) {
+      toast.error('Please select a category');
+      return;
+    }
     setIsGeneratingFromTaskTemplates(true);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-plans-from-task-templates');
+      const { data, error } = await supabase.functions.invoke('generate-plans-from-task-templates', {
+        body: { categoryId: selectedCategoryForGeneration }
+      });
       if (error) throw error;
       if (data?.error) {
         toast.error(data.error);
         return;
       }
-      toast.success(data.message || `Created ${data.createdCount} plans`);
+      toast.success(data.message || 'Plan created successfully');
       queryClient.invalidateQueries({ queryKey: ['admin-routine-plans'] });
+      setShowCategoryPickerFor(null);
+      setSelectedCategoryForGeneration('');
     } catch (error) {
       console.error('Generation error:', error);
-      toast.error('Failed to generate plans from task templates');
+      toast.error('Failed to generate plan from task templates');
     } finally {
       setIsGeneratingFromTaskTemplates(false);
     }
@@ -460,7 +471,10 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
             Pro from Templates
           </Button>
           <Button 
-            onClick={handleGenerateFromTaskTemplates} 
+            onClick={() => {
+              setSelectedCategoryForGeneration('');
+              setShowCategoryPickerFor('tasks');
+            }} 
             size="sm" 
             variant="outline"
             disabled={isGeneratingFromTaskTemplates}
@@ -474,7 +488,10 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
             Plans from Tasks
           </Button>
           <Button 
-            onClick={() => setShowAIDialog(true)} 
+            onClick={() => {
+              setSelectedCategoryForGeneration('');
+              setShowCategoryPickerFor('ai');
+            }} 
             size="sm" 
             variant="outline"
             disabled={isAIGenerating}
@@ -883,27 +900,25 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* AI Generate Plan Dialog */}
-      <Dialog open={showAIDialog} onOpenChange={setShowAIDialog}>
+      {/* Category Picker Dialog for AI Generation */}
+      <Dialog open={showCategoryPickerFor !== null} onOpenChange={(open) => !open && setShowCategoryPickerFor(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>AI Generate Routine Plan</DialogTitle>
+            <DialogTitle>
+              {showCategoryPickerFor === 'ai' ? 'AI Generate Routine Plan' : 'Generate Plan from Tasks'}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Category (optional)</Label>
+              <Label>Select Category</Label>
               <Select
-                value={formData.category_id || 'none'}
-                onValueChange={(value) => setFormData(prev => ({ 
-                  ...prev, 
-                  category_id: value === 'none' ? null : value 
-                }))}
+                value={selectedCategoryForGeneration}
+                onValueChange={setSelectedCategoryForGeneration}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder="Choose a category..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Any category</SelectItem>
                   {categories?.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id}>
                       {cat.name}
@@ -911,28 +926,23 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            <div>
-              <Label>Theme / Topic (optional)</Label>
-              <Input
-                value={aiTheme}
-                onChange={(e) => setAiTheme(e.target.value)}
-                placeholder="e.g. 5-minute stress relief, productivity boost, evening relaxation..."
-              />
               <p className="text-xs text-muted-foreground mt-1">
-                Describe the type of routine you want to generate
+                {showCategoryPickerFor === 'ai' 
+                  ? 'AI will create a complete plan with sections and tasks for this category'
+                  : 'Will create a plan using existing task templates from this category'
+                }
               </p>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAIDialog(false)}>
+            <Button variant="outline" onClick={() => setShowCategoryPickerFor(null)}>
               Cancel
             </Button>
             <Button 
-              onClick={handleAIGeneratePlan}
-              disabled={isAIGenerating}
+              onClick={showCategoryPickerFor === 'ai' ? handleAIGeneratePlan : handleGenerateFromTaskTemplates}
+              disabled={!selectedCategoryForGeneration || isAIGenerating || isGeneratingFromTaskTemplates}
             >
-              {isAIGenerating ? (
+              {(isAIGenerating || isGeneratingFromTaskTemplates) ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Generating...
@@ -940,7 +950,7 @@ export function RoutinePlansManager({ onSelectPlan }: RoutinePlansManagerProps) 
               ) : (
                 <>
                   <Wand2 className="h-4 w-4 mr-2" />
-                  Generate
+                  Generate Plan
                 </>
               )}
             </Button>
