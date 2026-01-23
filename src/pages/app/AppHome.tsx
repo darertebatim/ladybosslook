@@ -315,59 +315,86 @@ const AppHome = () => {
               ))}
             </div>
 
-            {/* Day rows - reduced gap */}
-            {showCalendar ? (
-              <MonthCalendar
-                selectedDate={selectedDate}
-                currentMonth={currentMonth}
-                onDateSelect={handleDateSelect}
-                completedDates={completedDates}
-                programEventDates={programEventDates}
-              />
-            ) : (
-              <div className="flex mt-1">
-                {weekDays.map((day) => {
-                  const isSelected = isSameDay(day, selectedDate);
-                  const isTodayDate = isToday(day);
-                  const dateStr = format(day, 'yyyy-MM-dd');
-                  const hasCompletions = completedDates?.has(dateStr);
-                  const hasProgramEvents = programEventDates?.has(dateStr);
-                  
-                  return (
-                    <button
-                      key={day.toISOString()}
-                      onClick={() => setSelectedDate(day)}
-                      className="flex-1 flex justify-center"
-                    >
-                      <div
-                        className={cn(
-                          'w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
-                          isSelected
-                            ? 'bg-[#D8C0F3] text-foreground shadow-md'
-                            : isTodayDate
-                              ? 'bg-white/60 text-foreground/80 dark:bg-violet-900/50 dark:text-violet-300'
-                              : 'hover:bg-white/40'
-                        )}
-                      >
-                        {hasCompletions && (
-                          <Flame className={cn(
-                            "absolute h-6 w-6",
-                            isSelected ? "text-orange-300 opacity-70" : "text-orange-400 opacity-50"
-                          )} />
-                        )}
-                        {hasProgramEvents && (
-                          <Star className={cn(
-                            "absolute -top-0.5 -right-0.5 h-3 w-3",
-                            isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-500 fill-indigo-500"
-                          )} />
-                        )}
-                        <span className="relative z-10">{format(day, 'd')}</span>
-                      </div>
-                    </button>
-                  );
-                })}
+            {/* Animated calendar grid container */}
+            <div 
+              className="grid transition-all duration-300 ease-out overflow-hidden"
+              style={{ 
+                gridTemplateRows: showCalendar ? '1fr' : '0fr',
+              }}
+            >
+              <div className="min-h-0">
+                <div className={cn(
+                  "transition-opacity duration-200",
+                  showCalendar ? "opacity-100" : "opacity-0"
+                )}>
+                  <MonthCalendar
+                    selectedDate={selectedDate}
+                    currentMonth={currentMonth}
+                    onDateSelect={handleDateSelect}
+                    completedDates={completedDates}
+                    programEventDates={programEventDates}
+                  />
+                </div>
               </div>
-            )}
+            </div>
+
+            {/* Week strip - always visible, morphs position */}
+            <div 
+              className={cn(
+                "grid transition-all duration-300 ease-out overflow-hidden",
+              )}
+              style={{ 
+                gridTemplateRows: showCalendar ? '0fr' : '1fr',
+              }}
+            >
+              <div className="min-h-0">
+                <div className={cn(
+                  "flex mt-1 transition-opacity duration-200",
+                  showCalendar ? "opacity-0" : "opacity-100"
+                )}>
+                  {weekDays.map((day) => {
+                    const isSelected = isSameDay(day, selectedDate);
+                    const isTodayDate = isToday(day);
+                    const dateStr = format(day, 'yyyy-MM-dd');
+                    const hasCompletions = completedDates?.has(dateStr);
+                    const hasProgramEvents = programEventDates?.has(dateStr);
+                    
+                    return (
+                      <button
+                        key={day.toISOString()}
+                        onClick={() => setSelectedDate(day)}
+                        className="flex-1 flex justify-center"
+                      >
+                        <div
+                          className={cn(
+                            'w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
+                            isSelected
+                              ? 'bg-[#D8C0F3] text-foreground shadow-md'
+                              : isTodayDate
+                                ? 'bg-white/60 text-foreground/80 dark:bg-violet-900/50 dark:text-violet-300'
+                                : 'hover:bg-white/40'
+                          )}
+                        >
+                          {hasCompletions && (
+                            <Flame className={cn(
+                              "absolute h-6 w-6",
+                              isSelected ? "text-orange-300 opacity-70" : "text-orange-400 opacity-50"
+                            )} />
+                          )}
+                          {hasProgramEvents && (
+                            <Star className={cn(
+                              "absolute -top-0.5 -right-0.5 h-3 w-3",
+                              isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-500 fill-indigo-500"
+                            )} />
+                          )}
+                          <span className="relative z-10">{format(day, 'd')}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
 
             {/* Calendar expand/collapse handle + Today button */}
             <div className="relative w-full flex justify-center pt-1.5 pb-1">
@@ -400,14 +427,14 @@ const AppHome = () => {
           </div>
         </header>
 
-        {/* Spacer for fixed header - adjusted for compact calendar */}
+        {/* Spacer for fixed header - animated height */}
         <div 
-          className="transition-all duration-200"
+          className="transition-all duration-300 ease-out"
           style={{ 
             height: showCalendar 
-              ? 'calc(48px + 320px + max(12px, env(safe-area-inset-top)))' 
+              ? 'calc(48px + 290px + max(12px, env(safe-area-inset-top)))' 
               : 'calc(48px + 72px + max(12px, env(safe-area-inset-top)))' 
-          }} 
+          }}
         />
 
         {/* Notification Banner - prompts users to enable notifications */}
