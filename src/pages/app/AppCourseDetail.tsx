@@ -711,7 +711,7 @@ const AppCourseDetail = () => {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="pt-6 pb-3 px-4 flex items-center gap-3">
-          <BackButton className="shrink-0" />
+          <BackButton to="/app/programs" className="shrink-0" />
           <div className="min-w-0">
             <h1 className="font-semibold text-lg truncate">{program?.title || 'Program Details'}</h1>
             {round && (
