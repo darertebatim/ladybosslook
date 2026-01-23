@@ -9,6 +9,7 @@ export interface ProgramEvent {
   title: string;
   programSlug: string;
   programTitle: string;
+  roundId?: string; // For navigating to reminder settings
   time?: string; // For sessions OR module release time
   isCompleted: boolean;
   
@@ -149,6 +150,7 @@ export function useProgramEventsForDate(date: Date) {
             title: session.title,
             programSlug,
             programTitle,
+            roundId: round.id,
             time: format(sessionDate, 'h:mm a'),
             isCompleted: completionSet.has(`session:${session.id}`),
             meetingLink: session.meeting_link || round.google_meet_link,
@@ -178,6 +180,7 @@ export function useProgramEventsForDate(date: Date) {
                 title: module.title,
                 programSlug,
                 programTitle,
+                roundId: round.id,
                 time: unlockTime || undefined,
                 isCompleted: completionSet.has(`module:${module.id}`),
                 moduleId: module.id,
@@ -214,6 +217,7 @@ export function useProgramEventsForDate(date: Date) {
                 title: audio.title,
                 programSlug,
                 programTitle,
+                roundId: round.id,
                 time: unlockTime || undefined,
                 isCompleted: completionSet.has(`track:${audio.id}`),
                 trackId: audio.id,
