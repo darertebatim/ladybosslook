@@ -145,17 +145,18 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             </span>
             
             {/* Settings icon - navigate to round page for reminder settings */}
-            {event.roundId && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/app/course/${event.programSlug}/${event.roundId}`);
-                }}
-                className="p-1 rounded-full hover:bg-foreground/10 active:bg-foreground/20 transition-colors"
-              >
-                <Settings2 className="h-3 w-3 text-foreground/50" />
-              </button>
-            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (Capacitor.isNativePlatform()) {
+                  Haptics.impact({ style: ImpactStyle.Light });
+                }
+                navigate(`/app/course/${event.programSlug}${event.roundId ? `/${event.roundId}` : ''}`);
+              }}
+              className="p-1.5 rounded-full bg-foreground/5 hover:bg-foreground/10 active:bg-foreground/20 transition-colors"
+            >
+              <Settings2 className="h-3.5 w-3.5 text-foreground/60" />
+            </button>
             
             {/* External link indicator for today's sessions */}
             {event.type === 'session' && isToday(date) && event.meetingLink && (
