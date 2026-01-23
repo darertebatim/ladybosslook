@@ -34,7 +34,7 @@ export function QuickActionsGrid() {
   ];
 
   return (
-    <div className="grid grid-cols-4 gap-3">
+    <div className="grid grid-cols-4 gap-3 tour-quick-actions">
       {actions.map((action, index) => (
         <Link
           key={index}
