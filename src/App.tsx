@@ -252,6 +252,7 @@ const App = () => (
                   <Route path="programs" element={<AppPrograms />} />
                   <Route path="browse" element={<AppStore />} />
                   <Route path="course/:slug" element={<AppCourseDetail />} />
+                  <Route path="course/:slug/:roundId" element={<AppCourseDetail />} />
                   <Route path="player" element={<AppPlayer />} />
                   <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />
                   <Route path="player/:audioId" element={<AppAudioPlayer />} />

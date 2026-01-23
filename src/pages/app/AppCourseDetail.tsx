@@ -32,7 +32,7 @@ import DOMPurify from 'dompurify';
 import { cn } from '@/lib/utils';
 
 const AppCourseDetail = () => {
-  const { slug } = useParams();
+  const { slug, roundId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -55,12 +55,26 @@ const AppCourseDetail = () => {
     // Provider not available, ignore
   }
   const { data: enrollment, isLoading: enrollmentLoading } = useQuery({
-    queryKey: ['course-enrollment', slug],
+    queryKey: ['course-enrollment', slug, roundId],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Get the most recent enrollment for this program (handles multiple enrollments for different rounds)
+      // If round ID is provided, get that specific enrollment
+      if (roundId) {
+        const { data, error } = await supabase
+          .from('course_enrollments')
+          .select('*, program_rounds(*)')
+          .eq('user_id', user.id)
+          .eq('program_slug', slug)
+          .eq('round_id', roundId)
+          .maybeSingle();
+
+        if (error) throw error;
+        return data;
+      }
+
+      // Otherwise, fall back to most recent enrollment
       const { data, error } = await supabase
         .from('course_enrollments')
         .select('*, program_rounds(*)')
