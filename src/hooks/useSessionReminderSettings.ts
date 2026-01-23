@@ -1,18 +1,27 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
+/**
+ * Settings for program event reminders (sessions and content tasks in planner)
+ */
 export interface ReminderSettings {
-  reminderMinutes: number;
-  isUrgent: boolean;
+  enabled: boolean;        // Whether reminders are on for this type
+  reminderMinutes: number; // 15, 30, 60, 120, 1440 (1 day)
+  isUrgent: boolean;       // Uses calendar alarm to bypass silent mode
 }
 
-const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
+export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
+  enabled: true,
   reminderMinutes: 60,
   isUrgent: false,
 };
 
 /**
- * Custom hook to manage GLOBAL reminder settings for all sessions and content items in a round.
- * Uses localStorage to persist settings per round.
+ * Custom hook to manage GLOBAL reminder settings for program event tasks in planner.
+ * Controls notifications for:
+ * - Sessions: Live sessions that appear as planner tasks
+ * - Content: Audio tracks/modules that appear when they unlock
+ * 
+ * Stored in localStorage per round.
  */
 export function useSessionReminderSettings(roundId: string | undefined) {
   // Global settings for ALL sessions in this round
@@ -22,9 +31,9 @@ export function useSessionReminderSettings(roundId: string | undefined) {
   // Track which content items have reminders scheduled
   const [scheduledContentIds, setScheduledContentIds] = useState<Set<string>>(new Set());
 
-  const sessionStorageKey = useMemo(() => roundId ? `sessionReminders_${roundId}` : null, [roundId]);
-  const contentStorageKey = useMemo(() => roundId ? `contentReminders_${roundId}` : null, [roundId]);
-  const scheduledStorageKey = useMemo(() => roundId ? `scheduledContent_${roundId}` : null, [roundId]);
+  const sessionStorageKey = useMemo(() => roundId ? `programEventReminders_sessions_${roundId}` : null, [roundId]);
+  const contentStorageKey = useMemo(() => roundId ? `programEventReminders_content_${roundId}` : null, [roundId]);
+  const scheduledStorageKey = useMemo(() => roundId ? `programEventReminders_scheduled_${roundId}` : null, [roundId]);
 
   // Load settings from localStorage on mount or when roundId changes
   useEffect(() => {
@@ -33,7 +42,12 @@ export function useSessionReminderSettings(roundId: string | undefined) {
     try {
       const stored = localStorage.getItem(sessionStorageKey);
       if (stored) {
-        setSessionSettingsState(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        setSessionSettingsState({
+          enabled: parsed.enabled ?? DEFAULT_REMINDER_SETTINGS.enabled,
+          reminderMinutes: parsed.reminderMinutes ?? DEFAULT_REMINDER_SETTINGS.reminderMinutes,
+          isUrgent: parsed.isUrgent ?? DEFAULT_REMINDER_SETTINGS.isUrgent,
+        });
       }
     } catch (error) {
       console.error('Error loading session reminder settings:', error);
@@ -46,7 +60,12 @@ export function useSessionReminderSettings(roundId: string | undefined) {
     try {
       const stored = localStorage.getItem(contentStorageKey);
       if (stored) {
-        setContentSettingsState(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        setContentSettingsState({
+          enabled: parsed.enabled ?? DEFAULT_REMINDER_SETTINGS.enabled,
+          reminderMinutes: parsed.reminderMinutes ?? DEFAULT_REMINDER_SETTINGS.reminderMinutes,
+          isUrgent: parsed.isUrgent ?? DEFAULT_REMINDER_SETTINGS.isUrgent,
+        });
       }
     } catch (error) {
       console.error('Error loading content reminder settings:', error);

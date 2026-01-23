@@ -33,19 +33,24 @@ export function SessionReminderSheet({
   currentSettings,
   onSave,
 }: SessionReminderSheetProps) {
+  const [enabled, setEnabled] = useState(currentSettings.enabled);
   const [reminderMinutes, setReminderMinutes] = useState(currentSettings.reminderMinutes.toString());
   const [isUrgent, setIsUrgent] = useState(currentSettings.isUrgent);
   
   const urgentAvailable = isUrgentAlarmAvailable();
 
-  // Reset form when settings change
+  // Reset form when settings change or sheet opens
   useEffect(() => {
-    setReminderMinutes(currentSettings.reminderMinutes.toString());
-    setIsUrgent(currentSettings.isUrgent);
+    if (open) {
+      setEnabled(currentSettings.enabled);
+      setReminderMinutes(currentSettings.reminderMinutes.toString());
+      setIsUrgent(currentSettings.isUrgent);
+    }
   }, [currentSettings, open]);
 
   const handleSave = () => {
     const settings: ReminderSettings = {
+      enabled,
       reminderMinutes: parseInt(reminderMinutes),
       isUrgent,
     };
@@ -67,8 +72,22 @@ export function SessionReminderSheet({
         </SheetHeader>
 
         <div className="space-y-6 py-6">
+          {/* Enable Toggle */}
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-1">
+              <Label className="font-medium">Enable Reminders</Label>
+              <p className="text-sm text-muted-foreground">
+                Get notified before program events
+              </p>
+            </div>
+            <Switch
+              checked={enabled}
+              onCheckedChange={setEnabled}
+            />
+          </div>
+
           {/* Reminder Time Selection */}
-          <div className="space-y-3">
+          <div className={`space-y-3 ${!enabled ? 'opacity-50 pointer-events-none' : ''}`}>
             <Label className="text-base font-medium">Remind me</Label>
             <RadioGroup
               value={reminderMinutes}
@@ -79,7 +98,7 @@ export function SessionReminderSheet({
                 <div
                   key={option.value}
                   className="flex items-center space-x-3 rounded-lg border p-3 cursor-pointer hover:bg-muted/50"
-                  onClick={() => setReminderMinutes(option.value)}
+                  onClick={() => enabled && setReminderMinutes(option.value)}
                 >
                   <RadioGroupItem value={option.value} id={`reminder-${option.value}`} />
                   <Label
@@ -95,7 +114,7 @@ export function SessionReminderSheet({
 
           {/* Urgent Alarm Toggle - Only show on native */}
           {urgentAvailable && (
-            <div className="space-y-3">
+            <div className={`space-y-3 ${!enabled ? 'opacity-50 pointer-events-none' : ''}`}>
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -111,9 +130,9 @@ export function SessionReminderSheet({
                   onCheckedChange={setIsUrgent}
                 />
               </div>
-              {isUrgent && (
+              {isUrgent && enabled && (
                 <p className="text-xs text-muted-foreground px-1">
-                  Uses calendar alarm to ensure you don't miss important sessions
+                  Uses calendar alarm to ensure you don't miss important events
                 </p>
               )}
             </div>
