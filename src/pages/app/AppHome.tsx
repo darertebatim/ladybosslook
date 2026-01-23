@@ -349,7 +349,7 @@ const AppHome = () => {
             >
               <div className="min-h-0">
                 <div className={cn(
-                  "flex mt-1 gap-1 transition-opacity duration-200",
+                  "flex mt-1 gap-0.5 transition-opacity duration-200",
                   showCalendar ? "opacity-0" : "opacity-100"
                 )}>
                   {weekDays.map((day) => {
@@ -365,29 +365,19 @@ const AppHome = () => {
                         onClick={() => setSelectedDate(day)}
                         className="flex-1 flex justify-center"
                       >
-                        {/* Me+ style: Pill container for selected, simple for others */}
+                        {/* Me+ style: Pill with outline circle for selected */}
                         <div
                           className={cn(
-                            'flex flex-col items-center py-1.5 px-1 rounded-full transition-all relative',
-                            isSelected
-                              ? 'bg-[#E8DEF8] dark:bg-violet-800'
-                              : ''
+                            'flex flex-col items-center px-1 py-1 rounded-full transition-all relative',
+                            isSelected && 'bg-[#E8DEF8] dark:bg-violet-800'
                           )}
                         >
-                          {/* Day name - only show for selected */}
-                          <span className={cn(
-                            'text-[10px] font-medium leading-tight mb-0.5',
-                            isSelected ? 'text-foreground/70' : 'hidden'
-                          )}>
-                            {format(day, 'EEE')}
-                          </span>
-                          
-                          {/* Number with circle */}
+                          {/* Number with circle outline for selected */}
                           <div
                             className={cn(
-                              'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative',
+                              'w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative',
                               isSelected
-                                ? 'border-2 border-foreground/30 text-foreground'
+                                ? 'border-2 border-foreground/25 text-foreground'
                                 : isTodayDate
                                   ? 'bg-white/60 text-foreground/80 dark:bg-violet-900/50 dark:text-violet-300'
                                   : 'text-foreground/70 hover:bg-white/40'
