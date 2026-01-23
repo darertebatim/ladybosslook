@@ -306,15 +306,6 @@ const AppHome = () => {
               transition: swipeOffset === 0 ? 'transform 0.2s ease-out' : 'none',
             }}
           >
-            {/* Weekday headers - tighter */}
-            <div className="flex">
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                <div key={day} className="flex-1 text-center text-[11px] text-foreground/50 font-medium leading-tight">
-                  {day}
-                </div>
-              ))}
-            </div>
-
             {/* Animated calendar grid container */}
             <div 
               className="grid transition-all duration-300 ease-out overflow-hidden"
@@ -338,7 +329,7 @@ const AppHome = () => {
               </div>
             </div>
 
-            {/* Week strip - always visible, morphs position */}
+            {/* Week strip - Me+ style with pill around day name + number */}
             <div 
               className={cn(
                 "grid transition-all duration-300 ease-out overflow-hidden",
@@ -349,7 +340,7 @@ const AppHome = () => {
             >
               <div className="min-h-0">
                 <div className={cn(
-                  "flex mt-1 gap-0.5 transition-opacity duration-200",
+                  "flex mt-1 transition-opacity duration-200",
                   showCalendar ? "opacity-0" : "opacity-100"
                 )}>
                   {weekDays.map((day) => {
@@ -365,22 +356,30 @@ const AppHome = () => {
                         onClick={() => setSelectedDate(day)}
                         className="flex-1 flex justify-center"
                       >
-                        {/* Me+ style: Pill with outline circle for selected */}
+                        {/* Pill wraps around both day name and number for selected */}
                         <div
                           className={cn(
-                            'flex flex-col items-center px-1 py-1 rounded-full transition-all relative',
+                            'flex flex-col items-center px-2 py-1 rounded-full transition-all',
                             isSelected && 'bg-[#E8DEF8] dark:bg-violet-800'
                           )}
                         >
-                          {/* Number with circle outline for selected */}
+                          {/* Day name */}
+                          <span className={cn(
+                            'text-[11px] font-medium leading-tight',
+                            isSelected ? 'text-foreground/70' : 'text-foreground/50'
+                          )}>
+                            {format(day, 'EEE')}
+                          </span>
+                          
+                          {/* Number with outline circle for selected */}
                           <div
                             className={cn(
-                              'w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative',
+                              'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5',
                               isSelected
                                 ? 'border-2 border-foreground/25 text-foreground'
                                 : isTodayDate
                                   ? 'bg-white/60 text-foreground/80 dark:bg-violet-900/50 dark:text-violet-300'
-                                  : 'text-foreground/70 hover:bg-white/40'
+                                  : 'text-foreground/70'
                             )}
                           >
                             {hasCompletions && !isSelected && (
