@@ -155,7 +155,7 @@ const AppCourseDetail = () => {
     getUnsyncedCount,
   } = useCalendarSyncTracking(round?.id);
 
-  // Session reminder settings hook - manages GLOBAL reminder timing and urgent mode for all sessions/content
+  // Program event reminder settings hook - manages reminder settings for program events (sessions & content) as planner tasks
   const {
     sessionSettings,
     setSessionSettings,
@@ -617,16 +617,113 @@ const AppCourseDetail = () => {
     setAddingSessionId(null);
   };
 
-  // Handle saving GLOBAL session reminder settings
-  const handleSaveSessionSettings = (settings: ReminderSettings) => {
+  // Handle saving GLOBAL session reminder settings - schedules notifications for program events
+  const handleSaveSessionSettings = async (settings: ReminderSettings) => {
     setSessionSettings(settings);
-    toast.success('Session reminder settings saved');
+    
+    if (!dbSessions || dbSessions.length === 0) {
+      toast.success('Session reminder settings saved');
+      return;
+    }
+    
+    if (settings.enabled && isLocalNotificationsAvailable()) {
+      // Schedule notifications for all future sessions
+      let scheduledCount = 0;
+      for (const session of dbSessions) {
+        const sessionDate = new Date(session.session_date);
+        if (sessionDate > new Date()) {
+          if (settings.isUrgent) {
+            await scheduleUrgentAlarm({
+              taskId: `program-session-${session.id}`,
+              title: session.title,
+              emoji: '📅',
+              scheduledDate: format(sessionDate, 'yyyy-MM-dd'),
+              scheduledTime: format(sessionDate, 'HH:mm'),
+              reminderOffset: settings.reminderMinutes,
+            });
+          } else {
+            await scheduleTaskReminder({
+              taskId: `program-session-${session.id}`,
+              title: `📅 ${session.title}`,
+              emoji: '📅',
+              scheduledDate: format(sessionDate, 'yyyy-MM-dd'),
+              scheduledTime: format(sessionDate, 'HH:mm'),
+              reminderOffset: settings.reminderMinutes,
+              repeatPattern: 'none',
+              proLinkType: 'course',
+              proLinkValue: slug || null,
+            });
+          }
+          scheduledCount++;
+        }
+      }
+      toast.success(`Reminders set for ${scheduledCount} sessions`);
+    } else if (!settings.enabled) {
+      // Cancel all session reminders
+      for (const session of dbSessions) {
+        await cancelTaskReminder(`program-session-${session.id}`);
+      }
+      toast.success('Session reminders disabled');
+    } else {
+      toast.success('Session reminder settings saved');
+    }
   };
 
-  // Handle saving GLOBAL content reminder settings
-  const handleSaveContentSettings = (settings: ReminderSettings) => {
+  // Handle saving GLOBAL content reminder settings - schedules notifications for content unlocks
+  const handleSaveContentSettings = async (settings: ReminderSettings) => {
     setContentSettings(settings);
-    toast.success('Content reminder settings saved');
+    
+    const items = hasDripModules ? playlistModules : (hasDripTracks ? playlistTracks : []);
+    if (!items || items.length === 0) {
+      toast.success('Content reminder settings saved');
+      return;
+    }
+    
+    if (settings.enabled && isLocalNotificationsAvailable()) {
+      // Schedule notifications for all future content unlocks
+      let scheduledCount = 0;
+      for (const item of items) {
+        const dripDays = item.drip_delay_days || 0;
+        const unlockDate = getModuleUnlockDate(dripDays);
+        if (unlockDate && unlockDate > new Date()) {
+          const title = (item as any).title || (item as any).audio_content?.title || 'Content Unlocked';
+          if (settings.isUrgent) {
+            await scheduleUrgentAlarm({
+              taskId: `program-content-${item.id}`,
+              title: title,
+              emoji: '🔓',
+              scheduledDate: format(unlockDate, 'yyyy-MM-dd'),
+              scheduledTime: format(unlockDate, 'HH:mm'),
+              reminderOffset: settings.reminderMinutes,
+            });
+          } else {
+            await scheduleTaskReminder({
+              taskId: `program-content-${item.id}`,
+              title: `🔓 ${title}`,
+              emoji: '🔓',
+              scheduledDate: format(unlockDate, 'yyyy-MM-dd'),
+              scheduledTime: format(unlockDate, 'HH:mm'),
+              reminderOffset: settings.reminderMinutes,
+              repeatPattern: 'none',
+              proLinkType: 'playlist',
+              proLinkValue: round?.audio_playlist_id || null,
+            });
+          }
+          markContentScheduled(item.id);
+          scheduledCount++;
+        }
+      }
+      toast.success(`Reminders set for ${scheduledCount} content items`);
+    } else if (!settings.enabled) {
+      // Cancel all content reminders
+      for (const item of items) {
+        await cancelTaskReminder(`program-content-${item.id}`);
+        unmarkContentScheduled(item.id);
+      }
+      toast.success('Content reminders disabled');
+    } else {
+      toast.success('Content reminder settings saved');
+    }
   };
 
   // Handle content reminder (for locked modules/tracks) - uses GLOBAL content settings
@@ -646,23 +743,42 @@ const AppCourseDetail = () => {
     } else {
       // Schedule new reminder using global content settings
       const title = item.title || item.audio_content?.title || 'Content Unlocked';
-      const result = await scheduleTaskReminder({
-        taskId: `content-${item.id}`,
-        title: `🔓 ${title}`,
-        emoji: '🔓',
-        scheduledDate: format(unlockDate, 'yyyy-MM-dd'),
-        scheduledTime: format(unlockDate, 'HH:mm'),
-        reminderOffset: contentSettings.reminderMinutes,
-        repeatPattern: 'none',
-        proLinkType: 'playlist',
-        proLinkValue: round?.audio_playlist_id || null,
-      });
       
-      if (result.success) {
-        markContentScheduled(item.id);
-        toast.success('Reminder set for unlock!');
+      if (contentSettings.isUrgent) {
+        const result = await scheduleUrgentAlarm({
+          taskId: `content-${item.id}`,
+          title: title,
+          emoji: '🔓',
+          scheduledDate: format(unlockDate, 'yyyy-MM-dd'),
+          scheduledTime: format(unlockDate, 'HH:mm'),
+          reminderOffset: contentSettings.reminderMinutes,
+        });
+        
+        if (result.success) {
+          markContentScheduled(item.id);
+          toast.success('Urgent reminder set for unlock!');
+        } else {
+          toast.error(result.error || 'Failed to set reminder');
+        }
       } else {
-        toast.error(result.error || 'Failed to set reminder');
+        const result = await scheduleTaskReminder({
+          taskId: `content-${item.id}`,
+          title: `🔓 ${title}`,
+          emoji: '🔓',
+          scheduledDate: format(unlockDate, 'yyyy-MM-dd'),
+          scheduledTime: format(unlockDate, 'HH:mm'),
+          reminderOffset: contentSettings.reminderMinutes,
+          repeatPattern: 'none',
+          proLinkType: 'playlist',
+          proLinkValue: round?.audio_playlist_id || null,
+        });
+        
+        if (result.success) {
+          markContentScheduled(item.id);
+          toast.success('Reminder set for unlock!');
+        } else {
+          toast.error(result.error || 'Failed to set reminder');
+        }
       }
     }
   };
@@ -1688,22 +1804,22 @@ const AppCourseDetail = () => {
         />
       )}
 
-      {/* Session Reminder Settings Sheet - GLOBAL for all sessions */}
+      {/* Session Reminder Settings Sheet - Controls program event task reminders */}
       <SessionReminderSheet
         open={showSessionReminderSheet}
         onOpenChange={setShowSessionReminderSheet}
         title="Session Reminders"
-        description="These settings apply to all sessions when added to calendar"
+        description="Control notifications for session tasks in your planner"
         currentSettings={sessionSettings}
         onSave={handleSaveSessionSettings}
       />
 
-      {/* Content Reminder Settings Sheet - GLOBAL for all content items */}
+      {/* Content Reminder Settings Sheet - Controls content unlock task reminders */}
       <SessionReminderSheet
         open={showContentReminderSheet}
         onOpenChange={setShowContentReminderSheet}
         title="Content Reminders"
-        description="These settings apply to all content unlock reminders"
+        description="Control notifications for content unlock tasks in your planner"
         currentSettings={contentSettings}
         onSave={handleSaveContentSettings}
       />
