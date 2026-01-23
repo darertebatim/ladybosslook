@@ -306,7 +306,7 @@ const AppHome = () => {
               transition: swipeOffset === 0 ? 'transform 0.2s ease-out' : 'none',
             }}
           >
-            {/* Animated calendar grid container */}
+            {/* Animated calendar grid container - with weekday headers */}
             <div 
               className="grid transition-all duration-300 ease-out overflow-hidden"
               style={{ 
@@ -318,6 +318,14 @@ const AppHome = () => {
                   "transition-opacity duration-200",
                   showCalendar ? "opacity-100" : "opacity-0"
                 )}>
+                  {/* Weekday headers for expanded view */}
+                  <div className="flex mb-1">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                      <div key={day} className="flex-1 text-center text-[11px] text-foreground/50 font-medium leading-tight">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
                   <MonthCalendar
                     selectedDate={selectedDate}
                     currentMonth={currentMonth}
