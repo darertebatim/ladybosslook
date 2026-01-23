@@ -9,6 +9,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { isNativeApp } from "@/lib/platform";
 import { registerNavigationCallback, refreshDeviceToken, initializePushNotificationHandlers, clearBadge } from "@/lib/pushNotifications";
+import { initializeLocalNotificationHandlers } from "@/lib/localNotifications";
 import { supabase } from "@/integrations/supabase/client";
 import { Capacitor } from "@capacitor/core";
 import { useDeepLinks, checkInitialDeepLink } from "@/hooks/useDeepLinks";
@@ -130,6 +131,12 @@ const NativeAppRedirect = () => {
 
       // Initialize push notification handlers once
       initializePushNotificationHandlers();
+      
+      // Initialize local notification handlers for task reminders
+      initializeLocalNotificationHandlers((url: string) => {
+        console.log('[App] Local notification deep link:', url);
+        navigate(url);
+      });
       
       // Initialize native social login (Google/Apple)
       initializeSocialLogin();

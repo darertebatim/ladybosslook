@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { format, subDays, isEqual, parseISO } from 'date-fns';
 import { scheduleUrgentAlarm, isUrgentAlarmAvailable } from '@/lib/taskAlarm';
+import { scheduleTaskReminder, cancelTaskReminder, isLocalNotificationsAvailable } from '@/lib/localNotifications';
 
 // ============================================
 // TYPES
@@ -454,7 +455,27 @@ export const useCreateTask = () => {
 
       if (taskError) throw taskError;
 
-      // Schedule urgent alarm if enabled
+      // Schedule local notification reminder if enabled (non-urgent tasks)
+      if (taskData.reminder_enabled && taskData.scheduled_time && taskData.scheduled_date && !taskData.is_urgent && isLocalNotificationsAvailable()) {
+        const reminderResult = await scheduleTaskReminder({
+          taskId: task.id,
+          title: taskData.title,
+          emoji: taskData.emoji || '☀️',
+          scheduledDate: taskData.scheduled_date,
+          scheduledTime: taskData.scheduled_time,
+          reminderOffset: taskData.reminder_offset || 0,
+          repeatPattern: taskData.repeat_pattern || 'none',
+          repeatDays: taskData.repeat_days,
+          proLinkType: taskData.pro_link_type,
+          proLinkValue: taskData.pro_link_value,
+        });
+        
+        if (!reminderResult.success && reminderResult.error) {
+          console.warn('[CreateTask] Local notification scheduling failed:', reminderResult.error);
+        }
+      }
+
+      // Schedule urgent alarm if enabled (uses Calendar for loud alarms)
       if (taskData.is_urgent && taskData.scheduled_time && taskData.scheduled_date && isUrgentAlarmAvailable()) {
         const alarmResult = await scheduleUrgentAlarm({
           taskId: task.id,
@@ -557,6 +578,11 @@ export const useUpdateTask = () => {
     mutationFn: async (input: UpdateTaskInput) => {
       const { id, subtasks, ...updates } = input;
 
+      // Cancel existing local notification before updating
+      if (isLocalNotificationsAvailable()) {
+        await cancelTaskReminder(id);
+      }
+
       // Update the task
       const { data, error } = await supabase
         .from('user_tasks')
@@ -566,6 +592,24 @@ export const useUpdateTask = () => {
         .single();
 
       if (error) throw error;
+
+      const task = data as UserTask;
+
+      // Reschedule local notification if reminder is enabled
+      if (task.reminder_enabled && task.scheduled_time && task.scheduled_date && !task.is_urgent && isLocalNotificationsAvailable()) {
+        await scheduleTaskReminder({
+          taskId: task.id,
+          title: task.title,
+          emoji: task.emoji,
+          scheduledDate: task.scheduled_date,
+          scheduledTime: task.scheduled_time,
+          reminderOffset: task.reminder_offset,
+          repeatPattern: task.repeat_pattern,
+          repeatDays: task.repeat_days,
+          proLinkType: task.pro_link_type,
+          proLinkValue: task.pro_link_value,
+        });
+      }
 
       // If subtasks are provided, replace existing subtasks
       if (subtasks !== undefined) {
@@ -593,7 +637,7 @@ export const useUpdateTask = () => {
         }
       }
 
-      return data as UserTask;
+      return task;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
@@ -615,6 +659,11 @@ export const useDeleteTask = () => {
 
   return useMutation({
     mutationFn: async (taskId: string) => {
+      // Cancel local notification before deleting
+      if (isLocalNotificationsAvailable()) {
+        await cancelTaskReminder(taskId);
+      }
+
       const { error } = await supabase
         .from('user_tasks')
         .delete()
