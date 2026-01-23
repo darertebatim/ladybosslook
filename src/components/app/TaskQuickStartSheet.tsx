@@ -42,8 +42,12 @@ export const TaskQuickStartSheet = ({
     onOpenChange(false);
   };
 
-  // Show popular templates as suggestions
-  const suggestions = templates.filter(t => t.is_popular).slice(0, 8);
+  // Filter templates based on search or show popular
+  const suggestions = taskName.trim()
+    ? templates.filter(t => 
+        t.title.toLowerCase().includes(taskName.toLowerCase())
+      ).slice(0, 8)
+    : templates.filter(t => t.is_popular).slice(0, 8);
 
   return (
     <Sheet open={open} onOpenChange={handleClose}>
@@ -106,7 +110,7 @@ export const TaskQuickStartSheet = ({
           {suggestions.length > 0 && (
             <div className="px-4 pb-6">
               <p className="text-sm text-muted-foreground mb-3">
-                Need some idea? 💡
+                {taskName.trim() ? 'Similar tasks 💡' : 'Need some idea? 💡'}
               </p>
               <div className="space-y-2">
                 {suggestions.map((template, index) => {
