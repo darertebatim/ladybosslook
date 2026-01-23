@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, Newspaper, MessageCircle, ShoppingBag, Music, GraduationCap, Sparkles } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { AudioPlayerProvider, useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { MiniPlayer } from '@/components/audio/MiniPlayer';
@@ -43,6 +43,10 @@ const NativeAppLayout = () => {
   const { showUnreadPopup, unreadMessageCount, dismissPopup, goToChat } = useChatNotifications();
   const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
 
+  // Debounce ref to prevent double invalidation from realtime + mutation success
+  const lastInvalidationTime = useRef(0);
+  const INVALIDATION_DEBOUNCE_MS = 2000;
+
   // Realtime subscription for enrollment changes - auto-refresh when enrollments change
   useEffect(() => {
     if (!user?.id) return;
@@ -58,6 +62,13 @@ const NativeAppLayout = () => {
           filter: `user_id=eq.${user.id}`
         },
         () => {
+          const now = Date.now();
+          // Debounce: skip if already invalidated within last 2 seconds (e.g., from mutation success)
+          if (now - lastInvalidationTime.current < INVALIDATION_DEBOUNCE_MS) {
+            console.log('[EnrollmentRealtime] Skipping - recent invalidation');
+            return;
+          }
+          lastInvalidationTime.current = now;
           console.log('[EnrollmentRealtime] Enrollment changed, invalidating caches');
           invalidateAllEnrollmentData();
         }
