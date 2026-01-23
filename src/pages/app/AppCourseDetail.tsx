@@ -1165,9 +1165,9 @@ const AppCourseDetail = () => {
             })()}
 
             {round?.important_message && (
-              <Alert className="border-primary/20 bg-primary/5">
+              <Alert className="border-primary/20 bg-primary/5" dir="auto">
                 <Info className="h-4 w-4" />
-                <AlertDescription className="text-sm leading-relaxed whitespace-pre-wrap">
+                <AlertDescription className="text-sm leading-relaxed whitespace-pre-wrap" dir="auto">
                   {round.important_message}
                 </AlertDescription>
               </Alert>
@@ -1389,7 +1389,7 @@ const AppCourseDetail = () => {
                   {/* Reminder Settings Button */}
                   <Button
                     variant="outline"
-                    className="w-full mb-4"
+                    className="w-full mb-4 bg-[#F4ECFE] hover:bg-[#E8DEF8] border-[#F4ECFE]"
                     onClick={() => setShowSessionReminderSheet(true)}
                   >
                     <Bell className="h-4 w-4 mr-2" />
@@ -1492,7 +1492,7 @@ const AppCourseDetail = () => {
                   {/* Reminder Settings Button */}
                   <Button
                     variant="outline"
-                    className="w-full mb-4"
+                    className="w-full mb-4 bg-[#F4ECFE] hover:bg-[#E8DEF8] border-[#F4ECFE]"
                     onClick={() => setShowContentReminderSheet(true)}
                   >
                     <Bell className="h-4 w-4 mr-2" />
