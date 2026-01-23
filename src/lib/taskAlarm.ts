@@ -77,14 +77,9 @@ export async function scheduleUrgentAlarm(task: UrgentTaskAlarm): Promise<{ succ
 }
 
 /**
- * Check if urgent alarms are available (native platform with calendar support)
+ * Check if urgent alarms are available
+ * Returns true for UI display purposes - actual scheduling will gracefully fail on non-native
  */
 export function isUrgentAlarmAvailable(): boolean {
-  // Check for dev preview flag
-  if (typeof window !== 'undefined') {
-    const devNative = new URLSearchParams(window.location.search).get('devNative') === 'true';
-    if (devNative) return true;
-  }
-  
-  return Capacitor.isNativePlatform();
+  return true;
 }
