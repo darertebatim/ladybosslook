@@ -552,6 +552,22 @@ html.native-app #root {
     animation: scale-in 0.4s ease-out;
   }
   
+  /* Slide up animation for bottom sheets */
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+      opacity: 0.8;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 0.35s ease-out;
+  }
+  
   /* Hover Effects */
   .hover-lift {
     transition: var(--transition-smooth);
