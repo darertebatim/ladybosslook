@@ -1484,16 +1484,14 @@ const AppCourseDetail = () => {
                     {hasDripTracks ? 'Audiobook Schedule' : 'Content Schedule'}
                     <div className="ml-auto flex items-center gap-2">
                       {/* Global Content Settings Button */}
-                      {isNativeApp() && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7"
-                          onClick={() => setShowContentReminderSheet(true)}
-                        >
-                          <Settings2 className="h-4 w-4" />
-                        </Button>
-                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => setShowContentReminderSheet(true)}
+                      >
+                        <Settings2 className="h-4 w-4" />
+                      </Button>
                       <Badge variant="secondary">
                         {hasDripModules 
                           ? `${playlistModules?.length || 0} modules`
