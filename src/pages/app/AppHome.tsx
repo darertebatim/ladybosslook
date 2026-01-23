@@ -397,7 +397,8 @@ const AppHome = () => {
             </div>
 
             {/* Calendar expand/collapse handle + Today button */}
-            <div className="relative w-full flex justify-center pt-1.5 pb-1">
+            <div className="flex items-center justify-center pt-1.5 pb-1">
+              {/* Center: Drag handle */}
               <button 
                 onClick={handleToggleCalendar}
                 className="flex-1 flex justify-center"
@@ -410,16 +411,17 @@ const AppHome = () => {
                 />
               </button>
               
-              {/* Today button - only show when not on today */}
+              {/* Right: Today button - compact Me+ style */}
               {!isToday(selectedDate) && (
                 <button
                   onClick={() => {
                     setSelectedDate(new Date());
                     setCurrentMonth(startOfMonth(new Date()));
+                    haptic.light();
                   }}
-                  className="absolute right-3 -top-0.5 flex items-center gap-1 px-3 py-1.5 text-sm font-semibold text-violet-700 bg-violet-200 dark:bg-violet-800 dark:text-violet-200 rounded-l-full shadow-sm active:scale-95 transition-transform"
+                  className="absolute right-2 flex items-center gap-0.5 px-2 py-0.5 text-xs font-semibold text-foreground/70 bg-violet-200/80 dark:bg-violet-800 dark:text-violet-200 rounded-full active:scale-95 transition-transform"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="h-3 w-3" />
                   Today
                 </button>
               )}
