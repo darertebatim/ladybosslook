@@ -23,10 +23,11 @@ export function ActiveRoundsCarousel({
   activeRounds, 
   nextSessionMap 
 }: ActiveRoundsCarouselProps) {
-  // Persist collapsed state
+  // Persist collapsed state - default to collapsed
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem(COLLAPSED_KEY);
-    return saved === 'true';
+    // Default to collapsed unless explicitly set to 'false'
+    return saved !== 'false';
   });
 
   useEffect(() => {
@@ -75,7 +76,7 @@ export function ActiveRoundsCarousel({
       {/* Header - always visible, acts as expand/collapse toggle */}
       <button 
         className={`w-full flex items-center justify-between px-2 rounded-xl transition-all active:bg-black/5 ${
-          isCollapsed ? 'bg-muted/50 py-1' : 'py-1.5'
+          isCollapsed ? 'bg-muted/60 py-2 border border-border/50' : 'py-1.5'
         }`}
         onClick={toggleCollapse}
         aria-label={isCollapsed ? 'Expand programs' : 'Collapse programs'}
@@ -91,6 +92,9 @@ export function ActiveRoundsCarousel({
           <Badge variant="secondary" className="h-4 px-1 text-[10px]">
             {activeRounds.length}
           </Badge>
+          {isCollapsed && (
+            <span className="text-[10px] text-muted-foreground ml-1">tap to expand</span>
+          )}
         </div>
         <Link 
           to="/app/programs"
