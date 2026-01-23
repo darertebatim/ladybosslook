@@ -2437,6 +2437,7 @@ export type Database = {
           emoji: string
           id: string
           is_active: boolean
+          is_urgent: boolean
           linked_playlist_id: string | null
           order_index: number
           pro_link_type: string | null
@@ -2460,6 +2461,7 @@ export type Database = {
           emoji?: string
           id?: string
           is_active?: boolean
+          is_urgent?: boolean
           linked_playlist_id?: string | null
           order_index?: number
           pro_link_type?: string | null
@@ -2483,6 +2485,7 @@ export type Database = {
           emoji?: string
           id?: string
           is_active?: boolean
+          is_urgent?: boolean
           linked_playlist_id?: string | null
           order_index?: number
           pro_link_type?: string | null

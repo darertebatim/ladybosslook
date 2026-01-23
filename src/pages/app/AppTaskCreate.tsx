@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format, addDays, nextMonday, startOfDay } from 'date-fns';
-import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag } from 'lucide-react';
+import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -89,6 +89,7 @@ export interface TaskFormData {
   repeatDays: number[];
   reminderEnabled: boolean;
   reminderTime: string;
+  isUrgent: boolean;
   tag: string | null;
   subtasks: string[];
   linkedPlaylistId: string | null;
@@ -146,6 +147,7 @@ const AppTaskCreate = ({
   const [repeatDays, setRepeatDays] = useState<number[]>(initialData?.repeatDays || []);
   const [reminderEnabled, setReminderEnabled] = useState(initialData?.reminderEnabled ?? false);
   const [reminderTime, setReminderTime] = useState(initialData?.reminderTime || '09:00');
+  const [isUrgent, setIsUrgent] = useState(initialData?.isUrgent ?? false);
   const [tag, setTag] = useState<string | null>(initialData?.tag ?? null);
   const [subtasks, setSubtasks] = useState<string[]>(initialData?.subtasks || []);
   const [newSubtask, setNewSubtask] = useState('');
@@ -224,6 +226,7 @@ const AppTaskCreate = ({
       setRepeatDays(initialData.repeatDays || []);
       setReminderEnabled(initialData.reminderEnabled ?? false);
       setReminderTime(initialData.reminderTime || '09:00');
+      setIsUrgent(initialData.isUrgent ?? false);
       setTag(initialData.tag ?? null);
       setSubtasks(initialData.subtasks || []);
       setLinkedPlaylistId(initialData.linkedPlaylistId ?? null);
@@ -257,6 +260,7 @@ const AppTaskCreate = ({
         }
       }
       
+      setIsUrgent(existingTask.is_urgent ?? false);
       setTag(existingTask.tag);
       setLinkedPlaylistId(existingTask.linked_playlist_id ?? null);
       setProLinkType(existingTask.pro_link_type ?? null);
@@ -287,6 +291,7 @@ const AppTaskCreate = ({
         repeatDays,
         reminderEnabled,
         reminderTime,
+        isUrgent,
         tag,
         subtasks: subtasks.filter(s => s.trim()),
         linkedPlaylistId,
@@ -307,6 +312,7 @@ const AppTaskCreate = ({
       repeat_days: repeatDays,
       reminder_enabled: reminderEnabled,
       reminder_offset: 0,
+      is_urgent: isUrgent,
       tag,
       subtasks: subtasks.filter(s => s.trim()),
       linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : linkedPlaylistId,
@@ -603,6 +609,24 @@ const AppTaskCreate = ({
             <ChevronRight className="h-4 w-4" />
           </div>
         </button>
+
+        {/* Urgent - Only show when reminder is enabled and time is set */}
+        {reminderEnabled && scheduledTime && (
+          <div className="flex items-center justify-between p-4 border-b border-muted/30">
+            <div className="flex items-center gap-3">
+              <AlarmClock className={cn("h-5 w-5", isUrgent ? "text-red-500" : "text-foreground/70")} />
+              <div className="flex flex-col">
+                <span className={cn("font-medium", isUrgent && "text-red-600")}>Urgent</span>
+                <span className="text-xs text-muted-foreground">Alarm rings even on silent</span>
+              </div>
+            </div>
+            <Switch 
+              checked={isUrgent} 
+              onCheckedChange={setIsUrgent}
+              className="data-[state=checked]:bg-red-500"
+            />
+          </div>
+        )}
 
         {/* Tag */}
         <button
