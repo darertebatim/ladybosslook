@@ -112,6 +112,63 @@ export function RoutineCategoriesManager() {
     },
   });
 
+  // Fetch counts for routine plans per category
+  const { data: planCounts } = useQuery({
+    queryKey: ['admin-routine-plan-counts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routine_plans')
+        .select('category_id');
+      if (error) throw error;
+      
+      const counts: Record<string, number> = {};
+      data?.forEach(plan => {
+        if (plan.category_id) {
+          counts[plan.category_id] = (counts[plan.category_id] || 0) + 1;
+        }
+      });
+      return counts;
+    },
+  });
+
+  // Fetch counts for task templates per category
+  const { data: taskCounts } = useQuery({
+    queryKey: ['admin-task-template-counts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('task_templates')
+        .select('category');
+      if (error) throw error;
+      
+      const counts: Record<string, number> = {};
+      data?.forEach(task => {
+        if (task.category) {
+          counts[task.category] = (counts[task.category] || 0) + 1;
+        }
+      });
+      return counts;
+    },
+  });
+
+  // Fetch counts for pro task templates per category
+  const { data: proTaskCounts } = useQuery({
+    queryKey: ['admin-pro-task-template-counts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routine_task_templates')
+        .select('category');
+      if (error) throw error;
+      
+      const counts: Record<string, number> = {};
+      data?.forEach(task => {
+        if (task.category) {
+          counts[task.category] = (counts[task.category] || 0) + 1;
+        }
+      });
+      return counts;
+    },
+  });
+
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       const { error } = await supabase.from('routine_categories').insert(data);
@@ -249,58 +306,82 @@ export function RoutineCategoriesManager() {
                 <TableHead>Slug</TableHead>
                 <TableHead>Icon</TableHead>
                 <TableHead>Color</TableHead>
+                <TableHead className="text-center">Plans</TableHead>
+                <TableHead className="text-center">Tasks</TableHead>
+                <TableHead className="text-center">Pro Tasks</TableHead>
                 <TableHead>Active</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.map((category) => (
-                <TableRow key={category.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <GripVertical className="h-4 w-4 text-muted-foreground" />
-                      {category.display_order}
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell className="text-muted-foreground">{category.slug}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {renderIcon(category.icon)}
-                      <span className="text-sm text-muted-foreground">{category.icon}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div 
-                      className="w-8 h-8 rounded-full border"
-                      style={{ backgroundColor: category.color }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <span className={category.is_active ? 'text-green-600' : 'text-muted-foreground'}>
-                      {category.is_active ? 'Yes' : 'No'}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleOpenEdit(category)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setDeleteId(category.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {categories.map((category) => {
+                const plansCount = planCounts?.[category.id] || 0;
+                const tasksCount = taskCounts?.[category.slug] || 0;
+                const proTasksCount = proTaskCounts?.[category.slug] || 0;
+                
+                return (
+                  <TableRow key={category.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <GripVertical className="h-4 w-4 text-muted-foreground" />
+                        {category.display_order}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">{category.name}</TableCell>
+                    <TableCell className="text-muted-foreground">{category.slug}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {renderIcon(category.icon)}
+                        <span className="text-sm text-muted-foreground">{category.icon}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div 
+                        className="w-8 h-8 rounded-full border"
+                        style={{ backgroundColor: category.color }}
+                      />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <span className={plansCount > 0 ? 'font-medium' : 'text-muted-foreground'}>
+                        {plansCount}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <span className={tasksCount > 0 ? 'font-medium' : 'text-muted-foreground'}>
+                        {tasksCount}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <span className={proTasksCount > 0 ? 'font-medium' : 'text-muted-foreground'}>
+                        {proTasksCount}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className={category.is_active ? 'text-green-600' : 'text-muted-foreground'}>
+                        {category.is_active ? 'Yes' : 'No'}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleOpenEdit(category)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setDeleteId(category.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         )}
