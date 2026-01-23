@@ -629,7 +629,7 @@ const AppProfile = () => {
   };
 
   return (
-    <>
+    <div className="flex flex-col h-full bg-background overflow-hidden">
       <SEOHead 
         title="Profile - LadyBoss Academy"
         description="Your profile settings"
@@ -649,6 +649,7 @@ const AppProfile = () => {
       {/* Header spacer */}
       <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} />
       
+      <div className="flex-1 overflow-y-auto overscroll-contain">
       <div className="container max-w-4xl py-4 px-4">
       <div className="space-y-6">
 
@@ -1499,7 +1500,8 @@ const AppProfile = () => {
         </Card>
       </div>
       </div>
-    </>
+      </div>
+    </div>
   );
 };
 
