@@ -1554,7 +1554,7 @@ const AppCourseDetail = () => {
                           </div>
                           
                           {/* Remind Me Button - only for locked future content */}
-                          {!isAvailable && unlockDate && isNativeApp() && (
+                          {!isAvailable && unlockDate && (
                             <Button
                               variant="ghost"
                               size="icon"
@@ -1627,7 +1627,7 @@ const AppCourseDetail = () => {
                           </div>
                           
                           {/* Remind Me Button - only for locked future content */}
-                          {!isAvailable && unlockDate && isNativeApp() && (
+                          {!isAvailable && unlockDate && (
                             <Button
                               variant="ghost"
                               size="icon"
