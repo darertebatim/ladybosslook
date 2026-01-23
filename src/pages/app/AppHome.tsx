@@ -360,7 +360,7 @@ const AppHome = () => {
                         <div
                           className={cn(
                             'flex flex-col items-center px-2 py-1 rounded-full transition-all',
-                            isSelected && 'bg-[#E8DEF8] dark:bg-violet-800'
+                            isSelected && 'bg-[#E5D4F1] dark:bg-violet-800'
                           )}
                         >
                           {/* Day name */}
