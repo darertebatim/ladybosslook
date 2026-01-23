@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Video, BookOpen, Music, ExternalLink } from 'lucide-react';
+import { Check, Video, BookOpen, Music, ExternalLink, Settings2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   ProgramEvent, 
@@ -129,7 +129,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          {/* Top line: time/release + badge centered + external link */}
+          {/* Top line: time/release + badge + settings + external link */}
           <div className="flex items-center gap-2 text-xs text-foreground/60 mb-0.5">
             {/* Left: Time or "Anytime" */}
             <span className="font-semibold text-foreground/70">
@@ -143,6 +143,19 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             )}>
               {style.badge}
             </span>
+            
+            {/* Settings icon - navigate to round page for reminder settings */}
+            {event.roundId && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/app/course/${event.programSlug}/${event.roundId}`);
+                }}
+                className="p-1 rounded-full hover:bg-foreground/10 active:bg-foreground/20 transition-colors"
+              >
+                <Settings2 className="h-3 w-3 text-foreground/50" />
+              </button>
+            )}
             
             {/* External link indicator for today's sessions */}
             {event.type === 'session' && isToday(date) && event.meetingLink && (
