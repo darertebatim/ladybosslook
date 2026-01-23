@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { useAutoCompleteProTask } from './useAutoCompleteProTask';
 
 export interface JournalEntry {
   id: string;
@@ -81,6 +82,7 @@ export const useJournalEntry = (entryId: string | undefined) => {
 export const useCreateJournalEntry = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { autoCompleteJournal } = useAutoCompleteProTask();
 
   return useMutation({
     mutationFn: async (entry: CreateJournalEntry) => {
@@ -100,8 +102,10 @@ export const useCreateJournalEntry = () => {
       if (error) throw error;
       return data as JournalEntry;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
+      // Auto-complete any journal pro tasks for today
+      await autoCompleteJournal();
     },
     onError: (error) => {
       console.error('Failed to create journal entry:', error);

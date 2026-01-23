@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { updateMusicControls, destroyMusicControls, setupMusicControlsListeners } from "@/lib/musicControls";
 import { Capacitor } from "@capacitor/core";
+import { format } from "date-fns";
+import { useQueryClient } from "@tanstack/react-query";
 
 export interface TrackInfo {
   id: string;
@@ -55,6 +57,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const saveProgressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastTimeUpdateRef = useRef<number>(0);
   const onTrackCompleteRef = useRef<(() => void) | null>(null);
@@ -123,17 +126,84 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     const handleEnded = async () => {
       setIsPlaying(false);
       
+      const track = currentTrackRef.current;
+      
       // Save final completion state
-      if (user?.id && currentTrack) {
+      if (user?.id && track) {
         await supabase.from("audio_progress").upsert({
           user_id: user.id,
-          audio_id: currentTrack.id,
+          audio_id: track.id,
           current_position_seconds: Math.floor(audio.duration || 0),
           completed: true,
           last_played_at: new Date().toISOString(),
         }, {
           onConflict: "user_id,audio_id",
         });
+        
+        // Auto-complete any playlist pro tasks linked to this playlist
+        if (track.playlistId) {
+          try {
+            const today = format(new Date(), 'yyyy-MM-dd');
+            const dayOfWeek = new Date().getDay();
+            
+            // Find applicable pro tasks for this playlist
+            const { data: tasks } = await supabase
+              .from('user_tasks')
+              .select('id, scheduled_date, repeat_pattern, repeat_days')
+              .eq('user_id', user.id)
+              .eq('is_active', true)
+              .eq('pro_link_type', 'playlist')
+              .eq('pro_link_value', track.playlistId);
+            
+            if (tasks && tasks.length > 0) {
+              const applicableTasks = tasks.filter(task => {
+                if (task.scheduled_date === today) return true;
+                if (task.repeat_pattern === 'daily') return true;
+                if (task.repeat_pattern === 'weekly' && task.repeat_days) {
+                  return (task.repeat_days as number[]).includes(dayOfWeek);
+                }
+                if (task.repeat_pattern === 'weekdays') {
+                  return dayOfWeek >= 1 && dayOfWeek <= 5;
+                }
+                return false;
+              });
+              
+              if (applicableTasks.length > 0) {
+                const taskIds = applicableTasks.map(t => t.id);
+                
+                // Get existing completions
+                const { data: existing } = await supabase
+                  .from('task_completions')
+                  .select('task_id')
+                  .eq('user_id', user.id)
+                  .eq('completed_date', today)
+                  .in('task_id', taskIds);
+                
+                const completedIds = new Set(existing?.map(c => c.task_id) || []);
+                const toComplete = applicableTasks.filter(t => !completedIds.has(t.id));
+                
+                if (toComplete.length > 0) {
+                  await supabase.from('task_completions').insert(
+                    toComplete.map(t => ({
+                      task_id: t.id,
+                      user_id: user.id,
+                      completed_date: today,
+                    }))
+                  );
+                  
+                  // Invalidate queries to update UI
+                  queryClient.invalidateQueries({ queryKey: ['planner-completions'] });
+                  queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
+                  queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
+                  
+                  console.log(`Auto-completed ${toComplete.length} playlist pro task(s)`);
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error auto-completing playlist task:', error);
+          }
+        }
       }
       
       // Trigger completion callback (for celebration)
