@@ -146,20 +146,6 @@ export default function Auth() {
     <>
       <SEOHead />
       <div className="h-[100dvh] flex flex-col bg-gradient-to-b from-primary/20 via-primary/10 to-background overflow-hidden">
-        {/* Back button - only show when in email form */}
-        {showEmailForm && (
-          <div className="absolute top-4 left-4 z-10">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleBack}
-              className="rounded-full"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </div>
-        )}
-
         {/* Hero Section with Logo */}
         <div className="flex-shrink-0 pt-16 pb-8 px-6 flex flex-col items-center">
           {/* Decorative hearts pattern could be added via CSS */}
@@ -177,6 +163,20 @@ export default function Auth() {
         {/* Main Content Card */}
         <div className="flex-1 bg-background rounded-t-[2.5rem] px-6 py-8 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] overflow-y-auto">
           <div className="max-w-md mx-auto space-y-6">
+            {/* Back button - inside card for better reach */}
+            {showEmailForm && (
+              <div className="-mt-2 -ml-2 mb-2">
+                <Button
+                  variant="ghost"
+                  size="lg"
+                  onClick={handleBack}
+                  className="rounded-full h-12 w-12 p-0"
+                >
+                  <ArrowLeft className="h-6 w-6" />
+                </Button>
+              </div>
+            )}
+            
             {/* Title */}
             <div className="text-center space-y-2">
               <h1 className="text-2xl font-bold">
