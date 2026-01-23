@@ -86,7 +86,7 @@ export default function AppNewHome() {
         description="Your personal dashboard"
       />
 
-      <div className="flex flex-col h-full bg-background overflow-hidden">
+      <div className="min-h-full bg-background pb-24">
         {/* Header */}
         <div className="bg-gradient-to-b from-violet-50 to-background dark:from-violet-950/20 dark:to-background px-4 pt-4 pb-6">
           <div className="flex items-center justify-between mb-1">

@@ -115,7 +115,7 @@ export default function AppFeed() {
   const selectedChannel = channels?.find(c => c.id === selectedChannelId);
 
   return (
-    <div className="flex flex-col h-full bg-muted/30 overflow-hidden">
+    <div className="min-h-full bg-muted/30">
       <SEOHead 
         title="Community" 
         description="Stay connected with announcements, content updates, and community discussions"

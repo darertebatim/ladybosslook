@@ -235,7 +235,7 @@ const AppHome = () => {
         description="Your personal dashboard and planner"
       />
       
-      <div className="flex flex-col h-full bg-background overflow-hidden">
+      <div className="flex flex-col min-h-full bg-background">
         {/* Fixed header with integrated week strip - Me+ style */}
         <header 
           className="tour-header fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
@@ -495,7 +495,7 @@ const AppHome = () => {
         )}
 
         {/* Content area - scrollable with extra padding for fixed bottom dashboard */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 pb-[280px]">
+        <div className="flex-1 px-4 py-4 pb-[280px]">
 
           {isLoading ? (
             <div className="space-y-3">
