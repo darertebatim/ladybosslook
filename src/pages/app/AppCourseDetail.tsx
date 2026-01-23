@@ -47,8 +47,8 @@ const AppCourseDetail = () => {
   const [addingSessionId, setAddingSessionId] = useState<string | null>(null);
   const [showCalendarPrompt, setShowCalendarPrompt] = useState(false);
   const [showCourseNotificationPrompt, setShowCourseNotificationPrompt] = useState(false);
-  const [reminderSheetSession, setReminderSheetSession] = useState<any>(null);
-  const [contentReminderItem, setContentReminderItem] = useState<any>(null);
+  const [showSessionReminderSheet, setShowSessionReminderSheet] = useState(false);
+  const [showContentReminderSheet, setShowContentReminderSheet] = useState(false);
   
   // Get unseen content functions for view tracking
   let markEnrollmentViewed: ((id: string) => Promise<void>) | null = null;
@@ -155,13 +155,15 @@ const AppCourseDetail = () => {
     getUnsyncedCount,
   } = useCalendarSyncTracking(round?.id);
 
-  // Session reminder settings hook - manages reminder timing and urgent mode
+  // Session reminder settings hook - manages GLOBAL reminder timing and urgent mode for all sessions/content
   const {
-    getSessionSettings,
-    setSessionReminderSettings,
-    getContentSettings,
-    setContentReminderSettings,
+    sessionSettings,
+    setSessionSettings,
+    contentSettings,
+    setContentSettings,
     hasContentReminder,
+    markContentScheduled,
+    unmarkContentScheduled,
   } = useSessionReminderSettings(round?.id);
 
   // Fetch sessions for this round from the database
@@ -538,20 +540,18 @@ const AppCourseDetail = () => {
     window.open(supportUrl, '_blank');
   };
 
-  // Add single session to calendar with reminder settings
+  // Add single session to calendar using GLOBAL reminder settings
   const handleAddSingleSession = async (
-    session: typeof dbSessions extends (infer T)[] ? T : never,
-    overrideSettings?: ReminderSettings
+    session: typeof dbSessions extends (infer T)[] ? T : never
   ) => {
     if (!program) return;
     
     setAddingSessionId(session.id);
     
-    const settings = overrideSettings || getSessionSettings(session.id);
     const sessionDate = new Date(session.session_date);
     
     // If urgent mode is enabled, use calendar alarm
-    if (settings.isUrgent && isNativeApp()) {
+    if (sessionSettings.isUrgent && isNativeApp()) {
       try {
         const result = await scheduleUrgentAlarm({
           taskId: `session-${session.id}`,
@@ -559,7 +559,7 @@ const AppCourseDetail = () => {
           emoji: '📅',
           scheduledDate: format(sessionDate, 'yyyy-MM-dd'),
           scheduledTime: format(sessionDate, 'HH:mm'),
-          reminderOffset: settings.reminderMinutes,
+          reminderOffset: sessionSettings.reminderMinutes,
         });
         
         if (result.success) {
@@ -583,7 +583,7 @@ const AppCourseDetail = () => {
       startDate: sessionDate,
       endDate: new Date(sessionDate.getTime() + (session.duration_minutes || 90) * 60000),
       location: getEventLocation(session.meeting_link),
-      reminderMinutes: settings.reminderMinutes,
+      reminderMinutes: sessionSettings.reminderMinutes,
     };
 
     if (isNativeApp() && isCalendarAvailable()) {
@@ -617,26 +617,19 @@ const AppCourseDetail = () => {
     setAddingSessionId(null);
   };
 
-  // Handle opening reminder sheet for a session
-  const handleOpenReminderSheet = (session: any) => {
-    setReminderSheetSession(session);
-  };
-
-  // Handle saving reminder settings and adding to calendar
-  const handleSaveAndAddSession = async (settings: ReminderSettings) => {
-    if (!reminderSheetSession) return;
-    setSessionReminderSettings(reminderSheetSession.id, settings);
-    await handleAddSingleSession(reminderSheetSession, settings);
-  };
-
-  // Handle saving reminder settings only
+  // Handle saving GLOBAL session reminder settings
   const handleSaveSessionSettings = (settings: ReminderSettings) => {
-    if (!reminderSheetSession) return;
-    setSessionReminderSettings(reminderSheetSession.id, settings);
-    toast.success('Reminder settings saved');
+    setSessionSettings(settings);
+    toast.success('Session reminder settings saved');
   };
 
-  // Handle content reminder (for locked modules/tracks)
+  // Handle saving GLOBAL content reminder settings
+  const handleSaveContentSettings = (settings: ReminderSettings) => {
+    setContentSettings(settings);
+    toast.success('Content reminder settings saved');
+  };
+
+  // Handle content reminder (for locked modules/tracks) - uses GLOBAL content settings
   const handleContentReminder = async (item: any, unlockDate: Date) => {
     if (!isLocalNotificationsAvailable()) {
       toast.error('Reminders are only available in the app');
@@ -648,10 +641,10 @@ const AppCourseDetail = () => {
     if (hasReminder) {
       // Cancel existing reminder
       await cancelTaskReminder(`content-${item.id}`);
-      setContentReminderSettings(item.id, { reminderMinutes: 60, enabled: false });
+      unmarkContentScheduled(item.id);
       toast.success('Reminder cancelled');
     } else {
-      // Schedule new reminder
+      // Schedule new reminder using global content settings
       const title = item.title || item.audio_content?.title || 'Content Unlocked';
       const result = await scheduleTaskReminder({
         taskId: `content-${item.id}`,
@@ -659,14 +652,14 @@ const AppCourseDetail = () => {
         emoji: '🔓',
         scheduledDate: format(unlockDate, 'yyyy-MM-dd'),
         scheduledTime: format(unlockDate, 'HH:mm'),
-        reminderOffset: 0, // At unlock time
+        reminderOffset: contentSettings.reminderMinutes,
         repeatPattern: 'none',
         proLinkType: 'playlist',
         proLinkValue: round?.audio_playlist_id || null,
       });
       
       if (result.success) {
-        setContentReminderSettings(item.id, { reminderMinutes: 0, enabled: true });
+        markContentScheduled(item.id);
         toast.success('Reminder set for unlock!');
       } else {
         toast.error(result.error || 'Failed to set reminder');
@@ -1271,9 +1264,20 @@ const AppCourseDetail = () => {
                   <CardTitle className="flex items-center gap-2">
                     <Clock className="h-5 w-5" />
                     Sessions
-                    <Badge variant="secondary" className="ml-auto">
-                      {dbSessions.length}
-                    </Badge>
+                    <div className="ml-auto flex items-center gap-2">
+                      {/* Global Settings Button */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => setShowSessionReminderSheet(true)}
+                      >
+                        <Settings2 className="h-4 w-4" />
+                      </Button>
+                      <Badge variant="secondary">
+                        {dbSessions.length}
+                      </Badge>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1326,37 +1330,26 @@ const AppCourseDetail = () => {
                             </p>
                           </div>
                           
-                          {/* Session Actions */}
+                          {/* Session Actions - Only calendar button, no per-session settings */}
                           {!isPast && (
-                            <div className="flex items-center gap-1 shrink-0">
-                              {/* Settings Button */}
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleOpenReminderSheet(session)}
-                              >
-                                <Settings2 className="h-4 w-4" />
-                              </Button>
-                              
-                              {/* Add to Calendar Button */}
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className={cn(
-                                  isSessionSynced(session.id) && "text-green-600 dark:text-green-400"
-                                )}
-                                onClick={() => handleAddSingleSession(session)}
-                                disabled={addingSessionId === session.id}
-                              >
-                                {addingSessionId === session.id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : isSessionSynced(session.id) ? (
-                                  <CheckCircle2 className="h-4 w-4" />
-                                ) : (
-                                  <CalendarPlus className="h-4 w-4" />
-                                )}
-                              </Button>
-                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={cn(
+                                "shrink-0",
+                                isSessionSynced(session.id) && "text-green-600 dark:text-green-400"
+                              )}
+                              onClick={() => handleAddSingleSession(session)}
+                              disabled={addingSessionId === session.id}
+                            >
+                              {addingSessionId === session.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : isSessionSynced(session.id) ? (
+                                <CheckCircle2 className="h-4 w-4" />
+                              ) : (
+                                <CalendarPlus className="h-4 w-4" />
+                              )}
+                            </Button>
                           )}
                         </div>
                       );
@@ -1373,12 +1366,25 @@ const AppCourseDetail = () => {
                   <CardTitle className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5" />
                     {hasDripTracks ? 'Audiobook Schedule' : 'Content Schedule'}
-                    <Badge variant="secondary" className="ml-auto">
-                      {hasDripModules 
-                        ? `${playlistModules?.length || 0} modules`
-                        : `${playlistTracks?.length || 0} chapters`
-                      }
-                    </Badge>
+                    <div className="ml-auto flex items-center gap-2">
+                      {/* Global Content Settings Button */}
+                      {isNativeApp() && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          onClick={() => setShowContentReminderSheet(true)}
+                        >
+                          <Settings2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Badge variant="secondary">
+                        {hasDripModules 
+                          ? `${playlistModules?.length || 0} modules`
+                          : `${playlistTracks?.length || 0} chapters`
+                        }
+                      </Badge>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1682,18 +1688,25 @@ const AppCourseDetail = () => {
         />
       )}
 
-      {/* Session Reminder Settings Sheet */}
-      {reminderSheetSession && (
-        <SessionReminderSheet
-          open={!!reminderSheetSession}
-          onOpenChange={(open) => !open && setReminderSheetSession(null)}
-          sessionTitle={reminderSheetSession.title}
-          currentSettings={getSessionSettings(reminderSheetSession.id)}
-          onSave={handleSaveSessionSettings}
-          onSaveAndAdd={handleSaveAndAddSession}
-          isAlreadySynced={isSessionSynced(reminderSheetSession.id)}
-        />
-      )}
+      {/* Session Reminder Settings Sheet - GLOBAL for all sessions */}
+      <SessionReminderSheet
+        open={showSessionReminderSheet}
+        onOpenChange={setShowSessionReminderSheet}
+        title="Session Reminders"
+        description="These settings apply to all sessions when added to calendar"
+        currentSettings={sessionSettings}
+        onSave={handleSaveSessionSettings}
+      />
+
+      {/* Content Reminder Settings Sheet - GLOBAL for all content items */}
+      <SessionReminderSheet
+        open={showContentReminderSheet}
+        onOpenChange={setShowContentReminderSheet}
+        title="Content Reminders"
+        description="These settings apply to all content unlock reminders"
+        currentSettings={contentSettings}
+        onSave={handleSaveContentSettings}
+      />
     </>
   );
 };
