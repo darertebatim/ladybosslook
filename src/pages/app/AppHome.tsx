@@ -349,7 +349,7 @@ const AppHome = () => {
             >
               <div className="min-h-0">
                 <div className={cn(
-                  "flex mt-1 transition-opacity duration-200",
+                  "flex mt-1 gap-1 transition-opacity duration-200",
                   showCalendar ? "opacity-0" : "opacity-100"
                 )}>
                   {weekDays.map((day) => {
@@ -365,29 +365,45 @@ const AppHome = () => {
                         onClick={() => setSelectedDate(day)}
                         className="flex-1 flex justify-center"
                       >
+                        {/* Me+ style: Pill container for selected, simple for others */}
                         <div
                           className={cn(
-                            'w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
+                            'flex flex-col items-center py-1.5 px-1 rounded-full transition-all relative',
                             isSelected
-                              ? 'bg-[#D8C0F3] text-foreground shadow-md'
-                              : isTodayDate
-                                ? 'bg-white/60 text-foreground/80 dark:bg-violet-900/50 dark:text-violet-300'
-                                : 'hover:bg-white/40'
+                              ? 'bg-[#E8DEF8] dark:bg-violet-800'
+                              : ''
                           )}
                         >
-                          {hasCompletions && (
-                            <Flame className={cn(
-                              "absolute h-6 w-6",
-                              isSelected ? "text-orange-300 opacity-70" : "text-orange-400 opacity-50"
-                            )} />
-                          )}
-                          {hasProgramEvents && (
-                            <Star className={cn(
-                              "absolute -top-0.5 -right-0.5 h-3 w-3",
-                              isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-500 fill-indigo-500"
-                            )} />
-                          )}
-                          <span className="relative z-10">{format(day, 'd')}</span>
+                          {/* Day name - only show for selected */}
+                          <span className={cn(
+                            'text-[10px] font-medium leading-tight mb-0.5',
+                            isSelected ? 'text-foreground/70' : 'hidden'
+                          )}>
+                            {format(day, 'EEE')}
+                          </span>
+                          
+                          {/* Number with circle */}
+                          <div
+                            className={cn(
+                              'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative',
+                              isSelected
+                                ? 'border-2 border-foreground/30 text-foreground'
+                                : isTodayDate
+                                  ? 'bg-white/60 text-foreground/80 dark:bg-violet-900/50 dark:text-violet-300'
+                                  : 'text-foreground/70 hover:bg-white/40'
+                            )}
+                          >
+                            {hasCompletions && !isSelected && (
+                              <Flame className="absolute h-5 w-5 text-orange-400 opacity-50" />
+                            )}
+                            {hasProgramEvents && (
+                              <Star className={cn(
+                                "absolute -top-0.5 -right-0.5 h-2.5 w-2.5",
+                                isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500"
+                              )} />
+                            )}
+                            <span className="relative z-10">{format(day, 'd')}</span>
+                          </div>
                         </div>
                       </button>
                     );
