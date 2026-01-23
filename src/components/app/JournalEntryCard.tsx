@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { format, isToday, isYesterday } from 'date-fns';
+import { format, isToday, isYesterday, parseISO } from 'date-fns';
 import { getMoodEmoji } from './MoodSelector';
 import { Card, CardContent } from '@/components/ui/card';
 import { Share2 } from 'lucide-react';
@@ -92,7 +92,8 @@ export const JournalEntryCard = memo(function JournalEntryCard({
 });
 
 export const formatDateGroup = (dateString: string): string => {
-  const date = new Date(dateString);
+  // Use parseISO for consistent timezone handling with Supabase timestamps
+  const date = parseISO(dateString);
   if (isToday(date)) return 'Today';
   if (isYesterday(date)) return 'Yesterday';
   return format(date, 'MMMM d');
