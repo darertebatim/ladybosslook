@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,7 +27,9 @@ import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { CalendarPermissionPrompt } from '@/components/app/CalendarPermissionPrompt';
 import { CourseNotificationPrompt } from '@/components/app/CourseNotificationPrompt';
 import { shouldShowCourseNotificationPrompt } from '@/hooks/usePushNotificationFlow';
+import { useCalendarSyncTracking } from '@/hooks/useCalendarSyncTracking';
 import DOMPurify from 'dompurify';
+import { cn } from '@/lib/utils';
 
 const AppCourseDetail = () => {
   const { slug } = useParams();
@@ -123,6 +125,15 @@ const AppCourseDetail = () => {
   });
 
   const round = enrollment?.program_rounds;
+
+  // Calendar sync tracking hook - tracks which sessions have been synced to calendar
+  const {
+    markSessionSynced,
+    markAllSessionsSynced,
+    isSessionSynced,
+    areAllSessionsSynced,
+    getUnsyncedCount,
+  } = useCalendarSyncTracking(round?.id);
 
   // Fetch sessions for this round from the database
   const { data: dbSessions } = useQuery({
@@ -236,31 +247,20 @@ const AppCourseDetail = () => {
     enabled: !!roundChannel?.id && !!user?.id,
   });
 
-  // Check if there are new sessions since last sync
+  // Memoize session IDs for sync tracking
+  const sessionIds = useMemo(() => dbSessions?.map(s => s.id) || [], [dbSessions]);
+
+  // Check if there are unsynced sessions using the tracking hook
   useEffect(() => {
     if (!round?.id || !dbSessions || dbSessions.length === 0) {
       setHasNewSessions(false);
       return;
     }
     
-    const lastSyncKey = `lastCalendarSync_${round.id}`;
-    const lastSyncTime = localStorage.getItem(lastSyncKey);
-    
-    if (!lastSyncTime) {
-      // Never synced - show banner if there are sessions
-      setHasNewSessions(true);
-      return;
-    }
-    
-    // Check if any session was created after last sync
-    const lastSync = new Date(lastSyncTime);
-    const hasNewer = dbSessions.some(session => {
-      const createdAt = new Date((session as any).created_at || session.session_date);
-      return createdAt > lastSync;
-    });
-    
-    setHasNewSessions(hasNewer);
-  }, [round?.id, dbSessions]);
+    // Show banner if there are any unsynced sessions
+    const unsyncedCount = getUnsyncedCount(sessionIds);
+    setHasNewSessions(unsyncedCount > 0);
+  }, [round?.id, dbSessions, sessionIds, getUnsyncedCount]);
 
   // Show calendar permission prompt for enrolled users on native app
   useEffect(() => {
@@ -350,6 +350,7 @@ const AppCourseDetail = () => {
         
         if (result.success) {
           toast.success('Session added to your calendar!');
+          markSessionSynced(nextSession.id);
         } else if (result.error === 'Calendar permission denied') {
           toast.error('Please allow calendar access in Settings');
         } else {
@@ -371,6 +372,7 @@ const AppCourseDetail = () => {
           });
           
           toast.success('Select Calendar app to add event');
+          markSessionSynced(nextSession.id);
         }
       } catch (error) {
         console.error('Error adding calendar event:', error);
@@ -380,6 +382,7 @@ const AppCourseDetail = () => {
       // Web: Download ICS file
       downloadICSFile(event, `${program.title.replace(/\s+/g, '-')}.ics`);
       toast.success('Calendar event downloaded!');
+      markSessionSynced(nextSession.id);
     }
   };
 
@@ -447,9 +450,9 @@ const AppCourseDetail = () => {
         
         if (result.success) {
           toast.success(`Added ${result.addedCount} sessions to your calendar!`);
-          // Save sync timestamp
-          const lastSyncKey = `lastCalendarSync_${round.id}`;
-          localStorage.setItem(lastSyncKey, new Date().toISOString());
+          // Mark all sessions as synced using the tracking hook
+          const sessionIds = dbSessions?.map(s => s.id) || [];
+          markAllSessionsSynced(sessionIds);
           setHasNewSessions(false);
         } else if (result.error === 'Calendar permission denied') {
           toast.error('Please allow calendar access in Settings');
@@ -475,9 +478,9 @@ const AppCourseDetail = () => {
       // For web, just download first session
       downloadICSFile(icsEvents[0], `${program.title.replace(/\s+/g, '-')}-sessions.ics`);
       toast.success('Calendar file downloaded!');
-      // Save sync timestamp for web too
-      const lastSyncKey = `lastCalendarSync_${round.id}`;
-      localStorage.setItem(lastSyncKey, new Date().toISOString());
+      // Mark all sessions as synced for web too
+      const sessionIds = dbSessions?.map(s => s.id) || [];
+      markAllSessionsSynced(sessionIds);
       setHasNewSessions(false);
     }
   };
@@ -527,6 +530,7 @@ const AppCourseDetail = () => {
         
         if (result.success) {
           toast.success('Session added to calendar!');
+          markSessionSynced(session.id);
         } else if (result.error === 'Calendar permission denied') {
           toast.error('Please allow calendar access in Settings');
         } else {
@@ -545,6 +549,7 @@ const AppCourseDetail = () => {
         location: event.location,
       }, `${session.title.replace(/\s+/g, '-')}.ics`);
       toast.success('Calendar file downloaded!');
+      markSessionSynced(session.id);
     }
     
     setAddingSessionId(null);
@@ -946,7 +951,7 @@ const AppCourseDetail = () => {
                 <CalendarPlus className="h-4 w-4 text-amber-600" />
                 <AlertDescription className="flex items-center justify-between gap-4">
                   <span className="text-sm text-amber-800 dark:text-amber-200">
-                    New sessions available! Sync to your calendar.
+                    {getUnsyncedCount(sessionIds)} new session{getUnsyncedCount(sessionIds) > 1 ? 's' : ''} available! Sync to your calendar.
                   </span>
                   <Button 
                     size="sm" 
@@ -960,7 +965,7 @@ const AppCourseDetail = () => {
                     ) : (
                       <>
                         <CalendarPlus className="h-4 w-4 mr-1" />
-                        Sync
+                        Sync {getUnsyncedCount(sessionIds)}
                       </>
                     )}
                   </Button>
@@ -1053,22 +1058,37 @@ const AppCourseDetail = () => {
                   {/* 4. Add Next Session to Calendar - only shows if there's an upcoming session */}
                   {nextSession && (
                     <Button 
-                      variant="secondary" 
+                      variant={isSessionSynced(nextSession.id) ? "outline" : "secondary"}
                       size="lg" 
-                      className="w-full"
+                      className={cn(
+                        "w-full",
+                        isSessionSynced(nextSession.id) && "border-green-500 text-green-700 dark:text-green-400"
+                      )}
                       onClick={handleAddToCalendar}
                     >
-                      <Calendar className="h-5 w-5 mr-2" />
-                      {nextSession.session_number === 1 ? 'Add First Session to Calendar' : `Add Session ${nextSession.session_number} to Calendar`}
+                      {isSessionSynced(nextSession.id) ? (
+                        <>
+                          <CheckCircle2 className="h-5 w-5 mr-2" />
+                          Session {nextSession.session_number} Synced
+                        </>
+                      ) : (
+                        <>
+                          <Calendar className="h-5 w-5 mr-2" />
+                          {nextSession.session_number === 1 ? 'Add First Session' : `Add Session ${nextSession.session_number}`}
+                        </>
+                      )}
                     </Button>
                   )}
 
                   {/* 5. Sync All Sessions to Calendar */}
                   {dbSessions && dbSessions.length > 1 && (
                     <Button 
-                      variant="secondary" 
+                      variant={areAllSessionsSynced(sessionIds) ? "outline" : "secondary"}
                       size="lg" 
-                      className="w-full"
+                      className={cn(
+                        "w-full",
+                        areAllSessionsSynced(sessionIds) && "border-green-500 text-green-700 dark:text-green-400"
+                      )}
                       onClick={handleSyncAllSessions}
                       disabled={isSyncingAllSessions}
                     >
@@ -1076,6 +1096,16 @@ const AppCourseDetail = () => {
                         <>
                           <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                           Syncing...
+                        </>
+                      ) : areAllSessionsSynced(sessionIds) ? (
+                        <>
+                          <CheckCircle2 className="h-5 w-5 mr-2" />
+                          All Sessions Synced
+                        </>
+                      ) : getUnsyncedCount(sessionIds) > 0 && getUnsyncedCount(sessionIds) < sessionIds.length ? (
+                        <>
+                          <CalendarPlus className="h-5 w-5 mr-2" />
+                          Sync {getUnsyncedCount(sessionIds)} New Sessions
                         </>
                       ) : (
                         <>
@@ -1182,12 +1212,17 @@ const AppCourseDetail = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="shrink-0"
+                              className={cn(
+                                "shrink-0",
+                                isSessionSynced(session.id) && "text-green-600 dark:text-green-400"
+                              )}
                               onClick={() => handleAddSingleSession(session)}
                               disabled={addingSessionId === session.id}
                             >
                               {addingSessionId === session.id ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : isSessionSynced(session.id) ? (
+                                <CheckCircle2 className="h-4 w-4" />
                               ) : (
                                 <CalendarPlus className="h-4 w-4" />
                               )}
