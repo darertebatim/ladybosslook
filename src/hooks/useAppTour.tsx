@@ -7,23 +7,10 @@ export const useAppTour = () => {
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
 
-  // Check if first time user and start tour
-  // Only start if push notification onboarding is NOT showing
+  // App tour is temporarily disabled for this version
+  // TODO: Re-enable and fix step 4 issue in future release
   useEffect(() => {
-    const tourCompleted = localStorage.getItem(TOUR_COMPLETED_KEY);
-    const pushOnboardingCompleted = localStorage.getItem('pushOnboardingCompleted');
-    const pushOnboardingDismissed = localStorage.getItem('pushOnboardingDismissed');
-    
-    // Only show tour if:
-    // 1. Tour hasn't been completed
-    // 2. Push notification onboarding is done (completed or dismissed)
-    const pnOnboardingDone = pushOnboardingCompleted === 'true' || !!pushOnboardingDismissed;
-    
-    if (!tourCompleted && pnOnboardingDone) {
-      // Delay start to let UI render
-      const timer = setTimeout(() => setRun(true), TOUR_DELAY_MS);
-      return () => clearTimeout(timer);
-    }
+    // Tour disabled - do nothing
   }, []);
 
   const completeTour = useCallback(() => {
