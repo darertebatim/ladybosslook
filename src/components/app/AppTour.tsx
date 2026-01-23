@@ -1,7 +1,7 @@
 import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
 import { useAppTour } from '@/hooks/useAppTour';
 
-// Tour step definitions
+// Tour step definitions - only targeting elements that are always present
 export const tourSteps: Step[] = [
   {
     target: '.tour-header',
@@ -25,18 +25,8 @@ export const tourSteps: Step[] = [
     placement: 'left',
   },
   {
-    target: '.tour-suggestions',
-    content: 'Get inspired with ready-made routines you can add instantly!',
-    placement: 'top',
-  },
-  {
     target: '.tour-programs-carousel',
     content: 'Your enrolled programs appear here. Tap any to see course content and upcoming sessions.',
-    placement: 'top',
-  },
-  {
-    target: '.tour-quick-actions',
-    content: 'Quick shortcuts to Listen, Journal, Channels, and Routines - all your favorites!',
     placement: 'top',
   },
   {
