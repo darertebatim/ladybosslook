@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
 import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft } from 'lucide-react';
@@ -32,6 +32,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
 import { usePopularPlans, useUserRoutinePlans } from '@/hooks/useRoutinePlans';
 import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
+import { haptic } from '@/lib/haptics';
+
+const SWIPE_THRESHOLD = 50; // Pixels needed to trigger expand/collapse
 
 const AppHome = () => {
   const navigate = useNavigate();
@@ -44,6 +47,11 @@ const AppHome = () => {
   const [showQuickStart, setShowQuickStart] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
   const [showNotificationFlow, setShowNotificationFlow] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  
+  // Refs for swipe gesture tracking
+  const touchStartY = useRef(0);
+  const isSwipingCalendar = useRef(false);
   
   // App tour hook
   const { run: runTour, stepIndex, setStepIndex, completeTour, skipTour } = useAppTour();
@@ -162,7 +170,49 @@ const AppHome = () => {
       setCurrentMonth(startOfMonth(selectedDate));
     }
     setShowCalendar(!showCalendar);
+    haptic.light();
   }, [showCalendar, selectedDate]);
+
+  // Swipe gesture handlers for calendar expand/collapse
+  const handleCalendarTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+    isSwipingCalendar.current = true;
+  }, []);
+
+  const handleCalendarTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isSwipingCalendar.current) return;
+    
+    const deltaY = e.touches[0].clientY - touchStartY.current;
+    
+    // Limit the swipe offset for visual feedback with resistance
+    if (!showCalendar) {
+      // Collapsed: only allow downward swipe (positive delta)
+      setSwipeOffset(Math.max(0, Math.min(80, deltaY * 0.5)));
+    } else {
+      // Expanded: only allow upward swipe (negative delta)
+      setSwipeOffset(Math.min(0, Math.max(-80, deltaY * 0.5)));
+    }
+  }, [showCalendar]);
+
+  const handleCalendarTouchEnd = useCallback(() => {
+    if (!isSwipingCalendar.current) return;
+    
+    // Determine if we should toggle based on swipe distance
+    if (!showCalendar && swipeOffset > SWIPE_THRESHOLD) {
+      // Swipe down while collapsed → expand
+      setCurrentMonth(startOfMonth(selectedDate));
+      setShowCalendar(true);
+      haptic.light();
+    } else if (showCalendar && swipeOffset < -SWIPE_THRESHOLD) {
+      // Swipe up while expanded → collapse
+      setShowCalendar(false);
+      haptic.light();
+    }
+    
+    // Reset state
+    setSwipeOffset(0);
+    isSwipingCalendar.current = false;
+  }, [showCalendar, swipeOffset, selectedDate]);
 
   const isLoading = tasksLoading || completionsLoading || programEventsLoading;
 
@@ -245,8 +295,17 @@ const AppHome = () => {
             </button>
           </div>
 
-          {/* Calendar area - compact spacing */}
-          <div className="tour-calendar px-4 pt-1 pb-1">
+          {/* Calendar area - compact spacing with swipe gesture */}
+          <div 
+            className="tour-calendar px-4 pt-1 pb-1"
+            onTouchStart={handleCalendarTouchStart}
+            onTouchMove={handleCalendarTouchMove}
+            onTouchEnd={handleCalendarTouchEnd}
+            style={{
+              transform: `translateY(${swipeOffset * 0.3}px)`,
+              transition: swipeOffset === 0 ? 'transform 0.2s ease-out' : 'none',
+            }}
+          >
             {/* Weekday headers - tighter */}
             <div className="flex">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
@@ -316,7 +375,12 @@ const AppHome = () => {
                 onClick={handleToggleCalendar}
                 className="flex-1 flex justify-center"
               >
-                <div className="w-10 h-1 rounded-full bg-foreground/20" />
+                <div 
+                  className={cn(
+                    "w-10 h-1 rounded-full bg-foreground/20 transition-all",
+                    swipeOffset !== 0 && "bg-foreground/40 w-12"
+                  )} 
+                />
               </button>
               
               {/* Today button - only show when not on today */}
