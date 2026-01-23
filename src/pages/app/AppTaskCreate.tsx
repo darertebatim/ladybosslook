@@ -173,6 +173,24 @@ const AppTaskCreate = ({
   const newSubtaskInputRef = useRef<HTMLInputElement>(null);
   const subtaskRefs = useRef<(HTMLInputElement | null)[]>([]);
   
+  // Ref to track the currently focused input for keyboard scroll fix
+  const focusedInputRef = useRef<HTMLInputElement | null>(null);
+  const prevKeyboardOpen = useRef(false);
+  
+  // iOS keyboard scroll fix: scroll focused input into view when keyboard opens
+  useEffect(() => {
+    if (isKeyboardOpen && !prevKeyboardOpen.current && focusedInputRef.current) {
+      // Keyboard just opened - scroll the focused input into view after viewport settles
+      setTimeout(() => {
+        focusedInputRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }, 50);
+    }
+    prevKeyboardOpen.current = isKeyboardOpen;
+  }, [isKeyboardOpen]);
+  
   // Determine the current pro link config
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
 
@@ -360,12 +378,11 @@ const AppTaskCreate = ({
     }
   };
 
-  // Scroll input into view when focused (for iOS keyboard handling)
+  // Store focused input ref for iOS keyboard scroll fix
   const handleSubtaskInputFocus = (element: HTMLInputElement | null) => {
     if (element && Capacitor.isNativePlatform()) {
-      setTimeout(() => {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300); // Wait for keyboard to appear
+      focusedInputRef.current = element;
+      // The useEffect watching isKeyboardOpen will handle scrolling
     }
   };
 
@@ -514,9 +531,7 @@ const AppTaskCreate = ({
           onChange={(e) => setTitle(e.target.value.slice(0, 50))}
           onFocus={(e) => {
             if (Capacitor.isNativePlatform()) {
-              setTimeout(() => {
-                e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              }, 300);
+              focusedInputRef.current = e.target;
             }
           }}
           placeholder="Task name"
