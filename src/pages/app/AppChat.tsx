@@ -92,9 +92,13 @@ export default function AppChat() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [swipeBackOffset, setSwipeBackOffset] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef(0);
+  const touchStartX = useRef(0);
   const isPulling = useRef(false);
+  const isSwipingBack = useRef(false);
+  const swipeStartedFromEdge = useRef(false);
 
   // Fetch or create conversation
   useEffect(() => {
@@ -325,23 +329,70 @@ export default function AppChat() {
     }
   };
 
-  // Pull-to-refresh handlers
+  // Edge swipe threshold (px from left edge to start swipe-back gesture)
+  const EDGE_SWIPE_ZONE = 30;
+  const SWIPE_BACK_THRESHOLD = 100;
+
+  // Pull-to-refresh and swipe-back handlers
   const handleTouchStart = (e: React.TouchEvent) => {
+    const touchX = e.touches[0].clientX;
+    const touchY = e.touches[0].clientY;
+    
+    touchStartX.current = touchX;
+    touchStartY.current = touchY;
+    
+    // Check if touch started from left edge (iOS-style back gesture zone)
+    if (touchX <= EDGE_SWIPE_ZONE) {
+      swipeStartedFromEdge.current = true;
+      isSwipingBack.current = true;
+    } else {
+      swipeStartedFromEdge.current = false;
+    }
+    
+    // Pull-to-refresh only when at top
     if (scrollContainerRef.current?.scrollTop === 0) {
-      touchStartY.current = e.touches[0].clientY;
       isPulling.current = true;
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    const touchX = e.touches[0].clientX;
+    const touchY = e.touches[0].clientY;
+    const deltaX = touchX - touchStartX.current;
+    const deltaY = touchY - touchStartY.current;
+    
+    // Handle edge swipe-back gesture (right swipe from left edge)
+    if (swipeStartedFromEdge.current && isSwipingBack.current) {
+      // Only trigger if horizontal movement is dominant
+      if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX > 0) {
+        // Apply resistance to make it feel natural
+        const resistance = 0.5;
+        const offset = Math.min(deltaX * resistance, 150);
+        setSwipeBackOffset(offset);
+        return; // Don't process pull-to-refresh when swiping back
+      }
+    }
+    
+    // Pull-to-refresh logic
     if (!isPulling.current || scrollContainerRef.current?.scrollTop !== 0) return;
     
-    const touchY = e.touches[0].clientY;
-    const distance = Math.max(0, Math.min(100, touchY - touchStartY.current));
+    const distance = Math.max(0, Math.min(100, deltaY));
     setPullDistance(distance);
   };
 
   const handleTouchEnd = async () => {
+    // Handle swipe-back completion
+    if (isSwipingBack.current && swipeBackOffset > SWIPE_BACK_THRESHOLD) {
+      haptic.light();
+      navigate(-1);
+    }
+    
+    // Reset swipe-back state with animation
+    setSwipeBackOffset(0);
+    isSwipingBack.current = false;
+    swipeStartedFromEdge.current = false;
+    
+    // Handle pull-to-refresh
     if (pullDistance >= 60 && conversation?.id) {
       setIsRefreshing(true);
       try {
@@ -420,8 +471,14 @@ export default function AppChat() {
         description="Chat with our support team"
       />
       
-      {/* Container - h-full to fill NativeAppLayout's main area */}
-      <div className="flex flex-col bg-background h-full">
+      {/* Container - h-full to fill NativeAppLayout's main area, with swipe-back visual feedback */}
+      <div 
+        className="flex flex-col bg-background h-full transition-transform duration-200 ease-out"
+        style={{ 
+          transform: swipeBackOffset > 0 ? `translateX(${swipeBackOffset}px)` : 'none',
+          transition: swipeBackOffset === 0 ? 'transform 0.2s ease-out' : 'none',
+        }}
+      >
         {/* iOS-style Blur Header - fixed for proper scroll behavior */}
         <header 
           className="fixed top-0 left-0 right-0 z-40 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-xl rounded-b-3xl shadow-sm"
