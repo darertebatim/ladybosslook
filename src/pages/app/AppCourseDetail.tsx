@@ -1377,26 +1377,24 @@ const AppCourseDetail = () => {
             {dbSessions && dbSessions.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2">
                     <Clock className="h-5 w-5" />
                     Sessions
-                    <div className="ml-auto flex items-center gap-2">
-                      {/* Global Settings Button */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => setShowSessionReminderSheet(true)}
-                      >
-                        <Settings2 className="h-4 w-4" />
-                      </Button>
-                      <Badge variant="secondary">
-                        {dbSessions.length}
-                      </Badge>
-                    </div>
+                    <Badge variant="secondary" className="ml-auto">
+                      {dbSessions.length}
+                    </Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {/* Reminder Settings Button */}
+                  <Button
+                    variant="outline"
+                    className="w-full mb-4"
+                    onClick={() => setShowSessionReminderSheet(true)}
+                  >
+                    <Bell className="h-4 w-4 mr-2" />
+                    {sessionSettings.enabled ? 'Reminder Settings' : 'Enable Reminders'}
+                  </Button>
                   <div className="space-y-3">
                     {dbSessions.map((session) => {
                       const sessionDate = new Date(session.session_date);
@@ -1482,26 +1480,24 @@ const AppCourseDetail = () => {
                   <CardTitle className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5" />
                     {hasDripTracks ? 'Audiobook Schedule' : 'Content Schedule'}
-                    <div className="ml-auto flex items-center gap-2">
-                      {/* Global Content Settings Button */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => setShowContentReminderSheet(true)}
-                      >
-                        <Settings2 className="h-4 w-4" />
-                      </Button>
-                      <Badge variant="secondary">
-                        {hasDripModules 
-                          ? `${playlistModules?.length || 0} modules`
-                          : `${playlistTracks?.length || 0} chapters`
-                        }
-                      </Badge>
-                    </div>
+                    <Badge variant="secondary" className="ml-auto">
+                      {hasDripModules 
+                        ? `${playlistModules?.length || 0} modules`
+                        : `${playlistTracks?.length || 0} chapters`
+                      }
+                    </Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {/* Reminder Settings Button */}
+                  <Button
+                    variant="outline"
+                    className="w-full mb-4"
+                    onClick={() => setShowContentReminderSheet(true)}
+                  >
+                    <Bell className="h-4 w-4 mr-2" />
+                    {contentSettings.enabled ? 'Reminder Settings' : 'Enable Reminders'}
+                  </Button>
                   <div className="space-y-3">
                     {/* Render modules if available */}
                     {hasDripModules && playlistModules?.map((module) => {
