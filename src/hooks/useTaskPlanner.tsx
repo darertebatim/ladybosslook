@@ -385,6 +385,8 @@ export const useTaskTemplates = (category?: TemplateCategory) => {
       if (error) throw error;
       return data as TaskTemplate[];
     },
+    staleTime: 1000 * 60 * 5, // 5 minutes - refresh on app reopen
+    refetchOnMount: 'always', // Always refetch when component mounts
   });
 };
 
