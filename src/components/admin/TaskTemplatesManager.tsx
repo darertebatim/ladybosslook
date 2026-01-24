@@ -41,8 +41,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, ListTodo, Star } from 'lucide-react';
+import { Plus, Pencil, Trash2, ListTodo, Star, CheckSquare, Square } from 'lucide-react';
 import { TASK_COLOR_CLASSES } from '@/hooks/useTaskPlanner';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Template {
   id: string;
@@ -77,6 +78,8 @@ export function TaskTemplatesManager() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     emoji: '✨',
@@ -173,6 +176,44 @@ export function TaskTemplatesManager() {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase
+        .from('task_templates')
+        .delete()
+        .in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-task-templates'] });
+      toast.success(`${selectedIds.size} templates deleted`);
+      setSelectedIds(new Set());
+      setShowBulkDeleteConfirm(false);
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (!templates) return;
+    if (selectedIds.size === templates.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(templates.map(t => t.id)));
+    }
+  };
+
   const handleOpenCreate = () => {
     setEditingTemplate(null);
     setFormData({
@@ -244,10 +285,22 @@ export function TaskTemplatesManager() {
             Basic task templates users can quickly add to their planner
           </CardDescription>
         </div>
-        <Button onClick={handleOpenCreate} size="sm">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Template
-        </Button>
+        <div className="flex items-center gap-2">
+          {selectedIds.size > 0 && (
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={() => setShowBulkDeleteConfirm(true)}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete ({selectedIds.size})
+            </Button>
+          )}
+          <Button onClick={handleOpenCreate} size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Template
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -260,6 +313,13 @@ export function TaskTemplatesManager() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={templates?.length > 0 && selectedIds.size === templates.length}
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="Select all"
+                  />
+                </TableHead>
                 <TableHead className="w-12">Icon</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead>Category</TableHead>
@@ -273,8 +333,16 @@ export function TaskTemplatesManager() {
             <TableBody>
               {templates.map((template) => {
                 const colorClass = TASK_COLOR_CLASSES[template.color as keyof typeof TASK_COLOR_CLASSES] || 'bg-gray-100';
+                const isSelected = selectedIds.has(template.id);
                 return (
-                  <TableRow key={template.id}>
+                  <TableRow key={template.id} className={isSelected ? 'bg-muted/50' : ''}>
+                    <TableCell>
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => toggleSelect(template.id)}
+                        aria-label={`Select ${template.title}`}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div className={`w-8 h-8 rounded-lg ${colorClass} flex items-center justify-center text-lg`}>
                         {template.emoji}
@@ -497,6 +565,28 @@ export function TaskTemplatesManager() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Confirmation */}
+      <AlertDialog open={showBulkDeleteConfirm} onOpenChange={setShowBulkDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {selectedIds.size} Templates?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete {selectedIds.size} task templates. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => bulkDeleteMutation.mutate(Array.from(selectedIds))}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={bulkDeleteMutation.isPending}
+            >
+              {bulkDeleteMutation.isPending ? 'Deleting...' : `Delete ${selectedIds.size} Templates`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
