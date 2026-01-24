@@ -44,6 +44,7 @@ import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, ListTodo, Star, CheckSquare, Square } from 'lucide-react';
 import { TASK_COLOR_CLASSES } from '@/hooks/useTaskPlanner';
 import { Checkbox } from '@/components/ui/checkbox';
+import { getContrastTextColor } from '@/lib/utils';
 
 interface Template {
   id: string;
@@ -113,11 +114,11 @@ export function TaskTemplatesManager() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('routine_categories')
-        .select('slug, name')
+        .select('slug, name, color')
         .eq('is_active', true)
         .order('display_order');
       if (error) throw error;
-      return data as { slug: string; name: string }[];
+      return data as { slug: string; name: string; color: string }[];
     },
   });
 
@@ -126,9 +127,10 @@ export function TaskTemplatesManager() {
     return routineCategories?.map(c => c.slug) || [];
   }, [routineCategories]);
 
-  // Helper to get category display name
-  const getCategoryName = (slug: string) => {
-    return routineCategories?.find(c => c.slug === slug)?.name || slug;
+  // Helper to get category info (name and color)
+  const getCategoryInfo = (slug: string) => {
+    const cat = routineCategories?.find(c => c.slug === slug);
+    return cat || { slug, name: slug, color: '#6B7280' };
   };
 
   const createMutation = useMutation({
@@ -357,9 +359,17 @@ export function TaskTemplatesManager() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary">
-                        {getCategoryName(template.category)}
-                      </Badge>
+                      {(() => {
+                        const catInfo = getCategoryInfo(template.category);
+                        return (
+                          <Badge 
+                            className={getContrastTextColor(catInfo.color)}
+                            style={{ backgroundColor: catInfo.color }}
+                          >
+                            {catInfo.name}
+                          </Badge>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell>
                       <div className={`w-6 h-6 rounded ${colorClass}`} />

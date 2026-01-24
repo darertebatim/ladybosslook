@@ -45,6 +45,7 @@ import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, Sparkles, Loader2, Music, BookOpen, Star, CheckCircle, AlertCircle } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { PRO_LINK_TYPES, PRO_LINK_CONFIGS, ProLinkType } from '@/lib/proTaskTypes';
+import { getContrastTextColor } from '@/lib/utils';
 
 interface Template {
   id: string;
@@ -213,6 +214,25 @@ export function ProTaskTemplatesManager() {
       return data as Playlist[];
     },
   });
+
+  // Fetch routine categories for colors
+  const { data: routineCategories } = useQuery({
+    queryKey: ['routine-categories-for-colors'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routine_categories')
+        .select('slug, name, color')
+        .order('display_order');
+      if (error) throw error;
+      return data as { slug: string; name: string; color: string }[];
+    },
+  });
+
+  // Helper to get category info (name and color)
+  const getCategoryInfo = (slug: string | null) => {
+    if (!slug) return null;
+    return routineCategories?.find(c => c.slug === slug) || { slug, name: slug, color: '#6B7280' };
+  };
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -494,9 +514,17 @@ export function ProTaskTemplatesManager() {
                     </TableCell>
                     <TableCell>{template.duration_minutes} min</TableCell>
                     <TableCell>
-                      {template.category && (
-                        <Badge variant="secondary">{template.category}</Badge>
-                      )}
+                      {template.category && (() => {
+                        const catInfo = getCategoryInfo(template.category);
+                        return catInfo ? (
+                          <Badge 
+                            className={getContrastTextColor(catInfo.color)}
+                            style={{ backgroundColor: catInfo.color }}
+                          >
+                            {catInfo.name}
+                          </Badge>
+                        ) : null;
+                      })()}
                     </TableCell>
                     <TableCell>
                       {template.is_popular ? (
