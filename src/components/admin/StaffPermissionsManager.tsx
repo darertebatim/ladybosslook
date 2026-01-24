@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Shield, User, UserCog, Loader2, ChevronRight, Bell } from 'lucide-react';
+import { Search, Shield, User, UserCog, Loader2, ChevronRight, Bell, GraduationCap } from 'lucide-react';
 
 const ADMIN_PAGES = [
   { slug: 'overview', label: 'Overview' },
@@ -45,6 +45,7 @@ export function StaffPermissionsManager() {
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [staffList, setStaffList] = useState<StaffMember[]>([]);
   const [loadingStaff, setLoadingStaff] = useState(true);
+  const [enrollingUserId, setEnrollingUserId] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Fetch staff list on mount
@@ -361,6 +362,32 @@ export function StaffPermissionsManager() {
     }
   };
 
+  const handleEnrollAllPrograms = async (userId: string, userEmail: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setEnrollingUserId(userId);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-enroll-all-programs', {
+        body: { targetUserId: userId }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Enrolled Successfully",
+        description: `${userEmail}: ${data.message}`
+      });
+    } catch (error: any) {
+      console.error('Enroll error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to enroll in all programs",
+        variant: "destructive"
+      });
+    } finally {
+      setEnrollingUserId(null);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -402,14 +429,16 @@ export function StaffPermissionsManager() {
           ) : (
             <div className="border rounded-lg divide-y">
               {staffList.map(staff => (
-                <button
+                <div
                   key={staff.id}
-                  onClick={() => handleSelectStaff(staff)}
-                  className={`w-full flex items-center justify-between p-3 hover:bg-muted/50 transition-colors text-left ${
+                  className={`flex items-center justify-between p-3 hover:bg-muted/50 transition-colors ${
                     selectedUser?.id === staff.id ? 'bg-muted' : ''
                   }`}
                 >
-                  <div className="min-w-0 flex-1">
+                  <button
+                    onClick={() => handleSelectStaff(staff)}
+                    className="min-w-0 flex-1 text-left"
+                  >
                     <div className="flex items-center gap-2">
                       <p className="font-medium truncate">
                         {staff.full_name || 'No name'}
@@ -427,9 +456,24 @@ export function StaffPermissionsManager() {
                         {getPermissionLabels(staff.permissions)}
                       </p>
                     )}
+                  </button>
+                  <div className="flex items-center gap-2 ml-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => handleEnrollAllPrograms(staff.id, staff.email, e)}
+                      disabled={enrollingUserId === staff.id}
+                      title="Enroll in All Programs"
+                    >
+                      {enrollingUserId === staff.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <GraduationCap className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0 ml-2" />
-                </button>
+                </div>
               ))}
             </div>
           )}
@@ -481,6 +525,32 @@ export function StaffPermissionsManager() {
                   onCheckedChange={handleToggleNotifications}
                   disabled={saving}
                 />
+              </div>
+
+              {/* Enroll in All Programs */}
+              <div className="flex items-center justify-between border-t pt-4">
+                <div>
+                  <Label className="font-medium flex items-center gap-2">
+                    <GraduationCap className="h-4 w-4 text-primary" />
+                    Enroll in All Programs
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Enroll this user in all active programs and rounds
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEnrollAllPrograms(selectedUser.id, selectedUser.email)}
+                  disabled={enrollingUserId === selectedUser.id}
+                >
+                  {enrollingUserId === selectedUser.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <GraduationCap className="h-4 w-4 mr-2" />
+                  )}
+                  Enroll Now
+                </Button>
               </div>
 
               {/* Page Permissions */}
