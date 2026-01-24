@@ -15,14 +15,6 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
-        // Purple/lavender variants with proper white text for contrast
-        lavender:
-          "border-transparent bg-violet-500 text-white hover:bg-violet-600",
-        purple:
-          "border-transparent bg-purple-500 text-white hover:bg-purple-600",
-        // Soft lavender with dark text (for light backgrounds)
-        lavenderSoft:
-          "border-transparent bg-violet-100 text-violet-700 hover:bg-violet-200",
       },
     },
     defaultVariants: {
