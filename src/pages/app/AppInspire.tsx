@@ -48,21 +48,16 @@ export default function AppInspire() {
 
   const isLoading = categoriesLoading || popularLoading || (selectedCategory && selectedCategory !== 'popular' && plansLoading);
 
-  // Get selected category name for filtering task templates
-  const selectedCategoryName = useMemo(() => {
-    if (!selectedCategory || selectedCategory === 'popular' || !categories) return null;
-    return categories.find(c => c.slug === selectedCategory)?.name || null;
-  }, [selectedCategory, categories]);
-
-  // Filter task templates by selected category or popular
+  // Filter task templates by selected category slug or popular
   const filteredTaskTemplates = useMemo(() => {
     if (!taskTemplates) return [];
     if (selectedCategory === 'popular') {
       return taskTemplates.filter(t => t.is_popular);
     }
-    if (!selectedCategoryName) return taskTemplates;
-    return taskTemplates.filter(t => t.category === selectedCategoryName);
-  }, [taskTemplates, selectedCategory, selectedCategoryName]);
+    if (!selectedCategory) return taskTemplates;
+    // Compare against the category slug stored in task_templates
+    return taskTemplates.filter(t => t.category === selectedCategory);
+  }, [taskTemplates, selectedCategory]);
 
   // Filter by search query
   const searchedPlans = displayPlans?.filter(plan => 
@@ -249,8 +244,8 @@ export default function AppInspire() {
                 <h2 className="text-sm font-semibold text-muted-foreground">
                   {selectedCategory === 'popular' 
                     ? 'POPULAR TASKS'
-                    : selectedCategoryName 
-                      ? `${selectedCategoryName.toUpperCase()} TASKS` 
+                    : selectedCategory 
+                      ? `${categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'CATEGORY'} TASKS` 
                       : 'ALL TASKS'
                   }
                 </h2>
