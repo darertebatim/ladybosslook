@@ -51,6 +51,31 @@ serve(async (req) => {
       });
     }
 
+    // Get targetUserId from request body, default to current user
+    let targetUserId = user.id;
+    try {
+      const body = await req.json();
+      if (body.targetUserId) {
+        targetUserId = body.targetUserId;
+      }
+    } catch {
+      // No body or invalid JSON, use current user
+    }
+
+    // Verify target user exists
+    const { data: targetProfile } = await supabase
+      .from("profiles")
+      .select("id, email")
+      .eq("id", targetUserId)
+      .single();
+
+    if (!targetProfile) {
+      return new Response(JSON.stringify({ error: "Target user not found" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Get all active programs
     const { data: programs, error: programsError } = await supabase
       .from("program_catalog")
@@ -67,11 +92,11 @@ serve(async (req) => {
 
     if (roundsError) throw roundsError;
 
-    // Get existing enrollments for this user (check program_slug + round_id combo)
+    // Get existing enrollments for target user (check program_slug + round_id combo)
     const { data: existingEnrollments } = await supabase
       .from("course_enrollments")
       .select("program_slug, round_id")
-      .eq("user_id", user.id);
+      .eq("user_id", targetUserId);
 
     const existingSet = new Set(
       (existingEnrollments || []).map(e => `${e.program_slug}-${e.round_id || 'null'}`)
@@ -89,7 +114,7 @@ serve(async (req) => {
           const key = `${program.slug}-${round.id}`;
           if (!existingSet.has(key)) {
             enrollmentsToCreate.push({
-              user_id: user.id,
+              user_id: targetUserId,
               course_name: `${program.title} - ${round.round_name}`,
               program_slug: program.slug,
               round_id: round.id,
@@ -102,7 +127,7 @@ serve(async (req) => {
         const key = `${program.slug}-null`;
         if (!existingSet.has(key)) {
           enrollmentsToCreate.push({
-            user_id: user.id,
+            user_id: targetUserId,
             course_name: program.title,
             program_slug: program.slug,
             round_id: null,
@@ -129,6 +154,8 @@ serve(async (req) => {
         created,
         totalPrograms: programs?.length || 0,
         totalRounds: rounds?.length || 0,
+        targetUserId,
+        targetEmail: targetProfile.email,
       }),
       {
         status: 200,
