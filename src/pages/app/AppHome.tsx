@@ -532,10 +532,10 @@ const AppHome = () => {
 
         {/* Fixed Bottom Dashboard */}
         <div 
-          className="fixed bottom-0 left-0 right-0 z-40 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-t-3xl shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)]"
+          className="fixed bottom-0 left-0 right-0 z-40 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-t-sm shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)]"
           style={{ paddingBottom: 'max(64px, calc(52px + env(safe-area-inset-bottom)))' }}
         >
-          <div className="px-4 py-2">
+          <div className="px-0 py-0">
             <ActiveRoundsCarousel
               activeRounds={activeRounds}
               nextSessionMap={nextSessionMap}
