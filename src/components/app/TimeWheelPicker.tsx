@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 
@@ -8,30 +8,102 @@ interface TimeWheelPickerProps {
 }
 
 // Generate arrays for picker
-const HOURS_12 = Array.from({ length: 12 }, (_, i) => (i === 0 ? 12 : i));
-const MINUTES = Array.from({ length: 60 }, (_, i) => i);
+const HOURS_12 = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // 12 hours: 12, 1, 2, ... 11
+const MINUTES = Array.from({ length: 60 }, (_, i) => i); // 0-59
 const PERIODS = ['AM', 'PM'] as const;
 
 const ITEM_HEIGHT = 44;
 const VISIBLE_ITEMS = 5;
 
+// Number of times to repeat the array for infinite scroll effect
+const REPEAT_COUNT = 5;
+
 interface WheelColumnProps {
   items: (string | number)[];
-  selectedIndex: number;
-  onSelect: (index: number) => void;
+  selectedValue: number | string;
+  onSelect: (value: number | string) => void;
   formatItem?: (item: string | number) => string;
+  isInfinite?: boolean;
 }
 
-const WheelColumn = ({ items, selectedIndex, onSelect, formatItem }: WheelColumnProps) => {
+const WheelColumn = ({ items, selectedValue, onSelect, formatItem, isInfinite = false }: WheelColumnProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
   const [scrollOffset, setScrollOffset] = useState(0);
+  const [lastSelectedValue, setLastSelectedValue] = useState(selectedValue);
+
+  // For infinite scroll, create repeated items
+  const displayItems = isInfinite
+    ? Array.from({ length: REPEAT_COUNT }, () => items).flat()
+    : items;
+
+  // Find the center occurrence index for the selected value
+  const getSelectedIndex = useCallback(() => {
+    if (!isInfinite) {
+      return items.indexOf(selectedValue);
+    }
+    // For infinite scroll, use the middle repetition
+    const middleRepeat = Math.floor(REPEAT_COUNT / 2);
+    const baseIndex = items.indexOf(selectedValue);
+    return middleRepeat * items.length + baseIndex;
+  }, [items, selectedValue, isInfinite]);
+
+  const selectedIndex = getSelectedIndex();
 
   useEffect(() => {
     // Center the selected item
     setScrollOffset(-selectedIndex * ITEM_HEIGHT);
   }, [selectedIndex]);
+
+  // Re-center when value changes externally
+  useEffect(() => {
+    if (selectedValue !== lastSelectedValue) {
+      setLastSelectedValue(selectedValue);
+      const newIndex = getSelectedIndex();
+      setScrollOffset(-newIndex * ITEM_HEIGHT);
+    }
+  }, [selectedValue, lastSelectedValue, getSelectedIndex]);
+
+  const snapToNearestItem = useCallback((currentOffset: number) => {
+    const rawIndex = Math.round(-currentOffset / ITEM_HEIGHT);
+    
+    if (isInfinite) {
+      // For infinite scroll, wrap around to the middle section
+      let normalizedIndex = rawIndex;
+      const totalItems = displayItems.length;
+      const singleSetLength = items.length;
+      const middleStart = Math.floor(REPEAT_COUNT / 2) * singleSetLength;
+      const middleEnd = middleStart + singleSetLength - 1;
+      
+      // Clamp to valid range first
+      normalizedIndex = Math.max(0, Math.min(totalItems - 1, normalizedIndex));
+      
+      // Get the actual value at this position
+      const actualValue = displayItems[normalizedIndex];
+      
+      // Calculate the index in the middle section for this value
+      const valueIndexInSet = items.indexOf(actualValue);
+      const targetIndex = middleStart + valueIndexInSet;
+      
+      setScrollOffset(-targetIndex * ITEM_HEIGHT);
+      
+      if (actualValue !== lastSelectedValue) {
+        haptic.selection();
+        setLastSelectedValue(actualValue);
+        onSelect(actualValue);
+      }
+    } else {
+      const newIndex = Math.max(0, Math.min(items.length - 1, rawIndex));
+      setScrollOffset(-newIndex * ITEM_HEIGHT);
+      const newValue = items[newIndex];
+      if (newValue !== lastSelectedValue) {
+        haptic.selection();
+        setLastSelectedValue(newValue);
+        onSelect(newValue);
+      }
+    }
+  }, [displayItems, items, isInfinite, onSelect, lastSelectedValue]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsDragging(true);
@@ -46,14 +118,7 @@ const WheelColumn = ({ items, selectedIndex, onSelect, formatItem }: WheelColumn
 
   const handleTouchEnd = () => {
     setIsDragging(false);
-    // Snap to nearest item
-    const rawIndex = Math.round(-scrollOffset / ITEM_HEIGHT);
-    const newIndex = Math.max(0, Math.min(items.length - 1, rawIndex));
-    setScrollOffset(-newIndex * ITEM_HEIGHT);
-    if (newIndex !== selectedIndex) {
-      haptic.selection();
-      onSelect(newIndex);
-    }
+    snapToNearestItem(scrollOffset);
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -70,19 +135,34 @@ const WheelColumn = ({ items, selectedIndex, onSelect, formatItem }: WheelColumn
   const handleMouseUp = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    const rawIndex = Math.round(-scrollOffset / ITEM_HEIGHT);
-    const newIndex = Math.max(0, Math.min(items.length - 1, rawIndex));
-    setScrollOffset(-newIndex * ITEM_HEIGHT);
-    if (newIndex !== selectedIndex) {
-      haptic.selection();
-      onSelect(newIndex);
-    }
+    snapToNearestItem(scrollOffset);
   };
 
   const handleItemClick = (index: number) => {
-    haptic.selection();
-    onSelect(index);
+    const clickedValue = displayItems[index];
+    
+    if (isInfinite) {
+      // Jump to center section for this value
+      const singleSetLength = items.length;
+      const middleStart = Math.floor(REPEAT_COUNT / 2) * singleSetLength;
+      const valueIndexInSet = items.indexOf(clickedValue);
+      const targetIndex = middleStart + valueIndexInSet;
+      
+      setScrollOffset(-targetIndex * ITEM_HEIGHT);
+      if (clickedValue !== lastSelectedValue) {
+        haptic.selection();
+        setLastSelectedValue(clickedValue);
+        onSelect(clickedValue);
+      }
+    } else {
+      haptic.selection();
+      setLastSelectedValue(clickedValue);
+      onSelect(clickedValue);
+    }
   };
+
+  // Calculate which index is currently centered
+  const currentCenterIndex = Math.round(-scrollOffset / ITEM_HEIGHT);
 
   return (
     <div 
@@ -115,8 +195,8 @@ const WheelColumn = ({ items, selectedIndex, onSelect, formatItem }: WheelColumn
           transitionDuration: isDragging ? '0ms' : '150ms'
         }}
       >
-        {items.map((item, index) => {
-          const distance = Math.abs(index - selectedIndex);
+        {displayItems.map((item, index) => {
+          const distance = Math.abs(index - currentCenterIndex);
           const opacity = distance === 0 ? 1 : distance === 1 ? 0.6 : distance === 2 ? 0.3 : 0.15;
           const scale = distance === 0 ? 1 : 0.85;
           const fontWeight = distance === 0 ? 600 : 400;
@@ -148,26 +228,22 @@ export const TimeWheelPicker = ({ value, onChange }: TimeWheelPickerProps) => {
   const [hours24, minutes] = value.split(':').map(Number);
   const period = hours24 >= 12 ? 'PM' : 'AM';
   const hours12 = hours24 % 12 || 12;
-  
-  // Find indices
-  const hourIndex = HOURS_12.indexOf(hours12);
-  const minuteIndex = minutes;
-  const periodIndex = PERIODS.indexOf(period);
 
-  const handleHourChange = (index: number) => {
-    const newHour12 = HOURS_12[index];
-    let newHour24 = period === 'PM' ? (newHour12 % 12) + 12 : newHour12 % 12;
+  const handleHourChange = (newHour12: number | string) => {
+    const hour = Number(newHour12);
+    let newHour24 = period === 'PM' ? (hour % 12) + 12 : hour % 12;
     onChange(`${String(newHour24).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`);
   };
 
-  const handleMinuteChange = (index: number) => {
-    onChange(`${String(hours24).padStart(2, '0')}:${String(index).padStart(2, '0')}`);
+  const handleMinuteChange = (newMinute: number | string) => {
+    const minute = Number(newMinute);
+    onChange(`${String(hours24).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
   };
 
-  const handlePeriodChange = (index: number) => {
-    const newPeriod = PERIODS[index];
+  const handlePeriodChange = (newPeriod: number | string) => {
+    const periodStr = String(newPeriod) as 'AM' | 'PM';
     let newHour24: number;
-    if (newPeriod === 'AM') {
+    if (periodStr === 'AM') {
       newHour24 = hours12 % 12;
     } else {
       newHour24 = (hours12 % 12) + 12;
@@ -179,21 +255,24 @@ export const TimeWheelPicker = ({ value, onChange }: TimeWheelPickerProps) => {
     <div className="flex justify-center items-center gap-0 py-4">
       <WheelColumn
         items={HOURS_12}
-        selectedIndex={hourIndex >= 0 ? hourIndex : 0}
+        selectedValue={hours12}
         onSelect={handleHourChange}
         formatItem={(item) => String(item).padStart(2, '0')}
+        isInfinite={true}
       />
       <WheelColumn
         items={MINUTES}
-        selectedIndex={minuteIndex}
+        selectedValue={minutes}
         onSelect={handleMinuteChange}
         formatItem={(item) => String(item).padStart(2, '0')}
+        isInfinite={true}
       />
       <WheelColumn
         items={PERIODS as unknown as string[]}
-        selectedIndex={periodIndex >= 0 ? periodIndex : 0}
+        selectedValue={period}
         onSelect={handlePeriodChange}
         formatItem={(item) => String(item)}
+        isInfinite={false}
       />
     </div>
   );
