@@ -132,63 +132,61 @@ const NativeAppLayout = () => {
   const TAB_BAR_CONTENT_HEIGHT = 48;
 
   return (
-    <>
-      <div className="flex flex-col h-[100dvh] bg-background app-theme font-farsi">
-        {/* Main Content - scrollable container for iOS */}
-        <main 
-          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain"
-          style={{ paddingBottom: isOnChatPage ? 0 : TAB_BAR_CONTENT_HEIGHT + 8 }}
-        >
-          <Outlet />
-        </main>
+    <div className="flex flex-col h-[100dvh] bg-background app-theme font-farsi">
+      {/* Main Content - scrollable container for iOS */}
+      <main 
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain"
+        style={{ paddingBottom: isOnChatPage ? 0 : TAB_BAR_CONTENT_HEIGHT + 8 }}
+      >
+        <Outlet />
+      </main>
 
-        {/* Mini Player - show when audio is playing and not on player page or chat page */}
-        {!isOnPlayerPage && !isOnChatPage && <MiniPlayer />}
+      {/* Mini Player - show when audio is playing and not on player page or chat page */}
+      {!isOnPlayerPage && !isOnChatPage && <MiniPlayer />}
 
-        {/* Bottom Navigation - hidden on chat page for full-screen experience */}
-        {!isOnChatPage && (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg pb-safe">
-          <div className="grid grid-cols-7 pt-1.5 pb-1.5">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.path || 
-                (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
-              const Icon = item.icon;
-              const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
-              const showBadge = showChatBadge || item.showBadge;
-              return (
-              <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex flex-col items-center justify-center gap-0.5 transition-colors min-h-[44px] ${item.tourClass || ''} ${
-                    isActive
-                      ? 'text-primary'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <div className="relative">
-                    <Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''}`} />
-                    {showChatBadge && (
-                      <span className="absolute -top-1 -right-2 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                      </span>
-                    )}
-                    {item.showBadge && !showChatBadge && item.badgeCount && (
-                      <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
-                        {item.badgeCount > 9 ? '9+' : item.badgeCount}
-                      </span>
-                    )}
-                    {item.showBadge && !showChatBadge && !item.badgeCount && (
-                      <span className="absolute -top-0.5 -right-0.5 bg-primary w-2 h-2 rounded-full" />
-                    )}
-                  </div>
-                  <span className="text-[10px] font-medium">{item.label}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </nav>
-        )}
-      </div>
+      {/* Bottom Navigation - hidden on chat page for full-screen experience */}
+      {!isOnChatPage && (
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg pb-safe">
+        <div className="grid grid-cols-7 pt-1.5 pb-1.5">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path || 
+              (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
+            const Icon = item.icon;
+            const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
+            const showBadge = showChatBadge || item.showBadge;
+            return (
+            <Link
+                key={item.path}
+                to={item.path}
+                className={`flex flex-col items-center justify-center gap-0.5 transition-colors min-h-[44px] ${item.tourClass || ''} ${
+                  isActive
+                    ? 'text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <div className="relative">
+                  <Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''}`} />
+                  {showChatBadge && (
+                    <span className="absolute -top-1 -right-2 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                  {item.showBadge && !showChatBadge && item.badgeCount && (
+                    <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
+                      {item.badgeCount > 9 ? '9+' : item.badgeCount}
+                    </span>
+                  )}
+                  {item.showBadge && !showChatBadge && !item.badgeCount && (
+                    <span className="absolute -top-0.5 -right-0.5 bg-primary w-2 h-2 rounded-full" />
+                  )}
+                </div>
+                <span className="text-[10px] font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+      )}
 
       {/* Full-screen Push Notification Onboarding */}
       {user && flowState.showOnboarding && (
@@ -232,7 +230,7 @@ const NativeAppLayout = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 };
 
