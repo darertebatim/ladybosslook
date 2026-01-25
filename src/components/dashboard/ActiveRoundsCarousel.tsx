@@ -60,7 +60,7 @@ export function ActiveRoundsCarousel({
     return (
       <Link 
         to="/app/browse"
-        className="flex items-center justify-between px-3 py-0 rounded-sm bg-muted/60 border border-border/50"
+        className="flex items-center justify-between px-0 py-0 rounded-sm bg-muted/60 border border-border/50"
       >
         <div className="flex items-center gap-2">
           <GraduationCap className="h-4 w-4 text-muted-foreground" />
