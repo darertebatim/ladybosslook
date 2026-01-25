@@ -95,9 +95,9 @@ export function ActiveRoundsCarousel({
           <Badge variant="secondary" className="h-4 px-1 text-[10px]">
             {activeRounds.length}
           </Badge>
-          {isCollapsed && (
-            <span className="text-[10px] text-muted-foreground ml-1">tap to expand</span>
-          )}
+          <span className="text-[10px] text-muted-foreground ml-1">
+            {isCollapsed ? 'tap to expand' : 'tap to collapse'}
+          </span>
         </div>
         <Link 
           to="/app/programs"
