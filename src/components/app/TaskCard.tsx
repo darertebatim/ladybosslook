@@ -52,6 +52,7 @@ export const TaskCard = ({
 
   // Check if this is a future date (after today)
   const isFutureDate = !isToday(date) && !isBefore(startOfDay(date), startOfDay(new Date()));
+  
   // Format time display
   const formatTime = (time: string | null) => {
     if (!time) return 'Anytime';
@@ -116,25 +117,25 @@ export const TaskCard = ({
       <div
         onClick={handleCardClick}
         className={cn(
-          'rounded-2xl px-3 py-2.5 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-          colorClass, // Use user's chosen task color
+          'rounded-3xl px-4 py-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+          colorClass,
           isCompleted && 'opacity-60'
         )}
       >
         {/* Main row */}
-        <div className="flex items-center gap-2.5">
-          {/* Icon - shows Pro link type icon */}
-          <div className="w-10 h-10 flex items-center justify-center shrink-0">
-            <ProIcon className={cn('h-5 w-5', proConfig.iconColorClass)} />
+        <div className="flex items-center gap-3">
+          {/* Icon - larger emoji display */}
+          <div className="w-14 h-14 flex items-center justify-center shrink-0">
+            <ProIcon className={cn('h-7 w-7', proConfig.iconColorClass)} />
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
             {/* Top line: Time + Badge */}
-            <div className="flex items-center gap-2 text-xs mb-0.5">
+            <div className="flex items-center gap-2 text-sm mb-1">
               <span className="text-foreground/60">{formatTime(task.scheduled_time)}</span>
               <span className={cn(
-                'px-2 py-0.5 rounded-full font-medium',
+                'px-2 py-0.5 rounded-full text-xs font-medium',
                 proConfig.badgeColorClass
               )}>
                 {proConfig.badgeText}
@@ -143,7 +144,7 @@ export const TaskCard = ({
             
             {/* Title */}
             <p className={cn(
-              'font-semibold text-foreground truncate transition-all',
+              'font-bold text-foreground text-base truncate transition-all',
               isCompleted && 'line-through text-foreground/50'
             )}>
               {task.title}
@@ -172,80 +173,80 @@ export const TaskCard = ({
             {proConfig.badgeText}
           </button>
 
-          {/* Checkbox - disabled for future dates */}
+          {/* Checkbox - larger, Me+ style */}
           <button
             onClick={handleToggleComplete}
             disabled={isFutureDate}
             className={cn(
-              'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+              'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
               isCompleted
                 ? 'bg-emerald-500 text-white shadow-md'
                 : isFutureDate
                   ? 'border-2 border-foreground/15 bg-white/30 cursor-not-allowed opacity-50'
-                  : 'border-2 border-foreground/25 hover:border-foreground/40 bg-white/50',
+                  : 'border-2 border-foreground/30 bg-white/60',
               isAnimating && 'scale-110'
             )}
           >
-            {isCompleted && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+            {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
           </button>
         </div>
       </div>
     );
   }
 
-  // Regular task styling
+  // Regular task styling - Me+ inspired
   return (
     <div
       onClick={handleCardClick}
       className={cn(
-        'rounded-2xl px-3 py-2.5 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+        'rounded-3xl px-4 py-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
         colorClass,
         isCompleted && 'opacity-60'
       )}
     >
       {/* Main row */}
-      <div className="flex items-center gap-2.5">
-        {/* Icon */}
-        <div className="w-10 h-10 flex items-center justify-center shrink-0">
-          <TaskIcon iconName={task.emoji} size={24} className="text-foreground/80" />
+      <div className="flex items-center gap-3">
+        {/* Icon - larger emoji display like Me+ */}
+        <div className="w-14 h-14 flex items-center justify-center shrink-0">
+          <TaskIcon iconName={task.emoji} size={32} className="text-foreground/80" />
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Top line: subtask count + time */}
-          <div className="flex items-center gap-2 text-xs text-foreground/60 mb-0.5">
+          <div className="flex items-center gap-2 text-sm text-foreground/60 mb-1">
             {hasSubtasks && (
-              <span className="font-semibold text-foreground/70">
+              <span className="font-semibold text-foreground/70 bg-white/50 px-1.5 py-0.5 rounded text-xs">
                 {completedCount}/{totalSubtasks}
               </span>
             )}
             <span>{formatTime(task.scheduled_time)}</span>
           </div>
           
-          {/* Title */}
+          {/* Title - larger, bolder */}
           <p className={cn(
-            'font-semibold text-foreground truncate transition-all',
+            'font-bold text-foreground text-base truncate transition-all',
             isCompleted && 'line-through text-foreground/50'
           )}>
             {task.title}
           </p>
         </div>
 
-        {/* Checkbox / Badge - disabled for future dates */}
+        {/* Checkbox - larger, Me+ style */}
         <button
           onClick={handleToggleComplete}
           disabled={isFutureDate}
           className={cn(
-            'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+            'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
             isCompleted
               ? 'bg-emerald-500 text-white shadow-md'
               : isFutureDate
                 ? 'border-2 border-foreground/15 bg-white/30 cursor-not-allowed opacity-50'
-                : 'border-2 border-foreground/25 hover:border-foreground/40 bg-white/50',
+                : 'border-2 border-foreground/30 bg-white/60',
             isAnimating && 'scale-110'
           )}
         >
-          {isCompleted && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+          {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
         </button>
       </div>
     </div>
