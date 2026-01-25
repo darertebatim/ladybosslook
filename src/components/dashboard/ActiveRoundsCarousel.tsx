@@ -78,8 +78,8 @@ export function ActiveRoundsCarousel({
     <div className={`tour-programs-carousel ${isCollapsed ? '' : 'space-y-2'}`}>
       {/* Header - always visible, acts as expand/collapse toggle */}
       <button 
-        className={`w-full flex items-center justify-between px-2 rounded-xl transition-all active:bg-black/5 ${
-          isCollapsed ? 'bg-muted/60 py-2 border border-border/50' : 'py-1.5'
+        className={`w-full flex items-center justify-between px-0 py-0 rounded-sm transition-all active:bg-black/5 ${
+          isCollapsed ? 'bg-muted/60 border border-border/50' : ''
         }`}
         onClick={toggleCollapse}
         aria-label={isCollapsed ? 'Expand programs' : 'Collapse programs'}
