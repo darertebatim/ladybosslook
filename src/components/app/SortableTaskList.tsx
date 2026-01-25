@@ -101,8 +101,28 @@ export const SortableTaskList = ({
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
   const reorderTasks = useReorderTasks();
 
-  // Sync local tasks when props change
-  if (JSON.stringify(tasks.map(t => t.id)) !== JSON.stringify(localTasks.map(t => t.id))) {
+  // Sync local tasks when props change (compare full task data, not just IDs)
+  // This ensures edits to task properties (title, color, time) are reflected
+  const tasksKey = JSON.stringify(tasks.map(t => ({ 
+    id: t.id, 
+    title: t.title, 
+    color: t.color, 
+    emoji: t.emoji,
+    scheduled_time: t.scheduled_time,
+    repeat_pattern: t.repeat_pattern,
+    updated_at: t.updated_at 
+  })));
+  const localKey = JSON.stringify(localTasks.map(t => ({ 
+    id: t.id, 
+    title: t.title, 
+    color: t.color, 
+    emoji: t.emoji,
+    scheduled_time: t.scheduled_time,
+    repeat_pattern: t.repeat_pattern,
+    updated_at: t.updated_at 
+  })));
+
+  if (tasksKey !== localKey) {
     setLocalTasks(tasks);
   }
 
