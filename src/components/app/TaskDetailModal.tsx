@@ -69,13 +69,14 @@ export const TaskDetailModal = ({
 
   // Get reminder description
   const getReminderText = () => {
-    if (!task.reminder_enabled) return '';
-    const offset = task.reminder_offset;
-    if (offset === 0) return 'Remind me at time';
-    if (offset === 10) return 'Remind me 10 minutes before';
-    if (offset === 30) return 'Remind me 30 minutes before';
-    if (offset === 60) return 'Remind me 1 hour before';
-    return '';
+    if (!task.reminder_enabled) return 'No Reminder';
+    const time = task.scheduled_time;
+    if (!time) return '';
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `Remind me at ${displayHour}:${minutes} ${ampm}`;
   };
 
   const handleToggleSubtask = async (subtaskId: string) => {
@@ -99,56 +100,71 @@ export const TaskDetailModal = ({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent hideCloseButton className="sm:max-w-md p-0 gap-0 rounded-3xl overflow-hidden">
-        {/* Header with icon and time */}
-        <div className={cn('p-6 pb-4 relative', colorClass)}>
-          <button 
-            onClick={onClose}
-            className="absolute right-4 top-4 w-7 h-7 rounded-full border border-foreground/30 flex items-center justify-center hover:bg-white/30 transition-colors"
-          >
-            <X className="h-4 w-4" strokeWidth={1.5} />
-          </button>
-          
+      <DialogContent 
+        hideCloseButton 
+        className={cn(
+          'sm:max-w-md p-0 gap-0 rounded-3xl overflow-hidden border-0',
+          colorClass
+        )}
+      >
+        {/* Close button */}
+        <button 
+          onClick={onClose}
+          className="absolute right-4 top-4 w-8 h-8 rounded-full border border-foreground/30 flex items-center justify-center hover:bg-white/30 transition-colors z-10"
+        >
+          <X className="h-4 w-4" strokeWidth={1.5} />
+        </button>
+
+        {/* Task header - Me+ style with emoji, time, title */}
+        <div className="px-6 pt-6 pb-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-white/80 flex items-center justify-center">
-              <TaskIcon iconName={task.emoji} size={28} className="text-foreground/80" />
+            {/* Large emoji */}
+            <div className="w-16 h-16 flex items-center justify-center shrink-0">
+              <TaskIcon iconName={task.emoji} size={40} className="text-foreground/80" />
             </div>
-            <div>
-              <p className="text-sm text-foreground/60">
+            
+            {/* Time and title */}
+            <div className="flex-1 min-w-0 pr-8">
+              <p className="text-sm text-foreground/60 mb-0.5">
                 Time: {formatTime(task.scheduled_time)}
               </p>
-              <h3 className="text-lg font-semibold">
+              <h3 className="text-xl font-bold text-foreground leading-tight">
                 {task.title}
               </h3>
+            </div>
+
+            {/* Checkbox circle on right */}
+            <div className="w-10 h-10 rounded-full border-2 border-foreground/30 bg-white/40 flex items-center justify-center shrink-0">
+              {/* Empty circle - for visual consistency with Me+ */}
             </div>
           </div>
         </div>
 
-        {/* Subtasks */}
+        {/* Subtasks section - white background card */}
         {subtasks.length > 0 && (
-          <div className="p-4 bg-background">
-            <div className="bg-muted/50 rounded-2xl p-4 space-y-3">
+          <div className="px-6 pb-4">
+            <div className="bg-white/80 rounded-2xl p-4 space-y-0 divide-y divide-foreground/10">
               {subtasks.map((subtask) => {
                 const isCompleted = completedSubtaskIds.includes(subtask.id);
                 return (
                   <button
                     key={subtask.id}
                     onClick={() => handleToggleSubtask(subtask.id)}
-                    className="flex items-center gap-3 w-full text-left"
+                    className="flex items-center gap-3 w-full text-left py-3 first:pt-0 last:pb-0"
                   >
                     <div
                       className={cn(
-                        'w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0',
+                        'w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all shrink-0',
                         isCompleted
                           ? 'bg-emerald-500 border-emerald-500 text-white'
-                          : 'border-muted-foreground/30'
+                          : 'border-foreground/30 bg-white/50'
                       )}
                     >
-                      {isCompleted && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+                      {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
                     </div>
                     <span className={cn(
-                      'flex-1',
-                      isCompleted && 'line-through text-muted-foreground'
+                      'flex-1 text-foreground',
+                      isCompleted && 'line-through text-foreground/50'
                     )}>
                       {subtask.title}
                     </span>
@@ -159,17 +175,17 @@ export const TaskDetailModal = ({
           </div>
         )}
 
-        {/* Repeat/Reminder info */}
+        {/* Repeat/Reminder info - centered text */}
         {combinedText && (
-          <div className="px-4 pb-2 bg-background">
-            <p className="text-sm text-muted-foreground">
+          <div className="px-6 pb-4">
+            <p className="text-sm text-foreground/70 text-center">
               {combinedText}.
             </p>
           </div>
         )}
 
         {/* Action buttons */}
-        <div className="p-4 pt-2 bg-background space-y-2">
+        <div className="px-6 pb-6 pt-2 space-y-3">
           {/* Pro Task: Navigation button */}
           {isProTask && proConfig ? (
             <>
@@ -178,37 +194,36 @@ export const TaskDetailModal = ({
                   onClose();
                   navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
                 }}
-                className={cn('w-full gap-2', proConfig.buttonClass)}
+                className={cn('w-full gap-2 h-12 rounded-2xl', proConfig.buttonClass)}
               >
                 {(() => {
                   const ProIcon = proConfig.icon;
-                  return <ProIcon className="h-4 w-4" />;
+                  return <ProIcon className="h-5 w-5" />;
                 })()}
                 {proConfig.badgeText}
               </Button>
-              {/* Small edit link for Pro Tasks */}
+              {/* Edit button */}
               <Button
-                variant="ghost"
-                size="sm"
+                variant="outline"
                 onClick={() => {
                   onClose();
                   onEdit(task);
                 }}
-                className="w-full text-muted-foreground"
+                className="w-full gap-2 h-12 rounded-full border-2 border-foreground/30 bg-transparent hover:bg-white/30 text-foreground"
               >
-                <Pencil className="h-3.5 w-3.5 mr-1.5" />
+                <Pencil className="h-4 w-4" />
                 Edit Task
               </Button>
             </>
           ) : (
-            /* Regular Task: Edit button */
+            /* Regular Task: Edit button - Me+ style rounded pill */
             <Button
               variant="outline"
               onClick={() => {
                 onClose();
                 onEdit(task);
               }}
-              className="w-full gap-2"
+              className="w-full gap-2 h-12 rounded-full border-2 border-foreground/30 bg-transparent hover:bg-white/30 text-foreground"
             >
               <Pencil className="h-4 w-4" />
               Edit Task
