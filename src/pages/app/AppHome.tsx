@@ -547,7 +547,7 @@ const AppHome = () => {
         <button
           onClick={() => setShowQuickStart(true)}
           className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-violet-500 text-white shadow-lg flex items-center justify-center hover:bg-violet-600 active:scale-95 transition-all z-50"
-          style={{ bottom: 'calc(200px + env(safe-area-inset-bottom))' }}
+          style={{ bottom: 'calc(100px + env(safe-area-inset-bottom))' }}
         >
           <Plus className="h-6 w-6" />
         </button>
