@@ -66,24 +66,14 @@ export const TaskCard = ({
   const handleToggleComplete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Prevent completing tasks for future dates - show Me+ style banner toast
+    // Prevent completing tasks for future dates - show toast message
     if (isFutureDate) {
       if (Capacitor.isNativePlatform()) {
         await Haptics.impact({ style: ImpactStyle.Light });
       }
       toast("Let's focus on today's routine.", {
-        position: 'top-center',
-        duration: 2500,
-        className: 'bg-violet-600 text-white border-0 shadow-lg',
-        style: {
-          background: 'linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%)',
-          color: 'white',
-          border: 'none',
-          borderRadius: '12px',
-          padding: '14px 20px',
-          fontSize: '15px',
-          fontWeight: '500',
-        },
+        description: "You can complete this task when the day comes.",
+        duration: 3000,
       });
       return;
     }
