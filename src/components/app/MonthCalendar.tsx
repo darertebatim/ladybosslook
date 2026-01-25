@@ -71,7 +71,7 @@ export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect, comple
                   {hasProgramEvents && isCurrentMonth && (
                     <Star className={cn(
                       "absolute -top-0.5 -right-0.5 h-3 w-3",
-                      isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-500 fill-indigo-500"
+                      isSelected ? "text-purple-300 fill-purple-300" : "text-purple-500 fill-purple-500"
                     )} />
                   )}
                   <span className="relative z-10">{format(dateItem, 'd')}</span>
