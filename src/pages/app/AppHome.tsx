@@ -236,7 +236,7 @@ const AppHome = () => {
             ) : (
               <h1 className="text-lg font-bold text-foreground flex items-center gap-1">
                 {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
-                <Star className="h-3 w-3 text-violet-500 fill-violet-500" />
+                <Star className="h-3 w-3 text-red-500 fill-red-500" />
               </h1>
             )}
 
