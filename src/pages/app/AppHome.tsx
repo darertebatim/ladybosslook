@@ -487,7 +487,7 @@ const AppHome = () => {
                 <div>
                   {/* My Tasks header - always show */}
                   <div className="flex items-center gap-2 mb-3">
-                    <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+                    <Star className="h-4 w-4 text-violet-500 fill-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
                       My Tasks
                     </h2>
