@@ -597,7 +597,7 @@ export const useUpdateTask = () => {
 
       const task = data as UserTask;
 
-      // Reschedule local notification if reminder is enabled
+      // Reschedule local notification if reminder is enabled (non-urgent)
       if (task.reminder_enabled && task.scheduled_time && task.scheduled_date && !task.is_urgent && isLocalNotificationsAvailable()) {
         await scheduleTaskReminder({
           taskId: task.id,
@@ -611,6 +611,22 @@ export const useUpdateTask = () => {
           proLinkType: task.pro_link_type,
           proLinkValue: task.pro_link_value,
         });
+      }
+
+      // Schedule urgent alarm if enabled (uses Calendar for loud alarms)
+      if (task.is_urgent && task.scheduled_time && task.scheduled_date && isUrgentAlarmAvailable()) {
+        const alarmResult = await scheduleUrgentAlarm({
+          taskId: task.id,
+          title: task.title,
+          emoji: task.emoji,
+          scheduledDate: task.scheduled_date,
+          scheduledTime: task.scheduled_time,
+          reminderOffset: task.reminder_offset,
+        });
+        
+        if (!alarmResult.success) {
+          console.warn('[UpdateTask] Urgent alarm not scheduled:', alarmResult.error);
+        }
       }
 
       // If subtasks are provided, replace existing subtasks
