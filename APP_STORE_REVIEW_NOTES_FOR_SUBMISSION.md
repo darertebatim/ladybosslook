@@ -106,14 +106,13 @@ The app includes persistent audio playback for educational content. This is the 
 
 This background audio capability is essential for users to listen to educational audio courses and podcasts while multitasking, driving, or exercising - a core use case for our learning platform.
 
-**What's New in Version 1.0.7:**
-- NEW: Account deletion - Users can permanently delete their account from Profile → Actions
-- NEW: Sign in with Apple & Google - Quick and secure authentication options
-- NEW: Community Feed - Connect with fellow students and share experiences
-- NEW: Daily Journal - Private journaling with mood tracking and writing prompts
-- Background Audio & MiniPlayer - Persistent audio playback with lock screen controls
-- Enhanced Chat - Improved attachment handling and error recovery
-- Performance improvements and bug fixes
+**What's New in Version 1.1.02:**
+- FIXED: Scrolling stability on Home screen - resolved header animation causing scroll issues
+- FIXED: Emoji icons now display correctly in task cards
+- IMPROVED: Task card design refinements (Me+ inspired layout)
+- IMPROVED: Task detail modal with full-color themed backgrounds
+- IMPROVED: Calendar star icon color consistency
+- UI Polish: Programs carousel now shows "tap to collapse" hint when expanded
 
 Thank you for reviewing LadyBoss Academy!
 
