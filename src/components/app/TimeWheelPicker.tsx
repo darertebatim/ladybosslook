@@ -8,15 +8,12 @@ interface TimeWheelPickerProps {
 }
 
 // Generate arrays for picker
-const HOURS_12 = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // 12 hours: 12, 1, 2, ... 11
-const MINUTES = Array.from({ length: 60 }, (_, i) => i); // 0-59
+const HOURS_12 = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 const PERIODS = ['AM', 'PM'] as const;
 
 const ITEM_HEIGHT = 44;
 const VISIBLE_ITEMS = 5;
-
-// Number of times to repeat the array for infinite scroll effect
-const REPEAT_COUNT = 5;
 
 interface WheelColumnProps {
   items: (string | number)[];
@@ -31,132 +28,230 @@ const WheelColumn = ({ items, selectedValue, onSelect, formatItem, isInfinite = 
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
   const [scrollOffset, setScrollOffset] = useState(0);
-  const [lastSelectedValue, setLastSelectedValue] = useState(selectedValue);
+  const [momentum, setMomentum] = useState(0);
+  const lastTouchY = useRef(0);
+  const lastTouchTime = useRef(0);
+  const animationRef = useRef<number | null>(null);
 
-  // For infinite scroll, create repeated items
-  const displayItems = isInfinite
-    ? Array.from({ length: REPEAT_COUNT }, () => items).flat()
-    : items;
-
-  // Find the center occurrence index for the selected value
+  // For infinite scroll, we create a virtual list that's 3x the original
+  // This gives us room to scroll in both directions before needing to "reset"
+  const multiplier = isInfinite ? 3 : 1;
+  const totalItems = items.length * multiplier;
+  
+  // Find the index in the middle set that matches our selected value
   const getSelectedIndex = useCallback(() => {
-    if (!isInfinite) {
-      return items.indexOf(selectedValue);
-    }
-    // For infinite scroll, use the middle repetition
-    const middleRepeat = Math.floor(REPEAT_COUNT / 2);
     const baseIndex = items.indexOf(selectedValue);
-    return middleRepeat * items.length + baseIndex;
+    if (baseIndex === -1) return 0;
+    // Start in the middle set
+    return isInfinite ? items.length + baseIndex : baseIndex;
   }, [items, selectedValue, isInfinite]);
 
-  const selectedIndex = getSelectedIndex();
-
+  // Initialize scroll position
   useEffect(() => {
-    // Center the selected item
-    setScrollOffset(-selectedIndex * ITEM_HEIGHT);
-  }, [selectedIndex]);
+    const idx = getSelectedIndex();
+    setScrollOffset(-idx * ITEM_HEIGHT);
+  }, []);
 
-  // Re-center when value changes externally
+  // When value changes externally, update position
   useEffect(() => {
-    if (selectedValue !== lastSelectedValue) {
-      setLastSelectedValue(selectedValue);
-      const newIndex = getSelectedIndex();
-      setScrollOffset(-newIndex * ITEM_HEIGHT);
+    if (!isDragging) {
+      const idx = getSelectedIndex();
+      setScrollOffset(-idx * ITEM_HEIGHT);
     }
-  }, [selectedValue, lastSelectedValue, getSelectedIndex]);
+  }, [selectedValue, isDragging, getSelectedIndex]);
 
-  const snapToNearestItem = useCallback((currentOffset: number) => {
+  // Get the actual item at any index (handles wrapping for infinite)
+  const getItemAtIndex = (index: number): string | number => {
+    if (!isInfinite) {
+      return items[Math.max(0, Math.min(items.length - 1, index))];
+    }
+    // Wrap the index to always be within bounds
+    const wrappedIndex = ((index % items.length) + items.length) % items.length;
+    return items[wrappedIndex];
+  };
+
+  // Snap to nearest item and handle infinite wrapping
+  const snapToNearest = useCallback((currentOffset: number, shouldAnimate: boolean = true) => {
+    // Cancel any existing animation
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+
     const rawIndex = Math.round(-currentOffset / ITEM_HEIGHT);
     
     if (isInfinite) {
-      // For infinite scroll, wrap around to the middle section
-      let normalizedIndex = rawIndex;
-      const totalItems = displayItems.length;
-      const singleSetLength = items.length;
-      const middleStart = Math.floor(REPEAT_COUNT / 2) * singleSetLength;
-      const middleEnd = middleStart + singleSetLength - 1;
+      // Clamp to valid range for the 3x list
+      const clampedIndex = Math.max(0, Math.min(totalItems - 1, rawIndex));
+      const newOffset = -clampedIndex * ITEM_HEIGHT;
       
-      // Clamp to valid range first
-      normalizedIndex = Math.max(0, Math.min(totalItems - 1, normalizedIndex));
+      // Get the actual value
+      const actualValue = getItemAtIndex(clampedIndex);
       
-      // Get the actual value at this position
-      const actualValue = displayItems[normalizedIndex];
+      // Update offset
+      setScrollOffset(newOffset);
       
-      // Calculate the index in the middle section for this value
-      const valueIndexInSet = items.indexOf(actualValue);
-      const targetIndex = middleStart + valueIndexInSet;
-      
-      setScrollOffset(-targetIndex * ITEM_HEIGHT);
-      
-      if (actualValue !== lastSelectedValue) {
+      // Notify parent if value changed
+      if (actualValue !== selectedValue) {
         haptic.selection();
-        setLastSelectedValue(actualValue);
         onSelect(actualValue);
+      }
+      
+      // After animation completes, silently recenter to middle set
+      if (shouldAnimate) {
+        setTimeout(() => {
+          const valueIndex = items.indexOf(actualValue);
+          const middleIndex = items.length + valueIndex;
+          const currentIndex = clampedIndex;
+          
+          // Only recenter if we're far from the middle
+          if (Math.abs(currentIndex - middleIndex) > items.length / 2) {
+            setScrollOffset(-middleIndex * ITEM_HEIGHT);
+          }
+        }, 160);
       }
     } else {
       const newIndex = Math.max(0, Math.min(items.length - 1, rawIndex));
-      setScrollOffset(-newIndex * ITEM_HEIGHT);
+      const newOffset = -newIndex * ITEM_HEIGHT;
+      setScrollOffset(newOffset);
+      
       const newValue = items[newIndex];
-      if (newValue !== lastSelectedValue) {
+      if (newValue !== selectedValue) {
         haptic.selection();
-        setLastSelectedValue(newValue);
         onSelect(newValue);
       }
     }
-  }, [displayItems, items, isInfinite, onSelect, lastSelectedValue]);
+  }, [items, selectedValue, isInfinite, totalItems, onSelect, getItemAtIndex]);
+
+  // Handle momentum scrolling
+  const applyMomentum = useCallback((velocity: number) => {
+    if (Math.abs(velocity) < 0.5) {
+      snapToNearest(scrollOffset);
+      return;
+    }
+
+    const decay = 0.92;
+    let currentVelocity = velocity;
+    let currentOffset = scrollOffset;
+
+    const animate = () => {
+      currentVelocity *= decay;
+      currentOffset += currentVelocity;
+
+      // Clamp offset for non-infinite
+      if (!isInfinite) {
+        const minOffset = -(items.length - 1) * ITEM_HEIGHT;
+        const maxOffset = 0;
+        currentOffset = Math.max(minOffset, Math.min(maxOffset, currentOffset));
+      }
+
+      setScrollOffset(currentOffset);
+
+      if (Math.abs(currentVelocity) > 0.5) {
+        animationRef.current = requestAnimationFrame(animate);
+      } else {
+        snapToNearest(currentOffset);
+      }
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+  }, [scrollOffset, items.length, isInfinite, snapToNearest]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
     setIsDragging(true);
     setStartY(e.touches[0].clientY - scrollOffset);
+    lastTouchY.current = e.touches[0].clientY;
+    lastTouchTime.current = Date.now();
+    setMomentum(0);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging) return;
-    const newOffset = e.touches[0].clientY - startY;
+    
+    const currentY = e.touches[0].clientY;
+    const newOffset = currentY - startY;
+    
+    // Calculate velocity for momentum
+    const now = Date.now();
+    const dt = now - lastTouchTime.current;
+    if (dt > 0) {
+      const velocity = (currentY - lastTouchY.current) / dt * 16; // normalize to ~60fps
+      setMomentum(velocity);
+    }
+    
+    lastTouchY.current = currentY;
+    lastTouchTime.current = now;
+    
     setScrollOffset(newOffset);
   };
 
   const handleTouchEnd = () => {
     setIsDragging(false);
-    snapToNearestItem(scrollOffset);
+    
+    if (Math.abs(momentum) > 2) {
+      applyMomentum(momentum);
+    } else {
+      snapToNearest(scrollOffset);
+    }
   };
 
+  // Mouse handlers for desktop testing
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
     setIsDragging(true);
     setStartY(e.clientY - scrollOffset);
+    lastTouchY.current = e.clientY;
+    lastTouchTime.current = Date.now();
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
-    const newOffset = e.clientY - startY;
+    
+    const currentY = e.clientY;
+    const newOffset = currentY - startY;
+    
+    const now = Date.now();
+    const dt = now - lastTouchTime.current;
+    if (dt > 0) {
+      const velocity = (currentY - lastTouchY.current) / dt * 16;
+      setMomentum(velocity);
+    }
+    
+    lastTouchY.current = currentY;
+    lastTouchTime.current = now;
+    
     setScrollOffset(newOffset);
   };
 
   const handleMouseUp = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    snapToNearestItem(scrollOffset);
+    
+    if (Math.abs(momentum) > 2) {
+      applyMomentum(momentum);
+    } else {
+      snapToNearest(scrollOffset);
+    }
   };
 
   const handleItemClick = (index: number) => {
-    const clickedValue = displayItems[index];
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
     
-    if (isInfinite) {
-      // Jump to center section for this value
-      const singleSetLength = items.length;
-      const middleStart = Math.floor(REPEAT_COUNT / 2) * singleSetLength;
-      const valueIndexInSet = items.indexOf(clickedValue);
-      const targetIndex = middleStart + valueIndexInSet;
-      
-      setScrollOffset(-targetIndex * ITEM_HEIGHT);
-      if (clickedValue !== lastSelectedValue) {
-        haptic.selection();
-        setLastSelectedValue(clickedValue);
-        onSelect(clickedValue);
-      }
-    } else {
+    const newOffset = -index * ITEM_HEIGHT;
+    setScrollOffset(newOffset);
+    
+    const clickedValue = getItemAtIndex(index);
+    if (clickedValue !== selectedValue) {
       haptic.selection();
-      setLastSelectedValue(clickedValue);
       onSelect(clickedValue);
     }
   };
@@ -164,10 +259,15 @@ const WheelColumn = ({ items, selectedValue, onSelect, formatItem, isInfinite = 
   // Calculate which index is currently centered
   const currentCenterIndex = Math.round(-scrollOffset / ITEM_HEIGHT);
 
+  // Generate display items
+  const displayItems = isInfinite
+    ? Array.from({ length: totalItems }, (_, i) => getItemAtIndex(i))
+    : items;
+
   return (
     <div 
       ref={containerRef}
-      className="relative h-[220px] overflow-hidden select-none cursor-grab active:cursor-grabbing"
+      className="relative h-[220px] overflow-hidden select-none cursor-grab active:cursor-grabbing touch-none"
       style={{ width: 70 }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -189,10 +289,12 @@ const WheelColumn = ({ items, selectedValue, onSelect, formatItem, isInfinite = 
       
       {/* Items */}
       <div 
-        className="flex flex-col items-center transition-transform duration-150"
+        className={cn(
+          "flex flex-col items-center",
+          !isDragging && "transition-transform duration-150"
+        )}
         style={{ 
           transform: `translateY(${scrollOffset + (VISIBLE_ITEMS - 1) / 2 * ITEM_HEIGHT}px)`,
-          transitionDuration: isDragging ? '0ms' : '150ms'
         }}
       >
         {displayItems.map((item, index) => {
@@ -205,13 +307,14 @@ const WheelColumn = ({ items, selectedValue, onSelect, formatItem, isInfinite = 
             <div
               key={`${item}-${index}`}
               onClick={() => handleItemClick(index)}
-              className="flex items-center justify-center transition-all"
+              className="flex items-center justify-center cursor-pointer"
               style={{ 
                 height: ITEM_HEIGHT,
                 opacity,
                 transform: `scale(${scale})`,
                 fontWeight,
                 fontSize: distance === 0 ? 24 : 18,
+                transition: isDragging ? 'none' : 'opacity 150ms, transform 150ms',
               }}
             >
               {formatItem ? formatItem(item) : String(item).padStart(2, '0')}
