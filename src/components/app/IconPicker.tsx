@@ -169,10 +169,12 @@ interface TaskIconProps {
 }
 
 export const TaskIcon = ({ iconName, className, size = 24 }: TaskIconProps) => {
-  // Check if it's an emoji (starts with emoji character or contains emoji)
-  const isEmoji = /^[\p{Emoji}]/u.test(iconName) || iconName.length <= 2;
+  // Check if it's an emoji - more comprehensive check
+  // Emojis include: emoticons, symbols, pictographs, transport symbols, etc.
+  const emojiRegex = /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{1FA00}-\u{1FAFF}]/u;
+  const isEmoji = emojiRegex.test(iconName) || (!icons[iconName as keyof typeof icons] && iconName.length <= 4);
   
-  if (isEmoji) {
+  if (isEmoji && iconName) {
     return <span className={cn('flex items-center justify-center', className)} style={{ fontSize: size * 0.8 }}>{iconName}</span>;
   }
   
