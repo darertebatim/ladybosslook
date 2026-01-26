@@ -108,7 +108,7 @@ const AppJournal = () => {
   }
 
   return (
-    <div className="min-h-full bg-background pb-24">
+    <div className="flex flex-col h-full overflow-hidden bg-background">
       <SEOHead title="My Journal" description="Your personal journal entries" />
       
       {/* Header */}
@@ -161,10 +161,11 @@ const AppJournal = () => {
       </div>
 
       {/* Spacer for fixed header */}
-      <div style={{ height: 'calc(90px + env(safe-area-inset-top, 0px))' }} />
+      <div className="shrink-0" style={{ height: 'calc(90px + env(safe-area-inset-top, 0px))' }} />
 
-      {/* Content */}
-      <div className="p-4 space-y-4">
+      {/* Scroll container */}
+      <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="p-4 pb-safe space-y-4">
         {/* Quick Actions Card */}
         <Card>
           <CardContent className="p-4 space-y-3">
@@ -222,8 +223,8 @@ const AppJournal = () => {
             ))}
           </div>
         )}
+        </div>
       </div>
-
     </div>
   );
 };

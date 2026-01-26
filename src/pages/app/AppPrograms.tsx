@@ -127,7 +127,7 @@ const AppCourses = () => {
   const totalPrograms = (enrollments?.length || 0);
 
   return (
-    <div className="min-h-full bg-background">
+    <div className="flex flex-col h-full overflow-hidden bg-background">
       <SEOHead 
         title="My Programs - LadyBoss Academy"
         description="Your enrolled programs and courses"
@@ -139,7 +139,9 @@ const AppCourses = () => {
       />
       <AppHeaderSpacer />
       
-      <div className="container max-w-4xl py-4 px-4 space-y-6 pb-24">
+      {/* Scroll container */}
+      <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="container max-w-4xl py-4 px-4 space-y-6 pb-safe">
         {/* Active Rounds Section */}
         {(sortedActiveRounds.length > 0 || selfPacedEnrollments.length > 0) && (
           <div className="space-y-3">
@@ -233,6 +235,7 @@ const AppCourses = () => {
 
         {/* Spacer for fixed bottom section */}
         {browsePrograms.length > 0 && <div className="h-[100px]" />}
+        </div>
       </div>
 
       {/* Fixed Browse Programs Section - Bottom Dashboard Style */}

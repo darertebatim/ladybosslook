@@ -933,6 +933,7 @@ const AppCourseDetail = () => {
 
   return (
     <>
+    <div className="flex flex-col h-full overflow-hidden bg-background">
       {/* Fixed Header with safe area */}
       <div 
         className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
@@ -952,9 +953,11 @@ const AppCourseDetail = () => {
       </div>
 
       {/* Header spacer */}
-      <div style={{ height: 'calc(76px + env(safe-area-inset-top, 0px))' }} />
+      <div className="shrink-0" style={{ height: 'calc(76px + env(safe-area-inset-top, 0px))' }} />
 
-      <div className="container max-w-4xl py-4 px-4">
+      {/* Scroll container */}
+      <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="container max-w-4xl py-4 px-4 pb-safe">
         <SEOHead 
           title={`${program?.title || 'Program'} Details - LadyBoss Academy`}
           description="Program details and materials"
@@ -1720,7 +1723,9 @@ const AppCourseDetail = () => {
           </>
         )}
         </div>
+        </div>
       </div>
+    </div>
 
       {/* Enrollment Reminder Popup */}
       <AlertDialog open={showEnrollmentReminder} onOpenChange={setShowEnrollmentReminder}>

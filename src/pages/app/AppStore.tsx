@@ -127,7 +127,7 @@ const AppStore = () => {
   };
 
   return (
-    <div className="min-h-full bg-background">
+    <div className="flex flex-col h-full overflow-hidden bg-background">
       <SEOHead 
         title="Browse Courses - LadyBoss Academy"
         description="Browse our free educational programs and courses"
@@ -174,10 +174,11 @@ const AppStore = () => {
       </div>
 
       {/* Spacer for fixed header */}
-      <div className="h-12" style={{ marginTop: 'env(safe-area-inset-top)' }} />
+      <div className="shrink-0 h-12" style={{ marginTop: 'env(safe-area-inset-top)' }} />
 
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto pb-safe">
+      {/* Scroll container */}
+      <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="pb-safe">
         {programsLoading ? (
           <div className="flex items-center justify-center min-h-[60vh]">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -252,6 +253,7 @@ const AppStore = () => {
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
