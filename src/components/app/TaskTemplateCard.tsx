@@ -1,7 +1,6 @@
 import { Plus, Loader2 } from 'lucide-react';
 import { TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { isNativeApp } from '@/lib/platform';
+import { haptic } from '@/lib/haptics';
 
 interface TaskTemplateCardProps {
   template: TaskTemplate;
@@ -12,12 +11,8 @@ interface TaskTemplateCardProps {
 export function TaskTemplateCard({ template, onAdd, isAdding }: TaskTemplateCardProps) {
   const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
 
-  const handleAdd = async () => {
-    if (isNativeApp()) {
-      try {
-        await Haptics.impact({ style: ImpactStyle.Light });
-      } catch {}
-    }
+  const handleAdd = () => {
+    haptic.light();
     onAdd();
   };
 
