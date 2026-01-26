@@ -103,6 +103,8 @@ export function useRoutineCategories() {
       if (error) throw error;
       return data as RoutineCategory[];
     },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes cache
   });
 }
 
@@ -179,6 +181,8 @@ export function useFeaturedPlans() {
       if (error) throw error;
       return data as RoutinePlan[];
     },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
 }
 
@@ -201,6 +205,8 @@ export function usePopularPlans() {
       if (error) throw error;
       return data as RoutinePlan[];
     },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
 }
 
@@ -504,5 +510,7 @@ export function useProRoutinePlans() {
       if (plansError) throw plansError;
       return plans as RoutinePlan[];
     },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
 }
