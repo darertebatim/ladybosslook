@@ -360,12 +360,6 @@ export default function Auth() {
           </div>
         </div>
 
-        {/* Build ID */}
-        <div className="fixed bottom-2 left-0 right-0 flex justify-center pointer-events-none">
-          <p className="text-xs text-muted-foreground font-mono bg-background/80 backdrop-blur px-2 py-1 rounded">
-            {getDisplayBuildInfo()}
-          </p>
-        </div>
       </div>
     </>
   );
