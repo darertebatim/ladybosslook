@@ -1,164 +1,131 @@
 
 
-## Plan: Standardize to Emojis Across Task System
+## Plan: Complete Emoji Standardization for Routine Pages
 
-### Current State Analysis
+### Problem Identified
 
-| Component | Field | Current Format | Example |
-|-----------|-------|----------------|---------|
-| `task_templates` | `emoji` | ✅ Emoji | '💪', '🧘', '💧' |
-| `routine_plan_tasks` | `icon` | ❌ Lucide icon name | 'Dumbbell', 'Coffee' |
-| User tasks (`user_tasks`) | `emoji` | ✅ Emoji | Already emoji |
-| App Task Create | icon picker | ❌ Lucide icons | Shows icon grid |
-| RoutinePreviewSheet | TaskIcon | ❌ Lucide icons | Renders icons |
-| Admin RoutinePlanDetailManager | icon selector | ❌ Lucide icons | 18 icon options |
+From the screenshots, I can see three places still showing Lucide icons instead of emojis:
 
-### Changes Required
+1. **Admin Tasks tab** (`RoutinePlanDetailManager.tsx`) - The `renderIcon` function already has emoji support, but the database contains Lucide icon names
+2. **RoutinePreviewSheet** - Shows icon *names* as text because database has "Dumbbell", "Heart" etc.
+3. **Routine detail page** (`AppInspireDetail.tsx`) - Line 181 uses `LucideIcons[task.icon]` to render icons
 
----
+### Root Cause
 
-#### 1. Database Schema Change
+The database table `routine_plan_tasks` has the `icon` column populated with Lucide icon names (e.g., "Brain", "Clock", "Star", "Book") instead of emoji characters.
 
-**File**: Create migration to rename column  
-Rename `routine_plan_tasks.icon` to `emoji` for consistency (or keep as `icon` but store emojis).
-
-Decision: Keep the column named `icon` but change its contents to store emojis. This avoids breaking existing code references while changing the actual values.
+### Solution: Two-Part Fix
 
 ---
 
-#### 2. Replace IconPicker with EmojiPicker in App Task Edit
+#### Part 1: Update AppInspireDetail.tsx
 
-**File**: `src/pages/app/AppTaskCreate.tsx`
+Update the task rendering in the "What's Included" section to handle both emojis and legacy Lucide icons (with emoji fallback display).
 
-- Replace the `IconPicker` component with a new `EmojiPicker` component
-- Change the `icon` state variable to store emoji values
-- The icon picker currently opens when tapping the icon at the top of the task form
-- Replace with an emoji grid picker (similar to `TaskTemplatesManager.tsx` emoji selector)
+**File:** `src/pages/app/AppInspireDetail.tsx`
 
-Create new component: `src/components/app/EmojiPicker.tsx`
-- Sheet-based picker with emoji categories
-- Common task emojis curated for routines/wellness
-- Search functionality
-- Categories: Common, Wellness, Work, Lifestyle, Nature, Objects
-
----
-
-#### 3. Update RoutinePreviewSheet to Use Emojis
-
-**File**: `src/components/app/RoutinePreviewSheet.tsx`
-
-- Currently imports `* as LucideIcons` and renders `<TaskIcon className="w-4 h-4" />`
-- Change to render emoji text directly: `<span className="text-lg">{display.icon}</span>`
-- Update `getTaskDisplay` to return emoji instead of icon name
-
----
-
-#### 4. Update Admin RoutinePlanDetailManager
-
-**File**: `src/components/admin/RoutinePlanDetailManager.tsx`
-
-Current icon selector (lines 1046-1061):
 ```tsx
-const ICON_OPTIONS = [
-  'Sun', 'Moon', 'Heart', 'Brain', 'Dumbbell', 'Coffee', ...
-];
-// Grid of icons with renderIcon()
-```
+// Line 180-197: Replace the task rendering logic
 
-Change to emoji selector:
-```tsx
-const EMOJI_OPTIONS = [
-  '☀️', '🌙', '❤️', '🧠', '💪', '☕',
-  '📖', '⭐', '✨', '⚡', '🎯', '🕐',
-  '✅', '🏆', '🔥', '🌿', '💧', '💨'
-];
-// Grid of emoji buttons
-```
+// Add helper function to check if string is emoji
+const isEmoji = (str: string) => 
+  /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
 
-Update:
-- `taskForm.icon` default from `'CheckCircle'` to `'✨'`
-- `renderIcon()` function to just return the emoji text
-- Bulk task creation default icon
+// In the map function, replace TaskIcon with:
+{isEmoji(task.icon) ? (
+  <span className="text-xl">{task.icon}</span>
+) : (
+  // Fallback for legacy Lucide names - show default emoji
+  <span className="text-xl">✨</span>
+)}
+```
 
 ---
 
-#### 5. Update useAddRoutinePlan Hook
+#### Part 2: Database Migration
 
-**File**: `src/hooks/useRoutinePlans.tsx`
+Run a SQL migration to convert existing Lucide icon names to emojis in the `routine_plan_tasks` table.
 
-Line 406: Currently sets `emoji: edited?.icon || task.icon || plan.icon`
+**Icon to Emoji Mapping:**
+| Lucide Icon | Emoji |
+|-------------|-------|
+| Brain | 🧠 |
+| Sparkles | ✨ |
+| Clock | 🕐 |
+| Star | ⭐ |
+| Book | 📖 |
+| BookOpen | 📖 |
+| Heart | ❤️ |
+| Droplet | 💧 |
+| Coffee | ☕ |
+| Dumbbell | 💪 |
+| Sun | ☀️ |
+| Moon | 🌙 |
+| Users | 👥 |
+| Target | 🎯 |
+| Music | 🎵 |
+| Mic | 🎤 |
+| MessageCircle | 💬 |
+| CheckCircle | ✅ |
+| Apple | 🍎 |
+| Bed | 🛏️ |
+| Calendar | 📅 |
+| Flame | 🔥 |
+| Leaf | 🌿 |
+| Phone | 📱 |
+| Smile | 😊 |
+| Wind | 💨 |
 
-This already maps `icon` to `emoji`, but the source values are Lucide names. Once the database contains emojis, this will work correctly.
-
----
-
-#### 6. Data Migration (Optional but Recommended)
-
-Create a mapping from existing Lucide icon names to emojis and update existing `routine_plan_tasks` records:
-
-```
-Dumbbell → 💪
-Coffee → ☕
-Heart → ❤️
-Brain → 🧠
-Sparkles → ✨
-Clock → 🕐
-Star → ⭐
-Book → 📖
-Sun → ☀️
-Moon → 🌙
-Droplet → 💧
-MessageCircle → 💬
-CheckCircle → ✅
-...
+**SQL Migration:**
+```sql
+UPDATE routine_plan_tasks SET icon = '🧠' WHERE icon = 'Brain';
+UPDATE routine_plan_tasks SET icon = '✨' WHERE icon = 'Sparkles';
+UPDATE routine_plan_tasks SET icon = '🕐' WHERE icon = 'Clock';
+UPDATE routine_plan_tasks SET icon = '⭐' WHERE icon = 'Star';
+UPDATE routine_plan_tasks SET icon = '📖' WHERE icon = 'Book';
+UPDATE routine_plan_tasks SET icon = '📖' WHERE icon = 'BookOpen';
+UPDATE routine_plan_tasks SET icon = '❤️' WHERE icon = 'Heart';
+UPDATE routine_plan_tasks SET icon = '💧' WHERE icon = 'Droplet';
+UPDATE routine_plan_tasks SET icon = '☕' WHERE icon = 'Coffee';
+UPDATE routine_plan_tasks SET icon = '💪' WHERE icon = 'Dumbbell';
+UPDATE routine_plan_tasks SET icon = '☀️' WHERE icon = 'Sun';
+UPDATE routine_plan_tasks SET icon = '🌙' WHERE icon = 'Moon';
+UPDATE routine_plan_tasks SET icon = '👥' WHERE icon = 'Users';
+UPDATE routine_plan_tasks SET icon = '🎯' WHERE icon = 'Target';
+UPDATE routine_plan_tasks SET icon = '🎵' WHERE icon = 'Music';
+UPDATE routine_plan_tasks SET icon = '🎤' WHERE icon = 'Mic';
+UPDATE routine_plan_tasks SET icon = '💬' WHERE icon = 'MessageCircle';
+UPDATE routine_plan_tasks SET icon = '✅' WHERE icon = 'CheckCircle';
+UPDATE routine_plan_tasks SET icon = '🍎' WHERE icon = 'Apple';
+UPDATE routine_plan_tasks SET icon = '🛏️' WHERE icon = 'Bed';
+UPDATE routine_plan_tasks SET icon = '📅' WHERE icon = 'Calendar';
+UPDATE routine_plan_tasks SET icon = '🔥' WHERE icon = 'Flame';
+UPDATE routine_plan_tasks SET icon = '🌿' WHERE icon = 'Leaf';
+UPDATE routine_plan_tasks SET icon = '📱' WHERE icon = 'Phone';
+UPDATE routine_plan_tasks SET icon = '😊' WHERE icon = 'Smile';
+UPDATE routine_plan_tasks SET icon = '💨' WHERE icon = 'Wind';
 ```
 
 ---
 
 ### Files to Modify
 
-1. **`src/components/app/EmojiPicker.tsx`** (NEW) - Create emoji picker component
-2. **`src/pages/app/AppTaskCreate.tsx`** - Replace IconPicker with EmojiPicker
-3. **`src/components/app/RoutinePreviewSheet.tsx`** - Render emojis instead of icons
-4. **`src/components/admin/RoutinePlanDetailManager.tsx`** - Replace icon grid with emoji grid
-5. **`src/hooks/useRoutinePlans.tsx`** - Minor adjustments if needed
+1. **`src/pages/app/AppInspireDetail.tsx`**
+   - Remove `* as LucideIcons` import for task icons
+   - Update task rendering in "What's Included" section to display emojis directly
+
+### Database Action Required
+
+After code changes, you'll need to run the SQL migration in Supabase to convert existing icon values to emojis. I can execute this migration for you.
 
 ---
 
-### Technical Details
+### Expected Result
 
-#### New EmojiPicker Component Structure
-
-```tsx
-// src/components/app/EmojiPicker.tsx
-const EMOJI_CATEGORIES = {
-  common: ['☀️', '🎯', '💪', '❤️', '⭐', '✨', '📖', '✏️', '☕', '💧', '🕐', '📅', '🔔', '✅', '⭕'],
-  wellness: ['🧘', '🍎', '👶', '🛁', '🛏️', '🧠', '🌸', '🤲', '🌿', '🌙', '🥗', '😊', '🍲', '🌅', '🌇', '🌳', '💨'],
-  work: ['💼', '🏢', '🧮', '📊', '📋', '💳', '💵', '📄', '📂', '💻', '✉️', '💬', '📱', '🐷', '📈', '👥', '👛'],
-  lifestyle: ['🚴', '📚', '📷', '🚗', '🐕', '🎮', '🎁', '🥤', '🎧', '🏠', '🔑', '🧳', '🗺️', '🎵', '🎨', '✈️', '🛍️', '🛒', '👕', '🎟️', '🏆', '📺', '🍽️', '🍷'],
-};
-
-export function EmojiPicker({ open, onOpenChange, selectedEmoji, onSelect }) {
-  // Sheet with emoji grid, categories, and search
-}
-```
-
-#### Rendering Emoji in Task Cards
-
-```tsx
-// Before (RoutinePreviewSheet.tsx line 230)
-<TaskIcon className="w-4 h-4" />
-
-// After
-<span className="text-base">{display.icon}</span>
-```
-
----
-
-### Visual Impact
-
-- Task cards will show colorful emojis instead of monochrome line icons
-- More expressive and playful UI
-- Consistent with the existing `task_templates` which already use emojis
-- Better visual distinction between different tasks
+After these changes:
+- Admin task list will show emojis (already has `renderIcon` with emoji support)
+- RoutinePreviewSheet will show emojis (already updated, just needs emoji data)
+- Routine detail page will show emojis in "What's Included" section
+- All new tasks created will use emojis
+- Existing tasks will be migrated to emojis
 
