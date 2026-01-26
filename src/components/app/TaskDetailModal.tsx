@@ -7,6 +7,8 @@ import {
   useSubtasks,
   useCompleteSubtask,
   useUncompleteSubtask,
+  useCompleteTask,
+  useUncompleteTask,
 } from '@/hooks/useTaskPlanner';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -20,8 +22,10 @@ interface TaskDetailModalProps {
   open: boolean;
   onClose: () => void;
   date: Date;
+  isCompleted: boolean;
   completedSubtaskIds: string[];
   onEdit: (task: UserTask) => void;
+  onStreakIncrease?: () => void;
 }
 
 export const TaskDetailModal = ({
@@ -29,13 +33,17 @@ export const TaskDetailModal = ({
   open,
   onClose,
   date,
+  isCompleted,
   completedSubtaskIds,
   onEdit,
+  onStreakIncrease,
 }: TaskDetailModalProps) => {
   const navigate = useNavigate();
   const { data: subtasks = [] } = useSubtasks(task?.id);
   const completeSubtask = useCompleteSubtask();
   const uncompleteSubtask = useUncompleteSubtask();
+  const completeTask = useCompleteTask();
+  const uncompleteTask = useUncompleteTask();
 
   if (!task) return null;
 
@@ -93,6 +101,24 @@ export const TaskDetailModal = ({
     }
   };
 
+  const handleToggleComplete = async () => {
+    if (Capacitor.isNativePlatform()) {
+      await Haptics.impact({ style: ImpactStyle.Light });
+    }
+
+    if (isCompleted) {
+      uncompleteTask.mutate({ taskId: task.id, date });
+    } else {
+      const result = await completeTask.mutateAsync({ taskId: task.id, date });
+      if (result.streakIncreased && onStreakIncrease) {
+        if (Capacitor.isNativePlatform()) {
+          await Haptics.impact({ style: ImpactStyle.Medium });
+        }
+        onStreakIncrease();
+      }
+    }
+  };
+
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
   const repeatText = getRepeatText();
   const reminderText = getReminderText();
@@ -133,10 +159,18 @@ export const TaskDetailModal = ({
               </h3>
             </div>
 
-            {/* Checkbox circle on right */}
-            <div className="w-10 h-10 rounded-full border-2 border-foreground/30 bg-white/40 flex items-center justify-center shrink-0">
-              {/* Empty circle - for visual consistency with Me+ */}
-            </div>
+            {/* Checkbox circle on right - clickable */}
+            <button
+              onClick={handleToggleComplete}
+              className={cn(
+                'w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all',
+                isCompleted
+                  ? 'bg-emerald-500 border-emerald-500 text-white'
+                  : 'border-foreground/30 bg-white/40 hover:bg-white/60'
+              )}
+            >
+              {isCompleted && <Check className="h-5 w-5" strokeWidth={3} />}
+            </button>
           </div>
         </div>
 

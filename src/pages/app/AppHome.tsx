@@ -435,7 +435,16 @@ const AppHome = () => {
         <TaskQuickStartSheet open={showQuickStart} onOpenChange={setShowQuickStart} onContinue={handleQuickStartContinue} />
 
         {/* Task Detail Modal */}
-        <TaskDetailModal task={selectedTask} open={!!selectedTask} onClose={() => setSelectedTask(null)} date={selectedDate} completedSubtaskIds={completedSubtaskIds} onEdit={handleEditTask} />
+        <TaskDetailModal 
+          task={selectedTask} 
+          open={!!selectedTask} 
+          onClose={() => setSelectedTask(null)} 
+          date={selectedDate} 
+          isCompleted={selectedTask ? completedTaskIds.has(selectedTask.id) : false}
+          completedSubtaskIds={completedSubtaskIds} 
+          onEdit={handleEditTask}
+          onStreakIncrease={() => setShowStreakModal(true)}
+        />
 
         {/* Streak celebration modal */}
         <StreakCelebration open={showStreakModal} onClose={() => setShowStreakModal(false)} />
