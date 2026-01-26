@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useRef, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
 import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft } from 'lucide-react';
@@ -184,6 +184,24 @@ const AppHome = () => {
   }, [showCalendar, selectedDate]);
   const isLoading = tasksLoading || completionsLoading || programEventsLoading;
 
+  // Force scroll container reset when loading completes (iOS WKWebView fix v1.1.05)
+  const prevLoadingRef = useRef(isLoading);
+  useLayoutEffect(() => {
+    // Only trigger when loading finishes (true → false)
+    if (prevLoadingRef.current && !isLoading) {
+      // Force WKWebView to recalculate scroll state
+      const scrollContainer = document.querySelector('main');
+      if (scrollContainer) {
+        const currentScroll = scrollContainer.scrollTop;
+        scrollContainer.scrollTop = currentScroll + 1;
+        requestAnimationFrame(() => {
+          scrollContainer.scrollTop = currentScroll;
+        });
+      }
+    }
+    prevLoadingRef.current = isLoading;
+  }, [isLoading]);
+
   // Check if viewing a future date
   const isFutureDate = !isToday(selectedDate) && !isBefore(startOfDay(selectedDate), startOfDay(new Date()));
   // Home data defaults
@@ -242,7 +260,8 @@ const AppHome = () => {
           <div className="tour-calendar px-4 pt-0.5 pb-0.5">
             {/* Animated calendar grid container - with weekday headers */}
             <div className="grid transition-all duration-300 ease-out overflow-hidden" style={{
-            gridTemplateRows: showCalendar ? '1fr' : '0fr'
+            gridTemplateRows: showCalendar ? '1fr' : '0fr',
+            touchAction: 'pan-y'
           }}>
               <div className="min-h-0">
                 <div className={cn("transition-opacity duration-200", showCalendar ? "opacity-100" : "opacity-0")}>
@@ -259,7 +278,8 @@ const AppHome = () => {
 
             {/* Week strip - Me+ style with pill around day name + number */}
             <div className={cn("grid transition-all duration-300 ease-out overflow-hidden")} style={{
-            gridTemplateRows: showCalendar ? '0fr' : '1fr'
+            gridTemplateRows: showCalendar ? '0fr' : '1fr',
+            touchAction: 'pan-y'
           }}>
               <div className="min-h-0">
                 <div className={cn("flex mt-1 transition-opacity duration-200", showCalendar ? "opacity-0" : "opacity-100")}>
@@ -311,8 +331,8 @@ const AppHome = () => {
           </div>
         </header>
 
-        {/* Spacer for fixed header - animated height */}
-        <div className="transition-all duration-300 ease-out" style={{
+        {/* Spacer for fixed header - NO animation to prevent iOS scroll corruption (v1.1.05) */}
+        <div style={{
         height: showCalendar ? 'calc(48px + 290px + max(12px, env(safe-area-inset-top)))' : 'calc(48px + 72px + max(12px, env(safe-area-inset-top)))'
       }} />
 
