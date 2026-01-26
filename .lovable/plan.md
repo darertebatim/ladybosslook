@@ -1,127 +1,164 @@
 
 
-## Fix Plan: iOS Scroll Stuck Bug v1.1.05
+## Plan: Standardize to Emojis Across Task System
 
-### Root Cause Identified
+### Current State Analysis
 
-The scrolling gets stuck because of a **perfect storm** of three factors:
+| Component | Field | Current Format | Example |
+|-----------|-------|----------------|---------|
+| `task_templates` | `emoji` | ✅ Emoji | '💪', '🧘', '💧' |
+| `routine_plan_tasks` | `icon` | ❌ Lucide icon name | 'Dumbbell', 'Coffee' |
+| User tasks (`user_tasks`) | `emoji` | ✅ Emoji | Already emoji |
+| App Task Create | icon picker | ❌ Lucide icons | Shows icon grid |
+| RoutinePreviewSheet | TaskIcon | ❌ Lucide icons | Renders icons |
+| Admin RoutinePlanDetailManager | icon selector | ❌ Lucide icons | 18 icon options |
 
-1. **Animated Header Spacer** (line 315): The spacer div uses `transition-all duration-300 ease-out` to animate its height. When `isLoading` changes, this animation runs simultaneously with content changes.
-
-2. **Conditional Content Rendering** (line 343): The loading state swaps between `<Skeleton>` and actual content. This DOM swap during the spacer animation confuses WKWebView.
-
-3. **WKWebView Scroll State Corruption**: iOS's WKWebView loses track of its scroll container when layout changes and animations happen simultaneously.
-
-**Why editing tasks fixes it**: Any task mutation invalidates React Query caches, causing `SortableTaskList` to receive new props and trigger a re-render. This re-render "rescues" the scroll container by forcing WKWebView to recalculate.
-
-**Why Player/Chat/Routines work**: These pages use their own internal scroll containers with static layouts - they don't rely on the shared `<main>` container and don't have animated height spacers.
-
----
-
-### Technical Fix (3 Steps)
-
-#### Step 1: Remove Spacer Height Animation
-Remove the `transition-all duration-300 ease-out` from the header spacer div. The calendar expand/collapse animation will still work (it uses CSS Grid animation), but the spacer won't animate during loading state changes.
-
-**File:** `src/pages/app/AppHome.tsx` (line 315)
-```tsx
-// Before
-<div className="transition-all duration-300 ease-out" style={{
-  height: showCalendar ? '...' : '...'
-}} />
-
-// After  
-<div style={{
-  height: showCalendar ? '...' : '...'
-}} />
-```
-
-#### Step 2: Add Touch Action to Calendar Grid Containers
-Add `touchAction: 'pan-y'` to the animated grid containers to ensure vertical scroll gestures pass through even when `overflow: hidden` is applied.
-
-**File:** `src/pages/app/AppHome.tsx` (lines 244 and 261)
-```tsx
-// Add to both grid container styles:
-style={{
-  gridTemplateRows: showCalendar ? '1fr' : '0fr',
-  touchAction: 'pan-y'  // NEW
-}}
-```
-
-#### Step 3: Force Scroll Container Reset After Loading
-Add a `useLayoutEffect` that triggers when loading completes, performing a minimal scroll "nudge" to force WKWebView to recalculate its scroll state.
-
-**File:** `src/pages/app/AppHome.tsx`
-```tsx
-// Add after isLoading definition (line 185)
-const prevLoadingRef = useRef(isLoading);
-useLayoutEffect(() => {
-  // Only trigger when loading finishes (true → false)
-  if (prevLoadingRef.current && !isLoading) {
-    // Force WKWebView to recalculate scroll state
-    const scrollContainer = document.querySelector('main');
-    if (scrollContainer) {
-      const currentScroll = scrollContainer.scrollTop;
-      scrollContainer.scrollTop = currentScroll + 1;
-      requestAnimationFrame(() => {
-        scrollContainer.scrollTop = currentScroll;
-      });
-    }
-  }
-  prevLoadingRef.current = isLoading;
-}, [isLoading]);
-```
+### Changes Required
 
 ---
 
-### Why This Works
+#### 1. Database Schema Change
+
+**File**: Create migration to rename column  
+Rename `routine_plan_tasks.icon` to `emoji` for consistency (or keep as `icon` but store emojis).
+
+Decision: Keep the column named `icon` but change its contents to store emojis. This avoids breaking existing code references while changing the actual values.
+
+---
+
+#### 2. Replace IconPicker with EmojiPicker in App Task Edit
+
+**File**: `src/pages/app/AppTaskCreate.tsx`
+
+- Replace the `IconPicker` component with a new `EmojiPicker` component
+- Change the `icon` state variable to store emoji values
+- The icon picker currently opens when tapping the icon at the top of the task form
+- Replace with an emoji grid picker (similar to `TaskTemplatesManager.tsx` emoji selector)
+
+Create new component: `src/components/app/EmojiPicker.tsx`
+- Sheet-based picker with emoji categories
+- Common task emojis curated for routines/wellness
+- Search functionality
+- Categories: Common, Wellness, Work, Lifestyle, Nature, Objects
+
+---
+
+#### 3. Update RoutinePreviewSheet to Use Emojis
+
+**File**: `src/components/app/RoutinePreviewSheet.tsx`
+
+- Currently imports `* as LucideIcons` and renders `<TaskIcon className="w-4 h-4" />`
+- Change to render emoji text directly: `<span className="text-lg">{display.icon}</span>`
+- Update `getTaskDisplay` to return emoji instead of icon name
+
+---
+
+#### 4. Update Admin RoutinePlanDetailManager
+
+**File**: `src/components/admin/RoutinePlanDetailManager.tsx`
+
+Current icon selector (lines 1046-1061):
+```tsx
+const ICON_OPTIONS = [
+  'Sun', 'Moon', 'Heart', 'Brain', 'Dumbbell', 'Coffee', ...
+];
+// Grid of icons with renderIcon()
+```
+
+Change to emoji selector:
+```tsx
+const EMOJI_OPTIONS = [
+  '☀️', '🌙', '❤️', '🧠', '💪', '☕',
+  '📖', '⭐', '✨', '⚡', '🎯', '🕐',
+  '✅', '🏆', '🔥', '🌿', '💧', '💨'
+];
+// Grid of emoji buttons
+```
+
+Update:
+- `taskForm.icon` default from `'CheckCircle'` to `'✨'`
+- `renderIcon()` function to just return the emoji text
+- Bulk task creation default icon
+
+---
+
+#### 5. Update useAddRoutinePlan Hook
+
+**File**: `src/hooks/useRoutinePlans.tsx`
+
+Line 406: Currently sets `emoji: edited?.icon || task.icon || plan.icon`
+
+This already maps `icon` to `emoji`, but the source values are Lucide names. Once the database contains emojis, this will work correctly.
+
+---
+
+#### 6. Data Migration (Optional but Recommended)
+
+Create a mapping from existing Lucide icon names to emojis and update existing `routine_plan_tasks` records:
 
 ```
-Before (Bug):
-┌─────────────────────────────────┐
-│ Header + Spacer (animating)    │ ← height transition runs
-├─────────────────────────────────┤
-│ isLoading? Skeleton : Content  │ ← DOM swap during animation
-│                                 │
-│ WKWebView loses scroll state   │ ← BUG!
-└─────────────────────────────────┘
-
-After (Fixed):
-┌─────────────────────────────────┐
-│ Header + Spacer (instant)      │ ← no height transition
-├─────────────────────────────────┤
-│ isLoading? Skeleton : Content  │ ← DOM swap is safe now
-│                                 │
-│ + scroll nudge on load finish  │ ← forces recalculation
-└─────────────────────────────────┘
+Dumbbell → 💪
+Coffee → ☕
+Heart → ❤️
+Brain → 🧠
+Sparkles → ✨
+Clock → 🕐
+Star → ⭐
+Book → 📖
+Sun → ☀️
+Moon → 🌙
+Droplet → 💧
+MessageCircle → 💬
+CheckCircle → ✅
+...
 ```
 
 ---
 
 ### Files to Modify
 
-1. **`src/pages/app/AppHome.tsx`**
-   - Line 1: Add `useLayoutEffect` to imports
-   - Line 185: Add scroll reset effect
-   - Line 244: Add `touchAction: 'pan-y'` to calendar grid
-   - Line 261: Add `touchAction: 'pan-y'` to week strip grid  
-   - Line 315: Remove `transition-all duration-300 ease-out`
+1. **`src/components/app/EmojiPicker.tsx`** (NEW) - Create emoji picker component
+2. **`src/pages/app/AppTaskCreate.tsx`** - Replace IconPicker with EmojiPicker
+3. **`src/components/app/RoutinePreviewSheet.tsx`** - Render emojis instead of icons
+4. **`src/components/admin/RoutinePlanDetailManager.tsx`** - Replace icon grid with emoji grid
+5. **`src/hooks/useRoutinePlans.tsx`** - Minor adjustments if needed
 
 ---
 
-### Testing Steps
+### Technical Details
 
-1. Build: `npm run build && npx cap sync ios`
-2. Xcode: Clean Build Folder (Cmd+Shift+K) → Run
-3. Test scenarios:
-   - Navigate to a day you haven't visited → scrolling should work
-   - Expand/collapse calendar → scrolling should work
-   - Navigate to other pages → scrolling should work
-4. Visual check: Calendar expand/collapse animation still works (via CSS Grid, not spacer)
+#### New EmojiPicker Component Structure
+
+```tsx
+// src/components/app/EmojiPicker.tsx
+const EMOJI_CATEGORIES = {
+  common: ['☀️', '🎯', '💪', '❤️', '⭐', '✨', '📖', '✏️', '☕', '💧', '🕐', '📅', '🔔', '✅', '⭕'],
+  wellness: ['🧘', '🍎', '👶', '🛁', '🛏️', '🧠', '🌸', '🤲', '🌿', '🌙', '🥗', '😊', '🍲', '🌅', '🌇', '🌳', '💨'],
+  work: ['💼', '🏢', '🧮', '📊', '📋', '💳', '💵', '📄', '📂', '💻', '✉️', '💬', '📱', '🐷', '📈', '👥', '👛'],
+  lifestyle: ['🚴', '📚', '📷', '🚗', '🐕', '🎮', '🎁', '🥤', '🎧', '🏠', '🔑', '🧳', '🗺️', '🎵', '🎨', '✈️', '🛍️', '🛒', '👕', '🎟️', '🏆', '📺', '🍽️', '🍷'],
+};
+
+export function EmojiPicker({ open, onOpenChange, selectedEmoji, onSelect }) {
+  // Sheet with emoji grid, categories, and search
+}
+```
+
+#### Rendering Emoji in Task Cards
+
+```tsx
+// Before (RoutinePreviewSheet.tsx line 230)
+<TaskIcon className="w-4 h-4" />
+
+// After
+<span className="text-base">{display.icon}</span>
+```
 
 ---
 
-### Version
+### Visual Impact
 
-This fix will be **v1.1.05**.
+- Task cards will show colorful emojis instead of monochrome line icons
+- More expressive and playful UI
+- Consistent with the existing `task_templates` which already use emojis
+- Better visual distinction between different tasks
 
