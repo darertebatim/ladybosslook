@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, Share2, Clock, Star, CheckCircle, Loader2 } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { StarRating } from '@/components/app/StarRating';
@@ -97,8 +96,12 @@ export default function AppInspireDetail() {
     );
   }
 
-  const IconComponent = (LucideIcons as any)[plan.icon] || LucideIcons.Sparkles;
   const gradient = colorGradients[plan.color] || colorGradients.purple;
+  
+  // Check if icon is an emoji or a legacy Lucide icon name
+  const isEmoji = (str: string) => 
+    /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
+  const planIcon = plan.icon && isEmoji(plan.icon) ? plan.icon : '✨';
 
   return (
     <div className="min-h-full bg-background">
@@ -140,7 +143,7 @@ export default function AppInspireDetail() {
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center pt-12">
-              <IconComponent className="w-24 h-24 text-white/30" />
+              <span className="text-8xl opacity-30">{planIcon}</span>
             </div>
           )}
         </div>
@@ -177,8 +180,11 @@ export default function AppInspireDetail() {
             <div className="mt-6">
               <h2 className="text-lg font-semibold text-foreground mb-3">What's Included</h2>
               <div className="space-y-2">
-                {plan.tasks.map((task, index) => {
-                  const TaskIcon = (LucideIcons as any)[task.icon] || LucideIcons.CheckCircle;
+              {plan.tasks.map((task, index) => {
+                  // Check if icon is an emoji or a legacy Lucide icon name
+                  const isEmoji = (str: string) => 
+                    /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
+                  
                   return (
                     <div
                       key={task.id}
@@ -187,7 +193,9 @@ export default function AppInspireDetail() {
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
                         {index + 1}
                       </div>
-                      <TaskIcon className="w-5 h-5 text-muted-foreground" />
+                      <span className="text-xl">
+                        {isEmoji(task.icon) ? task.icon : '✨'}
+                      </span>
                       <div className="flex-1">
                         <span className="text-foreground">{task.title}</span>
                       </div>
