@@ -97,10 +97,10 @@ interface Props {
   onBack: () => void;
 }
 
-const ICON_OPTIONS = [
-  'Sun', 'Moon', 'Heart', 'Brain', 'Dumbbell', 'Coffee', 
-  'Book', 'Star', 'Sparkles', 'Zap', 'Target', 'Clock',
-  'CheckCircle', 'Award', 'Flame', 'Leaf', 'Droplet', 'Wind'
+const EMOJI_OPTIONS = [
+  '☀️', '🌙', '❤️', '🧠', '💪', '☕',
+  '📖', '⭐', '✨', '⚡', '🎯', '🕐',
+  '✅', '🏆', '🔥', '🌿', '💧', '💨',
 ];
 
 const colorGradients: Record<string, string> = {
@@ -135,7 +135,7 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
   const [taskForm, setTaskForm] = useState({
     title: '',
     duration_minutes: 1,
-    icon: 'CheckCircle',
+    icon: '✅',
     task_order: 0,
     is_active: true,
     linked_playlist_id: null as string | null,
@@ -421,7 +421,7 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
     setTaskForm({
       title: '',
       duration_minutes: isPro ? 5 : 1,
-      icon: isPro ? 'Sparkles' : 'CheckCircle',
+      icon: isPro ? '✨' : '✅',
       task_order: (tasks?.length || 0) + 1,
       is_active: true,
       linked_playlist_id: null,
@@ -506,7 +506,7 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
           plan_id: planId,
           title: lines[i].trim(),
           duration_minutes: 5,
-          icon: 'CheckCircle',
+          icon: '✅',
           task_order: (tasks?.length || 0) + i + 1,
           is_active: true,
           pro_link_type: null,
@@ -525,9 +525,15 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
     setBulkTasks('');
   };
 
-  const renderIcon = (iconName: string) => {
-    const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[iconName];
-    return Icon ? <Icon className="h-4 w-4" /> : null;
+  const renderIcon = (iconOrEmoji: string) => {
+    // Check if it's an emoji (not a Lucide icon name)
+    const isEmoji = /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{1FA00}-\u{1FAFF}]/u.test(iconOrEmoji);
+    if (isEmoji) {
+      return <span className="text-lg">{iconOrEmoji}</span>;
+    }
+    // Fallback to Lucide icon for legacy data
+    const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[iconOrEmoji];
+    return Icon ? <Icon className="h-4 w-4" /> : <span className="text-lg">✨</span>;
   };
 
   const moveSection = (section: Section, direction: 'up' | 'down') => {
@@ -1042,20 +1048,20 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
               />
             </div>
             <div>
-              <Label>Icon</Label>
+              <Label>Emoji</Label>
               <div className="grid grid-cols-6 gap-2 mt-2">
-                {ICON_OPTIONS.map((icon) => (
+                {EMOJI_OPTIONS.map((emoji) => (
                   <button
-                    key={icon}
+                    key={emoji}
                     type="button"
-                    onClick={() => setTaskForm(prev => ({ ...prev, icon }))}
-                    className={`p-2 rounded-lg border-2 transition-colors ${
-                      taskForm.icon === icon 
+                    onClick={() => setTaskForm(prev => ({ ...prev, icon: emoji }))}
+                    className={`p-2 rounded-lg border-2 transition-colors text-xl ${
+                      taskForm.icon === emoji 
                         ? 'border-primary bg-primary/10' 
                         : 'border-transparent hover:bg-muted'
                     }`}
                   >
-                    {renderIcon(icon)}
+                    {emoji}
                   </button>
                 ))}
               </div>

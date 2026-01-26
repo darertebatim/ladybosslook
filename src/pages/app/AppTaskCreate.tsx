@@ -25,7 +25,8 @@ import {
   RepeatPattern,
   TASK_COLORS,
 } from '@/hooks/useTaskPlanner';
-import { IconPicker, TaskIcon } from '@/components/app/IconPicker';
+import { EmojiPicker } from '@/components/app/EmojiPicker';
+import { TaskIcon } from '@/components/app/IconPicker';
 import { TimeWheelPicker } from '@/components/app/TimeWheelPicker';
 import { PRO_LINK_TYPES, ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
 
@@ -135,7 +136,7 @@ const AppTaskCreate = ({
 
   // Form state - prioritize URL params for new tasks
   const [title, setTitle] = useState(initialData?.title || urlName || '');
-  const [icon, setIcon] = useState(initialData?.icon || urlEmoji || 'Sun');
+  const [icon, setIcon] = useState(initialData?.icon || urlEmoji || '☀️');
   const [color, setColor] = useState<TaskColor>(initialData?.color || urlColor || 'yellow');
   const [scheduledDate, setScheduledDate] = useState<Date>(initialData?.scheduledDate || new Date());
   const [scheduledTime, setScheduledTime] = useState<string | null>(initialData?.scheduledTime ?? null);
@@ -232,7 +233,7 @@ const AppTaskCreate = ({
   useEffect(() => {
     if (isSheet && initialData) {
       setTitle(initialData.title || '');
-      setIcon(initialData.icon || 'Sun');
+      setIcon(initialData.icon || '☀️');
       setColor(initialData.color || 'yellow');
       setScheduledDate(initialData.scheduledDate || new Date());
       setScheduledTime(initialData.scheduledTime ?? null);
@@ -744,11 +745,11 @@ const AppTaskCreate = ({
   // Picker sheets (Me+ style)
   const pickerSheets = (
     <>
-      {/* Icon Picker */}
-      <IconPicker
+      {/* Emoji Picker */}
+      <EmojiPicker
         open={showIconPicker}
         onOpenChange={setShowIconPicker}
-        selectedIcon={icon}
+        selectedEmoji={icon}
         onSelect={setIcon}
       />
 

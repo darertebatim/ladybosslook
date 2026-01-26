@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Check, Pencil, Clock } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -196,11 +195,10 @@ export function RoutinePreviewSheet({
               </p>
               
               <div className="space-y-3">
-                {tasks.map((task, index) => {
+              {tasks.map((task, index) => {
                   const isSelected = selectedTaskIds.has(task.id);
                   const display = getTaskDisplay(task, index);
                   const colorClass = TASK_COLOR_CLASSES[display.color];
-                  const TaskIcon = (LucideIcons as any)[display.icon] || LucideIcons.Sparkles;
                   
                   return (
                     <div 
@@ -227,7 +225,7 @@ export function RoutinePreviewSheet({
                       )}>
                         <div className="p-3">
                           <div className="flex items-center gap-2 text-xs text-foreground/70 mb-1">
-                            <TaskIcon className="w-4 h-4" />
+                            <span className="text-base">{display.icon || '✨'}</span>
                             <span>Anytime</span>
                           </div>
                           <p className="font-medium text-foreground">{display.title}</p>
