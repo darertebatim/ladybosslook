@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -25,14 +25,14 @@ interface TaskCardProps {
   onStreakIncrease?: () => void;
 }
 
-export const TaskCard = ({
+export const TaskCard = memo(function TaskCard({
   task,
   date,
   isCompleted,
   completedSubtaskIds,
   onTap,
   onStreakIncrease,
-}: TaskCardProps) => {
+}: TaskCardProps) {
   const navigate = useNavigate();
   const [isAnimating, setIsAnimating] = useState(false);
   
@@ -251,4 +251,4 @@ export const TaskCard = ({
       </div>
     </div>
   );
-};
+});

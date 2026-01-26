@@ -111,12 +111,14 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     const audio = audioRef.current;
     
     const handleTimeUpdate = () => {
-      // Throttle state updates to every 500ms for better performance
-      const now = Date.now();
-      if (now - lastTimeUpdateRef.current > 500) {
-        lastTimeUpdateRef.current = now;
-        setCurrentTime(audio.currentTime);
-      }
+      // Use RAF + throttle for smoother visual updates
+      requestAnimationFrame(() => {
+        const now = Date.now();
+        if (now - lastTimeUpdateRef.current > 500) {
+          lastTimeUpdateRef.current = now;
+          setCurrentTime(audio.currentTime);
+        }
+      });
     };
     
     const handleDurationChange = () => {

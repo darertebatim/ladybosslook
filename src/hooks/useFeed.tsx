@@ -96,6 +96,7 @@ export function useFeedPosts(channelId?: string) {
   return useQuery({
     queryKey: ['feed-posts', channelId],
     queryFn: async () => {
+      // Single optimized query with all data
       let query = supabase
         .from('feed_posts')
         .select(`
@@ -112,24 +113,36 @@ export function useFeedPosts(channelId?: string) {
 
       const { data: posts, error } = await query;
       if (error) throw error;
+      if (!posts || posts.length === 0) return [] as FeedPost[];
 
-      // Get reactions for all posts
+      // Batch fetch reactions and comments in parallel
       const postIds = posts.map(p => p.id);
-      const { data: reactions } = await supabase
-        .from('feed_reactions')
-        .select('*')
-        .in('post_id', postIds);
+      
+      const [reactionsResult, commentsResult] = await Promise.all([
+        supabase.from('feed_reactions').select('post_id, emoji, user_id').in('post_id', postIds),
+        supabase.from('feed_comments').select('post_id').in('post_id', postIds).eq('is_hidden', false)
+      ]);
 
-      // Get comments count
-      const { data: commentsCounts } = await supabase
-        .from('feed_comments')
-        .select('post_id')
-        .in('post_id', postIds)
-        .eq('is_hidden', false);
+      const reactions = reactionsResult.data || [];
+      const comments = commentsResult.data || [];
 
-      // Process posts with reaction counts and user reactions
+      // Pre-compute maps for O(1) lookups instead of O(n) filters per post
+      const reactionsByPost = new Map<string, typeof reactions>();
+      reactions.forEach(r => {
+        if (!reactionsByPost.has(r.post_id)) {
+          reactionsByPost.set(r.post_id, []);
+        }
+        reactionsByPost.get(r.post_id)!.push(r);
+      });
+
+      const commentsCountByPost = new Map<string, number>();
+      comments.forEach(c => {
+        commentsCountByPost.set(c.post_id, (commentsCountByPost.get(c.post_id) || 0) + 1);
+      });
+
+      // Process posts with O(1) lookups
       const postsWithEngagement = posts.map(post => {
-        const postReactions = reactions?.filter(r => r.post_id === post.id) || [];
+        const postReactions = reactionsByPost.get(post.id) || [];
         const reactionsCounts: Record<string, number> = {};
         const userReactions: string[] = [];
 
@@ -140,19 +153,18 @@ export function useFeedPosts(channelId?: string) {
           }
         });
 
-        const commentsCount = commentsCounts?.filter(c => c.post_id === post.id).length || 0;
-
         return {
           ...post,
           reactions_count: reactionsCounts,
           user_reactions: userReactions,
-          comments_count: commentsCount,
+          comments_count: commentsCountByPost.get(post.id) || 0,
         };
       });
 
       return postsWithEngagement as FeedPost[];
     },
     enabled: !!user,
+    staleTime: 1000 * 30, // 30 seconds
   });
 }
 

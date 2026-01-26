@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast } from "lucide-react";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
@@ -30,19 +30,31 @@ export default function AppPlayer() {
   // Use centralized data hook with parallel fetching
   const { playlists, playlistItems, progressData, enrollments, programs, isLoading } = usePlayerData();
 
-  const getPlaylistStats = (playlistId: string) => {
-    const items = playlistItems?.filter(item => item.playlist_id === playlistId) || [];
-    const trackCount = items.length;
-    const totalDuration = items.reduce((sum, item) => sum + (item.audio_content?.duration_seconds || 0), 0);
+  // Memoized playlist stats calculation - O(1) lookups
+  const playlistStats = useMemo(() => {
+    const statsMap = new Map<string, { trackCount: number; totalDuration: number; completedTracks: number; coverImage: string | null }>();
     
-    const completedTracks = items.filter(item => {
-      const progress = progressData?.find(p => p.audio_id === item.audio_id);
-      return progress?.completed || false;
-    }).length;
+    if (!playlists || !playlistItems) return statsMap;
+    
+    // Pre-compute progress lookup map
+    const progressMap = new Map<string, boolean>();
+    progressData?.forEach(p => progressMap.set(p.audio_id, p.completed || false));
+    
+    playlists.forEach(playlist => {
+      const items = playlistItems.filter(item => item.playlist_id === playlist.id);
+      const trackCount = items.length;
+      const totalDuration = items.reduce((sum, item) => sum + (item.audio_content?.duration_seconds || 0), 0);
+      const completedTracks = items.filter(item => progressMap.get(item.audio_id)).length;
+      const coverImage = items[0]?.audio_content?.cover_image_url || null;
+      
+      statsMap.set(playlist.id, { trackCount, totalDuration, completedTracks, coverImage });
+    });
+    
+    return statsMap;
+  }, [playlists, playlistItems, progressData]);
 
-    const coverImage = items[0]?.audio_content?.cover_image_url;
-
-    return { trackCount, totalDuration, completedTracks, coverImage };
+  const getPlaylistStats = (playlistId: string) => {
+    return playlistStats.get(playlistId) || { trackCount: 0, totalDuration: 0, completedTracks: 0, coverImage: null };
   };
 
   const isPlaylistLocked = (playlist: any) => {
