@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef, useLayoutEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
 import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft } from 'lucide-react';
@@ -184,24 +184,6 @@ const AppHome = () => {
   }, [showCalendar, selectedDate]);
   const isLoading = tasksLoading || completionsLoading || programEventsLoading;
 
-  // Force scroll container reset when loading completes (iOS WKWebView fix v1.1.05)
-  const prevLoadingRef = useRef(isLoading);
-  useLayoutEffect(() => {
-    // Only trigger when loading finishes (true → false)
-    if (prevLoadingRef.current && !isLoading) {
-      // Force WKWebView to recalculate scroll state
-      const scrollContainer = document.querySelector('main');
-      if (scrollContainer) {
-        const currentScroll = scrollContainer.scrollTop;
-        scrollContainer.scrollTop = currentScroll + 1;
-        requestAnimationFrame(() => {
-          scrollContainer.scrollTop = currentScroll;
-        });
-      }
-    }
-    prevLoadingRef.current = isLoading;
-  }, [isLoading]);
-
   // Check if viewing a future date
   const isFutureDate = !isToday(selectedDate) && !isBefore(startOfDay(selectedDate), startOfDay(new Date()));
   // Home data defaults
@@ -216,7 +198,7 @@ const AppHome = () => {
   return <>
       <SEOHead title="Home - LadyBoss" description="Your personal dashboard and planner" />
       
-      <div className="flex flex-col min-h-full bg-background">
+      <div className="flex flex-col h-full overflow-hidden bg-background">
         {/* Fixed header with integrated week strip - Me+ style */}
         <header className="tour-header fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-xl shadow-sm" style={{
         paddingTop: 'max(12px, env(safe-area-inset-top))'
@@ -256,12 +238,11 @@ const AppHome = () => {
             </button>
           </div>
 
-          {/* Calendar area - compact spacing with swipe gesture */}
+          {/* Calendar area - compact spacing */}
           <div className="tour-calendar px-4 pt-0.5 pb-0.5">
-            {/* Animated calendar grid container - with weekday headers */}
-            <div className="grid transition-all duration-300 ease-out overflow-hidden" style={{
-            gridTemplateRows: showCalendar ? '1fr' : '0fr',
-            touchAction: 'pan-y'
+            {/* Calendar grid container - with weekday headers */}
+            <div className="grid overflow-hidden" style={{
+            gridTemplateRows: showCalendar ? '1fr' : '0fr'
           }}>
               <div className="min-h-0">
                 <div className={cn("transition-opacity duration-200", showCalendar ? "opacity-100" : "opacity-0")}>
@@ -277,9 +258,8 @@ const AppHome = () => {
             </div>
 
             {/* Week strip - Me+ style with pill around day name + number */}
-            <div className={cn("grid transition-all duration-300 ease-out overflow-hidden")} style={{
-            gridTemplateRows: showCalendar ? '0fr' : '1fr',
-            touchAction: 'pan-y'
+            <div className={cn("grid overflow-hidden")} style={{
+            gridTemplateRows: showCalendar ? '0fr' : '1fr'
           }}>
               <div className="min-h-0">
                 <div className={cn("flex mt-1 transition-opacity duration-200", showCalendar ? "opacity-0" : "opacity-100")}>
@@ -331,34 +311,34 @@ const AppHome = () => {
           </div>
         </header>
 
-        {/* Spacer for fixed header - NO animation to prevent iOS scroll corruption (v1.1.05) */}
-        <div style={{
+        {/* Fixed spacer for header */}
+        <div className="shrink-0" style={{
         height: showCalendar ? 'calc(48px + 290px + max(12px, env(safe-area-inset-top)))' : 'calc(48px + 72px + max(12px, env(safe-area-inset-top)))'
       }} />
 
-        {/* Notification Banner - prompts users to enable notifications */}
-        <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
+        {/* Scroll container */}
+        <div className="flex-1 overflow-y-auto overscroll-contain">
+          <div className="px-4 py-4 pb-safe">
+            {/* Notification Banner - prompts users to enable notifications */}
+            <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
-        {/* Promo Banner */}
-        <PromoBanner />
+            {/* Promo Banner */}
+            <PromoBanner />
 
-        {/* Home Banners (announcements with videos/CTAs) */}
-        <HomeBanner />
+            {/* Home Banners (announcements with videos/CTAs) */}
+            <HomeBanner />
 
-        {/* Tag filter chips */}
-        {taskTags.length > 0 && <div className="px-4 py-2 bg-background overflow-x-auto">
-            <div className="flex gap-2">
-              <button onClick={() => setSelectedTag(null)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all font-medium', selectedTag === null ? 'bg-[#D8C0F3] text-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80')}>
-                All
-              </button>
-              {taskTags.map(tag => <button key={tag} onClick={() => setSelectedTag(tag === selectedTag ? null : tag)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all capitalize font-medium', selectedTag === tag ? 'bg-[#D8C0F3] text-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80')}>
-                  {tag}
-                </button>)}
-            </div>
-          </div>}
-
-        {/* Content area - scrollable with extra padding for fixed bottom dashboard */}
-        <div className="flex-1 px-4 py-4 pb-[280px]">
+            {/* Tag filter chips */}
+            {taskTags.length > 0 && <div className="py-2 -mx-4 px-4 bg-background overflow-x-auto">
+                <div className="flex gap-2">
+                  <button onClick={() => setSelectedTag(null)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all font-medium', selectedTag === null ? 'bg-[#D8C0F3] text-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80')}>
+                    All
+                  </button>
+                  {taskTags.map(tag => <button key={tag} onClick={() => setSelectedTag(tag === selectedTag ? null : tag)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all capitalize font-medium', selectedTag === tag ? 'bg-[#D8C0F3] text-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80')}>
+                      {tag}
+                    </button>)}
+                </div>
+              </div>}
 
           {isLoading ? <div className="space-y-3">
               {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 rounded-2xl" />)}
@@ -413,6 +393,10 @@ const AppHome = () => {
                 </div>}
 
             </>}
+          </div>
+
+          {/* Extra padding for fixed bottom dashboard */}
+          <div className="h-[200px]" />
         </div>
 
         {/* Fixed Bottom Dashboard */}
