@@ -246,7 +246,7 @@ const AppHome = () => {
                 </button>
               </div> : <h1 className="text-lg font-bold text-foreground flex items-center gap-1">
                 {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
-                <Star className="h-3 w-3 text-green-500 fill-green-500" />
+                <Star className="h-3 w-3 text-red-500 fill-red-500" />
               </h1>}
 
             {/* Streak badge */}
