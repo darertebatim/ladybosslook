@@ -9,8 +9,7 @@ import {
   useCompleteTask,
   useUncompleteTask,
 } from '@/hooks/useTaskPlanner';
-import { Capacitor } from '@capacitor/core';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { haptic } from '@/lib/haptics';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 import { isToday, isBefore, startOfDay } from 'date-fns';
@@ -68,9 +67,7 @@ export const TaskCard = memo(function TaskCard({
     
     // Prevent completing tasks for future dates - show toast message
     if (isFutureDate) {
-      if (Capacitor.isNativePlatform()) {
-        await Haptics.impact({ style: ImpactStyle.Light });
-      }
+      haptic.light();
       toast("Let's focus on today's routine.", {
         description: "You can complete this task when the day comes.",
         duration: 3000,
@@ -79,9 +76,7 @@ export const TaskCard = memo(function TaskCard({
     }
     
     // Haptic feedback
-    if (Capacitor.isNativePlatform()) {
-      await Haptics.impact({ style: ImpactStyle.Light });
-    }
+    haptic.light();
 
     // Animate
     setIsAnimating(true);
@@ -93,9 +88,7 @@ export const TaskCard = memo(function TaskCard({
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
       if (result.streakIncreased && onStreakIncrease) {
         // Stronger haptic for streak
-        if (Capacitor.isNativePlatform()) {
-          await Haptics.impact({ style: ImpactStyle.Medium });
-        }
+        haptic.medium();
         onStreakIncrease();
       }
     }
