@@ -439,7 +439,7 @@ export function useAddRoutinePlan() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-routine-plans'] });
       queryClient.invalidateQueries({ queryKey: ['routine-plan'] });
-      queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
     },
   });
 }

@@ -165,19 +165,16 @@ export const TASK_COLOR_CLASSES: Record<TaskColor, string> = {
 // ============================================
 
 /**
- * Get tasks for a specific date (including repeating tasks)
+ * Get ALL active tasks (cached) - base query that rarely refetches
  */
-export const useTasksForDate = (date: Date) => {
+export const useAllActiveTasks = () => {
   const { user } = useAuth();
-  const dateStr = format(date, 'yyyy-MM-dd');
-  const dayOfWeek = date.getDay(); // 0 = Sunday
 
   return useQuery({
-    queryKey: ['planner-tasks', user?.id, dateStr],
+    queryKey: ['planner-all-tasks', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
 
-      // Get all active tasks with linked playlist info
       const { data: tasks, error } = await supabase
         .from('user_tasks')
         .select(`
@@ -189,44 +186,62 @@ export const useTasksForDate = (date: Date) => {
         .order('order_index', { ascending: true });
 
       if (error) throw error;
-
-      // Filter tasks that apply to this date
-      return (tasks as UserTask[]).filter(task => {
-        // Non-repeating tasks - only show on scheduled date
-        if (task.repeat_pattern === 'none') {
-          return task.scheduled_date === dateStr;
-        }
-
-        // Daily tasks - always show
-        if (task.repeat_pattern === 'daily') return true;
-
-        // Weekend tasks - only Sat/Sun
-        if (task.repeat_pattern === 'weekend') {
-          return dayOfWeek === 0 || dayOfWeek === 6;
-        }
-
-        // Weekly tasks - show on same day of week as original
-        if (task.repeat_pattern === 'weekly' && task.scheduled_date) {
-          const originalDay = parseISO(task.scheduled_date).getDay();
-          return dayOfWeek === originalDay;
-        }
-
-        // Monthly tasks - show on same day of month
-        if (task.repeat_pattern === 'monthly' && task.scheduled_date) {
-          const originalDate = parseISO(task.scheduled_date).getDate();
-          return date.getDate() === originalDate;
-        }
-
-        // Custom - check repeat_days array
-        if (task.repeat_pattern === 'custom' && task.repeat_days) {
-          return task.repeat_days.includes(dayOfWeek);
-        }
-
-        return false;
-      });
+      return tasks as UserTask[];
     },
     enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // 5 minutes - tasks rarely change
+    gcTime: 1000 * 60 * 30, // Keep in cache for 30 min
   });
+};
+
+/**
+ * Get tasks for a specific date (filters from cached all-tasks)
+ * This is instant after initial load since it reuses cached data
+ */
+export const useTasksForDate = (date: Date) => {
+  const { data: allTasks = [], isLoading } = useAllActiveTasks();
+  const dateStr = format(date, 'yyyy-MM-dd');
+  const dayOfWeek = date.getDay(); // 0 = Sunday
+
+  // Filter tasks that apply to this date - computed from cached data
+  const tasksForDate = allTasks.filter(task => {
+    // Non-repeating tasks - only show on scheduled date
+    if (task.repeat_pattern === 'none') {
+      return task.scheduled_date === dateStr;
+    }
+
+    // Daily tasks - always show
+    if (task.repeat_pattern === 'daily') return true;
+
+    // Weekend tasks - only Sat/Sun
+    if (task.repeat_pattern === 'weekend') {
+      return dayOfWeek === 0 || dayOfWeek === 6;
+    }
+
+    // Weekly tasks - show on same day of week as original
+    if (task.repeat_pattern === 'weekly' && task.scheduled_date) {
+      const originalDay = parseISO(task.scheduled_date).getDay();
+      return dayOfWeek === originalDay;
+    }
+
+    // Monthly tasks - show on same day of month
+    if (task.repeat_pattern === 'monthly' && task.scheduled_date) {
+      const originalDate = parseISO(task.scheduled_date).getDate();
+      return date.getDate() === originalDate;
+    }
+
+    // Custom - check repeat_days array
+    if (task.repeat_pattern === 'custom' && task.repeat_days) {
+      return task.repeat_days.includes(dayOfWeek);
+    }
+
+    return false;
+  });
+
+  return {
+    data: tasksForDate,
+    isLoading,
+  };
 };
 
 /**
@@ -285,6 +300,7 @@ export const useCompletionsForDate = (date: Date) => {
       };
     },
     enabled: !!user?.id,
+    staleTime: 1000 * 30, // 30 seconds - completions change more often
   });
 };
 
@@ -511,7 +527,7 @@ export const useCreateTask = () => {
       return task as UserTask;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       toast({ title: 'Task created! ✨' });
     },
     onError: (error) => {
@@ -559,7 +575,7 @@ export const useQuickAddPlaylistTask = () => {
       return data as UserTask;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['playlist-task-exists'] });
       toast({ title: 'Added to your routine! 🎧' });
     },
@@ -658,7 +674,7 @@ export const useUpdateTask = () => {
       return task;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['planner-task', data.id] });
       queryClient.invalidateQueries({ queryKey: ['planner-subtasks', data.id] });
     },
@@ -691,7 +707,7 @@ export const useDeleteTask = () => {
       return taskId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       toast({ title: 'Task deleted' });
     },
     onError: (error) => {
@@ -910,7 +926,7 @@ export const useCreateTaskFromTemplate = () => {
       return data as UserTask;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       toast({ title: 'Task added from template! ✨' });
     },
     onError: (error) => {
@@ -1044,7 +1060,7 @@ export const useReorderTasks = () => {
       return tasks;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['planner-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
     },
     onError: (error) => {
       console.error('Reorder tasks error:', error);
