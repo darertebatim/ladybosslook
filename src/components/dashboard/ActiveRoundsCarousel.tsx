@@ -60,7 +60,7 @@ export function ActiveRoundsCarousel({
   }
   return <div className={`tour-programs-carousel ${isCollapsed ? '' : 'space-y-2'}`}>
       {/* Header - always visible, acts as expand/collapse toggle */}
-      <button className="w-full flex items-center justify-between rounded-2xl transition-all shadow-sm py-0 px-0 bg-primary-foreground" onClick={toggleCollapse} aria-label={isCollapsed ? 'Expand programs' : 'Collapse programs'} aria-expanded={!isCollapsed}>
+      <button className="w-full flex items-center justify-between rounded-2xl transition-all py-0 px-0 bg-primary-foreground shadow-none" onClick={toggleCollapse} aria-label={isCollapsed ? 'Expand programs' : 'Collapse programs'} aria-expanded={!isCollapsed}>
         <div className="flex items-center gap-1.5">
           <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`} />
           <h2 className="text-sm font-semibold text-foreground">Your Programs</h2>
