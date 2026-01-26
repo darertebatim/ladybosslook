@@ -115,7 +115,7 @@ export default function AppFeed() {
   const selectedChannel = channels?.find(c => c.id === selectedChannelId);
 
   return (
-    <div className="min-h-full bg-muted/30">
+    <div className="flex flex-col h-full overflow-hidden bg-muted/30">
       <SEOHead 
         title="Community" 
         description="Stay connected with announcements, content updates, and community discussions"
@@ -144,10 +144,11 @@ export default function AppFeed() {
       </header>
 
       {/* Spacer for fixed header */}
-      <div style={{ height: 'calc(100px + env(safe-area-inset-top, 0px))' }} />
+      <div className="shrink-0" style={{ height: 'calc(100px + env(safe-area-inset-top, 0px))' }} />
 
-      {/* Messages stream */}
-      <main className="pb-24 px-4">
+      {/* Scroll container */}
+      <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="px-4 pb-safe">
         {postsLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -189,7 +190,8 @@ export default function AppFeed() {
         
         {/* Scroll anchor for auto-scroll to bottom */}
         <div ref={bottomRef} />
-      </main>
+        </div>
+      </div>
     </div>
   );
 }

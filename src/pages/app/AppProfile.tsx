@@ -629,7 +629,7 @@ const AppProfile = () => {
   };
 
   return (
-    <div className="min-h-full bg-background pb-24">
+    <div className="flex flex-col h-full overflow-hidden bg-background">
       <SEOHead 
         title="Profile - LadyBoss Academy"
         description="Your profile settings"
@@ -647,9 +647,11 @@ const AppProfile = () => {
       </header>
       
       {/* Header spacer */}
-      <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} />
+      <div className="shrink-0" style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} />
       
-      <div className="container max-w-4xl py-4 px-4">
+      {/* Scroll container */}
+      <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="container max-w-4xl py-4 px-4 pb-safe">
       <div className="space-y-6">
 
         {/* Quick Navigation */}
@@ -1497,6 +1499,7 @@ const AppProfile = () => {
             </AlertDialog>
           </CardContent>
         </Card>
+      </div>
       </div>
       </div>
     </div>
