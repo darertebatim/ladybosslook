@@ -1,131 +1,128 @@
 
+## Plan: Redesign Routine Cards to Match Playlist Card Style
 
-## Plan: Complete Emoji Standardization for Routine Pages
+### Goal
+Update the `RoutinePlanCard` component to match the visual design of `PlaylistCard` - featuring a Card wrapper with borders, an aspect-square image area with overlaid title, category badge, and a separate content section below with description and meta info.
 
-### Problem Identified
+### Visual Comparison
 
-From the screenshots, I can see three places still showing Lucide icons instead of emojis:
+```text
+Current RoutinePlanCard:          Target PlaylistCard Style:
+┌─────────────────────┐           ┌─────────────────────┐
+│                     │           │ [Category]    [pts] │ ← Top badges
+│   (gradient/image)  │           │                     │
+│   aspect-4/5 tall   │           │   (square image)    │
+│                     │           │                     │
+│   ═══════════════   │           │   Title overlaid    │
+│   Title             │           │───────────────────── │
+│   Subtitle          │           │ Description...      │
+│   ⏱ 15 min  ★ 4.5  │           │ 📝 5 tasks  ⏱ 15m   │
+└─────────────────────┘           │ ★ 4.5 (rating)      │
+                                  └─────────────────────┘
+```
 
-1. **Admin Tasks tab** (`RoutinePlanDetailManager.tsx`) - The `renderIcon` function already has emoji support, but the database contains Lucide icon names
-2. **RoutinePreviewSheet** - Shows icon *names* as text because database has "Dumbbell", "Heart" etc.
-3. **Routine detail page** (`AppInspireDetail.tsx`) - Line 181 uses `LucideIcons[task.icon]` to render icons
+### Changes to `RoutinePlanCard.tsx`
 
-### Root Cause
+#### 1. Add Card Wrapper
+- Import and use `Card` component from `@/components/ui/card`
+- Add border styling and shadow similar to PlaylistCard
+- Keep hover/active scale transitions
 
-The database table `routine_plan_tasks` has the `icon` column populated with Lucide icon names (e.g., "Brain", "Clock", "Star", "Book") instead of emoji characters.
+#### 2. Change Aspect Ratio
+- Change from `aspect-[4/5]` (tall) to `aspect-square` to match playlist cards
 
-### Solution: Two-Part Fix
+#### 3. Restructure Content
+**Image section (inside Card):**
+- Cover image or gradient with emoji fallback
+- Bottom gradient overlay for title
+- Category badge (top-left) - show the category name from `plan.category?.name`
+- Points badge (top-right) - keep the star + points display
+- Title overlaid at bottom of image
 
----
+**Content section (below image, `p-3`):**
+- Description text (line-clamp-2) if available
+- Meta row: number of tasks icon + count, clock icon + duration
+- Rating display if `average_rating` exists
 
-#### Part 1: Update AppInspireDetail.tsx
+#### 4. Update Emoji Display
+- Replace Lucide icon fallback with emoji (from the standardization we just did)
+- Use `isEmoji()` helper function
 
-Update the task rendering in the "What's Included" section to handle both emojis and legacy Lucide icons (with emoji fallback display).
+#### 5. Keep Compact Variant
+- The compact variant will also be updated to use emojis instead of icons
 
-**File:** `src/pages/app/AppInspireDetail.tsx`
+### Code Changes
+
+**File: `src/components/app/RoutinePlanCard.tsx`**
 
 ```tsx
-// Line 180-197: Replace the task rendering logic
+import { memo } from 'react';
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Clock, Star, CheckSquare } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { haptic } from '@/lib/haptics';
+import { RoutinePlan } from '@/hooks/useRoutinePlans';
 
-// Add helper function to check if string is emoji
+// Helper to check if string is emoji
 const isEmoji = (str: string) => 
   /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
 
-// In the map function, replace TaskIcon with:
-{isEmoji(task.icon) ? (
-  <span className="text-xl">{task.icon}</span>
-) : (
-  // Fallback for legacy Lucide names - show default emoji
-  <span className="text-xl">✨</span>
-)}
+// Color gradients for fallback when no cover image
+const colorGradients = { /* existing */ };
+
+export const RoutinePlanCard = memo(function RoutinePlanCard({ 
+  plan, 
+  onClick, 
+  variant = 'default' 
+}: RoutinePlanCardProps) {
+  // ... compact variant stays similar but with emoji
+  
+  // Default variant - PlaylistCard style:
+  return (
+    <Card 
+      className="overflow-hidden rounded-2xl border-border/50 cursor-pointer 
+                 hover:shadow-lg hover:border-border transition-all 
+                 hover:scale-[1.02] active:scale-[0.98]"
+      onClick={handleClick}
+    >
+      {/* Image Section - aspect-square */}
+      <div className="relative aspect-square">
+        {/* Cover image or gradient with emoji */}
+        {/* Bottom gradient overlay */}
+        {/* Category badge - top left */}
+        {/* Points badge - top right */}
+        {/* Title overlay - bottom */}
+      </div>
+      
+      {/* Content Section */}
+      <div className="p-3 space-y-2">
+        {/* Description */}
+        {/* Meta: tasks count, duration */}
+        {/* Rating if available */}
+      </div>
+    </Card>
+  );
+});
 ```
-
----
-
-#### Part 2: Database Migration
-
-Run a SQL migration to convert existing Lucide icon names to emojis in the `routine_plan_tasks` table.
-
-**Icon to Emoji Mapping:**
-| Lucide Icon | Emoji |
-|-------------|-------|
-| Brain | 🧠 |
-| Sparkles | ✨ |
-| Clock | 🕐 |
-| Star | ⭐ |
-| Book | 📖 |
-| BookOpen | 📖 |
-| Heart | ❤️ |
-| Droplet | 💧 |
-| Coffee | ☕ |
-| Dumbbell | 💪 |
-| Sun | ☀️ |
-| Moon | 🌙 |
-| Users | 👥 |
-| Target | 🎯 |
-| Music | 🎵 |
-| Mic | 🎤 |
-| MessageCircle | 💬 |
-| CheckCircle | ✅ |
-| Apple | 🍎 |
-| Bed | 🛏️ |
-| Calendar | 📅 |
-| Flame | 🔥 |
-| Leaf | 🌿 |
-| Phone | 📱 |
-| Smile | 😊 |
-| Wind | 💨 |
-
-**SQL Migration:**
-```sql
-UPDATE routine_plan_tasks SET icon = '🧠' WHERE icon = 'Brain';
-UPDATE routine_plan_tasks SET icon = '✨' WHERE icon = 'Sparkles';
-UPDATE routine_plan_tasks SET icon = '🕐' WHERE icon = 'Clock';
-UPDATE routine_plan_tasks SET icon = '⭐' WHERE icon = 'Star';
-UPDATE routine_plan_tasks SET icon = '📖' WHERE icon = 'Book';
-UPDATE routine_plan_tasks SET icon = '📖' WHERE icon = 'BookOpen';
-UPDATE routine_plan_tasks SET icon = '❤️' WHERE icon = 'Heart';
-UPDATE routine_plan_tasks SET icon = '💧' WHERE icon = 'Droplet';
-UPDATE routine_plan_tasks SET icon = '☕' WHERE icon = 'Coffee';
-UPDATE routine_plan_tasks SET icon = '💪' WHERE icon = 'Dumbbell';
-UPDATE routine_plan_tasks SET icon = '☀️' WHERE icon = 'Sun';
-UPDATE routine_plan_tasks SET icon = '🌙' WHERE icon = 'Moon';
-UPDATE routine_plan_tasks SET icon = '👥' WHERE icon = 'Users';
-UPDATE routine_plan_tasks SET icon = '🎯' WHERE icon = 'Target';
-UPDATE routine_plan_tasks SET icon = '🎵' WHERE icon = 'Music';
-UPDATE routine_plan_tasks SET icon = '🎤' WHERE icon = 'Mic';
-UPDATE routine_plan_tasks SET icon = '💬' WHERE icon = 'MessageCircle';
-UPDATE routine_plan_tasks SET icon = '✅' WHERE icon = 'CheckCircle';
-UPDATE routine_plan_tasks SET icon = '🍎' WHERE icon = 'Apple';
-UPDATE routine_plan_tasks SET icon = '🛏️' WHERE icon = 'Bed';
-UPDATE routine_plan_tasks SET icon = '📅' WHERE icon = 'Calendar';
-UPDATE routine_plan_tasks SET icon = '🔥' WHERE icon = 'Flame';
-UPDATE routine_plan_tasks SET icon = '🌿' WHERE icon = 'Leaf';
-UPDATE routine_plan_tasks SET icon = '📱' WHERE icon = 'Phone';
-UPDATE routine_plan_tasks SET icon = '😊' WHERE icon = 'Smile';
-UPDATE routine_plan_tasks SET icon = '💨' WHERE icon = 'Wind';
-```
-
----
 
 ### Files to Modify
 
-1. **`src/pages/app/AppInspireDetail.tsx`**
-   - Remove `* as LucideIcons` import for task icons
-   - Update task rendering in "What's Included" section to display emojis directly
+1. **`src/components/app/RoutinePlanCard.tsx`** - Complete redesign to match PlaylistCard style
 
-### Database Action Required
+### Data Considerations
 
-After code changes, you'll need to run the SQL migration in Supabase to convert existing icon values to emojis. I can execute this migration for you.
-
----
+The card needs `tasks.length` to show task count, but the current `RoutinePlan` type doesn't include tasks by default. Options:
+- Use the `points` field as a proxy (already displayed)
+- Add a `task_count` field to the query (would need hook changes)
+- For now, display points badge + duration, skip task count
 
 ### Expected Result
 
-After these changes:
-- Admin task list will show emojis (already has `renderIcon` with emoji support)
-- RoutinePreviewSheet will show emojis (already updated, just needs emoji data)
-- Routine detail page will show emojis in "What's Included" section
-- All new tasks created will use emojis
-- Existing tasks will be migrated to emojis
-
+After this change:
+- Routine cards will have the same visual structure as playlist cards
+- Cards will have proper borders and shadows
+- Image section will be square with overlaid title
+- Category badge will appear in top-left if category exists
+- Description and meta info will appear below the image
+- Consistent look across the app's card-based UI
