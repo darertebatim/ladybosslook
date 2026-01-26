@@ -399,7 +399,7 @@ const AppHome = () => {
         <div className="fixed bottom-0 left-0 right-0 z-40 rounded-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)] bg-primary-foreground" style={{
         paddingBottom: 'max(64px, calc(52px + env(safe-area-inset-bottom)))'
       }}>
-          <div className="px-1 py-1">
+          <div className="px-1 py-1 bg-primary-foreground">
             <ActiveRoundsCarousel activeRounds={activeRounds} nextSessionMap={nextSessionMap} />
           </div>
         </div>
