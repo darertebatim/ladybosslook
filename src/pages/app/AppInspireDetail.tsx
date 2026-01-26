@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, Share2, Clock, Star, CheckCircle, Loader2 } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { StarRating } from '@/components/app/StarRating';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
@@ -104,7 +103,7 @@ export default function AppInspireDetail() {
   const planIcon = plan.icon && isEmoji(plan.icon) ? plan.icon : '✨';
 
   return (
-    <div className="min-h-full bg-background">
+    <div className="flex flex-col h-full overflow-hidden bg-background">
       {/* Fixed Header */}
       <header 
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4"
@@ -129,7 +128,11 @@ export default function AppInspireDetail() {
         </div>
       </header>
 
-      <ScrollArea className="flex-1">
+      {/* Scroll Container */}
+      <div 
+        className="flex-1 overflow-y-auto overscroll-contain"
+        style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+      >
         {/* Hero Image/Gradient */}
         <div className={cn(
           'relative w-full bg-gradient-to-br',
@@ -148,7 +151,7 @@ export default function AppInspireDetail() {
           )}
         </div>
 
-        <div className="px-4 pb-40">
+        <div className="px-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 160px)' }}>
           {/* Title & Badges */}
           <div className="pt-4">
             <h1 className="text-2xl font-bold text-foreground">{plan.title}</h1>
@@ -257,7 +260,7 @@ export default function AppInspireDetail() {
             </div>
           </div>
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Sticky Add Button */}
       <div 
