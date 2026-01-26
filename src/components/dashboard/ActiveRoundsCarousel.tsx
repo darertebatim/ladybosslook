@@ -60,7 +60,7 @@ export function ActiveRoundsCarousel({
     return (
       <Link 
         to="/app/browse"
-        className="flex items-center justify-between px-0 py-0 rounded-sm bg-muted/60 border border-border/50"
+        className="flex items-center justify-between px-0 py-0 rounded-sm bg-white border border-border/50"
       >
         <div className="flex items-center gap-2">
           <GraduationCap className="h-4 w-4 text-muted-foreground" />
@@ -79,7 +79,7 @@ export function ActiveRoundsCarousel({
       {/* Header - always visible, acts as expand/collapse toggle */}
       <button 
         className={`w-full flex items-center justify-between px-0 py-0 rounded-sm transition-all active:bg-black/5 ${
-          isCollapsed ? 'bg-muted/60 border border-border/50' : ''
+          isCollapsed ? 'bg-white border border-border/50' : ''
         }`}
         onClick={toggleCollapse}
         aria-label={isCollapsed ? 'Expand programs' : 'Collapse programs'}
