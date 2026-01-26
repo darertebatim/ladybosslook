@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Star } from 'lucide-react';
@@ -42,7 +41,7 @@ const colorBackgrounds: Record<string, string> = {
   rose: 'bg-rose-50',
 };
 
-export const RoutinePlanCard = memo(function RoutinePlanCard({ 
+export function RoutinePlanCard({ 
   plan, 
   onClick, 
   variant = 'default' 
@@ -153,4 +152,4 @@ export const RoutinePlanCard = memo(function RoutinePlanCard({
       </div>
     </Card>
   );
-});
+}
