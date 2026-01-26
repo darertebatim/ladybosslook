@@ -42,6 +42,16 @@ html.native-app #root {
   flex-direction: column;
 }
 
+/*
+  iOS WKWebView: Ensure our *actual* scroll containers have momentum scrolling.
+  (body/html are fixed+hidden in native mode, so these are the elements that must scroll.)
+*/
+html.native-app main,
+html.native-app [data-scroll-container="true"] {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
 /* Safe area inset utilities */
 @layer base {
   .pt-safe {
