@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { CheckCircle, Play, Sparkles } from "lucide-react";
 import confetti from "canvas-confetti";
-import { Capacitor } from "@capacitor/core";
-import { Haptics, NotificationType } from "@capacitor/haptics";
+import { haptic } from "@/lib/haptics";
 import {
   Dialog,
   DialogContent,
@@ -35,9 +34,7 @@ export function TrackCompletionCelebration({
   useEffect(() => {
     if (isOpen) {
       // Trigger haptic feedback on native platforms
-      if (Capacitor.isNativePlatform()) {
-        Haptics.notification({ type: NotificationType.Success }).catch(() => {});
-      }
+      haptic.success();
 
       // Trigger confetti - lighter than course completion
       const duration = 1500;

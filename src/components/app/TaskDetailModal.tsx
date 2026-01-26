@@ -12,8 +12,7 @@ import {
 } from '@/hooks/useTaskPlanner';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Capacitor } from '@capacitor/core';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { haptic } from '@/lib/haptics';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 
@@ -90,9 +89,7 @@ export const TaskDetailModal = ({
   const handleToggleSubtask = async (subtaskId: string) => {
     const isCompleted = completedSubtaskIds.includes(subtaskId);
     
-    if (Capacitor.isNativePlatform()) {
-      await Haptics.impact({ style: ImpactStyle.Light });
-    }
+    haptic.light();
 
     if (isCompleted) {
       uncompleteSubtask.mutate({ subtaskId, date });
@@ -102,18 +99,14 @@ export const TaskDetailModal = ({
   };
 
   const handleToggleComplete = async () => {
-    if (Capacitor.isNativePlatform()) {
-      await Haptics.impact({ style: ImpactStyle.Light });
-    }
+    haptic.light();
 
     if (isCompleted) {
       uncompleteTask.mutate({ taskId: task.id, date });
     } else {
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
       if (result.streakIncreased && onStreakIncrease) {
-        if (Capacitor.isNativePlatform()) {
-          await Haptics.impact({ style: ImpactStyle.Medium });
-        }
+        haptic.medium();
         onStreakIncrease();
       }
     }
