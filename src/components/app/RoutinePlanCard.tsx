@@ -1,4 +1,6 @@
-import * as LucideIcons from 'lucide-react';
+import { memo } from 'react';
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Clock, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -9,6 +11,10 @@ interface RoutinePlanCardProps {
   onClick?: () => void;
   variant?: 'default' | 'compact';
 }
+
+// Helper to check if string is emoji
+const isEmoji = (str: string) => 
+  /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400/80 to-amber-600/90',
@@ -36,10 +42,14 @@ const colorBackgrounds: Record<string, string> = {
   rose: 'bg-rose-50',
 };
 
-export function RoutinePlanCard({ plan, onClick, variant = 'default' }: RoutinePlanCardProps) {
-  const IconComponent = (LucideIcons as any)[plan.icon] || LucideIcons.Sparkles;
-  const gradient = colorGradients[plan.color] || colorGradients.yellow;
-  const bgColor = colorBackgrounds[plan.color] || colorBackgrounds.yellow;
+export const RoutinePlanCard = memo(function RoutinePlanCard({ 
+  plan, 
+  onClick, 
+  variant = 'default' 
+}: RoutinePlanCardProps) {
+  const gradient = colorGradients[plan.color] || colorGradients.purple;
+  const bgColor = colorBackgrounds[plan.color] || colorBackgrounds.purple;
+  const planEmoji = plan.icon && isEmoji(plan.icon) ? plan.icon : '✨';
 
   const handleClick = () => {
     haptic.light();
@@ -59,7 +69,7 @@ export function RoutinePlanCard({ plan, onClick, variant = 'default' }: RoutineP
           'w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br',
           gradient
         )}>
-          <IconComponent className="w-6 h-6 text-white" />
+          <span className="text-2xl">{planEmoji}</span>
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-foreground truncate">{plan.title}</h3>
@@ -76,55 +86,71 @@ export function RoutinePlanCard({ plan, onClick, variant = 'default' }: RoutineP
   }
 
   return (
-    <button
+    <Card 
+      className="overflow-hidden rounded-2xl border-border/50 cursor-pointer hover:shadow-lg hover:border-border transition-all hover:scale-[1.02] active:scale-[0.98]"
       onClick={handleClick}
-      className="relative rounded-2xl overflow-hidden w-full min-w-0 transition-all active:scale-[0.98] aspect-[4/5]"
     >
-      {/* Cover Image or Gradient - Full Card */}
-      {plan.cover_image_url ? (
-        <img
-          src={plan.cover_image_url}
-          alt={plan.title}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      ) : (
-        <div className={cn(
-          'absolute inset-0 w-full h-full bg-gradient-to-br flex items-center justify-center',
-          gradient
-        )}>
-          <IconComponent className="w-16 h-16 text-white/30" />
-        </div>
-      )}
-      
-      {/* Bottom Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-      
-      {/* Points badge - Top Right */}
-      <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1">
-        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-        <span>{plan.points}</span>
-      </div>
-
-      {/* Content - Overlaid at Bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-3 text-left">
-        <h3 className="font-semibold text-white line-clamp-2 text-sm drop-shadow-md">{plan.title}</h3>
-        {plan.subtitle && (
-          <p className="text-xs text-white/70 line-clamp-1 mt-0.5">{plan.subtitle}</p>
+      {/* Image Section - aspect-square */}
+      <div className="relative aspect-square">
+        {plan.cover_image_url ? (
+          <img
+            src={plan.cover_image_url}
+            alt={plan.title}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className={cn(
+            'w-full h-full bg-gradient-to-br flex items-center justify-center',
+            gradient
+          )}>
+            <span className="text-6xl opacity-40">{planEmoji}</span>
+          </div>
         )}
         
-        <div className="flex items-center gap-3 mt-1.5 text-xs text-white/70">
+        {/* Bottom Gradient for Title Overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        
+        {/* Category badge - top left */}
+        {plan.category?.name && (
+          <Badge variant="secondary" className="absolute top-2 left-2 rounded-full">
+            {plan.category.name}
+          </Badge>
+        )}
+        
+        {/* Points badge - top right */}
+        <Badge className="absolute top-2 right-2 bg-black/40 hover:bg-black/50 backdrop-blur-sm text-white rounded-full">
+          <Star className="w-3 h-3 fill-amber-400 text-amber-400 mr-1" />
+          {plan.points}
+        </Badge>
+        
+        {/* Title Overlay */}
+        <h3 className="absolute bottom-2 left-2 right-2 font-semibold text-sm text-white line-clamp-2 drop-shadow-md z-10">
+          {plan.title}
+        </h3>
+      </div>
+      
+      {/* Content Section */}
+      <div className="p-3 space-y-2">
+        {plan.subtitle && (
+          <p className="text-xs text-muted-foreground line-clamp-2">{plan.subtitle}</p>
+        )}
+        
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" />
+            <Clock className="h-3 w-3" />
             <span>{plan.estimated_minutes} min</span>
           </div>
-          {plan.average_rating && (
-            <div className="flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span>{plan.average_rating.toFixed(1)}</span>
-            </div>
-          )}
         </div>
+        
+        {plan.average_rating && plan.average_rating > 0 && (
+          <div className="flex items-center gap-1 text-xs">
+            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+            <span className="font-medium">{plan.average_rating.toFixed(1)}</span>
+          </div>
+        )}
       </div>
-    </button>
+    </Card>
   );
-}
+});
