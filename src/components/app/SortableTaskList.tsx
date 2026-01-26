@@ -21,8 +21,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
 import { UserTask, useReorderTasks } from '@/hooks/useTaskPlanner';
 import { TaskCard } from './TaskCard';
-import { Capacitor } from '@capacitor/core';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { haptic } from '@/lib/haptics';
 
 interface SortableTaskItemProps {
   task: UserTask;
@@ -139,16 +138,14 @@ export const SortableTaskList = ({
     })
   );
 
-  const handleDragStart = useCallback(async (event: DragStartEvent) => {
+  const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(event.active.id as string);
     
     // Haptic feedback on drag start
-    if (Capacitor.isNativePlatform()) {
-      await Haptics.impact({ style: ImpactStyle.Medium });
-    }
+    haptic.medium();
   }, []);
 
-  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
 
@@ -160,9 +157,7 @@ export const SortableTaskList = ({
       setLocalTasks(reorderedTasks);
 
       // Haptic feedback on drop
-      if (Capacitor.isNativePlatform()) {
-        await Haptics.impact({ style: ImpactStyle.Light });
-      }
+      haptic.light();
 
       // Update order_index in database
       const updates = reorderedTasks.map((task, index) => ({

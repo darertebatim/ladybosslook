@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
-import { Haptics, ImpactStyle } from "@capacitor/haptics";
+import { haptic } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, X, Loader2, FileText, Image as ImageIcon, Mic, Square, Play, Pause, Trash2, Plus } from "lucide-react";
@@ -114,9 +114,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
   const handleSend = useCallback(() => {
     if ((message.trim() || attachment) && !disabled && !uploading) {
       // Haptic feedback on iOS/Android
-      if (Capacitor.isNativePlatform()) {
-        Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
-      }
+      haptic.light();
       
       // CRITICAL: Store the message content BEFORE clearing state
       const messageToSend = message.trim();

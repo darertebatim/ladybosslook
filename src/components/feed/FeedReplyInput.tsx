@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
-import { Haptics, ImpactStyle } from "@capacitor/haptics";
+import { haptic } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Loader2 } from "lucide-react";
@@ -29,9 +29,7 @@ export function FeedReplyInput({ onSend, disabled, placeholder = "Write a reply.
   const handleSend = () => {
     if (message.trim() && !disabled) {
       // Haptic feedback on iOS/Android
-      if (Capacitor.isNativePlatform()) {
-        Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
-      }
+      haptic.light();
       
       const textarea = textareaRef.current;
       

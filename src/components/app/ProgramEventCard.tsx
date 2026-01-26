@@ -7,8 +7,8 @@ import {
   useCompleteProgramEvent, 
   useUncompleteProgramEvent 
 } from '@/hooks/usePlannerProgramEvents';
+import { haptic } from '@/lib/haptics';
 import { Capacitor } from '@capacitor/core';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Browser } from '@capacitor/browser';
 import { isToday } from 'date-fns';
 import { SessionReminderSheet } from '@/components/app/SessionReminderSheet';
@@ -67,12 +67,10 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   const currentSettings = isSession ? sessionSettings : contentSettings;
   const saveSettings = isSession ? setSessionSettings : setContentSettings;
 
-  const handleToggleComplete = async (e: React.MouseEvent) => {
+  const handleToggleComplete = (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    if (Capacitor.isNativePlatform()) {
-      await Haptics.impact({ style: ImpactStyle.Light });
-    }
+    haptic.light();
 
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 300);
@@ -93,9 +91,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   };
 
   const handleCardClick = async () => {
-    if (Capacitor.isNativePlatform()) {
-      await Haptics.impact({ style: ImpactStyle.Light });
-    }
+    haptic.light();
 
     switch (event.type) {
       case 'session':
@@ -124,11 +120,9 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
     }
   };
 
-  const handleSettingsClick = async (e: React.MouseEvent) => {
+  const handleSettingsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (Capacitor.isNativePlatform()) {
-      await Haptics.impact({ style: ImpactStyle.Light });
-    }
+    haptic.light();
     setShowReminderSheet(true);
   };
 
