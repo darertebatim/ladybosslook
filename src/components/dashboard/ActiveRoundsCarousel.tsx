@@ -75,7 +75,7 @@ export function ActiveRoundsCarousel({
   }
 
   return (
-    <div className={`tour-programs-carousel bg-white rounded-lg ${isCollapsed ? '' : 'space-y-2 p-2'}`}>
+    <div className={`tour-programs-carousel bg-white rounded-lg border border-border ${isCollapsed ? '' : 'space-y-2 p-2'}`}>
       {/* Header - always visible, acts as expand/collapse toggle */}
       <button 
         className={`w-full flex items-center justify-between px-2 py-1 rounded-sm transition-all active:bg-black/5 ${
