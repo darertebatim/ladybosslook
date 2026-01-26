@@ -50,7 +50,11 @@ export function CompactRoundCard({
       onClick={onView}
       className="block"
     >
-      <div className="relative w-[260px] h-[88px] rounded-xl overflow-hidden shadow-sm transition-transform active:scale-[0.98] bg-white">
+      <div className={`relative w-[260px] h-[88px] rounded-xl overflow-hidden shadow-sm transition-transform active:scale-[0.98] border border-border/50 ${
+        isActive 
+          ? 'bg-violet-50 dark:bg-violet-950/30' 
+          : 'bg-muted/50 dark:bg-muted/30'
+      } ${isUnseen ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
         {/* Content */}
         <div className="absolute inset-0 p-2.5 flex flex-col justify-end">
           {/* Course name with badges inline */}
