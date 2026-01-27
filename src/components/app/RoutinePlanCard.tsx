@@ -118,11 +118,11 @@ export function RoutinePlanCard({
           </Badge>
         )}
         
-        {/* Points badge - top right */}
-        <Badge className="absolute top-2 right-2 bg-black/40 hover:bg-black/50 backdrop-blur-sm text-white rounded-full">
+        {/* Points badge - hidden for now due to iOS rendering issue */}
+        {/* <Badge className="absolute top-2 right-2 bg-black/40 hover:bg-black/50 backdrop-blur-sm text-white rounded-full">
           <Star className="w-3 h-3 fill-amber-400 text-amber-400 mr-1" />
           {plan.points}
-        </Badge>
+        </Badge> */}
         
         {/* Title Overlay */}
         <h3 className="absolute bottom-2 left-2 right-2 font-semibold text-sm text-white line-clamp-2 drop-shadow-md z-10">
