@@ -255,14 +255,21 @@ Deno.serve(async (req) => {
     const completedTaskIds = new Set(completedTasks?.map(c => c.task_id) || []);
     console.log(`[Task Reminder] Found ${completedTaskIds.size} tasks already completed today`);
     
-    // Get user profiles for timezone info
+    // Get user profiles for timezone info (including their stored timezone if available)
     const userIds = [...new Set(tasks.map(t => t.user_id))];
-    const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
-      .select('id, full_name')
-      .in('id', userIds);
     
-    const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+    // Also fetch journal reminder settings which stores user timezone
+    const { data: reminderSettings } = await supabase
+      .from('journal_reminder_settings')
+      .select('user_id, timezone')
+      .in('user_id', userIds);
+    
+    const userTimezoneMap = new Map<string, string>();
+    for (const setting of reminderSettings || []) {
+      if (setting.timezone) {
+        userTimezoneMap.set(setting.user_id, setting.timezone);
+      }
+    }
     
     // Find tasks that need reminders now
     const tasksToNotify: Array<{ task: any; userId: string }> = [];
@@ -290,40 +297,27 @@ Deno.serve(async (req) => {
         task.reminder_offset || 0
       );
       
-      // We need the user's timezone to check if it's reminder time
-      // For now, use a simple approach: check if current UTC time falls within 
-      // a reasonable window (we run every 5 minutes, so check ±3 minute window)
-      // In production, you'd want to store user timezone and calculate properly
-      
-      // Simple approach: Check multiple common timezones
-      const timezonesToCheck = [
-        'America/Los_Angeles', // PST/PDT
-        'America/New_York',    // EST/EDT
-        'America/Chicago',     // CST/CDT
-        'Asia/Tokyo',          // JST
-        'Europe/London',       // GMT/BST
-      ];
+      // Get user's timezone - fall back to a sensible default (PST) if not set
+      const userTimezone = userTimezoneMap.get(task.user_id) || 'America/Los_Angeles';
       
       let shouldNotify = false;
       
-      for (const tz of timezonesToCheck) {
-        try {
-          const userTime = new Date(now.toLocaleString('en-US', { timeZone: tz }));
-          const userHour = userTime.getHours();
-          const userMinutes = userTime.getMinutes();
-          
-          // Check if within 5-minute window
-          const reminderTotalMinutes = reminderHour * 60 + reminderMinute;
-          const currentTotalMinutes = userHour * 60 + userMinutes;
-          
-          if (Math.abs(reminderTotalMinutes - currentTotalMinutes) <= 5) {
-            shouldNotify = true;
-            console.log(`[Task Reminder] Task "${task.title}" due for user ${task.user_id} in ${tz}`);
-            break;
-          }
-        } catch (e) {
-          // Invalid timezone, skip
+      try {
+        // Convert current time to user's timezone
+        const userTime = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }));
+        const userHour = userTime.getHours();
+        const userMinutes = userTime.getMinutes();
+        
+        // Check if within 5-minute window
+        const reminderTotalMinutes = reminderHour * 60 + reminderMinute;
+        const currentTotalMinutes = userHour * 60 + userMinutes;
+        
+        if (Math.abs(reminderTotalMinutes - currentTotalMinutes) <= 5) {
+          shouldNotify = true;
+          console.log(`[Task Reminder] Task "${task.title}" due for user ${task.user_id} (tz: ${userTimezone})`);
         }
+      } catch (e) {
+        console.error(`[Task Reminder] Invalid timezone for user ${task.user_id}: ${userTimezone}`);
       }
       
       if (shouldNotify) {
