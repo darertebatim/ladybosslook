@@ -176,7 +176,7 @@ export default function AppInspire() {
                     isSelected={selectedCategory === 'all-tasks'}
                     onClick={() => setSelectedCategory('all-tasks')}
                   />
-                  {categories.map((category) => (
+                  {categories.filter(c => c.slug !== 'pro').map((category) => (
                     <CategoryCircle
                       key={category.id}
                       name={category.name}
@@ -186,6 +186,15 @@ export default function AppInspire() {
                       onClick={() => setSelectedCategory(category.slug)}
                     />
                   ))}
+                  {categories.find(c => c.slug === 'pro') && (
+                    <CategoryCircle
+                      name={categories.find(c => c.slug === 'pro')!.name}
+                      icon={categories.find(c => c.slug === 'pro')!.icon}
+                      color={categories.find(c => c.slug === 'pro')!.color}
+                      isSelected={selectedCategory === 'pro'}
+                      onClick={() => setSelectedCategory('pro')}
+                    />
+                  )}
                 </div>
                 <ScrollBar orientation="horizontal" className="invisible" />
               </ScrollArea>
