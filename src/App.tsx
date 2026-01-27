@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +17,7 @@ import { initializeSocialLogin } from "@/lib/nativeSocialAuth";
 import AppLayout from "@/layouts/NativeAppLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 // Page loading fallback - minimal for fast render
 const PageLoader = () => (
@@ -44,7 +45,6 @@ const AppInspire = lazy(() => import("@/pages/app/AppInspire"));
 const AppInspireDetail = lazy(() => import("@/pages/app/AppInspireDetail"));
 
 // Lazy load admin pages
-const Overview = lazy(() => import("@/pages/admin/Overview"));
 const Users = lazy(() => import("@/pages/admin/Users"));
 const Enrollment = lazy(() => import("@/pages/admin/Enrollment"));
 const Audio = lazy(() => import("@/pages/admin/Audio"));
@@ -77,7 +77,6 @@ const Five = lazy(() => import("@/pages/Five"));
 const Floew = lazy(() => import("@/pages/Floew"));
 const Giveaway = lazy(() => import("@/pages/Giveaway"));
 const IQMoneyWorkshop = lazy(() => import("@/pages/IQMoneyWorkshop"));
-const Index = lazy(() => import("@/pages/Index"));
 const LadybossAnnouncements = lazy(() => import("@/pages/LadybossAnnouncements"));
 const CCWAnnouncements = lazy(() => import("@/pages/CCWAnnouncements"));
 const EmpoweredWomanCoaching = lazy(() => import("@/pages/EmpoweredWomanCoaching"));
@@ -100,6 +99,61 @@ const AppMarketing = lazy(() => import("@/pages/AppMarketing"));
 // Eagerly imported (small, always needed)
 import CalendarRedirect from "@/components/CalendarRedirect";
 import Redirect from "@/components/Redirect";
+import Index from "@/pages/Index";
+import Overview from "@/pages/admin/Overview";
+
+class ChunkLoadErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { error: Error | null }
+> {
+  state: { error: Error | null } = { error: null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  componentDidCatch(error: Error) {
+    const message = error?.message || "";
+    const isChunkLoadError =
+      /Failed to fetch dynamically imported module/i.test(message) ||
+      /Loading chunk .* failed/i.test(message) ||
+      /Importing a module script failed/i.test(message);
+
+    if (!isChunkLoadError) return;
+
+    // Avoid infinite reload loops.
+    const key = "__chunk_reload_ts__";
+    const last = Number(sessionStorage.getItem(key) || "0");
+    const now = Date.now();
+    if (now - last > 30_000) {
+      sessionStorage.setItem(key, String(now));
+      window.location.reload();
+    }
+  }
+
+  render() {
+    if (!this.state.error) return this.props.children;
+
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background p-6">
+        <div className="max-w-md w-full space-y-3 text-center">
+          <h1 className="text-xl font-semibold">App needs a refresh</h1>
+          <p className="text-sm text-muted-foreground">
+            We couldn’t load a required file (usually after an update). Please reload.
+          </p>
+          <div className="flex justify-center">
+            <Button onClick={() => window.location.reload()}>
+              Reload
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground break-all">
+            {this.state.error.message}
+          </p>
+        </div>
+      </div>
+    );
+  }
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -178,107 +232,109 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <NativeAppRedirect />
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/programs" element={<Programs />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/landing" element={<Landing />} />
-                <Route path="/asac" element={<AssertLanding />} />
-                <Route path="/auth" element={<Auth />} />
-                
-                {/* Admin Routes */}
-                {!isNativeApp() && (
-                  <Route path="/admin" element={<AdminLayout />}>
-                    <Route index element={<ProtectedRoute requiredPage="overview"><Overview /></ProtectedRoute>} />
-                    <Route path="users" element={<ProtectedRoute requiredPage="users"><Users /></ProtectedRoute>} />
-                    <Route path="enrollment" element={<ProtectedRoute requiredPage="enrollment"><Enrollment /></ProtectedRoute>} />
-                    <Route path="audio" element={<ProtectedRoute requiredPage="audio"><Audio /></ProtectedRoute>} />
-                    <Route path="community" element={<ProtectedRoute requiredPage="community"><Community /></ProtectedRoute>} />
-                    <Route path="routines" element={<ProtectedRoute requiredPage="routines"><Routines /></ProtectedRoute>} />
-                    <Route path="communications" element={<ProtectedRoute requiredPage="communications"><Communications /></ProtectedRoute>} />
-                    <Route path="programs" element={<ProtectedRoute requiredPage="programs"><ProgramsAdmin /></ProtectedRoute>} />
-                    <Route path="payments" element={<ProtectedRoute requiredPage="payments"><Payments /></ProtectedRoute>} />
-                    <Route path="support" element={<ProtectedRoute requiredPage="support"><Support /></ProtectedRoute>} />
-                    <Route path="system" element={<ProtectedRoute requiredPage="system"><System /></ProtectedRoute>} />
-                    <Route path="app-icon" element={<ProtectedRoute requiredPage="system"><AppIconGenerator /></ProtectedRoute>} />
+            <ChunkLoadErrorBoundary>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/programs" element={<Programs />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/landing" element={<Landing />} />
+                  <Route path="/asac" element={<AssertLanding />} />
+                  <Route path="/auth" element={<Auth />} />
+                  
+                  {/* Admin Routes */}
+                  {!isNativeApp() && (
+                    <Route path="/admin" element={<AdminLayout />}>
+                      <Route index element={<ProtectedRoute requiredPage="overview"><Overview /></ProtectedRoute>} />
+                      <Route path="users" element={<ProtectedRoute requiredPage="users"><Users /></ProtectedRoute>} />
+                      <Route path="enrollment" element={<ProtectedRoute requiredPage="enrollment"><Enrollment /></ProtectedRoute>} />
+                      <Route path="audio" element={<ProtectedRoute requiredPage="audio"><Audio /></ProtectedRoute>} />
+                      <Route path="community" element={<ProtectedRoute requiredPage="community"><Community /></ProtectedRoute>} />
+                      <Route path="routines" element={<ProtectedRoute requiredPage="routines"><Routines /></ProtectedRoute>} />
+                      <Route path="communications" element={<ProtectedRoute requiredPage="communications"><Communications /></ProtectedRoute>} />
+                      <Route path="programs" element={<ProtectedRoute requiredPage="programs"><ProgramsAdmin /></ProtectedRoute>} />
+                      <Route path="payments" element={<ProtectedRoute requiredPage="payments"><Payments /></ProtectedRoute>} />
+                      <Route path="support" element={<ProtectedRoute requiredPage="support"><Support /></ProtectedRoute>} />
+                      <Route path="system" element={<ProtectedRoute requiredPage="system"><System /></ProtectedRoute>} />
+                      <Route path="app-icon" element={<ProtectedRoute requiredPage="system"><AppIconGenerator /></ProtectedRoute>} />
+                    </Route>
+                  )}
+                  
+                  <Route path="/video" element={<Video />} />
+                  <Route path="/expressassert" element={<ExpressAssert />} />
+                  <Route path="/business-ideas" element={<BusinessIdeas />} />
+                  <Route path="/business-growth-accelerator" element={<BusinessGrowthAccelerator />} />
+                  <Route path="/business-startup-accelerator" element={<BusinessStartupAccelerator />} />
+                  {!isNativeApp() && <Route path="/event-irvine" element={<EventIrvine />} />}
+                  {!isNativeApp() && <Route path="/ccw" element={<CourageousWorkshop />} />}
+                  {!isNativeApp() && <Route path="/cc" element={<CourageousCharacter />} />}
+                  {!isNativeApp() && <Route path="/payment-success" element={<PaymentSuccess />} />}
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/refund-policy" element={<RefundPolicy />} />
+                  <Route path="/sms-terms" element={<SMSTerms />} />
+                  <Route path="/appsupport" element={<AppSupport />} />
+                  <Route path="/appmarketing" element={<AppMarketing />} />
+                  <Route path="/giveaway" element={<Giveaway />} />
+                  {!isNativeApp() && <Route path="/ewc" element={<EmpoweredWomanCoaching />} />}
+                  {!isNativeApp() && <Route path="/ewcnow" element={<EmpoweredWomanCoaching />} />}
+                  {!isNativeApp() && <Route path="/ewc-balance" element={<EWCBalance />} />}
+                  {!isNativeApp() && <Route path="/ewplus" element={<EWPlus />} />}
+                  <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
+                  <Route path="/announcements/ccw" element={<CCWAnnouncements />} />
+                  {!isNativeApp() && <Route path="/freelive" element={<FreeLive />} />}
+                  {!isNativeApp() && <Route path="/one" element={<One />} />}
+                  {!isNativeApp() && <Route path="/five" element={<Five />} />}
+                  {!isNativeApp() && <Route path="/floew" element={<Floew />} />}
+                  {!isNativeApp() && <Route path="/thankfreelive" element={<ThankFreeLive />} />}
+                  {!isNativeApp() && <Route path="/thankone" element={<ThankOne />} />}
+                  {!isNativeApp() && <Route path="/iqmoney" element={<IQMoneyWorkshop />} />}
+                  <Route path="/rathus" element={<RathusAssessment />} />
+                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  
+                  {/* Full-screen pages - Outside of AppLayout so no tab bar */}
+                  <Route path="/app/journal/new" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
+                  <Route path="/app/journal/:entryId" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
+                  <Route path="/app/home/new" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
+                  <Route path="/app/home/edit/:taskId" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
+                  <Route path="/app/channels/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
+                  {/* Redirect old feed post route */}
+                  <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
+                  
+                  {/* App Routes */}
+                  <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+                    <Route index element={<Navigate to="/app/home" replace />} />
+                    <Route path="home" element={<AppHome />} />
+                    <Route path="programs" element={<AppPrograms />} />
+                    <Route path="browse" element={<AppStore />} />
+                    <Route path="course/:slug" element={<AppCourseDetail />} />
+                    <Route path="course/:slug/:roundId" element={<AppCourseDetail />} />
+                    <Route path="player" element={<AppPlayer />} />
+                    <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />
+                    <Route path="player/:audioId" element={<AppAudioPlayer />} />
+                    <Route path="chat" element={<AppChat />} />
+                    <Route path="channels" element={<AppFeed />} />
+                    {/* Redirect old feed route */}
+                    <Route path="feed" element={<Navigate to="/app/channels" replace />} />
+                    <Route path="journal" element={<AppJournal />} />
+                    <Route path="routines" element={<AppInspire />} />
+                    <Route path="routines/:planId" element={<AppInspireDetail />} />
+                    <Route path="profile" element={<AppProfile />} />
+                    {/* Legacy routes - redirect to home */}
                   </Route>
-                )}
-                
-                <Route path="/video" element={<Video />} />
-                <Route path="/expressassert" element={<ExpressAssert />} />
-                <Route path="/business-ideas" element={<BusinessIdeas />} />
-                <Route path="/business-growth-accelerator" element={<BusinessGrowthAccelerator />} />
-                <Route path="/business-startup-accelerator" element={<BusinessStartupAccelerator />} />
-                {!isNativeApp() && <Route path="/event-irvine" element={<EventIrvine />} />}
-                {!isNativeApp() && <Route path="/ccw" element={<CourageousWorkshop />} />}
-                {!isNativeApp() && <Route path="/cc" element={<CourageousCharacter />} />}
-                {!isNativeApp() && <Route path="/payment-success" element={<PaymentSuccess />} />}
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/refund-policy" element={<RefundPolicy />} />
-                <Route path="/sms-terms" element={<SMSTerms />} />
-                <Route path="/appsupport" element={<AppSupport />} />
-                <Route path="/appmarketing" element={<AppMarketing />} />
-                <Route path="/giveaway" element={<Giveaway />} />
-                {!isNativeApp() && <Route path="/ewc" element={<EmpoweredWomanCoaching />} />}
-                {!isNativeApp() && <Route path="/ewcnow" element={<EmpoweredWomanCoaching />} />}
-                {!isNativeApp() && <Route path="/ewc-balance" element={<EWCBalance />} />}
-                {!isNativeApp() && <Route path="/ewplus" element={<EWPlus />} />}
-                <Route path="/announcements/coaching" element={<LadybossAnnouncements />} />
-                <Route path="/announcements/ccw" element={<CCWAnnouncements />} />
-                {!isNativeApp() && <Route path="/freelive" element={<FreeLive />} />}
-                {!isNativeApp() && <Route path="/one" element={<One />} />}
-                {!isNativeApp() && <Route path="/five" element={<Five />} />}
-                {!isNativeApp() && <Route path="/floew" element={<Floew />} />}
-                {!isNativeApp() && <Route path="/thankfreelive" element={<ThankFreeLive />} />}
-                {!isNativeApp() && <Route path="/thankone" element={<ThankOne />} />}
-                {!isNativeApp() && <Route path="/iqmoney" element={<IQMoneyWorkshop />} />}
-                <Route path="/rathus" element={<RathusAssessment />} />
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                
-                {/* Full-screen pages - Outside of AppLayout so no tab bar */}
-                <Route path="/app/journal/new" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
-                <Route path="/app/journal/:entryId" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
-                <Route path="/app/home/new" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
-                <Route path="/app/home/edit/:taskId" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
-                <Route path="/app/channels/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
-                {/* Redirect old feed post route */}
-                <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
-                
-                {/* App Routes */}
-                <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-                  <Route index element={<Navigate to="/app/home" replace />} />
-                  <Route path="home" element={<AppHome />} />
-                  <Route path="programs" element={<AppPrograms />} />
-                  <Route path="browse" element={<AppStore />} />
-                  <Route path="course/:slug" element={<AppCourseDetail />} />
-                  <Route path="course/:slug/:roundId" element={<AppCourseDetail />} />
-                  <Route path="player" element={<AppPlayer />} />
-                  <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />
-                  <Route path="player/:audioId" element={<AppAudioPlayer />} />
-                  <Route path="chat" element={<AppChat />} />
-                  <Route path="channels" element={<AppFeed />} />
-                  {/* Redirect old feed route */}
-                  <Route path="feed" element={<Navigate to="/app/channels" replace />} />
-                  <Route path="journal" element={<AppJournal />} />
-                  <Route path="routines" element={<AppInspire />} />
-                  <Route path="routines/:planId" element={<AppInspireDetail />} />
-                  <Route path="profile" element={<AppProfile />} />
-                  {/* Legacy routes - redirect to home */}
-                </Route>
-                
-                <Route path="/calendar" element={<CalendarRedirect />} />
-                <Route path="/send-test-email" element={<SendTestEmail />} />
-                <Route path="/firststepbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/RightsnboundariesLadybossgift.pdf" />} />
-                <Route path="/fnpbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/fnpbonus.pdf" />} />
-                
-                {/* Dynamic program routes - must be before catch-all */}
-                {!isNativeApp() && <Route path="/:slug" element={<ProgramPage />} />}
-                
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
+                  
+                  <Route path="/calendar" element={<CalendarRedirect />} />
+                  <Route path="/send-test-email" element={<SendTestEmail />} />
+                  <Route path="/firststepbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/RightsnboundariesLadybossgift.pdf" />} />
+                  <Route path="/fnpbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/fnpbonus.pdf" />} />
+                  
+                  {/* Dynamic program routes - must be before catch-all */}
+                  {!isNativeApp() && <Route path="/:slug" element={<ProgramPage />} />}
+                  
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </ChunkLoadErrorBoundary>
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
