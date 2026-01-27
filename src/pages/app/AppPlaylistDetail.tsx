@@ -358,7 +358,7 @@ export default function AppPlaylistDetail() {
     task_order: 0,
     is_active: true,
     linked_playlist_id: playlistId,
-    pro_link_type: 'playlist' as const,
+    pro_link_type: 'playlist' as 'playlist',
     pro_link_value: playlistId,
     created_at: new Date().toISOString(),
   }] : null;
