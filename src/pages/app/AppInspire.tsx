@@ -39,6 +39,14 @@ export default function AppInspire() {
     if (selectedCategory === 'popular') {
       return popularPlans;
     }
+    if (selectedCategory === 'all-routines') {
+      // Show all routine plans
+      return filteredPlans;
+    }
+    if (selectedCategory === 'all-tasks') {
+      // Don't show routines for all-tasks view
+      return [];
+    }
     // Category-specific plans
     return filteredPlans;
   }, [selectedCategory, filteredPlans, popularPlans]);
@@ -50,6 +58,14 @@ export default function AppInspire() {
     if (!taskTemplates) return [];
     if (selectedCategory === 'popular') {
       return taskTemplates.filter(t => t.is_popular);
+    }
+    if (selectedCategory === 'all-tasks') {
+      // Show all task templates
+      return taskTemplates;
+    }
+    if (selectedCategory === 'all-routines') {
+      // Don't show tasks for all-routines view
+      return [];
     }
     if (!selectedCategory) return taskTemplates;
     // Compare against the category slug stored in task_templates
@@ -142,9 +158,23 @@ export default function AppInspire() {
                   <CategoryCircle
                     name="Popular"
                     icon="Star"
-                    color="#FBBF24"
+                    color="yellow"
                     isSelected={selectedCategory === 'popular'}
                     onClick={() => setSelectedCategory('popular')}
+                  />
+                  <CategoryCircle
+                    name="All Routines"
+                    icon="Sparkles"
+                    color="purple"
+                    isSelected={selectedCategory === 'all-routines'}
+                    onClick={() => setSelectedCategory('all-routines')}
+                  />
+                  <CategoryCircle
+                    name="All Tasks"
+                    icon="ListTodo"
+                    color="blue"
+                    isSelected={selectedCategory === 'all-tasks'}
+                    onClick={() => setSelectedCategory('all-tasks')}
                   />
                   {categories.map((category) => (
                     <CategoryCircle
@@ -167,6 +197,10 @@ export default function AppInspire() {
             <h2 className="text-sm font-semibold text-muted-foreground mb-3">
               {selectedCategory === 'popular'
                 ? 'POPULAR ROUTINES'
+                : selectedCategory === 'all-routines'
+                ? 'ALL ROUTINES'
+                : selectedCategory === 'all-tasks'
+                ? 'ALL TASKS'
                 : categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'ROUTINES'
               }
             </h2>
@@ -198,14 +232,16 @@ export default function AppInspire() {
             )}
           </div>
 
-          {/* Task Ideas Section - hide for Pro category since it has no standalone templates */}
-          {taskTemplates && taskTemplates.length > 0 && selectedCategory !== 'pro' && (
+          {/* Task Ideas Section - hide for Pro category and all-routines since they focus on routines only */}
+          {taskTemplates && taskTemplates.length > 0 && selectedCategory !== 'pro' && selectedCategory !== 'all-routines' && (
             <div className="mt-8 px-4 w-full max-w-full overflow-hidden pb-8">
               <div className="flex items-center gap-2 mb-3">
                 <ListTodo className="w-4 h-4 text-primary" />
                 <h2 className="text-sm font-semibold text-muted-foreground">
                   {selectedCategory === 'popular' 
                     ? 'POPULAR TASKS'
+                    : selectedCategory === 'all-tasks'
+                    ? 'ALL TASKS'
                     : `${categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'CATEGORY'} TASKS`
                   }
                 </h2>
