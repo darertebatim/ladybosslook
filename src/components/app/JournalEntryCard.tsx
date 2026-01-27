@@ -2,7 +2,6 @@ import { memo } from 'react';
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
 import { getMoodEmoji } from './MoodSelector';
 import { Card, CardContent } from '@/components/ui/card';
-import { Share2 } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 
 interface JournalEntryCardProps {
@@ -11,7 +10,6 @@ interface JournalEntryCardProps {
   content: string;
   mood: string | null;
   createdAt: string;
-  sharedWithAdmin?: boolean | null;
   onClick: () => void;
 }
 
@@ -46,7 +44,6 @@ export const JournalEntryCard = memo(function JournalEntryCard({
   content,
   mood,
   createdAt,
-  sharedWithAdmin,
   onClick,
 }: JournalEntryCardProps) {
   const plainContent = stripHtml(content);
@@ -67,14 +64,9 @@ export const JournalEntryCard = memo(function JournalEntryCard({
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h3 className="font-medium text-foreground truncate">
-                {displayTitle}
-              </h3>
-              {sharedWithAdmin && (
-                <Share2 className="h-3 w-3 text-primary flex-shrink-0" />
-              )}
-            </div>
+            <h3 className="font-medium text-foreground truncate">
+              {displayTitle}
+            </h3>
             <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
               {preview || 'No content'}
             </p>

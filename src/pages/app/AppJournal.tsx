@@ -214,7 +214,6 @@ const AppJournal = () => {
                       content={entry.content}
                       mood={entry.mood}
                       createdAt={entry.created_at}
-                      sharedWithAdmin={entry.shared_with_admin}
                       onClick={() => navigate(`/app/journal/${entry.id}`)}
                     />
                   ))}
