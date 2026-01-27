@@ -237,28 +237,6 @@ export default function AppInspireDetail() {
             </div>
           )}
 
-          {/* Completion Section */}
-          <div className="mt-10 py-8 border-t border-border">
-            <div className="text-center">
-              <CheckCircle className="w-12 h-12 text-primary mx-auto mb-3" />
-              <h3 className="text-lg font-semibold text-foreground">You're all set!</h3>
-              <p className="text-muted-foreground mt-1">
-                Add this routine to your planner to start building better habits.
-              </p>
-            </div>
-          </div>
-
-          {/* Rating Section */}
-          <div className="mt-6 py-6 border-t border-border">
-            <div className="text-center">
-              <p className="text-muted-foreground mb-3">How did you find this content?</p>
-              <StarRating
-                rating={plan.userRating}
-                onRate={handleRate}
-                size="lg"
-              />
-            </div>
-          </div>
         </div>
       </div>
 
