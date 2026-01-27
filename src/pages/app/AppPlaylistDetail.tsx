@@ -344,21 +344,31 @@ export default function AppPlaylistDetail() {
 
   const handleAddToRoutine = () => {
     if (!playlist || !playlistId) return;
-
-    // If there's a linked Pro Routine with tasks, show the preview sheet
-    if (fullRoutinePlan?.tasks && fullRoutinePlan.tasks.length > 0) {
-      setShowRoutineSheet(true);
-    } else {
-      // Quick-add directly as a playlist task
-      quickAddTask.mutate({ 
-        playlistId, 
-        playlistName: playlist.name 
-      });
-    }
+    // Always show the routine sheet for editing before saving
+    setShowRoutineSheet(true);
   };
 
+  // Create fallback task for playlists without a linked Pro Routine
+  const fallbackRoutineTasks = playlist && !fullRoutinePlan?.tasks ? [{
+    id: `playlist-${playlistId}`,
+    plan_id: `synthetic-${playlistId}`,
+    title: `Listen to ${playlist.name}`,
+    icon: '🎧',
+    duration_minutes: 15,
+    task_order: 0,
+    is_active: true,
+    linked_playlist_id: playlistId,
+    pro_link_type: 'playlist' as const,
+    pro_link_value: playlistId,
+    created_at: new Date().toISOString(),
+  }] : null;
+
+  // Use linked routine tasks or fallback
+  const routineTasks = fullRoutinePlan?.tasks || fallbackRoutineTasks;
+  const routineTitle = fullRoutinePlan?.title || playlist?.name || 'Playlist Routine';
+
   const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: Record<string, any>) => {
-    if (!fullRoutinePlan?.tasks) return;
+    if (!routineTasks || !playlist || !playlistId) return;
     
     // Transform edited tasks to the format expected by useAddRoutinePlan
     const transformedEditedTasks = Object.entries(editedTasks).map(([id, edits]) => ({
@@ -372,11 +382,25 @@ export default function AppPlaylistDetail() {
     }));
 
     try {
-      await addRoutinePlan.mutateAsync({
-        planId: fullRoutinePlan.id,
-        selectedTaskIds,
-        editedTasks: transformedEditedTasks,
-      });
+      if (fullRoutinePlan?.id) {
+        // Has a linked Pro Routine - use the normal flow
+        await addRoutinePlan.mutateAsync({
+          planId: fullRoutinePlan.id,
+          selectedTaskIds,
+          editedTasks: transformedEditedTasks,
+        });
+      } else {
+        // No linked routine - use quick add with edits
+        const editedTask = transformedEditedTasks[0];
+        await quickAddTask.mutateAsync({ 
+          playlistId, 
+          playlistName: editedTask?.title || playlist.name,
+          scheduledTime: editedTask?.scheduledTime,
+          repeatPattern: editedTask?.repeatPattern,
+          color: editedTask?.color,
+          icon: editedTask?.icon,
+        });
+      }
       setShowRoutineSheet(false);
       toast.success('Added to your routine!');
     } catch (error) {
@@ -828,15 +852,15 @@ export default function AppPlaylistDetail() {
           } : undefined}
         />
 
-        {/* Routine Preview Sheet */}
-        {fullRoutinePlan?.tasks && (
+        {/* Routine Preview Sheet - works with linked Pro Routine or fallback task */}
+        {routineTasks && routineTasks.length > 0 && (
           <RoutinePreviewSheet
             open={showRoutineSheet}
             onOpenChange={setShowRoutineSheet}
-            tasks={fullRoutinePlan.tasks}
-            routineTitle={fullRoutinePlan.title}
+            tasks={routineTasks}
+            routineTitle={routineTitle}
             onSave={handleSaveRoutine}
-            isSaving={addRoutinePlan.isPending}
+            isSaving={addRoutinePlan.isPending || quickAddTask.isPending}
           />
         )}
         

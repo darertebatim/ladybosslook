@@ -548,9 +548,17 @@ export const useQuickAddPlaylistTask = () => {
     mutationFn: async ({ 
       playlistId, 
       playlistName,
+      scheduledTime,
+      repeatPattern,
+      color,
+      icon,
     }: { 
       playlistId: string; 
       playlistName: string;
+      scheduledTime?: string | null;
+      repeatPattern?: RepeatPattern;
+      color?: TaskColor;
+      icon?: string;
     }) => {
       if (!user?.id) throw new Error('Not authenticated');
 
@@ -559,10 +567,11 @@ export const useQuickAddPlaylistTask = () => {
         .insert({
           user_id: user.id,
           title: playlistName,
-          emoji: '🎧',
-          color: 'sky' as TaskColor,
-          repeat_pattern: 'daily' as RepeatPattern,
+          emoji: icon || '🎧',
+          color: (color || 'sky') as TaskColor,
+          repeat_pattern: (repeatPattern || 'daily') as RepeatPattern,
           repeat_days: [],
+          scheduled_time: scheduledTime || null,
           pro_link_type: 'playlist' as const,
           pro_link_value: playlistId,
           linked_playlist_id: playlistId,
