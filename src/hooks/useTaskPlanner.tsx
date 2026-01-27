@@ -494,18 +494,23 @@ export const useCreateTask = () => {
       }
 
       // Schedule urgent alarm if enabled (uses Calendar for loud alarms)
-      if (taskData.is_urgent && taskData.scheduled_time && taskData.scheduled_date && isUrgentAlarmAvailable()) {
+      // For recurring tasks, this schedules 7 days of alarms
+      if (taskData.is_urgent && taskData.scheduled_time && isUrgentAlarmAvailable()) {
         const alarmResult = await scheduleUrgentAlarm({
           taskId: task.id,
           title: taskData.title,
           emoji: taskData.emoji || '☀️',
-          scheduledDate: taskData.scheduled_date,
+          scheduledDate: taskData.scheduled_date || format(new Date(), 'yyyy-MM-dd'),
           scheduledTime: taskData.scheduled_time,
           reminderOffset: taskData.reminder_offset || 0,
+          repeatPattern: taskData.repeat_pattern || 'none',
+          repeatDays: taskData.repeat_days,
         });
         
         if (!alarmResult.success && alarmResult.error) {
           console.warn('[CreateTask] Urgent alarm scheduling failed:', alarmResult.error);
+        } else if (alarmResult.scheduledCount) {
+          console.log(`[CreateTask] Scheduled ${alarmResult.scheduledCount} urgent alarms`);
         }
       }
 
@@ -639,18 +644,23 @@ export const useUpdateTask = () => {
       }
 
       // Schedule urgent alarm if enabled (uses Calendar for loud alarms)
-      if (task.is_urgent && task.scheduled_time && task.scheduled_date && isUrgentAlarmAvailable()) {
+      // For recurring tasks, this schedules 7 days of alarms
+      if (task.is_urgent && task.scheduled_time && isUrgentAlarmAvailable()) {
         const alarmResult = await scheduleUrgentAlarm({
           taskId: task.id,
           title: task.title,
           emoji: task.emoji,
-          scheduledDate: task.scheduled_date,
+          scheduledDate: task.scheduled_date || format(new Date(), 'yyyy-MM-dd'),
           scheduledTime: task.scheduled_time,
           reminderOffset: task.reminder_offset,
+          repeatPattern: task.repeat_pattern,
+          repeatDays: task.repeat_days,
         });
         
         if (!alarmResult.success) {
           console.warn('[UpdateTask] Urgent alarm not scheduled:', alarmResult.error);
+        } else if (alarmResult.scheduledCount) {
+          console.log(`[UpdateTask] Scheduled ${alarmResult.scheduledCount} urgent alarms`);
         }
       }
 
