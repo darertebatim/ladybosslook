@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Check, Loader2, Trash2, Share2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -34,7 +34,6 @@ const AppJournalEntry = () => {
   const [mood, setMood] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showShareDialog, setShowShareDialog] = useState(false);
   const [entryIdState, setEntryIdState] = useState<string | null>(entryId || null);
   const [isTextareaFocused, setIsTextareaFocused] = useState(false);
   
@@ -176,21 +175,6 @@ const AppJournalEntry = () => {
     }
   };
 
-  const handleShare = async () => {
-    if (!entryIdState) return;
-    
-    try {
-      await updateMutation.mutateAsync({
-        id: entryIdState,
-        shared_with_admin: true,
-      });
-      toast.success('Journal entry shared with Razie');
-      setShowShareDialog(false);
-    } catch (error) {
-      // Error handled by mutation
-    }
-  };
-
   // Show skeleton for existing entries while loading
   if (!isNewEntry && isLoading) {
     return (
@@ -215,7 +199,6 @@ const AppJournalEntry = () => {
   }
 
   const showWritingPrompts = isNewEntry && !content.trim() && !isTextareaFocused;
-  const canShare = entryIdState && !existingEntry?.shared_with_admin && content.trim();
   const canDelete = entryIdState;
 
   return (
@@ -318,19 +301,6 @@ const AppJournalEntry = () => {
               </Button>
             )}
           </div>
-          
-          <div className="flex items-center gap-2">
-            {canShare && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowShareDialog(true)}
-              >
-                <Share2 className="h-4 w-4 mr-1" />
-                Share with Razie
-              </Button>
-            )}
-          </div>
         </div>
       </div>
 
@@ -350,25 +320,6 @@ const AppJournalEntry = () => {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Share Confirmation Dialog */}
-      <AlertDialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Share with Razie?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will share your journal entry with Razie for personal feedback and support. 
-              Your entry will remain private otherwise.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleShare}>
-              Share Entry
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
