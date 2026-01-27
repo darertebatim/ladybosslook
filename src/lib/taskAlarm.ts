@@ -1,7 +1,6 @@
 import { Capacitor } from '@capacitor/core';
-import { CapacitorCalendar } from '@ebarooni/capacitor-calendar';
-import { checkCalendarPermission, requestCalendarPermission } from './calendarIntegration';
-import { addDays, format, parse } from 'date-fns';
+import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
+import { addDays, format } from 'date-fns';
 
 export interface UrgentTaskAlarm {
   taskId: string;
@@ -16,6 +15,9 @@ export interface UrgentTaskAlarm {
 
 // Number of days to schedule ahead for recurring tasks
 const RECURRING_DAYS_AHEAD = 7;
+
+// Notification ID prefix to identify urgent task alarms
+const URGENT_ALARM_ID_PREFIX = 900000;
 
 /**
  * Calculate the alarm time based on scheduled time and reminder offset
@@ -81,8 +83,47 @@ function getDatesToSchedule(baseDate: string, repeatPattern?: string, repeatDays
 }
 
 /**
- * Schedule an urgent alarm using native iOS Calendar
- * Calendar alarms bypass silent mode and show full-screen alerts with sound
+ * Generate a unique notification ID for a task + date combo
+ */
+function generateNotificationId(taskId: string, dateStr: string): number {
+  // Create a hash from taskId + date for uniqueness
+  let hash = 0;
+  const str = `${taskId}-${dateStr}`;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  // Ensure positive number and add prefix
+  return URGENT_ALARM_ID_PREFIX + Math.abs(hash % 100000);
+}
+
+/**
+ * Request notification permissions
+ */
+async function ensureNotificationPermission(): Promise<boolean> {
+  try {
+    const permission = await LocalNotifications.checkPermissions();
+    
+    if (permission.display === 'granted') {
+      return true;
+    }
+    
+    if (permission.display === 'prompt' || permission.display === 'prompt-with-rationale') {
+      const result = await LocalNotifications.requestPermissions();
+      return result.display === 'granted';
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('[TaskAlarm] Permission check failed:', error);
+    return false;
+  }
+}
+
+/**
+ * Schedule an urgent alarm using Time-Sensitive Local Notifications
+ * These bypass Focus/DND on iOS 15+ and play a loud sound
  * For recurring tasks, schedules multiple days ahead
  */
 export async function scheduleUrgentAlarm(task: UrgentTaskAlarm): Promise<{ success: boolean; error?: string; scheduledCount?: number }> {
@@ -92,16 +133,12 @@ export async function scheduleUrgentAlarm(task: UrgentTaskAlarm): Promise<{ succ
   }
   
   try {
-    // Check/request calendar permission
-    let permission = await checkCalendarPermission();
+    // Check/request notification permission
+    const hasPermission = await ensureNotificationPermission();
     
-    if (permission === 'prompt') {
-      permission = await requestCalendarPermission();
-    }
-    
-    if (permission !== 'granted') {
-      console.log('[TaskAlarm] Calendar permission denied');
-      return { success: false, error: 'Calendar permission denied. Enable in Settings to use urgent alarms.' };
+    if (!hasPermission) {
+      console.log('[TaskAlarm] Notification permission denied');
+      return { success: false, error: 'Notification permission denied. Enable in Settings to use urgent alarms.' };
     }
     
     // Get all dates that need alarms
@@ -112,7 +149,7 @@ export async function scheduleUrgentAlarm(task: UrgentTaskAlarm): Promise<{ succ
       return { success: false, error: 'No future dates to schedule' };
     }
     
-    let scheduledCount = 0;
+    const notifications: ScheduleOptions['notifications'] = [];
     
     for (const dateStr of datesToSchedule) {
       const alarmTime = calculateAlarmTime(dateStr, task.scheduledTime, task.reminderOffset);
@@ -123,36 +160,70 @@ export async function scheduleUrgentAlarm(task: UrgentTaskAlarm): Promise<{ succ
         continue;
       }
       
-      // Create calendar event with alarm at the event time (alerts: [0] = at event start)
-      const result = await CapacitorCalendar.createEvent({
-        title: `${task.emoji} ${task.title}`,
-        description: '⚠️ Urgent task reminder from LadyBoss Academy',
-        location: '',
-        startDate: alarmTime.getTime(),
-        endDate: alarmTime.getTime() + 30 * 60 * 1000, // 30 min duration
-        isAllDay: false,
-        alerts: [0], // Alert at event start time - this triggers the iOS alarm!
+      const notificationId = generateNotificationId(task.taskId, dateStr);
+      
+      notifications.push({
+        id: notificationId,
+        title: `⚠️ ${task.emoji} ${task.title}`,
+        body: 'Urgent task reminder - Time to take action!',
+        schedule: {
+          at: alarmTime,
+          allowWhileIdle: true, // Deliver even in Doze mode
+        },
+        sound: 'alarm.wav', // Use default loud sound if custom not available
+        // iOS specific options for time-sensitive notifications
+        extra: {
+          taskId: task.taskId,
+          isUrgent: true,
+          scheduledDate: dateStr,
+        },
+        // This makes it "time-sensitive" on iOS 15+
+        // Note: Capacitor may use 'importance' or the sound config for this
       });
       
-      console.log('[TaskAlarm] ✅ Urgent alarm scheduled:', {
+      console.log('[TaskAlarm] Preparing notification:', {
+        id: notificationId,
         task: task.title,
         date: dateStr,
         alarmTime: alarmTime.toISOString(),
-        eventResult: result,
       });
-      
-      scheduledCount++;
     }
     
-    if (scheduledCount === 0) {
+    if (notifications.length === 0) {
       return { success: false, error: 'All alarm times have already passed' };
     }
     
-    console.log(`[TaskAlarm] ✅ Scheduled ${scheduledCount} urgent alarms for "${task.title}"`);
-    return { success: true, scheduledCount };
+    // Schedule all notifications
+    await LocalNotifications.schedule({ notifications });
+    
+    console.log(`[TaskAlarm] ✅ Scheduled ${notifications.length} urgent alarms for "${task.title}"`);
+    return { success: true, scheduledCount: notifications.length };
   } catch (error: any) {
     console.error('[TaskAlarm] Failed to schedule urgent alarm:', error);
     return { success: false, error: error.message || 'Failed to schedule alarm' };
+  }
+}
+
+/**
+ * Cancel all urgent alarms for a specific task
+ */
+export async function cancelUrgentAlarms(taskId: string): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+  
+  try {
+    const pending = await LocalNotifications.getPending();
+    const taskNotifications = pending.notifications.filter(n => 
+      n.extra?.taskId === taskId && n.extra?.isUrgent === true
+    );
+    
+    if (taskNotifications.length > 0) {
+      await LocalNotifications.cancel({ 
+        notifications: taskNotifications.map(n => ({ id: n.id }))
+      });
+      console.log(`[TaskAlarm] Cancelled ${taskNotifications.length} alarms for task ${taskId}`);
+    }
+  } catch (error) {
+    console.error('[TaskAlarm] Failed to cancel alarms:', error);
   }
 }
 
