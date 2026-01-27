@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
+import { LocalNotifications, LocalNotificationSchema } from '@capacitor/local-notifications';
 import { addDays, format } from 'date-fns';
 
 export interface UrgentTaskAlarm {
@@ -149,7 +149,7 @@ export async function scheduleUrgentAlarm(task: UrgentTaskAlarm): Promise<{ succ
       return { success: false, error: 'No future dates to schedule' };
     }
     
-    const notifications: ScheduleOptions['notifications'] = [];
+    const notifications: LocalNotificationSchema[] = [];
     
     for (const dateStr of datesToSchedule) {
       const alarmTime = calculateAlarmTime(dateStr, task.scheduledTime, task.reminderOffset);
