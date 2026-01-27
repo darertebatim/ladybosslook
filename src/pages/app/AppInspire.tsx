@@ -129,33 +129,7 @@ export default function AppInspire() {
             </div>
           )}
 
-          {/* Pro Routines Section */}
-          {proPlans && proPlans.length > 0 && selectedCategory === 'popular' && !searchQuery && (
-            <div className="mt-5">
-              <div className="flex items-center gap-2 px-4 mb-3">
-                <Sparkles className="w-4 h-4 text-violet-500" />
-                <h2 className="text-sm font-semibold text-muted-foreground">
-                  PRO ROUTINES
-                </h2>
-              </div>
-              <ScrollArea className="w-full">
-                <div className="flex gap-3 px-4 pb-2">
-                  {proPlans.map((plan) => (
-                    <div key={plan.id} className="w-40 shrink-0 relative">
-                      <div className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-violet-500 flex items-center justify-center shadow-md">
-                        <Sparkles className="h-3 w-3 text-white" />
-                      </div>
-                      <RoutinePlanCard
-                        plan={plan}
-                        onClick={() => navigate(`/app/routines/${plan.id}`)}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <ScrollBar orientation="horizontal" className="invisible" />
-              </ScrollArea>
-            </div>
-          )}
+          {/* Pro Routines Section - only shown when Pro category is selected */}
 
           {/* Categories */}
           {categories && categories.length > 0 && (
