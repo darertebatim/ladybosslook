@@ -39,11 +39,8 @@ export default function AppInspire() {
     if (selectedCategory === 'popular') {
       return popularPlans;
     }
-    if (selectedCategory) {
-      return filteredPlans;
-    }
-    // "All" shows everything
-    return filteredPlans || popularPlans;
+    // Category-specific plans
+    return filteredPlans;
   }, [selectedCategory, filteredPlans, popularPlans]);
 
   const isLoading = categoriesLoading || popularLoading || (selectedCategory && selectedCategory !== 'popular' && plansLoading);
@@ -126,14 +123,14 @@ export default function AppInspire() {
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full">
         <div className="pb-safe w-full max-w-full">
           {/* Featured Banner Carousel */}
-          {featuredPlans && featuredPlans.length > 0 && !selectedCategory && !searchQuery && (
+          {featuredPlans && featuredPlans.length > 0 && selectedCategory === 'popular' && !searchQuery && (
             <div className="px-4 pt-4">
               <InspireBanner plans={featuredPlans} />
             </div>
           )}
 
           {/* Pro Routines Section */}
-          {proPlans && proPlans.length > 0 && !selectedCategory && !searchQuery && (
+          {proPlans && proPlans.length > 0 && selectedCategory === 'popular' && !searchQuery && (
             <div className="mt-5">
               <div className="flex items-center gap-2 px-4 mb-3">
                 <Sparkles className="w-4 h-4 text-violet-500" />
@@ -175,13 +172,6 @@ export default function AppInspire() {
                     isSelected={selectedCategory === 'popular'}
                     onClick={() => setSelectedCategory('popular')}
                   />
-                  <CategoryCircle
-                    name="All"
-                    icon="LayoutGrid"
-                    color="purple"
-                    isSelected={!selectedCategory}
-                    onClick={() => setSelectedCategory(null)}
-                  />
                   {categories.map((category) => (
                     <CategoryCircle
                       key={category.id}
@@ -203,9 +193,7 @@ export default function AppInspire() {
             <h2 className="text-sm font-semibold text-muted-foreground mb-3">
               {selectedCategory === 'popular'
                 ? 'POPULAR ROUTINES'
-                : selectedCategory 
-                  ? categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'ROUTINES'
-                  : 'ALL ROUTINES'
+                : categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'ROUTINES'
               }
             </h2>
 
@@ -244,9 +232,7 @@ export default function AppInspire() {
                 <h2 className="text-sm font-semibold text-muted-foreground">
                   {selectedCategory === 'popular' 
                     ? 'POPULAR TASKS'
-                    : selectedCategory 
-                      ? `${categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'CATEGORY'} TASKS` 
-                      : 'ALL TASKS'
+                    : `${categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'CATEGORY'} TASKS`
                   }
                 </h2>
               </div>
