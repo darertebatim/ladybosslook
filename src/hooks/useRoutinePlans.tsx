@@ -101,14 +101,7 @@ export function useRoutineCategories() {
         .order('display_order', { ascending: true });
 
       if (error) throw error;
-      
-      // Sort "All" category to the end
-      const categories = data as RoutineCategory[];
-      return categories.sort((a, b) => {
-        if (a.slug === 'all') return 1;
-        if (b.slug === 'all') return -1;
-        return 0; // Keep original order for others
-      });
+      return data as RoutineCategory[];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 30, // 30 minutes cache
