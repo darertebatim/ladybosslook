@@ -45,9 +45,14 @@ export const GoalSettingsSheet = ({
 }: GoalSettingsSheetProps) => {
   const [enabled, setEnabled] = useState(value.enabled);
   const [goalType, setGoalType] = useState<GoalType>(value.type);
-  const [timerMinutes, setTimerMinutes] = useState(Math.floor(value.target / 60).toString());
-  const [timerSeconds, setTimerSeconds] = useState((value.target % 60).toString().padStart(2, '0'));
-  const [countValue, setCountValue] = useState(value.target.toString());
+  // Default timer: 1 min (if target is 0 or very small, use 1 min)
+  const initialMins = value.type === 'timer' && value.target > 0 ? Math.floor(value.target / 60) : 1;
+  const initialSecs = value.type === 'timer' && value.target > 0 ? value.target % 60 : 0;
+  const [timerMinutes, setTimerMinutes] = useState(initialMins.toString());
+  const [timerSeconds, setTimerSeconds] = useState(initialSecs.toString().padStart(2, '0'));
+  // Default count: 2 (if target is 0 or 1 for count, use 2)
+  const initialCount = value.type === 'count' && value.target > 1 ? value.target : 2;
+  const [countValue, setCountValue] = useState(initialCount.toString());
   const [unit, setUnit] = useState(value.unit);
 
   // Keypad states
@@ -74,10 +79,13 @@ export const GoalSettingsSheet = ({
     setEnabled(value.enabled);
     setGoalType(value.type);
     if (value.type === 'timer') {
-      setTimerMinutes(Math.floor(value.target / 60).toString());
-      setTimerSeconds((value.target % 60).toString().padStart(2, '0'));
+      const mins = value.target > 0 ? Math.floor(value.target / 60) : 1;
+      const secs = value.target > 0 ? value.target % 60 : 0;
+      setTimerMinutes(mins.toString());
+      setTimerSeconds(secs.toString().padStart(2, '0'));
     } else {
-      setCountValue(value.target.toString() || '1');
+      const count = value.target > 1 ? value.target : 2;
+      setCountValue(count.toString());
     }
     setUnit(value.unit);
   }, [value]);
@@ -146,6 +154,7 @@ export const GoalSettingsSheet = ({
         <SheetContent 
           side="bottom" 
           className="h-[85vh] rounded-t-3xl px-0 pt-0 bg-[#E8F5F0]"
+          hideCloseButton
         >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-4 bg-[#E8F5F0]">
