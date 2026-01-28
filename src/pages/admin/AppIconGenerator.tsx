@@ -67,7 +67,7 @@ export default function AppIconGenerator() {
                 AI Icon Generator
               </CardTitle>
               <CardDescription>
-                Creates a crown icon with magenta-to-rose-gold gradient and golden accents (edge-to-edge, no borders)
+                Creates a glassmorphism crown icon with purple/magenta gradient and golden accents
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
