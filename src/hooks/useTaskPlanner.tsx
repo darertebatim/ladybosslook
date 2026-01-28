@@ -238,8 +238,26 @@ export const useTasksForDate = (date: Date) => {
     return false;
   });
 
+  // Sort tasks: scheduled times first (chronologically), then "Anytime" tasks by order_index
+  const sortedTasks = [...tasksForDate].sort((a, b) => {
+    const aHasTime = !!a.scheduled_time;
+    const bHasTime = !!b.scheduled_time;
+    
+    // Both have times - sort chronologically
+    if (aHasTime && bHasTime) {
+      return a.scheduled_time!.localeCompare(b.scheduled_time!);
+    }
+    
+    // One has time, one doesn't - timed tasks come first
+    if (aHasTime && !bHasTime) return -1;
+    if (!aHasTime && bHasTime) return 1;
+    
+    // Neither has time - sort by order_index
+    return a.order_index - b.order_index;
+  });
+
   return {
-    data: tasksForDate,
+    data: sortedTasks,
     isLoading,
   };
 };
