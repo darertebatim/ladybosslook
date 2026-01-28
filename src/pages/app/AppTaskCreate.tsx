@@ -162,11 +162,11 @@ const AppTaskCreate = ({
   const [proLinkValue, setProLinkValue] = useState<string | null>(initialData?.proLinkValue ?? null);
   const [newTagName, setNewTagName] = useState('');
   
-  // Goal settings state
+  // Goal settings state - defaults: timer=1 min (60s), count=2
   const [goalSettings, setGoalSettings] = useState<GoalSettings>({
     enabled: initialData?.goalEnabled ?? false,
     type: initialData?.goalType ?? 'count',
-    target: initialData?.goalTarget ?? 1,
+    target: initialData?.goalTarget ?? 2,
     unit: initialData?.goalUnit ?? 'times',
   });
 
