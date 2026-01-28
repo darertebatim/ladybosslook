@@ -57,7 +57,7 @@ export interface RoutinePlanTask {
   created_at: string;
   linked_playlist_id: string | null;
   // Pro Task fields
-  pro_link_type: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
+  pro_link_type: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | null;
   pro_link_value: string | null;
   // Joined data
   linked_playlist?: {
@@ -352,7 +352,7 @@ export function useAddRoutinePlan() {
         scheduledTime?: string | null;
         tag?: string | null;
         linked_playlist_id?: string | null;
-        pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
+        pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | null;
         pro_link_value?: string | null;
       }[];
     }) => {

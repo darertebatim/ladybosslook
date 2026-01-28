@@ -5,11 +5,12 @@ import {
   GraduationCap, 
   Calendar, 
   Sparkles, 
-  Link 
+  Link,
+  Wind 
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -50,6 +51,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     badgeColorClass: 'bg-purple-500/20 text-purple-700 dark:text-purple-300',
     buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
     description: 'Open the journal editor',
+    requiresValue: false,
+  },
+  breathe: {
+    value: 'breathe',
+    label: 'Breathing Exercise',
+    icon: Wind,
+    badgeText: 'Breathe',
+    color: 'indigo',
+    gradientClass: 'bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40',
+    iconColorClass: 'text-indigo-600 dark:text-indigo-400',
+    badgeColorClass: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open breathing exercises',
     requiresValue: false,
   },
   channel: {
@@ -128,6 +142,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return `/app/player/playlist/${linkValue}`;
     case 'journal':
       return '/app/journal/new';
+    case 'breathe':
+      return linkValue ? `/app/breathe?exercise=${linkValue}` : '/app/breathe';
     case 'channel':
       return `/app/channels?channel=${linkValue}`;
     case 'program':
