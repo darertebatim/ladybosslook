@@ -243,6 +243,34 @@ const AppTaskCreate = ({
   const { data: userTags = [] } = useUserTags();
   const createTag = useCreateTag();
 
+  // Check for existing goal progress (task completions)
+  const { data: hasExistingProgress = false } = useQuery({
+    queryKey: ['task-has-progress', taskId],
+    queryFn: async () => {
+      if (!taskId) return false;
+      
+      const { data, error } = await supabase
+        .from('task_completions')
+        .select('id')
+        .eq('task_id', taskId)
+        .limit(1);
+      
+      if (error) return false;
+      return (data?.length ?? 0) > 0;
+    },
+    enabled: !!taskId && !isSheet,
+  });
+
+  // Handler to reset progress when goal type/unit changes
+  const handleResetProgress = async () => {
+    if (!taskId) return;
+    
+    await supabase
+      .from('task_completions')
+      .delete()
+      .eq('task_id', taskId);
+  };
+
   // Reset form when initialData changes (sheet mode)
   useEffect(() => {
     if (isSheet && initialData) {
@@ -801,6 +829,8 @@ const AppTaskCreate = ({
         onOpenChange={setShowGoalSettings}
         value={goalSettings}
         onChange={setGoalSettings}
+        hasExistingProgress={hasExistingProgress}
+        onResetProgress={handleResetProgress}
       />
 
       {/* Date Picker Sheet - Me+ Full Page Style */}
