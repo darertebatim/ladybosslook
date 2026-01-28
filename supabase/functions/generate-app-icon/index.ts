@@ -16,7 +16,7 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const prompt = `Minimal elegant crown silhouette, simplified iconic design, liquid glass glassmorphism aesthetic, translucent frosted glass effect, subtle depth with layered transparency, soft glows and reflections, purple to pink gradient base with glass overlay, subtle gold amber accents for premium touch, clean minimal design, pure white background edge to edge, NO frame NO border NO rounded corners NO card shape NO container, crown fills the canvas, 1024x1024 square, no text, ultra high resolution, premium modern futuristic feel`;
+    const prompt = `Create a modern, minimalist app icon for an assertiveness training app called 'Courageous Character'. Feature a bold, stylized phoenix or flame symbol in the center. Use a vibrant gradient background that transitions from deep magenta/purple at the bottom to warm orange/red at the top, filling the entire 1024x1024 canvas edge-to-edge with NO white borders or padding. The phoenix/flame should be golden-yellow with subtle orange highlights, positioned prominently in the center. The design should be clean, professional, and suitable for an iOS app icon with automatic rounded corners applied by the system. Make sure the background gradient extends all the way to all four edges of the square canvas.`;
 
     console.log('Generating app icon with prompt:', prompt);
 
