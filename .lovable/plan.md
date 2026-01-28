@@ -1,82 +1,143 @@
 
+# Timer Goal Feature Implementation Plan
 
-# Toast Notification Redesign Plan
+## Overview
+This plan adds the timer-based goal functionality for tasks, matching the Me+ app experience. When a task has a "Timer" type goal, tapping the Play button opens a full-screen countdown timer with pause/stop/complete controls.
 
-## Problem
-Toast notifications appear at the very bottom of the screen and are often missed by users. The screenshot shows the toast "Let's focus on today's routine" is barely visible, hidden behind the FAB button area.
+## Current State Analysis
+- **Goal types exist**: Tasks support `goal_type: 'timer' | 'count'` in the database
+- **Count goals work**: GoalInputSheet handles count-type goals with number input
+- **Timer goals missing**: No Play button, no timer screen, no countdown functionality
+- **Input validation missing**: Minutes accepts 100+, seconds accepts 60+
 
-## Current Implementation
-- The app uses **Sonner** library for modern toast notifications
-- The `Toaster` component from `src/components/ui/sonner.tsx` is mounted in `App.tsx`
-- Current position: **bottom-right** (Sonner's default)
-- No `position` prop is explicitly set
+## Features to Implement
 
-## Solution Overview
+### 1. Input Validation with Toasts
+**File: `src/components/app/GoalSettingsSheet.tsx`**
+- Add validation in NumberKeypad onChange handlers:
+  - Minutes: max 99 (show "0-99 only" toast badge like Me+)
+  - Seconds: max 59 (show "0-59 only" toast badge)
+- Show a pill-shaped badge inside keypad when limit is exceeded
+- Prevent invalid values from being entered
 
-Redesign toasts to appear at the **top center** of the screen with improved styling that matches the app's native feel.
+### 2. TaskCard Updates - Play Button for Timer Goals
+**File: `src/components/app/TaskCard.tsx`**
+- Detect timer-type goals: `task.goal_type === 'timer'`
+- Show Play icon (▶) button instead of Plus (+) for timer goals
+- Display "Goal: 0/20 minutes" format for timer goals
+- Handler: `onOpenTimer` instead of `onOpenGoalInput` for timer tasks
 
-### Changes
+### 3. New Timer Screen Component
+**File: `src/components/app/TaskTimerScreen.tsx` (NEW)**
 
-**1. Update Sonner Toaster Position** (`src/components/ui/sonner.tsx`)
-- Add `position="top-center"` to move toasts to the top of the screen
-- Add `offset` prop for proper safe area spacing on iOS
-- Update styling for a more prominent, pill-shaped appearance that matches the app's design language
+Full-screen timer interface with:
+- **Header**: Task emoji, title, goal progress (e.g., "Goal: 0/20 minutes")
+- **Timer Display**: 
+  - Large countdown (MM:SS format)
+  - Dashed oval/ellipse border around timer
+  - Border fills with white as progress accumulates
+- **Controls** (bottom):
+  - Pause button (⏸) - left side
+  - "Mark as complete" button - center
+  - Stop button (⏹) - right side
 
-**2. Enhanced Styling**
-- Increase border-radius for a pill/capsule shape (matching the app's rounded design)
-- Add subtle shadow for better visibility
-- Slightly increase padding for better touch targets
-- Add safe-area-aware top offset for iOS notch devices
+**Timer Logic**:
+- Timer counts DOWN from remaining time (goal_target - progress)
+- Pause: stops countdown, saves current elapsed
+- Stop: saves elapsed seconds to goal_progress, returns to home
+- Mark as complete: sets goal_progress = goal_target, marks done
+- Timer hits 0: shows "Done" screen with "I did it!" button
 
-### Visual Design
-```
-┌────────────────────────────────────────┐
-│  ┌──────────────────────────────────┐  │ ← Top of screen
-│  │  Let's focus on today's routine. │  │ ← New toast position
-│  │  You can complete when the day   │  │
-│  │  comes.                          │  │
-│  └──────────────────────────────────┘  │
-│                                        │
-│        [Calendar & Tasks UI]           │
-│                                        │
-└────────────────────────────────────────┘
-```
+**Progress Storage**:
+- Goal progress stored in seconds in `task_completions.goal_progress`
+- Progress persists between sessions (can resume later)
+
+### 4. Timer State Management
+**File: `src/hooks/useTaskPlanner.tsx`**
+- `useAddTimerProgress` mutation: Add seconds to goal_progress
+- Similar to `useAddGoalProgress` but for timer (adds seconds directly)
+
+### 5. AppHome Integration
+**File: `src/pages/app/AppHome.tsx`**
+- Add `timerTask` state for full-screen timer
+- Pass `onOpenTimer` handler to SortableTaskList
+- Render TaskTimerScreen when timerTask is set
+
+### 6. SortableTaskList Updates
+**File: `src/components/app/SortableTaskList.tsx`**
+- Add `onOpenTimer` prop for timer-goal tasks
+- Distinguish between count goals and timer goals
+
+### 7. TaskDetailModal Updates  
+**File: `src/components/app/TaskDetailModal.tsx`**
+- For timer goals: Show Play button instead of + button
+- Trigger timer screen when Play is tapped
 
 ---
 
 ## Technical Details
 
-### File: `src/components/ui/sonner.tsx`
-
-Update the Sonner `Toaster` component:
-
-```tsx
-<Sonner
-  theme={theme as ToasterProps["theme"]}
-  position="top-center"
-  offset="60px"  // Account for iOS notch + header
-  className="toaster group"
-  toastOptions={{
-    classNames: {
-      toast:
-        "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-xl group-[.toaster]:rounded-2xl",
-      description: "group-[.toast]:text-muted-foreground",
-      actionButton:
-        "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-      cancelButton:
-        "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
-    },
-  }}
-  {...props}
-/>
+### TaskTimerScreen Component Structure
+```text
+┌────────────────────────────────────────┐
+│                                        │
+│           🧘 (emoji, large)            │
+│              Yoga                       │
+│        Goal: 0/20 minutes              │
+│                                        │
+│    ╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮           │
+│   ╎                        ╎           │
+│   ╎        19:53           ╎           │
+│   ╎    (countdown timer)   ╎           │
+│   ╎                        ╎           │
+│    ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯           │
+│     (dashed oval, fills white)         │
+│                                        │
+│                                        │
+│  ⏸      [Mark as complete]      ⏹     │
+│                                        │
+└────────────────────────────────────────┘
 ```
 
-### Key Props:
-- `position="top-center"`: Moves toasts to the top-center of the screen
-- `offset="60px"`: Provides spacing from the top to avoid the iOS notch/dynamic island and app header
-- Enhanced `rounded-2xl` and `shadow-xl` for better visibility
+### Timer Progress Circle (SVG)
+- Use SVG ellipse with dashed stroke
+- Calculate stroke-dasharray based on progress percentage
+- Animate fill as timer progresses
 
-### No Changes Needed To:
-- `src/components/app/TaskCard.tsx` - toast calls remain the same
-- Other files using `toast()` from sonner - the API is unchanged
+### NumberKeypad Validation Badge
+```text
+┌────────────────────────────────────────┐
+│  ✕              Minutes                │
+│           ┌──────────────┐             │
+│           │  0-99 only   │             │
+│           └──────────────┘             │
+│               100                      │
+│              (value)                   │
+└────────────────────────────────────────┘
+```
 
+---
+
+## Files to Create/Modify
+
+| File | Action | Description |
+|------|--------|-------------|
+| `src/components/app/TaskTimerScreen.tsx` | CREATE | Full-screen countdown timer |
+| `src/components/app/GoalSettingsSheet.tsx` | MODIFY | Add validation badges for min/sec limits |
+| `src/components/app/NumberKeypad.tsx` | MODIFY | Add validation hint/badge prop |
+| `src/components/app/TaskCard.tsx` | MODIFY | Play button for timer goals |
+| `src/components/app/TaskDetailModal.tsx` | MODIFY | Play button for timer goals |
+| `src/components/app/SortableTaskList.tsx` | MODIFY | Pass onOpenTimer handler |
+| `src/pages/app/AppHome.tsx` | MODIFY | Timer screen state + rendering |
+| `src/hooks/useTaskPlanner.tsx` | MODIFY | Timer progress mutation |
+
+---
+
+## Implementation Order
+
+1. **NumberKeypad validation** - Add hint badge and input limits
+2. **GoalSettingsSheet validation** - Enforce 0-99 min, 0-59 sec with visual feedback
+3. **TaskCard updates** - Play button for timer goals
+4. **TaskTimerScreen component** - Full timer UI with all controls
+5. **AppHome integration** - State management and rendering
+6. **Testing** - Verify timer flow, progress saving, resume functionality
