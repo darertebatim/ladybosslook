@@ -369,6 +369,92 @@ export type Database = {
           },
         ]
       }
+      breathing_exercises: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          emoji: string | null
+          exhale_hold_seconds: number
+          exhale_method: string
+          exhale_seconds: number
+          id: string
+          inhale_hold_seconds: number
+          inhale_method: string
+          inhale_seconds: number
+          is_active: boolean
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          emoji?: string | null
+          exhale_hold_seconds?: number
+          exhale_method?: string
+          exhale_seconds?: number
+          id?: string
+          inhale_hold_seconds?: number
+          inhale_method?: string
+          inhale_seconds?: number
+          is_active?: boolean
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          emoji?: string | null
+          exhale_hold_seconds?: number
+          exhale_method?: string
+          exhale_seconds?: number
+          id?: string
+          inhale_hold_seconds?: number
+          inhale_method?: string
+          inhale_seconds?: number
+          is_active?: boolean
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      breathing_sessions: {
+        Row: {
+          completed_at: string
+          duration_seconds: number
+          exercise_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          duration_seconds: number
+          exercise_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          duration_seconds?: number
+          exercise_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "breathing_sessions_exercise_id_fkey"
+            columns: ["exercise_id"]
+            isOneToOne: false
+            referencedRelation: "breathing_exercises"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       broadcast_messages: {
         Row: {
           content: string

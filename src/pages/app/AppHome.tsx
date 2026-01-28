@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
-import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft } from 'lucide-react';
+import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Wind } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
@@ -295,9 +295,12 @@ const AppHome = () => {
       }}>
           {/* Title bar */}
           <div className="flex items-center justify-between px-4 h-12">
-            {/* Left: Journal + Profile buttons */}
+            {/* Left: Breathe + Journal + Profile buttons */}
             <div className="flex items-center gap-1">
-              <button onClick={() => navigate('/app/journal')} className="p-2 -ml-2 text-foreground/70 hover:text-foreground transition-colors">
+              <button onClick={() => navigate('/app/breathe')} className="p-2 -ml-2 text-foreground/70 hover:text-foreground transition-colors">
+                <Wind className="h-5 w-5" />
+              </button>
+              <button onClick={() => navigate('/app/journal')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
                 <NotebookPen className="h-5 w-5" />
               </button>
               <button onClick={() => navigate('/app/profile')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
