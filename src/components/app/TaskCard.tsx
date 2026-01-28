@@ -110,23 +110,22 @@ export const TaskCard = memo(function TaskCard({
       <div
         onClick={handleCardClick}
         className={cn(
-          'rounded-3xl px-4 py-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-          colorClass,
-          isCompleted && 'opacity-60'
+          'rounded-3xl px-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+          colorClass
         )}
       >
         {/* Main row */}
         <div className="flex items-center gap-3">
           {/* Icon - larger emoji display */}
-          <div className="w-14 h-14 flex items-center justify-center shrink-0">
-            <ProIcon className={cn('h-7 w-7', proConfig.iconColorClass)} />
+          <div className="w-12 h-12 flex items-center justify-center shrink-0">
+            <ProIcon className={cn('h-6 w-6', proConfig.iconColorClass)} />
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
             {/* Top line: Time + Badge */}
-            <div className="flex items-center gap-2 text-sm mb-1">
-              <span className="text-foreground/60">{formatTime(task.scheduled_time)}</span>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-black font-medium">{formatTime(task.scheduled_time)}</span>
               <span className={cn(
                 'px-2 py-0.5 rounded-full text-xs font-medium',
                 proConfig.badgeColorClass
@@ -137,8 +136,8 @@ export const TaskCard = memo(function TaskCard({
             
             {/* Title */}
             <p className={cn(
-              'font-bold text-foreground text-base truncate transition-all',
-              isCompleted && 'line-through text-foreground/50'
+              'font-semibold text-black text-[15px] truncate transition-all',
+              isCompleted && 'line-through'
             )}>
               {task.title}
             </p>
@@ -192,34 +191,33 @@ export const TaskCard = memo(function TaskCard({
     <div
       onClick={handleCardClick}
       className={cn(
-        'rounded-3xl px-4 py-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-        colorClass,
-        isCompleted && 'opacity-60'
+        'rounded-3xl px-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+        colorClass
       )}
     >
       {/* Main row */}
       <div className="flex items-center gap-3">
-        {/* Icon - larger emoji display like Me+ */}
-        <div className="w-14 h-14 flex items-center justify-center shrink-0">
-          <TaskIcon iconName={task.emoji} size={32} className="text-foreground/80" />
+        {/* Icon - emoji display like Me+ */}
+        <div className="w-12 h-12 flex items-center justify-center shrink-0">
+          <TaskIcon iconName={task.emoji} size={28} className="text-black/80" />
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Top line: subtask count + time */}
-          <div className="flex items-center gap-2 text-sm text-foreground/60 mb-1">
+          <div className="flex items-center gap-2 text-sm text-black">
             {hasSubtasks && (
-              <span className="font-semibold text-foreground/70 bg-white/50 px-1.5 py-0.5 rounded text-xs">
+              <span className="font-semibold bg-white/50 px-1.5 py-0.5 rounded text-xs">
                 {completedCount}/{totalSubtasks}
               </span>
             )}
-            <span>{formatTime(task.scheduled_time)}</span>
+            <span className="font-medium">{formatTime(task.scheduled_time)}</span>
           </div>
           
-          {/* Title - larger, bolder */}
+          {/* Title */}
           <p className={cn(
-            'font-bold text-foreground text-base truncate transition-all',
-            isCompleted && 'line-through text-foreground/50'
+            'font-semibold text-black text-[15px] truncate transition-all',
+            isCompleted && 'line-through'
           )}>
             {task.title}
           </p>
