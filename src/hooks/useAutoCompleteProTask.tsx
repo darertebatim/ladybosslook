@@ -10,6 +10,8 @@ import { ProLinkType } from '@/lib/proTaskTypes';
  * For example:
  * - When user writes a journal entry → complete all 'journal' pro tasks for today
  * - When user completes an audio track → complete all 'playlist' pro tasks linked to that playlist
+ * 
+ * Also handles goal progress: if the task has a count goal, it increments goal_progress.
  */
 export const useAutoCompleteProTask = () => {
   const { user } = useAuth();
@@ -32,7 +34,7 @@ export const useAutoCompleteProTask = () => {
       // Find all active pro tasks of this type that are scheduled for today
       let query = supabase
         .from('user_tasks')
-        .select('id, title, pro_link_type, pro_link_value, scheduled_date, repeat_pattern, repeat_days')
+        .select('id, title, pro_link_type, pro_link_value, scheduled_date, repeat_pattern, repeat_days, goal_enabled, goal_type, goal_target')
         .eq('user_id', user.id)
         .eq('is_active', true)
         .eq('pro_link_type', linkType);
@@ -77,43 +79,73 @@ export const useAutoCompleteProTask = () => {
 
       if (applicableTasks.length === 0) return 0;
 
-      // Get existing completions for today to avoid duplicates
+      // Get existing completions for today to check progress
       const taskIds = applicableTasks.map(t => t.id);
       const { data: existingCompletions } = await supabase
         .from('task_completions')
-        .select('task_id')
+        .select('task_id, goal_progress')
         .eq('user_id', user.id)
         .eq('completed_date', today)
         .in('task_id', taskIds);
 
-      const alreadyCompletedIds = new Set(existingCompletions?.map(c => c.task_id) || []);
-      const tasksToComplete = applicableTasks.filter(t => !alreadyCompletedIds.has(t.id));
+      const completionMap = new Map(existingCompletions?.map(c => [c.task_id, c.goal_progress || 0]) || []);
+      
+      let tasksCompleted = 0;
 
-      if (tasksToComplete.length === 0) return 0;
-
-      // Insert completions for each task
-      const completions = tasksToComplete.map(task => ({
-        task_id: task.id,
-        user_id: user.id,
-        completed_date: today,
-      }));
-
-      const { error: insertError } = await supabase
-        .from('task_completions')
-        .insert(completions);
-
-      if (insertError) {
-        console.error('Error auto-completing tasks:', insertError);
-        return 0;
+      for (const task of applicableTasks) {
+        const currentProgress = completionMap.get(task.id) || 0;
+        const hasGoal = task.goal_enabled && task.goal_target && task.goal_target > 0;
+        const isCountGoal = hasGoal && task.goal_type === 'count';
+        
+        if (isCountGoal) {
+          // For count goals, increment progress by 1
+          const newProgress = currentProgress + 1;
+          
+          if (completionMap.has(task.id)) {
+            // Update existing completion with incremented progress
+            await supabase
+              .from('task_completions')
+              .update({ goal_progress: newProgress })
+              .eq('task_id', task.id)
+              .eq('user_id', user.id)
+              .eq('completed_date', today);
+          } else {
+            // Insert new completion with progress = 1
+            await supabase
+              .from('task_completions')
+              .insert({
+                task_id: task.id,
+                user_id: user.id,
+                completed_date: today,
+                goal_progress: 1,
+              });
+          }
+          tasksCompleted++;
+        } else {
+          // For non-goal tasks, just mark complete if not already
+          if (!completionMap.has(task.id)) {
+            await supabase
+              .from('task_completions')
+              .insert({
+                task_id: task.id,
+                user_id: user.id,
+                completed_date: today,
+              });
+            tasksCompleted++;
+          }
+        }
       }
 
-      // Invalidate queries to update UI
-      queryClient.invalidateQueries({ queryKey: ['planner-completions', user.id, today] });
-      queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
-      queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
+      if (tasksCompleted > 0) {
+        // Invalidate queries to update UI
+        queryClient.invalidateQueries({ queryKey: ['planner-completions', user.id, today] });
+        queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
+        queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
 
-      console.log(`Auto-completed ${tasksToComplete.length} pro task(s) for ${linkType}`);
-      return tasksToComplete.length;
+        console.log(`Auto-completed/progressed ${tasksCompleted} pro task(s) for ${linkType}`);
+      }
+      
+      return tasksCompleted;
     } catch (error) {
       console.error('Error in autoComplete:', error);
       return 0;

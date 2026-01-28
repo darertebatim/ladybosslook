@@ -202,19 +202,12 @@ export const TaskCard = memo(function TaskCard({
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            {/* Top line: Time/Goal + Badge */}
+            {/* Top line: Time + Goal (if applicable) */}
             <div className="flex items-center gap-2">
-              {hasGoal ? (
-                <span className="text-[13px] text-black/80 font-medium">{formatProGoalLabel()}</span>
-              ) : (
-                <span className="text-[13px] text-black/80">{formatTime(task.scheduled_time)}</span>
+              <span className="text-[13px] text-black/80">{formatTime(task.scheduled_time)}</span>
+              {hasGoal && (
+                <span className="text-[13px] text-black/80 font-medium">• {formatProGoalLabel()}</span>
               )}
-              <span className={cn(
-                'px-2 py-0.5 rounded-full text-xs font-medium',
-                proConfig.badgeColorClass
-              )}>
-                {proConfig.badgeText}
-              </span>
             </div>
             
             {/* Title - strike through when goal reached or completed */}
