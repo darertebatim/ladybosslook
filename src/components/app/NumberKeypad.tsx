@@ -11,6 +11,8 @@ interface NumberKeypadProps {
   onConfirm: () => void;
   title: string;
   maxLength?: number;
+  /** Optional validation hint to show above the value (e.g., "0-99 only") */
+  validationHint?: string | null;
 }
 
 export const NumberKeypad = ({
@@ -21,6 +23,7 @@ export const NumberKeypad = ({
   onConfirm,
   title,
   maxLength = 4,
+  validationHint,
 }: NumberKeypadProps) => {
   const handleKeyPress = (key: string) => {
     haptic.light();
@@ -60,6 +63,15 @@ export const NumberKeypad = ({
           <span className="text-lg font-semibold">{title}</span>
           <div className="w-9" /> {/* Spacer for centering */}
         </div>
+
+        {/* Validation hint badge */}
+        {validationHint && (
+          <div className="flex justify-center mb-2">
+            <span className="px-3 py-1 rounded-full bg-red-100 text-red-600 text-sm font-medium">
+              {validationHint}
+            </span>
+          </div>
+        )}
 
         {/* Display */}
         <div className="flex items-center justify-center mb-8">

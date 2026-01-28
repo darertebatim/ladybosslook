@@ -1,6 +1,6 @@
 import { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Plus } from 'lucide-react';
+import { Check, Plus, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   UserTask, 
@@ -24,6 +24,7 @@ interface TaskCardProps {
   onTap?: (task: UserTask) => void;
   onStreakIncrease?: () => void;
   onOpenGoalInput?: (task: UserTask) => void;
+  onOpenTimer?: (task: UserTask) => void;
 }
 
 export const TaskCard = memo(function TaskCard({
@@ -35,6 +36,7 @@ export const TaskCard = memo(function TaskCard({
   onTap,
   onStreakIncrease,
   onOpenGoalInput,
+  onOpenTimer,
 }: TaskCardProps) {
   const navigate = useNavigate();
   const [isAnimating, setIsAnimating] = useState(false);
@@ -58,6 +60,8 @@ export const TaskCard = memo(function TaskCard({
   
   // Check if this task has a goal
   const hasGoal = task.goal_enabled && task.goal_target && task.goal_target > 0;
+  const isTimerGoal = hasGoal && task.goal_type === 'timer';
+  const isCountGoal = hasGoal && task.goal_type === 'count';
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
   
   // Format time display
@@ -121,6 +125,25 @@ export const TaskCard = memo(function TaskCard({
     }
   };
 
+  const handleOpenTimer = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (isFutureDate) {
+      haptic.light();
+      toast("Let's focus on today's routine.", {
+        description: "You can start this timer when the day comes.",
+        duration: 3000,
+      });
+      return;
+    }
+    
+    haptic.light();
+    
+    if (onOpenTimer) {
+      onOpenTimer(task);
+    }
+  };
+
   const handleCardClick = () => {
     // Always open task detail modal (for both regular and Pro tasks)
     if (onTap) {
@@ -133,6 +156,14 @@ export const TaskCard = memo(function TaskCard({
   // Format goal display
   const formatGoalLabel = () => {
     if (!hasGoal) return null;
+    
+    if (isTimerGoal) {
+      // Timer goals: show in minutes
+      const progressMins = Math.floor(goalProgress / 60);
+      const goalMins = Math.floor((task.goal_target || 0) / 60);
+      return `Goal: ${progressMins}/${goalMins} min`;
+    }
+    
     const unit = task.goal_unit || 'times';
     return `Goal: ${goalProgress}/${task.goal_target} ${unit}`;
   };
@@ -258,8 +289,25 @@ export const TaskCard = memo(function TaskCard({
           </p>
         </div>
 
-        {/* Goal: + button, Regular: Checkbox */}
-        {hasGoal ? (
+        {/* Timer goal: Play button, Count goal: + button, Regular: Checkbox */}
+        {isTimerGoal ? (
+          <button
+            onClick={handleOpenTimer}
+            className={cn(
+              'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+              goalReached
+                ? 'bg-emerald-500 text-white shadow-md'
+                : 'border-2 border-foreground/30 bg-white/60',
+              isAnimating && 'scale-110'
+            )}
+          >
+            {goalReached ? (
+              <Check className="h-4 w-4" strokeWidth={3} />
+            ) : (
+              <Play className="h-5 w-5 text-foreground/70 ml-0.5" fill="currentColor" />
+            )}
+          </button>
+        ) : isCountGoal ? (
           <button
             onClick={handleOpenGoalInput}
             className={cn(
