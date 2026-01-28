@@ -23,9 +23,9 @@ export function BreathingInfoSheet({
 
   const steps = [
     { label: 'Inhale', seconds: exercise.inhale_seconds, method: exercise.inhale_method },
-    ...(hasInhaleHold ? [{ label: 'Hold', seconds: exercise.inhale_hold_seconds }] : []),
+    ...(hasInhaleHold ? [{ label: 'Hold', seconds: exercise.inhale_hold_seconds, subLabel: 'after inhale' }] : []),
     { label: 'Exhale', seconds: exercise.exhale_seconds, method: exercise.exhale_method },
-    ...(hasExhaleHold ? [{ label: 'Hold', seconds: exercise.exhale_hold_seconds }] : []),
+    ...(hasExhaleHold ? [{ label: 'Hold', seconds: exercise.exhale_hold_seconds, subLabel: 'after exhale' }] : []),
   ];
 
   return (
@@ -54,6 +54,9 @@ export function BreathingInfoSheet({
                 <span className="text-sm text-white/80">{step.label}</span>
                 {step.method && (
                   <span className="text-xs text-white/50 capitalize">{step.method}</span>
+                )}
+                {step.subLabel && (
+                  <span className="text-xs text-white/40">{step.subLabel}</span>
                 )}
               </div>
             ))}
