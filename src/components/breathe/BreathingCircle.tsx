@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 interface BreathingCircleProps {
@@ -15,7 +16,18 @@ export function BreathingCircle({
   methodText,
   countdown,
 }: BreathingCircleProps) {
-  const isExpanded = phase === 'inhale' || phase === 'inhale_hold';
+  // Start collapsed, then animate to the actual phase state
+  const [hasInitialized, setHasInitialized] = useState(false);
+
+  useEffect(() => {
+    // Small delay to ensure CSS transition works from collapsed to expanded
+    const timer = setTimeout(() => setHasInitialized(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const shouldBeExpanded = phase === 'inhale' || phase === 'inhale_hold';
+  // Only expand after initialization to allow the transition animation to play
+  const isExpanded = hasInitialized && shouldBeExpanded;
   const isAnimating = phase === 'inhale' || phase === 'exhale';
 
   return (
