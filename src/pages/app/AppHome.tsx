@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
 import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate } from '@/hooks/useTaskPlanner';
+import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { useNewHomeData } from '@/hooks/useNewHomeData';
 import { TaskCard } from '@/components/app/TaskCard';
@@ -26,6 +26,8 @@ import { SEOHead } from '@/components/SEOHead';
 import { usePopularPlans, useUserRoutinePlans } from '@/hooks/useRoutinePlans';
 import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
 import { haptic } from '@/lib/haptics';
+import { GoalInputSheet } from '@/components/app/GoalInputSheet';
+import { toast } from 'sonner';
 const AppHome = () => {
   const navigate = useNavigate();
   const {
@@ -39,6 +41,10 @@ const AppHome = () => {
   const [showQuickStart, setShowQuickStart] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
   const [showNotificationFlow, setShowNotificationFlow] = useState(false);
+  
+  // Goal input state
+  const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
+  const addGoalProgress = useAddGoalProgress();
 
   // App tour hook
   const {
@@ -155,9 +161,46 @@ const AppHome = () => {
   const completedSubtaskIds = useMemo(() => {
     return completions?.subtasks.map(c => c.subtask_id) || [];
   }, [completions]);
+
+  // Goal progress map for this date
+  const goalProgressMap = useMemo(() => {
+    const map = new Map<string, number>();
+    completions?.tasks.forEach(c => {
+      if ((c as any).goal_progress) {
+        map.set(c.task_id, (c as any).goal_progress);
+      }
+    });
+    return map;
+  }, [completions]);
+
   const handleStreakIncrease = useCallback(() => {
     setShowStreakModal(true);
   }, []);
+
+  const handleOpenGoalInput = useCallback((task: UserTask) => {
+    setGoalInputTask(task);
+  }, []);
+
+  const handleGoalInputConfirm = useCallback((amount: number) => {
+    if (!goalInputTask) return;
+    
+    addGoalProgress.mutate(
+      { taskId: goalInputTask.id, date: selectedDate, amount },
+      {
+        onSuccess: (result) => {
+          haptic.success();
+          const unit = goalInputTask.goal_unit || 'times';
+          toast(`+${amount} ${unit}`, {
+            description: `Progress: ${result.newProgress}/${goalInputTask.goal_target}`,
+            duration: 2000,
+          });
+          if (result.streakIncreased) {
+            setShowStreakModal(true);
+          }
+        },
+      }
+    );
+  }, [goalInputTask, selectedDate, addGoalProgress]);
   const handleEditTask = useCallback((task: UserTask) => {
     setSelectedTask(null);
     navigate(`/app/home/edit/${task.id}`);
@@ -374,7 +417,7 @@ const AppHome = () => {
                     </h2>
                     <span className="text-xs text-foreground/40 ml-auto">Hold to reorder</span>
                   </div>
-                  <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} />
+                  <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} />
                 </div>}
 
               {/* Popular Routines Suggestions - only show routines user hasn't added */}
@@ -425,13 +468,23 @@ const AppHome = () => {
           onClose={() => setSelectedTask(null)} 
           date={selectedDate} 
           isCompleted={selectedTask ? completedTaskIds.has(selectedTask.id) : false}
-          completedSubtaskIds={completedSubtaskIds} 
+          completedSubtaskIds={completedSubtaskIds}
+          goalProgress={selectedTask ? (goalProgressMap.get(selectedTask.id) || 0) : 0}
           onEdit={handleEditTask}
           onStreakIncrease={() => setShowStreakModal(true)}
+          onOpenGoalInput={handleOpenGoalInput}
         />
 
         {/* Streak celebration modal */}
         <StreakCelebration open={showStreakModal} onClose={() => setShowStreakModal(false)} />
+
+        {/* Goal Input Sheet */}
+        <GoalInputSheet
+          open={!!goalInputTask}
+          onOpenChange={(open) => !open && setGoalInputTask(null)}
+          unit={goalInputTask?.goal_unit || 'times'}
+          onConfirm={handleGoalInputConfirm}
+        />
 
         {/* Push notification onboarding (triggered from banner) */}
         {user && showNotificationFlow && <PushNotificationOnboarding userId={user.id} onComplete={() => setShowNotificationFlow(false)} onSkip={() => setShowNotificationFlow(false)} />}

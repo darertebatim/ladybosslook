@@ -23,7 +23,7 @@ interface TaskCardProps {
   goalProgress?: number;
   onTap?: (task: UserTask) => void;
   onStreakIncrease?: () => void;
-  onIncrementGoal?: (taskId: string) => void;
+  onOpenGoalInput?: (task: UserTask) => void;
 }
 
 export const TaskCard = memo(function TaskCard({
@@ -34,7 +34,7 @@ export const TaskCard = memo(function TaskCard({
   goalProgress = 0,
   onTap,
   onStreakIncrease,
-  onIncrementGoal,
+  onOpenGoalInput,
 }: TaskCardProps) {
   const navigate = useNavigate();
   const [isAnimating, setIsAnimating] = useState(false);
@@ -102,7 +102,7 @@ export const TaskCard = memo(function TaskCard({
     }
   };
 
-  const handleIncrementGoal = (e: React.MouseEvent) => {
+  const handleOpenGoalInput = (e: React.MouseEvent) => {
     e.stopPropagation();
     
     if (isFutureDate) {
@@ -115,11 +115,9 @@ export const TaskCard = memo(function TaskCard({
     }
     
     haptic.light();
-    setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 300);
     
-    if (onIncrementGoal) {
-      onIncrementGoal(task.id);
+    if (onOpenGoalInput) {
+      onOpenGoalInput(task);
     }
   };
 
@@ -263,7 +261,7 @@ export const TaskCard = memo(function TaskCard({
         {/* Goal: + button, Regular: Checkbox */}
         {hasGoal ? (
           <button
-            onClick={handleIncrementGoal}
+            onClick={handleOpenGoalInput}
             className={cn(
               'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
               goalReached

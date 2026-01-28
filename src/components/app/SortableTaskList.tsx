@@ -28,8 +28,10 @@ interface SortableTaskItemProps {
   date: Date;
   isCompleted: boolean;
   completedSubtaskIds: string[];
+  goalProgress: number;
   onTap: (task: UserTask) => void;
   onStreakIncrease: () => void;
+  onOpenGoalInput: (task: UserTask) => void;
   isDragging?: boolean;
 }
 
@@ -38,8 +40,10 @@ const SortableTaskItem = ({
   date,
   isCompleted,
   completedSubtaskIds,
+  goalProgress,
   onTap,
   onStreakIncrease,
+  onOpenGoalInput,
   isDragging,
 }: SortableTaskItemProps) => {
   const {
@@ -72,8 +76,10 @@ const SortableTaskItem = ({
         date={date}
         isCompleted={isCompleted}
         completedSubtaskIds={completedSubtaskIds}
+        goalProgress={goalProgress}
         onTap={onTap}
         onStreakIncrease={onStreakIncrease}
+        onOpenGoalInput={onOpenGoalInput}
       />
     </div>
   );
@@ -84,8 +90,10 @@ interface SortableTaskListProps {
   date: Date;
   completedTaskIds: Set<string>;
   completedSubtaskIds: string[];
+  goalProgressMap: Map<string, number>;
   onTaskTap: (task: UserTask) => void;
   onStreakIncrease: () => void;
+  onOpenGoalInput: (task: UserTask) => void;
 }
 
 export const SortableTaskList = ({
@@ -93,8 +101,10 @@ export const SortableTaskList = ({
   date,
   completedTaskIds,
   completedSubtaskIds,
+  goalProgressMap,
   onTaskTap,
   onStreakIncrease,
+  onOpenGoalInput,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -187,8 +197,10 @@ export const SortableTaskList = ({
               date={date}
               isCompleted={completedTaskIds.has(task.id)}
               completedSubtaskIds={completedSubtaskIds}
+              goalProgress={goalProgressMap.get(task.id) || 0}
               onTap={onTaskTap}
               onStreakIncrease={onStreakIncrease}
+              onOpenGoalInput={onOpenGoalInput}
               isDragging={activeId === task.id}
             />
           ))}

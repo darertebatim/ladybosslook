@@ -1,4 +1,4 @@
-import { Check, X, Pencil } from 'lucide-react';
+import { Check, X, Pencil, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
@@ -23,8 +23,10 @@ interface TaskDetailModalProps {
   date: Date;
   isCompleted: boolean;
   completedSubtaskIds: string[];
+  goalProgress?: number;
   onEdit: (task: UserTask) => void;
   onStreakIncrease?: () => void;
+  onOpenGoalInput?: (task: UserTask) => void;
 }
 
 export const TaskDetailModal = ({
@@ -34,8 +36,10 @@ export const TaskDetailModal = ({
   date,
   isCompleted,
   completedSubtaskIds,
+  goalProgress = 0,
   onEdit,
   onStreakIncrease,
+  onOpenGoalInput,
 }: TaskDetailModalProps) => {
   const navigate = useNavigate();
   const { data: subtasks = [] } = useSubtasks(task?.id);
@@ -51,6 +55,10 @@ export const TaskDetailModal = ({
   const proLinkType: ProLinkType | null = task.pro_link_type as ProLinkType || (task.linked_playlist_id ? 'playlist' : null);
   const proLinkValue = task.pro_link_value || task.linked_playlist_id;
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
+
+  // Goal tracking
+  const hasGoal = task.goal_enabled && task.goal_target && task.goal_target > 0;
+  const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
 
   // Format time display
   const formatTime = (time: string | null) => {
@@ -142,28 +150,53 @@ export const TaskDetailModal = ({
               <TaskIcon iconName={task.emoji} size={40} className="text-foreground/80" />
             </div>
             
-            {/* Time and title */}
+            {/* Time/Goal and title */}
             <div className="flex-1 min-w-0 pr-8">
               <p className="text-sm text-foreground/60 mb-0.5">
-                Time: {formatTime(task.scheduled_time)}
+                {hasGoal 
+                  ? `Goal: ${goalProgress}/${task.goal_target} ${task.goal_unit || 'times'}`
+                  : `Time: ${formatTime(task.scheduled_time)}`
+                }
               </p>
               <h3 className="text-xl font-bold text-foreground leading-tight">
                 {task.title}
               </h3>
             </div>
 
-            {/* Checkbox circle on right - clickable */}
-            <button
-              onClick={handleToggleComplete}
-              className={cn(
-                'w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all',
-                isCompleted
-                  ? 'bg-emerald-500 border-emerald-500 text-white'
-                  : 'border-foreground/30 bg-white/40 hover:bg-white/60'
-              )}
-            >
-              {isCompleted && <Check className="h-5 w-5" strokeWidth={3} />}
-            </button>
+            {/* Goal: + button, Regular: Checkbox */}
+            {hasGoal ? (
+              <button
+                onClick={() => {
+                  haptic.light();
+                  onOpenGoalInput?.(task);
+                  onClose();
+                }}
+                className={cn(
+                  'w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all',
+                  goalReached
+                    ? 'bg-emerald-500 border-emerald-500 text-white'
+                    : 'border-foreground/30 bg-white/40 hover:bg-white/60'
+                )}
+              >
+                {goalReached ? (
+                  <Check className="h-5 w-5" strokeWidth={3} />
+                ) : (
+                  <Plus className="h-5 w-5" strokeWidth={2} />
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={handleToggleComplete}
+                className={cn(
+                  'w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all',
+                  isCompleted
+                    ? 'bg-emerald-500 border-emerald-500 text-white'
+                    : 'border-foreground/30 bg-white/40 hover:bg-white/60'
+                )}
+              >
+                {isCompleted && <Check className="h-5 w-5" strokeWidth={3} />}
+              </button>
+            )}
           </div>
         </div>
 

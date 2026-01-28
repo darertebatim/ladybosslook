@@ -915,14 +915,14 @@ export const useUncompleteSubtask = () => {
 };
 
 /**
- * Increment goal progress for a task on a specific date
+ * Add goal progress for a task on a specific date (with custom amount)
  */
-export const useIncrementGoal = () => {
+export const useAddGoalProgress = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ taskId, date }: { taskId: string; date: Date }) => {
+    mutationFn: async ({ taskId, date, amount }: { taskId: string; date: Date; amount: number }) => {
       if (!user?.id) throw new Error('Not authenticated');
 
       const dateStr = format(date, 'yyyy-MM-dd');
@@ -937,8 +937,8 @@ export const useIncrementGoal = () => {
         .maybeSingle();
 
       if (existing) {
-        // Update existing completion with incremented goal
-        const newProgress = (existing.goal_progress || 0) + 1;
+        // Update existing completion with added amount
+        const newProgress = (existing.goal_progress || 0) + amount;
         const { data, error } = await supabase
           .from('task_completions')
           .update({ goal_progress: newProgress })
@@ -947,16 +947,16 @@ export const useIncrementGoal = () => {
           .single();
 
         if (error) throw error;
-        return { completion: data, newProgress };
+        return { completion: data, newProgress, addedAmount: amount };
       } else {
-        // Create new completion with goal_progress = 1
+        // Create new completion with goal_progress = amount
         const { data, error } = await supabase
           .from('task_completions')
           .insert({
             task_id: taskId,
             user_id: user.id,
             completed_date: dateStr,
-            goal_progress: 1,
+            goal_progress: amount,
           })
           .select()
           .single();
@@ -966,7 +966,7 @@ export const useIncrementGoal = () => {
         // Update streak
         const streakResult = await updateStreak(user.id, dateStr);
         
-        return { completion: data, newProgress: 1, streakIncreased: streakResult.increased };
+        return { completion: data, newProgress: amount, addedAmount: amount, streakIncreased: streakResult.increased };
       }
     },
     onSuccess: (_, variables) => {
@@ -976,7 +976,7 @@ export const useIncrementGoal = () => {
       queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
     },
     onError: (error) => {
-      console.error('Increment goal error:', error);
+      console.error('Add goal progress error:', error);
     },
   });
 };
