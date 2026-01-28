@@ -168,6 +168,20 @@ export const TaskCard = memo(function TaskCard({
     return `Goal: ${goalProgress}/${task.goal_target} ${unit}`;
   };
 
+  // Format goal display for Pro Tasks too
+  const formatProGoalLabel = () => {
+    if (!hasGoal) return null;
+    
+    if (isTimerGoal) {
+      const progressMins = Math.floor(goalProgress / 60);
+      const goalMins = Math.floor((task.goal_target || 0) / 60);
+      return `${progressMins}/${goalMins} min`;
+    }
+    
+    const unit = task.goal_unit || 'times';
+    return `${goalProgress}/${task.goal_target} ${unit}`;
+  };
+
   // Pro Task - uses user's chosen color but shows Pro icon and badge
   if (isProTask && proConfig) {
     const ProIcon = proConfig.icon;
@@ -188,9 +202,13 @@ export const TaskCard = memo(function TaskCard({
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            {/* Top line: Time + Badge */}
+            {/* Top line: Time/Goal + Badge */}
             <div className="flex items-center gap-2">
-              <span className="text-[13px] text-black/80">{formatTime(task.scheduled_time)}</span>
+              {hasGoal ? (
+                <span className="text-[13px] text-black/80 font-medium">{formatProGoalLabel()}</span>
+              ) : (
+                <span className="text-[13px] text-black/80">{formatTime(task.scheduled_time)}</span>
+              )}
               <span className={cn(
                 'px-2 py-0.5 rounded-full text-xs font-medium',
                 proConfig.badgeColorClass
@@ -199,10 +217,10 @@ export const TaskCard = memo(function TaskCard({
               </span>
             </div>
             
-            {/* Title */}
+            {/* Title - strike through when goal reached or completed */}
             <p className={cn(
               'font-bold text-black text-[15px] truncate transition-all',
-              isCompleted && 'line-through'
+              (hasGoal ? goalReached : isCompleted) && 'line-through'
             )}>
               {task.title}
             </p>
@@ -230,19 +248,55 @@ export const TaskCard = memo(function TaskCard({
             {proConfig.badgeText}
           </button>
 
-          {/* Checkbox - larger, Me+ style */}
-          <button
-            onClick={handleToggleComplete}
-            className={cn(
-              'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
-              isCompleted
-                ? 'bg-emerald-500 text-white shadow-md'
-                : 'border-2 border-foreground/30 bg-white/60',
-              isAnimating && 'scale-110'
-            )}
-          >
-            {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
-          </button>
+          {/* Timer goal: Play button, Count goal: + button, Regular: Checkbox */}
+          {isTimerGoal ? (
+            <button
+              onClick={handleOpenTimer}
+              className={cn(
+                'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+                goalReached
+                  ? 'bg-emerald-500 text-white shadow-md'
+                  : 'border-2 border-foreground/30 bg-white/60',
+                isAnimating && 'scale-110'
+              )}
+            >
+              {goalReached ? (
+                <Check className="h-4 w-4" strokeWidth={3} />
+              ) : (
+                <Play className="h-5 w-5 text-foreground/70 ml-0.5" fill="currentColor" />
+              )}
+            </button>
+          ) : isCountGoal ? (
+            <button
+              onClick={handleOpenGoalInput}
+              className={cn(
+                'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+                goalReached
+                  ? 'bg-emerald-500 text-white shadow-md'
+                  : 'border-2 border-foreground/30 bg-white/60',
+                isAnimating && 'scale-110'
+              )}
+            >
+              {goalReached ? (
+                <Check className="h-4 w-4" strokeWidth={3} />
+              ) : (
+                <Plus className="h-5 w-5 text-foreground/70" strokeWidth={2} />
+              )}
+            </button>
+          ) : (
+            <button
+              onClick={handleToggleComplete}
+              className={cn(
+                'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+                isCompleted
+                  ? 'bg-emerald-500 text-white shadow-md'
+                  : 'border-2 border-foreground/30 bg-white/60',
+                isAnimating && 'scale-110'
+              )}
+            >
+              {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
+            </button>
+          )}
         </div>
       </div>
     );
