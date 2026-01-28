@@ -32,6 +32,7 @@ interface SortableTaskItemProps {
   onTap: (task: UserTask) => void;
   onStreakIncrease: () => void;
   onOpenGoalInput: (task: UserTask) => void;
+  onOpenTimer: (task: UserTask) => void;
   isDragging?: boolean;
 }
 
@@ -44,6 +45,7 @@ const SortableTaskItem = ({
   onTap,
   onStreakIncrease,
   onOpenGoalInput,
+  onOpenTimer,
   isDragging,
 }: SortableTaskItemProps) => {
   const {
@@ -80,6 +82,7 @@ const SortableTaskItem = ({
         onTap={onTap}
         onStreakIncrease={onStreakIncrease}
         onOpenGoalInput={onOpenGoalInput}
+        onOpenTimer={onOpenTimer}
       />
     </div>
   );
@@ -94,6 +97,7 @@ interface SortableTaskListProps {
   onTaskTap: (task: UserTask) => void;
   onStreakIncrease: () => void;
   onOpenGoalInput: (task: UserTask) => void;
+  onOpenTimer: (task: UserTask) => void;
 }
 
 export const SortableTaskList = ({
@@ -105,6 +109,7 @@ export const SortableTaskList = ({
   onTaskTap,
   onStreakIncrease,
   onOpenGoalInput,
+  onOpenTimer,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -201,6 +206,7 @@ export const SortableTaskList = ({
               onTap={onTaskTap}
               onStreakIncrease={onStreakIncrease}
               onOpenGoalInput={onOpenGoalInput}
+              onOpenTimer={onOpenTimer}
               isDragging={activeId === task.id}
             />
           ))}

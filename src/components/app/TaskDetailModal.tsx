@@ -1,4 +1,4 @@
-import { Check, X, Pencil, Plus } from 'lucide-react';
+import { Check, X, Pencil, Plus, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
@@ -27,6 +27,7 @@ interface TaskDetailModalProps {
   onEdit: (task: UserTask) => void;
   onStreakIncrease?: () => void;
   onOpenGoalInput?: (task: UserTask) => void;
+  onOpenTimer?: (task: UserTask) => void;
 }
 
 export const TaskDetailModal = ({
@@ -40,6 +41,7 @@ export const TaskDetailModal = ({
   onEdit,
   onStreakIncrease,
   onOpenGoalInput,
+  onOpenTimer,
 }: TaskDetailModalProps) => {
   const navigate = useNavigate();
   const { data: subtasks = [] } = useSubtasks(task?.id);
@@ -58,6 +60,8 @@ export const TaskDetailModal = ({
 
   // Goal tracking
   const hasGoal = task.goal_enabled && task.goal_target && task.goal_target > 0;
+  const isTimerGoal = hasGoal && task.goal_type === 'timer';
+  const isCountGoal = hasGoal && task.goal_type === 'count';
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
 
   // Format time display
@@ -154,7 +158,9 @@ export const TaskDetailModal = ({
             <div className="flex-1 min-w-0 pr-8">
               <p className="text-sm text-foreground/60 mb-0.5">
                 {hasGoal 
-                  ? `Goal: ${goalProgress}/${task.goal_target} ${task.goal_unit || 'times'}`
+                  ? isTimerGoal
+                    ? `Goal: ${Math.floor(goalProgress / 60)}/${Math.floor((task.goal_target || 0) / 60)} min`
+                    : `Goal: ${goalProgress}/${task.goal_target} ${task.goal_unit || 'times'}`
                   : `Time: ${formatTime(task.scheduled_time)}`
                 }
               </p>
@@ -163,8 +169,28 @@ export const TaskDetailModal = ({
               </h3>
             </div>
 
-            {/* Goal: + button, Regular: Checkbox */}
-            {hasGoal ? (
+            {/* Timer goal: Play button, Count goal: + button, Regular: Checkbox */}
+            {isTimerGoal ? (
+              <button
+                onClick={() => {
+                  haptic.light();
+                  onOpenTimer?.(task);
+                  onClose();
+                }}
+                className={cn(
+                  'w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all',
+                  goalReached
+                    ? 'bg-emerald-500 border-emerald-500 text-white'
+                    : 'border-foreground/30 bg-white/40 hover:bg-white/60'
+                )}
+              >
+                {goalReached ? (
+                  <Check className="h-5 w-5" strokeWidth={3} />
+                ) : (
+                  <Play className="h-5 w-5 ml-0.5" fill="currentColor" />
+                )}
+              </button>
+            ) : isCountGoal ? (
               <button
                 onClick={() => {
                   haptic.light();

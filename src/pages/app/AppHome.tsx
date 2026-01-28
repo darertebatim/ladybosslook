@@ -27,6 +27,7 @@ import { usePopularPlans, useUserRoutinePlans } from '@/hooks/useRoutinePlans';
 import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
 import { haptic } from '@/lib/haptics';
 import { GoalInputSheet } from '@/components/app/GoalInputSheet';
+import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
 import { toast } from 'sonner';
 const AppHome = () => {
   const navigate = useNavigate();
@@ -45,6 +46,9 @@ const AppHome = () => {
   // Goal input state
   const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
   const addGoalProgress = useAddGoalProgress();
+  
+  // Timer screen state
+  const [timerTask, setTimerTask] = useState<UserTask | null>(null);
 
   // App tour hook
   const {
@@ -181,6 +185,10 @@ const AppHome = () => {
     setGoalInputTask(task);
   }, []);
 
+  const handleOpenTimer = useCallback((task: UserTask) => {
+    setTimerTask(task);
+  }, []);
+
   const handleGoalInputConfirm = useCallback((amount: number) => {
     if (!goalInputTask) return;
     
@@ -201,6 +209,45 @@ const AppHome = () => {
       }
     );
   }, [goalInputTask, selectedDate, addGoalProgress]);
+
+  const handleTimerSaveProgress = useCallback((secondsElapsed: number) => {
+    if (!timerTask) return;
+    
+    addGoalProgress.mutate(
+      { taskId: timerTask.id, date: selectedDate, amount: secondsElapsed },
+      {
+        onSuccess: (result) => {
+          haptic.success();
+          const mins = Math.floor(result.newProgress / 60);
+          const goalMins = Math.floor((timerTask.goal_target || 0) / 60);
+          toast(`Timer saved`, {
+            description: `Progress: ${mins}/${goalMins} min`,
+            duration: 2000,
+          });
+          if (result.streakIncreased) {
+            setShowStreakModal(true);
+          }
+        },
+      }
+    );
+  }, [timerTask, selectedDate, addGoalProgress]);
+
+  const handleTimerMarkComplete = useCallback(() => {
+    if (!timerTask) return;
+    
+    const remainingSeconds = (timerTask.goal_target || 0) - (goalProgressMap.get(timerTask.id) || 0);
+    
+    addGoalProgress.mutate(
+      { taskId: timerTask.id, date: selectedDate, amount: remainingSeconds },
+      {
+        onSuccess: () => {
+          haptic.success();
+          toast(`Goal completed! 🎉`, { duration: 2000 });
+        },
+      }
+    );
+  }, [timerTask, selectedDate, addGoalProgress, goalProgressMap]);
+
   const handleEditTask = useCallback((task: UserTask) => {
     setSelectedTask(null);
     navigate(`/app/home/edit/${task.id}`);
@@ -417,7 +464,7 @@ const AppHome = () => {
                     </h2>
                     <span className="text-xs text-foreground/40 ml-auto">Hold to reorder</span>
                   </div>
-                  <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} />
+                  <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                 </div>}
 
               {/* Popular Routines Suggestions - only show routines user hasn't added */}
@@ -473,6 +520,7 @@ const AppHome = () => {
           onEdit={handleEditTask}
           onStreakIncrease={() => setShowStreakModal(true)}
           onOpenGoalInput={handleOpenGoalInput}
+          onOpenTimer={handleOpenTimer}
         />
 
         {/* Streak celebration modal */}
@@ -485,6 +533,17 @@ const AppHome = () => {
           unit={goalInputTask?.goal_unit || 'times'}
           onConfirm={handleGoalInputConfirm}
         />
+
+        {/* Timer Screen - Full screen overlay */}
+        {timerTask && (
+          <TaskTimerScreen
+            task={timerTask}
+            currentProgress={goalProgressMap.get(timerTask.id) || 0}
+            onSaveProgress={handleTimerSaveProgress}
+            onMarkComplete={handleTimerMarkComplete}
+            onClose={() => setTimerTask(null)}
+          />
+        )}
 
         {/* Push notification onboarding (triggered from banner) */}
         {user && showNotificationFlow && <PushNotificationOnboarding userId={user.id} onComplete={() => setShowNotificationFlow(false)} onSkip={() => setShowNotificationFlow(false)} />}

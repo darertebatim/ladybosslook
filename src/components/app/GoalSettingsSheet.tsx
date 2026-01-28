@@ -41,6 +41,10 @@ export const GoalSettingsSheet = ({
   const [showSecondsKeypad, setShowSecondsKeypad] = useState(false);
   const [showCountKeypad, setShowCountKeypad] = useState(false);
   const [showUnitPicker, setShowUnitPicker] = useState(false);
+  
+  // Validation hints
+  const [minutesHint, setMinutesHint] = useState<string | null>(null);
+  const [secondsHint, setSecondsHint] = useState<string | null>(null);
 
   // Sync state when value prop changes
   useEffect(() => {
@@ -225,26 +229,45 @@ export const GoalSettingsSheet = ({
       {/* Number Keypads */}
       <NumberKeypad
         open={showMinutesKeypad}
-        onOpenChange={setShowMinutesKeypad}
+        onOpenChange={(open) => {
+          setShowMinutesKeypad(open);
+          if (!open) setMinutesHint(null);
+        }}
         value={timerMinutes}
-        onChange={setTimerMinutes}
-        onConfirm={() => {}}
+        onChange={(v) => {
+          const num = parseInt(v) || 0;
+          if (num > 99) {
+            setMinutesHint('0-99 only');
+          } else {
+            setMinutesHint(null);
+            setTimerMinutes(v);
+          }
+        }}
+        onConfirm={() => setMinutesHint(null)}
         title="Minutes"
         maxLength={3}
+        validationHint={minutesHint}
       />
       <NumberKeypad
         open={showSecondsKeypad}
-        onOpenChange={setShowSecondsKeypad}
+        onOpenChange={(open) => {
+          setShowSecondsKeypad(open);
+          if (!open) setSecondsHint(null);
+        }}
         value={timerSeconds}
         onChange={(v) => {
           const num = parseInt(v) || 0;
-          if (num <= 59) {
+          if (num > 59) {
+            setSecondsHint('0-59 only');
+          } else {
+            setSecondsHint(null);
             setTimerSeconds(v);
           }
         }}
-        onConfirm={() => {}}
+        onConfirm={() => setSecondsHint(null)}
         title="Seconds"
         maxLength={2}
+        validationHint={secondsHint}
       />
       <NumberKeypad
         open={showCountKeypad}
