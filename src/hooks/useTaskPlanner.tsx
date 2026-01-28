@@ -30,7 +30,7 @@ export interface UserTask {
   updated_at: string;
   linked_playlist_id: string | null;
   // Pro Task fields
-  pro_link_type: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
+  pro_link_type: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | null;
   pro_link_value: string | null;
   // Goal tracking fields
   goal_enabled: boolean;
@@ -120,7 +120,7 @@ export interface CreateTaskInput {
   tag?: string | null;
   subtasks?: string[];
   linked_playlist_id?: string | null;
-  pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
+  pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | null;
   pro_link_value?: string | null;
   goal_enabled?: boolean;
   goal_type?: 'timer' | 'count' | null;
@@ -134,7 +134,7 @@ export interface UpdateTaskInput extends Partial<CreateTaskInput> {
   order_index?: number;
   is_urgent?: boolean;
   linked_playlist_id?: string | null;
-  pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
+  pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | null;
   pro_link_value?: string | null;
 }
 
