@@ -331,10 +331,10 @@ const AppHome = () => {
             {/* Tag filter chips */}
             {taskTags.length > 0 && <div className="py-2 -mx-4 px-4 bg-background overflow-x-auto">
                 <div className="flex gap-2">
-                  <button onClick={() => setSelectedTag(null)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all font-medium', selectedTag === null ? 'bg-[#D8C0F3] text-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80')}>
+                  <button onClick={() => setSelectedTag(null)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all font-medium', selectedTag === null ? 'bg-[#D8C0F3] text-foreground' : 'bg-transparent border border-foreground/20 text-foreground/60')}>
                     All
                   </button>
-                  {taskTags.map(tag => <button key={tag} onClick={() => setSelectedTag(tag === selectedTag ? null : tag)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all capitalize font-medium', selectedTag === tag ? 'bg-[#D8C0F3] text-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80')}>
+                  {taskTags.map(tag => <button key={tag} onClick={() => setSelectedTag(tag === selectedTag ? null : tag)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all capitalize font-medium', selectedTag === tag ? 'bg-[#D8C0F3] text-foreground' : 'bg-transparent border border-foreground/20 text-foreground/60')}>
                       {tag}
                     </button>)}
                 </div>

@@ -110,14 +110,14 @@ export const TaskCard = memo(function TaskCard({
       <div
         onClick={handleCardClick}
         className={cn(
-          'rounded-3xl px-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+          'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
           colorClass
         )}
       >
         {/* Main row */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {/* Icon - larger emoji display */}
-          <div className="w-12 h-12 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 flex items-center justify-center shrink-0">
             <ProIcon className={cn('h-6 w-6', proConfig.iconColorClass)} />
           </div>
 
@@ -136,7 +136,7 @@ export const TaskCard = memo(function TaskCard({
             
             {/* Title */}
             <p className={cn(
-              'font-bold text-black text-[16px] truncate transition-all',
+              'font-bold text-black text-[15px] truncate transition-all',
               isCompleted && 'line-through'
             )}>
               {task.title}
@@ -191,14 +191,14 @@ export const TaskCard = memo(function TaskCard({
     <div
       onClick={handleCardClick}
       className={cn(
-        'rounded-3xl px-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+        'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
         colorClass
       )}
     >
       {/* Main row */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {/* Icon - emoji display like Me+ */}
-        <div className="w-12 h-12 flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 flex items-center justify-center shrink-0">
           <TaskIcon iconName={task.emoji} size={32} className="text-black/80" />
         </div>
 
@@ -216,7 +216,7 @@ export const TaskCard = memo(function TaskCard({
           
           {/* Title */}
           <p className={cn(
-            'font-bold text-black text-[16px] truncate transition-all',
+            'font-bold text-black text-[15px] truncate transition-all',
             isCompleted && 'line-through'
           )}>
             {task.title}
