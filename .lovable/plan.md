@@ -1,35 +1,82 @@
 
-# TaskCard Typography & Emoji Size Update
 
-## Overview
-Update the TaskCard component to match Me+ app styling more precisely, focusing on typography adjustments and emoji sizing.
+# Toast Notification Redesign Plan
 
-## Changes
+## Problem
+Toast notifications appear at the very bottom of the screen and are often missed by users. The screenshot shows the toast "Let's focus on today's routine" is barely visible, hidden behind the FAB button area.
 
-### File: `src/components/app/TaskCard.tsx`
+## Current Implementation
+- The app uses **Sonner** library for modern toast notifications
+- The `Toaster` component from `src/components/ui/sonner.tsx` is mounted in `App.tsx`
+- Current position: **bottom-right** (Sonner's default)
+- No `position` prop is explicitly set
 
-#### 1. "Anytime" Line Typography
-- **Current**: `text-sm`, `font-medium`, `text-black`
-- **New**: `text-[13px]`, no font-medium (regular weight), `text-black/80`
+## Solution Overview
 
-#### 2. Task Title Typography  
-- **Current**: `font-semibold`, `text-[15px]`
-- **New**: `font-bold`, `text-[16px]`
+Redesign toasts to appear at the **top center** of the screen with improved styling that matches the app's native feel.
 
-#### 3. Emoji Size
-- **Current**: `size={28}` for regular tasks
-- **New**: `size={32}` for regular tasks (matching Me+)
+### Changes
 
-### Summary of Changes
+**1. Update Sonner Toaster Position** (`src/components/ui/sonner.tsx`)
+- Add `position="top-center"` to move toasts to the top of the screen
+- Add `offset` prop for proper safe area spacing on iOS
+- Update styling for a more prominent, pill-shaped appearance that matches the app's design language
 
-| Element | Before | After |
-|---------|--------|-------|
-| Time text size | `text-sm` (~14px) | `text-[13px]` |
-| Time font weight | `font-medium` | (none/regular) |
-| Time color | `text-black` | `text-black/80` |
-| Title size | `text-[15px]` | `text-[16px]` |
-| Title weight | `font-semibold` | `font-bold` |
-| Emoji size | 28px | 32px |
+**2. Enhanced Styling**
+- Increase border-radius for a pill/capsule shape (matching the app's rounded design)
+- Add subtle shadow for better visibility
+- Slightly increase padding for better touch targets
+- Add safe-area-aware top offset for iOS notch devices
+
+### Visual Design
+```
+┌────────────────────────────────────────┐
+│  ┌──────────────────────────────────┐  │ ← Top of screen
+│  │  Let's focus on today's routine. │  │ ← New toast position
+│  │  You can complete when the day   │  │
+│  │  comes.                          │  │
+│  └──────────────────────────────────┘  │
+│                                        │
+│        [Calendar & Tasks UI]           │
+│                                        │
+└────────────────────────────────────────┘
+```
+
+---
 
 ## Technical Details
-These changes will be applied to both the regular task card and the Pro task card sections within the component to maintain consistency.
+
+### File: `src/components/ui/sonner.tsx`
+
+Update the Sonner `Toaster` component:
+
+```tsx
+<Sonner
+  theme={theme as ToasterProps["theme"]}
+  position="top-center"
+  offset="60px"  // Account for iOS notch + header
+  className="toaster group"
+  toastOptions={{
+    classNames: {
+      toast:
+        "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-xl group-[.toaster]:rounded-2xl",
+      description: "group-[.toast]:text-muted-foreground",
+      actionButton:
+        "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
+      cancelButton:
+        "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+    },
+  }}
+  {...props}
+/>
+```
+
+### Key Props:
+- `position="top-center"`: Moves toasts to the top-center of the screen
+- `offset="60px"`: Provides spacing from the top to avoid the iOS notch/dynamic island and app header
+- Enhanced `rounded-2xl` and `shadow-xl` for better visibility
+
+### No Changes Needed To:
+- `src/components/app/TaskCard.tsx` - toast calls remain the same
+- Other files using `toast()` from sonner - the API is unchanged
+
