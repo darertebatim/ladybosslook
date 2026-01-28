@@ -1,6 +1,6 @@
 import { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check } from 'lucide-react';
+import { Check, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   UserTask, 
@@ -20,8 +20,10 @@ interface TaskCardProps {
   date: Date;
   isCompleted: boolean;
   completedSubtaskIds: string[];
+  goalProgress?: number;
   onTap?: (task: UserTask) => void;
   onStreakIncrease?: () => void;
+  onIncrementGoal?: (taskId: string) => void;
 }
 
 export const TaskCard = memo(function TaskCard({
@@ -29,8 +31,10 @@ export const TaskCard = memo(function TaskCard({
   date,
   isCompleted,
   completedSubtaskIds,
+  goalProgress = 0,
   onTap,
   onStreakIncrease,
+  onIncrementGoal,
 }: TaskCardProps) {
   const navigate = useNavigate();
   const [isAnimating, setIsAnimating] = useState(false);
@@ -51,6 +55,10 @@ export const TaskCard = memo(function TaskCard({
 
   // Check if this is a future date (after today)
   const isFutureDate = !isToday(date) && !isBefore(startOfDay(date), startOfDay(new Date()));
+  
+  // Check if this task has a goal
+  const hasGoal = task.goal_enabled && task.goal_target && task.goal_target > 0;
+  const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
   
   // Format time display
   const formatTime = (time: string | null) => {
@@ -94,6 +102,27 @@ export const TaskCard = memo(function TaskCard({
     }
   };
 
+  const handleIncrementGoal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (isFutureDate) {
+      haptic.light();
+      toast("Let's focus on today's routine.", {
+        description: "You can track this goal when the day comes.",
+        duration: 3000,
+      });
+      return;
+    }
+    
+    haptic.light();
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 300);
+    
+    if (onIncrementGoal) {
+      onIncrementGoal(task.id);
+    }
+  };
+
   const handleCardClick = () => {
     // Always open task detail modal (for both regular and Pro tasks)
     if (onTap) {
@@ -102,6 +131,13 @@ export const TaskCard = memo(function TaskCard({
   };
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
+  
+  // Format goal display
+  const formatGoalLabel = () => {
+    if (!hasGoal) return null;
+    const unit = task.goal_unit || 'times';
+    return `Goal: ${goalProgress}/${task.goal_target} ${unit}`;
+  };
 
   // Pro Task - uses user's chosen color but shows Pro icon and badge
   if (isProTask && proConfig) {
@@ -201,38 +237,61 @@ export const TaskCard = memo(function TaskCard({
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          {/* Top line: subtask count + time */}
+          {/* Top line: subtask count + time/goal */}
           <div className="flex items-center gap-2">
             {hasSubtasks && (
               <span className="font-semibold bg-white/50 px-1.5 py-0.5 rounded text-xs text-black">
                 {completedCount}/{totalSubtasks}
               </span>
             )}
-            <span className="text-[13px] text-black/80">{formatTime(task.scheduled_time)}</span>
+            {hasGoal ? (
+              <span className="text-[13px] text-black/80 font-medium">{formatGoalLabel()}</span>
+            ) : (
+              <span className="text-[13px] text-black/80">{formatTime(task.scheduled_time)}</span>
+            )}
           </div>
           
           {/* Title */}
           <p className={cn(
             'font-bold text-black text-[15px] truncate transition-all',
-            isCompleted && 'line-through'
+            (isCompleted || goalReached) && 'line-through'
           )}>
             {task.title}
           </p>
         </div>
 
-        {/* Checkbox - larger, Me+ style */}
-        <button
-          onClick={handleToggleComplete}
-          className={cn(
-            'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
-            isCompleted
-              ? 'bg-emerald-500 text-white shadow-md'
-              : 'border-2 border-foreground/30 bg-white/60',
-            isAnimating && 'scale-110'
-          )}
-        >
-          {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
-        </button>
+        {/* Goal: + button, Regular: Checkbox */}
+        {hasGoal ? (
+          <button
+            onClick={handleIncrementGoal}
+            className={cn(
+              'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+              goalReached
+                ? 'bg-emerald-500 text-white shadow-md'
+                : 'border-2 border-foreground/30 bg-white/60',
+              isAnimating && 'scale-110'
+            )}
+          >
+            {goalReached ? (
+              <Check className="h-4 w-4" strokeWidth={3} />
+            ) : (
+              <Plus className="h-5 w-5 text-foreground/70" strokeWidth={2} />
+            )}
+          </button>
+        ) : (
+          <button
+            onClick={handleToggleComplete}
+            className={cn(
+              'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+              isCompleted
+                ? 'bg-emerald-500 text-white shadow-md'
+                : 'border-2 border-foreground/30 bg-white/60',
+              isAnimating && 'scale-110'
+            )}
+          >
+            {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
+          </button>
+        )}
       </div>
     </div>
   );

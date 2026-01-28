@@ -2117,6 +2117,7 @@ export type Database = {
         Row: {
           completed_at: string
           completed_date: string
+          goal_progress: number | null
           id: string
           task_id: string
           user_id: string
@@ -2124,6 +2125,7 @@ export type Database = {
         Insert: {
           completed_at?: string
           completed_date: string
+          goal_progress?: number | null
           id?: string
           task_id: string
           user_id: string
@@ -2131,6 +2133,7 @@ export type Database = {
         Update: {
           completed_at?: string
           completed_date?: string
+          goal_progress?: number | null
           id?: string
           task_id?: string
           user_id?: string
@@ -2435,6 +2438,10 @@ export type Database = {
           color: string
           created_at: string
           emoji: string
+          goal_enabled: boolean
+          goal_target: number | null
+          goal_type: string | null
+          goal_unit: string | null
           id: string
           is_active: boolean
           is_urgent: boolean
@@ -2459,6 +2466,10 @@ export type Database = {
           color?: string
           created_at?: string
           emoji?: string
+          goal_enabled?: boolean
+          goal_target?: number | null
+          goal_type?: string | null
+          goal_unit?: string | null
           id?: string
           is_active?: boolean
           is_urgent?: boolean
@@ -2483,6 +2494,10 @@ export type Database = {
           color?: string
           created_at?: string
           emoji?: string
+          goal_enabled?: boolean
+          goal_target?: number | null
+          goal_type?: string | null
+          goal_unit?: string | null
           id?: string
           is_active?: boolean
           is_urgent?: boolean
