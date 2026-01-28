@@ -1,143 +1,246 @@
 
-# Timer Goal Feature Implementation Plan
+
+# Breathe App Implementation Plan
 
 ## Overview
-This plan adds the timer-based goal functionality for tasks, matching the Me+ app experience. When a task has a "Timer" type goal, tapping the Play button opens a full-screen countdown timer with pause/stop/complete controls.
+Building a complete breathing exercise tool inspired by Finch app, with:
+- User-facing `/app/breathe` page with animated breathing circles
+- Admin panel to manage breathing techniques
+- Categories for filtering (Morning, Energize, Focus, Calm, Night)
+- Full-screen breathing animation with circular visualizations
+- Button on home header for quick access
 
-## Current State Analysis
-- **Goal types exist**: Tasks support `goal_type: 'timer' | 'count'` in the database
-- **Count goals work**: GoalInputSheet handles count-type goals with number input
-- **Timer goals missing**: No Play button, no timer screen, no countdown functionality
-- **Input validation missing**: Minutes accepts 100+, seconds accepts 60+
+## Feature Breakdown
 
-## Features to Implement
+### 1. Database Schema
 
-### 1. Input Validation with Toasts
-**File: `src/components/app/GoalSettingsSheet.tsx`**
-- Add validation in NumberKeypad onChange handlers:
-  - Minutes: max 99 (show "0-99 only" toast badge like Me+)
-  - Seconds: max 59 (show "0-59 only" toast badge)
-- Show a pill-shaped badge inside keypad when limit is exceeded
-- Prevent invalid values from being entered
+**New Table: `breathing_exercises`**
+```
+id: uuid (primary key)
+name: text (e.g., "Calm Breathing", "Focus Breathing")
+description: text (explanation of technique)
+category: text (morning, energize, focus, calm, night)
+emoji: text (icon for the card)
+inhale_seconds: integer (e.g., 4)
+inhale_hold_seconds: integer (nullable, 0 if no hold)
+exhale_seconds: integer (e.g., 6)
+exhale_hold_seconds: integer (nullable, 0 if no hold)
+inhale_method: text ("nose" or "mouth")
+exhale_method: text ("nose" or "mouth")
+sort_order: integer
+is_active: boolean
+created_at: timestamp
+updated_at: timestamp
+```
 
-### 2. TaskCard Updates - Play Button for Timer Goals
-**File: `src/components/app/TaskCard.tsx`**
-- Detect timer-type goals: `task.goal_type === 'timer'`
-- Show Play icon (▶) button instead of Plus (+) for timer goals
-- Display "Goal: 0/20 minutes" format for timer goals
-- Handler: `onOpenTimer` instead of `onOpenGoalInput` for timer tasks
+**New Table: `breathing_sessions`** (for tracking user history - optional for analytics)
+```
+id: uuid
+user_id: uuid (references profiles)
+exercise_id: uuid (references breathing_exercises)
+duration_seconds: integer (how long user did it)
+completed_at: timestamp
+```
 
-### 3. New Timer Screen Component
-**File: `src/components/app/TaskTimerScreen.tsx` (NEW)**
+### 2. User-Facing Pages and Components
 
-Full-screen timer interface with:
-- **Header**: Task emoji, title, goal progress (e.g., "Goal: 0/20 minutes")
-- **Timer Display**: 
-  - Large countdown (MM:SS format)
-  - Dashed oval/ellipse border around timer
-  - Border fills with white as progress accumulates
-- **Controls** (bottom):
-  - Pause button (⏸) - left side
-  - "Mark as complete" button - center
-  - Stop button (⏹) - right side
+**Route: `/app/breathe` (full-screen, outside AppLayout)**
 
-**Timer Logic**:
-- Timer counts DOWN from remaining time (goal_target - progress)
-- Pause: stops countdown, saves current elapsed
-- Stop: saves elapsed seconds to goal_progress, returns to home
-- Mark as complete: sets goal_progress = goal_target, marks done
-- Timer hits 0: shows "Done" screen with "I did it!" button
+**Page Flow:**
+1. **Exercise List Screen** - Purple gradient background, category tabs, exercise cards
+2. **Info Sheet** - Shows technique details before starting (inhale/exhale timings)
+3. **Settings Screen** - Choose duration (1, 3, 5, 10 min), breath type (Normal/Easier)
+4. **Active Breathing Screen** - Full-screen animated circles with instructions
 
-**Progress Storage**:
-- Goal progress stored in seconds in `task_completions.goal_progress`
-- Progress persists between sessions (can resume later)
+**Components to Create:**
 
-### 4. Timer State Management
-**File: `src/hooks/useTaskPlanner.tsx`**
-- `useAddTimerProgress` mutation: Add seconds to goal_progress
-- Similar to `useAddGoalProgress` but for timer (adds seconds directly)
+| Component | Purpose |
+|-----------|---------|
+| `src/pages/app/AppBreathe.tsx` | Main page with exercise list |
+| `src/components/breathe/BreathingExerciseCard.tsx` | Card for each exercise |
+| `src/components/breathe/BreathingInfoSheet.tsx` | Bottom sheet showing technique details |
+| `src/components/breathe/BreathingSettingsSheet.tsx` | Duration and type selector |
+| `src/components/breathe/BreathingActiveScreen.tsx` | Full-screen animated breathing interface |
+| `src/components/breathe/BreathingCircle.tsx` | Animated concentric circles component |
 
-### 5. AppHome Integration
-**File: `src/pages/app/AppHome.tsx`**
-- Add `timerTask` state for full-screen timer
-- Pass `onOpenTimer` handler to SortableTaskList
-- Render TaskTimerScreen when timerTask is set
+### 3. Animation System (Breathing Circles)
 
-### 6. SortableTaskList Updates
-**File: `src/components/app/SortableTaskList.tsx`**
-- Add `onOpenTimer` prop for timer-goal tasks
-- Distinguish between count goals and timer goals
+The core visual is **two concentric circles** that expand/contract:
 
-### 7. TaskDetailModal Updates  
-**File: `src/components/app/TaskDetailModal.tsx`**
-- For timer goals: Show Play button instead of + button
-- Trigger timer screen when Play is tapped
+**Circle Animation Logic:**
+- **Outer circle**: Large background circle, subtle pulse
+- **Middle circle**: Follows breathing rhythm - expands on inhale, contracts on exhale
+- **Inner circle**: Contains text (phase name, method, countdown)
+
+**Animation States:**
+- `inhale`: Circles expand smoothly over N seconds
+- `inhale_hold`: Circles stay expanded, shows countdown
+- `exhale`: Circles contract smoothly over N seconds  
+- `exhale_hold`: Circles stay contracted, shows countdown
+
+**Technical Implementation:**
+- Use CSS transitions with `transform: scale()` for smooth animations
+- `transition-duration` set dynamically based on phase duration
+- Inner text updates: "Inhale" / "Hold" / "Exhale" with method (Nose/Mouth)
+- Progress bar at bottom fills over total session duration
+
+### 4. Screen Designs
+
+**Exercise List Screen:**
+```
+┌────────────────────────────────────────┐
+│ ✕                  🍃                  │
+│               Breathe                   │
+│                                         │
+│ ┌───────┬─────────┬───────┬─────┬─────┐│
+│ │MORNING│ENERGIZE │ FOCUS │CALM │NIGHT││
+│ └───────┴─────────┴───────┴─────┴─────┘│
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ 🏝️  Calm Breathing                  │ │
+│ │     Lower your heart rate...        │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ 🐯  Energy Breathing                │ │
+│ │     Perfect when you need...        │ │
+│ └─────────────────────────────────────┘ │
+└────────────────────────────────────────┘
+```
+
+**Active Breathing Screen:**
+```
+┌────────────────────────────────────────┐
+│                                    (?) │
+│                                        │
+│         ┌──────────────────┐           │
+│        ╱                    ╲          │
+│       │    ┌──────────┐     │          │
+│       │   ╱            ╲    │          │
+│       │  │   Inhale    │    │          │
+│       │  │    Nose     │    │          │
+│       │   ╲            ╱    │          │
+│       │    └──────────┘     │          │
+│        ╲                    ╱          │
+│         └──────────────────┘           │
+│                                        │
+│    ═══════════════════════════════     │
+│    (progress bar)                      │
+│                                        │
+│    ┌──────────────────────────────┐    │
+│    │           Pause              │    │
+│    └──────────────────────────────┘    │
+└────────────────────────────────────────┘
+```
+
+### 5. Admin Panel
+
+**New admin page: `/admin/tools`**
+
+Add "Tools" tab to AdminNav with a `breathing_exercises` manager:
+- CRUD for breathing exercises
+- Fields: name, description, category, emoji, timings, methods
+- Sort order management
+- Toggle active/inactive
+
+### 6. Home Header Integration
+
+**Modify:** `src/pages/app/AppHome.tsx`
+
+Add a "Breathe" button next to the Journal icon in the header:
+```tsx
+<button onClick={() => navigate('/app/breathe')} className="p-2 text-foreground/70">
+  <Wind className="h-5 w-5" />  {/* or custom breathing icon */}
+</button>
+```
+
+### 7. Routing Updates
+
+**Modify:** `src/App.tsx`
+
+Add new route outside AppLayout (full-screen experience):
+```tsx
+<Route path="/app/breathe" element={<ProtectedRoute><AppBreathe /></ProtectedRoute>} />
+```
+
+Add admin route:
+```tsx
+<Route path="tools" element={<ProtectedRoute requiredPage="tools"><Tools /></ProtectedRoute>} />
+```
 
 ---
 
 ## Technical Details
 
-### TaskTimerScreen Component Structure
-```text
-┌────────────────────────────────────────┐
-│                                        │
-│           🧘 (emoji, large)            │
-│              Yoga                       │
-│        Goal: 0/20 minutes              │
-│                                        │
-│    ╭╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮           │
-│   ╎                        ╎           │
-│   ╎        19:53           ╎           │
-│   ╎    (countdown timer)   ╎           │
-│   ╎                        ╎           │
-│    ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯           │
-│     (dashed oval, fills white)         │
-│                                        │
-│                                        │
-│  ⏸      [Mark as complete]      ⏹     │
-│                                        │
-└────────────────────────────────────────┘
+### Breathing Animation Algorithm
+
+```typescript
+interface BreathingPhase {
+  type: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold';
+  duration: number; // seconds
+  method?: 'nose' | 'mouth';
+}
+
+// For "Calm Breathing" (4s inhale, 6s exhale):
+const phases: BreathingPhase[] = [
+  { type: 'inhale', duration: 4, method: 'nose' },
+  { type: 'exhale', duration: 6, method: 'mouth' },
+];
+
+// For "Focus Breathing" (4-4-4-4 box breathing):
+const phases: BreathingPhase[] = [
+  { type: 'inhale', duration: 4, method: 'nose' },
+  { type: 'inhale_hold', duration: 4 },
+  { type: 'exhale', duration: 4, method: 'mouth' },
+  { type: 'exhale_hold', duration: 4 },
+];
 ```
 
-### Timer Progress Circle (SVG)
-- Use SVG ellipse with dashed stroke
-- Calculate stroke-dasharray based on progress percentage
-- Animate fill as timer progresses
+### Circle Scale Values
+- **Contracted** (exhale complete): `scale(0.4)` inner, `scale(0.6)` middle
+- **Expanded** (inhale complete): `scale(1.0)` inner, `scale(1.0)` middle
 
-### NumberKeypad Validation Badge
-```text
-┌────────────────────────────────────────┐
-│  ✕              Minutes                │
-│           ┌──────────────┐             │
-│           │  0-99 only   │             │
-│           └──────────────┘             │
-│               100                      │
-│              (value)                   │
-└────────────────────────────────────────┘
-```
+### Color Scheme (matching Finch screenshots)
+- Background: `#5C5A8D` (deep purple-blue)
+- Outer circle: `#6B699E` (lighter purple)
+- Middle circle: `#9A98C2` (light purple/gray)
+- Inner circle: `#7C7AB0` (medium purple)
+- Text: White
 
 ---
 
-## Files to Create/Modify
+## Files to Create
 
-| File | Action | Description |
-|------|--------|-------------|
-| `src/components/app/TaskTimerScreen.tsx` | CREATE | Full-screen countdown timer |
-| `src/components/app/GoalSettingsSheet.tsx` | MODIFY | Add validation badges for min/sec limits |
-| `src/components/app/NumberKeypad.tsx` | MODIFY | Add validation hint/badge prop |
-| `src/components/app/TaskCard.tsx` | MODIFY | Play button for timer goals |
-| `src/components/app/TaskDetailModal.tsx` | MODIFY | Play button for timer goals |
-| `src/components/app/SortableTaskList.tsx` | MODIFY | Pass onOpenTimer handler |
-| `src/pages/app/AppHome.tsx` | MODIFY | Timer screen state + rendering |
-| `src/hooks/useTaskPlanner.tsx` | MODIFY | Timer progress mutation |
+| File | Purpose |
+|------|---------|
+| `src/pages/app/AppBreathe.tsx` | Main breathe page |
+| `src/pages/admin/Tools.tsx` | Admin tools page |
+| `src/components/breathe/BreathingExerciseCard.tsx` | Exercise list card |
+| `src/components/breathe/BreathingInfoSheet.tsx` | Technique info sheet |
+| `src/components/breathe/BreathingSettingsSheet.tsx` | Duration selector |
+| `src/components/breathe/BreathingActiveScreen.tsx` | Active breathing UI |
+| `src/components/breathe/BreathingCircle.tsx` | Animated circles |
+| `src/components/admin/BreathingExercisesManager.tsx` | Admin CRUD |
+| `src/hooks/useBreathingExercises.tsx` | Data fetching hook |
+
+## Files to Modify
+
+| File | Change |
+|------|--------|
+| `src/App.tsx` | Add `/app/breathe` and `/admin/tools` routes |
+| `src/pages/app/AppHome.tsx` | Add breathe button to header |
+| `src/components/admin/AdminNav.tsx` | Add Tools menu item |
 
 ---
 
 ## Implementation Order
 
-1. **NumberKeypad validation** - Add hint badge and input limits
-2. **GoalSettingsSheet validation** - Enforce 0-99 min, 0-59 sec with visual feedback
-3. **TaskCard updates** - Play button for timer goals
-4. **TaskTimerScreen component** - Full timer UI with all controls
-5. **AppHome integration** - State management and rendering
-6. **Testing** - Verify timer flow, progress saving, resume functionality
+1. **Database**: Create `breathing_exercises` table with RLS
+2. **Admin**: Build BreathingExercisesManager and Tools page
+3. **Seed Data**: Add initial exercises (Calm, Focus, Energy, etc.)
+4. **User Page**: Build AppBreathe with exercise list
+5. **Animation**: Build BreathingActiveScreen with circle animations
+6. **Sheets**: Build info and settings sheets
+7. **Integration**: Add button to home header
+8. **Testing**: Test full flow end-to-end
+
