@@ -32,6 +32,11 @@ export interface UserTask {
   // Pro Task fields
   pro_link_type: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
   pro_link_value: string | null;
+  // Goal tracking fields
+  goal_enabled: boolean;
+  goal_type: 'timer' | 'count' | null;
+  goal_target: number | null;
+  goal_unit: string | null;
   // Joined data (optional, populated by queries)
   linked_playlist?: {
     id: string;
@@ -54,6 +59,7 @@ export interface TaskCompletion {
   user_id: string;
   completed_date: string;
   completed_at: string;
+  goal_progress: number;
 }
 
 export interface SubtaskCompletion {
@@ -116,6 +122,10 @@ export interface CreateTaskInput {
   linked_playlist_id?: string | null;
   pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | null;
   pro_link_value?: string | null;
+  goal_enabled?: boolean;
+  goal_type?: 'timer' | 'count' | null;
+  goal_target?: number | null;
+  goal_unit?: string | null;
 }
 
 export interface UpdateTaskInput extends Partial<CreateTaskInput> {
@@ -485,6 +495,10 @@ export const useCreateTask = () => {
           linked_playlist_id: taskData.linked_playlist_id || null,
           pro_link_type: taskData.pro_link_type || null,
           pro_link_value: taskData.pro_link_value || null,
+          goal_enabled: taskData.goal_enabled || false,
+          goal_type: taskData.goal_type || null,
+          goal_target: taskData.goal_target || null,
+          goal_unit: taskData.goal_unit || null,
         })
         .select()
         .single();
@@ -896,6 +910,73 @@ export const useUncompleteSubtask = () => {
     },
     onError: (error) => {
       console.error('Uncomplete subtask error:', error);
+    },
+  });
+};
+
+/**
+ * Increment goal progress for a task on a specific date
+ */
+export const useIncrementGoal = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ taskId, date }: { taskId: string; date: Date }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      const dateStr = format(date, 'yyyy-MM-dd');
+
+      // Check if completion exists for this date
+      const { data: existing } = await supabase
+        .from('task_completions')
+        .select('id, goal_progress')
+        .eq('task_id', taskId)
+        .eq('user_id', user.id)
+        .eq('completed_date', dateStr)
+        .maybeSingle();
+
+      if (existing) {
+        // Update existing completion with incremented goal
+        const newProgress = (existing.goal_progress || 0) + 1;
+        const { data, error } = await supabase
+          .from('task_completions')
+          .update({ goal_progress: newProgress })
+          .eq('id', existing.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return { completion: data, newProgress };
+      } else {
+        // Create new completion with goal_progress = 1
+        const { data, error } = await supabase
+          .from('task_completions')
+          .insert({
+            task_id: taskId,
+            user_id: user.id,
+            completed_date: dateStr,
+            goal_progress: 1,
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        
+        // Update streak
+        const streakResult = await updateStreak(user.id, dateStr);
+        
+        return { completion: data, newProgress: 1, streakIncreased: streakResult.increased };
+      }
+    },
+    onSuccess: (_, variables) => {
+      const dateStr = format(variables.date, 'yyyy-MM-dd');
+      queryClient.invalidateQueries({ queryKey: ['planner-completions', user?.id, dateStr] });
+      queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
+    },
+    onError: (error) => {
+      console.error('Increment goal error:', error);
     },
   });
 };

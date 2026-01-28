@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format, addDays, nextMonday, startOfDay } from 'date-fns';
-import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock } from 'lucide-react';
+import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,7 @@ import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { TaskIcon } from '@/components/app/IconPicker';
 import { TimeWheelPicker } from '@/components/app/TimeWheelPicker';
 import { PRO_LINK_TYPES, ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
+import { GoalSettingsSheet, GoalSettings, formatGoalTarget } from '@/components/app/GoalSettingsSheet';
 
 // Me+ style pastel color options with hex values
 const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
@@ -96,6 +97,10 @@ export interface TaskFormData {
   linkedPlaylistId: string | null;
   proLinkType: ProLinkType | null;
   proLinkValue: string | null;
+  goalEnabled: boolean;
+  goalType: 'timer' | 'count';
+  goalTarget: number;
+  goalUnit: string;
 }
 
 // Playlist type for the picker
@@ -156,6 +161,14 @@ const AppTaskCreate = ({
   const [proLinkType, setProLinkType] = useState<ProLinkType | null>(initialData?.proLinkType ?? null);
   const [proLinkValue, setProLinkValue] = useState<string | null>(initialData?.proLinkValue ?? null);
   const [newTagName, setNewTagName] = useState('');
+  
+  // Goal settings state
+  const [goalSettings, setGoalSettings] = useState<GoalSettings>({
+    enabled: initialData?.goalEnabled ?? false,
+    type: initialData?.goalType ?? 'count',
+    target: initialData?.goalTarget ?? 1,
+    unit: initialData?.goalUnit ?? 'times',
+  });
 
   // Sheet states
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -168,6 +181,7 @@ const AppTaskCreate = ({
   const [showTagPicker, setShowTagPicker] = useState(false);
   const [showProLinkPicker, setShowProLinkPicker] = useState(false);
   const [showPlaylistPicker, setShowPlaylistPicker] = useState(false);
+  const [showGoalSettings, setShowGoalSettings] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   
   // Refs for subtask inputs to scroll into view
@@ -251,6 +265,12 @@ const AppTaskCreate = ({
       setLinkedPlaylistId(initialData.linkedPlaylistId ?? null);
       setProLinkType(initialData.proLinkType ?? null);
       setProLinkValue(initialData.proLinkValue ?? null);
+      setGoalSettings({
+        enabled: initialData.goalEnabled ?? false,
+        type: initialData.goalType ?? 'count',
+        target: initialData.goalTarget ?? 1,
+        unit: initialData.goalUnit ?? 'times',
+      });
     }
   }, [isSheet, initialData, sheetOpen]);
 
@@ -284,6 +304,14 @@ const AppTaskCreate = ({
       setLinkedPlaylistId(existingTask.linked_playlist_id ?? null);
       setProLinkType(existingTask.pro_link_type ?? null);
       setProLinkValue(existingTask.pro_link_value ?? null);
+      
+      // Goal settings from existing task
+      setGoalSettings({
+        enabled: (existingTask as any).goal_enabled ?? false,
+        type: (existingTask as any).goal_type ?? 'count',
+        target: (existingTask as any).goal_target ?? 1,
+        unit: (existingTask as any).goal_unit ?? 'times',
+      });
     }
   }, [existingTask, isSheet]);
 
@@ -316,6 +344,10 @@ const AppTaskCreate = ({
         linkedPlaylistId,
         proLinkType,
         proLinkValue,
+        goalEnabled: goalSettings.enabled,
+        goalType: goalSettings.type,
+        goalTarget: goalSettings.target,
+        goalUnit: goalSettings.unit,
       });
       return;
     }
@@ -337,6 +369,10 @@ const AppTaskCreate = ({
       linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : linkedPlaylistId,
       pro_link_type: proLinkType,
       pro_link_value: proLinkValue,
+      goal_enabled: goalSettings.enabled,
+      goal_type: goalSettings.enabled ? goalSettings.type : null,
+      goal_target: goalSettings.enabled ? goalSettings.target : null,
+      goal_unit: goalSettings.enabled ? goalSettings.unit : null,
     };
 
     if (taskId) {
@@ -660,6 +696,26 @@ const AppTaskCreate = ({
         </button>
       </div>
 
+      {/* Goal - Separate card */}
+      <div className="mx-4 mt-3 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <button
+          onClick={() => setShowGoalSettings(true)}
+          className={cn(
+            "w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50",
+            goalSettings.enabled && "bg-emerald-50 dark:bg-emerald-900/20"
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <Target className={cn("h-5 w-5", goalSettings.enabled ? "text-emerald-600" : "text-foreground/70")} />
+            <span className="font-medium">Goal</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span>{goalSettings.enabled ? formatGoalTarget(goalSettings) : 'Off'}</span>
+            <ChevronRight className="h-4 w-4" />
+          </div>
+        </button>
+      </div>
+
       {/* Pro Task Link - Separate card */}
       <div className="mx-4 mt-3 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
         <button
@@ -737,6 +793,14 @@ const AppTaskCreate = ({
         onOpenChange={setShowIconPicker}
         selectedEmoji={icon}
         onSelect={setIcon}
+      />
+
+      {/* Goal Settings Sheet */}
+      <GoalSettingsSheet
+        open={showGoalSettings}
+        onOpenChange={setShowGoalSettings}
+        value={goalSettings}
+        onChange={setGoalSettings}
       />
 
       {/* Date Picker Sheet - Me+ Full Page Style */}
