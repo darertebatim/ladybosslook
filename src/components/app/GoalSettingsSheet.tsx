@@ -6,6 +6,16 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
 import { NumberKeypad } from './NumberKeypad';
 import { UnitSelectionSheet } from './UnitSelectionSheet';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export type GoalType = 'timer' | 'count';
 
@@ -21,6 +31,8 @@ interface GoalSettingsSheetProps {
   onOpenChange: (open: boolean) => void;
   value: GoalSettings;
   onChange: (value: GoalSettings) => void;
+  hasExistingProgress?: boolean;
+  onResetProgress?: () => void;
 }
 
 export const GoalSettingsSheet = ({
@@ -28,6 +40,8 @@ export const GoalSettingsSheet = ({
   onOpenChange,
   value,
   onChange,
+  hasExistingProgress = false,
+  onResetProgress,
 }: GoalSettingsSheetProps) => {
   const [enabled, setEnabled] = useState(value.enabled);
   const [goalType, setGoalType] = useState<GoalType>(value.type);
@@ -45,6 +59,15 @@ export const GoalSettingsSheet = ({
   // Validation hints
   const [minutesHint, setMinutesHint] = useState<string | null>(null);
   const [secondsHint, setSecondsHint] = useState<string | null>(null);
+  
+  // Confirmation dialog for goal type/unit changes
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [pendingType, setPendingType] = useState<GoalType | null>(null);
+  const [pendingUnit, setPendingUnit] = useState<string | null>(null);
+
+  // Track original values to detect changes
+  const originalType = value.type;
+  const originalUnit = value.unit;
 
   // Sync state when value prop changes
   useEffect(() => {
@@ -67,12 +90,43 @@ export const GoalSettingsSheet = ({
       target = parseInt(countValue) || 1;
     }
 
+    // Check if goal type or unit changed and there's existing progress
+    const typeChanged = goalType !== originalType;
+    const unitChanged = goalType === 'count' && unit !== originalUnit;
+    
+    if (hasExistingProgress && (typeChanged || unitChanged)) {
+      setPendingType(goalType);
+      setPendingUnit(goalType === 'count' ? unit : 'minutes');
+      setShowResetConfirm(true);
+      return;
+    }
+
     onChange({
       enabled,
       type: goalType,
       target,
       unit: goalType === 'count' ? unit : 'minutes',
     });
+    onOpenChange(false);
+  };
+
+  const handleConfirmReset = () => {
+    onResetProgress?.();
+    
+    let target = 0;
+    if (goalType === 'timer') {
+      target = (parseInt(timerMinutes) || 0) * 60 + (parseInt(timerSeconds) || 0);
+    } else {
+      target = parseInt(countValue) || 1;
+    }
+
+    onChange({
+      enabled,
+      type: pendingType || goalType,
+      target,
+      unit: pendingUnit || (goalType === 'count' ? unit : 'minutes'),
+    });
+    setShowResetConfirm(false);
     onOpenChange(false);
   };
 
@@ -286,6 +340,31 @@ export const GoalSettingsSheet = ({
         value={unit}
         onChange={setUnit}
       />
+
+      {/* Reset confirmation dialog */}
+      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <AlertDialogContent className="rounded-3xl max-w-[90%]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl text-center">
+              Changing the goal type or unit will delete all your previous data
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-base">
+              This includes all progress you've made. Do you still want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
+            <AlertDialogAction
+              onClick={handleConfirmReset}
+              className="w-full h-14 rounded-full bg-violet-500 hover:bg-violet-600 text-white text-lg font-semibold"
+            >
+              Confirm Change
+            </AlertDialogAction>
+            <AlertDialogCancel className="w-full h-12 rounded-full border-0 bg-transparent text-muted-foreground hover:bg-transparent hover:text-foreground text-base">
+              Cancel
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
