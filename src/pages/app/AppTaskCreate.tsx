@@ -723,20 +723,6 @@ const AppTaskCreate = ({
         Subtasks can be set as your daily routine or checklist
       </p>
 
-      {/* Delete button (edit mode only, page mode only) */}
-      {!isSheet && taskId && (
-        <div className="p-4 mt-4">
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            className="w-full rounded-2xl"
-            disabled={deleteTask.isPending}
-          >
-            Delete Task
-          </Button>
-        </div>
-      )}
-
       {/* Bottom safe area */}
       <div className="pb-safe h-8" />
     </div>
@@ -1646,9 +1632,20 @@ const AppTaskCreate = ({
                 className="flex items-center justify-between px-4 py-3 flex-shrink-0 transition-colors duration-300"
                 style={{ backgroundColor: bgColor }}
               >
-                <button onClick={handleClose} className="p-2 -ml-2">
-                  <X className="h-5 w-5" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button onClick={handleClose} className="p-2 -ml-2">
+                    <X className="h-5 w-5" />
+                  </button>
+                  {taskId && (
+                    <button 
+                      onClick={handleDelete} 
+                      disabled={deleteTask.isPending}
+                      className="p-2 text-destructive"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                  )}
+                </div>
                 <h1 className="text-lg font-semibold">Edit Task</h1>
                 <Button
                   onClick={handleSubmit}
@@ -1684,9 +1681,20 @@ const AppTaskCreate = ({
         }}
       >
         <div className="flex items-center justify-between px-4 h-12">
-          <button onClick={handleClose} className="p-2 -ml-2">
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button onClick={handleClose} className="p-2 -ml-2">
+              <X className="h-5 w-5" />
+            </button>
+            {taskId && (
+              <button 
+                onClick={handleDelete} 
+                disabled={deleteTask.isPending}
+                className="p-2 text-destructive"
+              >
+                <Trash2 className="h-5 w-5" />
+              </button>
+            )}
+          </div>
           <div className="flex-1" />
           <Button
             onClick={handleSubmit}
