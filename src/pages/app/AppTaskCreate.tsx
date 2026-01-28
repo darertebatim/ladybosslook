@@ -605,7 +605,7 @@ const AppTaskCreate = ({
         {/* Date */}
         <button
           onClick={() => setShowDatePicker(true)}
-          className="w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
+          className="w-full flex items-center justify-between py-3 px-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
             <Calendar className="h-5 w-5 text-foreground/70" />
@@ -620,7 +620,7 @@ const AppTaskCreate = ({
         {/* Repeat */}
         <button
           onClick={() => setShowRepeatPicker(true)}
-          className="w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
+          className="w-full flex items-center justify-between py-3 px-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
             <Repeat className="h-5 w-5 text-foreground/70" />
@@ -635,7 +635,7 @@ const AppTaskCreate = ({
         {/* Time */}
         <button
           onClick={() => setShowTimePicker(true)}
-          className="w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
+          className="w-full flex items-center justify-between py-3 px-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
             <Clock className="h-5 w-5 text-foreground/70" />
@@ -650,7 +650,7 @@ const AppTaskCreate = ({
         {/* Reminder */}
         <button
           onClick={() => setShowReminderPicker(true)}
-          className="w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
+          className="w-full flex items-center justify-between py-3 px-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
             <Bell className="h-5 w-5 text-foreground/70" />
@@ -664,7 +664,7 @@ const AppTaskCreate = ({
 
         {/* Urgent - Only show when reminder is enabled and time is set */}
         {reminderEnabled && scheduledTime && (
-          <div className="flex items-center justify-between p-4 border-b border-muted/30">
+          <div className="flex items-center justify-between py-3 px-4 border-b border-muted/30">
             <div className="flex items-center gap-3">
               <AlarmClock className={cn("h-5 w-5", isUrgent ? "text-red-500" : "text-foreground/70")} />
               <div className="flex flex-col">
@@ -683,7 +683,7 @@ const AppTaskCreate = ({
         {/* Tag */}
         <button
           onClick={() => setShowTagPicker(true)}
-          className="w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50"
+          className="w-full flex items-center justify-between py-3 px-4 hover:bg-muted/30 active:bg-muted/50"
         >
           <div className="flex items-center gap-3">
             <Tag className="h-5 w-5 text-foreground/70" />
@@ -697,11 +697,11 @@ const AppTaskCreate = ({
       </div>
 
       {/* Goal - Separate card */}
-      <div className="mx-4 mt-3 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="mx-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
         <button
           onClick={() => setShowGoalSettings(true)}
           className={cn(
-            "w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50",
+            "w-full flex items-center justify-between py-3 px-4 hover:bg-muted/30 active:bg-muted/50",
             goalSettings.enabled && "bg-emerald-50 dark:bg-emerald-900/20"
           )}
         >
@@ -717,11 +717,11 @@ const AppTaskCreate = ({
       </div>
 
       {/* Pro Task Link - Separate card */}
-      <div className="mx-4 mt-3 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="mx-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
         <button
           onClick={() => setShowProLinkPicker(true)}
           className={cn(
-            "w-full flex items-center justify-between p-4 hover:bg-muted/30 active:bg-muted/50",
+            "w-full flex items-center justify-between py-3 px-4 hover:bg-muted/30 active:bg-muted/50",
             proLinkType && "bg-violet-50 dark:bg-violet-900/20"
           )}
         >
