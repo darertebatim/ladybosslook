@@ -43,6 +43,7 @@ const AppJournalEntry = lazy(() => import("@/pages/app/AppJournalEntry"));
 const AppTaskCreate = lazy(() => import("@/pages/app/AppTaskCreate"));
 const AppInspire = lazy(() => import("@/pages/app/AppInspire"));
 const AppInspireDetail = lazy(() => import("@/pages/app/AppInspireDetail"));
+const AppBreathe = lazy(() => import("@/pages/app/AppBreathe"));
 
 // Lazy load admin pages
 const Users = lazy(() => import("@/pages/admin/Users"));
@@ -56,6 +57,7 @@ const AppIconGenerator = lazy(() => import("@/pages/admin/AppIconGenerator"));
 const Support = lazy(() => import("@/pages/admin/Support"));
 const Community = lazy(() => import("@/pages/admin/Community"));
 const Routines = lazy(() => import("@/pages/admin/Routines"));
+const Tools = lazy(() => import("@/pages/admin/Tools"));
 
 // Lazy load marketing/landing pages
 const Programs = lazy(() => import("@/pages/Programs"));
@@ -257,6 +259,7 @@ const App = () => (
                       <Route path="support" element={<ProtectedRoute requiredPage="support"><Support /></ProtectedRoute>} />
                       <Route path="system" element={<ProtectedRoute requiredPage="system"><System /></ProtectedRoute>} />
                       <Route path="app-icon" element={<ProtectedRoute requiredPage="system"><AppIconGenerator /></ProtectedRoute>} />
+                      <Route path="tools" element={<ProtectedRoute requiredPage="tools"><Tools /></ProtectedRoute>} />
                     </Route>
                   )}
                   
@@ -297,6 +300,7 @@ const App = () => (
                   <Route path="/app/home/new" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
                   <Route path="/app/home/edit/:taskId" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
                   <Route path="/app/channels/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
+                  <Route path="/app/breathe" element={<ProtectedRoute><AppBreathe /></ProtectedRoute>} />
                   {/* Redirect old feed post route */}
                   <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
                   
