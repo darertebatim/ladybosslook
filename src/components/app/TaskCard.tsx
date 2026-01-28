@@ -124,8 +124,8 @@ export const TaskCard = memo(function TaskCard({
           {/* Content */}
           <div className="flex-1 min-w-0">
             {/* Top line: Time + Badge */}
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-black font-medium">{formatTime(task.scheduled_time)}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[13px] text-black/80">{formatTime(task.scheduled_time)}</span>
               <span className={cn(
                 'px-2 py-0.5 rounded-full text-xs font-medium',
                 proConfig.badgeColorClass
@@ -136,7 +136,7 @@ export const TaskCard = memo(function TaskCard({
             
             {/* Title */}
             <p className={cn(
-              'font-semibold text-black text-[15px] truncate transition-all',
+              'font-bold text-black text-[16px] truncate transition-all',
               isCompleted && 'line-through'
             )}>
               {task.title}
@@ -199,24 +199,24 @@ export const TaskCard = memo(function TaskCard({
       <div className="flex items-center gap-3">
         {/* Icon - emoji display like Me+ */}
         <div className="w-12 h-12 flex items-center justify-center shrink-0">
-          <TaskIcon iconName={task.emoji} size={28} className="text-black/80" />
+          <TaskIcon iconName={task.emoji} size={32} className="text-black/80" />
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Top line: subtask count + time */}
-          <div className="flex items-center gap-2 text-sm text-black">
+          <div className="flex items-center gap-2">
             {hasSubtasks && (
-              <span className="font-semibold bg-white/50 px-1.5 py-0.5 rounded text-xs">
+              <span className="font-semibold bg-white/50 px-1.5 py-0.5 rounded text-xs text-black">
                 {completedCount}/{totalSubtasks}
               </span>
             )}
-            <span className="font-medium">{formatTime(task.scheduled_time)}</span>
+            <span className="text-[13px] text-black/80">{formatTime(task.scheduled_time)}</span>
           </div>
           
           {/* Title */}
           <p className={cn(
-            'font-semibold text-black text-[15px] truncate transition-all',
+            'font-bold text-black text-[16px] truncate transition-all',
             isCompleted && 'line-through'
           )}>
             {task.title}
