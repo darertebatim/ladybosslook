@@ -168,14 +168,11 @@ export const TaskCard = memo(function TaskCard({
           {/* Checkbox - larger, Me+ style */}
           <button
             onClick={handleToggleComplete}
-            disabled={isFutureDate}
             className={cn(
               'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
               isCompleted
                 ? 'bg-emerald-500 text-white shadow-md'
-                : isFutureDate
-                  ? 'border-2 border-foreground/15 bg-white/30 cursor-not-allowed opacity-50'
-                  : 'border-2 border-foreground/30 bg-white/60',
+                : 'border-2 border-foreground/30 bg-white/60',
               isAnimating && 'scale-110'
             )}
           >
@@ -226,14 +223,11 @@ export const TaskCard = memo(function TaskCard({
         {/* Checkbox - larger, Me+ style */}
         <button
           onClick={handleToggleComplete}
-          disabled={isFutureDate}
           className={cn(
             'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
             isCompleted
               ? 'bg-emerald-500 text-white shadow-md'
-              : isFutureDate
-                ? 'border-2 border-foreground/15 bg-white/30 cursor-not-allowed opacity-50'
-                : 'border-2 border-foreground/30 bg-white/60',
+              : 'border-2 border-foreground/30 bg-white/60',
             isAnimating && 'scale-110'
           )}
         >
