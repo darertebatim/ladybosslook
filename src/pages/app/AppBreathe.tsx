@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Leaf, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SEOHead } from '@/components/SEOHead';
@@ -21,6 +21,7 @@ import { haptic } from '@/lib/haptics';
 
 export default function AppBreathe() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { data: exercises, isLoading } = useBreathingExercises();
   
   const [selectedCategory, setSelectedCategory] = useState<string>('calm');
@@ -29,6 +30,20 @@ export default function AppBreathe() {
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
   const [showActiveScreen, setShowActiveScreen] = useState(false);
   const [sessionDuration, setSessionDuration] = useState(180); // 3 minutes default
+
+  // Handle deep link to specific exercise from pro task
+  const exerciseId = searchParams.get('exercise');
+  
+  useEffect(() => {
+    if (exerciseId && exercises && exercises.length > 0) {
+      const exercise = exercises.find(e => e.id === exerciseId);
+      if (exercise) {
+        setSelectedExercise(exercise);
+        setSelectedCategory(exercise.category);
+        setShowInfoSheet(true);
+      }
+    }
+  }, [exerciseId, exercises]);
 
   // Filter exercises by category
   const filteredExercises = useMemo(() => {
@@ -82,7 +97,7 @@ export default function AppBreathe() {
         description="Breathing exercises for relaxation and focus" 
       />
       
-      <div className="flex flex-col h-full overflow-hidden bg-gradient-to-b from-[#5C5A8D] to-[#4A4875]">
+      <div className="fixed inset-0 flex flex-col overflow-hidden bg-gradient-to-b from-[#5C5A8D] to-[#4A4875]">
         {/* Fixed Header */}
         <div 
           className="fixed top-0 left-0 right-0 z-10"
