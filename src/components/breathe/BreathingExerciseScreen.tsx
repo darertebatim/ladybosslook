@@ -239,35 +239,35 @@ export function BreathingExerciseScreen({
   const circleState = getCircleState();
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-gradient-to-b from-primary-dark via-primary to-primary-light">
+    <div className="fixed inset-0 z-50 bg-gradient-to-b from-primary-dark via-primary to-primary-light">
       {/* Safe area top padding */}
-      <div style={{ paddingTop: 'env(safe-area-inset-top)' }} />
-
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3">
-        <button
-          onClick={handleClose}
-          className="p-2 rounded-full bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20 transition-colors"
-        >
-          <X className="h-5 w-5" />
-        </button>
-        
-        {isActive && (
-          <span className="text-primary-foreground/80 font-medium">
-            {formatTime(selectedDuration - totalElapsed)}
-          </span>
-        )}
-        
-        <button
-          onClick={() => setShowInfoSheet(true)}
-          className="p-2 rounded-full bg-primary-foreground/10 text-primary-foreground/70 hover:bg-primary-foreground/20 transition-colors"
-        >
-          <HelpCircle className="h-5 w-5" />
-        </button>
+      <div className="absolute top-0 left-0 right-0" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3">
+          <button
+            onClick={handleClose}
+            className="p-2 rounded-full bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20 transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          
+          {isActive && (
+            <span className="text-primary-foreground/80 font-medium">
+              {formatTime(selectedDuration - totalElapsed)}
+            </span>
+          )}
+          
+          <button
+            onClick={() => setShowInfoSheet(true)}
+            className="p-2 rounded-full bg-primary-foreground/10 text-primary-foreground/70 hover:bg-primary-foreground/20 transition-colors"
+          >
+            <HelpCircle className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
-      {/* Main breathing visualization */}
-      <div className="flex-1 flex items-center justify-center">
+      {/* Main breathing visualization - absolutely centered */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <BreathingCircle
           phase={circleState.phase}
           phaseDuration={isActive && !isPaused ? currentPhase?.duration || 4 : 0}
@@ -277,50 +277,47 @@ export function BreathingExerciseScreen({
         />
       </div>
 
-      {/* Controls section - fixed height to prevent layout shift */}
-      <div className="px-6 pb-safe mb-8">
-        {/* Fixed height container for duration/progress area */}
-        <div className="h-24 flex flex-col justify-end">
-          {/* Duration selector (only shown when not active) */}
-          {!isActive && !isCountingDown && (
-            <div className="animate-fade-in">
-              <h4 className="text-sm font-medium text-primary-foreground/60 mb-3 text-center">LENGTH</h4>
-              <div className="grid grid-cols-4 gap-2">
-                {DURATION_OPTIONS.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => {
-                      setSelectedDuration(option.value);
-                      haptic.light();
-                    }}
-                    className={cn(
-                      'py-3 px-2 rounded-xl text-sm font-medium transition-all',
-                      selectedDuration === option.value
-                        ? 'bg-primary-foreground text-primary'
-                        : 'bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
-                    )}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
+      {/* Controls section - fixed to bottom */}
+      <div className="absolute bottom-0 left-0 right-0 px-6 pb-safe mb-8">
+        {/* Duration selector (only shown when not active) */}
+        {!isActive && !isCountingDown && (
+          <div className="mb-4 animate-fade-in">
+            <h4 className="text-sm font-medium text-primary-foreground/60 mb-3 text-center">LENGTH</h4>
+            <div className="grid grid-cols-4 gap-2">
+              {DURATION_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setSelectedDuration(option.value);
+                    haptic.light();
+                  }}
+                  className={cn(
+                    'py-3 px-2 rounded-xl text-sm font-medium transition-all',
+                    selectedDuration === option.value
+                      ? 'bg-primary-foreground text-primary'
+                      : 'bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Progress bar (only shown when active) */}
-          {(isActive || isCountingDown) && (
-            <div className="animate-fade-in">
-              <Progress 
-                value={progressPercent} 
-                className="h-2 bg-primary-foreground/20 [&>div]:bg-primary-foreground"
-              />
-              <div className="flex justify-between mt-2 text-sm text-primary-foreground/60">
-                <span>{formatTime(totalElapsed)}</span>
-                <span>{formatTime(selectedDuration)}</span>
-              </div>
+        {/* Progress bar (only shown when active) */}
+        {(isActive || isCountingDown) && (
+          <div className="mb-4 animate-fade-in">
+            <Progress 
+              value={progressPercent} 
+              className="h-2 bg-primary-foreground/20 [&>div]:bg-primary-foreground"
+            />
+            <div className="flex justify-between mt-2 text-sm text-primary-foreground/60">
+              <span>{formatTime(totalElapsed)}</span>
+              <span>{formatTime(selectedDuration)}</span>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Action button */}
         {!isCountingDown && (
