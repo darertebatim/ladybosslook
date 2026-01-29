@@ -1,6 +1,6 @@
 import { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Plus, Play } from 'lucide-react';
+import { Check, Plus, Play, Droplets } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   UserTask, 
@@ -14,6 +14,7 @@ import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 import { isToday, isBefore, startOfDay } from 'date-fns';
 import { toast } from 'sonner';
+import { isWaterTask } from '@/lib/waterTracking';
 
 interface TaskCardProps {
   task: UserTask;
@@ -25,6 +26,7 @@ interface TaskCardProps {
   onStreakIncrease?: () => void;
   onOpenGoalInput?: (task: UserTask) => void;
   onOpenTimer?: (task: UserTask) => void;
+  onOpenWaterTracking?: (task: UserTask) => void;
 }
 
 export const TaskCard = memo(function TaskCard({
@@ -37,6 +39,7 @@ export const TaskCard = memo(function TaskCard({
   onStreakIncrease,
   onOpenGoalInput,
   onOpenTimer,
+  onOpenWaterTracking,
 }: TaskCardProps) {
   const navigate = useNavigate();
   const [isAnimating, setIsAnimating] = useState(false);
@@ -62,6 +65,7 @@ export const TaskCard = memo(function TaskCard({
   const hasGoal = task.goal_enabled && task.goal_target && task.goal_target > 0;
   const isTimerGoal = hasGoal && task.goal_type === 'timer';
   const isCountGoal = hasGoal && task.goal_type === 'count';
+  const isWater = isWaterTask(task);
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
   
   // Format time display
@@ -119,6 +123,12 @@ export const TaskCard = memo(function TaskCard({
     }
     
     haptic.light();
+    
+    // Check if this is a water task - open water tracking screen instead
+    if (isWater && onOpenWaterTracking) {
+      onOpenWaterTracking(task);
+      return;
+    }
     
     if (onOpenGoalInput) {
       onOpenGoalInput(task);
@@ -361,12 +371,16 @@ export const TaskCard = memo(function TaskCard({
               'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
               goalReached
                 ? 'bg-emerald-500 text-white shadow-md'
-                : 'border-2 border-foreground/30 bg-white/60',
+                : isWater 
+                  ? 'border-2 border-sky-400 bg-sky-100'
+                  : 'border-2 border-foreground/30 bg-white/60',
               isAnimating && 'scale-110'
             )}
           >
             {goalReached ? (
               <Check className="h-4 w-4" strokeWidth={3} />
+            ) : isWater ? (
+              <Droplets className="h-5 w-5 text-sky-500" />
             ) : (
               <Plus className="h-5 w-5 text-foreground/70" strokeWidth={2} />
             )}

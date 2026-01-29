@@ -1,4 +1,4 @@
-import { Check, X, Pencil, Plus, Play } from 'lucide-react';
+import { Check, X, Pencil, Plus, Play, Droplets } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
+import { isWaterTask } from '@/lib/waterTracking';
 
 interface TaskDetailModalProps {
   task: UserTask | null;
@@ -28,6 +29,7 @@ interface TaskDetailModalProps {
   onStreakIncrease?: () => void;
   onOpenGoalInput?: (task: UserTask) => void;
   onOpenTimer?: (task: UserTask) => void;
+  onOpenWaterTracking?: (task: UserTask) => void;
 }
 
 export const TaskDetailModal = ({
@@ -42,6 +44,7 @@ export const TaskDetailModal = ({
   onStreakIncrease,
   onOpenGoalInput,
   onOpenTimer,
+  onOpenWaterTracking,
 }: TaskDetailModalProps) => {
   const navigate = useNavigate();
   const { data: subtasks = [] } = useSubtasks(task?.id);
@@ -62,6 +65,7 @@ export const TaskDetailModal = ({
   const hasGoal = task.goal_enabled && task.goal_target && task.goal_target > 0;
   const isTimerGoal = hasGoal && task.goal_type === 'timer';
   const isCountGoal = hasGoal && task.goal_type === 'count';
+  const isWater = isWaterTask(task);
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
 
   // Format time display
@@ -194,18 +198,26 @@ export const TaskDetailModal = ({
               <button
                 onClick={() => {
                   haptic.light();
-                  onOpenGoalInput?.(task);
+                  if (isWater && onOpenWaterTracking) {
+                    onOpenWaterTracking(task);
+                  } else {
+                    onOpenGoalInput?.(task);
+                  }
                   onClose();
                 }}
                 className={cn(
                   'w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all',
                   goalReached
                     ? 'bg-emerald-500 border-emerald-500 text-white'
-                    : 'border-foreground/30 bg-white/40 hover:bg-white/60'
+                    : isWater
+                      ? 'border-sky-400 bg-sky-100'
+                      : 'border-foreground/30 bg-white/40 hover:bg-white/60'
                 )}
               >
                 {goalReached ? (
                   <Check className="h-5 w-5" strokeWidth={3} />
+                ) : isWater ? (
+                  <Droplets className="h-5 w-5 text-sky-500" />
                 ) : (
                   <Plus className="h-5 w-5" strokeWidth={2} />
                 )}

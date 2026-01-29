@@ -28,6 +28,8 @@ import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
 import { haptic } from '@/lib/haptics';
 import { GoalInputSheet } from '@/components/app/GoalInputSheet';
 import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
+import { WaterTrackingScreen } from '@/components/app/WaterTrackingScreen';
+import { isWaterTask } from '@/lib/waterTracking';
 import { toast } from 'sonner';
 const AppHome = () => {
   const navigate = useNavigate();
@@ -49,6 +51,9 @@ const AppHome = () => {
   
   // Timer screen state
   const [timerTask, setTimerTask] = useState<UserTask | null>(null);
+  
+  // Water tracking screen state
+  const [waterTask, setWaterTask] = useState<UserTask | null>(null);
 
   // App tour hook
   const {
@@ -188,6 +193,31 @@ const AppHome = () => {
   const handleOpenTimer = useCallback((task: UserTask) => {
     setTimerTask(task);
   }, []);
+
+  const handleOpenWaterTracking = useCallback((task: UserTask) => {
+    setWaterTask(task);
+  }, []);
+
+  const handleAddWater = useCallback((amount: number) => {
+    if (!waterTask) return;
+    
+    addGoalProgress.mutate(
+      { taskId: waterTask.id, date: selectedDate, amount },
+      {
+        onSuccess: (result) => {
+          haptic.success();
+          const unit = waterTask.goal_unit || 'oz';
+          toast(`+${amount} ${unit}`, {
+            description: `Progress: ${result.newProgress}/${waterTask.goal_target}`,
+            duration: 2000,
+          });
+          if (result.streakIncreased) {
+            setShowStreakModal(true);
+          }
+        },
+      }
+    );
+  }, [waterTask, selectedDate, addGoalProgress]);
 
   const handleGoalInputConfirm = useCallback((amount: number) => {
     if (!goalInputTask) return;
@@ -467,7 +497,7 @@ const AppHome = () => {
                     </h2>
                     <span className="text-xs text-foreground/40 ml-auto">Hold to reorder</span>
                   </div>
-                  <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                  <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenWaterTracking={handleOpenWaterTracking} />
                 </div>}
 
               {/* Popular Routines Suggestions - only show routines user hasn't added */}
@@ -524,6 +554,7 @@ const AppHome = () => {
           onStreakIncrease={() => setShowStreakModal(true)}
           onOpenGoalInput={handleOpenGoalInput}
           onOpenTimer={handleOpenTimer}
+          onOpenWaterTracking={handleOpenWaterTracking}
         />
 
         {/* Streak celebration modal */}
@@ -548,7 +579,21 @@ const AppHome = () => {
           />
         )}
 
-        {/* Push notification onboarding (triggered from banner) */}
+        {/* Water Tracking Screen - Full screen overlay */}
+        {waterTask && (
+          <WaterTrackingScreen
+            task={waterTask}
+            date={selectedDate}
+            goalProgress={goalProgressMap.get(waterTask.id) || 0}
+            onClose={() => setWaterTask(null)}
+            onAddWater={handleAddWater}
+            onOpenSettings={() => {
+              setWaterTask(null);
+              handleEditTask(waterTask);
+            }}
+          />
+        )}
+
         {user && showNotificationFlow && <PushNotificationOnboarding userId={user.id} onComplete={() => setShowNotificationFlow(false)} onSkip={() => setShowNotificationFlow(false)} />}
 
         {/* App Tour - Joyride guided walkthrough */}
