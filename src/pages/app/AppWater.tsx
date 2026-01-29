@@ -163,7 +163,7 @@ const AppWater = () => {
   // Loading state
   if (tasksLoading) {
     return (
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-b from-sky-200 to-sky-50">
+      <div className="fixed inset-0 z-10 flex items-center justify-center bg-gradient-to-b from-sky-200 to-sky-50">
         <Droplets className="h-12 w-12 text-sky-500 animate-pulse" />
       </div>
     );
@@ -172,20 +172,26 @@ const AppWater = () => {
   // Always show the tracking screen (whether task exists or not)
   return (
     <>
-      <div className="fixed inset-0 z-[9999] flex flex-col overflow-hidden">
+      {/*
+        Important: avoid extremely high z-index here.
+        Radix/shadcn Sheets & Dialogs render in a portal (typically z-50+).
+        If this screen sits above them (e.g. z-[9999]), the sheets open *behind* it
+        and it looks like buttons "don’t work".
+      */}
+      <div className="fixed inset-0 z-10 flex flex-col overflow-hidden">
         {/* Sky background with gradient */}
         <div 
-          className="absolute inset-0"
+          className="absolute inset-0 pointer-events-none"
           style={{
             background: 'linear-gradient(180deg, #87CEEB 0%, #B0E0E6 30%, #E0F4FF 60%, #FFFFFF 100%)',
           }}
         />
 
         {/* Clouds decoration */}
-        <div className="absolute top-20 left-4 w-24 h-10 bg-white/60 rounded-full blur-sm" />
-        <div className="absolute top-28 left-16 w-16 h-8 bg-white/50 rounded-full blur-sm" />
-        <div className="absolute top-16 right-8 w-20 h-8 bg-white/50 rounded-full blur-sm" />
-        <div className="absolute top-24 right-4 w-12 h-6 bg-white/40 rounded-full blur-sm" />
+        <div className="absolute top-20 left-4 w-24 h-10 bg-white/60 rounded-full blur-sm pointer-events-none" />
+        <div className="absolute top-28 left-16 w-16 h-8 bg-white/50 rounded-full blur-sm pointer-events-none" />
+        <div className="absolute top-16 right-8 w-20 h-8 bg-white/50 rounded-full blur-sm pointer-events-none" />
+        <div className="absolute top-24 right-4 w-12 h-6 bg-white/40 rounded-full blur-sm pointer-events-none" />
 
         {/* Header */}
         <div className="relative z-10 flex items-center justify-between px-4 pt-safe-top">
