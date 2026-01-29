@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { CalendarPlus } from 'lucide-react';
 import { BreathingExercise } from '@/hooks/useBreathingExercises';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
@@ -96,10 +96,10 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
           {/* Add to routine button */}
           <button
             onClick={handleAddToRoutine}
-            className="flex-shrink-0 p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+            className="flex-shrink-0 p-2.5 rounded-full bg-foreground hover:bg-foreground/90 transition-colors"
             aria-label="Add to routine"
           >
-            <Plus className="h-5 w-5 text-muted-foreground" />
+            <CalendarPlus className="h-5 w-5 text-background" />
           </button>
         </div>
       </button>
