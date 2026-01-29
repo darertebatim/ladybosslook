@@ -2,16 +2,16 @@ import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Plus, Settings, Droplets, CalendarPlus } from 'lucide-react';
 import { format } from 'date-fns';
-import { useTasksForDate, useCompletionsForDate, useAddGoalProgress, UserTask } from '@/hooks/useTaskPlanner';
+import { useTasksForDate, useCompletionsForDate, useAddGoalProgress, useCreateTask, UserTask } from '@/hooks/useTaskPlanner';
 import { isWaterTask, createWaterRoutineTask } from '@/lib/waterTracking';
 import { WaterInputSheet } from '@/components/app/WaterInputSheet';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
-import { useAddRoutinePlan } from '@/hooks/useRoutinePlans';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 import { useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Default water goal when no task exists
 const DEFAULT_WATER_GOAL = 64;
@@ -33,7 +33,9 @@ const AppWater = () => {
   const { data: completions } = useCompletionsForDate(selectedDate);
   
   const addGoalProgress = useAddGoalProgress();
-  const addRoutinePlan = useAddRoutinePlan();
+  const createTask = useCreateTask();
+  const queryClient = useQueryClient();
+  const [isSavingRoutine, setIsSavingRoutine] = useState(false);
 
   // Find water task for today
   const waterTask = useMemo(() => {
@@ -120,32 +122,49 @@ const AppWater = () => {
     setShowRoutineSheet(true);
   }, []);
 
-  // Handle saving routine
+  // Handle saving routine - create water task directly
   const handleSaveRoutine = useCallback((selectedTaskIds: string[], editedTasks: EditedTask[]) => {
-    addRoutinePlan.mutate(
-      { 
-        planId: 'synthetic-water-plan', 
-        selectedTaskIds,
-        editedTasks: editedTasks.map(t => ({
-          ...t,
-          pro_link_type: null,
-          pro_link_value: null,
-        })),
+    // Get the edited water task (or use defaults)
+    const editedWater = editedTasks.find(t => t.id === 'water-routine-template');
+    
+    setIsSavingRoutine(true);
+    
+    createTask.mutate(
+      {
+        title: editedWater?.title || 'Drink Water 💧',
+        emoji: editedWater?.icon || '💧',
+        color: editedWater?.color || 'sky',
+        repeat_pattern: editedWater?.repeatPattern || 'daily',
+        scheduled_time: editedWater?.scheduledTime || null,
+        tag: editedWater?.tag || 'Water',
+        reminder_enabled: editedWater?.reminderEnabled || false,
+        // Pro task link to water tool
+        pro_link_type: 'water',
+        pro_link_value: null,
+        // Goal settings for water tracking
+        goal_enabled: true,
+        goal_type: 'count',
+        goal_target: DEFAULT_WATER_GOAL,
+        goal_unit: DEFAULT_WATER_UNIT,
       },
       {
         onSuccess: () => {
           haptic.success();
           toast.success('Water tracking added to your routine!');
           setShowRoutineSheet(false);
-          setLocalProgress(0); // Reset local progress, will be saved to task
+          setLocalProgress(0);
+          setIsSavingRoutine(false);
+          // Refresh tasks
+          queryClient.invalidateQueries({ queryKey: ['planner-tasks-for-date'] });
         },
         onError: (error) => {
-          console.error('Error adding routine:', error);
-          toast.error('Failed to add routine');
+          console.error('Error adding water task:', error);
+          toast.error('Failed to add water tracking');
+          setIsSavingRoutine(false);
         },
       }
     );
-  }, [addRoutinePlan]);
+  }, [createTask, queryClient]);
 
   // Create synthetic task for routine sheet
   const syntheticWaterTask = useMemo(() => createWaterRoutineTask(), []);
@@ -374,7 +393,7 @@ const AppWater = () => {
         tasks={[syntheticWaterTask]}
         routineTitle="Water Tracking"
         onSave={handleSaveRoutine}
-        isSaving={addRoutinePlan.isPending}
+        isSaving={isSavingRoutine}
       />
 
       {/* Streak celebration */}
