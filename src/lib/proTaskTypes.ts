@@ -6,11 +6,12 @@ import {
   Calendar, 
   Sparkles, 
   Link,
-  Wind 
+  Wind,
+  Droplets 
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -131,6 +132,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Link to any app page',
     requiresValue: true,
   },
+  water: {
+    value: 'water',
+    label: 'Water Tracking',
+    icon: Droplets,
+    badgeText: 'Drink',
+    color: 'sky',
+    gradientClass: 'bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900/40 dark:to-cyan-900/40',
+    iconColorClass: 'text-sky-600 dark:text-sky-400',
+    badgeColorClass: 'bg-sky-500/20 text-sky-700 dark:text-sky-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open the water tracking tool',
+    requiresValue: false,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
@@ -144,6 +158,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return '/app/journal/new';
     case 'breathe':
       return linkValue ? `/app/breathe?exercise=${linkValue}` : '/app/breathe';
+    case 'water':
+      return '/app/water';
     case 'channel':
       return `/app/channels?channel=${linkValue}`;
     case 'program':

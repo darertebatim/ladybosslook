@@ -74,7 +74,7 @@ export function formatWaterUnit(unit: string, value: number): string {
 export function createWaterRoutineTask(): RoutinePlanTask {
   return {
     id: 'water-routine-template',
-    plan_id: 'synthetic-water',
+    plan_id: 'synthetic-water-plan',
     title: 'Drink Water 💧',
     icon: '💧',
     duration_minutes: 0,
@@ -82,7 +82,8 @@ export function createWaterRoutineTask(): RoutinePlanTask {
     is_active: true,
     created_at: new Date().toISOString(),
     linked_playlist_id: null,
-    pro_link_type: null,
+    // Pro Task link to water tracking tool
+    pro_link_type: 'water',
     pro_link_value: null,
   };
 }
