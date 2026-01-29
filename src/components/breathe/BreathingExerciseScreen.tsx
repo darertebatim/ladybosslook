@@ -277,47 +277,50 @@ export function BreathingExerciseScreen({
         />
       </div>
 
-      {/* Controls section */}
+      {/* Controls section - fixed height to prevent layout shift */}
       <div className="px-6 pb-safe mb-8">
-        {/* Duration selector (only shown when not active) */}
-        {!isActive && !isCountingDown && (
-          <div className="mb-6 animate-fade-in">
-            <h4 className="text-sm font-medium text-primary-foreground/60 mb-3 text-center">LENGTH</h4>
-            <div className="grid grid-cols-4 gap-2">
-              {DURATION_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => {
-                    setSelectedDuration(option.value);
-                    haptic.light();
-                  }}
-                  className={cn(
-                    'py-3 px-2 rounded-xl text-sm font-medium transition-all',
-                    selectedDuration === option.value
-                      ? 'bg-primary-foreground text-primary'
-                      : 'bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
-                  )}
-                >
-                  {option.label}
-                </button>
-              ))}
+        {/* Fixed height container for duration/progress area */}
+        <div className="h-24 flex flex-col justify-end">
+          {/* Duration selector (only shown when not active) */}
+          {!isActive && !isCountingDown && (
+            <div className="animate-fade-in">
+              <h4 className="text-sm font-medium text-primary-foreground/60 mb-3 text-center">LENGTH</h4>
+              <div className="grid grid-cols-4 gap-2">
+                {DURATION_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => {
+                      setSelectedDuration(option.value);
+                      haptic.light();
+                    }}
+                    className={cn(
+                      'py-3 px-2 rounded-xl text-sm font-medium transition-all',
+                      selectedDuration === option.value
+                        ? 'bg-primary-foreground text-primary'
+                        : 'bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Progress bar (only shown when active) */}
-        {(isActive || isCountingDown) && (
-          <div className="mb-6 animate-fade-in">
-            <Progress 
-              value={progressPercent} 
-              className="h-2 bg-primary-foreground/20 [&>div]:bg-primary-foreground"
-            />
-            <div className="flex justify-between mt-2 text-sm text-primary-foreground/60">
-              <span>{formatTime(totalElapsed)}</span>
-              <span>{formatTime(selectedDuration)}</span>
+          {/* Progress bar (only shown when active) */}
+          {(isActive || isCountingDown) && (
+            <div className="animate-fade-in">
+              <Progress 
+                value={progressPercent} 
+                className="h-2 bg-primary-foreground/20 [&>div]:bg-primary-foreground"
+              />
+              <div className="flex justify-between mt-2 text-sm text-primary-foreground/60">
+                <span>{formatTime(totalElapsed)}</span>
+                <span>{formatTime(selectedDuration)}</span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Action button */}
         {!isCountingDown && (
