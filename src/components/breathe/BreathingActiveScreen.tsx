@@ -176,7 +176,7 @@ export function BreathingActiveScreen({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-gradient-to-b from-[#5C5A8D] to-[#4A4875]">
+    <div className="fixed inset-0 z-50 flex flex-col bg-gradient-to-b from-primary-dark via-primary to-primary-light">
       {/* Safe area top padding */}
       <div style={{ paddingTop: 'env(safe-area-inset-top)' }} />
 
@@ -184,12 +184,12 @@ export function BreathingActiveScreen({
       <div className="flex items-center justify-between px-4 py-3">
         <button
           onClick={handleClose}
-          className="p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+          className="p-2 rounded-full bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20 transition-colors"
         >
           <X className="h-5 w-5" />
         </button>
         
-        <span className="text-white/80 font-medium">
+        <span className="text-primary-foreground/80 font-medium">
           {formatTime(duration - totalElapsed)}
         </span>
         
@@ -197,7 +197,7 @@ export function BreathingActiveScreen({
           onClick={() => setShowHelp(!showHelp)}
           className={cn(
             "p-2 rounded-full transition-colors",
-            showHelp ? "bg-white/20 text-white" : "bg-white/10 text-white/70 hover:bg-white/20"
+            showHelp ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary-foreground/10 text-primary-foreground/70 hover:bg-primary-foreground/20"
           )}
         >
           <HelpCircle className="h-5 w-5" />
@@ -206,10 +206,11 @@ export function BreathingActiveScreen({
 
       {/* Help overlay */}
       {showHelp && (
-        <div className="absolute inset-x-4 top-20 bg-white/20 backdrop-blur-md rounded-2xl p-4 z-10">
-          <h4 className="font-semibold text-white mb-2">How to breathe</h4>
-          <ul className="text-sm text-white/80 space-y-1">
-            <li>• Follow the expanding and contracting circles</li>
+        <div className="absolute inset-x-4 top-20 bg-primary-foreground/20 backdrop-blur-md rounded-2xl p-4 z-10">
+          <h4 className="font-semibold text-primary-foreground mb-2">How to breathe</h4>
+          <ul className="text-sm text-primary-foreground/80 space-y-1">
+            <li>• Circle expands to outer ring = Inhale</li>
+            <li>• Circle shrinks to inner ring = Exhale</li>
             <li>• Inhale through your {exercise.inhale_method}</li>
             <li>• Exhale through your {exercise.exhale_method}</li>
             {exercise.inhale_hold_seconds > 0 && (
@@ -226,10 +227,10 @@ export function BreathingActiveScreen({
       <div className="flex-1 flex items-center justify-center">
         {isStarting ? (
           <div className="flex flex-col items-center">
-            <div className="w-40 h-40 rounded-full bg-white/20 flex items-center justify-center mb-4">
-              <span className="text-6xl font-bold text-white">{countdown}</span>
+            <div className="w-40 h-40 rounded-full bg-primary-foreground/20 flex items-center justify-center mb-4">
+              <span className="text-6xl font-bold text-primary-foreground">{countdown}</span>
             </div>
-            <span className="text-white/70 text-lg">Get ready...</span>
+            <span className="text-primary-foreground/70 text-lg">Get ready...</span>
           </div>
         ) : (
           <BreathingCircle
@@ -248,9 +249,9 @@ export function BreathingActiveScreen({
         <div className="mb-6">
           <Progress 
             value={progressPercent} 
-            className="h-2 bg-white/20"
+            className="h-2 bg-primary-foreground/20 [&>div]:bg-primary-foreground"
           />
-          <div className="flex justify-between mt-2 text-sm text-white/60">
+          <div className="flex justify-between mt-2 text-sm text-primary-foreground/60">
             <span>{formatTime(totalElapsed)}</span>
             <span>{formatTime(duration)}</span>
           </div>
@@ -260,7 +261,7 @@ export function BreathingActiveScreen({
         {!isStarting && (
           <Button
             onClick={handlePauseToggle}
-            className="w-full h-14 text-lg font-semibold bg-white/20 text-white hover:bg-white/30 rounded-2xl border border-white/10"
+            className="w-full h-14 text-lg font-semibold bg-primary-foreground text-primary hover:bg-primary-foreground/90 rounded-2xl"
           >
             {isPaused ? (
               <>

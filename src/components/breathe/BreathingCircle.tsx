@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 interface BreathingCircleProps {
@@ -16,86 +15,69 @@ export function BreathingCircle({
   methodText,
   countdown,
 }: BreathingCircleProps) {
-  // Start collapsed, then animate to the actual phase state
-  const [hasInitialized, setHasInitialized] = useState(false);
-
-  useEffect(() => {
-    // Small delay to ensure CSS transition works from collapsed to expanded
-    const timer = setTimeout(() => setHasInitialized(true), 50);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const shouldBeExpanded = phase === 'inhale' || phase === 'inhale_hold';
-  // Only expand after initialization to allow the transition animation to play
-  const isExpanded = hasInitialized && shouldBeExpanded;
+  // Determine if circle should be expanded (at max) or collapsed (at min)
+  const isExpanded = phase === 'inhale' || phase === 'inhale_hold';
   const isAnimating = phase === 'inhale' || phase === 'exhale';
+
+  // Calculate the animated circle scale (moves between inner and outer fixed rings)
+  // Inner ring is at ~40% size, outer ring is at 100% size
+  // Animated circle moves between 45% (collapsed) and 95% (expanded)
+  const animatedScale = isExpanded ? 0.95 : 0.45;
 
   return (
     <div className="relative flex items-center justify-center w-72 h-72">
-      {/* Outer ring - subtle glow */}
+      {/* Outer fixed ring - marks the "full inhale" boundary */}
+      <div 
+        className="absolute rounded-full border-2 border-primary/30"
+        style={{
+          width: '100%',
+          height: '100%',
+        }}
+      />
+
+      {/* Inner fixed ring - marks the "full exhale" boundary */}
+      <div 
+        className="absolute rounded-full border-2 border-primary/30"
+        style={{
+          width: '40%',
+          height: '40%',
+        }}
+      />
+
+      {/* Animated circle - expands/contracts between the two fixed rings */}
       <div
         className={cn(
-          'absolute rounded-full bg-white/10 transition-transform',
+          'absolute rounded-full bg-gradient-to-br from-primary/60 to-primary/40 backdrop-blur-sm shadow-lg transition-transform',
           isAnimating ? 'ease-linear' : 'ease-out'
         )}
         style={{
           width: '100%',
           height: '100%',
-          transform: isExpanded ? 'scale(1)' : 'scale(0.65)',
+          transform: `scale(${animatedScale})`,
           transitionDuration: isAnimating ? `${phaseDuration}s` : '0.3s',
         }}
       />
 
-      {/* Middle circle - follows breathing */}
-      <div
-        className={cn(
-          'absolute rounded-full bg-white/20 backdrop-blur-sm transition-transform',
-          isAnimating ? 'ease-linear' : 'ease-out'
-        )}
+      {/* Center content circle with text */}
+      <div 
+        className="absolute rounded-full bg-primary/80 backdrop-blur-md flex flex-col items-center justify-center shadow-xl"
         style={{
-          width: '80%',
-          height: '80%',
-          transform: isExpanded ? 'scale(1)' : 'scale(0.55)',
-          transitionDuration: isAnimating ? `${phaseDuration}s` : '0.3s',
-        }}
-      />
-
-      {/* Inner circle - contains text */}
-      <div
-        className={cn(
-          'absolute rounded-full bg-white/30 backdrop-blur-md flex flex-col items-center justify-center transition-transform',
-          isAnimating ? 'ease-linear' : 'ease-out'
-        )}
-        style={{
-          width: '55%',
-          height: '55%',
-          transform: isExpanded ? 'scale(1)' : 'scale(0.7)',
-          transitionDuration: isAnimating ? `${phaseDuration}s` : '0.3s',
+          width: '35%',
+          height: '35%',
         }}
       >
         {/* Phase text */}
-        <span className="text-2xl font-semibold text-white drop-shadow-sm">
+        <span className="text-xl font-semibold text-primary-foreground drop-shadow-sm">
           {phaseText}
         </span>
         
         {/* Method text (Nose/Mouth) or countdown */}
         {countdown !== undefined && phase.includes('hold') ? (
-          <span className="text-lg text-white/80 mt-1">{countdown}</span>
+          <span className="text-base text-primary-foreground/80 mt-0.5">{countdown}</span>
         ) : methodText ? (
-          <span className="text-sm text-white/70 mt-1">{methodText}</span>
+          <span className="text-xs text-primary-foreground/70 mt-0.5">{methodText}</span>
         ) : null}
       </div>
-
-      {/* Decorative dots around the circle */}
-      {[...Array(8)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute w-2 h-2 rounded-full bg-white/30"
-          style={{
-            transform: `rotate(${i * 45}deg) translateY(-140px)`,
-          }}
-        />
-      ))}
     </div>
   );
 }
