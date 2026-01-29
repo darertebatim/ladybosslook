@@ -1,10 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Leaf, Sparkles } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Leaf } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SEOHead } from '@/components/SEOHead';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { BackButton } from '@/components/app/BackButton';
 import { 
   useBreathingExercises, 
@@ -15,12 +13,10 @@ import { BreathingExerciseCard } from '@/components/breathe/BreathingExerciseCar
 import { BreathingInfoSheet } from '@/components/breathe/BreathingInfoSheet';
 import { BreathingSettingsSheet } from '@/components/breathe/BreathingSettingsSheet';
 import { BreathingActiveScreen } from '@/components/breathe/BreathingActiveScreen';
-import { BreathingReminderSettings } from '@/components/breathe/BreathingReminderSettings';
 import { Skeleton } from '@/components/ui/skeleton';
 import { haptic } from '@/lib/haptics';
 
 export default function AppBreathe() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { data: exercises, isLoading } = useBreathingExercises();
   
@@ -147,28 +143,6 @@ export default function AppBreathe() {
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           <div className="px-4 pb-safe space-y-4">
-            {/* Quick Actions Card */}
-            <Card className="bg-white/10 border-white/20">
-              <CardContent className="p-4 space-y-3">
-                {/* Start Breathing Button */}
-                <Button 
-                  className="w-full bg-white hover:bg-white/90 text-[#5C5A8D]" 
-                  onClick={() => {
-                    if (filteredExercises.length > 0) {
-                      handleExerciseClick(filteredExercises[0]);
-                    }
-                  }}
-                  disabled={filteredExercises.length === 0}
-                >
-                  <Leaf className="h-4 w-4 mr-2" />
-                  Start Breathing
-                </Button>
-
-                {/* Add to Routine Button */}
-                <BreathingReminderSettings />
-              </CardContent>
-            </Card>
-
             {/* Exercise list */}
             {isLoading ? (
               // Loading skeletons
