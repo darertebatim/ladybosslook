@@ -77,6 +77,7 @@ export function createWaterRoutineTask(): RoutinePlanTask {
     plan_id: 'synthetic-water-plan',
     title: 'Drink Water 💧',
     icon: '💧',
+    color: 'sky', // Match the water theme
     duration_minutes: 0,
     task_order: 0,
     is_active: true,
