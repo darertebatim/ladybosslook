@@ -7,21 +7,29 @@ import { cn } from '@/lib/utils';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
-import { ProLinkType } from '@/lib/proTaskTypes';
+import { ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
 
-// Color cycle for variety in planner
+// Color cycle for variety in planner (used when no specific color is set)
 export const ROUTINE_COLOR_CYCLE: TaskColor[] = [
-  'peach',
   'sky', 
-  'pink',
-  'yellow',
-  'lavender',
   'mint',
+  'lavender',
+  'pink',
   'lime',
+  'yellow',
+  'peach',
 ];
 
 export const getTaskColor = (index: number): TaskColor => {
   return ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length];
+};
+
+// Get color based on pro_link_type or fall back to cycle
+export const getProLinkColor = (proLinkType: ProLinkType | null | undefined, index: number): TaskColor => {
+  if (proLinkType && PRO_LINK_CONFIGS[proLinkType]) {
+    return PRO_LINK_CONFIGS[proLinkType].color as TaskColor;
+  }
+  return getTaskColor(index);
 };
 
 export interface EditedTask {
@@ -121,10 +129,12 @@ export function RoutinePreviewSheet({
 
   const getTaskDisplay = (task: RoutinePlanTask, index: number) => {
     const edited = editedTasks[task.id];
+    // Priority: edited color > task.color > pro_link_type color > cycle color
+    const defaultColor = task.color as TaskColor || getProLinkColor(task.pro_link_type, index);
     return {
       title: edited?.title || task.title,
       icon: edited?.icon || task.icon,
-      color: edited?.color || getTaskColor(index),
+      color: edited?.color || defaultColor,
       repeatPattern: edited?.repeatPattern || 'daily',
     };
   };
@@ -134,11 +144,13 @@ export function RoutinePreviewSheet({
     // Determine pro_link fields - prefer existing edits, fall back to template
     const proLinkType = existing?.pro_link_type ?? task.pro_link_type ?? (task.linked_playlist_id ? 'playlist' : null);
     const proLinkValue = existing?.pro_link_value ?? task.pro_link_value ?? task.linked_playlist_id ?? null;
+    // Priority: edited color > task.color > pro_link_type color > cycle color
+    const defaultColor = task.color as TaskColor || getProLinkColor(task.pro_link_type, index);
     
     return {
       title: existing?.title || task.title,
       icon: existing?.icon || task.icon,
-      color: existing?.color || getTaskColor(index),
+      color: existing?.color || defaultColor,
       scheduledDate: new Date(),
       scheduledTime: existing?.scheduledTime ?? null,
       repeatEnabled: existing?.repeatPattern ? existing.repeatPattern !== 'none' : true,
