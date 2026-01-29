@@ -137,11 +137,11 @@ export const TaskTimerScreen = ({
 
   return (
     <div className={cn('fixed inset-0 z-[9999] flex flex-col', colorClass)}>
-      {/* Safe area padding */}
-      <div style={{ paddingTop: 'max(20px, env(safe-area-inset-top))' }} />
-      
-      {/* Header with task info */}
-      <div className="flex flex-col items-center px-6 pt-8">
+      {/* Header with task info - includes safe area */}
+      <div 
+        className="flex flex-col items-center px-6 pt-8"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 32px)' }}
+      >
         {/* Large emoji */}
         <div className="mb-3">
           <TaskIcon iconName={task.emoji} size={56} />

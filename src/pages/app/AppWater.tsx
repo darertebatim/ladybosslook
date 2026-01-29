@@ -213,7 +213,10 @@ const AppWater = () => {
         <div className="absolute top-24 right-4 w-12 h-6 bg-white/40 rounded-full blur-sm pointer-events-none" />
 
         {/* Header */}
-        <div className="relative z-10 flex items-center justify-between px-4 pt-safe-top">
+        <div 
+          className="relative z-10 flex items-center justify-between px-4 pt-3"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
+        >
           <button
             onClick={() => navigate('/app/home')}
             className="w-10 h-10 rounded-full bg-white/40 backdrop-blur-sm flex items-center justify-center"
