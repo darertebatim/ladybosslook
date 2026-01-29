@@ -340,7 +340,8 @@ export function useAddRoutinePlan() {
     mutationFn: async ({ 
       planId, 
       selectedTaskIds, 
-      editedTasks 
+      editedTasks,
+      syntheticTasks,
     }: { 
       planId: string; 
       selectedTaskIds?: string[]; 
@@ -356,35 +357,60 @@ export function useAddRoutinePlan() {
         pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | null;
         pro_link_value?: string | null;
       }[];
+      syntheticTasks?: RoutinePlanTask[];
     }) => {
       if (!user) throw new Error('Must be logged in');
 
-      // Get plan details
-      const { data: plan, error: planError } = await supabase
-        .from('routine_plans')
-        .select('*, category:routine_categories(*)')
-        .eq('id', planId)
-        .single();
+      // Check if this is a synthetic plan (created on-the-fly, not from database)
+      const isSyntheticPlan = planId.startsWith('synthetic-');
 
-      if (planError) throw planError;
+      let tasks: RoutinePlanTask[] = [];
+      let planTitle = 'Routine';
+      let planIcon = '✨';
+      let planCategoryName: string | null = null;
 
-      // Get plan tasks with linked playlist info
-      const { data: allTasks, error: tasksError } = await supabase
-        .from('routine_plan_tasks')
-        .select(`
-          *,
-          linked_playlist:audio_playlists!linked_playlist_id(id, name)
-        `)
-        .eq('plan_id', planId)
-        .eq('is_active', true)
-        .order('task_order', { ascending: true });
+      if (isSyntheticPlan && syntheticTasks) {
+        // Use the provided synthetic tasks directly
+        tasks = selectedTaskIds 
+          ? syntheticTasks.filter(t => selectedTaskIds.includes(t.id))
+          : syntheticTasks;
+        // Extract title from first task's tag or title
+        if (tasks.length > 0) {
+          planTitle = tasks[0].title;
+          planIcon = tasks[0].icon || '✨';
+        }
+      } else {
+        // Get plan details from database
+        const { data: plan, error: planError } = await supabase
+          .from('routine_plans')
+          .select('*, category:routine_categories(*)')
+          .eq('id', planId)
+          .single();
 
-      if (tasksError) throw tasksError;
+        if (planError) throw planError;
+        
+        planTitle = plan.title;
+        planIcon = plan.icon;
+        planCategoryName = plan.category?.name;
 
-      // Filter tasks if selectedTaskIds provided
-      const tasks = selectedTaskIds 
-        ? allTasks?.filter(t => selectedTaskIds.includes(t.id)) || []
-        : allTasks || [];
+        // Get plan tasks with linked playlist info
+        const { data: allTasks, error: tasksError } = await supabase
+          .from('routine_plan_tasks')
+          .select(`
+            *,
+            linked_playlist:audio_playlists!linked_playlist_id(id, name)
+          `)
+          .eq('plan_id', planId)
+          .eq('is_active', true)
+          .order('task_order', { ascending: true });
+
+        if (tasksError) throw tasksError;
+
+        // Filter tasks if selectedTaskIds provided
+        tasks = selectedTaskIds 
+          ? (allTasks?.filter(t => selectedTaskIds.includes(t.id)) || []) as RoutinePlanTask[]
+          : (allTasks || []) as RoutinePlanTask[];
+      }
 
       // Create a map of edited task data
       const editedTasksMap = new Map(editedTasks?.map(t => [t.id, t]) || []);
@@ -410,11 +436,11 @@ export function useAddRoutinePlan() {
           return {
             user_id: user.id,
             title: edited?.title || task.title,
-            emoji: edited?.icon || task.icon || plan.icon,
+            emoji: edited?.icon || task.icon || planIcon,
             color: edited?.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
             repeat_pattern: edited?.repeatPattern || 'daily',
             scheduled_time: edited?.scheduledTime || null,
-            tag: edited?.tag ?? plan.category?.name ?? plan.title,
+            tag: edited?.tag ?? planCategoryName ?? planTitle,
             linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : null,
             pro_link_type: proLinkType,
             pro_link_value: proLinkValue,
@@ -430,16 +456,18 @@ export function useAddRoutinePlan() {
         if (tasksInsertError) throw tasksInsertError;
       }
 
-      // Track that user added this plan
-      const { error: trackError } = await supabase
-        .from('user_routine_plans')
-        .insert({
-          user_id: user.id,
-          plan_id: planId,
-          is_active: true,
-        });
+      // Only track if it's a real plan (not synthetic)
+      if (!isSyntheticPlan) {
+        const { error: trackError } = await supabase
+          .from('user_routine_plans')
+          .insert({
+            user_id: user.id,
+            plan_id: planId,
+            is_active: true,
+          });
 
-      if (trackError) throw trackError;
+        if (trackError) throw trackError;
+      }
 
       return { success: true, taskCount: tasks?.length || 0 };
     },
