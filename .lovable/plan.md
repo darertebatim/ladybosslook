@@ -1,169 +1,199 @@
 
-# Breathing Exercise UI Redesign Plan
+# Breathe Page Redesign Plan
 
 ## Overview
-Complete redesign of the breathing exercise flow to match the Finch app UX pattern with a single-screen experience instead of multiple sheets.
+Complete redesign of the `/app/breathe` page to match the design patterns used in other app pages like Listen (AppPlayer) and Routines (AppInspire), while also fixing the "info sheet shows only first time" issue.
 
-## Current Flow (What Exists Now)
-1. User taps exercise from list → Opens **Info Sheet** (description, pattern, Start button)
-2. Tap Start → Opens **Settings Sheet** (duration, cycle info)
-3. Tap Begin → Opens **Active Screen** (full screen breathing animation)
+## Current Issues
+1. **Inconsistent design** - Uses purple gradient background instead of app-theme (black & white)
+2. **Missing "All" category** - No way to view all breathing exercises at once
+3. **Different category UI** - Uses pill buttons instead of CategoryCircle components
+4. **First-time info only** - Info sheet only auto-shows on first view per exercise
 
-## New Flow (Finch-Style)
-1. User taps exercise from list → Opens **Full-Screen Exercise View** with:
-   - Breathing circles visible immediately (in collapsed/ready state)
-   - Duration selector (1, 3, 5, 10 min)
-   - Start button at bottom
-   - X button (close) top-left, ? button (info) top-right
-   
-2. User taps **?** button → Opens **Info Sheet** as bottom overlay with:
-   - Exercise name
-   - Visual breakdown: Inhale (Xs, Nose) → Hold (Xs) → Exhale (Xs, Mouth) → Hold (Xs)
-   - Description text
-   - "Okay" button to dismiss
-   - **First-time users see this automatically, then dismiss**
+## Design Changes
 
-3. User taps **Start** button → Same screen transitions:
-   - Duration selector fades out
-   - Start button becomes Pause button
-   - Breathing animation begins from collapsed state (inhale first)
-   - ? button remains accessible
+### 1. AppBreathe.tsx - List Page Redesign
+
+**Header Section:**
+- Change from `bg-gradient-to-b from-primary-dark to-primary` to `bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl`
+- Use app-theme foreground colors for text
+
+**Categories:**
+- Add "All" category at the beginning of BREATHING_CATEGORIES
+- Replace pill buttons with CategoryCircle components (matching AppPlayer pattern)
+- Use horizontal scroll with icons and colors per category
+
+**Category Configuration:**
+```
+all: { icon: 'Wind', color: 'purple' }
+morning: { icon: 'Sunrise', color: 'orange' }
+energize: { icon: 'Zap', color: 'yellow' }
+focus: { icon: 'Target', color: 'blue' }
+calm: { icon: 'Leaf', color: 'green' }
+night: { icon: 'Moon', color: 'indigo' }
+```
+
+**Content Area:**
+- Use `bg-background` instead of gradient
+- Cards use proper card styling matching other app pages
+
+### 2. BreathingExerciseCard.tsx - Card Redesign
+
+**Current:** Glass/blur effect with white text
+**New:** Standard card styling matching app-theme
+- `bg-card` background
+- `text-foreground` for title
+- `text-muted-foreground` for description
+- Rounded corners and subtle shadow
+
+### 3. BreathingExerciseScreen.tsx - Exercise Screen Redesign
+
+**Background:**
+- Change from purple gradient to `bg-background`
+
+**Circles & Animation:**
+- Use app-theme tokens for rings and animated circle
+- Outer ring: `border-muted-foreground/30`
+- Inner ring: `border-muted-foreground/30`
+- Animated circle: `bg-primary/20` or similar subtle color
+- Center circle: `bg-card` with `text-foreground`
+
+**Info Sheet Trigger:**
+- Remove localStorage-based "first time" tracking
+- Always show info sheet automatically when exercise opens
+- User can dismiss and start when ready
+
+**Controls:**
+- Duration buttons use muted/primary styling
+- Start/Pause button uses primary colors
+
+### 4. BreathingInfoSheet.tsx - Styling Update
+
+**Current:** Uses `bg-primary` with `text-primary-foreground`
+**New:** Uses `bg-card` or `bg-background` with `text-foreground`
+- Phase breakdown uses muted backgrounds
+- Okay button uses primary styling
+
+### 5. BreathingCircle.tsx - Color Updates
+
+Update all colors to use app-theme tokens:
+- Rings: `border-muted-foreground/30`
+- Animated circle: Subtle primary tint
+- Center content: Card background with foreground text
+
+### 6. useBreathingExercises.tsx - Add "All" Category
+
+Add to BREATHING_CATEGORIES array:
+```typescript
+{ value: 'all', label: 'All', emoji: '🌬️' }
+```
+
+Update filtering logic to show all active exercises when "all" is selected.
 
 ---
 
-## Technical Changes
+## Technical Details
 
-### 1. Create New Component: `BreathingExerciseScreen.tsx`
-A single full-screen component that handles both setup and active breathing states.
+### Files to Modify
 
-**Props:**
-- `exercise: BreathingExercise`
-- `onClose: () => void`
+| File | Changes |
+|------|---------|
+| `src/hooks/useBreathingExercises.tsx` | Add "All" category to BREATHING_CATEGORIES |
+| `src/pages/app/AppBreathe.tsx` | Complete UI redesign: header, categories, content area |
+| `src/components/breathe/BreathingExerciseCard.tsx` | Update to card-based design |
+| `src/components/breathe/BreathingExerciseScreen.tsx` | Update colors, remove first-time-only logic |
+| `src/components/breathe/BreathingCircle.tsx` | Update colors to app-theme |
+| `src/components/breathe/BreathingInfoSheet.tsx` | Update colors to app-theme |
 
-**Internal States:**
-- `isActive: boolean` - Whether breathing session is running
-- `isPaused: boolean` - Pause state during active session
-- `showInfoSheet: boolean` - Info overlay visibility
-- `selectedDuration: number` - 60, 180, 300, or 600 seconds
-- `hasSeenInfo: boolean` - Track first-time info display
+### Color Token Mapping
 
-**Layout Structure:**
-```
-┌──────────────────────────────┐
-│  [X]                    [?]  │  ← Header with close/info buttons
-│                              │
-│                              │
-│     ┌────────────────┐       │
-│     │   ┌────────┐   │       │  ← Fixed outer ring (inhale boundary)
-│     │   │        │   │       │
-│     │   │ Inhale │   │       │  ← Animated circle + center text
-│     │   │  Nose  │   │       │
-│     │   └────────┘   │       │  ← Fixed inner ring (exhale boundary)
-│     └────────────────┘       │
-│                              │
-│         LENGTH               │
-│    [1] [3] [5] [10] min      │  ← Duration buttons (hidden when active)
-│                              │
-│    ═══════════════════       │  ← Progress bar
-│       [ Start/Pause ]        │  ← Primary action button
-└──────────────────────────────┘
-```
+| Element | Current | New |
+|---------|---------|-----|
+| List page background | `from-primary-dark to-primary` | `bg-background` |
+| Header | `from-primary-dark to-primary` | `bg-[#F4ECFE] dark:bg-violet-950/90` |
+| Exercise screen bg | Purple gradient | `bg-background` |
+| Circle rings | `border-primary/30` | `border-muted-foreground/30` |
+| Animated circle | `bg-primary/60` | `bg-primary/20` |
+| Center circle | `bg-primary/80` | `bg-card` |
+| Text | `text-primary-foreground` | `text-foreground` |
+| Info sheet bg | `bg-primary` | `bg-card` |
 
-### 2. Modify `BreathingInfoSheet.tsx`
-Transform into a simpler info overlay (no Start button here).
+### Category Configuration Object
 
-**Changes:**
-- Remove "Start Breathing" button
-- Remove "Add to Routine" button (move to main screen or keep in list)
-- Display only:
-  - Exercise name as title
-  - Phase breakdown with visual icons
-  - Description text
-  - "Okay" button to dismiss
-
-**Visual Phase Breakdown:**
-```
-  Inhale    Hold    Exhale    Hold
-   [◯]      [●]      [◯]      [●]
-  4 sec    4 sec    4 sec    4 sec
-   Nose             Mouth
+```typescript
+const categoryConfig: Record<string, { name: string; icon: string; color: string }> = {
+  all: { name: 'All', icon: 'Wind', color: 'purple' },
+  morning: { name: 'Morning', icon: 'Sunrise', color: 'orange' },
+  energize: { name: 'Energize', icon: 'Zap', color: 'yellow' },
+  focus: { name: 'Focus', icon: 'Target', color: 'blue' },
+  calm: { name: 'Calm', icon: 'Leaf', color: 'green' },
+  night: { name: 'Night', icon: 'Moon', color: 'indigo' },
+};
 ```
 
-### 3. Modify `BreathingCircle.tsx`
-Update to start in collapsed state when `phase === 'ready'`.
+### Info Sheet Behavior Change
 
-**Current Issue:** Circle shows in expanded state initially
-**Fix:** Ensure `ready` phase uses `animatedScale = 0.40` (collapsed)
+**Before:**
+```typescript
+useEffect(() => {
+  const seen = getSeenExercises();
+  if (!seen.has(exercise.id)) {
+    setShowInfoSheet(true);
+  }
+}, [exercise.id]);
+```
 
-### 4. Update `AppBreathe.tsx` Flow
-Replace the multi-sheet flow with single-screen navigation.
+**After:**
+```typescript
+useEffect(() => {
+  // Always show info sheet when exercise opens
+  setShowInfoSheet(true);
+}, [exercise.id]);
+```
 
-**Changes:**
-- Remove `showInfoSheet`, `showSettingsSheet` states
-- Add `selectedExercise` opens `BreathingExerciseScreen` as full-screen overlay
-- Handle deep links the same way
-
-### 5. Design Token Updates for Breathing Screens
-Use consistent color scheme based on app's design system.
-
-**Color Mapping:**
-- Background gradient: `from-primary-dark via-primary to-primary-light`
-- Outer ring: `border-primary-foreground/30`
-- Inner ring: `border-primary-foreground/30`
-- Animated circle: `bg-primary-light/60`
-- Center circle: `bg-primary/80`
-- Text: `text-primary-foreground`
-- Duration buttons (inactive): `bg-primary-foreground/10`
-- Duration buttons (active): `bg-primary-foreground text-primary`
-- Start/Pause button: `bg-white text-primary-dark`
-
-### 6. First-Time Info Display Logic
-Show info sheet automatically on first open of each exercise.
-
-**Implementation:**
-- Store viewed exercises in `localStorage` key: `breathe_seen_info`
-- On exercise open, check if `exerciseId` is in the set
-- If not seen, auto-show info sheet, then add to set on dismiss
+Remove `markExerciseSeen`, `getSeenExercises`, and `LOCAL_STORAGE_KEY` since they're no longer needed.
 
 ---
 
-## Files to Modify
+## Visual Layout
 
-| File | Action |
-|------|--------|
-| `src/components/breathe/BreathingExerciseScreen.tsx` | **CREATE** - New unified screen component |
-| `src/components/breathe/BreathingInfoSheet.tsx` | **MODIFY** - Simplify to info-only overlay |
-| `src/components/breathe/BreathingCircle.tsx` | **VERIFY** - Ensure ready state is collapsed |
-| `src/components/breathe/BreathingActiveScreen.tsx` | **DELETE** - Merged into BreathingExerciseScreen |
-| `src/components/breathe/BreathingSettingsSheet.tsx` | **DELETE** - No longer needed |
-| `src/pages/app/AppBreathe.tsx` | **MODIFY** - Use new single-screen flow |
-
----
-
-## UI Details
-
-### Duration Selector
+### AppBreathe List Page
 ```
-       LENGTH
- ┌───┐ ┌───┐ ┌───┐ ┌───┐
- │ 1 │ │ 3 │ │ 5 │ │10 │
- │min│ │min│ │min│ │min│
- └───┘ └───┘ └───┘ └───┘
-   ▲ selected = white bg, dark text
+┌─────────────────────────────────┐
+│    ← Breathe         🔍        │ ← Lavender header
+│                                │
+│ [🌬️All] [🌅Morn] [⚡Ener] [🎯] │ ← CategoryCircle scroll
+└────────────────────────────────┘
+                                   ← White/background content
+┌─────────────────────────────────┐
+│ 🧘 Box Breathing               │ ← Card style
+│ 4-second cycle for calm...     │
+│ [4s cycle] [with holds]        │
+└─────────────────────────────────┘
+
+┌─────────────────────────────────┐
+│ 🌙 4-7-8 Sleep                 │
+│ Relaxation technique...        │
+│ [19s cycle] [with holds]       │
+└─────────────────────────────────┘
 ```
 
-### Info Sheet Phase Icons
-Each phase shows a small circle with visual indicator:
-- **Inhale**: Circle with outward arrows `←○→`
-- **Hold**: Filled circle `●`
-- **Exhale**: Circle with inward arrows `→○←`
-
-### Transitions
-- Duration buttons: `animate-fade-out` when session starts
-- Start → Pause button: Smooth text/icon swap
-- Info sheet: Slide up from bottom with backdrop blur
-
----
-
-## Summary
-This redesign consolidates 3 separate screens (Info Sheet → Settings Sheet → Active Screen) into a single unified experience where the breathing visualization is always visible, settings are inline, and the info is accessible via a ? button overlay.
+### Exercise Screen
+```
+┌─────────────────────────────────┐
+│  [X]           2:45        [?] │ ← Header with timer
+│                                │
+│         ╭─────────────╮        │ ← Outer ring (light gray)
+│         │   ╭─────╮   │        │ ← Inner ring (light gray)
+│         │   │Inhale│  │        │ ← Animated circle (subtle)
+│         │   │ Nose │  │        │
+│         │   ╰─────╯   │        │
+│         ╰─────────────╯        │
+│                                │
+│          LENGTH                │
+│    [1] [3] [5] [10] min        │ ← Duration options
+│                                │
+│    ═══════════════════         │ ← Progress bar
+│         [ Start ]              │ ← Primary button
+└─────────────────────────────────┘
+```
