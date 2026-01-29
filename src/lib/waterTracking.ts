@@ -1,4 +1,5 @@
 import { UserTask } from '@/hooks/useTaskPlanner';
+import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { Coffee, GlassWater, CupSoda, Wine, Milk } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
@@ -67,4 +68,21 @@ export function formatWaterUnit(unit: string, value: number): string {
   }
   
   return unit;
+}
+
+// Create a synthetic water routine task for RoutinePreviewSheet
+export function createWaterRoutineTask(): RoutinePlanTask {
+  return {
+    id: 'water-routine-template',
+    plan_id: 'synthetic-water',
+    title: 'Drink Water 💧',
+    icon: '💧',
+    duration_minutes: 0,
+    task_order: 0,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    linked_playlist_id: null,
+    pro_link_type: null,
+    pro_link_value: null,
+  };
 }

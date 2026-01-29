@@ -44,6 +44,7 @@ const AppTaskCreate = lazy(() => import("@/pages/app/AppTaskCreate"));
 const AppInspire = lazy(() => import("@/pages/app/AppInspire"));
 const AppInspireDetail = lazy(() => import("@/pages/app/AppInspireDetail"));
 const AppBreathe = lazy(() => import("@/pages/app/AppBreathe"));
+const AppWater = lazy(() => import("@/pages/app/AppWater"));
 
 // Lazy load admin pages
 const Users = lazy(() => import("@/pages/admin/Users"));
@@ -301,6 +302,7 @@ const App = () => (
                   <Route path="/app/home/edit/:taskId" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
                   <Route path="/app/channels/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
                   <Route path="/app/breathe" element={<ProtectedRoute><AppBreathe /></ProtectedRoute>} />
+                  <Route path="/app/water" element={<ProtectedRoute><AppWater /></ProtectedRoute>} />
                   {/* Redirect old feed post route */}
                   <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
                   

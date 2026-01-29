@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Plus, Settings, Droplets } from 'lucide-react';
+import { X, Plus, Settings, Droplets, CalendarPlus } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { UserTask } from '@/hooks/useTaskPlanner';
 import { WaterInputSheet } from './WaterInputSheet';
@@ -12,6 +12,7 @@ interface WaterTrackingScreenProps {
   onClose: () => void;
   onAddWater: (amount: number) => void;
   onOpenSettings: () => void;
+  onOpenRoutineSheet?: () => void;
 }
 
 export const WaterTrackingScreen = ({
@@ -21,6 +22,7 @@ export const WaterTrackingScreen = ({
   onClose,
   onAddWater,
   onOpenSettings,
+  onOpenRoutineSheet,
 }: WaterTrackingScreenProps) => {
   const [showInputSheet, setShowInputSheet] = useState(false);
   const prevProgressRef = useRef(goalProgress);
@@ -197,8 +199,18 @@ export const WaterTrackingScreen = ({
           Add Water
         </button>
 
-        {/* Placeholder for symmetry (or future history button) */}
-        <div className="w-14" />
+        {/* Add to Routine button */}
+        {onOpenRoutineSheet && (
+          <button
+            onClick={() => {
+              haptic.light();
+              onOpenRoutineSheet();
+            }}
+            className="w-14 h-14 rounded-full bg-white/80 backdrop-blur-sm shadow-lg flex items-center justify-center"
+          >
+            <CalendarPlus className="h-6 w-6 text-sky-700" />
+          </button>
+        )}
       </div>
 
       {/* Water input sheet */}

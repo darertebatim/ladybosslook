@@ -327,18 +327,7 @@ const AppHome = () => {
           <div className="flex items-center justify-between px-4 h-12">
             {/* Left: Water + Breathe + Journal + Profile buttons */}
             <div className="flex items-center gap-1">
-              <button onClick={() => {
-                // Find first water task and open tracking, or just show a toast
-                const waterTaskFound = tasks.find(t => isWaterTask(t));
-                if (waterTaskFound) {
-                  setWaterTask(waterTaskFound);
-                } else {
-                  toast("No water task today", {
-                    description: "Create a task with oz, ml, cups, or glasses goal",
-                    duration: 3000,
-                  });
-                }
-              }} className="p-2 -ml-2 text-sky-500 hover:text-sky-600 transition-colors">
+              <button onClick={() => navigate('/app/water')} className="p-2 -ml-2 text-sky-500 hover:text-sky-600 transition-colors">
                 <Droplets className="h-5 w-5" />
               </button>
               <button onClick={() => navigate('/app/breathe')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
