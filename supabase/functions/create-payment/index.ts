@@ -210,10 +210,46 @@ serve(async (req) => {
       
       let priceId: string;
       
-      // Check if we have an existing Stripe price ID to reuse
+      // Check if we have an existing Stripe price ID and verify it's a recurring price
       if (programData.stripe_price_id) {
-        priceId = programData.stripe_price_id;
-        logStep("Reusing existing Stripe price", { priceId });
+        try {
+          const existingPrice = await stripe.prices.retrieve(programData.stripe_price_id);
+          if (existingPrice.recurring) {
+            priceId = programData.stripe_price_id;
+            logStep("Reusing existing recurring Stripe price", { priceId });
+          } else {
+            // Stored price is not recurring, create a new recurring price
+            logStep("Stored price is not recurring, creating new recurring price");
+            const price = await stripe.prices.create({
+              unit_amount: chargeAmount,
+              currency: 'usd',
+              recurring: {
+                interval: (programData.subscription_interval as 'day' | 'week' | 'month' | 'year') || 'month',
+              },
+              product: existingPrice.product as string,
+            });
+            priceId = price.id;
+            logStep("Created new recurring Stripe price", { priceId, productId: existingPrice.product });
+          }
+        } catch (priceError) {
+          logStep("Error retrieving stored price, creating new one", { error: priceError });
+          // Fallback: create new price with product_data
+          const price = await stripe.prices.create({
+            unit_amount: chargeAmount,
+            currency: 'usd',
+            recurring: {
+              interval: (programData.subscription_interval as 'day' | 'week' | 'month' | 'year') || 'month',
+            },
+            product_data: {
+              name: productName,
+              metadata: {
+                program_slug: program,
+              },
+            },
+          });
+          priceId = price.id;
+          logStep("Created new Stripe price for subscription", { priceId });
+        }
       } else {
         // Create a new price for the subscription (legacy behavior)
         const price = await stripe.prices.create({
