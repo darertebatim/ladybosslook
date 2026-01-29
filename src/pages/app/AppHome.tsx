@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
-import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Wind } from 'lucide-react';
+import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Wind, Droplets } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
@@ -325,9 +325,23 @@ const AppHome = () => {
       }}>
           {/* Title bar */}
           <div className="flex items-center justify-between px-4 h-12">
-            {/* Left: Breathe + Journal + Profile buttons */}
+            {/* Left: Water + Breathe + Journal + Profile buttons */}
             <div className="flex items-center gap-1">
-              <button onClick={() => navigate('/app/breathe')} className="p-2 -ml-2 text-foreground/70 hover:text-foreground transition-colors">
+              <button onClick={() => {
+                // Find first water task and open tracking, or just show a toast
+                const waterTaskFound = tasks.find(t => isWaterTask(t));
+                if (waterTaskFound) {
+                  setWaterTask(waterTaskFound);
+                } else {
+                  toast("No water task today", {
+                    description: "Create a task with oz, ml, cups, or glasses goal",
+                    duration: 3000,
+                  });
+                }
+              }} className="p-2 -ml-2 text-sky-500 hover:text-sky-600 transition-colors">
+                <Droplets className="h-5 w-5" />
+              </button>
+              <button onClick={() => navigate('/app/breathe')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
                 <Wind className="h-5 w-5" />
               </button>
               <button onClick={() => navigate('/app/journal')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
