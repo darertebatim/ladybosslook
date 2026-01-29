@@ -10,9 +10,7 @@ import {
   BREATHING_CATEGORIES 
 } from '@/hooks/useBreathingExercises';
 import { BreathingExerciseCard } from '@/components/breathe/BreathingExerciseCard';
-import { BreathingInfoSheet } from '@/components/breathe/BreathingInfoSheet';
-import { BreathingSettingsSheet } from '@/components/breathe/BreathingSettingsSheet';
-import { BreathingActiveScreen } from '@/components/breathe/BreathingActiveScreen';
+import { BreathingExerciseScreen } from '@/components/breathe/BreathingExerciseScreen';
 import { Skeleton } from '@/components/ui/skeleton';
 import { haptic } from '@/lib/haptics';
 
@@ -22,10 +20,6 @@ export default function AppBreathe() {
   
   const [selectedCategory, setSelectedCategory] = useState<string>('calm');
   const [selectedExercise, setSelectedExercise] = useState<BreathingExercise | null>(null);
-  const [showInfoSheet, setShowInfoSheet] = useState(false);
-  const [showSettingsSheet, setShowSettingsSheet] = useState(false);
-  const [showActiveScreen, setShowActiveScreen] = useState(false);
-  const [sessionDuration, setSessionDuration] = useState(180); // 3 minutes default
 
   // Handle deep link to specific exercise from pro task
   const exerciseId = searchParams.get('exercise');
@@ -36,7 +30,6 @@ export default function AppBreathe() {
       if (exercise) {
         setSelectedExercise(exercise);
         setSelectedCategory(exercise.category);
-        setShowInfoSheet(true);
       }
     }
   }, [exerciseId, exercises]);
@@ -49,39 +42,19 @@ export default function AppBreathe() {
 
   const handleExerciseClick = (exercise: BreathingExercise) => {
     setSelectedExercise(exercise);
-    setShowInfoSheet(true);
     haptic.light();
   };
 
-  const handleStartFromInfo = () => {
-    setShowInfoSheet(false);
-    setShowSettingsSheet(true);
-  };
-
-  const handleStartSession = () => {
-    setShowSettingsSheet(false);
-    setShowActiveScreen(true);
-    haptic.medium();
-  };
-
-  const handleSessionComplete = () => {
-    setShowActiveScreen(false);
+  const handleCloseExercise = () => {
     setSelectedExercise(null);
-    haptic.success();
   };
 
-  const handleCloseSession = () => {
-    setShowActiveScreen(false);
-  };
-
-  // If active breathing screen is open, show it full screen
-  if (showActiveScreen && selectedExercise) {
+  // If an exercise is selected, show the unified exercise screen
+  if (selectedExercise) {
     return (
-      <BreathingActiveScreen
+      <BreathingExerciseScreen
         exercise={selectedExercise}
-        duration={sessionDuration}
-        onClose={handleCloseSession}
-        onComplete={handleSessionComplete}
+        onClose={handleCloseExercise}
       />
     );
   }
@@ -93,7 +66,7 @@ export default function AppBreathe() {
         description="Breathing exercises for relaxation and focus" 
       />
       
-      <div className="fixed inset-0 flex flex-col overflow-hidden bg-gradient-to-b from-[#5C5A8D] to-[#4A4875]">
+      <div className="fixed inset-0 flex flex-col overflow-hidden bg-gradient-to-b from-primary-dark to-primary">
         {/* Fixed Header */}
         <div 
           className="fixed top-0 left-0 right-0 z-10"
@@ -101,10 +74,10 @@ export default function AppBreathe() {
         >
           <div className="flex items-center justify-between px-4 pt-3 pb-2">
             <div className="flex items-center gap-3">
-              <BackButton to="/app/home" className="text-white/70 hover:text-white hover:bg-white/10" />
+              <BackButton to="/app/home" className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10" />
               <div className="flex items-center gap-2">
-                <Leaf className="h-5 w-5 text-green-300" />
-                <h1 className="text-xl font-bold text-white">Breathe</h1>
+                <Leaf className="h-5 w-5 text-primary-light" />
+                <h1 className="text-xl font-bold text-primary-foreground">Breathe</h1>
               </div>
             </div>
           </div>
@@ -122,8 +95,8 @@ export default function AppBreathe() {
                   className={cn(
                     'flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all',
                     selectedCategory === category.value
-                      ? 'bg-white text-[#5C5A8D]'
-                      : 'bg-white/10 text-white/80 hover:bg-white/20'
+                      ? 'bg-primary-foreground text-primary'
+                      : 'bg-primary-foreground/10 text-primary-foreground/80 hover:bg-primary-foreground/20'
                   )}
                 >
                   <span>{category.emoji}</span>
@@ -149,15 +122,15 @@ export default function AppBreathe() {
               [...Array(4)].map((_, i) => (
                 <Skeleton 
                   key={i} 
-                  className="h-28 rounded-2xl bg-white/10" 
+                  className="h-28 rounded-2xl bg-primary-foreground/10" 
                 />
               ))
             ) : filteredExercises.length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
-                  <Leaf className="h-8 w-8 text-white/60" />
+                <div className="w-16 h-16 rounded-full bg-primary-foreground/10 flex items-center justify-center mx-auto mb-4">
+                  <Leaf className="h-8 w-8 text-primary-foreground/60" />
                 </div>
-                <p className="text-white/60">No exercises in this category yet</p>
+                <p className="text-primary-foreground/60">No exercises in this category yet</p>
               </div>
             ) : (
               filteredExercises.map((exercise) => (
@@ -170,24 +143,6 @@ export default function AppBreathe() {
             )}
           </div>
         </div>
-
-        {/* Info Sheet */}
-        <BreathingInfoSheet
-          exercise={selectedExercise}
-          open={showInfoSheet}
-          onOpenChange={setShowInfoSheet}
-          onStart={handleStartFromInfo}
-        />
-
-        {/* Settings Sheet */}
-        <BreathingSettingsSheet
-          exercise={selectedExercise}
-          open={showSettingsSheet}
-          onOpenChange={setShowSettingsSheet}
-          selectedDuration={sessionDuration}
-          onDurationChange={setSessionDuration}
-          onStart={handleStartSession}
-        />
       </div>
     </>
   );
