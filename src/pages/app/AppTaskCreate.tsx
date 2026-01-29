@@ -8,6 +8,16 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
@@ -154,6 +164,7 @@ const AppTaskCreate = ({
   const [reminderEnabled, setReminderEnabled] = useState(initialData?.reminderEnabled ?? false);
   const [reminderTime, setReminderTime] = useState(initialData?.reminderTime || '09:00');
   const [isUrgent, setIsUrgent] = useState(initialData?.isUrgent ?? false);
+  const [showUrgentConfirm, setShowUrgentConfirm] = useState(false);
   const [tag, setTag] = useState<string | null>(initialData?.tag ?? null);
   const [subtasks, setSubtasks] = useState<string[]>(initialData?.subtasks || []);
   const [newSubtask, setNewSubtask] = useState('');
@@ -721,7 +732,13 @@ const AppTaskCreate = ({
             </div>
             <Switch 
               checked={isUrgent} 
-              onCheckedChange={setIsUrgent}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  setShowUrgentConfirm(true);
+                } else {
+                  setIsUrgent(false);
+                }
+              }}
               className="data-[state=checked]:bg-red-500"
             />
           </div>
@@ -1905,6 +1922,33 @@ const AppTaskCreate = ({
       </div>
 
       {pickerSheets}
+
+      {/* Urgent Confirmation Dialog */}
+      <AlertDialog open={showUrgentConfirm} onOpenChange={setShowUrgentConfirm}>
+        <AlertDialogContent className="rounded-2xl max-w-[90vw]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlarmClock className="h-5 w-5 text-red-500" />
+              Enable Urgent Alarm?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-left">
+              This will create an alarm that rings even when your phone is on silent mode. The alarm will be added to your device's calendar.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3">
+            <AlertDialogCancel className="flex-1 mt-0">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              className="flex-1 bg-red-500 hover:bg-red-600"
+              onClick={() => {
+                setIsUrgent(true);
+                setShowUrgentConfirm(false);
+              }}
+            >
+              Enable Urgent
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
