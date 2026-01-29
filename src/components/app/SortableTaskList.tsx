@@ -33,6 +33,7 @@ interface SortableTaskItemProps {
   onStreakIncrease: () => void;
   onOpenGoalInput: (task: UserTask) => void;
   onOpenTimer: (task: UserTask) => void;
+  onOpenWaterTracking?: (task: UserTask) => void;
   isDragging?: boolean;
 }
 
@@ -46,6 +47,7 @@ const SortableTaskItem = ({
   onStreakIncrease,
   onOpenGoalInput,
   onOpenTimer,
+  onOpenWaterTracking,
   isDragging,
 }: SortableTaskItemProps) => {
   const {
@@ -83,6 +85,7 @@ const SortableTaskItem = ({
         onStreakIncrease={onStreakIncrease}
         onOpenGoalInput={onOpenGoalInput}
         onOpenTimer={onOpenTimer}
+        onOpenWaterTracking={onOpenWaterTracking}
       />
     </div>
   );
@@ -98,6 +101,7 @@ interface SortableTaskListProps {
   onStreakIncrease: () => void;
   onOpenGoalInput: (task: UserTask) => void;
   onOpenTimer: (task: UserTask) => void;
+  onOpenWaterTracking?: (task: UserTask) => void;
 }
 
 export const SortableTaskList = ({
@@ -110,6 +114,7 @@ export const SortableTaskList = ({
   onStreakIncrease,
   onOpenGoalInput,
   onOpenTimer,
+  onOpenWaterTracking,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -207,6 +212,7 @@ export const SortableTaskList = ({
               onStreakIncrease={onStreakIncrease}
               onOpenGoalInput={onOpenGoalInput}
               onOpenTimer={onOpenTimer}
+              onOpenWaterTracking={onOpenWaterTracking}
               isDragging={activeId === task.id}
             />
           ))}
