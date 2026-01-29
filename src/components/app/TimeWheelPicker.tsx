@@ -9,7 +9,7 @@ interface TimeWheelPickerProps {
 
 // Generate arrays for picker
 const HOURS_12 = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-const MINUTES = Array.from({ length: 60 }, (_, i) => i);
+const MINUTES = [0, 10, 20, 30, 40, 50]; // 10-minute increments for easier selection
 const PERIODS = ['AM', 'PM'] as const;
 
 const ITEM_HEIGHT = 44;
@@ -331,11 +331,14 @@ export const TimeWheelPicker = ({ value, onChange }: TimeWheelPickerProps) => {
   const [hours24, minutes] = value.split(':').map(Number);
   const period = hours24 >= 12 ? 'PM' : 'AM';
   const hours12 = hours24 % 12 || 12;
+  
+  // Snap minutes to nearest 10 for display
+  const displayMinutes = Math.round(minutes / 10) * 10 % 60;
 
   const handleHourChange = (newHour12: number | string) => {
     const hour = Number(newHour12);
     let newHour24 = period === 'PM' ? (hour % 12) + 12 : hour % 12;
-    onChange(`${String(newHour24).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`);
+    onChange(`${String(newHour24).padStart(2, '0')}:${String(displayMinutes).padStart(2, '0')}`);
   };
 
   const handleMinuteChange = (newMinute: number | string) => {
@@ -365,7 +368,7 @@ export const TimeWheelPicker = ({ value, onChange }: TimeWheelPickerProps) => {
       />
       <WheelColumn
         items={MINUTES}
-        selectedValue={minutes}
+        selectedValue={displayMinutes}
         onSelect={handleMinuteChange}
         formatItem={(item) => String(item).padStart(2, '0')}
         isInfinite={true}
