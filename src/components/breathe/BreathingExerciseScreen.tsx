@@ -241,8 +241,8 @@ export function BreathingExerciseScreen({
         </div>
       </div>
 
-      {/* Main breathing visualization - absolutely centered */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      {/* Main breathing visualization - positioned upper */}
+      <div className="absolute inset-x-0 top-24 flex justify-center pointer-events-none">
         <BreathingCircle
           phase={circleState.phase}
           phaseDuration={isActive && !isPaused ? currentPhase?.duration || 4 : 0}
