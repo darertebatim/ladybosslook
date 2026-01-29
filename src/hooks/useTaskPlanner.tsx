@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { format, subDays, isEqual, parseISO } from 'date-fns';
-import { scheduleUrgentAlarm, isUrgentAlarmAvailable } from '@/lib/taskAlarm';
+import { scheduleUrgentAlarm, cancelUrgentAlarms, isUrgentAlarmAvailable } from '@/lib/taskAlarm';
 import { scheduleTaskReminder, cancelTaskReminder, isLocalNotificationsAvailable } from '@/lib/localNotifications';
 
 // ============================================
@@ -642,9 +642,14 @@ export const useUpdateTask = () => {
     mutationFn: async (input: UpdateTaskInput) => {
       const { id, subtasks, ...updates } = input;
 
-      // Cancel existing local notification before updating
+      // Cancel existing local notification and urgent alarms before updating
       if (isLocalNotificationsAvailable()) {
         await cancelTaskReminder(id);
+      }
+      
+      // Cancel existing urgent alarms (will be rescheduled if still urgent)
+      if (isUrgentAlarmAvailable()) {
+        await cancelUrgentAlarms(id);
       }
 
       // Update the task
