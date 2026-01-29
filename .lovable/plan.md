@@ -1,199 +1,207 @@
 
-# Breathe Page Redesign Plan
+
+# Water Tracking Feature Implementation Plan
 
 ## Overview
-Complete redesign of the `/app/breathe` page to match the design patterns used in other app pages like Listen (AppPlayer) and Routines (AppInspire), while also fixing the "info sheet shows only first time" issue.
+Create a dedicated water tracking screen that opens when tapping on a "Drink Water" task (a regular task with a count-based goal and unit "oz" or "ml"). The screen provides a beautiful themed UI showing today's water intake progress, with a specialized keypad featuring quick-select cup size buttons.
 
-## Current Issues
-1. **Inconsistent design** - Uses purple gradient background instead of app-theme (black & white)
-2. **Missing "All" category** - No way to view all breathing exercises at once
-3. **Different category UI** - Uses pill buttons instead of CategoryCircle components
-4. **First-time info only** - Info sheet only auto-shows on first view per exercise
+**Note:** The hydration goal calculator (based on body data like weight/activity) will NOT be implemented since I don't have access to verified scientific data for the calculation formula.
 
-## Design Changes
+## Feature Design
 
-### 1. AppBreathe.tsx - List Page Redesign
+### 1. Detection Logic: "Water Task" Recognition
+A task is recognized as a "water task" when it has:
+- `goal_enabled: true`
+- `goal_type: 'count'`
+- `goal_unit` is one of: `'oz'`, `'ml'`, `'cups'`, `'glasses'`
 
-**Header Section:**
-- Change from `bg-gradient-to-b from-primary-dark to-primary` to `bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl`
-- Use app-theme foreground colors for text
+This allows any task with water-related units to open the specialized water tracking screen.
 
-**Categories:**
-- Add "All" category at the beginning of BREATHING_CATEGORIES
-- Replace pill buttons with CategoryCircle components (matching AppPlayer pattern)
-- Use horizontal scroll with icons and colors per category
+### 2. New Component: `WaterTrackingScreen.tsx`
+A full-screen modal/overlay similar to the breathing exercise screen.
 
-**Category Configuration:**
+**Visual Design (based on Me+ screenshots):**
 ```
-all: { icon: 'Wind', color: 'purple' }
-morning: { icon: 'Sunrise', color: 'orange' }
-energize: { icon: 'Zap', color: 'yellow' }
-focus: { icon: 'Target', color: 'blue' }
-calm: { icon: 'Leaf', color: 'green' }
-night: { icon: 'Moon', color: 'indigo' }
-```
-
-**Content Area:**
-- Use `bg-background` instead of gradient
-- Cards use proper card styling matching other app pages
-
-### 2. BreathingExerciseCard.tsx - Card Redesign
-
-**Current:** Glass/blur effect with white text
-**New:** Standard card styling matching app-theme
-- `bg-card` background
-- `text-foreground` for title
-- `text-muted-foreground` for description
-- Rounded corners and subtle shadow
-
-### 3. BreathingExerciseScreen.tsx - Exercise Screen Redesign
-
-**Background:**
-- Change from purple gradient to `bg-background`
-
-**Circles & Animation:**
-- Use app-theme tokens for rings and animated circle
-- Outer ring: `border-muted-foreground/30`
-- Inner ring: `border-muted-foreground/30`
-- Animated circle: `bg-primary/20` or similar subtle color
-- Center circle: `bg-card` with `text-foreground`
-
-**Info Sheet Trigger:**
-- Remove localStorage-based "first time" tracking
-- Always show info sheet automatically when exercise opens
-- User can dismiss and start when ready
-
-**Controls:**
-- Duration buttons use muted/primary styling
-- Start/Pause button uses primary colors
-
-### 4. BreathingInfoSheet.tsx - Styling Update
-
-**Current:** Uses `bg-primary` with `text-primary-foreground`
-**New:** Uses `bg-card` or `bg-background` with `text-foreground`
-- Phase breakdown uses muted backgrounds
-- Okay button uses primary styling
-
-### 5. BreathingCircle.tsx - Color Updates
-
-Update all colors to use app-theme tokens:
-- Rings: `border-muted-foreground/30`
-- Animated circle: Subtle primary tint
-- Center content: Card background with foreground text
-
-### 6. useBreathingExercises.tsx - Add "All" Category
-
-Add to BREATHING_CATEGORIES array:
-```typescript
-{ value: 'all', label: 'All', emoji: '🌬️' }
+┌─────────────────────────────────────┐
+│  [X]          Today                 │  ← Header with close button
+│                                     │
+│        Sky/clouds illustration      │  ← Light blue sky top section
+│                                     │
+│                                     │
+│           12/73oz                   │  ← Large progress display
+│     Water intake & your goal        │
+│                                     │
+│     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~    │
+│     ~~~~~~~~~~ Water waves ~~~~~~~  │  ← Animated water level based on %
+│     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~    │
+│     🌿      🌊       ⭐             │  ← Decorative underwater elements
+│                                     │
+│  [⚙️]    [+ Add Water]    [📅]     │  ← Bottom action buttons
+└─────────────────────────────────────┘
 ```
 
-Update filtering logic to show all active exercises when "all" is selected.
+**Water level animation:** The wave illustration rises as progress increases (using CSS gradients or layered divs with wave clip-paths).
 
----
+### 3. New Component: `WaterInputSheet.tsx`
+Extended version of GoalInputSheet with cup size presets.
 
-## Technical Details
+**Design:**
+```
+┌─────────────────────────────────────┐
+│  Cancel       Add Water             │
+│                                     │
+│            12|oz                    │  ← Current value with unit
+│                                     │
+│  [☕12oz] [🥤16oz] [🧊20oz] [🍶24oz] [🫙30oz]  ← Quick presets
+│                                     │
+│    [7]      [8]      [9]           │
+│    [4]      [5]      [6]           │  ← Number keypad
+│    [1]      [2]      [3]           │
+│    [⌫]      [0]      [✓]           │
+└─────────────────────────────────────┘
+```
+
+**Cup size presets:** Tapping fills in the value immediately and shows it in the display. User can still manually type a custom amount.
+
+### 4. Flow Integration
+
+**Entry point:** When user taps + button (count goal) or card on a water task:
+- Instead of opening `GoalInputSheet`, open `WaterTrackingScreen`
+- The screen shows current progress and allows adding water
+- Settings button (⚙️) opens the task detail modal for editing
+
+**Files to check for water unit detection:**
+- `TaskCard.tsx` - detect water task and route to water screen
+- `TaskDetailModal.tsx` - same detection for modal flow
+
+### 5. History Feature (Calendar button)
+Simple view showing water intake history (optional, can be Phase 2).
+
+## Technical Implementation
+
+### Files to Create
+
+| File | Purpose |
+|------|---------|
+| `src/components/app/WaterTrackingScreen.tsx` | Main water tracking fullscreen UI |
+| `src/components/app/WaterInputSheet.tsx` | Keypad with cup size presets |
+| `src/lib/waterTracking.ts` | Helper functions and constants |
 
 ### Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/hooks/useBreathingExercises.tsx` | Add "All" category to BREATHING_CATEGORIES |
-| `src/pages/app/AppBreathe.tsx` | Complete UI redesign: header, categories, content area |
-| `src/components/breathe/BreathingExerciseCard.tsx` | Update to card-based design |
-| `src/components/breathe/BreathingExerciseScreen.tsx` | Update colors, remove first-time-only logic |
-| `src/components/breathe/BreathingCircle.tsx` | Update colors to app-theme |
-| `src/components/breathe/BreathingInfoSheet.tsx` | Update colors to app-theme |
+| `src/components/app/TaskCard.tsx` | Detect water task, open WaterTrackingScreen instead of GoalInputSheet |
+| `src/components/app/TaskDetailModal.tsx` | Add "Track Water" button for water tasks |
 
-### Color Token Mapping
-
-| Element | Current | New |
-|---------|---------|-----|
-| List page background | `from-primary-dark to-primary` | `bg-background` |
-| Header | `from-primary-dark to-primary` | `bg-[#F4ECFE] dark:bg-violet-950/90` |
-| Exercise screen bg | Purple gradient | `bg-background` |
-| Circle rings | `border-primary/30` | `border-muted-foreground/30` |
-| Animated circle | `bg-primary/60` | `bg-primary/20` |
-| Center circle | `bg-primary/80` | `bg-card` |
-| Text | `text-primary-foreground` | `text-foreground` |
-| Info sheet bg | `bg-primary` | `bg-card` |
-
-### Category Configuration Object
+### Constants (in `waterTracking.ts`)
 
 ```typescript
-const categoryConfig: Record<string, { name: string; icon: string; color: string }> = {
-  all: { name: 'All', icon: 'Wind', color: 'purple' },
-  morning: { name: 'Morning', icon: 'Sunrise', color: 'orange' },
-  energize: { name: 'Energize', icon: 'Zap', color: 'yellow' },
-  focus: { name: 'Focus', icon: 'Target', color: 'blue' },
-  calm: { name: 'Calm', icon: 'Leaf', color: 'green' },
-  night: { name: 'Night', icon: 'Moon', color: 'indigo' },
+export const WATER_UNITS = ['oz', 'ml', 'cups', 'glasses'] as const;
+
+export const CUP_PRESETS = {
+  oz: [
+    { label: '12oz', value: 12, icon: 'Coffee' },
+    { label: '16oz', value: 16, icon: 'GlassWater' },
+    { label: '20oz', value: 20, icon: 'CupSoda' },
+    { label: '24oz', value: 24, icon: 'Wine' },
+    { label: '30oz', value: 30, icon: 'Bottle' },
+  ],
+  ml: [
+    { label: '250ml', value: 250, icon: 'Coffee' },
+    { label: '350ml', value: 350, icon: 'GlassWater' },
+    { label: '500ml', value: 500, icon: 'CupSoda' },
+    { label: '750ml', value: 750, icon: 'Wine' },
+    { label: '1L', value: 1000, icon: 'Bottle' },
+  ],
+  // similar for cups/glasses
 };
+
+export function isWaterTask(task: UserTask): boolean {
+  return (
+    task.goal_enabled &&
+    task.goal_type === 'count' &&
+    task.goal_unit &&
+    WATER_UNITS.includes(task.goal_unit.toLowerCase())
+  );
+}
 ```
 
-### Info Sheet Behavior Change
+### WaterTrackingScreen Component Structure
 
-**Before:**
 ```typescript
-useEffect(() => {
-  const seen = getSeenExercises();
-  if (!seen.has(exercise.id)) {
-    setShowInfoSheet(true);
-  }
-}, [exercise.id]);
+interface WaterTrackingScreenProps {
+  task: UserTask;
+  date: Date;
+  goalProgress: number;
+  onClose: () => void;
+  onAddWater: (amount: number) => void;
+  onOpenSettings: () => void;
+}
 ```
 
-**After:**
+**Key features:**
+- Shows task emoji + title in header
+- Large progress display: `{goalProgress}/{goal_target}{unit}`
+- Visual water level indicator (CSS-based waves)
+- Three bottom buttons: Settings (opens task edit), Add Water, History (optional)
+- Animated water level that rises based on percentage complete
+- Celebration animation when goal is reached
+
+### WaterInputSheet Props
+
 ```typescript
-useEffect(() => {
-  // Always show info sheet when exercise opens
-  setShowInfoSheet(true);
-}, [exercise.id]);
+interface WaterInputSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  unit: string;
+  presets: Array<{ label: string; value: number; icon: string }>;
+  onConfirm: (amount: number) => void;
+}
 ```
 
-Remove `markExerciseSeen`, `getSeenExercises`, and `LOCAL_STORAGE_KEY` since they're no longer needed.
+### Visual Styling
 
----
+**Color palette (water theme):**
+- Sky gradient: `#E3F2FD` to `#BBDEFB` (light blue sky)
+- Water color: `#2196F3` to `#1565C0` (blue water)
+- Wave layers: Multiple opacity levels of blue
+- Decorative elements: Navy blue plants/coral
 
-## Visual Layout
-
-### AppBreathe List Page
-```
-┌─────────────────────────────────┐
-│    ← Breathe         🔍        │ ← Lavender header
-│                                │
-│ [🌬️All] [🌅Morn] [⚡Ener] [🎯] │ ← CategoryCircle scroll
-└────────────────────────────────┘
-                                   ← White/background content
-┌─────────────────────────────────┐
-│ 🧘 Box Breathing               │ ← Card style
-│ 4-second cycle for calm...     │
-│ [4s cycle] [with holds]        │
-└─────────────────────────────────┘
-
-┌─────────────────────────────────┐
-│ 🌙 4-7-8 Sleep                 │
-│ Relaxation technique...        │
-│ [19s cycle] [with holds]       │
-└─────────────────────────────────┘
+**CSS for water waves:**
+```css
+.water-wave {
+  position: absolute;
+  bottom: 0;
+  width: 200%;
+  height: var(--water-level);
+  background: linear-gradient(to bottom, rgba(33, 150, 243, 0.8), rgba(21, 101, 192, 1));
+  border-radius: 100% 100% 0 0;
+  animation: wave 3s ease-in-out infinite;
+}
 ```
 
-### Exercise Screen
-```
-┌─────────────────────────────────┐
-│  [X]           2:45        [?] │ ← Header with timer
-│                                │
-│         ╭─────────────╮        │ ← Outer ring (light gray)
-│         │   ╭─────╮   │        │ ← Inner ring (light gray)
-│         │   │Inhale│  │        │ ← Animated circle (subtle)
-│         │   │ Nose │  │        │
-│         │   ╰─────╯   │        │
-│         ╰─────────────╯        │
-│                                │
-│          LENGTH                │
-│    [1] [3] [5] [10] min        │ ← Duration options
-│                                │
-│    ═══════════════════         │ ← Progress bar
-│         [ Start ]              │ ← Primary button
-└─────────────────────────────────┘
-```
+## Implementation Order
+
+1. Create `waterTracking.ts` with helper functions and constants
+2. Create `WaterInputSheet.tsx` (extended keypad with presets)
+3. Create `WaterTrackingScreen.tsx` (main UI)
+4. Modify `TaskCard.tsx` to detect water tasks and open water screen
+5. Modify `TaskDetailModal.tsx` to add water tracking button
+6. Test end-to-end with a "Drink Water" task
+
+## What's NOT Included (per user request)
+
+- **Hydration calculator** based on body data (weight, activity, weather) - skipped because reliable scientific formulas are not available
+- **History view** - can be added in Phase 2
+
+## User Experience
+
+1. User creates a task "Drink Water 💧" with goal: 8 cups/day
+2. On home page, tapping the task opens the water tracking screen
+3. User sees beautiful water-themed UI with 0/8 cups progress
+4. User taps "+ Add Water" → keypad opens with preset cup sizes
+5. User taps "1 cup" preset → value fills in → confirms
+6. Screen updates to show 1/8 cups with water level rising
+7. Settings button opens task edit modal for changing goal
+
