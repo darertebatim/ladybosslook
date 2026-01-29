@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.ladybosslook.academy',
-  appName: 'Ladybosslook',
+  appName: 'Simora - ladybosslook',
   webDir: 'dist',
   // 🚨 NUCLEAR GUARD: Ensure native platform is always detected
   ios: {
