@@ -1,207 +1,166 @@
 
 
-# Water Tracking Feature Implementation Plan
+# Water Tracking Feature Fixes
 
-## Overview
-Create a dedicated water tracking screen that opens when tapping on a "Drink Water" task (a regular task with a count-based goal and unit "oz" or "ml"). The screen provides a beautiful themed UI showing today's water intake progress, with a specialized keypad featuring quick-select cup size buttons.
+## Issues Identified
 
-**Note:** The hydration goal calculator (based on body data like weight/activity) will NOT be implemented since I don't have access to verified scientific data for the calculation formula.
+After analyzing the codebase, I found three distinct problems:
 
-## Feature Design
+### Issue 1: Water header button only opens if a water task exists for today
 
-### 1. Detection Logic: "Water Task" Recognition
-A task is recognized as a "water task" when it has:
-- `goal_enabled: true`
-- `goal_type: 'count'`
-- `goal_unit` is one of: `'oz'`, `'ml'`, `'cups'`, `'glasses'`
+**Current behavior:** The Droplets button in the header tries to find a water task for today and opens the `WaterTrackingScreen` only if one exists. If no water task exists, it shows a toast message.
 
-This allows any task with water-related units to open the specialized water tracking screen.
+**Expected behavior:** Like Breathe and Journal, the water feature should be a standalone page at `/app/water` that the user can always access.
 
-### 2. New Component: `WaterTrackingScreen.tsx`
-A full-screen modal/overlay similar to the breathing exercise screen.
+### Issue 2: "Add Water" button may not work due to missing dialog accessibility attributes
 
-**Visual Design (based on Me+ screenshots):**
+**Current behavior:** Console logs show warnings about missing `DialogTitle` and `Description` for sheet components. The `WaterInputSheet` uses a Sheet component which may have accessibility issues that could affect functionality in some scenarios.
+
+### Issue 3: "Add to my routine" button doesn't exist for water tracking
+
+**Current behavior:** The `WaterTrackingScreen` has no "Add to my routine" functionality.
+
+**Expected behavior:** Like Breathe exercises, users should be able to add water tracking as a routine task.
+
+---
+
+## Solution Plan
+
+### Step 1: Create a dedicated Water Tracking page
+
+Create a new page at `src/pages/app/AppWater.tsx` following the Breathe page pattern:
+
+- Shows the `WaterTrackingScreen` component
+- If no water task exists for today, show an option to create one or guide to add via routines
+- Accessible from `/app/water` route
+- Has a back button to return to home
+
+### Step 2: Add the route in App.tsx
+
+Add a new full-screen route:
 ```
-┌─────────────────────────────────────┐
-│  [X]          Today                 │  ← Header with close button
-│                                     │
-│        Sky/clouds illustration      │  ← Light blue sky top section
-│                                     │
-│                                     │
-│           12/73oz                   │  ← Large progress display
-│     Water intake & your goal        │
-│                                     │
-│     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~    │
-│     ~~~~~~~~~~ Water waves ~~~~~~~  │  ← Animated water level based on %
-│     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~    │
-│     🌿      🌊       ⭐             │  ← Decorative underwater elements
-│                                     │
-│  [⚙️]    [+ Add Water]    [📅]     │  ← Bottom action buttons
-└─────────────────────────────────────┘
-```
-
-**Water level animation:** The wave illustration rises as progress increases (using CSS gradients or layered divs with wave clip-paths).
-
-### 3. New Component: `WaterInputSheet.tsx`
-Extended version of GoalInputSheet with cup size presets.
-
-**Design:**
-```
-┌─────────────────────────────────────┐
-│  Cancel       Add Water             │
-│                                     │
-│            12|oz                    │  ← Current value with unit
-│                                     │
-│  [☕12oz] [🥤16oz] [🧊20oz] [🍶24oz] [🫙30oz]  ← Quick presets
-│                                     │
-│    [7]      [8]      [9]           │
-│    [4]      [5]      [6]           │  ← Number keypad
-│    [1]      [2]      [3]           │
-│    [⌫]      [0]      [✓]           │
-└─────────────────────────────────────┘
+/app/water → AppWater component (outside AppLayout, like /app/breathe)
 ```
 
-**Cup size presets:** Tapping fills in the value immediately and shows it in the display. User can still manually type a custom amount.
+### Step 3: Update the header button navigation
 
-### 4. Flow Integration
+Change the Droplets button in `AppHome.tsx` to navigate to `/app/water` instead of trying to find a task and open the overlay.
 
-**Entry point:** When user taps + button (count goal) or card on a water task:
-- Instead of opening `GoalInputSheet`, open `WaterTrackingScreen`
-- The screen shows current progress and allows adding water
-- Settings button (⚙️) opens the task detail modal for editing
+### Step 4: Fix WaterInputSheet accessibility
 
-**Files to check for water unit detection:**
-- `TaskCard.tsx` - detect water task and route to water screen
-- `TaskDetailModal.tsx` - same detection for modal flow
+Add proper `DialogTitle` (with `VisuallyHidden` wrapper) and `DialogDescription` to the Sheet component to fix console warnings.
 
-### 5. History Feature (Calendar button)
-Simple view showing water intake history (optional, can be Phase 2).
+### Step 5: Add "Add to my routine" button to WaterTrackingScreen
 
-## Technical Implementation
+Add an "Add to Routine" button in the `WaterTrackingScreen` that:
+- Creates a synthetic task for water tracking (similar to Breathe pattern)
+- Opens the `RoutinePreviewSheet` for scheduling customization
+- Uses `useAddRoutinePlan` hook to save
 
-### Files to Create
+### Step 6: Handle the case when no water task exists
+
+In the new `AppWater.tsx` page:
+- If no water task exists for today, show a prompt: "Start tracking your water intake"
+- Provide a button that opens `RoutinePreviewSheet` with a pre-configured water task template
+
+---
+
+## Technical Details
+
+### New File: `src/pages/app/AppWater.tsx`
+
+```typescript
+// Structure:
+// - Fetch today's water task (if any) using useTasksForDate
+// - If task exists: show WaterTrackingScreen with current progress
+// - If no task: show onboarding UI with "Add to My Routine" button
+// - Always show back button to /app/home
+```
+
+### Modifications to `src/components/app/WaterTrackingScreen.tsx`
+
+1. Add RoutinePreviewSheet integration (like BreathingExerciseCard)
+2. Add "Add to Routine" button alongside Settings button
+3. Create synthetic water task template
+
+### Modifications to `src/components/app/WaterInputSheet.tsx`
+
+Add accessibility attributes to SheetContent:
+```tsx
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+// Inside SheetContent:
+<SheetHeader>
+  <VisuallyHidden>
+    <SheetTitle>Add Water</SheetTitle>
+  </VisuallyHidden>
+</SheetHeader>
+```
+
+### Modifications to `src/App.tsx`
+
+Add new route:
+```tsx
+const AppWater = lazy(() => import("@/pages/app/AppWater"));
+// ...
+<Route path="/app/water" element={<ProtectedRoute><AppWater /></ProtectedRoute>} />
+```
+
+### Modifications to `src/pages/app/AppHome.tsx`
+
+Change the Droplets button:
+```tsx
+<button onClick={() => navigate('/app/water')} className="p-2 -ml-2 text-sky-500">
+  <Droplets className="h-5 w-5" />
+</button>
+```
+
+### Water Routine Template (in waterTracking.ts)
+
+```typescript
+export const createWaterRoutineTask = (): RoutinePlanTask => ({
+  id: 'water-routine-template',
+  plan_id: 'synthetic-water',
+  title: 'Drink Water 💧',
+  icon: '💧',
+  duration_minutes: 0,
+  task_order: 0,
+  is_active: true,
+  created_at: new Date().toISOString(),
+  linked_playlist_id: null,
+  pro_link_type: null,
+  pro_link_value: null,
+  goal_enabled: true,
+  goal_type: 'count',
+  goal_target: 8,
+  goal_unit: 'cups',
+});
+```
+
+---
+
+## Files to Create
 
 | File | Purpose |
 |------|---------|
-| `src/components/app/WaterTrackingScreen.tsx` | Main water tracking fullscreen UI |
-| `src/components/app/WaterInputSheet.tsx` | Keypad with cup size presets |
-| `src/lib/waterTracking.ts` | Helper functions and constants |
+| `src/pages/app/AppWater.tsx` | Dedicated water tracking page |
 
-### Files to Modify
+## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/components/app/TaskCard.tsx` | Detect water task, open WaterTrackingScreen instead of GoalInputSheet |
-| `src/components/app/TaskDetailModal.tsx` | Add "Track Water" button for water tasks |
+| `src/App.tsx` | Add `/app/water` route |
+| `src/pages/app/AppHome.tsx` | Change Droplets button to navigate to /app/water |
+| `src/components/app/WaterInputSheet.tsx` | Add accessibility attributes |
+| `src/components/app/WaterTrackingScreen.tsx` | Add "Add to Routine" button with RoutinePreviewSheet |
+| `src/lib/waterTracking.ts` | Add `createWaterRoutineTask` helper |
 
-### Constants (in `waterTracking.ts`)
+---
 
-```typescript
-export const WATER_UNITS = ['oz', 'ml', 'cups', 'glasses'] as const;
+## User Experience After Fix
 
-export const CUP_PRESETS = {
-  oz: [
-    { label: '12oz', value: 12, icon: 'Coffee' },
-    { label: '16oz', value: 16, icon: 'GlassWater' },
-    { label: '20oz', value: 20, icon: 'CupSoda' },
-    { label: '24oz', value: 24, icon: 'Wine' },
-    { label: '30oz', value: 30, icon: 'Bottle' },
-  ],
-  ml: [
-    { label: '250ml', value: 250, icon: 'Coffee' },
-    { label: '350ml', value: 350, icon: 'GlassWater' },
-    { label: '500ml', value: 500, icon: 'CupSoda' },
-    { label: '750ml', value: 750, icon: 'Wine' },
-    { label: '1L', value: 1000, icon: 'Bottle' },
-  ],
-  // similar for cups/glasses
-};
-
-export function isWaterTask(task: UserTask): boolean {
-  return (
-    task.goal_enabled &&
-    task.goal_type === 'count' &&
-    task.goal_unit &&
-    WATER_UNITS.includes(task.goal_unit.toLowerCase())
-  );
-}
-```
-
-### WaterTrackingScreen Component Structure
-
-```typescript
-interface WaterTrackingScreenProps {
-  task: UserTask;
-  date: Date;
-  goalProgress: number;
-  onClose: () => void;
-  onAddWater: (amount: number) => void;
-  onOpenSettings: () => void;
-}
-```
-
-**Key features:**
-- Shows task emoji + title in header
-- Large progress display: `{goalProgress}/{goal_target}{unit}`
-- Visual water level indicator (CSS-based waves)
-- Three bottom buttons: Settings (opens task edit), Add Water, History (optional)
-- Animated water level that rises based on percentage complete
-- Celebration animation when goal is reached
-
-### WaterInputSheet Props
-
-```typescript
-interface WaterInputSheetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  unit: string;
-  presets: Array<{ label: string; value: number; icon: string }>;
-  onConfirm: (amount: number) => void;
-}
-```
-
-### Visual Styling
-
-**Color palette (water theme):**
-- Sky gradient: `#E3F2FD` to `#BBDEFB` (light blue sky)
-- Water color: `#2196F3` to `#1565C0` (blue water)
-- Wave layers: Multiple opacity levels of blue
-- Decorative elements: Navy blue plants/coral
-
-**CSS for water waves:**
-```css
-.water-wave {
-  position: absolute;
-  bottom: 0;
-  width: 200%;
-  height: var(--water-level);
-  background: linear-gradient(to bottom, rgba(33, 150, 243, 0.8), rgba(21, 101, 192, 1));
-  border-radius: 100% 100% 0 0;
-  animation: wave 3s ease-in-out infinite;
-}
-```
-
-## Implementation Order
-
-1. Create `waterTracking.ts` with helper functions and constants
-2. Create `WaterInputSheet.tsx` (extended keypad with presets)
-3. Create `WaterTrackingScreen.tsx` (main UI)
-4. Modify `TaskCard.tsx` to detect water tasks and open water screen
-5. Modify `TaskDetailModal.tsx` to add water tracking button
-6. Test end-to-end with a "Drink Water" task
-
-## What's NOT Included (per user request)
-
-- **Hydration calculator** based on body data (weight, activity, weather) - skipped because reliable scientific formulas are not available
-- **History view** - can be added in Phase 2
-
-## User Experience
-
-1. User creates a task "Drink Water 💧" with goal: 8 cups/day
-2. On home page, tapping the task opens the water tracking screen
-3. User sees beautiful water-themed UI with 0/8 cups progress
-4. User taps "+ Add Water" → keypad opens with preset cup sizes
-5. User taps "1 cup" preset → value fills in → confirms
-6. Screen updates to show 1/8 cups with water level rising
-7. Settings button opens task edit modal for changing goal
+1. **Tapping water icon in header** → Opens `/app/water` page (always works)
+2. **On water page with existing task** → Shows beautiful water tracking screen with progress
+3. **On water page without task** → Shows "Start tracking" prompt with "Add to My Routine" button
+4. **"Add Water" button** → Opens input sheet (works properly with accessibility fixes)
+5. **"Add to Routine" button** → Opens RoutinePreviewSheet to customize scheduling
 
