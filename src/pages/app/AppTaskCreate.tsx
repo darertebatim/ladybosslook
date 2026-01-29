@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format, addDays, nextMonday, startOfDay } from 'date-fns';
-import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target } from 'lucide-react';
+import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target, Wind } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -181,6 +181,7 @@ const AppTaskCreate = ({
   const [showTagPicker, setShowTagPicker] = useState(false);
   const [showProLinkPicker, setShowProLinkPicker] = useState(false);
   const [showPlaylistPicker, setShowPlaylistPicker] = useState(false);
+  const [showBreathingPicker, setShowBreathingPicker] = useState(false);
   const [showGoalSettings, setShowGoalSettings] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   
@@ -224,8 +225,26 @@ const AppTaskCreate = ({
     },
   });
 
+  // Fetch breathing exercises for linking
+  const { data: breathingExercises = [] } = useQuery({
+    queryKey: ['linkable-breathing-exercises'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('breathing_exercises')
+        .select('id, name, emoji, category')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data as { id: string; name: string; emoji: string | null; category: string }[];
+    },
+  });
+
   // Get selected playlist info
   const selectedPlaylist = playlists.find(p => p.id === linkedPlaylistId);
+  
+  // Get selected breathing exercise info
+  const selectedBreathingExercise = breathingExercises.find(b => b.id === proLinkValue);
 
   // Filter playlists by search
   const filteredPlaylists = playlists.filter(p =>
@@ -1602,6 +1621,10 @@ const AppTaskCreate = ({
                           // Show playlist picker
                           setShowProLinkPicker(false);
                           setShowPlaylistPicker(true);
+                        } else if (config.value === 'breathe') {
+                          // Show breathing exercise picker
+                          setShowProLinkPicker(false);
+                          setShowBreathingPicker(true);
                         }
                       }}
                       className={cn(
@@ -1699,6 +1722,72 @@ const AppTaskCreate = ({
                       {playlist.category && (
                         <p className="text-xs text-muted-foreground capitalize">{playlist.category}</p>
                       )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Breathing Exercise Picker Sheet */}
+      <Sheet open={showBreathingPicker} onOpenChange={setShowBreathingPicker}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
+          <SheetHeader>
+            <SheetTitle>Select Breathing Exercise</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Choose a breathing exercise to link to this task.
+            </p>
+            
+            {/* Option for generic breathe (no specific exercise) */}
+            <button
+              onClick={() => {
+                setProLinkType('breathe');
+                setProLinkValue(null);
+                setShowBreathingPicker(false);
+              }}
+              className={cn(
+                'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
+                proLinkType === 'breathe' && !proLinkValue && 'bg-indigo-100 dark:bg-indigo-900/30'
+              )}
+            >
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 flex items-center justify-center">
+                <Wind className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="font-medium">Any Exercise</p>
+                <p className="text-xs text-muted-foreground">Open the Breathe page to choose</p>
+              </div>
+            </button>
+            
+            <div className="border-t pt-3">
+              <p className="text-xs text-muted-foreground mb-2">Or select a specific exercise:</p>
+            </div>
+            
+            <ScrollArea className="h-[40vh]">
+              <div className="space-y-2 pr-4">
+                {breathingExercises.map((exercise) => (
+                  <button
+                    key={exercise.id}
+                    onClick={() => {
+                      setProLinkType('breathe');
+                      setProLinkValue(exercise.id);
+                      setShowBreathingPicker(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
+                      proLinkValue === exercise.id && 'bg-indigo-100 dark:bg-indigo-900/30'
+                    )}
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 flex items-center justify-center">
+                      <span className="text-xl">{exercise.emoji || '🫁'}</span>
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{exercise.name}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{exercise.category}</p>
                     </div>
                   </button>
                 ))}

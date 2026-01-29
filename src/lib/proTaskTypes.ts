@@ -63,8 +63,8 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     iconColorClass: 'text-indigo-600 dark:text-indigo-400',
     badgeColorClass: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300',
     buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
-    description: 'Open breathing exercises',
-    requiresValue: false,
+    description: 'Link to a specific breathing exercise',
+    requiresValue: true,
   },
   channel: {
     value: 'channel',
