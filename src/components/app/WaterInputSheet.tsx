@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { X, Check, Delete } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { CupPreset, getPresetsForUnit } from '@/lib/waterTracking';
 
 interface WaterInputSheetProps {
@@ -67,6 +68,14 @@ export const WaterInputSheet = ({
         className="rounded-t-3xl px-4 pt-6 pb-8 bg-gradient-to-b from-white to-sky-50"
         style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}
       >
+        {/* Accessibility - hidden title and description */}
+        <VisuallyHidden>
+          <SheetHeader>
+            <SheetTitle>Add Water</SheetTitle>
+            <SheetDescription>Enter the amount of water you drank</SheetDescription>
+          </SheetHeader>
+        </VisuallyHidden>
+
         {/* Header */}
         <div className="flex items-center justify-center mb-6 relative">
           <button
