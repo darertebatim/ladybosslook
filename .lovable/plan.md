@@ -1,246 +1,169 @@
 
-
-# Breathe App Implementation Plan
+# Breathing Exercise UI Redesign Plan
 
 ## Overview
-Building a complete breathing exercise tool inspired by Finch app, with:
-- User-facing `/app/breathe` page with animated breathing circles
-- Admin panel to manage breathing techniques
-- Categories for filtering (Morning, Energize, Focus, Calm, Night)
-- Full-screen breathing animation with circular visualizations
-- Button on home header for quick access
+Complete redesign of the breathing exercise flow to match the Finch app UX pattern with a single-screen experience instead of multiple sheets.
 
-## Feature Breakdown
+## Current Flow (What Exists Now)
+1. User taps exercise from list → Opens **Info Sheet** (description, pattern, Start button)
+2. Tap Start → Opens **Settings Sheet** (duration, cycle info)
+3. Tap Begin → Opens **Active Screen** (full screen breathing animation)
 
-### 1. Database Schema
+## New Flow (Finch-Style)
+1. User taps exercise from list → Opens **Full-Screen Exercise View** with:
+   - Breathing circles visible immediately (in collapsed/ready state)
+   - Duration selector (1, 3, 5, 10 min)
+   - Start button at bottom
+   - X button (close) top-left, ? button (info) top-right
+   
+2. User taps **?** button → Opens **Info Sheet** as bottom overlay with:
+   - Exercise name
+   - Visual breakdown: Inhale (Xs, Nose) → Hold (Xs) → Exhale (Xs, Mouth) → Hold (Xs)
+   - Description text
+   - "Okay" button to dismiss
+   - **First-time users see this automatically, then dismiss**
 
-**New Table: `breathing_exercises`**
-```
-id: uuid (primary key)
-name: text (e.g., "Calm Breathing", "Focus Breathing")
-description: text (explanation of technique)
-category: text (morning, energize, focus, calm, night)
-emoji: text (icon for the card)
-inhale_seconds: integer (e.g., 4)
-inhale_hold_seconds: integer (nullable, 0 if no hold)
-exhale_seconds: integer (e.g., 6)
-exhale_hold_seconds: integer (nullable, 0 if no hold)
-inhale_method: text ("nose" or "mouth")
-exhale_method: text ("nose" or "mouth")
-sort_order: integer
-is_active: boolean
-created_at: timestamp
-updated_at: timestamp
-```
-
-**New Table: `breathing_sessions`** (for tracking user history - optional for analytics)
-```
-id: uuid
-user_id: uuid (references profiles)
-exercise_id: uuid (references breathing_exercises)
-duration_seconds: integer (how long user did it)
-completed_at: timestamp
-```
-
-### 2. User-Facing Pages and Components
-
-**Route: `/app/breathe` (full-screen, outside AppLayout)**
-
-**Page Flow:**
-1. **Exercise List Screen** - Purple gradient background, category tabs, exercise cards
-2. **Info Sheet** - Shows technique details before starting (inhale/exhale timings)
-3. **Settings Screen** - Choose duration (1, 3, 5, 10 min), breath type (Normal/Easier)
-4. **Active Breathing Screen** - Full-screen animated circles with instructions
-
-**Components to Create:**
-
-| Component | Purpose |
-|-----------|---------|
-| `src/pages/app/AppBreathe.tsx` | Main page with exercise list |
-| `src/components/breathe/BreathingExerciseCard.tsx` | Card for each exercise |
-| `src/components/breathe/BreathingInfoSheet.tsx` | Bottom sheet showing technique details |
-| `src/components/breathe/BreathingSettingsSheet.tsx` | Duration and type selector |
-| `src/components/breathe/BreathingActiveScreen.tsx` | Full-screen animated breathing interface |
-| `src/components/breathe/BreathingCircle.tsx` | Animated concentric circles component |
-
-### 3. Animation System (Breathing Circles)
-
-The core visual is **two concentric circles** that expand/contract:
-
-**Circle Animation Logic:**
-- **Outer circle**: Large background circle, subtle pulse
-- **Middle circle**: Follows breathing rhythm - expands on inhale, contracts on exhale
-- **Inner circle**: Contains text (phase name, method, countdown)
-
-**Animation States:**
-- `inhale`: Circles expand smoothly over N seconds
-- `inhale_hold`: Circles stay expanded, shows countdown
-- `exhale`: Circles contract smoothly over N seconds  
-- `exhale_hold`: Circles stay contracted, shows countdown
-
-**Technical Implementation:**
-- Use CSS transitions with `transform: scale()` for smooth animations
-- `transition-duration` set dynamically based on phase duration
-- Inner text updates: "Inhale" / "Hold" / "Exhale" with method (Nose/Mouth)
-- Progress bar at bottom fills over total session duration
-
-### 4. Screen Designs
-
-**Exercise List Screen:**
-```
-┌────────────────────────────────────────┐
-│ ✕                  🍃                  │
-│               Breathe                   │
-│                                         │
-│ ┌───────┬─────────┬───────┬─────┬─────┐│
-│ │MORNING│ENERGIZE │ FOCUS │CALM │NIGHT││
-│ └───────┴─────────┴───────┴─────┴─────┘│
-│                                         │
-│ ┌─────────────────────────────────────┐ │
-│ │ 🏝️  Calm Breathing                  │ │
-│ │     Lower your heart rate...        │ │
-│ └─────────────────────────────────────┘ │
-│                                         │
-│ ┌─────────────────────────────────────┐ │
-│ │ 🐯  Energy Breathing                │ │
-│ │     Perfect when you need...        │ │
-│ └─────────────────────────────────────┘ │
-└────────────────────────────────────────┘
-```
-
-**Active Breathing Screen:**
-```
-┌────────────────────────────────────────┐
-│                                    (?) │
-│                                        │
-│         ┌──────────────────┐           │
-│        ╱                    ╲          │
-│       │    ┌──────────┐     │          │
-│       │   ╱            ╲    │          │
-│       │  │   Inhale    │    │          │
-│       │  │    Nose     │    │          │
-│       │   ╲            ╱    │          │
-│       │    └──────────┘     │          │
-│        ╲                    ╱          │
-│         └──────────────────┘           │
-│                                        │
-│    ═══════════════════════════════     │
-│    (progress bar)                      │
-│                                        │
-│    ┌──────────────────────────────┐    │
-│    │           Pause              │    │
-│    └──────────────────────────────┘    │
-└────────────────────────────────────────┘
-```
-
-### 5. Admin Panel
-
-**New admin page: `/admin/tools`**
-
-Add "Tools" tab to AdminNav with a `breathing_exercises` manager:
-- CRUD for breathing exercises
-- Fields: name, description, category, emoji, timings, methods
-- Sort order management
-- Toggle active/inactive
-
-### 6. Home Header Integration
-
-**Modify:** `src/pages/app/AppHome.tsx`
-
-Add a "Breathe" button next to the Journal icon in the header:
-```tsx
-<button onClick={() => navigate('/app/breathe')} className="p-2 text-foreground/70">
-  <Wind className="h-5 w-5" />  {/* or custom breathing icon */}
-</button>
-```
-
-### 7. Routing Updates
-
-**Modify:** `src/App.tsx`
-
-Add new route outside AppLayout (full-screen experience):
-```tsx
-<Route path="/app/breathe" element={<ProtectedRoute><AppBreathe /></ProtectedRoute>} />
-```
-
-Add admin route:
-```tsx
-<Route path="tools" element={<ProtectedRoute requiredPage="tools"><Tools /></ProtectedRoute>} />
-```
+3. User taps **Start** button → Same screen transitions:
+   - Duration selector fades out
+   - Start button becomes Pause button
+   - Breathing animation begins from collapsed state (inhale first)
+   - ? button remains accessible
 
 ---
 
-## Technical Details
+## Technical Changes
 
-### Breathing Animation Algorithm
+### 1. Create New Component: `BreathingExerciseScreen.tsx`
+A single full-screen component that handles both setup and active breathing states.
 
-```typescript
-interface BreathingPhase {
-  type: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold';
-  duration: number; // seconds
-  method?: 'nose' | 'mouth';
-}
+**Props:**
+- `exercise: BreathingExercise`
+- `onClose: () => void`
 
-// For "Calm Breathing" (4s inhale, 6s exhale):
-const phases: BreathingPhase[] = [
-  { type: 'inhale', duration: 4, method: 'nose' },
-  { type: 'exhale', duration: 6, method: 'mouth' },
-];
+**Internal States:**
+- `isActive: boolean` - Whether breathing session is running
+- `isPaused: boolean` - Pause state during active session
+- `showInfoSheet: boolean` - Info overlay visibility
+- `selectedDuration: number` - 60, 180, 300, or 600 seconds
+- `hasSeenInfo: boolean` - Track first-time info display
 
-// For "Focus Breathing" (4-4-4-4 box breathing):
-const phases: BreathingPhase[] = [
-  { type: 'inhale', duration: 4, method: 'nose' },
-  { type: 'inhale_hold', duration: 4 },
-  { type: 'exhale', duration: 4, method: 'mouth' },
-  { type: 'exhale_hold', duration: 4 },
-];
+**Layout Structure:**
+```
+┌──────────────────────────────┐
+│  [X]                    [?]  │  ← Header with close/info buttons
+│                              │
+│                              │
+│     ┌────────────────┐       │
+│     │   ┌────────┐   │       │  ← Fixed outer ring (inhale boundary)
+│     │   │        │   │       │
+│     │   │ Inhale │   │       │  ← Animated circle + center text
+│     │   │  Nose  │   │       │
+│     │   └────────┘   │       │  ← Fixed inner ring (exhale boundary)
+│     └────────────────┘       │
+│                              │
+│         LENGTH               │
+│    [1] [3] [5] [10] min      │  ← Duration buttons (hidden when active)
+│                              │
+│    ═══════════════════       │  ← Progress bar
+│       [ Start/Pause ]        │  ← Primary action button
+└──────────────────────────────┘
 ```
 
-### Circle Scale Values
-- **Contracted** (exhale complete): `scale(0.4)` inner, `scale(0.6)` middle
-- **Expanded** (inhale complete): `scale(1.0)` inner, `scale(1.0)` middle
+### 2. Modify `BreathingInfoSheet.tsx`
+Transform into a simpler info overlay (no Start button here).
 
-### Color Scheme (matching Finch screenshots)
-- Background: `#5C5A8D` (deep purple-blue)
-- Outer circle: `#6B699E` (lighter purple)
-- Middle circle: `#9A98C2` (light purple/gray)
-- Inner circle: `#7C7AB0` (medium purple)
-- Text: White
+**Changes:**
+- Remove "Start Breathing" button
+- Remove "Add to Routine" button (move to main screen or keep in list)
+- Display only:
+  - Exercise name as title
+  - Phase breakdown with visual icons
+  - Description text
+  - "Okay" button to dismiss
+
+**Visual Phase Breakdown:**
+```
+  Inhale    Hold    Exhale    Hold
+   [◯]      [●]      [◯]      [●]
+  4 sec    4 sec    4 sec    4 sec
+   Nose             Mouth
+```
+
+### 3. Modify `BreathingCircle.tsx`
+Update to start in collapsed state when `phase === 'ready'`.
+
+**Current Issue:** Circle shows in expanded state initially
+**Fix:** Ensure `ready` phase uses `animatedScale = 0.40` (collapsed)
+
+### 4. Update `AppBreathe.tsx` Flow
+Replace the multi-sheet flow with single-screen navigation.
+
+**Changes:**
+- Remove `showInfoSheet`, `showSettingsSheet` states
+- Add `selectedExercise` opens `BreathingExerciseScreen` as full-screen overlay
+- Handle deep links the same way
+
+### 5. Design Token Updates for Breathing Screens
+Use consistent color scheme based on app's design system.
+
+**Color Mapping:**
+- Background gradient: `from-primary-dark via-primary to-primary-light`
+- Outer ring: `border-primary-foreground/30`
+- Inner ring: `border-primary-foreground/30`
+- Animated circle: `bg-primary-light/60`
+- Center circle: `bg-primary/80`
+- Text: `text-primary-foreground`
+- Duration buttons (inactive): `bg-primary-foreground/10`
+- Duration buttons (active): `bg-primary-foreground text-primary`
+- Start/Pause button: `bg-white text-primary-dark`
+
+### 6. First-Time Info Display Logic
+Show info sheet automatically on first open of each exercise.
+
+**Implementation:**
+- Store viewed exercises in `localStorage` key: `breathe_seen_info`
+- On exercise open, check if `exerciseId` is in the set
+- If not seen, auto-show info sheet, then add to set on dismiss
 
 ---
-
-## Files to Create
-
-| File | Purpose |
-|------|---------|
-| `src/pages/app/AppBreathe.tsx` | Main breathe page |
-| `src/pages/admin/Tools.tsx` | Admin tools page |
-| `src/components/breathe/BreathingExerciseCard.tsx` | Exercise list card |
-| `src/components/breathe/BreathingInfoSheet.tsx` | Technique info sheet |
-| `src/components/breathe/BreathingSettingsSheet.tsx` | Duration selector |
-| `src/components/breathe/BreathingActiveScreen.tsx` | Active breathing UI |
-| `src/components/breathe/BreathingCircle.tsx` | Animated circles |
-| `src/components/admin/BreathingExercisesManager.tsx` | Admin CRUD |
-| `src/hooks/useBreathingExercises.tsx` | Data fetching hook |
 
 ## Files to Modify
 
-| File | Change |
+| File | Action |
 |------|--------|
-| `src/App.tsx` | Add `/app/breathe` and `/admin/tools` routes |
-| `src/pages/app/AppHome.tsx` | Add breathe button to header |
-| `src/components/admin/AdminNav.tsx` | Add Tools menu item |
+| `src/components/breathe/BreathingExerciseScreen.tsx` | **CREATE** - New unified screen component |
+| `src/components/breathe/BreathingInfoSheet.tsx` | **MODIFY** - Simplify to info-only overlay |
+| `src/components/breathe/BreathingCircle.tsx` | **VERIFY** - Ensure ready state is collapsed |
+| `src/components/breathe/BreathingActiveScreen.tsx` | **DELETE** - Merged into BreathingExerciseScreen |
+| `src/components/breathe/BreathingSettingsSheet.tsx` | **DELETE** - No longer needed |
+| `src/pages/app/AppBreathe.tsx` | **MODIFY** - Use new single-screen flow |
 
 ---
 
-## Implementation Order
+## UI Details
 
-1. **Database**: Create `breathing_exercises` table with RLS
-2. **Admin**: Build BreathingExercisesManager and Tools page
-3. **Seed Data**: Add initial exercises (Calm, Focus, Energy, etc.)
-4. **User Page**: Build AppBreathe with exercise list
-5. **Animation**: Build BreathingActiveScreen with circle animations
-6. **Sheets**: Build info and settings sheets
-7. **Integration**: Add button to home header
-8. **Testing**: Test full flow end-to-end
+### Duration Selector
+```
+       LENGTH
+ ┌───┐ ┌───┐ ┌───┐ ┌───┐
+ │ 1 │ │ 3 │ │ 5 │ │10 │
+ │min│ │min│ │min│ │min│
+ └───┘ └───┘ └───┘ └───┘
+   ▲ selected = white bg, dark text
+```
 
+### Info Sheet Phase Icons
+Each phase shows a small circle with visual indicator:
+- **Inhale**: Circle with outward arrows `←○→`
+- **Hold**: Filled circle `●`
+- **Exhale**: Circle with inward arrows `→○←`
+
+### Transitions
+- Duration buttons: `animate-fade-out` when session starts
+- Start → Pause button: Smooth text/icon swap
+- Info sheet: Slide up from bottom with backdrop blur
+
+---
+
+## Summary
+This redesign consolidates 3 separate screens (Info Sheet → Settings Sheet → Active Screen) into a single unified experience where the breathing visualization is always visible, settings are inline, and the info is accessible via a ? button overlay.
