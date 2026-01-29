@@ -82,7 +82,9 @@ const EWPlus = () => {
         // Don't block payment - just log the error
       }
       
-      const idempotencyKey = `ewplus-${selectedPaymentType}-${trimmedEmail}`;
+      // Include timestamp rounded to 5-minute window for idempotency (prevents double-clicks but allows retries after failures)
+      const timeWindow = Math.floor(Date.now() / (5 * 60 * 1000));
+      const idempotencyKey = `ewplus-${selectedPaymentType}-${trimmedEmail}-${timeWindow}`;
       
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: { 
