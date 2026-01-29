@@ -106,14 +106,11 @@ The app includes persistent audio playback for educational content. This is the 
 
 This background audio capability is essential for users to listen to educational audio courses and podcasts while multitasking, driving, or exercising - a core use case for our learning platform.
 
-**What's New in Version 1.1.02:**
-- FIXED: Scrolling stability on Home screen - resolved header animation causing scroll issues
-- FIXED: Emoji icons now display correctly in task cards
-- IMPROVED: Task card design refinements (Me+ inspired layout)
-- IMPROVED: Task detail modal with full-color themed backgrounds
-- IMPROVED: Calendar star icon color consistency
-- UI Polish: Programs carousel now shows "tap to collapse" hint when expanded
+**What's New in Version 1.1.04:**
+- NEW: App renamed to "Simora - ladybosslook"
+- FIXED: Close button positioning on Water, Timer, and Breathing screens - now properly respects iOS safe area on all iPhone models
+- FIXED: Header elements no longer overlap with notch/status bar on fullscreen pages
 
-Thank you for reviewing LadyBoss Academy!
+Thank you for reviewing Simora - ladybosslook Academy!
 
 ---
