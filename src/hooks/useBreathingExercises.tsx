@@ -29,11 +29,12 @@ export interface BreathingSession {
 }
 
 export const BREATHING_CATEGORIES = [
-  { value: 'morning', label: 'Morning', emoji: '🌅' },
-  { value: 'energize', label: 'Energize', emoji: '⚡' },
-  { value: 'focus', label: 'Focus', emoji: '🎯' },
-  { value: 'calm', label: 'Calm', emoji: '🧘' },
-  { value: 'night', label: 'Night', emoji: '🌙' },
+  { value: 'all', label: 'All', emoji: '🌬️', icon: 'Wind', color: 'purple' },
+  { value: 'morning', label: 'Morning', emoji: '🌅', icon: 'Sunrise', color: 'orange' },
+  { value: 'energize', label: 'Energize', emoji: '⚡', icon: 'Zap', color: 'yellow' },
+  { value: 'focus', label: 'Focus', emoji: '🎯', icon: 'Target', color: 'blue' },
+  { value: 'calm', label: 'Calm', emoji: '🧘', icon: 'Leaf', color: 'green' },
+  { value: 'night', label: 'Night', emoji: '🌙', icon: 'Moon', color: 'indigo' },
 ] as const;
 
 // Fetch all breathing exercises

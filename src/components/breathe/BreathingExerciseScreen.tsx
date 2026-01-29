@@ -30,27 +30,6 @@ const DURATION_OPTIONS = [
   { value: 600, label: '10 min' },
 ];
 
-const LOCAL_STORAGE_KEY = 'breathe_seen_info';
-
-function getSeenExercises(): Set<string> {
-  try {
-    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return stored ? new Set(JSON.parse(stored)) : new Set();
-  } catch {
-    return new Set();
-  }
-}
-
-function markExerciseSeen(exerciseId: string) {
-  try {
-    const seen = getSeenExercises();
-    seen.add(exerciseId);
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify([...seen]));
-  } catch {
-    // Ignore storage errors
-  }
-}
-
 export function BreathingExerciseScreen({
   exercise,
   onClose,
@@ -71,12 +50,9 @@ export function BreathingExerciseScreen({
   const saveSession = useSaveBreathingSession();
   const startTimeRef = useRef<number>(0);
 
-  // Check if first time viewing this exercise
+  // Always show info sheet when exercise opens
   useEffect(() => {
-    const seen = getSeenExercises();
-    if (!seen.has(exercise.id)) {
-      setShowInfoSheet(true);
-    }
+    setShowInfoSheet(true);
   }, [exercise.id]);
 
   // Build phases array from exercise config
@@ -208,9 +184,8 @@ export function BreathingExerciseScreen({
   }, [exercise.id, isActive, totalElapsed, saveSession, onClose]);
 
   const handleInfoDismiss = useCallback(() => {
-    markExerciseSeen(exercise.id);
     setShowInfoSheet(false);
-  }, [exercise.id]);
+  }, []);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -239,27 +214,27 @@ export function BreathingExerciseScreen({
   const circleState = getCircleState();
 
   return (
-    <div className="fixed inset-0 z-50 bg-gradient-to-b from-primary-dark via-primary to-primary-light">
+    <div className="fixed inset-0 z-50 bg-background">
       {/* Safe area top padding */}
       <div className="absolute top-0 left-0 right-0" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3">
           <button
             onClick={handleClose}
-            className="p-2 rounded-full bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20 transition-colors"
+            className="p-2 rounded-full bg-muted text-foreground hover:bg-muted/80 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
           
           {isActive && (
-            <span className="text-primary-foreground/80 font-medium">
+            <span className="text-muted-foreground font-medium">
               {formatTime(selectedDuration - totalElapsed)}
             </span>
           )}
           
           <button
             onClick={() => setShowInfoSheet(true)}
-            className="p-2 rounded-full bg-primary-foreground/10 text-primary-foreground/70 hover:bg-primary-foreground/20 transition-colors"
+            className="p-2 rounded-full bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
           >
             <HelpCircle className="h-5 w-5" />
           </button>
@@ -282,7 +257,7 @@ export function BreathingExerciseScreen({
         {/* Duration selector (only shown when not active) */}
         {!isActive && !isCountingDown && (
           <div className="mb-4 animate-fade-in">
-            <h4 className="text-sm font-medium text-primary-foreground/60 mb-3 text-center">LENGTH</h4>
+            <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">LENGTH</h4>
             <div className="grid grid-cols-4 gap-2">
               {DURATION_OPTIONS.map((option) => (
                 <button
@@ -294,8 +269,8 @@ export function BreathingExerciseScreen({
                   className={cn(
                     'py-3 px-2 rounded-xl text-sm font-medium transition-all',
                     selectedDuration === option.value
-                      ? 'bg-primary-foreground text-primary'
-                      : 'bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
                   )}
                 >
                   {option.label}
@@ -310,9 +285,9 @@ export function BreathingExerciseScreen({
           <div className="mb-4 animate-fade-in">
             <Progress 
               value={progressPercent} 
-              className="h-2 bg-primary-foreground/20 [&>div]:bg-primary-foreground"
+              className="h-2 bg-muted [&>div]:bg-primary"
             />
-            <div className="flex justify-between mt-2 text-sm text-primary-foreground/60">
+            <div className="flex justify-between mt-2 text-sm text-muted-foreground">
               <span>{formatTime(totalElapsed)}</span>
               <span>{formatTime(selectedDuration)}</span>
             </div>
@@ -323,7 +298,7 @@ export function BreathingExerciseScreen({
         {!isCountingDown && (
           <Button
             onClick={isActive ? handlePauseToggle : handleStart}
-            className="w-full h-14 text-lg font-semibold bg-primary-foreground text-primary hover:bg-primary-foreground/90 rounded-2xl"
+            className="w-full h-14 text-lg font-semibold rounded-2xl"
           >
             {isActive ? (
               isPaused ? (

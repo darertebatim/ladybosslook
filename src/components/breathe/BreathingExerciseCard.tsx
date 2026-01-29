@@ -19,8 +19,8 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
       onClick={onClick}
       className={cn(
         'w-full text-left p-4 rounded-2xl transition-all',
-        'bg-white/20 backdrop-blur-sm border border-white/10',
-        'hover:bg-white/30 active:scale-[0.98]'
+        'bg-card border border-border shadow-sm',
+        'hover:shadow-md active:scale-[0.98]'
       )}
     >
       <div className="flex items-start gap-3">
@@ -29,18 +29,18 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
         
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-white text-lg">{exercise.name}</h3>
-          <p className="text-white/70 text-sm line-clamp-2 mt-0.5">
+          <h3 className="font-semibold text-foreground text-lg">{exercise.name}</h3>
+          <p className="text-muted-foreground text-sm line-clamp-2 mt-0.5">
             {exercise.description}
           </p>
           
           {/* Timing info */}
           <div className="flex items-center gap-2 mt-2">
-            <span className="text-xs text-white/50 bg-white/10 px-2 py-0.5 rounded-full">
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
               {cycleDuration}s cycle
             </span>
             {exercise.inhale_hold_seconds > 0 && (
-              <span className="text-xs text-white/50 bg-white/10 px-2 py-0.5 rounded-full">
+              <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                 with holds
               </span>
             )}
