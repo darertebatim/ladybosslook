@@ -267,7 +267,7 @@ const AppWater = () => {
           {/* Wave layers */}
           <div 
             className="relative transition-all duration-1000 ease-out"
-            style={{ height: `${Math.max(progressPercent * 2.5, 20)}px` }}
+            style={{ height: `${Math.max(progressPercent * 2.5, 60)}px` }}
           >
             {/* Back wave */}
             <div 
@@ -293,7 +293,7 @@ const AppWater = () => {
           <div 
             className="transition-all duration-1000 ease-out"
             style={{ 
-              height: `${Math.min(progressPercent * 3, 250)}px`,
+              height: `${Math.max(Math.min(progressPercent * 3, 250), 80)}px`,
               background: 'linear-gradient(to bottom, rgba(14, 165, 233, 0.8), rgba(2, 132, 199, 1))',
             }}
           >
