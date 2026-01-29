@@ -7,10 +7,15 @@ export const useAppTour = () => {
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
 
-  // App tour is temporarily disabled for this version
-  // TODO: Re-enable and fix step 4 issue in future release
   useEffect(() => {
-    // Tour disabled - do nothing
+    const hasCompleted = localStorage.getItem(TOUR_COMPLETED_KEY);
+    if (!hasCompleted) {
+      // Delay tour start to let the page render
+      const timer = setTimeout(() => {
+        setRun(true);
+      }, TOUR_DELAY_MS);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   const completeTour = useCallback(() => {
