@@ -1017,24 +1017,30 @@ const AppTaskCreate = ({
                   </button>
                 </div>
 
-                {/* Scroll wheel picker(s) */}
-                <TimeWheelPicker
-                  value={scheduledTime}
-                  onChange={setScheduledTime}
-                />
+                {/* Scroll container for time pickers */}
+                <div className={cn(
+                  "overflow-y-auto",
+                  timeMode === 'period' ? "max-h-[400px]" : ""
+                )}>
+                  {/* Scroll wheel picker(s) */}
+                  <TimeWheelPicker
+                    value={scheduledTime}
+                    onChange={setScheduledTime}
+                  />
 
-                {/* Time period - show second picker with TO label */}
-                {timeMode === 'period' && (
-                  <>
-                    <div className="text-center py-2">
-                      <span className="text-lg font-bold text-foreground">TO</span>
-                    </div>
-                    <TimeWheelPicker
-                      value={scheduledEndTime || '10:00'}
-                      onChange={setScheduledEndTime}
-                    />
-                  </>
-                )}
+                  {/* Time period - show second picker with TO label */}
+                  {timeMode === 'period' && (
+                    <>
+                      <div className="text-center py-2">
+                        <span className="text-lg font-bold text-foreground">TO</span>
+                      </div>
+                      <TimeWheelPicker
+                        value={scheduledEndTime || '10:00'}
+                        onChange={setScheduledEndTime}
+                      />
+                    </>
+                  )}
+                </div>
               </>
             )}
 
