@@ -52,6 +52,7 @@ export interface RoutinePlanTask {
   title: string;
   duration_minutes: number;
   icon: string;
+  color?: string; // Task color for display
   task_order: number;
   is_active: boolean;
   created_at: string;
