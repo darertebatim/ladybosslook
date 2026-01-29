@@ -16,13 +16,23 @@ export function BreathingCircle({
   countdown,
 }: BreathingCircleProps) {
   // Determine if circle should be expanded (at max) or collapsed (at min)
-  const isExpanded = phase === 'inhale' || phase === 'inhale_hold';
+  // Ready and exhale_hold start at collapsed (inner ring)
+  // Inhale_hold stays at expanded (outer ring)
+  const isExpanded = phase === 'inhale_hold';
   const isAnimating = phase === 'inhale' || phase === 'exhale';
+  const isInhaling = phase === 'inhale';
 
   // Calculate the animated circle scale (moves between inner and outer fixed rings)
-  // Inner ring is at ~40% size, outer ring is at 100% size
-  // Animated circle moves between 45% (collapsed) and 95% (expanded)
-  const animatedScale = isExpanded ? 0.95 : 0.45;
+  // Inner ring is at 40% size, outer ring is at 100% size
+  // Animated circle should exactly match: 0.40 (collapsed) and 1.0 (expanded)
+  let animatedScale = 0.40; // default collapsed (ready, exhale_hold)
+  if (isExpanded) {
+    animatedScale = 1.0; // fully expanded for inhale_hold
+  } else if (isInhaling) {
+    animatedScale = 1.0; // animating to expanded
+  } else if (phase === 'exhale') {
+    animatedScale = 0.40; // animating to collapsed
+  }
 
   return (
     <div className="relative flex items-center justify-center w-72 h-72">
