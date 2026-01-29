@@ -59,6 +59,7 @@ export const BreathingReminderSettings = ({ className }: BreathingReminderSettin
             planId: 'synthetic-breathe',
             selectedTaskIds,
             editedTasks,
+            syntheticTasks: FALLBACK_BREATHING_TASKS,
           });
         }
       }

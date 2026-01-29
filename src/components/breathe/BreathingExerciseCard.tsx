@@ -50,6 +50,7 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
         planId: 'synthetic-breathe',
         selectedTaskIds,
         editedTasks,
+        syntheticTasks: [syntheticTask], // Pass the synthetic task for on-the-fly creation
       });
       toast.success(`${exercise.name} added to your routine!`);
       setShowRoutineSheet(false);
