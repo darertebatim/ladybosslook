@@ -14,6 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_task_bank: {
+        Row: {
+          color: string
+          created_at: string
+          emoji: string
+          goal_enabled: boolean
+          goal_target: number | null
+          goal_type: string | null
+          goal_unit: string | null
+          id: string
+          is_active: boolean
+          linked_playlist_id: string | null
+          pro_link_type: string | null
+          pro_link_value: string | null
+          reminder_enabled: boolean
+          repeat_days: number[] | null
+          repeat_pattern: string
+          sort_order: number
+          tag: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          emoji?: string
+          goal_enabled?: boolean
+          goal_target?: number | null
+          goal_type?: string | null
+          goal_unit?: string | null
+          id?: string
+          is_active?: boolean
+          linked_playlist_id?: string | null
+          pro_link_type?: string | null
+          pro_link_value?: string | null
+          reminder_enabled?: boolean
+          repeat_days?: number[] | null
+          repeat_pattern?: string
+          sort_order?: number
+          tag?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          emoji?: string
+          goal_enabled?: boolean
+          goal_target?: number | null
+          goal_type?: string | null
+          goal_unit?: string | null
+          id?: string
+          is_active?: boolean
+          linked_playlist_id?: string | null
+          pro_link_type?: string | null
+          pro_link_value?: string | null
+          reminder_enabled?: boolean
+          repeat_days?: number[] | null
+          repeat_pattern?: string
+          sort_order?: number
+          tag?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      admin_task_bank_subtasks: {
+        Row: {
+          created_at: string
+          id: string
+          order_index: number
+          task_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          task_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          task_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_task_bank_subtasks_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "admin_task_bank"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       announcements: {
         Row: {
           badge: string | null
