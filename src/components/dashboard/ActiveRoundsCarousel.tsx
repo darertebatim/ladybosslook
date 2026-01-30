@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, ChevronDown, GraduationCap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { CompactRoundCard } from './CompactRoundCard';
@@ -37,41 +38,31 @@ export function ActiveRoundsCarousel({
   // Track if we've already auto-expanded for the current unseen items
   const hasAutoExpandedRef = useRef(false);
 
-  const getUserCollapsedPreference = () => {
-    try {
-      const saved = localStorage.getItem(COLLAPSED_KEY);
-      // Default to collapsed unless explicitly set to 'false'
-      return saved !== 'false';
-    } catch {
-      return true;
-    }
-  };
-
   // Persist collapsed state - default to collapsed
-  const [isCollapsed, setIsCollapsed] = useState(getUserCollapsedPreference);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem(COLLAPSED_KEY);
+    // Default to collapsed unless explicitly set to 'false'
+    return saved !== 'false';
+  });
 
   // Auto-expand ONLY when unseen programs are newly detected (transition from none to some)
   useEffect(() => {
     if (hasUnseenPrograms && !hasAutoExpandedRef.current) {
       setIsCollapsed(false);
       hasAutoExpandedRef.current = true;
-    } else if (!hasUnseenPrograms && hasAutoExpandedRef.current) {
-      // When unseen clears, return to the user's saved preference (default: collapsed)
-      setIsCollapsed(getUserCollapsedPreference());
+    } else if (!hasUnseenPrograms) {
+      // Reset the flag when there are no unseen programs
       hasAutoExpandedRef.current = false;
     }
   }, [hasUnseenPrograms]);
 
+  useEffect(() => {
+    localStorage.setItem(COLLAPSED_KEY, isCollapsed.toString());
+  }, [isCollapsed]);
+
   const toggleCollapse = () => {
     haptic.light();
-    const next = !isCollapsed;
-    setIsCollapsed(next);
-    try {
-      // Persist ONLY manual toggles
-      localStorage.setItem(COLLAPSED_KEY, next.toString());
-    } catch {
-      // Storage error
-    }
+    setIsCollapsed(!isCollapsed);
   };
 
   // When no programs, show a minimal collapsed state
