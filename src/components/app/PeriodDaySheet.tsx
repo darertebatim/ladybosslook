@@ -89,8 +89,8 @@ export const PeriodDaySheet = ({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh]">
-        <DrawerHeader className="border-b border-pink-100 shrink-0">
+      <DrawerContent>
+        <DrawerHeader className="border-b border-pink-100 py-3">
           <DrawerTitle className="text-pink-800">
             {format(date, 'EEEE, MMMM d')}
           </DrawerTitle>
@@ -98,14 +98,14 @@ export const PeriodDaySheet = ({
 
         <div 
           ref={scrollContainerRef}
-          className="flex-1 p-4 space-y-6 overflow-y-auto overscroll-contain"
+          className="p-4 space-y-4 overflow-y-auto overscroll-contain"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {/* Period day toggle */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-foreground">Period Day</p>
-              <p className="text-sm text-muted-foreground">Mark this day as a period day</p>
+              <p className="font-medium text-foreground text-sm">Period Day</p>
+              <p className="text-xs text-muted-foreground">Mark this day as a period day</p>
             </div>
             <Switch
               checked={isPeriodDay}
@@ -121,8 +121,8 @@ export const PeriodDaySheet = ({
             <>
               {/* Flow intensity */}
               <div>
-                <p className="font-medium text-foreground mb-3">Flow Intensity</p>
-                <div className="flex gap-3">
+                <p className="font-medium text-foreground text-sm mb-2">Flow Intensity</p>
+                <div className="flex gap-2">
                   {FLOW_OPTIONS.map((option) => (
                     <button
                       key={option.id}
@@ -131,14 +131,14 @@ export const PeriodDaySheet = ({
                         setFlowIntensity(option.id);
                       }}
                       className={cn(
-                        'flex-1 py-3 px-4 rounded-xl border-2 transition-all text-center',
+                        'flex-1 py-2 px-3 rounded-xl border-2 transition-all text-center',
                         flowIntensity === option.id
                           ? 'border-pink-500 bg-pink-50 text-pink-700'
                           : 'border-border bg-background hover:border-pink-200'
                       )}
                     >
-                      <span className="text-lg block mb-1">{option.emoji}</span>
-                      <span className="text-sm font-medium">{option.label}</span>
+                      <span className="text-base block">{option.emoji}</span>
+                      <span className="text-xs font-medium">{option.label}</span>
                     </button>
                   ))}
                 </div>
@@ -146,14 +146,14 @@ export const PeriodDaySheet = ({
 
               {/* Symptoms */}
               <div>
-                <p className="font-medium text-foreground mb-3">Symptoms</p>
-                <div className="flex flex-wrap gap-2">
+                <p className="font-medium text-foreground text-sm mb-2">Symptoms</p>
+                <div className="flex flex-wrap gap-1.5">
                   {SYMPTOM_OPTIONS.map((symptom) => (
                     <button
                       key={symptom.id}
                       onClick={() => toggleSymptom(symptom.id)}
                       className={cn(
-                        'px-3 py-2 rounded-full border text-sm font-medium transition-all',
+                        'px-2.5 py-1.5 rounded-full border text-xs font-medium transition-all',
                         symptoms.includes(symptom.id)
                           ? 'border-pink-500 bg-pink-50 text-pink-700'
                           : 'border-border bg-background hover:border-pink-200 text-muted-foreground'
@@ -167,14 +167,14 @@ export const PeriodDaySheet = ({
 
               {/* Notes */}
               <div>
-                <p className="font-medium text-foreground mb-3">Notes (optional)</p>
+                <p className="font-medium text-foreground text-sm mb-2">Notes (optional)</p>
                 <Textarea
                   ref={notesRef}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   onFocus={handleNotesFocus}
                   placeholder="Add any notes about today..."
-                  className="resize-none h-24 border-pink-200 focus:border-pink-400"
+                  className="resize-none h-20 border-pink-200 focus:border-pink-400 text-sm"
                 />
               </div>
             </>
@@ -183,7 +183,7 @@ export const PeriodDaySheet = ({
 
         {/* Actions - with safe area */}
         <div 
-          className="shrink-0 p-4 border-t border-pink-100 flex gap-3"
+          className="shrink-0 p-4 pt-3 border-t border-pink-100 flex gap-3"
           style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
         >
           {existingLog && (
