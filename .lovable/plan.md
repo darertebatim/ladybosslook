@@ -1,196 +1,182 @@
 
 
-# Plan: Create NEW Routines Bank System
+# Plan: Enhance Routines Bank with Rich Sections
 
-## Overview
-Build a completely new **Routines Bank** feature from scratch at `/admin/tools` with dedicated database tables. This is separate from the existing routine_plans system.
+## Current State
+The Routines Bank currently uses a simple `section_title` field on each task to create section dividers. This is limited - it only shows a header text above a task.
+
+## What You Want: Rich Sections
+Looking at the existing `routine_plan_sections` table structure, a proper section includes:
+- **Title** - Section heading (e.g., "Get Moving", "Mindfulness")
+- **Content** - Rich text describing the section and its purpose
+- **Image URL** - Optional visual for the section
+- **Order** - Position in the routine
+
+This allows you to write detailed introductions for each group of tasks.
 
 ## Database Changes
 
-### 1. Create New `routines_bank` Table
-A new table to store routine templates:
+### Create `routines_bank_sections` Table
+A new table for rich section content:
 
 ```sql
-CREATE TABLE routines_bank (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  title text NOT NULL,
-  subtitle text,
-  description text,
-  cover_image_url text,
-  category text NOT NULL DEFAULT 'general',
-  color text DEFAULT 'yellow',
-  emoji text DEFAULT '✨',
-  is_active boolean DEFAULT true,
-  is_popular boolean DEFAULT false,
-  sort_order integer DEFAULT 0,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-```
-
-### 2. Create `routines_bank_tasks` Table
-Links tasks from admin_task_bank to routines, with section support:
-
-```sql
-CREATE TABLE routines_bank_tasks (
+CREATE TABLE routines_bank_sections (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   routine_id uuid NOT NULL REFERENCES routines_bank(id) ON DELETE CASCADE,
-  task_id uuid REFERENCES admin_task_bank(id) ON DELETE SET NULL,
   title text NOT NULL,
-  emoji text DEFAULT '☀️',
-  duration_minutes integer DEFAULT 1,
-  section_title text,  -- Optional section header before this task
-  task_order integer DEFAULT 0,
+  content text,           -- Descriptive text about this section
+  image_url text,         -- Optional section image
+  section_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
   created_at timestamptz DEFAULT now()
 );
+
+-- RLS Policy
+ALTER TABLE routines_bank_sections ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Admins can manage routine sections"
+  ON routines_bank_sections FOR ALL
+  USING (has_role(auth.uid(), 'admin'))
+  WITH CHECK (has_role(auth.uid(), 'admin'));
 ```
 
-### 3. RLS Policies
-Standard admin-only policies for both tables.
+### Update `routines_bank_tasks` Table
+Add a reference to which section the task belongs to:
 
-## UI Components
-
-### 1. Add "Routines Bank" Tab to Tools.tsx
-- New tab with Layers icon
-- Renders `RoutinesBank` component
-
-### 2. Create `RoutinesBank.tsx` Component
-Location: `src/components/admin/RoutinesBank.tsx`
-
-**Features:**
-- Card-based list of routines (like Tasks Bank style)
-- Category filter tabs (reuse routine_categories)
-- Quick toggles: Popular (star), Active (eye)
-- Each card shows: Emoji, Title, Duration (sum of tasks), Category, Task count
-
-**Create/Edit Dialog:**
-- Title (required)
-- Subtitle (optional)
-- Description (optional)
-- Cover Image URL (optional)
-- Category dropdown
-- Color picker
-- Emoji picker
-
-**Task Management (inline in edit view):**
-- List of tasks in the routine
-- Add task button with searchable picker (from admin_task_bank)
-- Reorder tasks with drag handles
-- Add section header before any task
-- Remove task button
-- Duration auto-calculated
-
-### 3. Enhance TasksBank.tsx with Multi-Select
-
-**New UI Elements:**
-- "Select" toggle button in header
-- Checkbox on each task row when in select mode
-- Selection counter bar: "X selected" with "Create Routine" and "Clear" buttons
-
-**Create Routine Dialog (from selection):**
-- Name input (required)
-- Category dropdown
-- Preview of selected tasks (ordered)
-- Creates new routine in routines_bank with linked tasks
-
-## File Changes
-
-```text
-src/pages/admin/Tools.tsx
-├── Add "Routines Bank" tab trigger (Layers icon)
-└── Add TabsContent rendering RoutinesBank
-
-src/components/admin/RoutinesBank.tsx (NEW)
-├── Query routines_bank with tasks count
-├── Category filter tabs
-├── Routine cards with quick toggles
-├── Create/Edit dialog with form
-└── Task management section
-
-src/pages/admin/TasksBank.tsx
-├── Add selection mode state
-├── Add checkbox column UI
-├── Add selection bar with counter
-├── Add Create Routine dialog
-└── Mutation to create routine from selected tasks
+```sql
+ALTER TABLE routines_bank_tasks 
+ADD COLUMN section_id uuid REFERENCES routines_bank_sections(id) ON DELETE SET NULL;
 ```
 
-## UI Wireframes
+## UI Changes
 
-### Routines Bank Tab
+### Enhanced Edit Dialog Structure
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
-│ Routines Bank                            [+ New Routine]│
+│ Edit Routine: Morning Energy Boost               [X]    │
 ├─────────────────────────────────────────────────────────┤
-│ [All] [Focus] [Calm] [Self-Care] [Productivity] ...     │
+│ [Basic Info] [Sections & Tasks]                         │
 ├─────────────────────────────────────────────────────────┤
-│ ┌───────────────────────────────────────────────────┐   │
-│ │ ✨ Morning Energy Boost         ⭐ 👁 ✏️ 🗑️      │   │
-│ │    15 min • Focus • 5 tasks                       │   │
-│ └───────────────────────────────────────────────────┘   │
-│ ┌───────────────────────────────────────────────────┐   │
-│ │ 🌙 Evening Wind Down               👁 ✏️ 🗑️      │   │
-│ │    10 min • Calm • 4 tasks                        │   │
-│ └───────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Routine Edit Dialog
-
-```text
-┌─────────────────────────────────────────────────────────┐
-│ Edit Routine                                     [X]    │
-├─────────────────────────────────────────────────────────┤
-│ Title: [Morning Energy Boost____________]               │
-│ Subtitle: [Start your day right_________]               │
-│ Category: [Focus v]   Color: [●●●●●●●]   Emoji: [✨]    │
-│ Cover URL: [https://..._________________]               │
-│ Description: [_____________________________]            │
 │                                                         │
-│ Tasks (Total: 15 min)                    [+ Add Task]   │
-│ ├─────────────────────────────────────────────────────┤ │
-│ │ Section: "Get Moving"               [Edit] [Remove] │ │
-│ │ ☀️ Morning Stretch          5m      [≡] [X]         │ │
-│ │ 🏃 Light Exercise           5m      [≡] [X]         │ │
-│ │ Section: "Mindfulness"              [Edit] [Remove] │ │
-│ │ 🧘 Meditation               5m      [≡] [X]         │ │
+│ SECTIONS (Rich content introducing each part)          │
+│                                                         │
+│ ┌─────────────────────────────────────────────────────┐ │
+│ │ Section 1: Get Moving                    [Edit] [X] │ │
+│ │ "Start with light movement to wake up..."          │ │
+│ │                                                     │ │
+│ │ Tasks in this section:                              │ │
+│ │   ☀️ Morning Stretch         1m         [X]        │ │
+│ │   🏃 Light Exercise          1m         [X]        │ │
+│ │                              [+ Add Task]           │ │
 │ └─────────────────────────────────────────────────────┘ │
+│                                                         │
+│ ┌─────────────────────────────────────────────────────┐ │
+│ │ Section 2: Mindfulness                   [Edit] [X] │ │
+│ │ "Take time to center yourself..."                  │ │
+│ │                                                     │ │
+│ │ Tasks in this section:                              │ │
+│ │   🧘 Meditation              1m         [X]        │ │
+│ │                              [+ Add Task]           │ │
+│ └─────────────────────────────────────────────────────┘ │
+│                                                         │
+│ [+ Add Section]                                         │
+│                                                         │
+│ UNCATEGORIZED TASKS                                     │
+│ (Tasks not assigned to any section)                     │
+│   📝 Journal                   1m         [X]          │
+│                                [+ Add Task]             │
 ├─────────────────────────────────────────────────────────┤
 │                              [Cancel]  [Save Routine]   │
 └─────────────────────────────────────────────────────────┘
 ```
 
-### Tasks Bank with Selection Mode
+### Section Editor Dialog
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
-│ Tasks Bank                       [Select] [+ Add Task]  │
+│ Edit Section                                      [X]   │
 ├─────────────────────────────────────────────────────────┤
-│ ☑ 3 selected              [Create Routine] [Clear]     │
+│ Title: [Get Moving_____________________]                │
+│                                                         │
+│ Content (What this section is about):                   │
+│ ┌─────────────────────────────────────────────────────┐ │
+│ │ Start your morning with light movement to wake     │ │
+│ │ up your body and increase blood flow. These        │ │
+│ │ exercises are designed to be gentle yet effective..│ │
+│ │                                                     │ │
+│ └─────────────────────────────────────────────────────┘ │
+│                                                         │
+│ Image URL (optional):                                   │
+│ [https://example.com/stretching.jpg___________]        │
 ├─────────────────────────────────────────────────────────┤
-│ ☑ ☀️ Morning Stretch      ⭐ 👁 ⚙️ 🗑️ >               │
-│ ☑ 🧘 Meditation           ⭐ 👁 ⚙️ 🗑️ >               │
-│ ☐ ☕ Make Coffee          ⭐ 👁 ⚙️ 🗑️ >               │
-│ ☑ 📝 Journal              ⭐ 👁 ⚙️ 🗑️ >               │
+│                              [Cancel]  [Save Section]   │
+└─────────────────────────────────────────────────────────┘
+```
+
+## File Changes
+
+### Database Migration
+Create `routines_bank_sections` table and add `section_id` to `routines_bank_tasks`
+
+### Updated RoutinesBank.tsx
+- Add sections management
+- Section CRUD operations
+- Assign tasks to sections
+- Reorder sections
+- Edit section content/image
+
+## How It Works
+
+1. **Create Routine** - Add basic info (title, subtitle, cover, category)
+2. **Add Sections** - Create sections with title + descriptive content
+3. **Add Tasks** - Add tasks from the bank, assign to sections
+4. **Rich Content** - Each section can have explanatory text and images
+
+## Visual Flow on Routine Page (App Side - Future)
+
+When a user views a routine:
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│ ✨ Morning Energy Boost                                 │
+│ Start your day with intention                           │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│ GET MOVING                                              │
+│ ───────────                                             │
+│ Start your morning with light movement to wake up       │
+│ your body and increase blood flow...                    │
+│                                                         │
+│ [Image: stretching.jpg]                                │
+│                                                         │
+│ ☀️ Morning Stretch                              1 min  │
+│ 🏃 Light Exercise                               1 min  │
+│                                                         │
+│ MINDFULNESS                                             │
+│ ───────────                                             │
+│ Take time to center yourself before the day begins...   │
+│                                                         │
+│ 🧘 Meditation                                   1 min  │
+│                                                         │
 └─────────────────────────────────────────────────────────┘
 ```
 
 ## Implementation Order
 
-1. **Database migration** - Create routines_bank and routines_bank_tasks tables with RLS
-2. **Create RoutinesBank.tsx** - Basic CRUD for routines
-3. **Add to Tools.tsx** - New tab
-4. **Add task management to RoutinesBank** - Task picker, sections, reordering
-5. **Add multi-select to TasksBank.tsx** - Checkboxes, selection state
-6. **Create routine dialog in TasksBank** - Quick routine creation from selection
-7. **Test end-to-end**
+1. **Database migration** - Create `routines_bank_sections` table, add `section_id` to tasks
+2. **Update RoutinesBank.tsx** - Add sections management UI
+3. **Section CRUD** - Create, edit, delete sections with rich content
+4. **Task-Section linking** - Assign tasks to sections, move between sections
+5. **Test end-to-end**
 
-## Technical Notes
+## Summary
 
-- Duration is auto-calculated by summing task durations in routines_bank_tasks
-- When adding a task from admin_task_bank, copy title/emoji/duration to routines_bank_tasks
-- Section headers are stored as section_title on the task that follows the header
-- Reordering updates task_order field
-- Uses same category system (routine_categories) as Tasks Bank for consistency
+**What we're adding:**
+- A new `routines_bank_sections` table for rich section content
+- Each section has a title, descriptive content, and optional image
+- Tasks can be assigned to sections
+- The edit dialog will show sections with their tasks grouped together
+- Sections provide the "discussion" content that introduces each part of the routine
+
+This gives you the ability to create beautifully structured routine templates with explanatory content for each section, similar to how courses have modules with descriptions.
 
