@@ -35,7 +35,7 @@ export function BreathingExerciseScreen({
   onClose,
 }: BreathingExerciseScreenProps) {
   // Setup state
-  const [selectedDuration, setSelectedDuration] = useState(180); // 3 min default
+  const [selectedDuration, setSelectedDuration] = useState(60); // 1 min default
   const [showInfoSheet, setShowInfoSheet] = useState(false);
   
   // Active session state
