@@ -7,7 +7,6 @@ import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
 import { InspireBanner } from '@/components/app/InspireBanner';
 import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
-import { AddTaskSheet } from '@/components/app/AddTaskSheet';
 import {
   useRoutineCategories,
   useRoutinePlans,
@@ -15,15 +14,15 @@ import {
   usePopularPlans,
   useProRoutinePlans,
 } from '@/hooks/useRoutinePlans';
-import { useTaskTemplates, TaskTemplate } from '@/hooks/useTaskPlanner';
+import { useTaskTemplates, useCreateTaskFromTemplate, TaskTemplate } from '@/hooks/useTaskPlanner';
+import { toast } from 'sonner';
 
 export default function AppInspire() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>('popular');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null);
-  const [addSheetOpen, setAddSheetOpen] = useState(false);
+  const [addingTemplateId, setAddingTemplateId] = useState<string | null>(null);
 
   const { data: categories, isLoading: categoriesLoading } = useRoutineCategories();
   const { data: featuredPlans } = useFeaturedPlans();
@@ -33,6 +32,7 @@ export default function AppInspire() {
     selectedCategory || undefined
   );
   const { data: taskTemplates, isLoading: templatesLoading } = useTaskTemplates();
+  const createFromTemplate = useCreateTaskFromTemplate();
 
   // Determine which plans to display based on selected category
   const displayPlans = useMemo(() => {
@@ -79,9 +79,20 @@ export default function AppInspire() {
     plan.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddTemplate = (template: TaskTemplate) => {
-    setSelectedTemplate(template);
-    setAddSheetOpen(true);
+  const handleAddTemplate = async (template: TaskTemplate) => {
+    setAddingTemplateId(template.id);
+    try {
+      await createFromTemplate.mutateAsync({
+        template,
+        date: new Date(),
+      });
+      toast.success('Task added to today! ✨');
+    } catch (error) {
+      console.error('Error adding task:', error);
+      toast.error('Failed to add task');
+    } finally {
+      setAddingTemplateId(null);
+    }
   };
 
   return (
@@ -258,6 +269,7 @@ export default function AppInspire() {
                       key={template.id}
                       template={template}
                       onAdd={() => handleAddTemplate(template)}
+                      isAdding={addingTemplateId === template.id}
                     />
                   ))}
                 </div>
@@ -270,13 +282,6 @@ export default function AppInspire() {
           )}
         </div>
       </div>
-
-      {/* Add Task Sheet */}
-      <AddTaskSheet
-        open={addSheetOpen}
-        onOpenChange={setAddSheetOpen}
-        template={selectedTemplate}
-      />
     </div>
   );
 }
