@@ -149,8 +149,8 @@ const AppStore = () => {
       />
 
       {/* Header */}
-      <div className="bg-gradient-to-b from-violet-50 to-background dark:from-violet-950/20 dark:to-background px-4 pt-4 pb-6">
-        <div className="flex items-center justify-between mb-1">
+      <div className="bg-gradient-to-b from-violet-50 to-background dark:from-violet-950/20 dark:to-background px-4 pt-3 pb-4">
+        <div className="flex items-center justify-between">
           {showSearch ? (
             <div className="flex-1 flex items-center gap-2">
               <Input
@@ -173,15 +173,10 @@ const AppStore = () => {
             </div>
           ) : (
             <>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">Browse</h1>
-                <p className="text-sm text-muted-foreground">
-                  Explore tools and content
-                </p>
-              </div>
+              <h1 className="text-xl font-bold text-foreground">Browse</h1>
               <button 
                 onClick={() => setShowSearch(true)}
-                className="p-2.5 rounded-full transition-transform active:scale-95"
+                className="p-2 rounded-full transition-transform active:scale-95"
               >
                 <Search className="h-5 w-5 text-muted-foreground" />
               </button>
@@ -191,7 +186,7 @@ const AppStore = () => {
       </div>
 
       {/* Content */}
-      <div className="px-4 space-y-6 -mt-2">
+      <div className="px-4 space-y-4">
         {programsLoading ? (
           <div className="flex items-center justify-center min-h-[60vh]">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -201,10 +196,10 @@ const AppStore = () => {
             {/* Wellness Tools Section */}
             {(!searchQuery || filteredWellnessTools.length > 0) && (
               <section>
-                <h2 className="text-base font-semibold text-foreground mb-3 px-1">
+                <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
                   Wellness Tools
                 </h2>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   {filteredWellnessTools.map((tool) => (
                     <ToolCard key={tool.id} tool={tool} />
                   ))}
@@ -215,10 +210,10 @@ const AppStore = () => {
             {/* Audio & Video Section */}
             {(!searchQuery || filteredAudioTools.length > 0) && (
               <section>
-                <h2 className="text-base font-semibold text-foreground mb-3 px-1">
+                <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
                   Audio & Video
                 </h2>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="flex justify-around">
                   {filteredAudioTools.map((tool) => (
                     <ToolCard key={tool.id} tool={tool} size="compact" />
                   ))}
@@ -226,13 +221,13 @@ const AppStore = () => {
               </section>
             )}
 
-            {/* Coming Soon Section */}
+            {/* Coming Soon Section - inline with Audio */}
             {comingSoonTools.length > 0 && !searchQuery && (
               <section>
-                <h2 className="text-base font-semibold text-foreground mb-3 px-1">
+                <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
                   Coming Soon
                 </h2>
-                <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+                <div className="flex justify-around">
                   {comingSoonTools.map((tool) => (
                     <ToolCard key={tool.id} tool={tool} size="teaser" />
                   ))}
@@ -243,7 +238,7 @@ const AppStore = () => {
             {/* Programs Section */}
             {(!searchQuery || hasProgramMatches) && freePrograms.length > 0 && (
               <section>
-                <h2 className="text-base font-semibold text-foreground mb-3 px-1">
+                <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
                   Browse Programs
                 </h2>
 
