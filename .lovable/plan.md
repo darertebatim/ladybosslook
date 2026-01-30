@@ -1,83 +1,129 @@
 
-# Plan: Enhance Tasks Bank with Admin Controls
+# Plan: Create Routines Bank with Task Selection
 
 ## Overview
-Add admin-specific controls to the Tasks Bank that allow managing `is_popular`, `is_active`, `description`, and `duration_minutes` fields. Also add the missing `repeat_interval` column to the schema for full feature parity.
+Add a "Routines Bank" tab to /admin/tools that allows managing routine templates (routine_plans). Additionally, enable multi-select in the Tasks Bank to create routines from selected tasks.
 
-## Changes
+## Database Changes
 
-### 1. Database: Add Missing Column
-Add `repeat_interval` to `admin_task_bank` for parity with user tasks.
+### 1. Add source_task_id to routine_plan_tasks
+Link routine tasks back to their source in admin_task_bank:
 
 ```sql
-ALTER TABLE admin_task_bank 
-ADD COLUMN repeat_interval integer DEFAULT 1;
+ALTER TABLE routine_plan_tasks 
+ADD COLUMN source_task_id uuid REFERENCES admin_task_bank(id) ON DELETE SET NULL;
 ```
 
-### 2. UI: Add Admin Controls to Task List
-Add quick-action buttons directly on each task row in the list:
-- **Star toggle** - Click the star icon to toggle `is_popular`
-- **Active toggle** - Add an eye/visibility icon to toggle `is_active`
+This allows tracking which bank task was used to create each routine task.
 
-### 3. UI: Extend Edit Sheet with Admin Section
-Add an "Admin Settings" collapsible section at the bottom of the task edit sheet with:
-- **Description** - Text area for optional description
-- **Duration** - Number input for estimated duration in minutes
-- **Popular** - Switch to mark as featured/popular
-- **Active** - Switch to enable/disable the template
+## UI Changes
 
-### 4. Update Mutations
-Modify `createTask` and `updateTask` mutations to include:
-- `is_popular`
-- `is_active`
-- `description`
-- `duration_minutes`
-- `repeat_interval`
+### 1. Add "Routines Bank" Tab to Tools.tsx
+Add a new tab alongside "Routines", "Tasks Bank", and "Breathing":
+- Tab with Layers icon labeled "Routines Bank"
+- This will be a simplified routine management focused on creating/editing routine templates
+
+### 2. Create RoutinesBank Component
+New component at `src/components/admin/RoutinesBank.tsx`:
+
+**Features:**
+- List of routine_plans with card-based view (similar to Tasks Bank)
+- Quick toggles for is_popular, is_active
+- Create/Edit dialog with:
+  - Title, subtitle, description
+  - Cover image URL
+  - Category selection (from routine_categories)
+  - Color picker
+  - Emoji picker for icon
+- Inline task management:
+  - Add tasks from admin_task_bank via searchable picker
+  - Reorder tasks with drag-and-drop
+  - Edit task duration
+  - Add section headers (routine_plan_sections)
+- Duration auto-calculated from task durations
+
+### 3. Add Multi-Select to Tasks Bank
+Enhance TasksBank.tsx:
+
+**Selection Mode:**
+- Add checkbox column to each task row
+- "Select Mode" toggle button
+- Selection counter badge
+- "Create Routine" button (appears when tasks selected)
+
+**Create Routine Flow:**
+1. User selects multiple tasks
+2. Clicks "Create Routine" button
+3. Dialog opens with:
+   - Name input (required)
+   - Category selector
+   - Tasks preview (ordered by selection)
+4. Creates new routine_plan and links tasks via routine_plan_tasks
 
 ## Technical Details
 
 ### File Changes
 
+**src/pages/admin/Tools.tsx**
+- Add "Routines Bank" tab trigger with Layers icon
+- Add TabsContent that renders RoutinesBank component
+
+**src/components/admin/RoutinesBank.tsx** (new file)
+- Query routine_plans with category join
+- Query routine_plan_tasks for each plan
+- CRUD mutations for plans
+- Task picker that queries admin_task_bank
+- Create tasks from bank items (copy title, icon, duration)
+
 **src/pages/admin/TasksBank.tsx**
-- Add `togglePopular` mutation for quick star toggle
-- Add `toggleActive` mutation for quick visibility toggle
-- Add click handlers on star icon to toggle popular status
-- Add visibility icon with click handler to toggle active status
-- Extend `TaskFormData` interface or add admin-specific fields
-- Add admin settings section to the sheet content
+- Add selection state: `selectedTaskIds: Set<string>`
+- Add checkbox UI on each task row
+- Add "Create Routine" floating action button
+- Add CreateRoutineDialog component
+- Mutation to create routine_plan with tasks
 
-**Database Migration**
-- Add `repeat_interval` column to `admin_task_bank`
-
-### UI Layout for Admin Settings Section
+### UI Layout for Routines Bank
 
 ```text
-┌─────────────────────────────────────────┐
-│ Admin Settings                      [v] │
-├─────────────────────────────────────────┤
-│ Description                             │
-│ ┌─────────────────────────────────────┐ │
-│ │ Optional task description...        │ │
-│ └─────────────────────────────────────┘ │
-│                                         │
-│ Duration          ┌──────┐              │
-│                   │  5   │ minutes      │
-│                   └──────┘              │
-│                                         │
-│ Popular (Featured)        [  Toggle  ]  │
-│ Active                    [  Toggle  ]  │
-└─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│ Routines Bank                            [+ New Routine]│
+├─────────────────────────────────────────────────────────┤
+│ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐                │
+│ │ All │ │Focus│ │Calm │ │Care │ │Grow │ ...             │
+│ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘                │
+├─────────────────────────────────────────────────────────┤
+│ ┌───────────────────────────────────────────────────┐  │
+│ │ ☀️ Morning Mindfulness    ⭐ 👁 ✏️               │  │
+│ │ 15 min • Focus • 3 tasks                          │  │
+│ └───────────────────────────────────────────────────┘  │
+│ ┌───────────────────────────────────────────────────┐  │
+│ │ 🌙 Evening Wind Down      👁 ✏️                   │  │
+│ │ 10 min • Calm • 4 tasks                           │  │
+│ └───────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### Quick Toggle Behavior in List
-- Clicking star icon toggles `is_popular` immediately (optimistic update)
-- Inactive tasks show at 50% opacity with strikethrough or badge
-- Add eye/eye-off icon for active status toggle
+### Tasks Bank with Selection Mode
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│ Tasks Bank                     [Select] [+ Add Task]    │
+├─────────────────────────────────────────────────────────┤
+│ ☑ 3 selected         [Create Routine]  [Clear]         │
+├─────────────────────────────────────────────────────────┤
+│ ☑ ☀️ Morning stretch        ⭐ 👁 ⚙️ 🗑️ >          │
+│ ☑ 🧘 Meditation             ⭐ 👁 ⚙️ 🗑️ >          │
+│ ☐ ☕ Make coffee            ⭐ 👁 ⚙️ 🗑️ >          │
+│ ☑ 📝 Journal                ⭐ 👁 ⚙️ 🗑️ >          │
+└─────────────────────────────────────────────────────────┘
+```
 
 ## Implementation Order
-1. Run database migration to add `repeat_interval` column
-2. Add quick-toggle mutations for `is_popular` and `is_active`
-3. Update task list row with clickable star and visibility icons
-4. Add admin settings section to the edit sheet
-5. Update create/update mutations with new fields
-6. Test end-to-end
+
+1. **Database migration** - Add source_task_id column
+2. **Create RoutinesBank.tsx** - Basic CRUD for routine_plans
+3. **Add to Tools.tsx** - New tab with RoutinesBank
+4. **Add task management to RoutinesBank** - Task picker, inline editing
+5. **Add multi-select to TasksBank.tsx** - Checkboxes, selection state
+6. **Create routine dialog in TasksBank** - Link selected tasks to new routine
+7. **Test end-to-end**
