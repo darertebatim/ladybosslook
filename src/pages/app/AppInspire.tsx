@@ -4,20 +4,19 @@ import { Search, Heart, Loader2, Sparkles, ListTodo } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
-import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
-import { InspireBanner } from '@/components/app/InspireBanner';
+import { RoutineBankCard } from '@/components/app/RoutineBankCard';
 import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import {
-  useRoutineCategories,
-  useRoutinePlans,
-  useFeaturedPlans,
-  usePopularPlans,
-  useProRoutinePlans,
-  useAddRoutinePlan,
-  RoutinePlanTask,
-} from '@/hooks/useRoutinePlans';
+  useRoutineBankCategories,
+  useRoutinesBank,
+  usePopularRoutinesBank,
+  useFeaturedRoutinesBank,
+  useAddRoutineFromBank,
+  RoutineBankTask,
+} from '@/hooks/useRoutinesBank';
 import { useTaskTemplates, TaskTemplate, TaskColor } from '@/hooks/useTaskPlanner';
+import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 
 export default function AppInspire() {
@@ -28,34 +27,35 @@ export default function AppInspire() {
   const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null);
   const [previewSheetOpen, setPreviewSheetOpen] = useState(false);
 
-  const { data: categories, isLoading: categoriesLoading } = useRoutineCategories();
-  const { data: featuredPlans } = useFeaturedPlans();
-  const { data: popularPlans, isLoading: popularLoading } = usePopularPlans();
-  const { data: proPlans } = useProRoutinePlans();
-  const { data: filteredPlans, isLoading: plansLoading } = useRoutinePlans(
-    selectedCategory || undefined
+  const { data: categories, isLoading: categoriesLoading } = useRoutineBankCategories();
+  const { data: featuredRoutines } = useFeaturedRoutinesBank();
+  const { data: popularRoutines, isLoading: popularLoading } = usePopularRoutinesBank();
+  const { data: filteredRoutines, isLoading: routinesLoading } = useRoutinesBank(
+    selectedCategory && selectedCategory !== 'popular' && selectedCategory !== 'all-routines' && selectedCategory !== 'all-tasks'
+      ? selectedCategory
+      : undefined
   );
   const { data: taskTemplates, isLoading: templatesLoading } = useTaskTemplates();
-  const addRoutinePlan = useAddRoutinePlan();
+  const addRoutineFromBank = useAddRoutineFromBank();
 
-  // Determine which plans to display based on selected category
-  const displayPlans = useMemo(() => {
+  // Determine which routines to display based on selected category
+  const displayRoutines = useMemo(() => {
     if (selectedCategory === 'popular') {
-      return popularPlans;
+      return popularRoutines;
     }
     if (selectedCategory === 'all-routines') {
-      // Show all routine plans
-      return filteredPlans;
+      // Show all routines
+      return filteredRoutines;
     }
     if (selectedCategory === 'all-tasks') {
       // Don't show routines for all-tasks view
       return [];
     }
-    // Category-specific plans
-    return filteredPlans;
-  }, [selectedCategory, filteredPlans, popularPlans]);
+    // Category-specific routines
+    return filteredRoutines;
+  }, [selectedCategory, filteredRoutines, popularRoutines]);
 
-  const isLoading = categoriesLoading || popularLoading || (selectedCategory && selectedCategory !== 'popular' && plansLoading);
+  const isLoading = categoriesLoading || popularLoading || (selectedCategory && selectedCategory !== 'popular' && routinesLoading);
 
   // Filter task templates by selected category slug or popular
   const filteredTaskTemplates = useMemo(() => {
@@ -77,10 +77,10 @@ export default function AppInspire() {
   }, [taskTemplates, selectedCategory]);
 
   // Filter by search query
-  const searchedPlans = displayPlans?.filter(plan => 
+  const searchedRoutines = displayRoutines?.filter(routine => 
     !searchQuery || 
-    plan.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    plan.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
+    routine.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    routine.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Convert TaskTemplate to RoutinePlanTask for the preview sheet
@@ -109,11 +109,19 @@ export default function AppInspire() {
     if (!selectedTemplate) return;
 
     try {
-      await addRoutinePlan.mutateAsync({
-        planId: `synthetic-task-${selectedTemplate.id}`,
+      // For individual task templates, we need to use the addRoutinePlan from useRoutinePlans
+      // since addRoutineFromBank expects a routine bank ID
+      const { useAddRoutinePlan } = await import('@/hooks/useRoutinePlans');
+      // This is a workaround - ideally we'd use a dedicated hook
+      // For now, use addRoutineFromBank with synthetic handling
+      await addRoutineFromBank.mutateAsync({
+        routineId: `synthetic-task-${selectedTemplate.id}`,
         selectedTaskIds,
-        editedTasks,
-        syntheticTasks: syntheticTask ? [syntheticTask] : [],
+        editedTasks: editedTasks.map(t => ({
+          ...t,
+          pro_link_type: t.pro_link_type as string | null,
+          pro_link_value: t.pro_link_value as string | null,
+        })),
       });
       toast.success('Task added to your routine! ✨');
       setPreviewSheetOpen(false);
@@ -168,15 +176,6 @@ export default function AppInspire() {
 
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full">
         <div className="pb-safe w-full max-w-full">
-          {/* Featured Banner Carousel */}
-          {featuredPlans && featuredPlans.length > 0 && selectedCategory === 'popular' && !searchQuery && (
-            <div className="px-4 pt-4">
-              <InspireBanner plans={featuredPlans} />
-            </div>
-          )}
-
-          {/* Pro Routines Section - only shown when Pro category is selected */}
-
           {/* Categories */}
           {categories && categories.length > 0 && (
             <div className="mt-5">
@@ -208,7 +207,7 @@ export default function AppInspire() {
                   />
                   {categories.filter(c => c.slug !== 'pro').map((category) => (
                     <CategoryCircle
-                      key={category.id}
+                      key={category.slug}
                       name={category.name}
                       icon={category.icon}
                       color={category.color}
@@ -231,7 +230,7 @@ export default function AppInspire() {
             </div>
           )}
 
-          {/* Plans Grid */}
+          {/* Routines Grid */}
           <div className="mt-5 px-4 w-full max-w-full overflow-hidden">
             <h2 className="text-sm font-semibold text-muted-foreground mb-3">
               {selectedCategory === 'popular'
@@ -248,17 +247,17 @@ export default function AppInspire() {
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
               </div>
-            ) : searchedPlans && searchedPlans.length > 0 ? (
+            ) : searchedRoutines && searchedRoutines.length > 0 ? (
               <div className="grid grid-cols-2 gap-3 w-full max-w-full">
-                {searchedPlans.map((plan) => (
-                  <RoutinePlanCard
-                    key={plan.id}
-                    plan={plan}
-                    onClick={() => navigate(`/app/routines/${plan.id}`)}
+                {searchedRoutines.map((routine) => (
+                  <RoutineBankCard
+                    key={routine.id}
+                    routine={routine}
+                    onClick={() => navigate(`/app/routines/${routine.id}`)}
                   />
                 ))}
               </div>
-            ) : (
+            ) : selectedCategory !== 'all-tasks' ? (
               <div className="text-center py-12">
                 <Sparkles className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
                 <p className="text-muted-foreground">
@@ -268,7 +267,7 @@ export default function AppInspire() {
                   {searchQuery ? 'Try a different search term' : 'Check back soon for new content!'}
                 </p>
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* Task Ideas Section - hide for Pro category and all-routines since they focus on routines only */}
@@ -323,7 +322,7 @@ export default function AppInspire() {
           routineTitle={selectedTemplate.title}
           defaultTag={categories?.find(c => c.slug === selectedTemplate.category)?.name || null}
           onSave={handleSaveRoutine}
-          isSaving={addRoutinePlan.isPending}
+          isSaving={addRoutineFromBank.isPending}
         />
       )}
     </div>

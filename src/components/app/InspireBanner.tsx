@@ -4,12 +4,12 @@ import {
   CarouselContent,
   CarouselItem,
 } from '@/components/ui/carousel';
-import { RoutinePlan } from '@/hooks/useRoutinePlans';
+import { RoutineBankItem } from '@/hooks/useRoutinesBank';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface InspireBannerProps {
-  plans: RoutinePlan[];
+  routines: (RoutineBankItem & { totalDuration?: number })[];
 }
 
 const colorGradients: Record<string, string> = {
@@ -23,39 +23,46 @@ const colorGradients: Record<string, string> = {
   teal: 'from-teal-400 to-teal-600',
   indigo: 'from-indigo-400 to-indigo-600',
   rose: 'from-rose-400 to-rose-600',
+  amber: 'from-amber-400 to-amber-600',
+  mint: 'from-teal-300 to-teal-500',
 };
 
-export function InspireBanner({ plans }: InspireBannerProps) {
+// Helper to check if string is emoji
+const isEmoji = (str: string) => 
+  /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
+
+export function InspireBanner({ routines }: InspireBannerProps) {
   const navigate = useNavigate();
 
-  if (!plans || plans.length === 0) return null;
+  if (!routines || routines.length === 0) return null;
 
   return (
     <Carousel className="w-full">
       <CarouselContent className="-ml-2">
-        {plans.map((plan) => {
-          const IconComponent = (LucideIcons as any)[plan.icon] || LucideIcons.Sparkles;
-          const gradient = colorGradients[plan.color] || colorGradients.purple;
+        {routines.map((routine) => {
+          const color = routine.color || 'purple';
+          const gradient = colorGradients[color] || colorGradients.purple;
+          const routineEmoji = routine.emoji && isEmoji(routine.emoji) ? routine.emoji : '✨';
 
           return (
-            <CarouselItem key={plan.id} className="pl-2 basis-[90%]">
+            <CarouselItem key={routine.id} className="pl-2 basis-[90%]">
               <button
-                onClick={() => navigate(`/app/routines/${plan.id}`)}
+                onClick={() => navigate(`/app/routines/${routine.id}`)}
                 className={cn(
                   'relative w-full h-36 rounded-2xl overflow-hidden',
                   'bg-gradient-to-br',
                   gradient
                 )}
               >
-                {plan.cover_image_url ? (
+                {routine.cover_image_url ? (
                   <img
-                    src={plan.cover_image_url}
-                    alt={plan.title}
+                    src={routine.cover_image_url}
+                    alt={routine.title}
                     className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-50"
                   />
                 ) : (
                   <div className="absolute right-4 bottom-4 opacity-20">
-                    <IconComponent className="w-24 h-24 text-white" />
+                    <span className="text-7xl">{routineEmoji}</span>
                   </div>
                 )}
                 
@@ -64,11 +71,11 @@ export function InspireBanner({ plans }: InspireBannerProps) {
                     Featured
                   </div>
                   <h3 className="text-white font-bold text-lg leading-tight">
-                    {plan.title}
+                    {routine.title}
                   </h3>
-                  {plan.subtitle && (
+                  {routine.subtitle && (
                     <p className="text-white/80 text-sm mt-0.5 line-clamp-1">
-                      {plan.subtitle}
+                      {routine.subtitle}
                     </p>
                   )}
                 </div>

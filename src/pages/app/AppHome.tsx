@@ -23,8 +23,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
-import { usePopularPlans, useUserRoutinePlans } from '@/hooks/useRoutinePlans';
-import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
+import { usePopularRoutinesBank } from '@/hooks/useRoutinesBank';
+import { RoutineBankCard } from '@/components/app/RoutineBankCard';
 import { haptic } from '@/lib/haptics';
 import { GoalInputSheet } from '@/components/app/GoalInputSheet';
 import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
@@ -118,15 +118,11 @@ const AppHome = () => {
     isLoading: homeLoading
   } = useNewHomeData();
 
-  // Popular routines for suggestions (excluding already added ones)
+  // Popular routines for suggestions
   const {
     data: popularRoutines = []
-  } = usePopularPlans();
-  const {
-    data: userRoutines = []
-  } = useUserRoutinePlans();
-  const userRoutineIds = useMemo(() => new Set(userRoutines.map(r => r.plan_id)), [userRoutines]);
-  const suggestedRoutines = useMemo(() => popularRoutines.filter(plan => !userRoutineIds.has(plan.id)), [popularRoutines, userRoutineIds]);
+  } = usePopularRoutinesBank();
+  const suggestedRoutines = useMemo(() => popularRoutines.slice(0, 4), [popularRoutines]);
 
   // Generate week days
   const weekDays = useMemo(() => {
@@ -583,8 +579,8 @@ const AppHome = () => {
                     </h2>
                   </div>
                   <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-                    {suggestedRoutines.slice(0, 4).map(plan => <div key={plan.id} className="w-32 shrink-0">
-                        <RoutinePlanCard plan={plan} onClick={() => navigate(`/app/routines/${plan.id}`)} />
+                    {suggestedRoutines.map(routine => <div key={routine.id} className="w-32 shrink-0">
+                        <RoutineBankCard routine={routine} onClick={() => navigate(`/app/routines/${routine.id}`)} />
                       </div>)}
                   </div>
                 </div>}
