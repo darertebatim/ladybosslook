@@ -1822,54 +1822,46 @@ const AppTaskCreate = ({
     </>
   );
 
-  // Sheet mode - render inside a Sheet
+  // Sheet mode - render as fullscreen overlay dialog
   if (isSheet) {
+    if (!sheetOpen) return null;
+    
     return (
       <>
-        <Sheet open={sheetOpen} onOpenChange={onSheetOpenChange}>
-          <SheetContent 
-            side="bottom" 
-            className="h-[90vh] rounded-t-3xl px-0"
-            hideCloseButton
+        <div className="fixed inset-0 z-[100] flex flex-col bg-background">
+          {/* Header - dynamic color */}
+          <header 
+            className="flex items-center justify-between px-4 flex-shrink-0 transition-colors duration-300"
+            style={{ 
+              paddingTop: 'max(12px, env(safe-area-inset-top))',
+              backgroundColor: bgColor,
+              paddingBottom: '12px'
+            }}
           >
-            <div className="flex flex-col h-full">
-              {/* Header - dynamic color */}
-              <div 
-                className="flex items-center justify-between px-4 py-3 flex-shrink-0 transition-colors duration-300"
-                style={{ backgroundColor: bgColor }}
-              >
-                <div className="flex items-center gap-1">
-                  <button onClick={handleClose} className="p-2 -ml-2">
-                    <X className="h-5 w-5" />
-                  </button>
-                  {taskId && (
-                    <button 
-                      onClick={handleDelete} 
-                      disabled={deleteTask.isPending}
-                      className="p-2 text-destructive"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
-                  )}
-                </div>
-                <h1 className="text-lg font-semibold">Edit Task</h1>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!title.trim()}
-                  variant="ghost"
-                  className="text-primary font-semibold"
-                >
-                  Save
-                </Button>
-              </div>
-
-              {/* Scrollable content */}
-              <div className="flex-1 overflow-y-auto overscroll-contain">
-                {content}
-              </div>
+            <div className="flex items-center gap-1">
+              <button onClick={handleClose} className="p-2 -ml-2">
+                <X className="h-5 w-5" />
+              </button>
             </div>
-          </SheetContent>
-        </Sheet>
+            <h1 className="text-lg font-semibold">Edit Task</h1>
+            <Button
+              onClick={handleSubmit}
+              disabled={!title.trim()}
+              variant="ghost"
+              className="text-primary font-semibold"
+            >
+              Save
+            </Button>
+          </header>
+
+          {/* Scrollable content */}
+          <div 
+            className="flex-1 overflow-y-auto overscroll-contain transition-colors duration-300"
+            style={{ backgroundColor: bgColor }}
+          >
+            {content}
+          </div>
+        </div>
         {pickerSheets}
       </>
     );
