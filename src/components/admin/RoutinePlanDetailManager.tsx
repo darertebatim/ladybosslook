@@ -92,6 +92,14 @@ interface Template {
   linked_playlist_id: string | null;
 }
 
+interface TaskTemplate {
+  id: string;
+  title: string;
+  emoji: string;
+  color: string;
+  category: string;
+}
+
 interface Props {
   planId: string;
   onBack: () => void;
@@ -219,6 +227,20 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
         .order('display_order');
       if (error) throw error;
       return data as Template[];
+    },
+  });
+
+  // Fetch regular Task templates (for adding to regular tasks)
+  const { data: taskTemplates } = useQuery({
+    queryKey: ['admin-task-templates-for-routine'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('task_templates')
+        .select('id, title, emoji, color, category')
+        .eq('is_active', true)
+        .order('display_order');
+      if (error) throw error;
+      return data as TaskTemplate[];
     },
   });
 
@@ -473,7 +495,7 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
     createTaskMutation.mutate(newTaskData);
   };
 
-  // Add from template
+  // Add from pro template
   const handleAddFromTemplate = async (templateId: string) => {
     const template = templates?.find(t => t.id === templateId);
     if (!template) return;
@@ -487,6 +509,24 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
       linked_playlist_id: template.linked_playlist_id,
       pro_link_type: template.pro_link_type,
       pro_link_value: template.pro_link_value,
+    };
+    createTaskMutation.mutate(newTaskData);
+  };
+
+  // Add from regular task template
+  const handleAddFromTaskTemplate = async (templateId: string) => {
+    const template = taskTemplates?.find(t => t.id === templateId);
+    if (!template) return;
+
+    const newTaskData = {
+      title: template.title,
+      duration_minutes: 5, // Default duration
+      icon: template.emoji,
+      task_order: (tasks?.length || 0) + 1,
+      is_active: true,
+      linked_playlist_id: null,
+      pro_link_type: null,
+      pro_link_value: null,
     };
     createTaskMutation.mutate(newTaskData);
   };
@@ -779,6 +819,23 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
                 <CardDescription>Simple checklist tasks for this routine</CardDescription>
               </div>
               <div className="flex gap-2">
+                {taskTemplates && taskTemplates.length > 0 && (
+                  <Select onValueChange={handleAddFromTaskTemplate}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Add from template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {taskTemplates.map(template => (
+                        <SelectItem key={template.id} value={template.id}>
+                          <div className="flex items-center gap-2">
+                            <span>{template.emoji}</span>
+                            {template.title}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
                 <Button onClick={() => setShowBulkDialog(true)} size="sm" variant="outline">
                   <ListPlus className="h-4 w-4 mr-2" />
                   Bulk Add
