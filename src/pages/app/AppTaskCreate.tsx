@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format, addDays, nextMonday, startOfDay } from 'date-fns';
 import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target, Wind } from 'lucide-react';
@@ -1822,13 +1823,13 @@ const AppTaskCreate = ({
     </>
   );
 
-  // Sheet mode - render as fullscreen overlay dialog
+  // Sheet mode - render as fullscreen overlay via portal (to escape parent Sheet context)
   if (isSheet) {
     if (!sheetOpen) return null;
     
-    return (
+    return createPortal(
       <>
-        <div className="fixed inset-0 z-[100] flex flex-col bg-background">
+        <div className="fixed inset-0 z-[200] flex flex-col bg-background">
           {/* Header - dynamic color */}
           <header 
             className="flex items-center justify-between px-4 flex-shrink-0 transition-colors duration-300"
@@ -1863,7 +1864,8 @@ const AppTaskCreate = ({
           </div>
         </div>
         {pickerSheets}
-      </>
+      </>,
+      document.body
     );
   }
 
