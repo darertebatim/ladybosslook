@@ -30,7 +30,8 @@ export function AIAssistantPanel() {
     isOpen, 
     setIsOpen, 
     messages, 
-    addMessage, 
+    addMessage,
+    updateMessage,
     clearMessages, 
     isLoading, 
     setIsLoading,
@@ -113,6 +114,7 @@ export function AIAssistantPanel() {
       let assistantContent = '';
       let toolCall: { name: string; data: Record<string, any> } | undefined;
       let toolCallBuffer = '';
+      let assistantMessageId: string | null = null;
 
       const processLine = (line: string) => {
         if (!line.startsWith('data: ')) return;
@@ -125,6 +127,13 @@ export function AIAssistantPanel() {
           
           if (delta?.content) {
             assistantContent += delta.content;
+            
+            // Create or update the assistant message
+            if (!assistantMessageId) {
+              assistantMessageId = addMessage({ role: 'assistant', content: assistantContent });
+            } else {
+              updateMessage(assistantMessageId, { content: assistantContent });
+            }
           }
           
           // Handle tool calls
@@ -144,6 +153,10 @@ export function AIAssistantPanel() {
           if (parsed.choices?.[0]?.finish_reason === 'tool_calls' && toolCall && toolCallBuffer) {
             try {
               toolCall.data = JSON.parse(toolCallBuffer);
+              // Update the message with the tool call
+              if (assistantMessageId) {
+                updateMessage(assistantMessageId, { toolCall });
+              }
             } catch {
               console.error('Failed to parse tool call arguments');
             }
@@ -165,14 +178,6 @@ export function AIAssistantPanel() {
         for (const line of lines) {
           processLine(line);
         }
-
-        // Update message in real-time if we have content
-        if (assistantContent) {
-          // Update or add the assistant message
-          addMessage({ role: 'assistant', content: assistantContent, toolCall });
-          // Remove the previous update since we're adding a new one
-          // This is a simplification - in production you'd update in place
-        }
       }
 
       // Process any remaining buffer
@@ -182,10 +187,14 @@ export function AIAssistantPanel() {
         }
       }
 
-      // Final message with tool call if present
-      if (assistantContent || toolCall) {
-        // The streaming already added messages, but we need to handle the final state
-        // For simplicity, we'll just ensure the last message has the tool call
+      // Final update: ensure tool call is attached if we have one
+      if (assistantMessageId && toolCall && toolCallBuffer) {
+        try {
+          toolCall.data = JSON.parse(toolCallBuffer);
+          updateMessage(assistantMessageId, { content: assistantContent, toolCall });
+        } catch {
+          // Already handled
+        }
       }
 
     } catch (error) {
