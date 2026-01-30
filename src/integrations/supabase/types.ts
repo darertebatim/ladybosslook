@@ -16,8 +16,11 @@ export type Database = {
     Tables: {
       admin_task_bank: {
         Row: {
+          category: string
           color: string
           created_at: string
+          description: string | null
+          duration_minutes: number | null
           emoji: string
           goal_enabled: boolean
           goal_target: number | null
@@ -25,6 +28,7 @@ export type Database = {
           goal_unit: string | null
           id: string
           is_active: boolean
+          is_popular: boolean
           linked_playlist_id: string | null
           pro_link_type: string | null
           pro_link_value: string | null
@@ -37,8 +41,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category?: string
           color?: string
           created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
           emoji?: string
           goal_enabled?: boolean
           goal_target?: number | null
@@ -46,6 +53,7 @@ export type Database = {
           goal_unit?: string | null
           id?: string
           is_active?: boolean
+          is_popular?: boolean
           linked_playlist_id?: string | null
           pro_link_type?: string | null
           pro_link_value?: string | null
@@ -58,8 +66,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category?: string
           color?: string
           created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
           emoji?: string
           goal_enabled?: boolean
           goal_target?: number | null
@@ -67,6 +78,7 @@ export type Database = {
           goal_unit?: string | null
           id?: string
           is_active?: boolean
+          is_popular?: boolean
           linked_playlist_id?: string | null
           pro_link_type?: string | null
           pro_link_value?: string | null
