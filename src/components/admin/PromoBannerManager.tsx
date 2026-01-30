@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { Trash2, Plus, Upload, ExternalLink, Sparkles, Loader2, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 
-type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url';
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
 
 interface PromoBanner {
@@ -87,6 +87,34 @@ export function PromoBannerManager() {
         .select('id, name')
         .eq('is_hidden', false)
         .order('name');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch task templates for destination selector
+  const { data: taskTemplates } = useQuery({
+    queryKey: ['task-templates-for-promo'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('admin_task_bank')
+        .select('id, title, emoji')
+        .eq('is_active', true)
+        .order('title');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch routines bank for destination selector
+  const { data: routinesBank } = useQuery({
+    queryKey: ['routines-bank-for-promo'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('id, title, emoji')
+        .eq('is_active', true)
+        .order('title');
       if (error) throw error;
       return data;
     },
@@ -177,10 +205,11 @@ export function PromoBannerManager() {
   // Create banner mutation
   const createMutation = useMutation({
     mutationFn: async () => {
+      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub'].includes(destinationType);
       const { error } = await supabase.from('promo_banners').insert({
         cover_image_url: coverImageUrl,
         destination_type: destinationType,
-        destination_id: (destinationType === 'routine' || destinationType === 'playlist') ? destinationId || null : null,
+        destination_id: needsDestinationId ? destinationId || null : null,
         custom_url: destinationType === 'custom_url' ? customUrl : null,
         display_frequency: displayFrequency,
         is_active: isActive,
@@ -204,10 +233,11 @@ export function PromoBannerManager() {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!editingBanner) return;
+      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub'].includes(destinationType);
       const { error } = await supabase.from('promo_banners').update({
         cover_image_url: coverImageUrl,
         destination_type: destinationType,
-        destination_id: (destinationType === 'routine' || destinationType === 'playlist') ? destinationId || null : null,
+        destination_id: needsDestinationId ? destinationId || null : null,
         custom_url: destinationType === 'custom_url' ? customUrl : null,
         display_frequency: displayFrequency,
         is_active: isActive,
@@ -293,6 +323,12 @@ export function PromoBannerManager() {
       case 'playlist':
         const playlist = playlists?.find(p => p.id === banner.destination_id);
         return playlist?.name || 'Unknown Playlist';
+      case 'tasks':
+        const task = taskTemplates?.find(t => t.id === banner.destination_id);
+        return task ? `${task.emoji} ${task.title}` : 'Unknown Task';
+      case 'routines_hub':
+        const routineBank = routinesBank?.find(r => r.id === banner.destination_id);
+        return routineBank ? `${routineBank.emoji || '📋'} ${routineBank.title}` : 'Unknown Routine';
       case 'journal':
         return 'Journal';
       case 'programs':
@@ -409,8 +445,10 @@ export function PromoBannerManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="routine">Routine (specific)</SelectItem>
+                    <SelectItem value="routine">Routine Plan (specific)</SelectItem>
                     <SelectItem value="playlist">Playlist (specific)</SelectItem>
+                    <SelectItem value="tasks">Task Template (specific)</SelectItem>
+                    <SelectItem value="routines_hub">Routine Bank (specific)</SelectItem>
                     <SelectItem value="inspire">Inspire / Routines Hub</SelectItem>
                     <SelectItem value="journal">Journal</SelectItem>
                     <SelectItem value="programs">Programs / Store</SelectItem>
@@ -423,23 +461,32 @@ export function PromoBannerManager() {
                 </Select>
               </div>
 
-              {/* Destination ID - for routine/playlist */}
-              {(destinationType === 'routine' || destinationType === 'playlist') && (
+              {/* Destination ID - for types that need specific selection */}
+              {['routine', 'playlist', 'tasks', 'routines_hub'].includes(destinationType) && (
                 <div className="space-y-2">
-                  <Label>{destinationType === 'routine' ? 'Select Routine' : 'Select Playlist'}</Label>
+                  <Label>
+                    {destinationType === 'routine' && 'Select Routine Plan'}
+                    {destinationType === 'playlist' && 'Select Playlist'}
+                    {destinationType === 'tasks' && 'Select Task Template'}
+                    {destinationType === 'routines_hub' && 'Select Routine from Bank'}
+                  </Label>
                   <Select value={destinationId} onValueChange={setDestinationId}>
                     <SelectTrigger>
-                      <SelectValue placeholder={`Choose a ${destinationType}`} />
+                      <SelectValue placeholder={`Choose a ${destinationType.replace('_', ' ')}`} />
                     </SelectTrigger>
                     <SelectContent>
-                      {destinationType === 'routine'
-                        ? routines?.map(r => (
-                            <SelectItem key={r.id} value={r.id}>{r.title}</SelectItem>
-                          ))
-                        : playlists?.map(p => (
-                            <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                          ))
-                      }
+                      {destinationType === 'routine' && routines?.map(r => (
+                        <SelectItem key={r.id} value={r.id}>{r.title}</SelectItem>
+                      ))}
+                      {destinationType === 'playlist' && playlists?.map(p => (
+                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                      ))}
+                      {destinationType === 'tasks' && taskTemplates?.map(t => (
+                        <SelectItem key={t.id} value={t.id}>{t.emoji} {t.title}</SelectItem>
+                      ))}
+                      {destinationType === 'routines_hub' && routinesBank?.map(r => (
+                        <SelectItem key={r.id} value={r.id}>{r.emoji || '📋'} {r.title}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
