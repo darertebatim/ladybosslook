@@ -8,10 +8,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Trash2, Plus, Upload, ExternalLink, Sparkles, Loader2 } from 'lucide-react';
+import { Trash2, Plus, Upload, ExternalLink, Sparkles, Loader2, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 
-type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'custom_url';
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
 
 interface PromoBanner {
@@ -31,6 +31,7 @@ interface PromoBanner {
 export function PromoBannerManager() {
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
+  const [editingBanner, setEditingBanner] = useState<PromoBanner | null>(null);
   const [uploading, setUploading] = useState(false);
   const [generating, setGenerating] = useState(false);
   
@@ -179,7 +180,7 @@ export function PromoBannerManager() {
       const { error } = await supabase.from('promo_banners').insert({
         cover_image_url: coverImageUrl,
         destination_type: destinationType,
-        destination_id: destinationType === 'routine' || destinationType === 'playlist' ? destinationId || null : null,
+        destination_id: (destinationType === 'routine' || destinationType === 'playlist') ? destinationId || null : null,
         custom_url: destinationType === 'custom_url' ? customUrl : null,
         display_frequency: displayFrequency,
         is_active: isActive,
@@ -196,6 +197,33 @@ export function PromoBannerManager() {
     },
     onError: (error: any) => {
       toast.error('Failed to create banner: ' + error.message);
+    },
+  });
+
+  // Update banner mutation
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      if (!editingBanner) return;
+      const { error } = await supabase.from('promo_banners').update({
+        cover_image_url: coverImageUrl,
+        destination_type: destinationType,
+        destination_id: (destinationType === 'routine' || destinationType === 'playlist') ? destinationId || null : null,
+        custom_url: destinationType === 'custom_url' ? customUrl : null,
+        display_frequency: displayFrequency,
+        is_active: isActive,
+        priority,
+        starts_at: startsAt || null,
+        ends_at: endsAt || null,
+      }).eq('id', editingBanner.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['promo-banners'] });
+      toast.success('Banner updated');
+      resetForm();
+    },
+    onError: (error: any) => {
+      toast.error('Failed to update banner: ' + error.message);
     },
   });
 
@@ -230,6 +258,7 @@ export function PromoBannerManager() {
 
   const resetForm = () => {
     setIsCreating(false);
+    setEditingBanner(null);
     setCoverImageUrl('');
     setDestinationType('routine');
     setDestinationId('');
@@ -241,6 +270,19 @@ export function PromoBannerManager() {
     setEndsAt('');
     setBannerTitle('');
     setBannerSubtitle('');
+  };
+
+  const startEditing = (banner: PromoBanner) => {
+    setEditingBanner(banner);
+    setCoverImageUrl(banner.cover_image_url);
+    setDestinationType(banner.destination_type);
+    setDestinationId(banner.destination_id || '');
+    setCustomUrl(banner.custom_url || '');
+    setDisplayFrequency(banner.display_frequency);
+    setIsActive(banner.is_active);
+    setPriority(banner.priority);
+    setStartsAt(banner.starts_at ? banner.starts_at.slice(0, 16) : '');
+    setEndsAt(banner.ends_at ? banner.ends_at.slice(0, 16) : '');
   };
 
   const getDestinationLabel = (banner: PromoBanner) => {
@@ -255,6 +297,16 @@ export function PromoBannerManager() {
         return 'Journal';
       case 'programs':
         return 'Programs Page';
+      case 'breathe':
+        return 'Breathe Page';
+      case 'water':
+        return 'Water Tracking';
+      case 'channels':
+        return 'Feed/Channels';
+      case 'home':
+        return 'Home Page';
+      case 'inspire':
+        return 'Inspire/Routines';
       case 'custom_url':
         return banner.custom_url || 'Custom URL';
       default:
@@ -262,12 +314,14 @@ export function PromoBannerManager() {
     }
   };
 
+  const isFormOpen = isCreating || editingBanner !== null;
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Promo Banners</CardTitle>
-          {!isCreating && (
+          {!isFormOpen && (
             <Button onClick={() => setIsCreating(true)}>
               <Plus className="h-4 w-4 mr-2" />
               New Banner
@@ -275,9 +329,9 @@ export function PromoBannerManager() {
           )}
         </CardHeader>
         <CardContent>
-          {isCreating && (
+          {isFormOpen && (
             <div className="space-y-4 mb-6 p-4 border rounded-lg bg-muted/50">
-              <h3 className="font-semibold">Create New Banner</h3>
+              <h3 className="font-semibold">{editingBanner ? 'Edit Banner' : 'Create New Banner'}</h3>
               
               {/* AI Generation Section */}
               <div className="space-y-3 p-4 bg-gradient-to-br from-violet-50 to-pink-50 dark:from-violet-950/30 dark:to-pink-950/30 rounded-lg border border-violet-200 dark:border-violet-800">
@@ -355,10 +409,15 @@ export function PromoBannerManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="routine">Routine</SelectItem>
-                    <SelectItem value="playlist">Playlist</SelectItem>
+                    <SelectItem value="routine">Routine (specific)</SelectItem>
+                    <SelectItem value="playlist">Playlist (specific)</SelectItem>
+                    <SelectItem value="inspire">Inspire / Routines Hub</SelectItem>
                     <SelectItem value="journal">Journal</SelectItem>
-                    <SelectItem value="programs">Programs Page</SelectItem>
+                    <SelectItem value="programs">Programs / Store</SelectItem>
+                    <SelectItem value="breathe">Breathe</SelectItem>
+                    <SelectItem value="water">Water Tracking</SelectItem>
+                    <SelectItem value="channels">Feed / Channels</SelectItem>
+                    <SelectItem value="home">Home</SelectItem>
                     <SelectItem value="custom_url">Custom URL</SelectItem>
                   </SelectContent>
                 </Select>
@@ -451,12 +510,21 @@ export function PromoBannerManager() {
 
               {/* Actions */}
               <div className="flex gap-2">
-                <Button
-                  onClick={() => createMutation.mutate()}
-                  disabled={!coverImageUrl || createMutation.isPending}
-                >
-                  Create Banner
-                </Button>
+                {editingBanner ? (
+                  <Button
+                    onClick={() => updateMutation.mutate()}
+                    disabled={!coverImageUrl || updateMutation.isPending}
+                  >
+                    {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => createMutation.mutate()}
+                    disabled={!coverImageUrl || createMutation.isPending}
+                  >
+                    {createMutation.isPending ? 'Creating...' : 'Create Banner'}
+                  </Button>
+                )}
                 <Button variant="outline" onClick={resetForm}>
                   Cancel
                 </Button>
@@ -503,6 +571,13 @@ export function PromoBannerManager() {
                       toggleActiveMutation.mutate({ id: banner.id, is_active: checked })
                     }
                   />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => startEditing(banner)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"

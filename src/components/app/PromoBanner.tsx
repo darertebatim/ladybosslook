@@ -7,7 +7,7 @@ import { X } from 'lucide-react';
 interface PromoBanner {
   id: string;
   cover_image_url: string;
-  destination_type: 'routine' | 'playlist' | 'journal' | 'programs' | 'custom_url';
+  destination_type: 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url';
   destination_id: string | null;
   custom_url: string | null;
   display_frequency: 'once' | 'daily' | 'weekly';
@@ -106,6 +106,21 @@ export function PromoBanner() {
         break;
       case 'programs':
         navigate('/app/programs');
+        break;
+      case 'breathe':
+        navigate('/app/breathe');
+        break;
+      case 'water':
+        navigate('/app/water');
+        break;
+      case 'channels':
+        navigate('/app/channels');
+        break;
+      case 'home':
+        navigate('/app/home');
+        break;
+      case 'inspire':
+        navigate('/app/routines');
         break;
       case 'custom_url':
         if (activeBanner.custom_url) {
