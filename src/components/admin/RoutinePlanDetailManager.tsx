@@ -44,6 +44,13 @@ interface Playlist {
   category: string | null;
 }
 
+interface BreathingExercise {
+  id: string;
+  name: string;
+  emoji: string | null;
+  category: string;
+}
+
 interface Section {
   id: string;
   plan_id: string;
@@ -213,6 +220,21 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
         .order('name');
       if (error) throw error;
       return data as Playlist[];
+    },
+  });
+
+  // Fetch breathing exercises for linking
+  const { data: breathingExercises } = useQuery({
+    queryKey: ['admin-breathing-exercises-for-linking'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('breathing_exercises')
+        .select('id, name, emoji, category')
+        .eq('is_active', true)
+        .order('sort_order');
+
+      if (error) throw error;
+      return data as BreathingExercise[];
     },
   });
 
@@ -1227,7 +1249,35 @@ export function RoutinePlanDetailManager({ planId, onBack }: Props) {
                 </div>
               )}
 
-              {taskForm.pro_link_type && !['playlist', 'channel', 'program', 'route'].includes(taskForm.pro_link_type) && (
+              {taskForm.pro_link_type === 'breathe' && (
+                <div>
+                  <Label className="text-xs">Select Breathing Exercise</Label>
+                  <Select
+                    value={taskForm.pro_link_value || 'none'}
+                    onValueChange={(value) => setTaskForm(prev => ({ 
+                      ...prev, 
+                      pro_link_value: value === 'none' ? null : value,
+                    }))}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select an exercise..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Any exercise (opens list)</SelectItem>
+                      {breathingExercises?.map((exercise) => (
+                        <SelectItem key={exercise.id} value={exercise.id}>
+                          <div className="flex items-center gap-2">
+                            <span>{exercise.emoji || '🌬️'}</span>
+                            {exercise.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {taskForm.pro_link_type && !['playlist', 'channel', 'program', 'route', 'breathe'].includes(taskForm.pro_link_type) && (
                 <p className="text-xs text-muted-foreground italic">
                   This link type doesn't require a value - it will open the {taskForm.pro_link_type} page directly.
                 </p>
