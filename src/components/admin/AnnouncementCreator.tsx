@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Megaphone, Bell, Mail, MessageCircle, Link as LinkIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAIAssistant } from '@/contexts/AIAssistantContext';
 
 interface Program {
   id: string;
@@ -44,6 +45,21 @@ export function AnnouncementCreator() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { registerFormHandler, unregisterFormHandler } = useAIAssistant();
+
+  // Register AI form handler
+  const handleAIFill = useCallback((data: Record<string, any>) => {
+    if (data.title) setTitle(data.title);
+    if (data.content) setMessage(data.content);
+    if (data.targetCourse) setTargetCourse(data.targetCourse);
+    if (data.sendEmail !== undefined) setSendEmail(data.sendEmail);
+    if (data.sendPush !== undefined) setSendPush(data.sendPush);
+  }, []);
+
+  useEffect(() => {
+    registerFormHandler('broadcast', handleAIFill);
+    return () => unregisterFormHandler('broadcast');
+  }, [registerFormHandler, unregisterFormHandler, handleAIFill]);
 
   // Compute actual link URL (empty if 'none' selected)
   const linkUrl = linkType === 'none' ? '' : (linkType === 'custom' ? customLinkUrl : linkType);

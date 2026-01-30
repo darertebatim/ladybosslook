@@ -181,3 +181,6 @@ verify_jwt = false
 
 [functions.send-weekly-summary]
 verify_jwt = false
+
+[functions.admin-assistant]
+verify_jwt = false
