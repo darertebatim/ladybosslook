@@ -1,16 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, Edit, ChevronRight, Music, Wind, Target, X } from 'lucide-react';
+import { Plus, Trash2, ChevronRight, Music, Wind, Target, X, Clock, Star, Sparkles } from 'lucide-react';
 import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { PRO_LINK_CONFIGS, ProLinkType } from '@/lib/proTaskTypes';
 
@@ -25,6 +27,19 @@ const COLOR_OPTIONS = [
   { name: 'lavender', hex: '#E8D4F8' },
 ];
 
+// Category options (matching the app's TemplateCategory + extras)
+const CATEGORY_OPTIONS = [
+  { value: 'morning', label: 'Morning', emoji: '🌅' },
+  { value: 'evening', label: 'Evening', emoji: '🌙' },
+  { value: 'selfcare', label: 'Self Care', emoji: '💆' },
+  { value: 'business', label: 'Business', emoji: '💼' },
+  { value: 'wellness', label: 'Wellness', emoji: '🧘' },
+  { value: 'fitness', label: 'Fitness', emoji: '💪' },
+  { value: 'mindfulness', label: 'Mindfulness', emoji: '🧠' },
+  { value: 'productivity', label: 'Productivity', emoji: '📊' },
+  { value: 'general', label: 'General', emoji: '📋' },
+];
+
 // Repeat pattern options
 const REPEAT_OPTIONS = [
   { value: 'none', label: 'No Repeat' },
@@ -32,6 +47,9 @@ const REPEAT_OPTIONS = [
   { value: 'weekly', label: 'Weekly' },
   { value: 'monthly', label: 'Monthly' },
 ];
+
+// Duration presets (in minutes)
+const DURATION_PRESETS = [1, 2, 5, 10, 15, 20, 30, 45, 60];
 
 // Goal unit options
 const GOAL_UNITS = ['times', 'minutes', 'pages', 'glasses', 'reps', 'steps'];
@@ -41,6 +59,10 @@ interface TaskBankItem {
   title: string;
   emoji: string;
   color: string;
+  category: string;
+  description: string | null;
+  duration_minutes: number | null;
+  is_popular: boolean;
   pro_link_type: string | null;
   pro_link_value: string | null;
   linked_playlist_id: string | null;
@@ -68,6 +90,10 @@ interface FormData {
   title: string;
   emoji: string;
   color: string;
+  category: string;
+  description: string;
+  duration_minutes: number;
+  is_popular: boolean;
   pro_link_type: ProLinkType | null;
   pro_link_value: string | null;
   linked_playlist_id: string | null;
@@ -86,6 +112,10 @@ const defaultFormData: FormData = {
   title: '',
   emoji: '☀️',
   color: 'yellow',
+  category: 'general',
+  description: '',
+  duration_minutes: 5,
+  is_popular: false,
   pro_link_type: null,
   pro_link_value: null,
   linked_playlist_id: null,
@@ -109,6 +139,7 @@ export default function TasksBank() {
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [newSubtask, setNewSubtask] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   // Fetch task bank items
   const { data: tasks = [], isLoading } = useQuery({
@@ -124,6 +155,14 @@ export default function TasksBank() {
       return data as TaskBankItem[];
     },
   });
+
+  // Filter tasks by category
+  const filteredTasks = selectedCategory === 'all' 
+    ? tasks 
+    : tasks.filter(t => t.category === selectedCategory);
+
+  // Get unique categories from tasks
+  const usedCategories = [...new Set(tasks.map(t => t.category))];
 
   // Fetch subtasks for editing task
   const { data: editingSubtasks = [] } = useQuery({
@@ -141,6 +180,16 @@ export default function TasksBank() {
     },
     enabled: !!editingTask?.id,
   });
+
+  // Load subtasks when they're fetched
+  useEffect(() => {
+    if (editingSubtasks.length > 0 && editingTask) {
+      setFormData(prev => ({
+        ...prev,
+        subtasks: editingSubtasks.map(s => s.title),
+      }));
+    }
+  }, [editingSubtasks, editingTask]);
 
   // Fetch playlists for linking
   const { data: playlists = [] } = useQuery({
@@ -184,6 +233,10 @@ export default function TasksBank() {
           title: taskData.title,
           emoji: taskData.emoji,
           color: taskData.color,
+          category: taskData.category,
+          description: taskData.description || null,
+          duration_minutes: taskData.duration_minutes,
+          is_popular: taskData.is_popular,
           pro_link_type: taskData.pro_link_type,
           pro_link_value: taskData.pro_link_value,
           linked_playlist_id: taskData.pro_link_type === 'playlist' ? taskData.pro_link_value : taskData.linked_playlist_id,
@@ -203,17 +256,19 @@ export default function TasksBank() {
       
       // Insert subtasks
       if (subtasks.length > 0) {
-        const subtaskRows = subtasks.map((title, idx) => ({
+        const subtaskRows = subtasks.filter(s => s.trim()).map((title, idx) => ({
           task_id: newTask.id,
           title,
           order_index: idx,
         }));
         
-        const { error: subError } = await supabase
-          .from('admin_task_bank_subtasks')
-          .insert(subtaskRows);
-        
-        if (subError) throw subError;
+        if (subtaskRows.length > 0) {
+          const { error: subError } = await supabase
+            .from('admin_task_bank_subtasks')
+            .insert(subtaskRows);
+          
+          if (subError) throw subError;
+        }
       }
       
       return newTask;
@@ -241,6 +296,10 @@ export default function TasksBank() {
           title: taskData.title,
           emoji: taskData.emoji,
           color: taskData.color,
+          category: taskData.category,
+          description: taskData.description || null,
+          duration_minutes: taskData.duration_minutes,
+          is_popular: taskData.is_popular,
           pro_link_type: taskData.pro_link_type,
           pro_link_value: taskData.pro_link_value,
           linked_playlist_id: taskData.pro_link_type === 'playlist' ? taskData.pro_link_value : taskData.linked_playlist_id,
@@ -264,8 +323,9 @@ export default function TasksBank() {
         .eq('task_id', id);
       
       // Insert new subtasks
-      if (subtasks.length > 0) {
-        const subtaskRows = subtasks.map((title, idx) => ({
+      const validSubtasks = subtasks.filter(s => s.trim());
+      if (validSubtasks.length > 0) {
+        const subtaskRows = validSubtasks.map((title, idx) => ({
           task_id: id,
           title,
           order_index: idx,
@@ -325,6 +385,10 @@ export default function TasksBank() {
       title: task.title,
       emoji: task.emoji,
       color: task.color,
+      category: task.category || 'general',
+      description: task.description || '',
+      duration_minutes: task.duration_minutes || 5,
+      is_popular: task.is_popular || false,
       pro_link_type: task.pro_link_type as ProLinkType | null,
       pro_link_value: task.pro_link_value,
       linked_playlist_id: task.linked_playlist_id,
@@ -340,23 +404,6 @@ export default function TasksBank() {
     });
     setDialogOpen(true);
   };
-
-  // Load subtasks when editing
-  const handleSubtasksLoaded = () => {
-    if (editingSubtasks.length > 0 && editingTask) {
-      setFormData(prev => ({
-        ...prev,
-        subtasks: editingSubtasks.map(s => s.title),
-      }));
-    }
-  };
-
-  // Effect to load subtasks
-  useState(() => {
-    if (editingSubtasks.length > 0) {
-      handleSubtasksLoaded();
-    }
-  });
 
   const handleSubmit = () => {
     if (!formData.title.trim()) {
@@ -388,7 +435,9 @@ export default function TasksBank() {
     }));
   };
 
-  const proConfig = formData.pro_link_type ? PRO_LINK_CONFIGS[formData.pro_link_type] : null;
+  const getCategoryInfo = (cat: string) => {
+    return CATEGORY_OPTIONS.find(c => c.value === cat) || { value: cat, label: cat, emoji: '📋' };
+  };
 
   return (
     <div className="space-y-6">
@@ -403,17 +452,45 @@ export default function TasksBank() {
         </Button>
       </div>
 
+      {/* Category Tabs */}
+      <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
+        <TabsList className="flex-wrap h-auto gap-1 bg-muted/50 p-1">
+          <TabsTrigger value="all" className="flex items-center gap-1">
+            <Sparkles className="h-3 w-3" />
+            All
+          </TabsTrigger>
+          {CATEGORY_OPTIONS.map((cat) => (
+            <TabsTrigger 
+              key={cat.value} 
+              value={cat.value}
+              className="flex items-center gap-1"
+            >
+              <span>{cat.emoji}</span>
+              {cat.label}
+              {usedCategories.includes(cat.value) && (
+                <span className="text-xs text-muted-foreground">
+                  ({tasks.filter(t => t.category === cat.value).length})
+                </span>
+              )}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
       {isLoading ? (
         <div className="text-center py-12 text-muted-foreground">Loading...</div>
-      ) : tasks.length === 0 ? (
+      ) : filteredTasks.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            No tasks in the bank yet. Click "Add Task" to create one.
+            {selectedCategory === 'all' 
+              ? 'No tasks in the bank yet. Click "Add Task" to create one.'
+              : `No tasks in "${getCategoryInfo(selectedCategory).label}" category.`
+            }
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-2">
-          {tasks.map((task) => (
+          {filteredTasks.map((task) => (
             <Card 
               key={task.id} 
               className={`cursor-pointer hover:bg-muted/50 transition-colors ${!task.is_active ? 'opacity-50' : ''}`}
@@ -422,7 +499,7 @@ export default function TasksBank() {
               <CardContent className="py-3 px-4 flex items-center gap-3">
                 {/* Emoji/Icon */}
                 <div 
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-lg"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
                   style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === task.color)?.hex || '#FFF59D' }}
                 >
                   {task.emoji}
@@ -430,8 +507,18 @@ export default function TasksBank() {
                 
                 {/* Title + metadata */}
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">{task.title}</div>
-                  <div className="text-xs text-muted-foreground flex items-center gap-2">
+                  <div className="font-medium truncate flex items-center gap-2">
+                    {task.title}
+                    {task.is_popular && <Star className="h-3 w-3 text-amber-500 fill-amber-500" />}
+                  </div>
+                  <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
+                    <span>{getCategoryInfo(task.category).emoji} {getCategoryInfo(task.category).label}</span>
+                    {task.duration_minutes && (
+                      <span className="flex items-center gap-0.5">
+                        <Clock className="h-3 w-3" />
+                        {task.duration_minutes}m
+                      </span>
+                    )}
                     {task.pro_link_type && (
                       <span className="flex items-center gap-1">
                         {task.pro_link_type === 'playlist' && <Music className="h-3 w-3" />}
@@ -440,7 +527,7 @@ export default function TasksBank() {
                       </span>
                     )}
                     {task.goal_enabled && (
-                      <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-0.5">
                         <Target className="h-3 w-3" />
                         {task.goal_target} {task.goal_unit}
                       </span>
@@ -451,7 +538,7 @@ export default function TasksBank() {
                   </div>
                 </div>
                 
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
               </CardContent>
             </Card>
           ))}
@@ -472,7 +559,7 @@ export default function TasksBank() {
                 <Button 
                   type="button" 
                   variant="outline" 
-                  className="h-10 w-10 p-0 text-lg"
+                  className="h-10 w-10 p-0 text-lg shrink-0"
                   style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === formData.color)?.hex }}
                   onClick={() => setShowEmojiPicker(true)}
                 >
@@ -484,6 +571,37 @@ export default function TasksBank() {
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                   className="flex-1"
                 />
+              </div>
+
+              {/* Description */}
+              <div>
+                <Label className="text-sm text-muted-foreground mb-2 block">Description (optional)</Label>
+                <Textarea
+                  placeholder="Describe the task..."
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  rows={2}
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <Label className="text-sm text-muted-foreground mb-2 block">Category</Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(v) => setFormData(prev => ({ ...prev, category: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORY_OPTIONS.map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {cat.emoji} {cat.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Color Picker */}
@@ -500,6 +618,24 @@ export default function TasksBank() {
                       style={{ backgroundColor: color.hex }}
                       onClick={() => setFormData(prev => ({ ...prev, color: color.name }))}
                     />
+                  ))}
+                </div>
+              </div>
+
+              {/* Duration */}
+              <div>
+                <Label className="text-sm text-muted-foreground mb-2 block">Duration (minutes)</Label>
+                <div className="flex gap-2 flex-wrap">
+                  {DURATION_PRESETS.map((mins) => (
+                    <Button
+                      key={mins}
+                      type="button"
+                      variant={formData.duration_minutes === mins ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setFormData(prev => ({ ...prev, duration_minutes: mins }))}
+                    >
+                      {mins}m
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -660,13 +796,34 @@ export default function TasksBank() {
                 </Select>
               </div>
 
-              {/* Reminder */}
-              <div className="flex items-center justify-between">
-                <Label>Reminder by default</Label>
-                <Switch
-                  checked={formData.reminder_enabled}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, reminder_enabled: checked }))}
-                />
+              {/* Toggles Row */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 text-amber-500" />
+                    <Label>Popular / Featured</Label>
+                  </div>
+                  <Switch
+                    checked={formData.is_popular}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_popular: checked }))}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <Label>Reminder by default</Label>
+                  <Switch
+                    checked={formData.reminder_enabled}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, reminder_enabled: checked }))}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <Label>Active</Label>
+                  <Switch
+                    checked={formData.is_active}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
+                  />
+                </div>
               </div>
 
               {/* Tag */}
@@ -717,15 +874,6 @@ export default function TasksBank() {
                     </Button>
                   </div>
                 </div>
-              </div>
-
-              {/* Active */}
-              <div className="flex items-center justify-between">
-                <Label>Active</Label>
-                <Switch
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
-                />
               </div>
             </div>
           </ScrollArea>
