@@ -1,173 +1,368 @@
 
 
-# Plan: Migrate /app/routines to Use Tasks Bank
+# Browse Hub Redesign
 
 ## Overview
-Consolidate task templates by making `admin_task_bank` the single source of truth. Remove the `task_templates` table and update all code to read from `admin_task_bank` instead.
 
-## What Changes
+Transform the Browse page from a programs-only store into a comprehensive **Tools & Content Hub** - the main discovery point for all app features, tools, and content. Designed specifically for iOS users with native-feeling interactions and polished visuals.
 
-### 1. Update `useTaskPlanner.tsx` Hooks
+---
 
-**Current:**
-```typescript
-export const useTaskTemplates = (category?: TemplateCategory) => {
-  return useQuery({
-    queryKey: ['planner-templates', category],
-    queryFn: async () => {
-      let query = supabase
-        .from('task_templates')  // OLD TABLE
-        .select('*')
-        ...
-    }
-  });
-};
-```
+## Current State
 
-**New:**
-```typescript
-export const useTaskTemplates = (category?: TemplateCategory) => {
-  return useQuery({
-    queryKey: ['planner-templates', category],
-    queryFn: async () => {
-      let query = supabase
-        .from('admin_task_bank')  // NEW TABLE
-        .select('*')
-        .eq('is_active', true)
-        ...
-    }
-  });
-};
-```
+- `AppStore.tsx` only shows free programs/courses with category filters
+- Tools like Journal, Breathe, Water, Routines are accessible via Home quick actions or hidden routes
+- No unified discovery experience for all app capabilities
+- Meditate, Workout, Soundscape exist as playlist categories in Listen but aren't easily discoverable
 
-Also update:
-- `TaskTemplate` interface to match `admin_task_bank` schema
-- `useCreateTaskFromTemplate` to use the correct field mappings
+---
 
-### 2. Update AppInspire.tsx (Routines Page)
+## Proposed Visual Design
 
-**Current behavior:** Shows task templates with a "+" button that adds task directly to planner
-
-**New behavior:** 
-- When user taps "+" on a task, open a sheet/dialog to edit the routine
-- User can then add this task to a routine or add directly to their planner
-
-Changes:
-- Replace `TaskTemplateCard` with updated version that opens routine editor
-- Add routine edit dialog/sheet for adding tasks to routines
-
-### 3. Update TaskQuickStartSheet.tsx
-
-This component shows task suggestions when creating a new task. Update to query from `admin_task_bank` instead of `task_templates`.
-
-### 4. Delete Deprecated Components
-
-Remove components that manage the old `task_templates` table:
-- `src/components/admin/TaskTemplatesManager.tsx`
-
-### 5. Update Edge Functions
-
-These edge functions reference `task_templates` and need updating:
-- `generate-plans-from-task-templates/index.ts` → Use `admin_task_bank`
-- `generate-routine-plan-ai/index.ts` → Use `admin_task_bank`
-- `admin-assistant/index.ts` → Update tool references
-
-### 6. Database Changes
-
-**Migration:**
-```sql
--- Drop the task_templates table (after confirming data migration)
-DROP TABLE IF EXISTS task_templates;
-```
-
-Note: The `routine_task_templates` table is separate (for Pro Tasks with playlist links). If you want to consolidate that too, let me know and I'll include it.
-
-## File Changes Summary
+The new Browse page will have **four distinct sections** with a clean, iOS-native aesthetic:
 
 ```text
-src/hooks/useTaskPlanner.tsx
-├── Update TaskTemplate interface
-├── Update useTaskTemplates to query admin_task_bank
-└── Update useCreateTaskFromTemplate field mappings
-
-src/pages/app/AppInspire.tsx
-├── Update to use new task bank data
-└── Add routine edit sheet when tapping "+"
-
-src/components/app/TaskQuickStartSheet.tsx
-└── Already uses useTaskTemplates (will auto-update)
-
-src/components/app/TaskTemplateCard.tsx
-└── Update to open routine editor on "+"
-
-src/components/admin/TaskTemplatesManager.tsx
-└── DELETE (replaced by TasksBank.tsx)
-
-supabase/functions/generate-plans-from-task-templates/index.ts
-└── Update to use admin_task_bank
-
-supabase/functions/generate-routine-plan-ai/index.ts
-└── Update to use admin_task_bank
-
-supabase/functions/admin-assistant/index.ts
-└── Update tool descriptions
-
-supabase/migrations/xxx.sql
-└── DROP TABLE task_templates
++------------------------------------------+
+|  Browse                          [search] |
++------------------------------------------+
+|                                          |
+|  ═══ WELLNESS TOOLS ═══                  |
+|  +----------+ +----------+ +----------+  |
+|  | Journal  | | Breathe  | |  Water   |  |
+|  |    📝    | |   🌬️    | |    💧    |  |
+|  |  Daily   | | Breathing| | Hydration|  |
+|  | Reflection| Exercises |  Tracker  |  |
+|  +----------+ +----------+ +----------+  |
+|  +----------+                            |
+|  | Routines |                            |
+|  |    ✨    |                            |
+|  |  Daily   |                            |
+|  |  Habits  |                            |
+|  +----------+                            |
+|                                          |
+|  ═══ AUDIO EXPERIENCES ═══               |
+|  +----------+ +----------+ +----------+  |
+|  | Meditate | | Workout  | |Soundscape|  |
+|  |    🧘    | |   💪    | |    🌊    |  |
+|  |  Guided  | |Energizing|  Ambient   |  |
+|  |Meditation| |  Audio   |   Sounds   |  |
+|  +----------+ +----------+ +----------+  |
+|                                          |
+|  ═══ COMING SOON ═══ (collapsed/hidden)  |
+|  [Period] [Fasting] [Mood] [Habits]...   |
+|                                          |
+|  ═══ BROWSE PROGRAMS ═══                 |
+|  [Category circles: All, Courses, etc.]  |
+|  [Program Card] [Program Card]           |
+|  [Program Card] [Program Card]           |
+|                                          |
++------------------------------------------+
 ```
 
-## UI Flow: Tapping "+" on Task
+---
 
-```text
-User on /app/routines
-        ↓
-    Sees task: "☀️ Morning Stretch"
-        ↓
-    Taps "+"
-        ↓
-┌─────────────────────────────────┐
-│ Add "Morning Stretch"           │
-├─────────────────────────────────┤
-│                                 │
-│ ○ Add to Today's Planner       │
-│ ○ Add to Routine               │
-│                                 │
-│ [Select Routine ▼]              │
-│ or [+ Create New Routine]       │
-│                                 │
-│              [Cancel]  [Add]    │
-└─────────────────────────────────┘
+## Tool Card Design
+
+Each tool card will have a premium, iOS-native feel with soft shadows and rounded corners:
+
+**Visual Specification:**
+
+| Element | Style |
+|---------|-------|
+| Card Size | Square-ish aspect ratio (roughly 1:1.1) |
+| Border Radius | 20px (rounded-2xl) |
+| Background | Soft gradient based on tool color |
+| Shadow | Subtle drop shadow (shadow-md) |
+| Icon | Large emoji or Lucide icon in the center |
+| Title | Centered, bold, below icon |
+| Subtitle | Small muted text describing the tool |
+| Active State | Scale down to 98% on tap |
+
+**Color Palette for Tools:**
+
+| Tool | Primary Color | Gradient | Icon |
+|------|---------------|----------|------|
+| Journal | Warm orange | `from-amber-100 to-orange-100` | BookOpen or 📝 |
+| Breathe | Calming teal | `from-teal-100 to-cyan-100` | Wind or 🌬️ |
+| Water | Fresh sky blue | `from-sky-100 to-blue-100` | Droplets or 💧 |
+| Routines | Vibrant purple | `from-purple-100 to-violet-100` | Sparkles or ✨ |
+| Meditate | Deep indigo | `from-indigo-100 to-purple-100` | Brain or 🧘 |
+| Workout | Energetic rose | `from-rose-100 to-pink-100` | Dumbbell or 💪 |
+| Soundscape | Ocean teal | `from-teal-100 to-blue-100` | Waves or 🌊 |
+
+---
+
+## Section 1: Wellness Tools
+
+Active functional tools that users can use right now:
+
+| Tool | Route | Description |
+|------|-------|-------------|
+| Journal | `/app/journal` | Daily reflections |
+| Breathe | `/app/breathe` | Breathing exercises |
+| Water | `/app/water` | Hydration tracker |
+| Routines | `/app/routines` | Daily habits & tasks |
+
+**Layout:** 2x2 grid
+
+---
+
+## Section 2: Audio Experiences
+
+Audio-based tools that navigate to the Listen page with a pre-selected category filter:
+
+| Tool | Route | Description |
+|------|-------|-------------|
+| Meditate | `/app/player?category=meditate` | Guided meditation sessions |
+| Workout | `/app/player?category=workout` | Energizing workout audio |
+| Soundscape | `/app/player?category=soundscape` | Ambient sounds for focus |
+
+**Layout:** 3-column row or wrap
+
+---
+
+## Section 3: Coming Soon (Hidden by Default)
+
+Future tools that will be grayed out with a "Coming Soon" badge. These are **not visible** yet but structured in the config for easy activation:
+
+| Tool | Status | Description |
+|------|--------|-------------|
+| Period Tracker | hidden | Cycle tracking |
+| Fasting Tracker | hidden | Intermittent fasting |
+| Mood Tracker | hidden | Emotional wellness |
+| Name Emotions | hidden | Emotional vocabulary |
+| Reflections | hidden | Guided prompts |
+| Tests | hidden | Assessments |
+| Challenges | hidden | Goal challenges |
+| AI Companion | hidden | AI chat assistant |
+| Habit Tracker | hidden | Habit building |
+
+**Visibility Control:** A simple boolean `comingSoon` flag in the config. When set to `true`, they're hidden. When ready, flip to `false`.
+
+---
+
+## Section 4: Browse Programs
+
+Existing program browsing functionality moved to the bottom, with:
+- Category filter circles (scrollable horizontal row)
+- Program cards in 2-column grid
+- Maintains all current enrollment logic
+
+---
+
+## Technical Implementation
+
+### New Files to Create
+
+**1. `src/lib/toolsConfig.ts`**
+Centralized configuration for all tools:
+
+```typescript
+export interface ToolConfig {
+  id: string;
+  name: string;
+  icon: string;        // Lucide icon name
+  emoji?: string;      // Optional emoji alternative
+  color: string;       // Color theme
+  gradient: string;    // Tailwind gradient classes
+  route: string;       // Navigation path
+  description: string; // Short subtitle
+  comingSoon?: boolean;
+  hidden?: boolean;    // Don't show at all
+}
+
+export const wellnessTools: ToolConfig[] = [
+  {
+    id: 'journal',
+    name: 'Journal',
+    icon: 'BookOpen',
+    emoji: '📝',
+    color: 'orange',
+    gradient: 'from-amber-100 to-orange-100',
+    route: '/app/journal',
+    description: 'Daily reflections',
+  },
+  {
+    id: 'breathe',
+    name: 'Breathe',
+    icon: 'Wind',
+    emoji: '🌬️',
+    color: 'teal',
+    gradient: 'from-teal-100 to-cyan-100',
+    route: '/app/breathe',
+    description: 'Breathing exercises',
+  },
+  {
+    id: 'water',
+    name: 'Water',
+    icon: 'Droplets',
+    emoji: '💧',
+    color: 'sky',
+    gradient: 'from-sky-100 to-blue-100',
+    route: '/app/water',
+    description: 'Hydration tracker',
+  },
+  {
+    id: 'routines',
+    name: 'Routines',
+    icon: 'Sparkles',
+    emoji: '✨',
+    color: 'purple',
+    gradient: 'from-purple-100 to-violet-100',
+    route: '/app/routines',
+    description: 'Daily habits',
+  },
+];
+
+export const audioTools: ToolConfig[] = [
+  {
+    id: 'meditate',
+    name: 'Meditate',
+    icon: 'Brain',
+    emoji: '🧘',
+    color: 'indigo',
+    gradient: 'from-indigo-100 to-purple-100',
+    route: '/app/player?category=meditate',
+    description: 'Guided meditation',
+  },
+  {
+    id: 'workout',
+    name: 'Workout',
+    icon: 'Dumbbell',
+    emoji: '💪',
+    color: 'rose',
+    gradient: 'from-rose-100 to-pink-100',
+    route: '/app/player?category=workout',
+    description: 'Energizing audio',
+  },
+  {
+    id: 'soundscape',
+    name: 'Soundscape',
+    icon: 'Waves',
+    emoji: '🌊',
+    color: 'teal',
+    gradient: 'from-teal-100 to-blue-100',
+    route: '/app/player?category=soundscape',
+    description: 'Ambient sounds',
+  },
+];
+
+export const comingSoonTools: ToolConfig[] = [
+  { id: 'period', name: 'Period', icon: 'Heart', ... },
+  { id: 'fasting', name: 'Fasting', icon: 'Timer', ... },
+  { id: 'mood', name: 'Mood', icon: 'Smile', ... },
+  { id: 'emotions', name: 'Emotions', icon: 'Palette', ... },
+  { id: 'reflections', name: 'Reflections', icon: 'PenLine', ... },
+  { id: 'tests', name: 'Tests', icon: 'ClipboardCheck', ... },
+  { id: 'challenges', name: 'Challenges', icon: 'Trophy', ... },
+  { id: 'ai', name: 'AI Coach', icon: 'Bot', ... },
+  { id: 'habits', name: 'Habits', icon: 'Target', ... },
+];
 ```
 
-## Implementation Order
+**2. `src/components/app/ToolCard.tsx`**
+Reusable tool card component with iOS-native styling:
 
-1. **Update useTaskPlanner.tsx** - Change data source to admin_task_bank
-2. **Update TaskTemplate interface** - Match admin_task_bank schema
-3. **Update AppInspire.tsx** - Add routine selection dialog
-4. **Update TaskTemplateCard.tsx** - Open dialog instead of direct add
-5. **Update edge functions** - Point to admin_task_bank
-6. **Delete TaskTemplatesManager.tsx** - Remove deprecated component
-7. **Database migration** - Drop task_templates table
-8. **Test end-to-end**
+```typescript
+interface ToolCardProps {
+  tool: ToolConfig;
+  size?: 'default' | 'compact';
+}
 
-## Schema Mapping
+export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
+  const navigate = useNavigate();
+  const IconComponent = icons[tool.icon];
+  
+  return (
+    <button
+      onClick={() => {
+        haptic.light();
+        navigate(tool.route);
+      }}
+      className={cn(
+        'relative rounded-2xl p-4 flex flex-col items-center justify-center gap-2',
+        'bg-gradient-to-br shadow-md',
+        'transition-all active:scale-[0.98]',
+        tool.gradient,
+        size === 'default' ? 'aspect-square' : 'aspect-[4/3]'
+      )}
+    >
+      {/* Icon/Emoji */}
+      {tool.emoji ? (
+        <span className="text-4xl">{tool.emoji}</span>
+      ) : (
+        <IconComponent className="h-10 w-10 text-foreground/80" />
+      )}
+      
+      {/* Title */}
+      <h3 className="font-semibold text-foreground text-sm">{tool.name}</h3>
+      
+      {/* Subtitle */}
+      <p className="text-xs text-muted-foreground text-center">
+        {tool.description}
+      </p>
+    </button>
+  );
+}
+```
 
-| task_templates | admin_task_bank | Notes |
-|----------------|-----------------|-------|
-| id | id | Same |
-| title | title | Same |
-| emoji | emoji | Same |
-| color | color | Same |
-| category | category | Same |
-| description | description | Same |
-| suggested_time | - | Not in bank, can add or skip |
-| repeat_pattern | repeat_pattern | Same |
-| display_order | sort_order | Different name |
-| is_active | is_active | Same |
-| is_popular | is_popular | Same |
-| - | duration_minutes | New field (useful!) |
-| - | pro_link_type | New field |
-| - | goal_enabled | New field |
+### Files to Modify
 
-The `admin_task_bank` has MORE fields, so this is an upgrade.
+**3. `src/pages/app/AppStore.tsx`**
+Major redesign to incorporate all sections:
+
+- Import new components and config
+- Add Wellness Tools section (2x2 grid)
+- Add Audio Experiences section (3-column row)
+- Keep existing Programs section at the bottom
+- Update search to filter tools by name as well
+
+**4. `src/pages/app/AppPlayer.tsx`**
+Minor update to support URL query param for initial category:
+
+- Read `category` from search params on mount
+- Set initial `selectedCategory` based on query param
+
+---
+
+## Search Behavior
+
+When user searches:
+1. First, filter tools by name match
+2. Then, filter programs by title/description match
+3. Show "Tools" section if any tools match
+4. Show "Programs" section if any programs match
+
+---
+
+## Design Tokens
+
+Consistent with existing app patterns:
+- Section headers: `text-xs font-semibold text-muted-foreground uppercase tracking-wider`
+- Card shadows: `shadow-md` for tools, existing styles for programs
+- Active states: `active:scale-[0.98]`
+- Border radius: `rounded-2xl` (20px)
+- Haptic feedback: `haptic.light()` on tap
+
+---
+
+## Files Summary
+
+| File | Action | Description |
+|------|--------|-------------|
+| `src/lib/toolsConfig.ts` | Create | Centralized tools configuration |
+| `src/components/app/ToolCard.tsx` | Create | Reusable tool card component |
+| `src/pages/app/AppStore.tsx` | Modify | Add tools sections, reorganize layout |
+| `src/pages/app/AppPlayer.tsx` | Modify | Support category query param |
+
+---
+
+## Future Extensibility
+
+This config-based approach enables:
+- Easy addition of new tools by adding to config
+- Toggle visibility without code changes
+- A/B testing different tool orders
+- Per-user tool recommendations (future)
+- Progressive disclosure of coming soon features
 
