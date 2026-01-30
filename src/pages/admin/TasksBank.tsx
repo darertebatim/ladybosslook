@@ -254,6 +254,10 @@ export default function TasksBank() {
     setEditSubtasks(subtasks);
     setEditCategory(task.category);
     
+    // Find category name from slug to use as tag if no tag is set
+    const categoryInfo = routineCategories.find(c => c.slug === task.category);
+    const tagValue = task.tag || categoryInfo?.name || null;
+    
     setSheetInitialData({
       title: task.title,
       icon: task.emoji,
@@ -269,7 +273,7 @@ export default function TasksBank() {
       reminderEnabled: task.reminder_enabled,
       reminderTime: '09:00',
       isUrgent: false,
-      tag: task.tag,
+      tag: tagValue,
       subtasks,
       linkedPlaylistId: task.linked_playlist_id,
       proLinkType: task.pro_link_type as any,
