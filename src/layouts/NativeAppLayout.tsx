@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Newspaper, MessageCircle, ShoppingBag, Music, GraduationCap } from 'lucide-react';
+import { Home, MessageCircle, ShoppingBag, Music, GraduationCap, Radio, Headset } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
@@ -120,11 +120,11 @@ const NativeAppLayout = () => {
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
-    { path: '/app/channels', icon: Newspaper, label: 'Channels', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
     { path: '/app/programs', icon: GraduationCap, label: 'Programs', tourClass: 'tour-nav-programs' },
     { path: '/app/browse', icon: ShoppingBag, label: 'Browse', tourClass: 'tour-nav-browse' },
     { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
-    { path: '/app/chat', icon: MessageCircle, label: 'Chat', tourClass: 'tour-nav-chat' },
+    { path: '/app/channels', icon: Radio, label: 'Channels', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
+    { path: '/app/chat', icon: Headset, label: 'Support', tourClass: 'tour-nav-chat' },
   ];
 
   // Tab bar actual height: grid content (~48px for compact) + safe area inset
