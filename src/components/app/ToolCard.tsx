@@ -109,7 +109,7 @@ export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
         <h3 className="font-semibold text-foreground text-[13px] leading-tight">
           {tool.name}
         </h3>
-        <p className="text-[11px] text-muted-foreground leading-tight">
+        <p className="text-[11px] text-foreground/80 leading-tight truncate">
           {tool.description}
         </p>
         {tool.comingSoon && (
