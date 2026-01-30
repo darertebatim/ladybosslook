@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Newspaper, MessageCircle, ShoppingBag, Music, GraduationCap, Sparkles } from 'lucide-react';
+import { Home, Newspaper, MessageCircle, ShoppingBag, Music, GraduationCap } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
@@ -123,7 +123,6 @@ const NativeAppLayout = () => {
     { path: '/app/channels', icon: Newspaper, label: 'Channels', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
     { path: '/app/programs', icon: GraduationCap, label: 'Programs', tourClass: 'tour-nav-programs' },
     { path: '/app/browse', icon: ShoppingBag, label: 'Browse', tourClass: 'tour-nav-browse' },
-    { path: '/app/routines', icon: Sparkles, label: 'Routines', tourClass: 'tour-nav-routines' },
     { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
     { path: '/app/chat', icon: MessageCircle, label: 'Chat', tourClass: 'tour-nav-chat' },
   ];
@@ -153,7 +152,7 @@ const NativeAppLayout = () => {
       {/* Bottom Navigation - hidden on chat page for full-screen experience */}
       {!isOnChatPage && (
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg pb-safe">
-        <div className="grid grid-cols-7 pt-1.5 pb-1.5">
+        <div className="grid grid-cols-6 pt-1.5 pb-1.5">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || 
               (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
