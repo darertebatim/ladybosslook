@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
-import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Wind, Droplets } from 'lucide-react';
+import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Wind, Droplets, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
@@ -30,6 +30,7 @@ import { GoalInputSheet } from '@/components/app/GoalInputSheet';
 import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
 import { WaterTrackingScreen } from '@/components/app/WaterTrackingScreen';
 import { isWaterTask } from '@/lib/waterTracking';
+import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { toast } from 'sonner';
 const AppHome = () => {
   const navigate = useNavigate();
@@ -515,6 +516,13 @@ const AppHome = () => {
                     {programEvents.map(event => <ProgramEventCard key={`${event.type}-${event.id}`} event={event} date={selectedDate} />)}
                   </div>
                 </div>}
+
+              {/* Period Status Card - shows cycle info when onboarding is complete */}
+              {selectedTag === null && homeData?.periodSettings?.onboarding_done && homeData?.periodSettings?.show_on_home && (
+                <div className="mb-4">
+                  <PeriodStatusCard />
+                </div>
+              )}
 
               {/* Personal Tasks Section */}
               {filteredTasks.length === 0 && (selectedTag !== null || programEvents.length === 0) ? <div className="text-center py-12">
