@@ -18,6 +18,7 @@ interface NewHomeData {
   completedRounds: any[];
   nextSessionMap: Map<string, string>;
   suggestedRoutine: any | null;
+  periodSettings: any | null;
 }
 
 async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
@@ -35,6 +36,7 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     completionsRes,
     enrollmentsRes,
     routineRes,
+    periodSettingsRes,
   ] = await Promise.all([
     supabase
       .from('profiles')
@@ -88,6 +90,12 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
       .eq('is_active', true)
       .eq('is_pro_routine', true)
       .limit(10),
+    // Period settings
+    supabase
+      .from('period_settings')
+      .select('*')
+      .eq('user_id', userId)
+      .single(),
   ]);
 
   // Calculate listening stats
@@ -214,6 +222,7 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     completedRounds,
     nextSessionMap,
     suggestedRoutine,
+    periodSettings: periodSettingsRes.data,
   };
 }
 
@@ -241,5 +250,6 @@ export function useNewHomeData() {
     completedRounds: query.data?.completedRounds || [],
     nextSessionMap: query.data?.nextSessionMap || new Map<string, string>(),
     suggestedRoutine: query.data?.suggestedRoutine || null,
+    periodSettings: query.data?.periodSettings || null,
   };
 }
