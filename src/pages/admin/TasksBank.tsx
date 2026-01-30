@@ -3,20 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Plus, Trash2, Sparkles, Star, ChevronRight, Bell, Target, Music } from 'lucide-react';
+import { Plus, Sparkles, Star, ChevronRight, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { TaskIcon } from '@/components/app/IconPicker';
-import { ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
-import { GoalSettingsSheet, GoalSettings, formatGoalTarget } from '@/components/app/GoalSettingsSheet';
+import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 
 // Color options matching the app
 const COLOR_OPTIONS = [
@@ -28,18 +20,6 @@ const COLOR_OPTIONS = [
   { name: 'mint', hex: '#B8F5E4' },
   { name: 'lavender', hex: '#E8D4F8' },
 ];
-
-// Repeat pattern options
-const REPEAT_OPTIONS = [
-  { value: 'none', label: 'No Repeat' },
-  { value: 'daily', label: 'Daily' },
-  { value: 'weekly', label: 'Weekly' },
-  { value: 'monthly', label: 'Monthly' },
-  { value: 'weekend', label: 'Weekends' },
-];
-
-// Duration presets
-const DURATION_PRESETS = [1, 2, 5, 10, 15, 20, 30, 45, 60];
 
 interface RoutineCategory {
   slug: string;
@@ -72,37 +52,10 @@ interface TaskBankItem {
   sort_order: number;
 }
 
-const defaultTask = {
-  title: '',
-  description: null as string | null,
-  emoji: '☀️',
-  color: 'yellow',
-  category: 'general',
-  duration_minutes: 5,
-  repeat_pattern: 'none',
-  repeat_days: [] as number[],
-  reminder_enabled: false,
-  goal_enabled: false,
-  goal_type: null as string | null,
-  goal_target: null as number | null,
-  goal_unit: null as string | null,
-  pro_link_type: null as string | null,
-  pro_link_value: null as string | null,
-  linked_playlist_id: null as string | null,
-  is_popular: false,
-  is_active: true,
-  tag: null as string | null,
-};
-
 export default function TasksBank() {
   const queryClient = useQueryClient();
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskBankItem | null>(null);
-  const [formData, setFormData] = useState(defaultTask);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [showGoalSettings, setShowGoalSettings] = useState(false);
-  const [newSubtask, setNewSubtask] = useState('');
-  const [subtasks, setSubtasks] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   // Fetch routine categories from database
@@ -135,65 +88,49 @@ export default function TasksBank() {
   });
 
   // Fetch subtasks for a task
-  const fetchSubtasks = async (taskId: string) => {
+  const fetchSubtasks = async (taskId: string): Promise<string[]> => {
     const { data } = await supabase
       .from('admin_task_bank_subtasks')
-      .select('*')
+      .select('title')
       .eq('task_id', taskId)
       .order('order_index', { ascending: true });
-    return data || [];
+    return (data || []).map(s => s.title);
   };
-
-  // Fetch playlists for Pro Link
-  const { data: playlists = [] } = useQuery({
-    queryKey: ['admin-playlists-for-tasks'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('audio_playlists')
-        .select('id, name, cover_image_url')
-        .eq('is_hidden', false)
-        .order('name', { ascending: true });
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // Fetch breathing exercises for Pro Link
-  const { data: breathingExercises = [] } = useQuery({
-    queryKey: ['admin-breathing-for-tasks'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('breathing_exercises')
-        .select('id, name, emoji')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
-      
-      if (error) throw error;
-      return data;
-    },
-  });
 
   // Create task mutation
   const createTask = useMutation({
-    mutationFn: async (data: typeof defaultTask & { subtasks: string[] }) => {
-      const { subtasks: subtaskList, ...taskData } = data;
-      
-      const finalData = {
-        ...taskData,
-        linked_playlist_id: taskData.pro_link_type === 'playlist' ? taskData.pro_link_value : taskData.linked_playlist_id,
+    mutationFn: async (data: { formData: TaskFormData; subtasks: string[]; category: string }) => {
+      const taskData = {
+        title: data.formData.title,
+        emoji: data.formData.icon,
+        color: data.formData.color,
+        category: data.category,
+        repeat_pattern: data.formData.repeatEnabled ? data.formData.repeatPattern : 'none',
+        repeat_days: data.formData.repeatDays,
+        reminder_enabled: data.formData.reminderEnabled,
+        goal_enabled: data.formData.goalEnabled,
+        goal_type: data.formData.goalEnabled ? data.formData.goalType : null,
+        goal_target: data.formData.goalEnabled ? data.formData.goalTarget : null,
+        goal_unit: data.formData.goalEnabled ? data.formData.goalUnit : null,
+        pro_link_type: data.formData.proLinkType,
+        pro_link_value: data.formData.proLinkValue,
+        linked_playlist_id: data.formData.proLinkType === 'playlist' ? data.formData.proLinkValue : data.formData.linkedPlaylistId,
+        tag: data.formData.tag,
+        is_active: true,
+        is_popular: false,
       };
-      
+
       const { data: newTask, error } = await supabase
         .from('admin_task_bank')
-        .insert([finalData])
+        .insert(taskData)
         .select()
         .single();
-      
+
       if (error) throw error;
 
-      if (subtaskList.length > 0) {
-        const subtaskRecords = subtaskList.map((title, index) => ({
+      // Insert subtasks
+      if (data.subtasks.length > 0) {
+        const subtaskRecords = data.subtasks.map((title, index) => ({
           task_id: newTask.id,
           title,
           order_index: index,
@@ -206,7 +143,7 @@ export default function TasksBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
       toast.success('Task created');
-      closeDialog();
+      closeSheet();
     },
     onError: (error) => {
       toast.error('Failed to create task: ' + error.message);
@@ -215,25 +152,37 @@ export default function TasksBank() {
 
   // Update task mutation
   const updateTask = useMutation({
-    mutationFn: async (data: TaskBankItem & { subtasks: string[] }) => {
-      const { subtasks: subtaskList, id, sort_order, ...taskData } = data;
-      
-      const finalData = {
-        ...taskData,
-        linked_playlist_id: taskData.pro_link_type === 'playlist' ? taskData.pro_link_value : taskData.linked_playlist_id,
+    mutationFn: async (data: { id: string; formData: TaskFormData; subtasks: string[]; category: string }) => {
+      const taskData = {
+        title: data.formData.title,
+        emoji: data.formData.icon,
+        color: data.formData.color,
+        category: data.category,
+        repeat_pattern: data.formData.repeatEnabled ? data.formData.repeatPattern : 'none',
+        repeat_days: data.formData.repeatDays,
+        reminder_enabled: data.formData.reminderEnabled,
+        goal_enabled: data.formData.goalEnabled,
+        goal_type: data.formData.goalEnabled ? data.formData.goalType : null,
+        goal_target: data.formData.goalEnabled ? data.formData.goalTarget : null,
+        goal_unit: data.formData.goalEnabled ? data.formData.goalUnit : null,
+        pro_link_type: data.formData.proLinkType,
+        pro_link_value: data.formData.proLinkValue,
+        linked_playlist_id: data.formData.proLinkType === 'playlist' ? data.formData.proLinkValue : data.formData.linkedPlaylistId,
+        tag: data.formData.tag,
       };
-      
+
       const { error } = await supabase
         .from('admin_task_bank')
-        .update(finalData)
-        .eq('id', id);
-      
+        .update(taskData)
+        .eq('id', data.id);
+
       if (error) throw error;
 
-      await supabase.from('admin_task_bank_subtasks').delete().eq('task_id', id);
-      if (subtaskList.length > 0) {
-        const subtaskRecords = subtaskList.map((title, index) => ({
-          task_id: id,
+      // Replace subtasks
+      await supabase.from('admin_task_bank_subtasks').delete().eq('task_id', data.id);
+      if (data.subtasks.length > 0) {
+        const subtaskRecords = data.subtasks.map((title, index) => ({
+          task_id: data.id,
           title,
           order_index: index,
         }));
@@ -243,7 +192,7 @@ export default function TasksBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
       toast.success('Task updated');
-      closeDialog();
+      closeSheet();
     },
     onError: (error) => {
       toast.error('Failed to update task: ' + error.message);
@@ -251,7 +200,7 @@ export default function TasksBank() {
   });
 
   // Delete task mutation
-  const deleteTask = useMutation({
+  const deleteTaskMutation = useMutation({
     mutationFn: async (id: string) => {
       await supabase.from('admin_task_bank_subtasks').delete().eq('task_id', id);
       const { error } = await supabase.from('admin_task_bank').delete().eq('id', id);
@@ -263,90 +212,105 @@ export default function TasksBank() {
     },
   });
 
-  const openNewDialog = () => {
+  // State for sheet initialData
+  const [sheetInitialData, setSheetInitialData] = useState<Partial<TaskFormData> | undefined>(undefined);
+  const [editSubtasks, setEditSubtasks] = useState<string[]>([]);
+  const [editCategory, setEditCategory] = useState<string>('general');
+
+  const openNewSheet = () => {
     setEditingTask(null);
-    setFormData(defaultTask);
-    setSubtasks([]);
-    setDialogOpen(true);
+    setSheetInitialData({
+      title: '',
+      icon: '☀️',
+      color: 'yellow',
+      scheduledDate: new Date(),
+      scheduledTime: null,
+      repeatEnabled: false,
+      repeatPattern: 'daily',
+      repeatInterval: 1,
+      repeatDays: [],
+      reminderEnabled: false,
+      reminderTime: '09:00',
+      isUrgent: false,
+      tag: null,
+      subtasks: [],
+      linkedPlaylistId: null,
+      proLinkType: null,
+      proLinkValue: null,
+      goalEnabled: false,
+      goalType: 'count',
+      goalTarget: 2,
+      goalUnit: 'times',
+    });
+    setEditSubtasks([]);
+    setEditCategory('general');
+    setSheetOpen(true);
   };
 
-  const openEditDialog = async (task: TaskBankItem) => {
+  const openEditSheet = async (task: TaskBankItem) => {
     setEditingTask(task);
-    setFormData({
+    
+    const subtasks = await fetchSubtasks(task.id);
+    setEditSubtasks(subtasks);
+    setEditCategory(task.category);
+    
+    setSheetInitialData({
       title: task.title,
-      description: task.description,
-      emoji: task.emoji,
-      color: task.color,
-      category: task.category,
-      duration_minutes: task.duration_minutes,
-      repeat_pattern: task.repeat_pattern,
-      repeat_days: task.repeat_days || [],
-      reminder_enabled: task.reminder_enabled,
-      goal_enabled: task.goal_enabled,
-      goal_type: task.goal_type,
-      goal_target: task.goal_target,
-      goal_unit: task.goal_unit,
-      pro_link_type: task.pro_link_type,
-      pro_link_value: task.pro_link_value,
-      linked_playlist_id: task.linked_playlist_id,
-      is_popular: task.is_popular,
-      is_active: task.is_active,
+      icon: task.emoji,
+      color: task.color as any,
+      scheduledDate: new Date(),
+      scheduledTime: null,
+      repeatEnabled: task.repeat_pattern !== 'none',
+      repeatPattern: ['daily', 'weekly', 'monthly'].includes(task.repeat_pattern) 
+        ? task.repeat_pattern as 'daily' | 'weekly' | 'monthly' 
+        : 'daily',
+      repeatInterval: 1,
+      repeatDays: task.repeat_days || [],
+      reminderEnabled: task.reminder_enabled,
+      reminderTime: '09:00',
+      isUrgent: false,
       tag: task.tag,
+      subtasks,
+      linkedPlaylistId: task.linked_playlist_id,
+      proLinkType: task.pro_link_type as any,
+      proLinkValue: task.pro_link_value,
+      goalEnabled: task.goal_enabled,
+      goalType: (task.goal_type as 'timer' | 'count') || 'count',
+      goalTarget: task.goal_target || 2,
+      goalUnit: task.goal_unit || 'times',
     });
     
-    const existingSubtasks = await fetchSubtasks(task.id);
-    setSubtasks(existingSubtasks.map(s => s.title));
-    
-    setDialogOpen(true);
+    setSheetOpen(true);
   };
 
-  const closeDialog = () => {
-    setDialogOpen(false);
+  const closeSheet = () => {
+    setSheetOpen(false);
     setEditingTask(null);
-    setFormData(defaultTask);
-    setSubtasks([]);
-    setNewSubtask('');
+    setSheetInitialData(undefined);
+    setEditSubtasks([]);
   };
 
-  const handleSubmit = () => {
-    if (!formData.title.trim()) {
-      toast.error('Title is required');
-      return;
-    }
-
+  const handleSaveSheet = (formData: TaskFormData) => {
     if (editingTask) {
-      updateTask.mutate({ ...editingTask, ...formData, subtasks } as TaskBankItem & { subtasks: string[] });
+      updateTask.mutate({
+        id: editingTask.id,
+        formData,
+        subtasks: formData.subtasks,
+        category: editCategory,
+      });
     } else {
-      createTask.mutate({ ...formData, subtasks });
+      createTask.mutate({
+        formData,
+        subtasks: formData.subtasks,
+        category: editCategory,
+      });
     }
   };
 
-  const addSubtask = () => {
-    if (newSubtask.trim()) {
-      setSubtasks([...subtasks, newSubtask.trim()]);
-      setNewSubtask('');
+  const handleDeleteTask = (id: string) => {
+    if (confirm('Delete this task template?')) {
+      deleteTaskMutation.mutate(id);
     }
-  };
-
-  const removeSubtask = (index: number) => {
-    setSubtasks(subtasks.filter((_, i) => i !== index));
-  };
-
-  const goalSettings: GoalSettings = {
-    enabled: formData.goal_enabled,
-    type: (formData.goal_type as 'timer' | 'count') || 'count',
-    target: formData.goal_target || 2,
-    unit: formData.goal_unit || 'times',
-  };
-
-  const handleGoalChange = (settings: GoalSettings) => {
-    setFormData({
-      ...formData,
-      goal_enabled: settings.enabled,
-      goal_type: settings.enabled ? settings.type : null,
-      goal_target: settings.enabled ? settings.target : null,
-      goal_unit: settings.enabled ? settings.unit : null,
-    });
   };
 
   const getCategoryInfo = (cat: string) => {
@@ -372,7 +336,7 @@ export default function TasksBank() {
             Reusable task templates for routine planning
           </CardDescription>
         </div>
-        <Button onClick={openNewDialog} className="gap-2">
+        <Button onClick={openNewSheet} className="gap-2">
           <Plus className="h-4 w-4" />
           Add Task
         </Button>
@@ -416,11 +380,11 @@ export default function TasksBank() {
                 <div
                   key={task.id}
                   className={cn(
-                    'flex items-center gap-3 p-3 rounded-xl border cursor-pointer hover:shadow-sm transition-shadow',
+                    'flex items-center gap-3 p-3 rounded-xl border cursor-pointer hover:shadow-sm transition-shadow group',
                     !task.is_active && 'opacity-50'
                   )}
                   style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === task.color)?.hex + '40' }}
-                  onClick={() => openEditDialog(task)}
+                  onClick={() => openEditSheet(task)}
                 >
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === task.color)?.hex }}>
                     <TaskIcon iconName={task.emoji} size={20} />
@@ -436,6 +400,15 @@ export default function TasksBank() {
                       {task.pro_link_type && <span>• Pro</span>}
                     </div>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteTask(task.id);
+                    }}
+                    className="p-2 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                   <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                 </div>
               );
@@ -444,337 +417,13 @@ export default function TasksBank() {
         )}
       </CardContent>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle>{editingTask ? 'Edit Task' : 'New Task'}</DialogTitle>
-          </DialogHeader>
-
-          <ScrollArea className="flex-1 -mx-6 px-6">
-            <div className="space-y-4 pb-4">
-              {/* Icon + Title */}
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowEmojiPicker(true)}
-                  className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 border-2 border-dashed border-muted-foreground/30 hover:border-muted-foreground/50 transition-colors"
-                  style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === formData.color)?.hex }}
-                >
-                  <TaskIcon iconName={formData.emoji} size={28} />
-                </button>
-                <Input
-                  placeholder="Task title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="flex-1 text-lg font-medium"
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Description (optional)</label>
-                <Textarea
-                  placeholder="Describe the task..."
-                  value={formData.description || ''}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value || null })}
-                  rows={2}
-                  className="mt-1"
-                />
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Category</label>
-                <Select
-                  value={formData.category}
-                  onValueChange={(v) => setFormData({ ...formData, category: v })}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {routineCategories.map((cat) => (
-                      <SelectItem key={cat.slug} value={cat.slug}>
-                        <span className="flex items-center gap-2">
-                          <TaskIcon iconName={cat.icon || '📋'} size={14} />
-                          {cat.name}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Color */}
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Color</label>
-                <div className="flex gap-2 mt-1">
-                  {COLOR_OPTIONS.map((color) => (
-                    <button
-                      key={color.name}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, color: color.name })}
-                      className={cn(
-                        'w-9 h-9 rounded-full transition-all',
-                        formData.color === color.name 
-                          ? 'ring-2 ring-offset-2 ring-foreground scale-110' 
-                          : 'hover:scale-105'
-                      )}
-                      style={{ backgroundColor: color.hex }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Duration */}
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Duration (minutes)</label>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {DURATION_PRESETS.map((d) => (
-                    <button
-                      key={d}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, duration_minutes: d })}
-                      className={cn(
-                        'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
-                        formData.duration_minutes === d
-                          ? 'bg-foreground text-background border-foreground'
-                          : 'bg-background border-border hover:bg-muted'
-                      )}
-                    >
-                      {d}m
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pro Link */}
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Pro Link (optional)</label>
-                <Select
-                  value={formData.pro_link_type || 'none'}
-                  onValueChange={(v) => {
-                    const linkType = v === 'none' ? null : v;
-                    setFormData({ 
-                      ...formData, 
-                      pro_link_type: linkType,
-                      pro_link_value: null,
-                      linked_playlist_id: null,
-                    });
-                  }}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="No link" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">No link</SelectItem>
-                    {(Object.keys(PRO_LINK_CONFIGS) as ProLinkType[]).map((type) => {
-                      const config = PRO_LINK_CONFIGS[type];
-                      const Icon = config.icon;
-                      return (
-                        <SelectItem key={type} value={type}>
-                          <span className="flex items-center gap-2">
-                            <Icon className="h-4 w-4" />
-                            {config.label}
-                          </span>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-
-                {formData.pro_link_type === 'playlist' && (
-                  <Select
-                    value={formData.pro_link_value || ''}
-                    onValueChange={(v) => setFormData({ 
-                      ...formData, 
-                      pro_link_value: v,
-                      linked_playlist_id: v,
-                    })}
-                  >
-                    <SelectTrigger className="mt-2">
-                      <SelectValue placeholder="Select playlist" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {playlists.map((p) => (
-                        <SelectItem key={p.id} value={p.id}>
-                          <span className="flex items-center gap-2">
-                            <Music className="h-4 w-4" />
-                            {p.name}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-
-                {formData.pro_link_type === 'breathe' && (
-                  <Select
-                    value={formData.pro_link_value || ''}
-                    onValueChange={(v) => setFormData({ ...formData, pro_link_value: v })}
-                  >
-                    <SelectTrigger className="mt-2">
-                      <SelectValue placeholder="Select exercise" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {breathingExercises.map((e) => (
-                        <SelectItem key={e.id} value={e.id}>
-                          <span className="flex items-center gap-2">
-                            {e.emoji || '🫁'} {e.name}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-
-              {/* Goal */}
-              <div 
-                onClick={() => setShowGoalSettings(true)}
-                className={cn(
-                  'flex items-center justify-between p-3 rounded-xl border cursor-pointer hover:bg-muted/50',
-                  formData.goal_enabled && 'bg-emerald-50 border-emerald-200'
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <Target className={cn("h-5 w-5", formData.goal_enabled ? "text-emerald-600" : "text-muted-foreground")} />
-                  <span className="font-medium">Goal</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span>{formData.goal_enabled ? formatGoalTarget(goalSettings) : 'Off'}</span>
-                  <ChevronRight className="h-4 w-4" />
-                </div>
-              </div>
-
-              {/* Default Repeat */}
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Default Repeat</label>
-                <Select
-                  value={formData.repeat_pattern}
-                  onValueChange={(v) => setFormData({ ...formData, repeat_pattern: v })}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {REPEAT_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Subtasks */}
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Subtasks</label>
-                <div className="mt-1 space-y-1">
-                  {subtasks.map((sub, index) => (
-                    <div key={index} className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2">
-                      <span className="flex-1">{sub}</span>
-                      <button 
-                        type="button"
-                        onClick={() => removeSubtask(index)}
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Add subtask..."
-                      value={newSubtask}
-                      onChange={(e) => setNewSubtask(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSubtask())}
-                      className="flex-1"
-                    />
-                    <Button type="button" variant="outline" size="icon" onClick={addSubtask}>
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Toggles */}
-              <div className="space-y-3 pt-2 border-t">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-amber-500" />
-                    <span>Popular / Featured</span>
-                  </div>
-                  <Switch
-                    checked={formData.is_popular}
-                    onCheckedChange={(v) => setFormData({ ...formData, is_popular: v })}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Bell className="h-4 w-4 text-muted-foreground" />
-                    <span>Reminder by default</span>
-                  </div>
-                  <Switch
-                    checked={formData.reminder_enabled}
-                    onCheckedChange={(v) => setFormData({ ...formData, reminder_enabled: v })}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span>Active</span>
-                  <Switch
-                    checked={formData.is_active}
-                    onCheckedChange={(v) => setFormData({ ...formData, is_active: v })}
-                  />
-                </div>
-              </div>
-            </div>
-          </ScrollArea>
-
-          {/* Footer */}
-          <div className="flex items-center justify-between pt-4 border-t">
-            {editingTask && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  if (confirm('Delete this task?')) {
-                    deleteTask.mutate(editingTask.id);
-                    closeDialog();
-                  }
-                }}
-                className="text-destructive hover:text-destructive"
-              >
-                <Trash2 className="h-4 w-4 mr-1" />
-                Delete
-              </Button>
-            )}
-            <div className="flex gap-2 ml-auto">
-              <Button variant="outline" onClick={closeDialog}>
-                Cancel
-              </Button>
-              <Button onClick={handleSubmit}>
-                {editingTask ? 'Save' : 'Create'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <EmojiPicker
-        open={showEmojiPicker}
-        onOpenChange={setShowEmojiPicker}
-        selectedEmoji={formData.emoji}
-        onSelect={(emoji) => setFormData({ ...formData, emoji })}
-      />
-
-      <GoalSettingsSheet
-        open={showGoalSettings}
-        onOpenChange={setShowGoalSettings}
-        value={goalSettings}
-        onChange={handleGoalChange}
+      {/* Use AppTaskCreate in sheet mode */}
+      <AppTaskCreate
+        isSheet={true}
+        sheetOpen={sheetOpen}
+        onSheetOpenChange={setSheetOpen}
+        initialData={sheetInitialData}
+        onSaveSheet={handleSaveSheet}
       />
     </Card>
   );
