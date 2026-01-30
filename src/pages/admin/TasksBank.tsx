@@ -27,18 +27,12 @@ const COLOR_OPTIONS = [
   { name: 'lavender', hex: '#E8D4F8' },
 ];
 
-// Category options (matching the app's TemplateCategory + extras)
-const CATEGORY_OPTIONS = [
-  { value: 'morning', label: 'Morning', emoji: '🌅' },
-  { value: 'evening', label: 'Evening', emoji: '🌙' },
-  { value: 'selfcare', label: 'Self Care', emoji: '💆' },
-  { value: 'business', label: 'Business', emoji: '💼' },
-  { value: 'wellness', label: 'Wellness', emoji: '🧘' },
-  { value: 'fitness', label: 'Fitness', emoji: '💪' },
-  { value: 'mindfulness', label: 'Mindfulness', emoji: '🧠' },
-  { value: 'productivity', label: 'Productivity', emoji: '📊' },
-  { value: 'general', label: 'General', emoji: '📋' },
-];
+interface RoutineCategory {
+  slug: string;
+  name: string;
+  icon: string | null;
+  is_active: boolean;
+}
 
 // Repeat pattern options
 const REPEAT_OPTIONS = [
@@ -140,6 +134,21 @@ export default function TasksBank() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [newSubtask, setNewSubtask] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+  // Fetch routine categories from database
+  const { data: routineCategories = [] } = useQuery({
+    queryKey: ['routine-categories-for-tasks-bank'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routine_categories')
+        .select('slug, name, icon, is_active')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      
+      if (error) throw error;
+      return data as RoutineCategory[];
+    },
+  });
 
   // Fetch task bank items
   const { data: tasks = [], isLoading } = useQuery({
@@ -436,7 +445,8 @@ export default function TasksBank() {
   };
 
   const getCategoryInfo = (cat: string) => {
-    return CATEGORY_OPTIONS.find(c => c.value === cat) || { value: cat, label: cat, emoji: '📋' };
+    const found = routineCategories.find(c => c.slug === cat);
+    return found ? { value: found.slug, label: found.name, emoji: found.icon || '📋' } : { value: cat, label: cat, emoji: '📋' };
   };
 
   return (
@@ -459,17 +469,17 @@ export default function TasksBank() {
             <Sparkles className="h-3 w-3" />
             All
           </TabsTrigger>
-          {CATEGORY_OPTIONS.map((cat) => (
+          {routineCategories.map((cat) => (
             <TabsTrigger 
-              key={cat.value} 
-              value={cat.value}
+              key={cat.slug} 
+              value={cat.slug}
               className="flex items-center gap-1"
             >
-              <span>{cat.emoji}</span>
-              {cat.label}
-              {usedCategories.includes(cat.value) && (
+              <span>{cat.icon || '📋'}</span>
+              {cat.name}
+              {usedCategories.includes(cat.slug) && (
                 <span className="text-xs text-muted-foreground">
-                  ({tasks.filter(t => t.category === cat.value).length})
+                  ({tasks.filter(t => t.category === cat.slug).length})
                 </span>
               )}
             </TabsTrigger>
@@ -595,9 +605,9 @@ export default function TasksBank() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {CATEGORY_OPTIONS.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {cat.emoji} {cat.label}
+                    {routineCategories.map((cat) => (
+                      <SelectItem key={cat.slug} value={cat.slug}>
+                        {cat.icon || '📋'} {cat.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
