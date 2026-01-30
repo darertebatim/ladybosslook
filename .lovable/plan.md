@@ -1,224 +1,164 @@
 
+# Plan: Fix and Complete the Routine Management System
 
-# Plan: Consolidate All Routine Management into `/admin/tools`
+## Issues Identified
 
-## Current State Analysis
+Based on my analysis, the current RoutineManagement.tsx has several critical gaps:
 
-The routine management is split across two locations with significant redundancy and inconsistencies:
+### 1. Task Editor Missing App Features
+**Current state:** Task editing only has: title, icon, duration, pro_link_type, pro_link_value, is_active
+**Missing from app (`AppTaskCreate.tsx`):**
+- `linked_playlist_id` field (separate from pro_link_value)
+- Description field
+- Color selection
+- Goal settings (goal_enabled, goal_type, goal_target, goal_unit)
 
-### `/admin/routines` (Routines.tsx)
-Uses `RoutineTemplatesManager` which contains:
-- **Categories** tab - RoutineCategoriesManager (uses Lucide icons, hex colors)
-- **Plans** tab - RoutinePlansManager (uses Lucide icons like "Sun", "Moon")  
-- **Pro Templates** tab - ProTaskTemplatesManager (uses Lucide icons)
-- **Task Templates** tab - TaskTemplatesManager (uses emojis, limited picker with 20 options)
-- **Statistics** tab - RoutineStatisticsManager
+However, checking the DB schema for `routine_plan_tasks`, the table only has:
+- id, plan_id, title, duration_minutes, icon, task_order, is_active, linked_playlist_id, pro_link_type, pro_link_value
 
-### `/admin/tools` (Tools.tsx)
-Uses `RoutineManager` which has:
-- **Plans** tab - Unified plan/task management with EmojiPicker
-- **Categories** tab - Basic category management  
+So the current fields are actually correct for this table. The main issues are:
+- **No "Add from Template" button** to quickly add tasks from existing templates
+- **No linked_playlist_id handling** (only pro_link_value is being used)
 
-### Key Problems
-1. **Duplicate functionality** - Two separate routine management systems
-2. **Icon inconsistency** - Old managers use Lucide icon strings ("Sun", "Moon"), app uses emojis
-3. **Limited emoji selection** - TaskTemplatesManager has only 20 hardcoded emojis vs app's full EmojiPicker
-4. **Pro Task confusion** - RoutinePlanDetailManager (1382 lines) duplicates task editing functionality
-5. **Fragmented navigation** - Users must navigate between two admin sections
+### 2. Plan Editor Missing Cover Image Field
+**Current state:** Plan dialog has no cover image input
+**In database:** `cover_image_url` column exists
+**Needed:** Cover image URL input field
+
+### 3. Pro Templates Manager Uses Lucide Icons, Not Emojis
+The `ProTaskTemplatesManager.tsx` still uses:
+```javascript
+const ICON_OPTIONS = ['Sun', 'Moon', 'Heart', 'Brain', 'Dumbbell', ...];
+```
+Should use `EmojiPicker` like the rest of the system.
+
+### 4. Task Templates Manager Has Limited Emoji Picker
+`TaskTemplatesManager.tsx` has only 20 hardcoded emojis:
+```javascript
+const EMOJI_OPTIONS = ['☀️', '🌙', '💪', '📚', ...]; // Only 20 emojis
+```
+Should use full `EmojiPicker`.
+
+### 5. No "Add Task from Template" Feature
+In the plan tasks editor, there's no way to quickly add a task from existing `routine_task_templates` (Pro Templates).
 
 ---
 
-## Proposed Solution
+## Implementation Plan
 
-Consolidate everything into `/admin/tools` with a completely rebuilt routine management system that:
-1. Uses the app's `EmojiPicker` component everywhere
-2. Shares `PRO_LINK_CONFIGS` from `proTaskTypes.ts` for feature parity
-3. Organizes all features under clear tabs
-4. Removes the separate `/admin/routines` route
+### Step 1: Fix Plan Editor - Add Cover Image Field
 
----
+In `PlansManager` dialog, add cover image URL input field after the toggles.
 
-## Implementation Steps
+### Step 2: Fix Task Editor - Add Template Selection
 
-### Step 1: Create New Unified RoutineManagement Component
+Add a button/dropdown to quickly add tasks from `routine_task_templates` to the current plan.
 
-Create `src/components/admin/RoutineManagement.tsx` with these tabs:
+### Step 3: Update ProTaskTemplatesManager - Use EmojiPicker
 
-```text
-+------------------------------------------------------------------+
-|  Routine Management                                               |
-+------------------------------------------------------------------+
-| [Plans] [Categories] [Pro Templates] [Task Templates] [Stats]    |
-+------------------------------------------------------------------+
-```
+Replace the Lucide icon grid with the app's `EmojiPicker` component.
 
-**Plans Tab** - Full plan and task management:
-- List all routine plans with filtering (All/Pro/Regular)
-- Click "Tasks" to manage tasks inline or in modal
-- Create/Edit plan dialog with:
-  - EmojiPicker for icon (not Lucide icons)
-  - Color picker (consistent color names: yellow, pink, blue, etc.)
-  - Category dropdown (from routine_categories)
-  - Pro Routine toggle
-  - Cover image upload/AI generation
-- Task management with:
-  - EmojiPicker for task icons
-  - Duration picker
-  - Pro Link Type selector (from PRO_LINK_CONFIGS)
-  - Value selectors for playlists, breathing exercises, etc.
+### Step 4: Update TaskTemplatesManager - Use Full EmojiPicker
 
-**Categories Tab** - Merged from RoutineCategoriesManager:
-- Use EmojiPicker instead of Lucide icon picker
-- Keep color picker with named colors
-- Display plan/task counts
+Replace the 20-emoji grid with the app's `EmojiPicker` component.
 
-**Pro Templates Tab** - From ProTaskTemplatesManager:
-- Use EmojiPicker instead of Lucide icons
-- Keep AI generation features (All Playlists, Journal Tasks)
-- Dynamic value selectors for playlists/breathing exercises
+### Step 5: Fix linked_playlist_id Handling
 
-**Task Templates Tab** - From TaskTemplatesManager:
-- Replace 20-emoji picker with full EmojiPicker
-- Keep category sync with routine_categories
-- Bulk delete functionality
-
-**Statistics Tab** - Keep RoutineStatisticsManager as-is:
-- Plan adoption counts
-- Rating averages
-- Recent ratings table
-
-### Step 2: Update Tools.tsx
-
-Replace the current simple setup with the new comprehensive management:
-
-```text
-Admin > Tools
-  +-- Routines tab (new RoutineManagement)
-  +-- Breathing tab (existing BreathingExercisesManager)
-```
-
-### Step 3: Remove Old Route
-
-- Remove `/admin/routines` route from App.tsx
-- Delete or deprecate:
-  - `src/pages/admin/Routines.tsx`
-  - `src/components/admin/RoutineTemplatesManager.tsx`
-  - `src/components/admin/RoutinePlansManager.tsx`
-  - `src/components/admin/RoutinePlanDetailManager.tsx`
-
-### Step 4: Update Admin Navigation
-
-Update `AdminNav.tsx` to:
-- Remove "Routines" link
-- Ensure "Tools" link is properly highlighted
+When pro_link_type is 'playlist', properly set both `linked_playlist_id` AND `pro_link_value` for consistency.
 
 ---
 
 ## Technical Details
 
-### Shared Components to Reuse
+### Changes to RoutineManagement.tsx
 
-| Component | From | Purpose |
-|-----------|------|---------|
-| EmojiPicker | `src/components/app/EmojiPicker.tsx` | Full emoji selection |
-| PRO_LINK_CONFIGS | `src/lib/proTaskTypes.ts` | Pro task link types |
-| PRO_LINK_TYPES | `src/lib/proTaskTypes.ts` | Link type array |
-
-### Database Tables Involved
-
-- `routine_categories` - Categories for plans/tasks
-- `routine_plans` - Routine plan templates
-- `routine_plan_tasks` - Tasks within plans
-- `routine_task_templates` - Pro task templates (for quick add)
-- `task_templates` - Basic task templates
-- `audio_playlists` - For playlist linking
-- `breathing_exercises` - For breathe linking
-
-### Key Form Fields
-
-**Plan Form:**
-```text
-- title (string)
-- subtitle (string, optional)
-- description (text, optional)
-- icon (emoji from EmojiPicker)
-- color (select: yellow, pink, blue, purple, green, orange, peach, sky, mint, lavender)
-- category_id (select from routine_categories)
-- estimated_minutes (number)
-- points (number)
-- is_featured (boolean)
-- is_popular (boolean)
-- is_pro_routine (boolean)
-- is_active (boolean)
-- cover_image_url (string, optional)
+**Plan Dialog (lines ~637-781):**
+Add cover image field:
+```tsx
+<div>
+  <Label>Cover Image URL (optional)</Label>
+  <Input
+    value={formData.cover_image_url || ''}
+    onChange={(e) => setFormData(prev => ({ ...prev, cover_image_url: e.target.value || null }))}
+    placeholder="https://..."
+  />
+</div>
 ```
 
-**Task Form:**
-```text
-- title (string)
-- duration_minutes (number)
-- icon (emoji from EmojiPicker)
-- is_active (boolean)
-- pro_link_type (select from PRO_LINK_TYPES or null)
-- pro_link_value (string, depends on pro_link_type)
+**PlanTasksEditor (lines ~816-1148):**
+Add "Add from Template" button that shows a dropdown of available `routine_task_templates`:
+- Fetch templates from `routine_task_templates` table
+- Show dropdown/sheet to select a template
+- Pre-fill task form with template data
+
+Fix playlist linking:
+```tsx
+// When saving task with playlist type:
+if (formData.pro_link_type === 'playlist') {
+  data.linked_playlist_id = formData.pro_link_value;
+}
 ```
 
-### Color Constants (Consistent with App)
+### Changes to ProTaskTemplatesManager.tsx
 
-```typescript
-const COLOR_OPTIONS = [
-  { name: 'Yellow', value: 'yellow' },
-  { name: 'Pink', value: 'pink' },
-  { name: 'Blue', value: 'blue' },
-  { name: 'Purple', value: 'purple' },
-  { name: 'Green', value: 'green' },
-  { name: 'Orange', value: 'orange' },
-  { name: 'Peach', value: 'peach' },
-  { name: 'Sky', value: 'sky' },
-  { name: 'Mint', value: 'mint' },
-  { name: 'Lavender', value: 'lavender' },
-];
+Replace icon selection (lines ~470-500):
+```tsx
+// Before: Grid of Lucide icon names
+const ICON_OPTIONS = ['Sun', 'Moon', ...];
+
+// After: EmojiPicker button
+<Label>Icon (Emoji)</Label>
+<Button variant="outline" onClick={() => setShowEmojiPicker(true)}>
+  {formData.icon}
+</Button>
+<EmojiPicker 
+  open={showEmojiPicker}
+  onOpenChange={setShowEmojiPicker}
+  selectedEmoji={formData.icon}
+  onSelect={(emoji) => setFormData(prev => ({ ...prev, icon: emoji }))}
+/>
+```
+
+Update icon default from 'Sparkles' to '✨'.
+
+### Changes to TaskTemplatesManager.tsx
+
+Replace emoji grid (lines ~469-486):
+```tsx
+// Before: 20-emoji hardcoded grid
+const EMOJI_OPTIONS = [...];
+
+// After: EmojiPicker button
+<Label>Emoji</Label>
+<Button variant="outline" onClick={() => setShowEmojiPicker(true)}>
+  {formData.emoji}
+</Button>
+<EmojiPicker 
+  open={showEmojiPicker}
+  onOpenChange={setShowEmojiPicker}
+  selectedEmoji={formData.emoji}
+  onSelect={(emoji) => setFormData(prev => ({ ...prev, emoji }))}
+/>
 ```
 
 ---
-
-## Files to Create
-
-| File | Description |
-|------|-------------|
-| `src/components/admin/RoutineManagement.tsx` | New unified management component (~800-1000 lines) |
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/pages/admin/Tools.tsx` | Replace RoutineManager with RoutineManagement |
-| `src/App.tsx` | Remove `/admin/routines` route |
-| `src/layouts/AdminLayout.tsx` or `AdminNav.tsx` | Remove Routines nav link |
-
-## Files to Delete (After Migration)
-
-| File | Reason |
-|------|--------|
-| `src/pages/admin/Routines.tsx` | Replaced by Tools > Routines |
-| `src/components/admin/RoutineTemplatesManager.tsx` | Consolidated |
-| `src/components/admin/RoutinePlansManager.tsx` | Consolidated |
-| `src/components/admin/RoutinePlanDetailManager.tsx` | Consolidated |
-| `src/components/admin/RoutineCategoriesManager.tsx` | Consolidated |
-| `src/components/admin/RoutineManager.tsx` | Replaced by RoutineManagement |
-
-Keep existing (used by new component):
-- `src/components/admin/ProTaskTemplatesManager.tsx`
-- `src/components/admin/TaskTemplatesManager.tsx`
-- `src/components/admin/RoutineStatisticsManager.tsx`
+| `src/components/admin/RoutineManagement.tsx` | Add cover image field, add template selector, fix playlist linking |
+| `src/components/admin/ProTaskTemplatesManager.tsx` | Replace Lucide icons with EmojiPicker |
+| `src/components/admin/TaskTemplatesManager.tsx` | Replace 20-emoji grid with EmojiPicker |
 
 ---
 
-## Benefits
+## Summary of Fixes
 
-1. **Single source of truth** - All routine management in one place
-2. **App parity** - Same emoji picker and pro link options as the mobile app
-3. **Cleaner codebase** - Remove ~3000 lines of duplicate code
-4. **Easier maintenance** - Changes to app features automatically available in admin
-5. **Better UX** - No more switching between admin sections
+1. **Plan editor**: Add missing cover image URL field
+2. **Task editor**: Add "Add from Template" feature to quickly populate tasks
+3. **Task editor**: Fix linked_playlist_id to be set when pro_link_type is 'playlist'
+4. **Pro Templates**: Replace Lucide icon picker with EmojiPicker (full emoji support)
+5. **Task Templates**: Replace limited 20-emoji picker with full EmojiPicker
 
+These changes will ensure the admin interface has full feature parity with the app.
