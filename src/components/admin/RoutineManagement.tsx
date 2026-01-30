@@ -125,6 +125,214 @@ const COLOR_OPTIONS = [
   { name: 'Lavender', value: 'lavender' },
 ];
 
+// Legacy icon name to emoji mapping for old data
+const LEGACY_ICON_MAP: Record<string, string> = {
+  'Sun': '☀️',
+  'Moon': '🌙',
+  'Coffee': '☕',
+  'Heart': '❤️',
+  'Star': '⭐',
+  'Music': '🎵',
+  'Book': '📖',
+  'BookOpen': '📖',
+  'Target': '🎯',
+  'Users': '👥',
+  'Award': '🏆',
+  'Sparkles': '✨',
+  'Zap': '⚡',
+  'Flame': '🔥',
+  'Droplet': '💧',
+  'Dumbbell': '💪',
+  'Brain': '🧠',
+  'Smile': '😊',
+  'Crown': '👑',
+  'Leaf': '🍃',
+  'Wind': '🌬️',
+  'Calendar': '📅',
+  'Clock': '🕐',
+  'Check': '✅',
+  'CheckCircle': '✅',
+  'Play': '▶️',
+  'Pause': '⏸️',
+  'Home': '🏠',
+  'Settings': '⚙️',
+  'Bell': '🔔',
+  'Mail': '📧',
+  'MessageCircle': '💬',
+  'Phone': '📱',
+  'Camera': '📷',
+  'Image': '🖼️',
+  'File': '📄',
+  'Folder': '📁',
+  'Search': '🔍',
+  'Plus': '➕',
+  'Minus': '➖',
+  'X': '❌',
+  'AlertCircle': '⚠️',
+  'Info': 'ℹ️',
+  'HelpCircle': '❓',
+  'Gift': '🎁',
+  'ShoppingBag': '🛍️',
+  'DollarSign': '💵',
+  'CreditCard': '💳',
+  'Utensils': '🍴',
+  'Apple': '🍎',
+  'Salad': '🥗',
+  'Activity': '📊',
+  'TrendingUp': '📈',
+  'BarChart': '📊',
+  'Compass': '🧭',
+  'Map': '🗺️',
+  'Navigation': '🧭',
+  'Plane': '✈️',
+  'Car': '🚗',
+  'Bike': '🚴',
+  'Run': '🏃',
+  'Walk': '🚶',
+  'Bed': '🛏️',
+  'Bath': '🛁',
+  'Shower': '🚿',
+  'Glasses': '👓',
+  'Eye': '👁️',
+  'Ear': '👂',
+  'Hand': '✋',
+  'ThumbsUp': '👍',
+  'ThumbsDown': '👎',
+  'Briefcase': '💼',
+  'Building': '🏢',
+  'Headphones': '🎧',
+  'Mic': '🎤',
+  'Video': '📹',
+  'Film': '🎬',
+  'Tv': '📺',
+  'Monitor': '🖥️',
+  'Laptop': '💻',
+  'Keyboard': '⌨️',
+  'Mouse': '🖱️',
+  'Printer': '🖨️',
+  'Wifi': '📶',
+  'Bluetooth': '📶',
+  'Battery': '🔋',
+  'Power': '⚡',
+  'Lightbulb': '💡',
+  'Umbrella': '☂️',
+  'Cloud': '☁️',
+  'CloudRain': '🌧️',
+  'CloudSnow': '❄️',
+  'Thermometer': '🌡️',
+  'Scissors': '✂️',
+  'Pen': '🖊️',
+  'Pencil': '✏️',
+  'Paintbrush': '🖌️',
+  'Palette': '🎨',
+  'Gamepad': '🎮',
+  'Puzzle': '🧩',
+  'Trophy': '🏆',
+  'Medal': '🏅',
+  'Flag': '🚩',
+  'Bookmark': '🔖',
+  'Tag': '🏷️',
+  'Lock': '🔒',
+  'Unlock': '🔓',
+  'Key': '🔑',
+  'Shield': '🛡️',
+  'Hammer': '🔨',
+  'Wrench': '🔧',
+  'Tool': '🔧',
+  'Anchor': '⚓',
+  'Link': '🔗',
+  'Paperclip': '📎',
+  'Trash': '🗑️',
+  'Archive': '📦',
+  'Download': '⬇️',
+  'Upload': '⬆️',
+  'Share': '📤',
+  'Send': '📤',
+  'Inbox': '📥',
+  'Reply': '↩️',
+  'Forward': '↪️',
+  'Undo': '↩️',
+  'Redo': '↪️',
+  'Refresh': '🔄',
+  'Repeat': '🔁',
+  'Shuffle': '🔀',
+  'Volume': '🔊',
+  'VolumeX': '🔇',
+  'Maximize': '⬜',
+  'Minimize': '➖',
+  'MoreHorizontal': '⋯',
+  'MoreVertical': '⋮',
+  'Menu': '☰',
+  'Grid': '⊞',
+  'List': '☰',
+  'Layout': '📐',
+  'Columns': '📊',
+  'Rows': '📊',
+  'Table': '📋',
+  'Type': '🔤',
+  'Bold': '𝐁',
+  'Italic': '𝐼',
+  'Underline': 'U̲',
+  'AlignLeft': '⬅️',
+  'AlignCenter': '⬛',
+  'AlignRight': '➡️',
+  'AlignJustify': '⬛',
+  'Code': '💻',
+  'Terminal': '💻',
+  'Database': '🗄️',
+  'Server': '🖥️',
+  'Cpu': '🔲',
+  'HardDrive': '💾',
+  'Save': '💾',
+  'Copy': '📋',
+  'Paste': '📋',
+  'Cut': '✂️',
+  'Edit': '✏️',
+  'ZoomIn': '🔍',
+  'ZoomOut': '🔍',
+  'RotateCw': '🔄',
+  'RotateCcw': '🔄',
+  'Move': '↔️',
+  'Crop': '✂️',
+  'Filter': '🔍',
+  'Sort': '↕️',
+  'Sliders': '🎚️',
+  'Settings2': '⚙️',
+  'Cog': '⚙️',
+  'Gear': '⚙️',
+  'User': '👤',
+  'UserPlus': '👤',
+  'UserMinus': '👤',
+  'UserCheck': '👤',
+  'UserX': '👤',
+  'Users2': '👥',
+  'Group': '👥',
+  'Team': '👥',
+};
+
+// Helper to display icons - handles both emojis and legacy Lucide icon names
+function DisplayIcon({ icon, className = "text-2xl" }: { icon: string; className?: string }) {
+  // Check if it's an emoji (contains emoji characters) or a Lucide icon name
+  const isEmoji = /[\p{Emoji_Presentation}\p{Extended_Pictographic}]/u.test(icon);
+  
+  if (isEmoji) {
+    return <span className={className}>{icon}</span>;
+  }
+  
+  // Try to map legacy icon name to emoji
+  const mappedEmoji = LEGACY_ICON_MAP[icon];
+  if (mappedEmoji) {
+    return <span className={className}>{mappedEmoji}</span>;
+  }
+  
+  // Fallback: show the icon name in a badge-like style
+  return (
+    <span className="text-xs font-medium bg-muted px-1.5 py-0.5 rounded">
+      {icon}
+    </span>
+  );
+}
+
 // =====================================
 // MAIN COMPONENT
 // =====================================
@@ -387,7 +595,7 @@ function PlansManager() {
                   onClick={() => setExpandedPlanId(expandedPlanId === plan.id ? null : plan.id)}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">{plan.icon}</span>
+                    <DisplayIcon icon={plan.icon} />
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{plan.title}</span>
@@ -490,15 +698,15 @@ function PlansManager() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Category</Label>
-                <Select 
-                  value={formData.category_id || ''} 
-                  onValueChange={(v) => setFormData(prev => ({ ...prev, category_id: v || null }))}
+              <Select 
+                  value={formData.category_id || 'none'} 
+                  onValueChange={(v) => setFormData(prev => ({ ...prev, category_id: v === 'none' ? null : v }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {categories?.map((cat) => (
                       <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                     ))}
@@ -769,7 +977,7 @@ function PlanTasksEditor({ planId }: { planId: string }) {
               <div key={task.id} className="flex items-center justify-between p-2 bg-background rounded border">
                 <div className="flex items-center gap-2">
                   <GripVertical className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-lg">{task.icon}</span>
+                  <DisplayIcon icon={task.icon} className="text-lg" />
                   <span className="text-sm">{task.title}</span>
                   <span className="text-xs text-muted-foreground">{task.duration_minutes}m</span>
                   {linkConfig && (
@@ -830,14 +1038,14 @@ function PlanTasksEditor({ planId }: { planId: string }) {
             <div>
               <Label>Pro Link Type (optional)</Label>
               <Select 
-                value={formData.pro_link_type || ''} 
-                onValueChange={(v) => setFormData(prev => ({ ...prev, pro_link_type: v || null, pro_link_value: null }))}
+                value={formData.pro_link_type || 'none'} 
+                onValueChange={(v) => setFormData(prev => ({ ...prev, pro_link_type: v === 'none' ? null : v, pro_link_value: null }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="None (regular task)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {PRO_LINK_TYPES.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       <div className="flex items-center gap-2">
@@ -1089,7 +1297,7 @@ function CategoriesManager() {
             <TableBody>
               {categories.map((cat) => (
                 <TableRow key={cat.id}>
-                  <TableCell className="text-2xl">{cat.icon}</TableCell>
+                  <TableCell><DisplayIcon icon={cat.icon} /></TableCell>
                   <TableCell className="font-medium">{cat.name}</TableCell>
                   <TableCell className="text-muted-foreground">{cat.slug}</TableCell>
                   <TableCell>
