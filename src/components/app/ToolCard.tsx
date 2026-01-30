@@ -12,26 +12,6 @@ const iconMap: Record<string, LucideIcon> = {
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle
 };
 
-// Icon-specific animations that match the tool's meaning
-const iconAnimations: Record<string, string> = {
-  BookOpen: 'group-hover:animate-[wiggle_0.5s_ease-in-out]',
-  Wind: 'group-hover:animate-[blow_1s_ease-in-out_infinite]',
-  Droplets: 'group-hover:animate-[bounce_0.6s_ease-in-out]',
-  Sparkles: 'group-hover:animate-[pulse_0.8s_ease-in-out_infinite]',
-  Brain: 'group-hover:animate-[pulse_1s_ease-in-out_infinite]',
-  Dumbbell: 'group-hover:animate-[shake_0.4s_ease-in-out]',
-  Waves: 'group-hover:animate-[wave_1.5s_ease-in-out_infinite]',
-  Bot: 'group-hover:animate-[bounce_0.5s_ease-in-out]',
-  Trophy: 'group-hover:animate-[wiggle_0.5s_ease-in-out]',
-  Smile: 'group-hover:animate-[bounce_0.4s_ease-in-out]',
-  Heart: 'group-hover:animate-[heartbeat_0.8s_ease-in-out_infinite]',
-  Timer: 'group-hover:animate-[spin_2s_linear_infinite]',
-  Palette: 'group-hover:animate-[wiggle_0.5s_ease-in-out]',
-  PenLine: 'group-hover:animate-[write_0.6s_ease-in-out]',
-  ClipboardCheck: 'group-hover:animate-[bounce_0.4s_ease-in-out]',
-  Target: 'group-hover:animate-[pulse_0.8s_ease-in-out_infinite]',
-};
-
 interface ToolCardProps {
   tool: ToolConfig;
   size?: 'default' | 'compact' | 'teaser';
@@ -39,10 +19,7 @@ interface ToolCardProps {
 
 export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
   const navigate = useNavigate();
-  
-  // Get the icon component and animation from the maps
   const IconComponent = iconMap[tool.icon] || Circle;
-  const iconAnimation = iconAnimations[tool.icon] || '';
 
   const handleClick = () => {
     if (tool.comingSoon) {
@@ -60,131 +37,87 @@ export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
         onClick={handleClick}
         disabled={tool.comingSoon}
         className={cn(
-          'relative flex flex-col items-center justify-center gap-2 p-4 w-24 shrink-0',
-          'rounded-2xl transition-all duration-300',
-          'bg-white/40 dark:bg-white/5 backdrop-blur-sm',
-          'border border-white/60 dark:border-white/10',
-          'shadow-sm',
+          'flex flex-col items-center gap-2 p-3 w-20 shrink-0',
+          'transition-transform active:scale-95',
           tool.comingSoon && 'opacity-70'
         )}
       >
-        {/* Icon Container */}
         <div className={cn(
-          'w-10 h-10 rounded-xl flex items-center justify-center',
-          'bg-gradient-to-br shadow-md',
-          tool.iconGradient
+          'w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm',
+          tool.bgColor
         )}>
-          <IconComponent className={cn("h-5 w-5 text-white", iconAnimation)} />
+          <IconComponent className={cn('h-6 w-6', tool.iconColor)} />
         </div>
-
-        {/* Title */}
-        <span className="text-xs font-medium text-foreground/80 text-center leading-tight">
-          {tool.name}
-        </span>
-
-        {/* Coming Soon Badge */}
-        {tool.comingSoon && (
-          <span className="absolute -top-1 -right-1 text-[8px] font-semibold bg-gradient-to-r from-violet-500 to-purple-500 text-white px-1.5 py-0.5 rounded-full shadow-sm">
-            Soon
+        <div className="text-center">
+          <span className="text-xs font-medium text-foreground block leading-tight">
+            {tool.name}
           </span>
-        )}
+          {tool.comingSoon && (
+            <span className="text-[10px] text-muted-foreground">
+              Soon
+            </span>
+          )}
+        </div>
       </button>
     );
   }
 
-  // Compact size for Audio & Video section
+  // Compact size for Audio & Video section (3-column)
   if (size === 'compact') {
     return (
       <button
         onClick={handleClick}
         disabled={tool.comingSoon}
         className={cn(
-          'group relative overflow-hidden rounded-2xl p-3 aspect-square',
-          'flex flex-col items-center justify-center gap-2',
-          'bg-gradient-to-br backdrop-blur-md',
-          'border border-white/40 dark:border-white/10',
-          'shadow-sm hover:shadow-lg',
-          'transition-all duration-300 active:scale-[0.97]',
-          'hover:-translate-y-0.5',
-          tool.gradient,
-          tool.comingSoon && 'opacity-60 cursor-not-allowed'
+          'flex flex-col items-center gap-2',
+          'transition-transform active:scale-95',
+          tool.comingSoon && 'opacity-60'
         )}
       >
-        {/* Decorative glow */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        
-        {/* Icon Container */}
         <div className={cn(
-          'relative w-11 h-11 rounded-xl flex items-center justify-center',
-          'bg-gradient-to-br shadow-lg',
-          'group-hover:scale-105 transition-transform duration-300',
-          tool.iconGradient
+          'w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm',
+          tool.bgColor
         )}>
-          <IconComponent className={cn("h-5 w-5 text-white drop-shadow-sm", iconAnimation)} />
+          <IconComponent className={cn('h-6 w-6', tool.iconColor)} />
         </div>
-
-        {/* Title */}
-        <h3 className="relative font-semibold text-foreground text-xs leading-tight text-center">
+        <span className="text-xs font-medium text-muted-foreground">
           {tool.name}
-        </h3>
-
-        {/* Coming Soon Badge */}
-        {tool.comingSoon && (
-          <span className="absolute top-2 right-2 text-[8px] font-semibold bg-white/80 dark:bg-black/40 text-muted-foreground px-1.5 py-0.5 rounded-full backdrop-blur-sm">
-            Soon
-          </span>
-        )}
+        </span>
       </button>
     );
   }
 
-  // Default size for Wellness Tools
+  // Default size for Wellness Tools (2-column grid cards)
   return (
     <button
       onClick={handleClick}
       disabled={tool.comingSoon}
       className={cn(
-        'group relative overflow-hidden rounded-3xl p-4 aspect-[4/3]',
-        'flex flex-col items-start justify-between',
-        'bg-gradient-to-br backdrop-blur-md',
-        'border border-white/50 dark:border-white/10',
-        'shadow-md hover:shadow-xl',
-        'transition-all duration-300 active:scale-[0.98]',
-        'hover:-translate-y-1',
-        tool.gradient,
-        tool.comingSoon && 'opacity-60 cursor-not-allowed'
+        'flex items-start gap-3 p-4 rounded-2xl bg-card',
+        'border border-border/50 shadow-sm',
+        'transition-transform active:scale-[0.97]',
+        tool.comingSoon && 'opacity-60'
       )}
     >
-      {/* Decorative elements */}
-      <div className="absolute -top-12 -right-12 w-32 h-32 bg-gradient-to-br from-white/30 to-transparent rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      
-      {/* Icon Container */}
       <div className={cn(
-        'relative w-12 h-12 rounded-2xl flex items-center justify-center',
-        'bg-gradient-to-br shadow-lg',
-        'group-hover:scale-105 group-hover:shadow-xl transition-all duration-300',
-        tool.iconGradient
+        'w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm',
+        tool.bgColor
       )}>
-        <IconComponent className={cn("h-6 w-6 text-white drop-shadow-sm", iconAnimation)} />
+        <IconComponent className={cn('h-6 w-6', tool.iconColor)} />
       </div>
-
-      {/* Text Content */}
-      <div className="relative mt-auto">
-        <h3 className="font-bold text-foreground text-sm leading-tight">
+      <div className="flex flex-col items-start min-w-0 pt-1">
+        <h3 className="font-semibold text-foreground text-sm leading-tight">
           {tool.name}
         </h3>
-        <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight line-clamp-1">
+        <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
           {tool.description}
         </p>
+        {tool.comingSoon && (
+          <span className="text-[10px] font-medium text-muted-foreground mt-1">
+            Coming Soon
+          </span>
+        )}
       </div>
-
-      {/* Coming Soon Badge */}
-      {tool.comingSoon && (
-        <span className="absolute top-3 right-3 text-[9px] font-semibold bg-white/80 dark:bg-black/40 text-muted-foreground px-2 py-0.5 rounded-full backdrop-blur-sm shadow-sm">
-          Coming Soon
-        </span>
-      )}
     </button>
   );
 }
