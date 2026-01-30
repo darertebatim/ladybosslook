@@ -1,101 +1,99 @@
 
-
-# Migration Plan: Task Templates → Tasks Bank
+# Migration Plan: Pro Task Templates → Tasks Bank
 
 ## Overview
-Migrate all 236 task templates from the legacy `task_templates` table to the new `admin_task_bank` table, which now supports the full app feature set (goals, subtasks, pro links).
+Migrate all 14 Pro Task Templates from the legacy `routine_task_templates` table to the unified `admin_task_bank` table. These are special tasks that deep-link to app features like playlists, breathing exercises, journal, water tracking, and channels.
 
-## Current Data Summary
+## Current Pro Task Templates (14 total)
 
-| Category | Count |
-|----------|-------|
-| calm | 24 |
-| connection | 26 (+5 with "Connection") |
-| easy-win | 14 |
-| gratitude | 21 |
-| hygiene | 20 |
-| inner-strength | 23 |
-| movement | 20 |
-| nutrition | 20 |
-| productivity | 20 |
-| self-kindness | 21 |
-| sleep | 22 |
+| Type | Count | Examples |
+|------|-------|----------|
+| Playlist | 7 | Relaxing Rain, Ladyboss Inner-Strength, Courageous Character |
+| Breathe | 4 | Calm Breathing, Box Breathing, Energy Boost, Simora Breathing |
+| Journal | 1 | Journal Writings |
+| Water | 1 | Drink Water |
+| Channel | 1 | Channel Check-in |
 
-**Note:** There's a data inconsistency - some templates use "Connection" (capitalized) instead of "connection". These will be normalized during migration.
-
-## Migration Approach
-
-### Step 1: Data Migration SQL
-Run a single INSERT statement that:
-1. Maps all compatible fields directly
-2. Normalizes category names (lowercase)
-3. Sets sensible defaults for new fields (goal_enabled=false, duration_minutes=5)
-
-### Step 2: Verification
-After migration, verify:
-- All 236 records migrated successfully
-- Category distribution matches
-- Popular tasks flagged correctly
-
-### Step 3: Remove Legacy Manager (Optional)
-Once confirmed, the `TaskTemplatesManager` component can be deprecated or removed from the admin UI.
-
-## Technical Details
+## Migration Details
 
 ### Field Mapping
+
 ```text
-task_templates          →  admin_task_bank
-─────────────────────────────────────────────
-title                   →  title
-emoji                   →  emoji
-color                   →  color
-LOWER(category)         →  category (normalized)
-description             →  description
-repeat_pattern          →  repeat_pattern
-display_order           →  sort_order
-is_active               →  is_active
-is_popular              →  is_popular
-(default)               →  goal_enabled = false
-(default)               →  duration_minutes = 5
-(default)               →  reminder_enabled = false
-(default)               →  repeat_days = []
+routine_task_templates     →  admin_task_bank
+──────────────────────────────────────────────────
+title                      →  title
+icon (may be emoji/text)   →  emoji (convert legacy icons)
+duration_minutes           →  duration_minutes
+pro_link_type              →  pro_link_type
+pro_link_value             →  pro_link_value
+linked_playlist_id         →  linked_playlist_id
+description                →  description
+category ('Pro')           →  category ('pro' lowercase)
+is_active                  →  is_active
+is_popular                 →  is_popular
+display_order              →  sort_order
+(default)                  →  color = 'amber' (Pro color)
+(default)                  →  goal_enabled = false
+(default)                  →  repeat_pattern = 'none'
 ```
 
-### Migration SQL
+### Icon Conversion
+Some Pro Task Templates use legacy Lucide icon names (e.g., "BookOpen", "Music", "Mic", "Users"). These will be converted to appropriate emojis:
+- `BookOpen` → 📖
+- `Music` → 🎵
+- `Mic` → 🎙️
+- `Users` → 👥
+
+### SQL Migration
+
 ```sql
 INSERT INTO admin_task_bank (
   title, emoji, color, category, description,
-  repeat_pattern, sort_order, is_active, is_popular,
-  goal_enabled, duration_minutes, reminder_enabled, repeat_days
+  duration_minutes, pro_link_type, pro_link_value, 
+  linked_playlist_id, is_active, is_popular, 
+  sort_order, goal_enabled, repeat_pattern
 )
 SELECT 
   title,
-  emoji,
-  color,
-  LOWER(category),  -- Normalize category names
+  CASE 
+    WHEN icon = 'BookOpen' THEN '📖'
+    WHEN icon = 'Music' THEN '🎵'
+    WHEN icon = 'Mic' THEN '🎙️'
+    WHEN icon = 'Users' THEN '👥'
+    ELSE icon  -- Already an emoji
+  END,
+  'amber',  -- Pro tasks use amber color
+  'pro',    -- Normalized category
   description,
-  repeat_pattern,
-  display_order,
+  duration_minutes,
+  pro_link_type,
+  pro_link_value,
+  linked_playlist_id,
   is_active,
   is_popular,
-  false,            -- goal_enabled
-  5,                -- duration_minutes default
-  false,            -- reminder_enabled
-  '{}'::integer[]   -- repeat_days empty
-FROM task_templates
-ORDER BY category, display_order;
+  (SELECT COALESCE(MAX(sort_order), 0) FROM admin_task_bank) + display_order,
+  false,
+  'none'
+FROM routine_task_templates
+ORDER BY display_order;
 ```
 
 ## Execution Steps
 
-1. **Run migration query** - Insert all task_templates into admin_task_bank
-2. **Verify counts** - Confirm 236 records exist in admin_task_bank
-3. **Verify categories** - Confirm all categories are lowercase and valid
-4. **Test in UI** - Open Tasks Bank in admin panel and verify display
-5. **Review individual tasks** - Spot check popular tasks for correct data
+1. **Run migration query** - Insert all 14 Pro Task Templates into admin_task_bank
+2. **Verify counts** - Confirm 14 new records with `pro_link_type IS NOT NULL`
+3. **Verify icon conversion** - Ensure legacy icon names are converted to emojis
+4. **Test in UI** - Open Tasks Bank and filter by "Pro" category
+5. **Spot check** - Verify playlist-linked tasks have correct `linked_playlist_id`
+
+## Post-Migration
+
+After migration:
+- Tasks Bank will contain **250 templates** (236 legacy + 14 Pro)
+- Pro category tab will show all 14 deep-linked tasks
+- Legacy `ProTaskTemplatesManager` can be deprecated (future cleanup)
 
 ## Risk Mitigation
-- This is an additive migration (no deletions)
-- Original task_templates data remains intact
-- Can be rolled back by deleting from admin_task_bank if issues arise
-
+- Additive migration only (no deletions)
+- Original `routine_task_templates` data remains intact
+- Can be rolled back by deleting Pro category tasks from `admin_task_bank`
