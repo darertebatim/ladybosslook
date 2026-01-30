@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, User, MessageCircle, Mail, Send } from 'lucide-react';
+import { BookOpen, User, MessageCircle, Mail, Send, ListChecks } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -98,10 +98,15 @@ export default function AppNewHome() {
                 Ready to make today count?
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Link to="/app/journal">
                 <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full">
                   <BookOpen className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link to="/app/routines">
+                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full">
+                  <ListChecks className="h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/app/profile">
