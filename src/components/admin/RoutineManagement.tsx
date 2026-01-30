@@ -1189,13 +1189,14 @@ function PlanTasksEditor({ planId }: { planId: string }) {
                 <Label>{selectedLinkConfig.label} Value</Label>
                 {formData.pro_link_type === 'playlist' && (
                   <Select 
-                    value={formData.pro_link_value || ''} 
-                    onValueChange={(v) => setFormData(prev => ({ ...prev, pro_link_value: v || null }))}
+                    value={formData.pro_link_value || 'none'} 
+                    onValueChange={(v) => setFormData(prev => ({ ...prev, pro_link_value: v === 'none' ? null : v }))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select playlist" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="none">Select playlist</SelectItem>
                       {playlists?.map((pl) => (
                         <SelectItem key={pl.id} value={pl.id}>{pl.name}</SelectItem>
                       ))}
@@ -1204,13 +1205,14 @@ function PlanTasksEditor({ planId }: { planId: string }) {
                 )}
                 {formData.pro_link_type === 'breathe' && (
                   <Select 
-                    value={formData.pro_link_value || ''} 
-                    onValueChange={(v) => setFormData(prev => ({ ...prev, pro_link_value: v || null }))}
+                    value={formData.pro_link_value || 'none'} 
+                    onValueChange={(v) => setFormData(prev => ({ ...prev, pro_link_value: v === 'none' ? null : v }))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select exercise" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="none">Select exercise</SelectItem>
                       {breathingExercises?.map((ex) => (
                         <SelectItem key={ex.id} value={ex.id}>
                           {ex.emoji} {ex.name}
