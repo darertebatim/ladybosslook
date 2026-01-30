@@ -12,13 +12,12 @@ interface ActiveRoundsCarouselProps {
   nextSessionMap: Map<string, string>;
 }
 const COLLAPSED_KEY = 'programsCarouselCollapsed';
-const SEEN_ENROLLMENTS_KEY = 'seenEnrollmentIds';
 
 export function ActiveRoundsCarousel({
   activeRounds,
   nextSessionMap
 }: ActiveRoundsCarouselProps) {
-  // Get unseen content
+  // Get unseen content from context (already tracks new/updated programs)
   let unseenEnrollments = new Set<string>();
   let unseenRounds = new Set<string>();
   let markEnrollmentViewed: ((id: string) => Promise<void>) | null = null;
@@ -33,25 +32,12 @@ export function ActiveRoundsCarousel({
     // Provider not available
   }
 
-  // Track locally seen enrollment IDs to detect new additions
-  const [seenIds, setSeenIds] = useState<Set<string>>(() => {
-    try {
-      const saved = localStorage.getItem(SEEN_ENROLLMENTS_KEY);
-      return saved ? new Set(JSON.parse(saved)) : new Set();
-    } catch {
-      return new Set();
-    }
-  });
-  
-  // Track if this is the initial load (no saved IDs yet means first time user)
-  const hasInitialized = localStorage.getItem(SEEN_ENROLLMENTS_KEY) !== null;
-  
-  // Only detect "new" enrollment if we've seen this user before AND there's an ID not in seenIds
-  const hasNewEnrollment = hasInitialized && activeRounds.some(e => !seenIds.has(e.id));
+  // Check if any programs have the "new" or "updated" tag
+  const hasUnseenPrograms = unseenEnrollments.size > 0 || unseenRounds.size > 0;
 
-  // Persist collapsed state - default to collapsed, only auto-expand if NEW program added
+  // Persist collapsed state - default to collapsed, auto-expand only if unseen programs
   const [isCollapsed, setIsCollapsed] = useState(() => {
-    if (hasNewEnrollment) {
+    if (hasUnseenPrograms) {
       return false;
     }
     const saved = localStorage.getItem(COLLAPSED_KEY);
@@ -59,28 +45,12 @@ export function ActiveRoundsCarousel({
     return saved !== 'false';
   });
 
-  // Auto-expand when new enrollments are detected
+  // Auto-expand when unseen programs are detected
   useEffect(() => {
-    if (hasNewEnrollment) {
+    if (hasUnseenPrograms) {
       setIsCollapsed(false);
     }
-  }, [hasNewEnrollment]);
-
-  // Update seen IDs when enrollments change
-  useEffect(() => {
-    if (activeRounds.length > 0) {
-      const currentIds = new Set(activeRounds.map(e => e.id));
-      const hasNew = activeRounds.some(e => !seenIds.has(e.id));
-      if (hasNew || !hasInitialized) {
-        setSeenIds(currentIds);
-        try {
-          localStorage.setItem(SEEN_ENROLLMENTS_KEY, JSON.stringify([...currentIds]));
-        } catch {
-          // Storage error
-        }
-      }
-    }
-  }, [activeRounds, seenIds, hasInitialized]);
+  }, [hasUnseenPrograms]);
 
   useEffect(() => {
     localStorage.setItem(COLLAPSED_KEY, isCollapsed.toString());
