@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, GripVertical, X, Search, Clock, FileText } from 'lucide-react';
+import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
 import EmojiPicker from '@/components/app/EmojiPicker';
@@ -49,6 +49,17 @@ interface RoutineBankItem {
   updated_at: string;
 }
 
+interface RoutineBankSection {
+  id: string;
+  routine_id: string;
+  title: string;
+  content: string | null;
+  image_url: string | null;
+  section_order: number;
+  is_active: boolean;
+  created_at: string;
+}
+
 interface RoutineBankTask {
   id: string;
   routine_id: string;
@@ -56,6 +67,7 @@ interface RoutineBankTask {
   title: string;
   emoji: string;
   duration_minutes: number;
+  section_id: string | null;
   section_title: string | null;
   task_order: number;
 }
@@ -69,6 +81,27 @@ interface TaskBankItem {
   is_active: boolean;
 }
 
+// Local state for sections while editing
+interface LocalSection {
+  id: string;
+  title: string;
+  content: string;
+  image_url: string;
+  section_order: number;
+  isNew?: boolean;
+}
+
+// Local state for tasks while editing
+interface LocalTask {
+  id: string;
+  task_id: string | null;
+  title: string;
+  emoji: string;
+  duration_minutes: number;
+  section_id: string | null;
+  task_order: number;
+}
+
 export default function RoutinesBank() {
   const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -77,8 +110,12 @@ export default function RoutinesBank() {
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const [taskSearchOpen, setTaskSearchOpen] = useState(false);
   const [taskSearch, setTaskSearch] = useState('');
-  const [sectionInputIndex, setSectionInputIndex] = useState<number | null>(null);
-  const [sectionInputValue, setSectionInputValue] = useState('');
+  const [addingTaskToSection, setAddingTaskToSection] = useState<string | null>(null); // section_id or 'uncategorized'
+  const [dialogTab, setDialogTab] = useState<'basic' | 'sections'>('basic');
+
+  // Section editor state
+  const [sectionDialogOpen, setSectionDialogOpen] = useState(false);
+  const [editingSection, setEditingSection] = useState<LocalSection | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -90,7 +127,8 @@ export default function RoutinesBank() {
     color: 'yellow',
     emoji: '✨',
   });
-  const [routineTasks, setRoutineTasks] = useState<RoutineBankTask[]>([]);
+  const [localSections, setLocalSections] = useState<LocalSection[]>([]);
+  const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
 
   // Fetch categories
   const { data: routineCategories = [] } = useQuery({
@@ -156,7 +194,8 @@ export default function RoutinesBank() {
 
   // Create routine
   const createRoutine = useMutation({
-    mutationFn: async (data: { formData: typeof formData; tasks: RoutineBankTask[] }) => {
+    mutationFn: async (data: { formData: typeof formData; sections: LocalSection[]; tasks: LocalTask[] }) => {
+      // Create routine
       const { data: newRoutine, error } = await supabase
         .from('routines_bank')
         .insert({
@@ -172,7 +211,31 @@ export default function RoutinesBank() {
         .single();
       if (error) throw error;
 
-      // Insert tasks
+      // Create sections and build id mapping
+      const sectionIdMap: Record<string, string> = {};
+      if (data.sections.length > 0) {
+        const sectionRecords = data.sections.map((s, idx) => ({
+          routine_id: newRoutine.id,
+          title: s.title,
+          content: s.content || null,
+          image_url: s.image_url || null,
+          section_order: idx,
+        }));
+        const { data: insertedSections, error: secError } = await supabase
+          .from('routines_bank_sections')
+          .insert(sectionRecords)
+          .select();
+        if (secError) throw secError;
+        
+        // Map local temp ids to real ids
+        data.sections.forEach((s, idx) => {
+          if (insertedSections && insertedSections[idx]) {
+            sectionIdMap[s.id] = insertedSections[idx].id;
+          }
+        });
+      }
+
+      // Insert tasks with mapped section_id
       if (data.tasks.length > 0) {
         const taskRecords = data.tasks.map((t, idx) => ({
           routine_id: newRoutine.id,
@@ -180,7 +243,7 @@ export default function RoutinesBank() {
           title: t.title,
           emoji: t.emoji,
           duration_minutes: t.duration_minutes,
-          section_title: t.section_title,
+          section_id: t.section_id ? sectionIdMap[t.section_id] || null : null,
           task_order: idx,
         }));
         await supabase.from('routines_bank_tasks').insert(taskRecords);
@@ -198,7 +261,8 @@ export default function RoutinesBank() {
 
   // Update routine
   const updateRoutine = useMutation({
-    mutationFn: async (data: { id: string; formData: typeof formData; tasks: RoutineBankTask[] }) => {
+    mutationFn: async (data: { id: string; formData: typeof formData; sections: LocalSection[]; tasks: LocalTask[] }) => {
+      // Update routine basic info
       const { error } = await supabase
         .from('routines_bank')
         .update({
@@ -213,8 +277,34 @@ export default function RoutinesBank() {
         .eq('id', data.id);
       if (error) throw error;
 
-      // Replace tasks
+      // Delete old sections and tasks
       await supabase.from('routines_bank_tasks').delete().eq('routine_id', data.id);
+      await supabase.from('routines_bank_sections').delete().eq('routine_id', data.id);
+
+      // Recreate sections
+      const sectionIdMap: Record<string, string> = {};
+      if (data.sections.length > 0) {
+        const sectionRecords = data.sections.map((s, idx) => ({
+          routine_id: data.id,
+          title: s.title,
+          content: s.content || null,
+          image_url: s.image_url || null,
+          section_order: idx,
+        }));
+        const { data: insertedSections, error: secError } = await supabase
+          .from('routines_bank_sections')
+          .insert(sectionRecords)
+          .select();
+        if (secError) throw secError;
+        
+        data.sections.forEach((s, idx) => {
+          if (insertedSections && insertedSections[idx]) {
+            sectionIdMap[s.id] = insertedSections[idx].id;
+          }
+        });
+      }
+
+      // Recreate tasks
       if (data.tasks.length > 0) {
         const taskRecords = data.tasks.map((t, idx) => ({
           routine_id: data.id,
@@ -222,7 +312,7 @@ export default function RoutinesBank() {
           title: t.title,
           emoji: t.emoji,
           duration_minutes: t.duration_minutes,
-          section_title: t.section_title,
+          section_id: t.section_id ? sectionIdMap[t.section_id] || null : null,
           task_order: idx,
         }));
         await supabase.from('routines_bank_tasks').insert(taskRecords);
@@ -267,14 +357,40 @@ export default function RoutinesBank() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['routines-bank'] }),
   });
 
-  // Fetch tasks for a routine when editing
-  const fetchRoutineTasks = async (routineId: string): Promise<RoutineBankTask[]> => {
-    const { data } = await supabase
-      .from('routines_bank_tasks')
-      .select('*')
-      .eq('routine_id', routineId)
-      .order('task_order', { ascending: true });
-    return (data || []) as RoutineBankTask[];
+  // Fetch sections and tasks for a routine when editing
+  const fetchRoutineData = async (routineId: string) => {
+    const [sectionsRes, tasksRes] = await Promise.all([
+      supabase
+        .from('routines_bank_sections')
+        .select('*')
+        .eq('routine_id', routineId)
+        .order('section_order', { ascending: true }),
+      supabase
+        .from('routines_bank_tasks')
+        .select('*')
+        .eq('routine_id', routineId)
+        .order('task_order', { ascending: true }),
+    ]);
+
+    const sections: LocalSection[] = (sectionsRes.data || []).map(s => ({
+      id: s.id,
+      title: s.title,
+      content: s.content || '',
+      image_url: s.image_url || '',
+      section_order: s.section_order,
+    }));
+
+    const tasks: LocalTask[] = (tasksRes.data || []).map(t => ({
+      id: t.id,
+      task_id: t.task_id,
+      title: t.title,
+      emoji: t.emoji,
+      duration_minutes: t.duration_minutes,
+      section_id: t.section_id,
+      task_order: t.task_order,
+    }));
+
+    return { sections, tasks };
   };
 
   const openNewDialog = () => {
@@ -288,7 +404,9 @@ export default function RoutinesBank() {
       color: 'yellow',
       emoji: '✨',
     });
-    setRoutineTasks([]);
+    setLocalSections([]);
+    setLocalTasks([]);
+    setDialogTab('basic');
     setDialogOpen(true);
   };
 
@@ -303,17 +421,21 @@ export default function RoutinesBank() {
       color: routine.color,
       emoji: routine.emoji,
     });
-    const tasks = await fetchRoutineTasks(routine.id);
-    setRoutineTasks(tasks);
+    const { sections, tasks } = await fetchRoutineData(routine.id);
+    setLocalSections(sections);
+    setLocalTasks(tasks);
+    setDialogTab('basic');
     setDialogOpen(true);
   };
 
   const closeDialog = () => {
     setDialogOpen(false);
     setEditingRoutine(null);
-    setRoutineTasks([]);
+    setLocalSections([]);
+    setLocalTasks([]);
     setTaskSearchOpen(false);
     setTaskSearch('');
+    setAddingTaskToSection(null);
   };
 
   const handleSave = () => {
@@ -322,9 +444,9 @@ export default function RoutinesBank() {
       return;
     }
     if (editingRoutine) {
-      updateRoutine.mutate({ id: editingRoutine.id, formData, tasks: routineTasks });
+      updateRoutine.mutate({ id: editingRoutine.id, formData, sections: localSections, tasks: localTasks });
     } else {
-      createRoutine.mutate({ formData, tasks: routineTasks });
+      createRoutine.mutate({ formData, sections: localSections, tasks: localTasks });
     }
   };
 
@@ -334,38 +456,109 @@ export default function RoutinesBank() {
     }
   };
 
-  const addTaskFromBank = (task: TaskBankItem) => {
-    const newTask: RoutineBankTask = {
+  // Section management
+  const addSection = () => {
+    const newSection: LocalSection = {
       id: crypto.randomUUID(),
-      routine_id: editingRoutine?.id || '',
+      title: 'New Section',
+      content: '',
+      image_url: '',
+      section_order: localSections.length,
+      isNew: true,
+    };
+    setLocalSections([...localSections, newSection]);
+    openSectionEditor(newSection);
+  };
+
+  const openSectionEditor = (section: LocalSection) => {
+    setEditingSection({ ...section });
+    setSectionDialogOpen(true);
+  };
+
+  const saveSectionEdit = () => {
+    if (!editingSection) return;
+    if (!editingSection.title.trim()) {
+      toast.error('Section title is required');
+      return;
+    }
+    setLocalSections(localSections.map(s => 
+      s.id === editingSection.id ? { ...editingSection, isNew: false } : s
+    ));
+    setSectionDialogOpen(false);
+    setEditingSection(null);
+  };
+
+  const deleteSection = (sectionId: string) => {
+    // Move tasks from this section to uncategorized
+    setLocalTasks(localTasks.map(t => 
+      t.section_id === sectionId ? { ...t, section_id: null } : t
+    ));
+    setLocalSections(localSections.filter(s => s.id !== sectionId));
+  };
+
+  const moveSectionUp = (index: number) => {
+    if (index <= 0) return;
+    const newSections = [...localSections];
+    [newSections[index - 1], newSections[index]] = [newSections[index], newSections[index - 1]];
+    setLocalSections(newSections);
+  };
+
+  const moveSectionDown = (index: number) => {
+    if (index >= localSections.length - 1) return;
+    const newSections = [...localSections];
+    [newSections[index], newSections[index + 1]] = [newSections[index + 1], newSections[index]];
+    setLocalSections(newSections);
+  };
+
+  // Task management
+  const addTaskToSection = (task: TaskBankItem, sectionId: string | null) => {
+    const newTask: LocalTask = {
+      id: crypto.randomUUID(),
       task_id: task.id,
       title: task.title,
       emoji: task.emoji,
       duration_minutes: task.duration_minutes || 1,
-      section_title: null,
-      task_order: routineTasks.length,
+      section_id: sectionId,
+      task_order: localTasks.filter(t => t.section_id === sectionId).length,
     };
-    setRoutineTasks([...routineTasks, newTask]);
+    setLocalTasks([...localTasks, newTask]);
     setTaskSearchOpen(false);
     setTaskSearch('');
+    setAddingTaskToSection(null);
   };
 
-  const removeTask = (index: number) => {
-    setRoutineTasks(routineTasks.filter((_, i) => i !== index));
+  const removeTask = (taskId: string) => {
+    setLocalTasks(localTasks.filter(t => t.id !== taskId));
   };
 
-  const moveTask = (fromIndex: number, direction: 'up' | 'down') => {
-    const toIndex = direction === 'up' ? fromIndex - 1 : fromIndex + 1;
-    if (toIndex < 0 || toIndex >= routineTasks.length) return;
-    const newTasks = [...routineTasks];
-    [newTasks[fromIndex], newTasks[toIndex]] = [newTasks[toIndex], newTasks[fromIndex]];
-    setRoutineTasks(newTasks);
+  const moveTaskUp = (taskId: string, sectionId: string | null) => {
+    const sectionTasks = localTasks.filter(t => t.section_id === sectionId);
+    const idx = sectionTasks.findIndex(t => t.id === taskId);
+    if (idx <= 0) return;
+    
+    const taskToMove = sectionTasks[idx];
+    const taskAbove = sectionTasks[idx - 1];
+    
+    setLocalTasks(localTasks.map(t => {
+      if (t.id === taskToMove.id) return { ...t, task_order: taskAbove.task_order };
+      if (t.id === taskAbove.id) return { ...t, task_order: taskToMove.task_order };
+      return t;
+    }));
   };
 
-  const updateTaskSection = (index: number, sectionTitle: string | null) => {
-    const newTasks = [...routineTasks];
-    newTasks[index] = { ...newTasks[index], section_title: sectionTitle };
-    setRoutineTasks(newTasks);
+  const moveTaskDown = (taskId: string, sectionId: string | null) => {
+    const sectionTasks = localTasks.filter(t => t.section_id === sectionId);
+    const idx = sectionTasks.findIndex(t => t.id === taskId);
+    if (idx >= sectionTasks.length - 1) return;
+    
+    const taskToMove = sectionTasks[idx];
+    const taskBelow = sectionTasks[idx + 1];
+    
+    setLocalTasks(localTasks.map(t => {
+      if (t.id === taskToMove.id) return { ...t, task_order: taskBelow.task_order };
+      if (t.id === taskBelow.id) return { ...t, task_order: taskToMove.task_order };
+      return t;
+    }));
   };
 
   const getCategoryInfo = (cat: string) => {
@@ -373,7 +566,7 @@ export default function RoutinesBank() {
     return found ? { value: found.slug, label: found.name, icon: found.icon || '📋' } : { value: cat, label: cat, icon: '📋' };
   };
 
-  const totalDuration = routineTasks.reduce((sum, t) => sum + (t.duration_minutes || 0), 0);
+  const totalDuration = localTasks.reduce((sum, t) => sum + (t.duration_minutes || 0), 0);
 
   const filteredRoutines = selectedCategory === 'all' 
     ? routines 
@@ -382,6 +575,21 @@ export default function RoutinesBank() {
   const filteredTaskBank = taskBank.filter(t => 
     t.title.toLowerCase().includes(taskSearch.toLowerCase())
   );
+
+  // Get tasks for a specific section
+  const getTasksForSection = (sectionId: string | null) => {
+    return localTasks
+      .filter(t => t.section_id === sectionId)
+      .sort((a, b) => a.task_order - b.task_order);
+  };
+
+  const uncategorizedTasks = getTasksForSection(null);
+
+  const getSectionDuration = (sectionId: string) => {
+    return localTasks
+      .filter(t => t.section_id === sectionId)
+      .reduce((sum, t) => sum + (t.duration_minutes || 0), 0);
+  };
 
   return (
     <Card>
@@ -392,7 +600,7 @@ export default function RoutinesBank() {
             Routines Bank
           </CardTitle>
           <CardDescription>
-            Create and manage routine templates
+            Create and manage routine templates with rich sections
           </CardDescription>
         </div>
         <Button onClick={openNewDialog} className="gap-2">
@@ -509,280 +717,487 @@ export default function RoutinesBank() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>{editingRoutine ? 'Edit Routine' : 'New Routine'}</DialogTitle>
             <DialogDescription>
-              {editingRoutine ? 'Update routine details and tasks' : 'Create a new routine template'}
+              {editingRoutine ? 'Update routine details and sections' : 'Create a new routine template'}
             </DialogDescription>
           </DialogHeader>
           
-          <ScrollArea className="flex-1 pr-4">
-            <div className="space-y-4 py-2">
-              {/* Title */}
-              <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Morning Energy Boost"
-                />
-              </div>
-
-              {/* Subtitle */}
-              <div className="space-y-2">
-                <Label htmlFor="subtitle">Subtitle</Label>
-                <Input
-                  id="subtitle"
-                  value={formData.subtitle}
-                  onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-                  placeholder="Start your day right"
-                />
-              </div>
-
-              {/* Row: Category, Color, Emoji */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-2">
-                  <Label>Category</Label>
-                  <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {routineCategories.map((cat) => (
-                        <SelectItem key={cat.slug} value={cat.slug}>
-                          <span className="flex items-center gap-2">
-                            <TaskIcon iconName={cat.icon || '📋'} size={14} />
-                            {cat.name}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Color</Label>
-                  <div className="flex gap-1 flex-wrap">
-                    {COLOR_OPTIONS.map((c) => (
-                      <button
-                        key={c.name}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, color: c.name })}
-                        className={cn(
-                          "w-6 h-6 rounded-full border-2 transition-all",
-                          formData.color === c.name ? "border-primary scale-110" : "border-transparent"
-                        )}
-                        style={{ backgroundColor: c.hex }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Icon</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setEmojiPickerOpen(true)}
-                    className="w-full justify-start gap-2"
-                  >
-                    <TaskIcon iconName={formData.emoji} size={18} />
-                    Change
-                  </Button>
-                </div>
-              </div>
-
-              {/* Cover Image URL */}
-              <div className="space-y-2">
-                <Label htmlFor="cover">Cover Image URL</Label>
-                <Input
-                  id="cover"
-                  value={formData.cover_image_url}
-                  onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
-                  placeholder="https://..."
-                />
-              </div>
-
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Optional description..."
-                  className="min-h-[60px]"
-                />
-              </div>
-
-              {/* Tasks Section */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    Tasks ({routineTasks.length})
-                    {totalDuration > 0 && (
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Clock className="h-3 w-3" /> {totalDuration}m total
-                      </span>
-                    )}
-                  </Label>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setTaskSearchOpen(!taskSearchOpen)}
-                    className="gap-1"
-                  >
-                    <Plus className="h-3 w-3" />
-                    Add Task
-                  </Button>
-                </div>
-
-                {/* Task Search Picker */}
-                {taskSearchOpen && (
-                  <div className="border rounded-lg p-3 space-y-2 bg-muted/30">
-                    <div className="relative">
-                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search tasks..."
-                        value={taskSearch}
-                        onChange={(e) => setTaskSearch(e.target.value)}
-                        className="pl-8"
-                        autoFocus
-                      />
-                    </div>
-                    <ScrollArea className="h-40">
-                      <div className="space-y-1">
-                        {filteredTaskBank.map((task) => (
-                          <button
-                            key={task.id}
-                            type="button"
-                            onClick={() => addTaskFromBank(task)}
-                            className="w-full flex items-center gap-2 p-2 rounded hover:bg-accent text-left text-sm"
-                          >
-                            <TaskIcon iconName={task.emoji} size={16} />
-                            <span className="flex-1 truncate">{task.title}</span>
-                            <span className="text-xs text-muted-foreground">{task.duration_minutes || 1}m</span>
-                          </button>
-                        ))}
-                        {filteredTaskBank.length === 0 && (
-                          <p className="text-center text-muted-foreground text-sm py-4">No tasks found</p>
-                        )}
-                      </div>
-                    </ScrollArea>
-                  </div>
+          <Tabs value={dialogTab} onValueChange={(v) => setDialogTab(v as 'basic' | 'sections')} className="flex-1 flex flex-col overflow-hidden">
+            <TabsList className="w-fit">
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="sections">
+                Sections & Tasks
+                {localSections.length > 0 && (
+                  <span className="ml-1 text-xs bg-muted px-1.5 rounded">{localSections.length}</span>
                 )}
+              </TabsTrigger>
+            </TabsList>
 
-                {/* Task List */}
-                <div className="space-y-1">
-                  {routineTasks.map((task, index) => (
-                    <div key={task.id}>
-                      {/* Section Header */}
-                      {task.section_title && (
-                        <div className="flex items-center gap-2 py-1 px-2 text-xs font-medium text-muted-foreground bg-muted/50 rounded mb-1">
-                          <span className="flex-1">{task.section_title}</span>
+            <TabsContent value="basic" className="flex-1 overflow-auto">
+              <ScrollArea className="h-full pr-4">
+                <div className="space-y-4 py-2">
+                  {/* Title */}
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Title *</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="Morning Energy Boost"
+                    />
+                  </div>
+
+                  {/* Subtitle */}
+                  <div className="space-y-2">
+                    <Label htmlFor="subtitle">Subtitle</Label>
+                    <Input
+                      id="subtitle"
+                      value={formData.subtitle}
+                      onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+                      placeholder="Start your day right"
+                    />
+                  </div>
+
+                  {/* Row: Category, Color, Emoji */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-2">
+                      <Label>Category</Label>
+                      <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {routineCategories.map((cat) => (
+                            <SelectItem key={cat.slug} value={cat.slug}>
+                              <span className="flex items-center gap-2">
+                                <TaskIcon iconName={cat.icon || '📋'} size={14} />
+                                {cat.name}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Color</Label>
+                      <div className="flex gap-1 flex-wrap">
+                        {COLOR_OPTIONS.map((c) => (
+                          <button
+                            key={c.name}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, color: c.name })}
+                            className={cn(
+                              "w-6 h-6 rounded-full border-2 transition-all",
+                              formData.color === c.name ? "border-primary scale-110" : "border-transparent"
+                            )}
+                            style={{ backgroundColor: c.hex }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Icon</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setEmojiPickerOpen(true)}
+                        className="w-full justify-start gap-2"
+                      >
+                        <TaskIcon iconName={formData.emoji} size={18} />
+                        Change
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Cover Image URL */}
+                  <div className="space-y-2">
+                    <Label htmlFor="cover">Cover Image URL</Label>
+                    <Input
+                      id="cover"
+                      value={formData.cover_image_url}
+                      onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
+                      placeholder="https://..."
+                    />
+                  </div>
+
+                  {/* Description */}
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      placeholder="Optional description..."
+                      className="min-h-[100px]"
+                    />
+                  </div>
+
+                  {/* Summary stats */}
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4">
+                    <span className="flex items-center gap-1">
+                      <FileText className="h-4 w-4" />
+                      {localSections.length} section{localSections.length !== 1 ? 's' : ''}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Layers className="h-4 w-4" />
+                      {localTasks.length} task{localTasks.length !== 1 ? 's' : ''}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      {totalDuration}m total
+                    </span>
+                  </div>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            <TabsContent value="sections" className="flex-1 overflow-hidden flex flex-col">
+              <ScrollArea className="flex-1 pr-4">
+                <div className="space-y-4 py-2">
+                  {/* Sections */}
+                  {localSections.map((section, sIdx) => {
+                    const sectionTasks = getTasksForSection(section.id);
+                    const sectionDuration = getSectionDuration(section.id);
+                    return (
+                      <div key={section.id} className="border rounded-lg overflow-hidden">
+                        {/* Section Header */}
+                        <div className="flex items-center gap-2 p-3 bg-muted/50 border-b">
+                          <div className="flex flex-col">
+                            <button
+                              type="button"
+                              onClick={() => moveSectionUp(sIdx)}
+                              disabled={sIdx === 0}
+                              className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                            >
+                              <ChevronUp className="h-3 w-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveSectionDown(sIdx)}
+                              disabled={sIdx === localSections.length - 1}
+                              className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                            >
+                              <ChevronDown className="h-3 w-3" />
+                            </button>
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-medium text-sm">{section.title}</h4>
+                            {section.content && (
+                              <p className="text-xs text-muted-foreground line-clamp-1">{section.content}</p>
+                            )}
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            {sectionTasks.length} task{sectionTasks.length !== 1 ? 's' : ''} • {sectionDuration}m
+                          </span>
+                          {section.image_url && (
+                            <Image className="h-4 w-4 text-muted-foreground" />
+                          )}
                           <button
                             type="button"
-                            onClick={() => updateTaskSection(index, null)}
-                            className="hover:text-destructive"
+                            onClick={() => openSectionEditor(section)}
+                            className="p-1 hover:bg-accent rounded"
                           >
-                            <X className="h-3 w-3" />
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteSection(section.id)}
+                            className="p-1 hover:bg-destructive/10 rounded text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
-                      )}
-                      <div className="flex items-center gap-2 p-2 rounded border bg-background">
-                        <div className="flex flex-col gap-0.5">
-                          <button
-                            type="button"
-                            onClick={() => moveTask(index, 'up')}
-                            disabled={index === 0}
-                            className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                          >
-                            <GripVertical className="h-3 w-3" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => moveTask(index, 'down')}
-                            disabled={index === routineTasks.length - 1}
-                            className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                          >
-                            <GripVertical className="h-3 w-3" />
-                          </button>
-                        </div>
-                        <TaskIcon iconName={task.emoji} size={16} />
-                        <span className="flex-1 text-sm truncate">{task.title}</span>
-                        <span className="text-xs text-muted-foreground">{task.duration_minutes}m</span>
-                        {sectionInputIndex === index ? (
-                          <div className="flex items-center gap-1">
-                            <Input
-                              value={sectionInputValue}
-                              onChange={(e) => setSectionInputValue(e.target.value)}
-                              placeholder="Section title"
-                              className="h-6 text-xs w-24"
-                              autoFocus
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  updateTaskSection(index, sectionInputValue || null);
-                                  setSectionInputIndex(null);
-                                  setSectionInputValue('');
-                                }
-                              }}
-                            />
+
+                        {/* Section Tasks */}
+                        <div className="p-2 space-y-1">
+                          {sectionTasks.length === 0 ? (
+                            <p className="text-center text-muted-foreground text-xs py-2">No tasks in this section</p>
+                          ) : (
+                            sectionTasks.map((task, tIdx) => (
+                              <div key={task.id} className="flex items-center gap-2 p-2 rounded bg-background border">
+                                <div className="flex flex-col">
+                                  <button
+                                    type="button"
+                                    onClick={() => moveTaskUp(task.id, section.id)}
+                                    disabled={tIdx === 0}
+                                    className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                  >
+                                    <ChevronUp className="h-3 w-3" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => moveTaskDown(task.id, section.id)}
+                                    disabled={tIdx === sectionTasks.length - 1}
+                                    className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                  >
+                                    <ChevronDown className="h-3 w-3" />
+                                  </button>
+                                </div>
+                                <TaskIcon iconName={task.emoji} size={16} />
+                                <span className="flex-1 text-sm truncate">{task.title}</span>
+                                <span className="text-xs text-muted-foreground">{task.duration_minutes}m</span>
+                                <button
+                                  type="button"
+                                  onClick={() => removeTask(task.id)}
+                                  className="p-1 text-destructive hover:bg-destructive/10 rounded"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </div>
+                            ))
+                          )}
+                          
+                          {/* Add task to section */}
+                          {addingTaskToSection === section.id ? (
+                            <div className="border rounded p-2 space-y-2 bg-muted/30">
+                              <div className="relative">
+                                <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                  placeholder="Search tasks..."
+                                  value={taskSearch}
+                                  onChange={(e) => setTaskSearch(e.target.value)}
+                                  className="pl-8 h-8 text-sm"
+                                  autoFocus
+                                />
+                              </div>
+                              <ScrollArea className="h-32">
+                                <div className="space-y-1">
+                                  {filteredTaskBank.map((task) => (
+                                    <button
+                                      key={task.id}
+                                      type="button"
+                                      onClick={() => addTaskToSection(task, section.id)}
+                                      className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-accent text-left text-xs"
+                                    >
+                                      <TaskIcon iconName={task.emoji} size={14} />
+                                      <span className="flex-1 truncate">{task.title}</span>
+                                      <span className="text-muted-foreground">{task.duration_minutes || 1}m</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </ScrollArea>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setAddingTaskToSection(null);
+                                  setTaskSearch('');
+                                }}
+                                className="w-full h-7"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          ) : (
                             <Button
                               type="button"
-                              size="sm"
                               variant="ghost"
-                              className="h-6 px-1"
-                              onClick={() => {
-                                updateTaskSection(index, sectionInputValue || null);
-                                setSectionInputIndex(null);
-                                setSectionInputValue('');
-                              }}
+                              size="sm"
+                              onClick={() => setAddingTaskToSection(section.id)}
+                              className="w-full h-7 text-xs gap-1"
                             >
-                              ✓
+                              <Plus className="h-3 w-3" />
+                              Add Task
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Add Section Button */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addSection}
+                    className="w-full gap-2"
+                  >
+                    <FolderPlus className="h-4 w-4" />
+                    Add Section
+                  </Button>
+
+                  {/* Uncategorized Tasks */}
+                  {(uncategorizedTasks.length > 0 || localSections.length === 0) && (
+                    <div className="border rounded-lg overflow-hidden border-dashed">
+                      <div className="flex items-center gap-2 p-3 bg-muted/30 border-b border-dashed">
+                        <h4 className="font-medium text-sm text-muted-foreground flex-1">
+                          {localSections.length === 0 ? 'Tasks' : 'Uncategorized Tasks'}
+                        </h4>
+                        <span className="text-xs text-muted-foreground">
+                          {uncategorizedTasks.length} task{uncategorizedTasks.length !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <div className="p-2 space-y-1">
+                        {uncategorizedTasks.map((task, tIdx) => (
+                          <div key={task.id} className="flex items-center gap-2 p-2 rounded bg-background border">
+                            <div className="flex flex-col">
+                              <button
+                                type="button"
+                                onClick={() => moveTaskUp(task.id, null)}
+                                disabled={tIdx === 0}
+                                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                              >
+                                <ChevronUp className="h-3 w-3" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => moveTaskDown(task.id, null)}
+                                disabled={tIdx === uncategorizedTasks.length - 1}
+                                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                              >
+                                <ChevronDown className="h-3 w-3" />
+                              </button>
+                            </div>
+                            <TaskIcon iconName={task.emoji} size={16} />
+                            <span className="flex-1 text-sm truncate">{task.title}</span>
+                            <span className="text-xs text-muted-foreground">{task.duration_minutes}m</span>
+                            <button
+                              type="button"
+                              onClick={() => removeTask(task.id)}
+                              className="p-1 text-destructive hover:bg-destructive/10 rounded"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                        
+                        {/* Add uncategorized task */}
+                        {addingTaskToSection === 'uncategorized' ? (
+                          <div className="border rounded p-2 space-y-2 bg-muted/30">
+                            <div className="relative">
+                              <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                placeholder="Search tasks..."
+                                value={taskSearch}
+                                onChange={(e) => setTaskSearch(e.target.value)}
+                                className="pl-8 h-8 text-sm"
+                                autoFocus
+                              />
+                            </div>
+                            <ScrollArea className="h-32">
+                              <div className="space-y-1">
+                                {filteredTaskBank.map((task) => (
+                                  <button
+                                    key={task.id}
+                                    type="button"
+                                    onClick={() => addTaskToSection(task, null)}
+                                    className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-accent text-left text-xs"
+                                  >
+                                    <TaskIcon iconName={task.emoji} size={14} />
+                                    <span className="flex-1 truncate">{task.title}</span>
+                                    <span className="text-muted-foreground">{task.duration_minutes || 1}m</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </ScrollArea>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setAddingTaskToSection(null);
+                                setTaskSearch('');
+                              }}
+                              className="w-full h-7"
+                            >
+                              Cancel
                             </Button>
                           </div>
                         ) : (
-                          <button
+                          <Button
                             type="button"
-                            onClick={() => {
-                              setSectionInputIndex(index);
-                              setSectionInputValue(task.section_title || '');
-                            }}
-                            className="text-xs text-muted-foreground hover:text-foreground"
-                            title="Add section header"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setAddingTaskToSection('uncategorized')}
+                            className="w-full h-7 text-xs gap-1"
                           >
-                            § 
-                          </button>
+                            <Plus className="h-3 w-3" />
+                            Add Task
+                          </Button>
                         )}
-                        <button
-                          type="button"
-                          onClick={() => removeTask(index)}
-                          className="text-destructive hover:text-destructive/80"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
                       </div>
                     </div>
-                  ))}
-                  {routineTasks.length === 0 && (
-                    <p className="text-center text-muted-foreground text-sm py-4 border border-dashed rounded">
-                      No tasks added yet
-                    </p>
                   )}
                 </div>
-              </div>
-            </div>
-          </ScrollArea>
+              </ScrollArea>
+            </TabsContent>
+          </Tabs>
 
           <DialogFooter className="pt-4 border-t">
             <Button variant="outline" onClick={closeDialog}>Cancel</Button>
             <Button onClick={handleSave} disabled={createRoutine.isPending || updateRoutine.isPending}>
               {editingRoutine ? 'Save Changes' : 'Create Routine'}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Section Editor Dialog */}
+      <Dialog open={sectionDialogOpen} onOpenChange={setSectionDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{editingSection?.isNew ? 'New Section' : 'Edit Section'}</DialogTitle>
+            <DialogDescription>
+              Add descriptive content to introduce this part of the routine
+            </DialogDescription>
+          </DialogHeader>
+          
+          {editingSection && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="section-title">Title *</Label>
+                <Input
+                  id="section-title"
+                  value={editingSection.title}
+                  onChange={(e) => setEditingSection({ ...editingSection, title: e.target.value })}
+                  placeholder="e.g., Get Moving"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="section-content">Content</Label>
+                <Textarea
+                  id="section-content"
+                  value={editingSection.content}
+                  onChange={(e) => setEditingSection({ ...editingSection, content: e.target.value })}
+                  placeholder="Describe what this section is about and why it's important..."
+                  className="min-h-[120px]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="section-image">Image URL (optional)</Label>
+                <Input
+                  id="section-image"
+                  value={editingSection.image_url}
+                  onChange={(e) => setEditingSection({ ...editingSection, image_url: e.target.value })}
+                  placeholder="https://..."
+                />
+                {editingSection.image_url && (
+                  <div className="mt-2 rounded-lg overflow-hidden border">
+                    <img 
+                      src={editingSection.image_url} 
+                      alt="Section preview" 
+                      className="w-full h-32 object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSectionDialogOpen(false)}>Cancel</Button>
+            <Button onClick={saveSectionEdit}>Save Section</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
