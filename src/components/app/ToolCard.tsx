@@ -4,12 +4,14 @@ import { haptic } from '@/lib/haptics';
 import type { ToolConfig } from '@/lib/toolsConfig';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
-  Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, LucideIcon
+  Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
+  GraduationCap, User, LucideIcon
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
-  Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle
+  Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle,
+  GraduationCap, User
 };
 
 interface ToolCardProps {
@@ -87,22 +89,20 @@ export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
     );
   }
 
-  // Default size for Wellness Tools (2-column grid cards) - compact version
+  // Default size for Wellness Tools (2-column grid cards) - with pastel background
   return (
     <button
       onClick={handleClick}
       disabled={tool.comingSoon}
       className={cn(
-        'flex items-center gap-2.5 p-3 rounded-xl bg-card',
-        'border border-border/40 shadow-sm',
+        'flex items-center gap-2.5 p-3 rounded-xl',
+        'shadow-sm border border-black/5',
         'transition-transform active:scale-[0.97]',
+        tool.bgColor,
         tool.comingSoon && 'opacity-60'
       )}
     >
-      <div className={cn(
-        'w-10 h-10 rounded-xl flex items-center justify-center shrink-0',
-        tool.bgColor
-      )}>
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-white/60">
         <IconComponent className={cn('h-5 w-5', tool.iconColor)} />
       </div>
       <div className="flex flex-col items-start min-w-0">
