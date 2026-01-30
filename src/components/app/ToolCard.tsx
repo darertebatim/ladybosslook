@@ -12,6 +12,26 @@ const iconMap: Record<string, LucideIcon> = {
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle
 };
 
+// Icon-specific animations that match the tool's meaning
+const iconAnimations: Record<string, string> = {
+  BookOpen: 'group-hover:animate-[wiggle_0.5s_ease-in-out]',
+  Wind: 'group-hover:animate-[blow_1s_ease-in-out_infinite]',
+  Droplets: 'group-hover:animate-[bounce_0.6s_ease-in-out]',
+  Sparkles: 'group-hover:animate-[pulse_0.8s_ease-in-out_infinite]',
+  Brain: 'group-hover:animate-[pulse_1s_ease-in-out_infinite]',
+  Dumbbell: 'group-hover:animate-[shake_0.4s_ease-in-out]',
+  Waves: 'group-hover:animate-[wave_1.5s_ease-in-out_infinite]',
+  Bot: 'group-hover:animate-[bounce_0.5s_ease-in-out]',
+  Trophy: 'group-hover:animate-[wiggle_0.5s_ease-in-out]',
+  Smile: 'group-hover:animate-[bounce_0.4s_ease-in-out]',
+  Heart: 'group-hover:animate-[heartbeat_0.8s_ease-in-out_infinite]',
+  Timer: 'group-hover:animate-[spin_2s_linear_infinite]',
+  Palette: 'group-hover:animate-[wiggle_0.5s_ease-in-out]',
+  PenLine: 'group-hover:animate-[write_0.6s_ease-in-out]',
+  ClipboardCheck: 'group-hover:animate-[bounce_0.4s_ease-in-out]',
+  Target: 'group-hover:animate-[pulse_0.8s_ease-in-out_infinite]',
+};
+
 interface ToolCardProps {
   tool: ToolConfig;
   size?: 'default' | 'compact' | 'teaser';
@@ -20,8 +40,9 @@ interface ToolCardProps {
 export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
   const navigate = useNavigate();
   
-  // Get the icon component from the map
+  // Get the icon component and animation from the maps
   const IconComponent = iconMap[tool.icon] || Circle;
+  const iconAnimation = iconAnimations[tool.icon] || '';
 
   const handleClick = () => {
     if (tool.comingSoon) {
@@ -53,7 +74,7 @@ export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
           'bg-gradient-to-br shadow-md',
           tool.iconGradient
         )}>
-          <IconComponent className="h-5 w-5 text-white" />
+          <IconComponent className={cn("h-5 w-5 text-white", iconAnimation)} />
         </div>
 
         {/* Title */}
@@ -99,7 +120,7 @@ export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
           'group-hover:scale-105 transition-transform duration-300',
           tool.iconGradient
         )}>
-          <IconComponent className="h-5 w-5 text-white drop-shadow-sm" />
+          <IconComponent className={cn("h-5 w-5 text-white drop-shadow-sm", iconAnimation)} />
         </div>
 
         {/* Title */}
@@ -145,7 +166,7 @@ export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
         'group-hover:scale-105 group-hover:shadow-xl transition-all duration-300',
         tool.iconGradient
       )}>
-        <IconComponent className="h-6 w-6 text-white drop-shadow-sm" />
+        <IconComponent className={cn("h-6 w-6 text-white drop-shadow-sm", iconAnimation)} />
       </div>
 
       {/* Text Content */}
