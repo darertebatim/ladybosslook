@@ -210,33 +210,6 @@ const AppStore = () => {
               </section>
             )}
 
-            {/* Audio & Video Section */}
-            {(!searchQuery || filteredAudioTools.length > 0) && (
-              <section>
-                <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
-                  Audio & Video
-                </h2>
-                <div className="flex justify-around">
-                  {filteredAudioTools.map((tool) => (
-                    <ToolCard key={tool.id} tool={tool} size="compact" />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Coming Soon Section - inline with Audio */}
-            {comingSoonTools.length > 0 && !searchQuery && (
-              <section>
-                <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
-                  Coming Soon
-                </h2>
-                <div className="flex justify-around">
-                  {comingSoonTools.map((tool) => (
-                    <ToolCard key={tool.id} tool={tool} size="teaser" />
-                  ))}
-                </div>
-              </section>
-            )}
 
             {/* Programs Section */}
             {(!searchQuery || hasProgramMatches) && freePrograms.length > 0 && (
