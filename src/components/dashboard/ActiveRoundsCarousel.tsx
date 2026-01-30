@@ -46,8 +46,17 @@ export function ActiveRoundsCarousel({
     }
   });
   
-  // Check if there's a new enrollment that wasn't in our local seen list
-  const hasNewEnrollment = activeRounds.some(e => !seenIds.has(e.id));
+  // Track if this is the initial load (no saved IDs yet means first time user)
+  const [hasInitialized, setHasInitialized] = useState(() => {
+    try {
+      return localStorage.getItem(SEEN_ENROLLMENTS_KEY) !== null;
+    } catch {
+      return false;
+    }
+  });
+  
+  // Only detect "new" enrollment if we've seen this user before AND there's an ID not in seenIds
+  const hasNewEnrollment = hasInitialized && activeRounds.some(e => !seenIds.has(e.id));
 
   // Persist collapsed state - default to collapsed, but auto-expand if new programs
   const [isCollapsed, setIsCollapsed] = useState(() => {
@@ -71,10 +80,10 @@ export function ActiveRoundsCarousel({
   useEffect(() => {
     if (activeRounds.length > 0) {
       const currentIds = new Set(activeRounds.map(e => e.id));
-      // Only update if there are new IDs
       const hasNew = activeRounds.some(e => !seenIds.has(e.id));
-      if (hasNew) {
+      if (hasNew || !hasInitialized) {
         setSeenIds(currentIds);
+        setHasInitialized(true);
         try {
           localStorage.setItem(SEEN_ENROLLMENTS_KEY, JSON.stringify([...currentIds]));
         } catch {
@@ -82,7 +91,7 @@ export function ActiveRoundsCarousel({
         }
       }
     }
-  }, [activeRounds, seenIds]);
+  }, [activeRounds, seenIds, hasInitialized]);
 
   useEffect(() => {
     localStorage.setItem(COLLAPSED_KEY, isCollapsed.toString());
