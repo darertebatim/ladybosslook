@@ -312,7 +312,7 @@ export default function AppInspire() {
       </div>
 
       {/* Routine Preview Sheet for editing task before adding */}
-      {syntheticTask && (
+      {syntheticTask && selectedTemplate && (
         <RoutinePreviewSheet
           open={previewSheetOpen}
           onOpenChange={(open) => {
@@ -320,7 +320,8 @@ export default function AppInspire() {
             if (!open) setSelectedTemplate(null);
           }}
           tasks={[syntheticTask]}
-          routineTitle={selectedTemplate?.title || 'Task'}
+          routineTitle={selectedTemplate.title}
+          defaultTag={categories?.find(c => c.slug === selectedTemplate.category)?.name || null}
           onSave={handleSaveRoutine}
           isSaving={addRoutinePlan.isPending}
         />
