@@ -70,7 +70,26 @@ const AppHome = () => {
   // Handle quick start continue
   const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
     if (template) {
-      navigate(`/app/home/new?name=${encodeURIComponent(template.title)}&emoji=${encodeURIComponent(template.emoji)}&color=${template.color}`);
+      const params = new URLSearchParams({
+        name: template.title,
+        emoji: template.emoji,
+        color: template.color,
+        repeat_pattern: template.repeat_pattern,
+        ...(template.repeat_days ? { repeat_days: JSON.stringify(template.repeat_days) } : {}),
+        ...(template.tag ? { tag: template.tag } : {}),
+        ...(template.goal_enabled ? { 
+          goal_enabled: 'true',
+          goal_type: template.goal_type || '',
+          goal_target: String(template.goal_target || ''),
+          goal_unit: template.goal_unit || ''
+        } : {}),
+        ...(template.pro_link_type ? {
+          pro_link_type: template.pro_link_type,
+          pro_link_value: template.pro_link_value || ''
+        } : {}),
+        ...(template.linked_playlist_id ? { linked_playlist_id: template.linked_playlist_id } : {}),
+      });
+      navigate(`/app/home/new?${params.toString()}`);
     } else {
       navigate(`/app/home/new?name=${encodeURIComponent(taskName)}`);
     }

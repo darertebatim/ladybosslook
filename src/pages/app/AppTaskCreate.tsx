@@ -129,9 +129,22 @@ const AppTaskCreate = ({
   const urlName = searchParams.get('name') || '';
   const urlEmoji = searchParams.get('emoji') || '';
   const urlColor = searchParams.get('color') as TaskColor | null;
+  const urlRepeatPattern = searchParams.get('repeat_pattern') as 'none' | 'daily' | 'weekly' | 'monthly' | null;
+  const urlRepeatDays = searchParams.get('repeat_days');
+  const urlTag = searchParams.get('tag');
+  const urlGoalEnabled = searchParams.get('goal_enabled') === 'true';
+  const urlGoalType = searchParams.get('goal_type') as 'count' | 'timer' | null;
+  const urlGoalTarget = searchParams.get('goal_target');
+  const urlGoalUnit = searchParams.get('goal_unit');
+  const urlProLinkType = searchParams.get('pro_link_type') as ProLinkType | null;
+  const urlProLinkValue = searchParams.get('pro_link_value');
+  const urlLinkedPlaylistId = searchParams.get('linked_playlist_id');
   
   const isEditing = !!taskId || !!initialData;
   const { effectiveInset, isKeyboardOpen } = useKeyboard();
+
+  // Parse URL repeat days
+  const parsedRepeatDays = urlRepeatDays ? JSON.parse(urlRepeatDays) as number[] : [];
 
   // Form state - prioritize URL params for new tasks
   const [title, setTitle] = useState(initialData?.title || urlName || '');
@@ -141,28 +154,38 @@ const AppTaskCreate = ({
   const [scheduledTime, setScheduledTime] = useState<string | null>(initialData?.scheduledTime ?? null);
   const [scheduledEndTime, setScheduledEndTime] = useState<string | null>(null);
   const [timeMode, setTimeMode] = useState<'point' | 'period'>('point');
-  const [repeatEnabled, setRepeatEnabled] = useState(initialData?.repeatEnabled ?? false);
-  const [repeatPattern, setRepeatPattern] = useState<'daily' | 'weekly' | 'monthly'>(initialData?.repeatPattern || 'daily');
+  const [repeatEnabled, setRepeatEnabled] = useState(
+    initialData?.repeatEnabled ?? (urlRepeatPattern && urlRepeatPattern !== 'none') ?? false
+  );
+  const [repeatPattern, setRepeatPattern] = useState<'daily' | 'weekly' | 'monthly'>(
+    initialData?.repeatPattern || (urlRepeatPattern && urlRepeatPattern !== 'none' ? urlRepeatPattern : 'daily')
+  );
   const [repeatInterval, setRepeatInterval] = useState(initialData?.repeatInterval || 1);
-  const [repeatDays, setRepeatDays] = useState<number[]>(initialData?.repeatDays || []);
+  const [repeatDays, setRepeatDays] = useState<number[]>(initialData?.repeatDays || parsedRepeatDays || []);
   const [reminderEnabled, setReminderEnabled] = useState(initialData?.reminderEnabled ?? false);
   const [reminderTime, setReminderTime] = useState(initialData?.reminderTime || '09:00');
   const [isUrgent, setIsUrgent] = useState(initialData?.isUrgent ?? false);
   const [showUrgentConfirm, setShowUrgentConfirm] = useState(false);
-  const [tag, setTag] = useState<string | null>(initialData?.tag ?? null);
+  const [tag, setTag] = useState<string | null>(initialData?.tag ?? urlTag ?? null);
   const [subtasks, setSubtasks] = useState<string[]>(initialData?.subtasks || []);
   const [newSubtask, setNewSubtask] = useState('');
-  const [linkedPlaylistId, setLinkedPlaylistId] = useState<string | null>(initialData?.linkedPlaylistId ?? null);
-  const [proLinkType, setProLinkType] = useState<ProLinkType | null>(initialData?.proLinkType ?? null);
-  const [proLinkValue, setProLinkValue] = useState<string | null>(initialData?.proLinkValue ?? null);
+  const [linkedPlaylistId, setLinkedPlaylistId] = useState<string | null>(
+    initialData?.linkedPlaylistId ?? urlLinkedPlaylistId ?? null
+  );
+  const [proLinkType, setProLinkType] = useState<ProLinkType | null>(
+    initialData?.proLinkType ?? urlProLinkType ?? null
+  );
+  const [proLinkValue, setProLinkValue] = useState<string | null>(
+    initialData?.proLinkValue ?? urlProLinkValue ?? null
+  );
   const [newTagName, setNewTagName] = useState('');
   
   // Goal settings state - defaults: timer=1 min (60s), count=2
   const [goalSettings, setGoalSettings] = useState<GoalSettings>({
-    enabled: initialData?.goalEnabled ?? false,
-    type: initialData?.goalType ?? 'count',
-    target: initialData?.goalTarget ?? 2,
-    unit: initialData?.goalUnit ?? 'times',
+    enabled: initialData?.goalEnabled ?? urlGoalEnabled ?? false,
+    type: initialData?.goalType ?? urlGoalType ?? 'count',
+    target: initialData?.goalTarget ?? (urlGoalTarget ? parseInt(urlGoalTarget) : 2),
+    unit: initialData?.goalUnit ?? urlGoalUnit ?? 'times',
   });
 
   // Sheet states
