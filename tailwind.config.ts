@@ -18,12 +18,13 @@ export default {
 			}
 		},
 		extend: {
-			fontFamily: {
-				'persian': ['Vazirmatn', 'Inter', 'sans-serif'],
-				'farsi': ['Vazirmatn', 'sans-serif'],
-				'display': ['Playfair Display', 'serif'],
-				'body': ['Inter', 'sans-serif'],
-			},
+		fontFamily: {
+			'persian': ['Vazirmatn', 'Inter', 'sans-serif'],
+			'farsi': ['Vazirmatn', 'sans-serif'],
+			'display': ['Playfair Display', 'serif'],
+			'body': ['Inter', 'sans-serif'],
+			'app': ['Nunito', 'sans-serif'],
+		},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
