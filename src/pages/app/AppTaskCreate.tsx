@@ -52,23 +52,7 @@ const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
   { name: 'lavender', hex: '#E8D4F8' },
 ];
 
-// Default tag categories (expanded from Me+ screenshot)
-const DEFAULT_TAGS = [
-  'Morning Routine',
-  'Workout',
-  'Clean Room',
-  'Healthy Lifestyle',
-  'Sleep Better',
-  'Relationship',
-  'Morning Routines',
-  'Night Reset',
-  'The Green Plan',
-  'Take Care of Myself',
-  'Business',
-  'Self Care',
-  'Wellness',
-  'Evening',
-];
+// Note: Tags are now fetched from routine_categories table dynamically
 
 // Reminder presets (Me+ style)
 const REMINDER_PRESETS = [
@@ -248,6 +232,21 @@ const AppTaskCreate = ({
       
       if (error) throw error;
       return data as { id: string; name: string; emoji: string | null; category: string }[];
+    },
+  });
+
+  // Fetch routine categories for tags (dynamic instead of hardcoded)
+  const { data: routineCategories = [] } = useQuery({
+    queryKey: ['routine-categories-for-tags'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routine_categories')
+        .select('name, slug')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      
+      if (error) throw error;
+      return data as { name: string; slug: string }[];
     },
   });
 
@@ -606,8 +605,9 @@ const AppTaskCreate = ({
     }
   };
 
-  // All tags combined (defaults + user created)
-  const allTags = [...DEFAULT_TAGS, ...userTags.filter(t => !DEFAULT_TAGS.includes(t.name)).map(t => t.name)];
+  // All tags combined (category names + user created tags that aren't already categories)
+  const categoryNames = routineCategories.map(c => c.name);
+  const allTags = [...categoryNames, ...userTags.filter(t => !categoryNames.includes(t.name)).map(t => t.name)];
 
   // The main content (Me+ style with dynamic background color)
   const bgColor = getColorHex(color);
