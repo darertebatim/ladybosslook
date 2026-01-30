@@ -222,7 +222,7 @@ export const TaskCard = memo(function TaskCard({
             
             {/* Title - strike through when goal reached or completed */}
             <p className={cn(
-              'font-bold text-black text-[15px] truncate transition-all',
+              'text-black text-[15px] truncate transition-all',
               (hasGoal ? goalReached : isCompleted) && 'line-through'
             )}>
               {task.title}
@@ -332,7 +332,7 @@ export const TaskCard = memo(function TaskCard({
           
           {/* Title - for goal tasks, only strike when goal reached; for regular tasks, when completed */}
           <p className={cn(
-            'font-bold text-black text-[15px] truncate transition-all',
+            'text-black text-[15px] truncate transition-all',
             (hasGoal ? goalReached : isCompleted) && 'line-through'
           )}>
             {task.title}
