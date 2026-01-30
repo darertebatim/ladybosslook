@@ -1339,6 +1339,84 @@ export type Database = {
         }
         Relationships: []
       }
+      period_logs: {
+        Row: {
+          created_at: string
+          date: string
+          flow_intensity: string | null
+          id: string
+          is_period_day: boolean
+          notes: string | null
+          symptoms: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          flow_intensity?: string | null
+          id?: string
+          is_period_day?: boolean
+          notes?: string | null
+          symptoms?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          flow_intensity?: string | null
+          id?: string
+          is_period_day?: boolean
+          notes?: string | null
+          symptoms?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      period_settings: {
+        Row: {
+          average_cycle: number
+          average_period: number
+          created_at: string
+          id: string
+          last_period_start: string | null
+          onboarding_done: boolean
+          reminder_days: number
+          reminder_enabled: boolean
+          show_on_home: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          average_cycle?: number
+          average_period?: number
+          created_at?: string
+          id?: string
+          last_period_start?: string | null
+          onboarding_done?: boolean
+          reminder_days?: number
+          reminder_enabled?: boolean
+          show_on_home?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          average_cycle?: number
+          average_period?: number
+          created_at?: string
+          id?: string
+          last_period_start?: string | null
+          onboarding_done?: boolean
+          reminder_days?: number
+          reminder_enabled?: boolean
+          show_on_home?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       planner_program_completions: {
         Row: {
           completed_date: string

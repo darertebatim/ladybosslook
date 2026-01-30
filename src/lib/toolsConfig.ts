@@ -136,8 +136,6 @@ export const comingSoonTools: ToolConfig[] = [
     iconColor: 'text-pink-600',
     route: '/app/period',
     description: 'Cycle tracking',
-    comingSoon: true,
-    hidden: true,
   },
   {
     id: 'fasting',
