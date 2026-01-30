@@ -53,6 +53,7 @@ interface RoutinePreviewSheetProps {
   onOpenChange: (open: boolean) => void;
   tasks: RoutinePlanTask[];
   routineTitle: string;
+  defaultTag?: string | null;
   onSave: (selectedTaskIds: string[], editedTasks: EditedTask[]) => void;
   isSaving?: boolean;
 }
@@ -62,6 +63,7 @@ export function RoutinePreviewSheet({
   onOpenChange,
   tasks,
   routineTitle,
+  defaultTag,
   onSave,
   isSaving,
 }: RoutinePreviewSheetProps) {
@@ -160,7 +162,7 @@ export function RoutinePreviewSheet({
       repeatInterval: 1,
       reminderEnabled: existing?.reminderEnabled ?? false,
       reminderTime: existing?.reminderTime || '09:00',
-      tag: existing?.tag ?? routineTitle,
+      tag: existing?.tag ?? defaultTag ?? routineTitle,
       subtasks: existing?.subtasks || [],
       linkedPlaylistId: proLinkType === 'playlist' ? proLinkValue : null,
       proLinkType: proLinkType as ProLinkType | null,
