@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, ChevronDown, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,21 +34,25 @@ export function ActiveRoundsCarousel({
 
   // Check if any programs have the "new" or "updated" tag
   const hasUnseenPrograms = unseenEnrollments.size > 0 || unseenRounds.size > 0;
+  
+  // Track if we've already auto-expanded for the current unseen items
+  const hasAutoExpandedRef = useRef(false);
 
-  // Persist collapsed state - default to collapsed, auto-expand only if unseen programs
+  // Persist collapsed state - default to collapsed
   const [isCollapsed, setIsCollapsed] = useState(() => {
-    if (hasUnseenPrograms) {
-      return false;
-    }
     const saved = localStorage.getItem(COLLAPSED_KEY);
     // Default to collapsed unless explicitly set to 'false'
     return saved !== 'false';
   });
 
-  // Auto-expand when unseen programs are detected
+  // Auto-expand ONLY when unseen programs are newly detected (transition from none to some)
   useEffect(() => {
-    if (hasUnseenPrograms) {
+    if (hasUnseenPrograms && !hasAutoExpandedRef.current) {
       setIsCollapsed(false);
+      hasAutoExpandedRef.current = true;
+    } else if (!hasUnseenPrograms) {
+      // Reset the flag when there are no unseen programs
+      hasAutoExpandedRef.current = false;
     }
   }, [hasUnseenPrograms]);
 
