@@ -325,8 +325,8 @@ const AppHome = () => {
       }}>
           {/* Title bar */}
           <div className="flex items-center justify-between px-4 h-12">
-            {/* Left: Water + Breathe + Journal + Routines + Profile buttons */}
-            <div className="flex items-center gap-1">
+            {/* Left: Water + Breathe + Journal + Routines + Profile buttons - hidden when calendar expanded */}
+            <div className={cn("flex items-center gap-1 transition-opacity duration-200", showCalendar ? "opacity-0 pointer-events-none" : "opacity-100")}>
               <button onClick={() => navigate('/app/water')} className="p-2 -ml-2 text-sky-500 hover:text-sky-600 transition-colors">
                 <Droplets className="h-5 w-5" />
               </button>
