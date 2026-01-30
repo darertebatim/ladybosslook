@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, MessageCircle, ShoppingBag, Music, GraduationCap, Users, Headset } from 'lucide-react';
+import { Home, MessageCircle, ShoppingBag, Music, Users, Headset } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { useChatNotifications } from '@/hooks/useChatNotifications';
+import { cn } from '@/lib/utils';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { usePushNotificationFlow } from '@/hooks/usePushNotificationFlow';
 
@@ -157,19 +158,26 @@ const NativeAppLayout = () => {
               (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
             const Icon = item.icon;
             const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
-            const showBadge = showChatBadge || item.showBadge;
+            
             return (
-            <Link
+              <Link
                 key={item.path}
                 to={item.path}
-                className={`flex flex-col items-center justify-center gap-0.5 transition-colors min-h-[44px] ${item.tourClass || ''} ${
-                  isActive
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                className={cn(
+                  'flex flex-col items-center justify-center gap-0.5 min-h-[44px] transition-colors',
+                  item.tourClass
+                )}
               >
-                <div className="relative">
-                  <Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''}`} />
+                <div className="relative flex flex-col items-center">
+                  <Icon 
+                    className={cn(
+                      'h-6 w-6',
+                      isActive ? 'text-foreground' : 'text-muted-foreground'
+                    )}
+                    strokeWidth={isActive ? 2.5 : 1.5}
+                  />
+                  
+                  {/* Badges */}
                   {showChatBadge && (
                     <span className="absolute -top-1 -right-2 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
                       {unreadCount > 99 ? '99+' : unreadCount}
@@ -183,8 +191,21 @@ const NativeAppLayout = () => {
                   {item.showBadge && !showChatBadge && !item.badgeCount && (
                     <span className="absolute -top-0.5 -right-0.5 bg-primary w-2 h-2 rounded-full" />
                   )}
+                  
+                  {/* Active indicator dot */}
+                  {isActive && (
+                    <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-foreground" />
+                  )}
                 </div>
-                <span className="text-[10px] font-medium">{item.label}</span>
+                
+                <span className={cn(
+                  'text-[10px]',
+                  isActive 
+                    ? 'text-foreground font-semibold' 
+                    : 'text-muted-foreground font-medium'
+                )}>
+                  {item.label}
+                </span>
               </Link>
             );
           })}
