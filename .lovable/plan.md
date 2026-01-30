@@ -1,368 +1,181 @@
 
 
-# Browse Hub Redesign
+# Bottom Navigation Bar Redesign
 
-## Overview
+## Problem Analysis
 
-Transform the Browse page from a programs-only store into a comprehensive **Tools & Content Hub** - the main discovery point for all app features, tools, and content. Designed specifically for iOS users with native-feeling interactions and polished visuals.
+The current bottom navigation has a critical visual issue:
+- When a tab is active, `fill-current` is applied to Lucide icons
+- Lucide icons are **stroke-based** (outlines), not designed for solid fills
+- Filling them creates an ugly, blocky appearance as seen in the screenshots
+
+**Current Code (line 172):**
+```tsx
+<Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''}`} />
+```
 
 ---
 
-## Current State
+## Proposed Design: iOS-Native Tab Bar
 
-- `AppStore.tsx` only shows free programs/courses with category filters
-- Tools like Journal, Breathe, Water, Routines are accessible via Home quick actions or hidden routes
-- No unified discovery experience for all app capabilities
-- Meditate, Workout, Soundscape exist as playlist categories in Listen but aren't easily discoverable
+Inspired by Apple's Human Interface Guidelines and modern iOS apps, we'll create a clean, premium tab bar with these characteristics:
 
----
-
-## Proposed Visual Design
-
-The new Browse page will have **four distinct sections** with a clean, iOS-native aesthetic:
+### Visual Design
 
 ```text
-+------------------------------------------+
-|  Browse                          [search] |
-+------------------------------------------+
-|                                          |
-|  ═══ WELLNESS TOOLS ═══                  |
-|  +----------+ +----------+ +----------+  |
-|  | Journal  | | Breathe  | |  Water   |  |
-|  |    📝    | |   🌬️    | |    💧    |  |
-|  |  Daily   | | Breathing| | Hydration|  |
-|  | Reflection| Exercises |  Tracker  |  |
-|  +----------+ +----------+ +----------+  |
-|  +----------+                            |
-|  | Routines |                            |
-|  |    ✨    |                            |
-|  |  Daily   |                            |
-|  |  Habits  |                            |
-|  +----------+                            |
-|                                          |
-|  ═══ AUDIO EXPERIENCES ═══               |
-|  +----------+ +----------+ +----------+  |
-|  | Meditate | | Workout  | |Soundscape|  |
-|  |    🧘    | |   💪    | |    🌊    |  |
-|  |  Guided  | |Energizing|  Ambient   |  |
-|  |Meditation| |  Audio   |   Sounds   |  |
-|  +----------+ +----------+ +----------+  |
-|                                          |
-|  ═══ COMING SOON ═══ (collapsed/hidden)  |
-|  [Period] [Fasting] [Mood] [Habits]...   |
-|                                          |
-|  ═══ BROWSE PROGRAMS ═══                 |
-|  [Category circles: All, Courses, etc.]  |
-|  [Program Card] [Program Card]           |
-|  [Program Card] [Program Card]           |
-|                                          |
-+------------------------------------------+
++----------------------------------------------------+
+|                                                    |
+|   🏠          🛍️          🎵         👥        🎧    |
+|   Home      Browse     Listen    Channels  Support |
+|   ━━━━                                              |
+|  (active)  (inactive) (inactive) (inactive) (badge)|
+|                                                    |
++----------------------------------------------------+
 ```
 
----
+### Active vs Inactive States
 
-## Tool Card Design
+| State | Icon Style | Label | Indicator |
+|-------|-----------|-------|-----------|
+| **Inactive** | Light stroke (stroke-width: 1.5), muted color | `text-muted-foreground` | None |
+| **Active** | Bold stroke (stroke-width: 2.5), primary color | `text-foreground font-semibold` | Subtle dot or underline below icon |
 
-Each tool card will have a premium, iOS-native feel with soft shadows and rounded corners:
+### Key Improvements
 
-**Visual Specification:**
-
-| Element | Style |
-|---------|-------|
-| Card Size | Square-ish aspect ratio (roughly 1:1.1) |
-| Border Radius | 20px (rounded-2xl) |
-| Background | Soft gradient based on tool color |
-| Shadow | Subtle drop shadow (shadow-md) |
-| Icon | Large emoji or Lucide icon in the center |
-| Title | Centered, bold, below icon |
-| Subtitle | Small muted text describing the tool |
-| Active State | Scale down to 98% on tap |
-
-**Color Palette for Tools:**
-
-| Tool | Primary Color | Gradient | Icon |
-|------|---------------|----------|------|
-| Journal | Warm orange | `from-amber-100 to-orange-100` | BookOpen or 📝 |
-| Breathe | Calming teal | `from-teal-100 to-cyan-100` | Wind or 🌬️ |
-| Water | Fresh sky blue | `from-sky-100 to-blue-100` | Droplets or 💧 |
-| Routines | Vibrant purple | `from-purple-100 to-violet-100` | Sparkles or ✨ |
-| Meditate | Deep indigo | `from-indigo-100 to-purple-100` | Brain or 🧘 |
-| Workout | Energetic rose | `from-rose-100 to-pink-100` | Dumbbell or 💪 |
-| Soundscape | Ocean teal | `from-teal-100 to-blue-100` | Waves or 🌊 |
+1. **Remove `fill-current`** - No more ugly filled icons
+2. **Increase stroke weight on active** - Makes active icon visually heavier without filling
+3. **Add active indicator** - Small dot or bar below active icon (iOS pattern)
+4. **Better visual hierarchy** - Active tab has bolder text weight
+5. **Refined spacing** - Consistent padding and alignment
 
 ---
 
-## Section 1: Wellness Tools
+## Implementation Details
 
-Active functional tools that users can use right now:
+### Icon Styling
 
-| Tool | Route | Description |
-|------|-------|-------------|
-| Journal | `/app/journal` | Daily reflections |
-| Breathe | `/app/breathe` | Breathing exercises |
-| Water | `/app/water` | Hydration tracker |
-| Routines | `/app/routines` | Daily habits & tasks |
-
-**Layout:** 2x2 grid
-
----
-
-## Section 2: Audio Experiences
-
-Audio-based tools that navigate to the Listen page with a pre-selected category filter:
-
-| Tool | Route | Description |
-|------|-------|-------------|
-| Meditate | `/app/player?category=meditate` | Guided meditation sessions |
-| Workout | `/app/player?category=workout` | Energizing workout audio |
-| Soundscape | `/app/player?category=soundscape` | Ambient sounds for focus |
-
-**Layout:** 3-column row or wrap
-
----
-
-## Section 3: Coming Soon (Hidden by Default)
-
-Future tools that will be grayed out with a "Coming Soon" badge. These are **not visible** yet but structured in the config for easy activation:
-
-| Tool | Status | Description |
-|------|--------|-------------|
-| Period Tracker | hidden | Cycle tracking |
-| Fasting Tracker | hidden | Intermittent fasting |
-| Mood Tracker | hidden | Emotional wellness |
-| Name Emotions | hidden | Emotional vocabulary |
-| Reflections | hidden | Guided prompts |
-| Tests | hidden | Assessments |
-| Challenges | hidden | Goal challenges |
-| AI Companion | hidden | AI chat assistant |
-| Habit Tracker | hidden | Habit building |
-
-**Visibility Control:** A simple boolean `comingSoon` flag in the config. When set to `true`, they're hidden. When ready, flip to `false`.
-
----
-
-## Section 4: Browse Programs
-
-Existing program browsing functionality moved to the bottom, with:
-- Category filter circles (scrollable horizontal row)
-- Program cards in 2-column grid
-- Maintains all current enrollment logic
-
----
-
-## Technical Implementation
-
-### New Files to Create
-
-**1. `src/lib/toolsConfig.ts`**
-Centralized configuration for all tools:
-
-```typescript
-export interface ToolConfig {
-  id: string;
-  name: string;
-  icon: string;        // Lucide icon name
-  emoji?: string;      // Optional emoji alternative
-  color: string;       // Color theme
-  gradient: string;    // Tailwind gradient classes
-  route: string;       // Navigation path
-  description: string; // Short subtitle
-  comingSoon?: boolean;
-  hidden?: boolean;    // Don't show at all
-}
-
-export const wellnessTools: ToolConfig[] = [
-  {
-    id: 'journal',
-    name: 'Journal',
-    icon: 'BookOpen',
-    emoji: '📝',
-    color: 'orange',
-    gradient: 'from-amber-100 to-orange-100',
-    route: '/app/journal',
-    description: 'Daily reflections',
-  },
-  {
-    id: 'breathe',
-    name: 'Breathe',
-    icon: 'Wind',
-    emoji: '🌬️',
-    color: 'teal',
-    gradient: 'from-teal-100 to-cyan-100',
-    route: '/app/breathe',
-    description: 'Breathing exercises',
-  },
-  {
-    id: 'water',
-    name: 'Water',
-    icon: 'Droplets',
-    emoji: '💧',
-    color: 'sky',
-    gradient: 'from-sky-100 to-blue-100',
-    route: '/app/water',
-    description: 'Hydration tracker',
-  },
-  {
-    id: 'routines',
-    name: 'Routines',
-    icon: 'Sparkles',
-    emoji: '✨',
-    color: 'purple',
-    gradient: 'from-purple-100 to-violet-100',
-    route: '/app/routines',
-    description: 'Daily habits',
-  },
-];
-
-export const audioTools: ToolConfig[] = [
-  {
-    id: 'meditate',
-    name: 'Meditate',
-    icon: 'Brain',
-    emoji: '🧘',
-    color: 'indigo',
-    gradient: 'from-indigo-100 to-purple-100',
-    route: '/app/player?category=meditate',
-    description: 'Guided meditation',
-  },
-  {
-    id: 'workout',
-    name: 'Workout',
-    icon: 'Dumbbell',
-    emoji: '💪',
-    color: 'rose',
-    gradient: 'from-rose-100 to-pink-100',
-    route: '/app/player?category=workout',
-    description: 'Energizing audio',
-  },
-  {
-    id: 'soundscape',
-    name: 'Soundscape',
-    icon: 'Waves',
-    emoji: '🌊',
-    color: 'teal',
-    gradient: 'from-teal-100 to-blue-100',
-    route: '/app/player?category=soundscape',
-    description: 'Ambient sounds',
-  },
-];
-
-export const comingSoonTools: ToolConfig[] = [
-  { id: 'period', name: 'Period', icon: 'Heart', ... },
-  { id: 'fasting', name: 'Fasting', icon: 'Timer', ... },
-  { id: 'mood', name: 'Mood', icon: 'Smile', ... },
-  { id: 'emotions', name: 'Emotions', icon: 'Palette', ... },
-  { id: 'reflections', name: 'Reflections', icon: 'PenLine', ... },
-  { id: 'tests', name: 'Tests', icon: 'ClipboardCheck', ... },
-  { id: 'challenges', name: 'Challenges', icon: 'Trophy', ... },
-  { id: 'ai', name: 'AI Coach', icon: 'Bot', ... },
-  { id: 'habits', name: 'Habits', icon: 'Target', ... },
-];
+```tsx
+// Instead of fill-current, use stroke-width variation
+<Icon 
+  className={cn(
+    'h-6 w-6',  // Slightly larger for better touch targets
+    isActive 
+      ? 'text-foreground' 
+      : 'text-muted-foreground'
+  )}
+  strokeWidth={isActive ? 2.5 : 1.5}  // Bolder stroke when active
+/>
 ```
 
-**2. `src/components/app/ToolCard.tsx`**
-Reusable tool card component with iOS-native styling:
+### Active Indicator Options
 
-```typescript
-interface ToolCardProps {
-  tool: ToolConfig;
-  size?: 'default' | 'compact';
-}
+**Option A: Dot indicator (Apple Music style)**
+```tsx
+{isActive && (
+  <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-foreground" />
+)}
+```
 
-export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
-  const navigate = useNavigate();
-  const IconComponent = icons[tool.icon];
+**Option B: Underline bar (minimal)**
+```tsx
+{isActive && (
+  <span className="absolute -bottom-0.5 w-4 h-0.5 rounded-full bg-foreground" />
+)}
+```
+
+### Label Styling
+```tsx
+<span className={cn(
+  'text-[10px] mt-0.5',
+  isActive 
+    ? 'text-foreground font-semibold' 
+    : 'text-muted-foreground font-medium'
+)}>
+  {item.label}
+</span>
+```
+
+### Badge Refinements
+Keep badges as-is but ensure they don't interfere with the active indicator.
+
+---
+
+## File Changes
+
+| File | Changes |
+|------|---------|
+| `src/layouts/NativeAppLayout.tsx` | Update icon styling, add active indicator, refine label styles |
+
+---
+
+## Technical Details
+
+### Updated navItems Rendering
+
+```tsx
+{navItems.map((item) => {
+  const isActive = location.pathname === item.path || 
+    (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
+  const Icon = item.icon;
   
   return (
-    <button
-      onClick={() => {
-        haptic.light();
-        navigate(tool.route);
-      }}
+    <Link
+      key={item.path}
+      to={item.path}
       className={cn(
-        'relative rounded-2xl p-4 flex flex-col items-center justify-center gap-2',
-        'bg-gradient-to-br shadow-md',
-        'transition-all active:scale-[0.98]',
-        tool.gradient,
-        size === 'default' ? 'aspect-square' : 'aspect-[4/3]'
+        'flex flex-col items-center justify-center gap-0.5 min-h-[44px]',
+        'transition-colors',
+        item.tourClass
       )}
     >
-      {/* Icon/Emoji */}
-      {tool.emoji ? (
-        <span className="text-4xl">{tool.emoji}</span>
-      ) : (
-        <IconComponent className="h-10 w-10 text-foreground/80" />
-      )}
+      <div className="relative flex flex-col items-center">
+        <Icon 
+          className={cn(
+            'h-6 w-6',
+            isActive ? 'text-foreground' : 'text-muted-foreground'
+          )}
+          strokeWidth={isActive ? 2.5 : 1.5}
+        />
+        
+        {/* Badges... */}
+        
+        {/* Active indicator dot */}
+        {isActive && (
+          <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-foreground" />
+        )}
+      </div>
       
-      {/* Title */}
-      <h3 className="font-semibold text-foreground text-sm">{tool.name}</h3>
-      
-      {/* Subtitle */}
-      <p className="text-xs text-muted-foreground text-center">
-        {tool.description}
-      </p>
-    </button>
+      <span className={cn(
+        'text-[10px]',
+        isActive 
+          ? 'text-foreground font-semibold' 
+          : 'text-muted-foreground font-medium'
+      )}>
+        {item.label}
+      </span>
+    </Link>
   );
-}
+})}
 ```
 
-### Files to Modify
+### Design Tokens Used
 
-**3. `src/pages/app/AppStore.tsx`**
-Major redesign to incorporate all sections:
-
-- Import new components and config
-- Add Wellness Tools section (2x2 grid)
-- Add Audio Experiences section (3-column row)
-- Keep existing Programs section at the bottom
-- Update search to filter tools by name as well
-
-**4. `src/pages/app/AppPlayer.tsx`**
-Minor update to support URL query param for initial category:
-
-- Read `category` from search params on mount
-- Set initial `selectedCategory` based on query param
+- Icon size: `h-6 w-6` (24px - better touch target)
+- Stroke inactive: `1.5` (light)
+- Stroke active: `2.5` (bold)
+- Active text: `text-foreground font-semibold`
+- Inactive text: `text-muted-foreground font-medium`
+- Active indicator: 4px circle below icon
+- Tab bar bg: `bg-background` with top border
 
 ---
 
-## Search Behavior
+## Summary
 
-When user searches:
-1. First, filter tools by name match
-2. Then, filter programs by title/description match
-3. Show "Tools" section if any tools match
-4. Show "Programs" section if any programs match
-
----
-
-## Design Tokens
-
-Consistent with existing app patterns:
-- Section headers: `text-xs font-semibold text-muted-foreground uppercase tracking-wider`
-- Card shadows: `shadow-md` for tools, existing styles for programs
-- Active states: `active:scale-[0.98]`
-- Border radius: `rounded-2xl` (20px)
-- Haptic feedback: `haptic.light()` on tap
-
----
-
-## Files Summary
-
-| File | Action | Description |
-|------|--------|-------------|
-| `src/lib/toolsConfig.ts` | Create | Centralized tools configuration |
-| `src/components/app/ToolCard.tsx` | Create | Reusable tool card component |
-| `src/pages/app/AppStore.tsx` | Modify | Add tools sections, reorganize layout |
-| `src/pages/app/AppPlayer.tsx` | Modify | Support category query param |
-
----
-
-## Future Extensibility
-
-This config-based approach enables:
-- Easy addition of new tools by adding to config
-- Toggle visibility without code changes
-- A/B testing different tool orders
-- Per-user tool recommendations (future)
-- Progressive disclosure of coming soon features
+This redesign:
+1. Fixes the ugly filled icon problem
+2. Uses iOS-native stroke weight pattern for active states
+3. Adds a subtle active indicator dot
+4. Creates better visual hierarchy with font weight
+5. Maintains all existing functionality (badges, routing, tour classes)
 
