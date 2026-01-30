@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BreathingExercisesManager } from '@/components/admin/BreathingExercisesManager';
-import { RoutineManager } from '@/components/admin/RoutineManager';
+import { RoutineManagement } from '@/components/admin/RoutineManagement';
 import { Wind, Sparkles } from 'lucide-react';
 
 export default function Tools() {
@@ -25,20 +25,7 @@ export default function Tools() {
         </TabsList>
 
         <TabsContent value="routines">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5" />
-                Routine Management
-              </CardTitle>
-              <CardDescription>
-                Create and manage routine templates that users can add to their daily planner.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <RoutineManager />
-            </CardContent>
-          </Card>
+          <RoutineManagement />
         </TabsContent>
 
         <TabsContent value="breathing">
@@ -49,7 +36,7 @@ export default function Tools() {
                 Breathing Exercises
               </CardTitle>
               <CardDescription>
-                Manage breathing techniques available in the app. Users can access these from the home screen.
+                Manage breathing techniques available in the app.
               </CardDescription>
             </CardHeader>
             <CardContent>
