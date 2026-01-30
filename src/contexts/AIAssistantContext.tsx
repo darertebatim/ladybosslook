@@ -20,7 +20,8 @@ interface AIAssistantContextType {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   messages: Message[];
-  addMessage: (message: Omit<Message, 'id'>) => void;
+  addMessage: (message: Omit<Message, 'id'>) => string; // Returns the message ID
+  updateMessage: (id: string, updates: Partial<Omit<Message, 'id'>>) => void;
   clearMessages: () => void;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
@@ -43,9 +44,16 @@ export function AIAssistantProvider({ children }: { children: ReactNode }) {
   // Extract current page from route
   const currentPage = location.pathname.split('/').pop() || 'overview';
 
-  const addMessage = useCallback((message: Omit<Message, 'id'>) => {
+  const addMessage = useCallback((message: Omit<Message, 'id'>): string => {
     const id = crypto.randomUUID();
     setMessages(prev => [...prev, { ...message, id }]);
+    return id;
+  }, []);
+
+  const updateMessage = useCallback((id: string, updates: Partial<Omit<Message, 'id'>>) => {
+    setMessages(prev => prev.map(msg => 
+      msg.id === id ? { ...msg, ...updates } : msg
+    ));
   }, []);
 
   const clearMessages = useCallback(() => {
@@ -88,6 +96,7 @@ export function AIAssistantProvider({ children }: { children: ReactNode }) {
         setIsOpen,
         messages,
         addMessage,
+        updateMessage,
         clearMessages,
         isLoading,
         setIsLoading,
