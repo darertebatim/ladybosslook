@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { CalendarPlus } from 'lucide-react';
 import { TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { haptic } from '@/lib/haptics';
 
@@ -31,9 +31,10 @@ export function TaskTemplateCard({ template, onAdd }: TaskTemplateCardProps) {
 
       <button
         onClick={handleAdd}
-        className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors text-foreground/70 hover:bg-white/50"
+        className="shrink-0 p-2.5 rounded-full bg-foreground hover:bg-foreground/90 transition-colors"
+        aria-label="Add to routine"
       >
-        <Plus className="w-5 h-5" />
+        <CalendarPlus className="h-5 w-5 text-background" />
       </button>
     </div>
   );
