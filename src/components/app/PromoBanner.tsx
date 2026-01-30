@@ -93,7 +93,7 @@ export function PromoBanner() {
     switch (activeBanner.destination_type) {
       case 'routine':
         if (activeBanner.destination_id) {
-          navigate(`/app/routine/${activeBanner.destination_id}`);
+          navigate(`/app/routines/${activeBanner.destination_id}`);
         }
         break;
       case 'playlist':
