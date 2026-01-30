@@ -145,15 +145,18 @@ const AppStore = () => {
   const comingSoonTools = getVisibleComingSoon();
 
   return (
-    <div className="min-h-full bg-background pb-24">
+    <div className="h-full overflow-hidden flex flex-col bg-background">
       <SEOHead 
         title="Browse - LadyBoss Academy"
         description="Browse tools, audio experiences, and educational programs"
       />
 
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-gradient-to-b from-violet-50 to-background dark:from-violet-950/20 dark:to-background px-4 pt-4 pb-6">
-        <div className="flex items-center justify-between">
+      {/* Fixed Header */}
+      <header 
+        className="shrink-0 z-40 bg-gradient-to-b from-violet-50 to-background dark:from-violet-950/20 dark:to-background"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="flex items-center justify-between px-4 pt-3 pb-4">
           {showSearch ? (
             <div className="flex-1 flex items-center gap-2">
               <Input
@@ -186,10 +189,13 @@ const AppStore = () => {
             </>
           )}
         </div>
-      </div>
+      </header>
 
-      {/* Content */}
-      <div className="px-4 space-y-4">
+      {/* Scrollable Content */}
+      <div 
+        className="flex-1 overflow-y-auto overscroll-contain px-4 space-y-4 pb-24"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
         {programsLoading ? (
           <div className="flex items-center justify-center min-h-[60vh]">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
