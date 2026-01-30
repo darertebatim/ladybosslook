@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { usePrograms } from '@/hooks/usePrograms';
 import { SEOHead } from '@/components/SEOHead';
-import { Search, ShoppingBag, X, Loader2, Sparkles, Dumbbell, Waves, Heart } from 'lucide-react';
+import { Search, ShoppingBag, X, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -9,19 +9,17 @@ import { useState, useMemo } from 'react';
 import { useEnrollments, useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import { ProgramCard } from '@/components/app/ProgramCard';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
+import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
+import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
 
-// Category configuration for filtering (icon names as strings for CategoryCircle)
+// Category configuration for filtering programs
 const categoryConfig = [
   { id: 'all', name: 'All', icon: 'LayoutGrid', color: 'purple' },
   { id: 'course', name: 'Courses', icon: 'BookOpen', color: 'purple' },
   { id: 'group-coaching', name: 'Coaching', icon: 'Users', color: 'pink' },
   { id: '1o1-session', name: '1-on-1', icon: 'UserCheck', color: 'blue' },
   { id: 'audiobook', name: 'Audiobook', icon: 'Headphones', color: 'orange' },
-  { id: 'meditate', name: 'Meditate', icon: 'Sparkles', color: 'teal' },
-  { id: 'workout', name: 'Workout', icon: 'Dumbbell', color: 'rose' },
-  { id: 'soundscape', name: 'Soundscape', icon: 'Waves', color: 'blue' },
-  { id: 'affirmations', name: 'Affirm', icon: 'Heart', color: 'pink' },
   { id: 'webinar', name: 'Webinar', icon: 'Video', color: 'green' },
   { id: 'event', name: 'Events', icon: 'Calendar', color: 'rose' },
 ];
@@ -35,7 +33,6 @@ const AppStore = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Use centralized enrollments hook - single source of truth
   const { data: enrollments = [] } = useEnrollments();
   const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
 
@@ -58,16 +55,33 @@ const AppStore = () => {
     return categoryConfig.filter(cat => cat.id === 'all' || types.has(cat.id));
   }, [freePrograms]);
 
+  // Filter tools by search
+  const filteredWellnessTools = useMemo(() => {
+    if (!searchQuery.trim()) return wellnessTools;
+    const query = searchQuery.toLowerCase();
+    return wellnessTools.filter(t => 
+      t.name.toLowerCase().includes(query) ||
+      t.description.toLowerCase().includes(query)
+    );
+  }, [searchQuery]);
+
+  const filteredAudioTools = useMemo(() => {
+    if (!searchQuery.trim()) return audioTools;
+    const query = searchQuery.toLowerCase();
+    return audioTools.filter(t => 
+      t.name.toLowerCase().includes(query) ||
+      t.description.toLowerCase().includes(query)
+    );
+  }, [searchQuery]);
+
   // Filter programs by category and search
   const filteredPrograms = useMemo(() => {
     let result = freePrograms;
     
-    // Filter by category
     if (selectedCategory) {
       result = result.filter(p => p.type === selectedCategory);
     }
     
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(p => 
@@ -79,6 +93,10 @@ const AppStore = () => {
     return result;
   }, [freePrograms, selectedCategory, searchQuery]);
 
+  // Check if any tools match search
+  const hasToolMatches = filteredWellnessTools.length > 0 || filteredAudioTools.length > 0;
+  const hasProgramMatches = filteredPrograms.length > 0;
+
   const handleEnroll = async (program: typeof freePrograms[0]) => {
     if (!user?.id) {
       toast.error('Please sign in to enroll');
@@ -88,7 +106,6 @@ const AppStore = () => {
     setEnrollingSlug(program.slug);
     
     try {
-      // Check if there's an auto-enrollment round for this program
       let roundId: string | null = null;
       const { data: autoEnroll } = await supabase
         .from('program_auto_enrollment')
@@ -100,7 +117,6 @@ const AppStore = () => {
         roundId = autoEnroll.round_id;
       }
       
-      // Create free enrollment with round_id if available
       const { error } = await supabase
         .from('course_enrollments')
         .insert({
@@ -115,10 +131,7 @@ const AppStore = () => {
         toast.error('Failed to enroll. Please try again.');
       } else {
         toast.success('Enrolled successfully!');
-        
-        // Invalidate ALL enrollment-related caches atomically
         invalidateAllEnrollmentData();
-        
         navigate('/app/programs');
       }
     } finally {
@@ -126,11 +139,13 @@ const AppStore = () => {
     }
   };
 
+  const comingSoonTools = getVisibleComingSoon();
+
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
       <SEOHead 
-        title="Browse Courses - LadyBoss Academy"
-        description="Browse our free educational programs and courses"
+        title="Browse - LadyBoss Academy"
+        description="Browse tools, audio experiences, and educational programs"
       />
 
       {/* Fixed Header */}
@@ -143,7 +158,7 @@ const AppStore = () => {
             <div className="flex-1 flex items-center gap-2">
               <Input
                 type="text"
-                placeholder="Search courses..."
+                placeholder="Search tools & programs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 h-9 bg-muted/50 border-0"
@@ -179,80 +194,125 @@ const AppStore = () => {
       {/* Scroll container */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="pb-safe">
-        {programsLoading ? (
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : (
-          <div className="px-4 py-4 space-y-6">
-            {/* Category Filters - only show if multiple categories */}
-            {availableCategories.length > 2 && (
-              <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-                {availableCategories.map((category) => (
-                  <CategoryCircle
-                    key={category.id}
-                    name={category.name}
-                    icon={category.icon}
-                    color={category.color}
-                    isSelected={selectedCategory === (category.id === 'all' ? null : category.id)}
-                    onClick={() => setSelectedCategory(category.id === 'all' ? null : category.id)}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Section Title */}
-            <div>
-              <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {selectedCategory 
-                  ? categoryConfig.find(c => c.id === selectedCategory)?.name || 'Programs'
-                  : 'Available Programs'
-                }
-              </h2>
+          {programsLoading ? (
+            <div className="flex items-center justify-center min-h-[60vh]">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
+          ) : (
+            <div className="px-4 py-4 space-y-6">
+              {/* Wellness Tools Section */}
+              {(!searchQuery || filteredWellnessTools.length > 0) && (
+                <div className="space-y-3">
+                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Wellness Tools
+                  </h2>
+                  <div className="grid grid-cols-2 gap-3">
+                    {filteredWellnessTools.map((tool) => (
+                      <ToolCard key={tool.id} tool={tool} />
+                    ))}
+                  </div>
+                </div>
+              )}
 
-            {/* Programs Grid */}
-            {filteredPrograms.length === 0 ? (
-              <div className="text-center py-12">
-                <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h2 className="text-xl font-semibold mb-2">
-                  {searchQuery ? 'No Results Found' : 'No Courses Available'}
-                </h2>
-                <p className="text-muted-foreground">
-                  {searchQuery 
-                    ? `No courses match "${searchQuery}"`
-                    : 'Check back later for new courses'
-                  }
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                {filteredPrograms.map((program) => {
-                  const enrolled = isEnrolled(program.slug);
-                  const isEnrolling = enrollingSlug === program.slug;
-                  
-                  return (
-                    <div key={program.slug} className="relative">
-                      <ProgramCard
-                        title={program.title}
-                        image={program.image}
-                        type={program.type}
-                        isFree={program.isFree || program.priceAmount === 0}
-                        isEnrolled={enrolled}
-                        onClick={() => navigate(`/app/course/${program.slug}`)}
-                      />
-                      {isEnrolling && (
-                        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                        </div>
-                      )}
+              {/* Audio Experiences Section */}
+              {(!searchQuery || filteredAudioTools.length > 0) && (
+                <div className="space-y-3">
+                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Audio Experiences
+                  </h2>
+                  <div className="grid grid-cols-3 gap-3">
+                    {filteredAudioTools.map((tool) => (
+                      <ToolCard key={tool.id} tool={tool} size="compact" />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Coming Soon Section - only show if visible tools exist */}
+              {comingSoonTools.length > 0 && !searchQuery && (
+                <div className="space-y-3">
+                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Coming Soon
+                  </h2>
+                  <div className="grid grid-cols-3 gap-3">
+                    {comingSoonTools.map((tool) => (
+                      <ToolCard key={tool.id} tool={tool} size="compact" />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Programs Section */}
+              {(!searchQuery || hasProgramMatches) && freePrograms.length > 0 && (
+                <div className="space-y-3">
+                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Browse Programs
+                  </h2>
+
+                  {/* Category Filters - only show if multiple categories and not searching */}
+                  {!searchQuery && availableCategories.length > 2 && (
+                    <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+                      {availableCategories.map((category) => (
+                        <CategoryCircle
+                          key={category.id}
+                          name={category.name}
+                          icon={category.icon}
+                          color={category.color}
+                          isSelected={selectedCategory === (category.id === 'all' ? null : category.id)}
+                          onClick={() => setSelectedCategory(category.id === 'all' ? null : category.id)}
+                        />
+                      ))}
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
+                  )}
+
+                  {/* Programs Grid */}
+                  {filteredPrograms.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground text-sm">
+                        No programs found
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                      {filteredPrograms.map((program) => {
+                        const enrolled = isEnrolled(program.slug);
+                        const isEnrolling = enrollingSlug === program.slug;
+                        
+                        return (
+                          <div key={program.slug} className="relative">
+                            <ProgramCard
+                              title={program.title}
+                              image={program.image}
+                              type={program.type}
+                              isFree={program.isFree || program.priceAmount === 0}
+                              isEnrolled={enrolled}
+                              onClick={() => navigate(`/app/course/${program.slug}`)}
+                            />
+                            {isEnrolling && (
+                              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* No Results */}
+              {searchQuery && !hasToolMatches && !hasProgramMatches && (
+                <div className="text-center py-12">
+                  <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                  <h2 className="text-xl font-semibold mb-2">No Results Found</h2>
+                  <p className="text-muted-foreground">
+                    No tools or programs match "{searchQuery}"
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

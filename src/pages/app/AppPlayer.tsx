@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast } from "lucide-react";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
@@ -22,10 +23,19 @@ const categoryConfig: Record<string, { name: string; icon: string; color: string
 };
 
 export default function AppPlayer() {
+  const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [progressFilter, setProgressFilter] = useState<"all" | "in_progress" | "completed">("all");
+
+  // Read initial category from URL query param
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam && categoryConfig[categoryParam]) {
+      setSelectedCategory(categoryParam);
+    }
+  }, [searchParams]);
 
   // Use centralized data hook with parallel fetching
   const { playlists, playlistItems, progressData, enrollments, programs, isLoading } = usePlayerData();
