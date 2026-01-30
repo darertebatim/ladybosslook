@@ -7,14 +7,17 @@ import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
 import { InspireBanner } from '@/components/app/InspireBanner';
 import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
+import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import {
   useRoutineCategories,
   useRoutinePlans,
   useFeaturedPlans,
   usePopularPlans,
   useProRoutinePlans,
+  useAddRoutinePlan,
+  RoutinePlanTask,
 } from '@/hooks/useRoutinePlans';
-import { useTaskTemplates, useCreateTaskFromTemplate, TaskTemplate } from '@/hooks/useTaskPlanner';
+import { useTaskTemplates, TaskTemplate, TaskColor } from '@/hooks/useTaskPlanner';
 import { toast } from 'sonner';
 
 export default function AppInspire() {
@@ -22,7 +25,8 @@ export default function AppInspire() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>('popular');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
-  const [addingTemplateId, setAddingTemplateId] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null);
+  const [previewSheetOpen, setPreviewSheetOpen] = useState(false);
 
   const { data: categories, isLoading: categoriesLoading } = useRoutineCategories();
   const { data: featuredPlans } = useFeaturedPlans();
@@ -32,7 +36,7 @@ export default function AppInspire() {
     selectedCategory || undefined
   );
   const { data: taskTemplates, isLoading: templatesLoading } = useTaskTemplates();
-  const createFromTemplate = useCreateTaskFromTemplate();
+  const addRoutinePlan = useAddRoutinePlan();
 
   // Determine which plans to display based on selected category
   const displayPlans = useMemo(() => {
@@ -79,19 +83,44 @@ export default function AppInspire() {
     plan.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddTemplate = async (template: TaskTemplate) => {
-    setAddingTemplateId(template.id);
+  // Convert TaskTemplate to RoutinePlanTask for the preview sheet
+  const syntheticTask: RoutinePlanTask | null = selectedTemplate ? {
+    id: selectedTemplate.id,
+    plan_id: `synthetic-task-${selectedTemplate.id}`,
+    title: selectedTemplate.title,
+    duration_minutes: selectedTemplate.duration_minutes || 1,
+    icon: selectedTemplate.emoji || '✨',
+    color: selectedTemplate.color as TaskColor,
+    task_order: 0,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    linked_playlist_id: selectedTemplate.linked_playlist_id || null,
+    pro_link_type: selectedTemplate.pro_link_type as RoutinePlanTask['pro_link_type'] || null,
+    pro_link_value: selectedTemplate.pro_link_value || null,
+    linked_playlist: null,
+  } : null;
+
+  const handleAddTemplate = (template: TaskTemplate) => {
+    setSelectedTemplate(template);
+    setPreviewSheetOpen(true);
+  };
+
+  const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
+    if (!selectedTemplate) return;
+
     try {
-      await createFromTemplate.mutateAsync({
-        template,
-        date: new Date(),
+      await addRoutinePlan.mutateAsync({
+        planId: `synthetic-task-${selectedTemplate.id}`,
+        selectedTaskIds,
+        editedTasks,
+        syntheticTasks: syntheticTask ? [syntheticTask] : [],
       });
-      toast.success('Task added to today! ✨');
+      toast.success('Task added to your routine! ✨');
+      setPreviewSheetOpen(false);
+      setSelectedTemplate(null);
     } catch (error) {
       console.error('Error adding task:', error);
       toast.error('Failed to add task');
-    } finally {
-      setAddingTemplateId(null);
     }
   };
 
@@ -269,7 +298,6 @@ export default function AppInspire() {
                       key={template.id}
                       template={template}
                       onAdd={() => handleAddTemplate(template)}
-                      isAdding={addingTemplateId === template.id}
                     />
                   ))}
                 </div>
@@ -282,6 +310,21 @@ export default function AppInspire() {
           )}
         </div>
       </div>
+
+      {/* Routine Preview Sheet for editing task before adding */}
+      {syntheticTask && (
+        <RoutinePreviewSheet
+          open={previewSheetOpen}
+          onOpenChange={(open) => {
+            setPreviewSheetOpen(open);
+            if (!open) setSelectedTemplate(null);
+          }}
+          tasks={[syntheticTask]}
+          routineTitle={selectedTemplate?.title || 'Task'}
+          onSave={handleSaveRoutine}
+          isSaving={addRoutinePlan.isPending}
+        />
+      )}
     </div>
   );
 }
