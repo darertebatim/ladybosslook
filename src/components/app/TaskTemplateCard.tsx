@@ -1,16 +1,18 @@
-import { Plus } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
 import { TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { haptic } from '@/lib/haptics';
 
 interface TaskTemplateCardProps {
   template: TaskTemplate;
   onAdd: () => void;
+  isAdding?: boolean;
 }
 
-export function TaskTemplateCard({ template, onAdd }: TaskTemplateCardProps) {
+export function TaskTemplateCard({ template, onAdd, isAdding }: TaskTemplateCardProps) {
   const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
 
   const handleAdd = () => {
+    if (isAdding) return;
     haptic.light();
     onAdd();
   };
@@ -31,9 +33,14 @@ export function TaskTemplateCard({ template, onAdd }: TaskTemplateCardProps) {
 
       <button
         onClick={handleAdd}
-        className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors text-foreground/70 hover:bg-white/50"
+        disabled={isAdding}
+        className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors text-foreground/70 hover:bg-white/50 disabled:opacity-50"
       >
-        <Plus className="w-5 h-5" />
+        {isAdding ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <Plus className="w-5 h-5" />
+        )}
       </button>
     </div>
   );
