@@ -12,24 +12,12 @@ interface ActiveRoundsCarouselProps {
   nextSessionMap: Map<string, string>;
 }
 const COLLAPSED_KEY = 'programsCarouselCollapsed';
+const SEEN_ENROLLMENTS_KEY = 'seenEnrollmentIds';
+
 export function ActiveRoundsCarousel({
   activeRounds,
   nextSessionMap
 }: ActiveRoundsCarouselProps) {
-  // Persist collapsed state - default to collapsed
-  const [isCollapsed, setIsCollapsed] = useState(() => {
-    const saved = localStorage.getItem(COLLAPSED_KEY);
-    // Default to collapsed unless explicitly set to 'false'
-    return saved !== 'false';
-  });
-  useEffect(() => {
-    localStorage.setItem(COLLAPSED_KEY, isCollapsed.toString());
-  }, [isCollapsed]);
-  const toggleCollapse = () => {
-    haptic.light();
-    setIsCollapsed(!isCollapsed);
-  };
-
   // Get unseen content
   let unseenEnrollments = new Set<string>();
   let unseenRounds = new Set<string>();
@@ -44,6 +32,66 @@ export function ActiveRoundsCarousel({
   } catch {
     // Provider not available
   }
+
+  // Check if there are any new enrollments the user hasn't seen in the carousel
+  const hasUnseenPrograms = unseenEnrollments.size > 0 || unseenRounds.size > 0;
+  
+  // Also track locally seen enrollment IDs to detect new additions
+  const [seenIds, setSeenIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem(SEEN_ENROLLMENTS_KEY);
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+  
+  // Check if there's a new enrollment that wasn't in our local seen list
+  const hasNewEnrollment = activeRounds.some(e => !seenIds.has(e.id));
+
+  // Persist collapsed state - default to collapsed, but auto-expand if new programs
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    // If there are unseen or new programs, start expanded
+    if (hasUnseenPrograms || hasNewEnrollment) {
+      return false;
+    }
+    const saved = localStorage.getItem(COLLAPSED_KEY);
+    // Default to collapsed unless explicitly set to 'false'
+    return saved !== 'false';
+  });
+
+  // Auto-expand when new enrollments are detected
+  useEffect(() => {
+    if (hasUnseenPrograms || hasNewEnrollment) {
+      setIsCollapsed(false);
+    }
+  }, [hasUnseenPrograms, hasNewEnrollment]);
+
+  // Update seen IDs when enrollments change
+  useEffect(() => {
+    if (activeRounds.length > 0) {
+      const currentIds = new Set(activeRounds.map(e => e.id));
+      // Only update if there are new IDs
+      const hasNew = activeRounds.some(e => !seenIds.has(e.id));
+      if (hasNew) {
+        setSeenIds(currentIds);
+        try {
+          localStorage.setItem(SEEN_ENROLLMENTS_KEY, JSON.stringify([...currentIds]));
+        } catch {
+          // Storage error
+        }
+      }
+    }
+  }, [activeRounds, seenIds]);
+
+  useEffect(() => {
+    localStorage.setItem(COLLAPSED_KEY, isCollapsed.toString());
+  }, [isCollapsed]);
+
+  const toggleCollapse = () => {
+    haptic.light();
+    setIsCollapsed(!isCollapsed);
+  };
 
   // When no programs, show a minimal collapsed state
   if (activeRounds.length === 0) {
