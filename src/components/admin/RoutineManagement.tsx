@@ -770,6 +770,14 @@ function PlansManager() {
                 />
               </div>
             </div>
+            <div>
+              <Label>Cover Image URL (optional)</Label>
+              <Input
+                value={formData.cover_image_url || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, cover_image_url: e.target.value || null }))}
+                placeholder="https://example.com/cover.jpg"
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={handleCloseDialog}>Cancel</Button>
@@ -813,12 +821,24 @@ function PlansManager() {
 // PLAN TASKS EDITOR
 // =====================================
 
+interface ProTaskTemplate {
+  id: string;
+  title: string;
+  duration_minutes: number;
+  icon: string;
+  pro_link_type: string;
+  pro_link_value: string | null;
+  linked_playlist_id: string | null;
+  is_active: boolean;
+}
+
 function PlanTasksEditor({ planId }: { planId: string }) {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<RoutinePlanTask | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -828,6 +848,7 @@ function PlanTasksEditor({ planId }: { planId: string }) {
     is_active: true,
     pro_link_type: null as string | null,
     pro_link_value: null as string | null,
+    linked_playlist_id: null as string | null,
   });
 
   const { data: tasks, isLoading } = useQuery({
@@ -840,6 +861,20 @@ function PlanTasksEditor({ planId }: { planId: string }) {
         .order('task_order');
       if (error) throw error;
       return data as RoutinePlanTask[];
+    },
+  });
+
+  // Fetch Pro Task Templates for quick add
+  const { data: proTemplates } = useQuery({
+    queryKey: ['admin-pro-task-templates-for-plan'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routine_task_templates')
+        .select('id, title, duration_minutes, icon, pro_link_type, pro_link_value, linked_playlist_id, is_active')
+        .eq('is_active', true)
+        .order('display_order');
+      if (error) throw error;
+      return data as ProTaskTemplate[];
     },
   });
 
@@ -871,7 +906,19 @@ function PlanTasksEditor({ planId }: { planId: string }) {
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from('routine_plan_tasks').insert({ ...data, plan_id: planId });
+      // If playlist type, also set linked_playlist_id
+      const insertData = {
+        title: data.title,
+        duration_minutes: data.duration_minutes,
+        icon: data.icon,
+        task_order: data.task_order,
+        is_active: data.is_active,
+        pro_link_type: data.pro_link_type,
+        pro_link_value: data.pro_link_value,
+        linked_playlist_id: data.pro_link_type === 'playlist' && data.pro_link_value ? data.pro_link_value : null,
+        plan_id: planId,
+      };
+      const { error } = await supabase.from('routine_plan_tasks').insert(insertData);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -884,7 +931,18 @@ function PlanTasksEditor({ planId }: { planId: string }) {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: typeof formData }) => {
-      const { error } = await supabase.from('routine_plan_tasks').update(data).eq('id', id);
+      // If playlist type, also set linked_playlist_id
+      const updateData = {
+        title: data.title,
+        duration_minutes: data.duration_minutes,
+        icon: data.icon,
+        task_order: data.task_order,
+        is_active: data.is_active,
+        pro_link_type: data.pro_link_type,
+        pro_link_value: data.pro_link_value,
+        linked_playlist_id: data.pro_link_type === 'playlist' && data.pro_link_value ? data.pro_link_value : null,
+      };
+      const { error } = await supabase.from('routine_plan_tasks').update(updateData).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -918,7 +976,24 @@ function PlanTasksEditor({ planId }: { planId: string }) {
       is_active: true,
       pro_link_type: null,
       pro_link_value: null,
+      linked_playlist_id: null,
     });
+    setIsDialogOpen(true);
+  };
+
+  const handleAddFromTemplate = (template: ProTaskTemplate) => {
+    setEditingTask(null);
+    setFormData({
+      title: template.title,
+      duration_minutes: template.duration_minutes,
+      icon: template.icon,
+      task_order: (tasks?.length || 0) + 1,
+      is_active: true,
+      pro_link_type: template.pro_link_type,
+      pro_link_value: template.pro_link_value,
+      linked_playlist_id: template.linked_playlist_id,
+    });
+    setShowTemplateSelector(false);
     setIsDialogOpen(true);
   };
 
@@ -932,6 +1007,7 @@ function PlanTasksEditor({ planId }: { planId: string }) {
       is_active: task.is_active,
       pro_link_type: task.pro_link_type,
       pro_link_value: task.pro_link_value,
+      linked_playlist_id: null, // Will be set from pro_link_value if type is playlist
     });
     setIsDialogOpen(true);
   };
@@ -959,11 +1035,60 @@ function PlanTasksEditor({ planId }: { planId: string }) {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium">Tasks ({tasks?.length || 0})</span>
-        <Button size="sm" variant="outline" onClick={handleOpenCreate}>
-          <Plus className="h-3 w-3 mr-1" />
-          Add Task
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => setShowTemplateSelector(true)}>
+            <Sparkles className="h-3 w-3 mr-1" />
+            From Template
+          </Button>
+          <Button size="sm" variant="outline" onClick={handleOpenCreate}>
+            <Plus className="h-3 w-3 mr-1" />
+            Add Task
+          </Button>
+        </div>
       </div>
+
+      {/* Template Selector Dialog */}
+      <Dialog open={showTemplateSelector} onOpenChange={setShowTemplateSelector}>
+        <DialogContent className="max-w-md max-h-[70vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-violet-500" />
+              Add from Pro Template
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            {!proTemplates?.length ? (
+              <div className="text-sm text-muted-foreground text-center py-4">
+                No templates available. Create some in Pro Templates tab.
+              </div>
+            ) : (
+              proTemplates.map((template) => {
+                const config = template.pro_link_type ? PRO_LINK_CONFIGS[template.pro_link_type as ProLinkType] : null;
+                return (
+                  <button
+                    key={template.id}
+                    onClick={() => handleAddFromTemplate(template)}
+                    className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors text-left"
+                  >
+                    <span className="text-xl">{template.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">{template.title}</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-2">
+                        <span>{template.duration_minutes}m</span>
+                        {config && (
+                          <Badge variant="secondary" className={config.badgeColorClass}>
+                            {config.badgeText}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {isLoading ? (
         <div className="text-sm text-muted-foreground">Loading...</div>

@@ -41,9 +41,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, ListTodo, Star, CheckSquare, Square } from 'lucide-react';
+import { Plus, Pencil, Trash2, ListTodo, Star } from 'lucide-react';
 import { TASK_COLOR_CLASSES } from '@/hooks/useTaskPlanner';
 import { Checkbox } from '@/components/ui/checkbox';
+import { EmojiPicker } from '@/components/app/EmojiPicker';
 
 interface Template {
   id: string;
@@ -59,18 +60,11 @@ interface Template {
   display_order: number;
 }
 
-
-
 const REPEAT_PATTERN_OPTIONS = [
   { value: 'none', label: 'One-time' },
   { value: 'daily', label: 'Daily' },
   { value: 'weekly', label: 'Weekly' },
   { value: 'weekdays', label: 'Weekdays' },
-];
-
-const EMOJI_OPTIONS = [
-  '☀️', '🌙', '💪', '📚', '🧘', '✨', '🎯', '⚡', '🔥', '💡',
-  '📝', '🏃', '💼', '🎨', '🌸', '☕', '🧠', '❤️', '🌿', '⭐'
 ];
 
 export function TaskTemplatesManager() {
@@ -80,6 +74,7 @@ export function TaskTemplatesManager() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     emoji: '✨',
@@ -468,22 +463,13 @@ export function TaskTemplatesManager() {
             
             <div>
               <Label>Emoji</Label>
-              <div className="grid grid-cols-10 gap-2 mt-2">
-                {EMOJI_OPTIONS.map((emoji) => (
-                  <button
-                    key={emoji}
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, emoji }))}
-                    className={`p-2 rounded-lg border-2 text-xl transition-colors ${
-                      formData.emoji === emoji 
-                        ? 'border-primary bg-primary/10' 
-                        : 'border-transparent hover:bg-muted'
-                    }`}
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-2xl h-12 mt-1"
+                onClick={() => setShowEmojiPicker(true)}
+              >
+                {formData.emoji}
+              </Button>
             </div>
 
             <div>
@@ -548,6 +534,14 @@ export function TaskTemplatesManager() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Emoji Picker */}
+      <EmojiPicker
+        open={showEmojiPicker}
+        onOpenChange={setShowEmojiPicker}
+        selectedEmoji={formData.emoji}
+        onSelect={(emoji) => setFormData(prev => ({ ...prev, emoji }))}
+      />
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

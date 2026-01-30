@@ -43,8 +43,8 @@ import {
 } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, Sparkles, Loader2, Music, BookOpen, Star, CheckCircle, AlertCircle } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
 import { PRO_LINK_TYPES, PRO_LINK_CONFIGS, ProLinkType } from '@/lib/proTaskTypes';
+import { EmojiPicker } from '@/components/app/EmojiPicker';
 
 interface Template {
   id: string;
@@ -87,12 +87,6 @@ interface GenerationResult {
   processedPlaylists: number;
 }
 
-const ICON_OPTIONS = [
-  'Sun', 'Moon', 'Heart', 'Brain', 'Dumbbell', 'Coffee', 
-  'Book', 'Star', 'Sparkles', 'Zap', 'Target', 'Clock',
-  'CheckCircle', 'Award', 'Flame', 'Leaf', 'Music', 'BookOpen'
-];
-
 const CATEGORY_OPTIONS = [
   'Pro', 'Morning', 'Evening', 'Productivity', 'Wellness', 'Learning', 'Community'
 ];
@@ -103,6 +97,7 @@ export function ProTaskTemplatesManager() {
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [generatingType, setGeneratingType] = useState<string | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   
   // Progress tracking state
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
@@ -113,7 +108,7 @@ export function ProTaskTemplatesManager() {
   const [formData, setFormData] = useState({
     title: '',
     duration_minutes: 5,
-    icon: 'Sparkles',
+    icon: '✨',
     pro_link_type: 'playlist' as string,
     pro_link_value: null as string | null,
     linked_playlist_id: null as string | null,
@@ -285,7 +280,7 @@ export function ProTaskTemplatesManager() {
     setFormData({
       title: '',
       duration_minutes: 5,
-      icon: 'Sparkles',
+      icon: '✨',
       pro_link_type: 'playlist',
       pro_link_value: null,
       linked_playlist_id: null,
@@ -337,10 +332,8 @@ export function ProTaskTemplatesManager() {
     }
   };
 
-  const renderIcon = (iconName: string) => {
-    const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[iconName];
-    return Icon ? <Icon className="h-4 w-4" /> : null;
-  };
+  // Helper to display icons - handles both emojis and legacy Lucide icon names
+  const isEmoji = (str: string) => /[\p{Emoji_Presentation}\p{Extended_Pictographic}]/u.test(str);
 
   const getLinkTypeConfig = (type: string) => {
     return PRO_LINK_CONFIGS[type as ProLinkType];
@@ -492,8 +485,8 @@ export function ProTaskTemplatesManager() {
                 return (
                   <TableRow key={template.id}>
                     <TableCell>
-                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-                        {renderIcon(template.icon)}
+                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-lg">
+                        {isEmoji(template.icon) ? template.icon : '✨'}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -612,23 +605,14 @@ export function ProTaskTemplatesManager() {
               </div>
             </div>
             <div>
-              <Label>Icon</Label>
-              <div className="grid grid-cols-6 gap-2 mt-2">
-                {ICON_OPTIONS.map((icon) => (
-                  <button
-                    key={icon}
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, icon }))}
-                    className={`p-2 rounded-lg border-2 transition-colors ${
-                      formData.icon === icon 
-                        ? 'border-primary bg-primary/10' 
-                        : 'border-transparent hover:bg-muted'
-                    }`}
-                  >
-                    {renderIcon(icon)}
-                  </button>
-                ))}
-              </div>
+              <Label>Icon (Emoji)</Label>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-2xl h-12 mt-1"
+                onClick={() => setShowEmojiPicker(true)}
+              >
+                {formData.icon}
+              </Button>
             </div>
             
             {/* Pro Link Configuration */}
@@ -804,6 +788,14 @@ export function ProTaskTemplatesManager() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Emoji Picker */}
+      <EmojiPicker
+        open={showEmojiPicker}
+        onOpenChange={setShowEmojiPicker}
+        selectedEmoji={formData.icon}
+        onSelect={(emoji) => setFormData(prev => ({ ...prev, icon: emoji }))}
+      />
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
