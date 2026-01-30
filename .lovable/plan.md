@@ -1,182 +1,173 @@
 
 
-# Plan: Enhance Routines Bank with Rich Sections
+# Plan: Migrate /app/routines to Use Tasks Bank
 
-## Current State
-The Routines Bank currently uses a simple `section_title` field on each task to create section dividers. This is limited - it only shows a header text above a task.
+## Overview
+Consolidate task templates by making `admin_task_bank` the single source of truth. Remove the `task_templates` table and update all code to read from `admin_task_bank` instead.
 
-## What You Want: Rich Sections
-Looking at the existing `routine_plan_sections` table structure, a proper section includes:
-- **Title** - Section heading (e.g., "Get Moving", "Mindfulness")
-- **Content** - Rich text describing the section and its purpose
-- **Image URL** - Optional visual for the section
-- **Order** - Position in the routine
+## What Changes
 
-This allows you to write detailed introductions for each group of tasks.
+### 1. Update `useTaskPlanner.tsx` Hooks
 
-## Database Changes
+**Current:**
+```typescript
+export const useTaskTemplates = (category?: TemplateCategory) => {
+  return useQuery({
+    queryKey: ['planner-templates', category],
+    queryFn: async () => {
+      let query = supabase
+        .from('task_templates')  // OLD TABLE
+        .select('*')
+        ...
+    }
+  });
+};
+```
 
-### Create `routines_bank_sections` Table
-A new table for rich section content:
+**New:**
+```typescript
+export const useTaskTemplates = (category?: TemplateCategory) => {
+  return useQuery({
+    queryKey: ['planner-templates', category],
+    queryFn: async () => {
+      let query = supabase
+        .from('admin_task_bank')  // NEW TABLE
+        .select('*')
+        .eq('is_active', true)
+        ...
+    }
+  });
+};
+```
 
+Also update:
+- `TaskTemplate` interface to match `admin_task_bank` schema
+- `useCreateTaskFromTemplate` to use the correct field mappings
+
+### 2. Update AppInspire.tsx (Routines Page)
+
+**Current behavior:** Shows task templates with a "+" button that adds task directly to planner
+
+**New behavior:** 
+- When user taps "+" on a task, open a sheet/dialog to edit the routine
+- User can then add this task to a routine or add directly to their planner
+
+Changes:
+- Replace `TaskTemplateCard` with updated version that opens routine editor
+- Add routine edit dialog/sheet for adding tasks to routines
+
+### 3. Update TaskQuickStartSheet.tsx
+
+This component shows task suggestions when creating a new task. Update to query from `admin_task_bank` instead of `task_templates`.
+
+### 4. Delete Deprecated Components
+
+Remove components that manage the old `task_templates` table:
+- `src/components/admin/TaskTemplatesManager.tsx`
+
+### 5. Update Edge Functions
+
+These edge functions reference `task_templates` and need updating:
+- `generate-plans-from-task-templates/index.ts` → Use `admin_task_bank`
+- `generate-routine-plan-ai/index.ts` → Use `admin_task_bank`
+- `admin-assistant/index.ts` → Update tool references
+
+### 6. Database Changes
+
+**Migration:**
 ```sql
-CREATE TABLE routines_bank_sections (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  routine_id uuid NOT NULL REFERENCES routines_bank(id) ON DELETE CASCADE,
-  title text NOT NULL,
-  content text,           -- Descriptive text about this section
-  image_url text,         -- Optional section image
-  section_order integer DEFAULT 0,
-  is_active boolean DEFAULT true,
-  created_at timestamptz DEFAULT now()
-);
-
--- RLS Policy
-ALTER TABLE routines_bank_sections ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Admins can manage routine sections"
-  ON routines_bank_sections FOR ALL
-  USING (has_role(auth.uid(), 'admin'))
-  WITH CHECK (has_role(auth.uid(), 'admin'));
+-- Drop the task_templates table (after confirming data migration)
+DROP TABLE IF EXISTS task_templates;
 ```
 
-### Update `routines_bank_tasks` Table
-Add a reference to which section the task belongs to:
+Note: The `routine_task_templates` table is separate (for Pro Tasks with playlist links). If you want to consolidate that too, let me know and I'll include it.
 
-```sql
-ALTER TABLE routines_bank_tasks 
-ADD COLUMN section_id uuid REFERENCES routines_bank_sections(id) ON DELETE SET NULL;
-```
-
-## UI Changes
-
-### Enhanced Edit Dialog Structure
+## File Changes Summary
 
 ```text
-┌─────────────────────────────────────────────────────────┐
-│ Edit Routine: Morning Energy Boost               [X]    │
-├─────────────────────────────────────────────────────────┤
-│ [Basic Info] [Sections & Tasks]                         │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│ SECTIONS (Rich content introducing each part)          │
-│                                                         │
-│ ┌─────────────────────────────────────────────────────┐ │
-│ │ Section 1: Get Moving                    [Edit] [X] │ │
-│ │ "Start with light movement to wake up..."          │ │
-│ │                                                     │ │
-│ │ Tasks in this section:                              │ │
-│ │   ☀️ Morning Stretch         1m         [X]        │ │
-│ │   🏃 Light Exercise          1m         [X]        │ │
-│ │                              [+ Add Task]           │ │
-│ └─────────────────────────────────────────────────────┘ │
-│                                                         │
-│ ┌─────────────────────────────────────────────────────┐ │
-│ │ Section 2: Mindfulness                   [Edit] [X] │ │
-│ │ "Take time to center yourself..."                  │ │
-│ │                                                     │ │
-│ │ Tasks in this section:                              │ │
-│ │   🧘 Meditation              1m         [X]        │ │
-│ │                              [+ Add Task]           │ │
-│ └─────────────────────────────────────────────────────┘ │
-│                                                         │
-│ [+ Add Section]                                         │
-│                                                         │
-│ UNCATEGORIZED TASKS                                     │
-│ (Tasks not assigned to any section)                     │
-│   📝 Journal                   1m         [X]          │
-│                                [+ Add Task]             │
-├─────────────────────────────────────────────────────────┤
-│                              [Cancel]  [Save Routine]   │
-└─────────────────────────────────────────────────────────┘
+src/hooks/useTaskPlanner.tsx
+├── Update TaskTemplate interface
+├── Update useTaskTemplates to query admin_task_bank
+└── Update useCreateTaskFromTemplate field mappings
+
+src/pages/app/AppInspire.tsx
+├── Update to use new task bank data
+└── Add routine edit sheet when tapping "+"
+
+src/components/app/TaskQuickStartSheet.tsx
+└── Already uses useTaskTemplates (will auto-update)
+
+src/components/app/TaskTemplateCard.tsx
+└── Update to open routine editor on "+"
+
+src/components/admin/TaskTemplatesManager.tsx
+└── DELETE (replaced by TasksBank.tsx)
+
+supabase/functions/generate-plans-from-task-templates/index.ts
+└── Update to use admin_task_bank
+
+supabase/functions/generate-routine-plan-ai/index.ts
+└── Update to use admin_task_bank
+
+supabase/functions/admin-assistant/index.ts
+└── Update tool descriptions
+
+supabase/migrations/xxx.sql
+└── DROP TABLE task_templates
 ```
 
-### Section Editor Dialog
+## UI Flow: Tapping "+" on Task
 
 ```text
-┌─────────────────────────────────────────────────────────┐
-│ Edit Section                                      [X]   │
-├─────────────────────────────────────────────────────────┤
-│ Title: [Get Moving_____________________]                │
-│                                                         │
-│ Content (What this section is about):                   │
-│ ┌─────────────────────────────────────────────────────┐ │
-│ │ Start your morning with light movement to wake     │ │
-│ │ up your body and increase blood flow. These        │ │
-│ │ exercises are designed to be gentle yet effective..│ │
-│ │                                                     │ │
-│ └─────────────────────────────────────────────────────┘ │
-│                                                         │
-│ Image URL (optional):                                   │
-│ [https://example.com/stretching.jpg___________]        │
-├─────────────────────────────────────────────────────────┤
-│                              [Cancel]  [Save Section]   │
-└─────────────────────────────────────────────────────────┘
-```
-
-## File Changes
-
-### Database Migration
-Create `routines_bank_sections` table and add `section_id` to `routines_bank_tasks`
-
-### Updated RoutinesBank.tsx
-- Add sections management
-- Section CRUD operations
-- Assign tasks to sections
-- Reorder sections
-- Edit section content/image
-
-## How It Works
-
-1. **Create Routine** - Add basic info (title, subtitle, cover, category)
-2. **Add Sections** - Create sections with title + descriptive content
-3. **Add Tasks** - Add tasks from the bank, assign to sections
-4. **Rich Content** - Each section can have explanatory text and images
-
-## Visual Flow on Routine Page (App Side - Future)
-
-When a user views a routine:
-
-```text
-┌─────────────────────────────────────────────────────────┐
-│ ✨ Morning Energy Boost                                 │
-│ Start your day with intention                           │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│ GET MOVING                                              │
-│ ───────────                                             │
-│ Start your morning with light movement to wake up       │
-│ your body and increase blood flow...                    │
-│                                                         │
-│ [Image: stretching.jpg]                                │
-│                                                         │
-│ ☀️ Morning Stretch                              1 min  │
-│ 🏃 Light Exercise                               1 min  │
-│                                                         │
-│ MINDFULNESS                                             │
-│ ───────────                                             │
-│ Take time to center yourself before the day begins...   │
-│                                                         │
-│ 🧘 Meditation                                   1 min  │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+User on /app/routines
+        ↓
+    Sees task: "☀️ Morning Stretch"
+        ↓
+    Taps "+"
+        ↓
+┌─────────────────────────────────┐
+│ Add "Morning Stretch"           │
+├─────────────────────────────────┤
+│                                 │
+│ ○ Add to Today's Planner       │
+│ ○ Add to Routine               │
+│                                 │
+│ [Select Routine ▼]              │
+│ or [+ Create New Routine]       │
+│                                 │
+│              [Cancel]  [Add]    │
+└─────────────────────────────────┘
 ```
 
 ## Implementation Order
 
-1. **Database migration** - Create `routines_bank_sections` table, add `section_id` to tasks
-2. **Update RoutinesBank.tsx** - Add sections management UI
-3. **Section CRUD** - Create, edit, delete sections with rich content
-4. **Task-Section linking** - Assign tasks to sections, move between sections
-5. **Test end-to-end**
+1. **Update useTaskPlanner.tsx** - Change data source to admin_task_bank
+2. **Update TaskTemplate interface** - Match admin_task_bank schema
+3. **Update AppInspire.tsx** - Add routine selection dialog
+4. **Update TaskTemplateCard.tsx** - Open dialog instead of direct add
+5. **Update edge functions** - Point to admin_task_bank
+6. **Delete TaskTemplatesManager.tsx** - Remove deprecated component
+7. **Database migration** - Drop task_templates table
+8. **Test end-to-end**
 
-## Summary
+## Schema Mapping
 
-**What we're adding:**
-- A new `routines_bank_sections` table for rich section content
-- Each section has a title, descriptive content, and optional image
-- Tasks can be assigned to sections
-- The edit dialog will show sections with their tasks grouped together
-- Sections provide the "discussion" content that introduces each part of the routine
+| task_templates | admin_task_bank | Notes |
+|----------------|-----------------|-------|
+| id | id | Same |
+| title | title | Same |
+| emoji | emoji | Same |
+| color | color | Same |
+| category | category | Same |
+| description | description | Same |
+| suggested_time | - | Not in bank, can add or skip |
+| repeat_pattern | repeat_pattern | Same |
+| display_order | sort_order | Different name |
+| is_active | is_active | Same |
+| is_popular | is_popular | Same |
+| - | duration_minutes | New field (useful!) |
+| - | pro_link_type | New field |
+| - | goal_enabled | New field |
 
-This gives you the ability to create beautifully structured routine templates with explanatory content for each section, similar to how courses have modules with descriptions.
+The `admin_task_bank` has MORE fields, so this is an upgrade.
 
