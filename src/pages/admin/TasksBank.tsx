@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Plus, Sparkles, Star, ChevronRight, Trash2, Eye, EyeOff, ChevronDown } from 'lucide-react';
+import { Plus, Sparkles, Star, ChevronRight, Trash2, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
@@ -79,6 +79,7 @@ export default function TasksBank() {
     is_active: true,
   });
   const [adminSettingsOpen, setAdminSettingsOpen] = useState(false);
+  const [adminSettingsTaskId, setAdminSettingsTaskId] = useState<string | null>(null);
 
   // Fetch routine categories from database
   const { data: routineCategories = [] } = useQuery({
@@ -134,6 +135,31 @@ export default function TasksBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
+    },
+  });
+
+  const updateAdminSettings = useMutation({
+    mutationFn: async (payload: { id: string; settings: AdminSettings }) => {
+      const { error } = await supabase
+        .from('admin_task_bank')
+        .update({
+          description: payload.settings.description || null,
+          duration_minutes: payload.settings.duration_minutes,
+          is_popular: payload.settings.is_popular,
+          is_active: payload.settings.is_active,
+        })
+        .eq('id', payload.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
+      toast.success('Admin settings saved');
+      setAdminSettingsOpen(false);
+      setAdminSettingsTaskId(null);
+    },
+    onError: (error) => {
+      toast.error('Failed to save admin settings: ' + error.message);
     },
   });
 
@@ -309,6 +335,7 @@ export default function TasksBank() {
       is_active: true,
     });
     setAdminSettingsOpen(false);
+    setAdminSettingsTaskId(null);
     setEditSubtasks([]);
     setEditCategory('general');
     setSheetOpen(true);
@@ -359,8 +386,20 @@ export default function TasksBank() {
       is_active: task.is_active,
     });
     setAdminSettingsOpen(false);
+    setAdminSettingsTaskId(null);
     
     setSheetOpen(true);
+  };
+
+  const openAdminSettingsForTask = (task: TaskBankItem) => {
+    setAdminSettings({
+      description: task.description || '',
+      duration_minutes: task.duration_minutes || 5,
+      is_popular: task.is_popular,
+      is_active: task.is_active,
+    });
+    setAdminSettingsTaskId(task.id);
+    setAdminSettingsOpen(true);
   };
 
   const closeSheet = () => {
@@ -514,6 +553,22 @@ export default function TasksBank() {
                   >
                     {task.is_active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </button>
+
+                  {/* Admin settings */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openAdminSettingsForTask(task);
+                    }}
+                    className={cn(
+                      "p-2 transition-all",
+                      "text-muted-foreground opacity-0 group-hover:opacity-100"
+                    )}
+                    title="Admin settings"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                  </button>
+
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -532,7 +587,13 @@ export default function TasksBank() {
       </CardContent>
 
       {/* Admin Settings Dialog - higher z-index to appear above sheet */}
-      <Dialog open={adminSettingsOpen} onOpenChange={setAdminSettingsOpen}>
+      <Dialog
+        open={adminSettingsOpen}
+        onOpenChange={(open) => {
+          setAdminSettingsOpen(open);
+          if (!open) setAdminSettingsTaskId(null);
+        }}
+      >
         <DialogContent className="sm:max-w-md z-[100]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -603,29 +664,27 @@ export default function TasksBank() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAdminSettingsOpen(false)}>Done</Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setAdminSettingsOpen(false);
+                setAdminSettingsTaskId(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (!adminSettingsTaskId) return;
+                updateAdminSettings.mutate({ id: adminSettingsTaskId, settings: adminSettings });
+              }}
+              disabled={!adminSettingsTaskId || updateAdminSettings.isPending}
+            >
+              Save
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Floating Admin Settings Button when sheet is open - very high z-index */}
-      {sheetOpen && (
-        <div className="fixed bottom-4 right-4 z-[100]">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="shadow-lg gap-2"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setAdminSettingsOpen(true);
-            }}
-          >
-            <Sparkles className="h-4 w-4" />
-            Admin Settings
-          </Button>
-        </div>
-      )}
 
       {/* Use AppTaskCreate in sheet mode */}
       <AppTaskCreate
