@@ -12,7 +12,7 @@ interface TaskTemplate {
   emoji: string;
   color: string;
   category: string | null;
-  suggested_time: string | null;
+  duration_minutes: number | null;
 }
 
 interface Category {
@@ -144,9 +144,9 @@ serve(async (req) => {
       );
     }
 
-    // Fetch all active task templates
+    // Fetch all active task templates from admin_task_bank (single source of truth)
     const { data: templates, error: templatesError } = await supabase
-      .from("task_templates")
+      .from("admin_task_bank")
       .select("*")
       .eq("is_active", true);
 
@@ -227,13 +227,9 @@ serve(async (req) => {
 
     const currentOrder = (maxOrderData?.[0]?.display_order || 0) + 1;
 
-    // Calculate total duration
+    // Calculate total duration from duration_minutes
     const totalMinutes = selectedTasks.reduce((sum, t) => {
-      if (t.suggested_time) {
-        const match = t.suggested_time.match(/(\d+)/);
-        return sum + (match ? parseInt(match[1]) : 5);
-      }
-      return sum + 5;
+      return sum + (t.duration_minutes || 5);
     }, 0);
 
     // Create routine plan
@@ -284,12 +280,7 @@ serve(async (req) => {
     // Create tasks from templates
     let taskOrder = 1;
     for (const template of selectedTasks) {
-      let durationMinutes = 5;
-      if (template.suggested_time) {
-        const match = template.suggested_time.match(/(\d+)/);
-        if (match) durationMinutes = parseInt(match[1]);
-      }
-
+      const durationMinutes = template.duration_minutes || 5;
       const icon = emojiToIcon[template.emoji] || 'CheckCircle';
 
       const { error: taskError } = await supabase

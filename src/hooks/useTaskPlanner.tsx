@@ -84,14 +84,24 @@ export interface TaskTemplate {
   title: string;
   emoji: string;
   color: TaskColor;
-  category: TemplateCategory;
+  category: string;
   description: string | null;
-  suggested_time: string | null;
   repeat_pattern: RepeatPattern;
-  display_order: number;
+  repeat_days: number[] | null;
+  sort_order: number;
   is_active: boolean;
   is_popular: boolean;
+  duration_minutes: number | null;
+  pro_link_type: string | null;
+  pro_link_value: string | null;
+  goal_enabled: boolean;
+  goal_type: string | null;
+  goal_target: number | null;
+  goal_unit: string | null;
+  tag: string | null;
+  linked_playlist_id: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface UserTag {
@@ -409,17 +419,17 @@ export const useUserTags = () => {
 };
 
 /**
- * Get task templates
+ * Get task templates from admin_task_bank (single source of truth)
  */
-export const useTaskTemplates = (category?: TemplateCategory) => {
+export const useTaskTemplates = (category?: string) => {
   return useQuery({
     queryKey: ['planner-templates', category],
     queryFn: async () => {
       let query = supabase
-        .from('task_templates')
+        .from('admin_task_bank')
         .select('*')
         .eq('is_active', true)
-        .order('display_order', { ascending: true });
+        .order('sort_order', { ascending: true });
 
       if (category) {
         query = query.eq('category', category);
@@ -1038,9 +1048,17 @@ export const useCreateTaskFromTemplate = () => {
           emoji: template.emoji,
           color: template.color,
           scheduled_date: format(date, 'yyyy-MM-dd'),
-          scheduled_time: template.suggested_time,
+          scheduled_time: null, // admin_task_bank doesn't have suggested_time
           repeat_pattern: template.repeat_pattern,
-          tag: template.category,
+          repeat_days: template.repeat_days || [],
+          tag: template.tag || template.category,
+          pro_link_type: template.pro_link_type as any,
+          pro_link_value: template.pro_link_value,
+          linked_playlist_id: template.linked_playlist_id,
+          goal_enabled: template.goal_enabled || false,
+          goal_type: template.goal_type as any,
+          goal_target: template.goal_target,
+          goal_unit: template.goal_unit,
         })
         .select()
         .single();
