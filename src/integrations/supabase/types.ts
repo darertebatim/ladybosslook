@@ -2308,6 +2308,47 @@ export type Database = {
         }
         Relationships: []
       }
+      routines_bank_sections: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          routine_id: string
+          section_order: number | null
+          title: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          routine_id: string
+          section_order?: number | null
+          title: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          routine_id?: string
+          section_order?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routines_bank_sections_routine_id_fkey"
+            columns: ["routine_id"]
+            isOneToOne: false
+            referencedRelation: "routines_bank"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       routines_bank_tasks: {
         Row: {
           created_at: string | null
@@ -2315,6 +2356,7 @@ export type Database = {
           emoji: string | null
           id: string
           routine_id: string
+          section_id: string | null
           section_title: string | null
           task_id: string | null
           task_order: number | null
@@ -2326,6 +2368,7 @@ export type Database = {
           emoji?: string | null
           id?: string
           routine_id: string
+          section_id?: string | null
           section_title?: string | null
           task_id?: string | null
           task_order?: number | null
@@ -2337,6 +2380,7 @@ export type Database = {
           emoji?: string | null
           id?: string
           routine_id?: string
+          section_id?: string | null
           section_title?: string | null
           task_id?: string | null
           task_order?: number | null
@@ -2348,6 +2392,13 @@ export type Database = {
             columns: ["routine_id"]
             isOneToOne: false
             referencedRelation: "routines_bank"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "routines_bank_tasks_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "routines_bank_sections"
             referencedColumns: ["id"]
           },
           {
