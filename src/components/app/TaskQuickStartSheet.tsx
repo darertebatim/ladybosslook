@@ -123,7 +123,7 @@ export const TaskQuickStartSheet = ({
                     >
                       <span className="text-2xl flex-shrink-0">{template.emoji}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground/90 truncate">
+                        <p className="text-[15px] text-foreground/90 truncate">
                           {template.title}
                         </p>
                         <p className="text-xs text-foreground/60 truncate">
