@@ -119,6 +119,38 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'wiggle': {
+					'0%, 100%': { transform: 'rotate(-3deg)' },
+					'50%': { transform: 'rotate(3deg)' }
+				},
+				'blow': {
+					'0%, 100%': { transform: 'translateX(0) rotate(0deg)' },
+					'25%': { transform: 'translateX(2px) rotate(5deg)' },
+					'75%': { transform: 'translateX(-2px) rotate(-5deg)' }
+				},
+				'shake': {
+					'0%, 100%': { transform: 'translateX(0)' },
+					'25%': { transform: 'translateX(-3px) rotate(-5deg)' },
+					'75%': { transform: 'translateX(3px) rotate(5deg)' }
+				},
+				'wave': {
+					'0%, 100%': { transform: 'translateY(0) scaleY(1)' },
+					'50%': { transform: 'translateY(-2px) scaleY(1.05)' }
+				},
+				'heartbeat': {
+					'0%, 100%': { transform: 'scale(1)' },
+					'14%': { transform: 'scale(1.15)' },
+					'28%': { transform: 'scale(1)' },
+					'42%': { transform: 'scale(1.15)' },
+					'70%': { transform: 'scale(1)' }
+				},
+				'write': {
+					'0%': { transform: 'translateX(0) translateY(0)' },
+					'25%': { transform: 'translateX(2px) translateY(1px)' },
+					'50%': { transform: 'translateX(0) translateY(2px)' },
+					'75%': { transform: 'translateX(-2px) translateY(1px)' },
+					'100%': { transform: 'translateX(0) translateY(0)' }
 				}
 			},
 			animation: {
@@ -129,7 +161,13 @@ export default {
 				'urgency-pulse': 'urgency-pulse 2s ease-in-out infinite',
 				'fade-in-up': 'fade-in-up 0.6s ease-out',
 				'scale-in': 'scale-in 0.4s ease-out',
-				'shimmer': 'shimmer 3s infinite'
+				'shimmer': 'shimmer 3s infinite',
+				'wiggle': 'wiggle 0.5s ease-in-out',
+				'blow': 'blow 1s ease-in-out infinite',
+				'shake': 'shake 0.4s ease-in-out',
+				'wave': 'wave 1.5s ease-in-out infinite',
+				'heartbeat': 'heartbeat 0.8s ease-in-out infinite',
+				'write': 'write 0.6s ease-in-out'
 			},
 			backgroundImage: {
 				'gradient-hero': 'var(--gradient-hero)',
