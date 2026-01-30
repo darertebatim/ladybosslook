@@ -33,10 +33,7 @@ export function ActiveRoundsCarousel({
     // Provider not available
   }
 
-  // Check if there are any new enrollments the user hasn't seen in the carousel
-  const hasUnseenPrograms = unseenEnrollments.size > 0 || unseenRounds.size > 0;
-  
-  // Also track locally seen enrollment IDs to detect new additions
+  // Track locally seen enrollment IDs to detect new additions
   const [seenIds, setSeenIds] = useState<Set<string>>(() => {
     try {
       const saved = localStorage.getItem(SEEN_ENROLLMENTS_KEY);
@@ -47,21 +44,14 @@ export function ActiveRoundsCarousel({
   });
   
   // Track if this is the initial load (no saved IDs yet means first time user)
-  const [hasInitialized, setHasInitialized] = useState(() => {
-    try {
-      return localStorage.getItem(SEEN_ENROLLMENTS_KEY) !== null;
-    } catch {
-      return false;
-    }
-  });
+  const hasInitialized = localStorage.getItem(SEEN_ENROLLMENTS_KEY) !== null;
   
   // Only detect "new" enrollment if we've seen this user before AND there's an ID not in seenIds
   const hasNewEnrollment = hasInitialized && activeRounds.some(e => !seenIds.has(e.id));
 
-  // Persist collapsed state - default to collapsed, but auto-expand if new programs
+  // Persist collapsed state - default to collapsed, only auto-expand if NEW program added
   const [isCollapsed, setIsCollapsed] = useState(() => {
-    // If there are unseen or new programs, start expanded
-    if (hasUnseenPrograms || hasNewEnrollment) {
+    if (hasNewEnrollment) {
       return false;
     }
     const saved = localStorage.getItem(COLLAPSED_KEY);
@@ -71,10 +61,10 @@ export function ActiveRoundsCarousel({
 
   // Auto-expand when new enrollments are detected
   useEffect(() => {
-    if (hasUnseenPrograms || hasNewEnrollment) {
+    if (hasNewEnrollment) {
       setIsCollapsed(false);
     }
-  }, [hasUnseenPrograms, hasNewEnrollment]);
+  }, [hasNewEnrollment]);
 
   // Update seen IDs when enrollments change
   useEffect(() => {
@@ -83,7 +73,6 @@ export function ActiveRoundsCarousel({
       const hasNew = activeRounds.some(e => !seenIds.has(e.id));
       if (hasNew || !hasInitialized) {
         setSeenIds(currentIds);
-        setHasInitialized(true);
         try {
           localStorage.setItem(SEEN_ENROLLMENTS_KEY, JSON.stringify([...currentIds]));
         } catch {
