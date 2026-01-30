@@ -373,9 +373,12 @@ const AppHome = () => {
         paddingTop: 'max(12px, env(safe-area-inset-top))'
       }}>
           {/* Title bar - three column layout for balanced centering */}
-          <div className="grid grid-cols-3 items-center px-4 h-12">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center px-4 h-12">
             {/* Left: Quick action buttons when collapsed, empty when expanded */}
-            <div className={cn("flex items-center gap-1 justify-start transition-opacity duration-200", showCalendar ? "opacity-0 pointer-events-none" : "opacity-100")}>
+            <div className={cn(
+              "flex items-center gap-1 justify-start transition-opacity duration-200 min-w-0 justify-self-start",
+              showCalendar ? "opacity-0 pointer-events-none" : "opacity-100"
+            )}>
               <button onClick={() => navigate('/app/water')} className="p-2 -ml-2 text-sky-500 hover:text-sky-600 transition-colors">
                 <Droplets className="h-5 w-5" />
               </button>
@@ -388,7 +391,7 @@ const AppHome = () => {
             </div>
 
             {/* Center: Title - changes to month/year when expanded */}
-            <div className="flex justify-center">
+            <div className="flex justify-center justify-self-center relative z-10">
               {showCalendar ? (
                 <div className="flex items-center gap-1">
                   <button onClick={handlePrevMonth} className="p-2.5 -m-1 rounded-full hover:bg-white/50 active:bg-white/70 transition-colors">
@@ -410,7 +413,7 @@ const AppHome = () => {
             </div>
 
             {/* Right: Additional buttons when collapsed + streak badge */}
-            <div className="flex items-center gap-1 justify-end">
+            <div className="flex items-center gap-1 justify-end justify-self-end min-w-0">
               {/* Extra buttons when collapsed */}
               <div className={cn("flex items-center transition-opacity duration-200", showCalendar ? "opacity-0 pointer-events-none" : "opacity-100")}>
                 <button onClick={() => navigate('/app/routines')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
