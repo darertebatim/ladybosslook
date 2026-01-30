@@ -176,7 +176,7 @@ const AppStore = () => {
             </div>
           ) : (
             <>
-              <h1 className="text-xl font-bold text-foreground">Browse</h1>
+              <h1 className="text-xl font-bold text-foreground">Explore Simora</h1>
               <button 
                 onClick={() => setShowSearch(true)}
                 className="p-2 rounded-full transition-transform active:scale-95"
