@@ -1,6 +1,6 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
+import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subWeeks, addWeeks } from 'date-fns';
 import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Wind, Droplets } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress } from '@/hooks/useTaskPlanner';
@@ -55,7 +55,10 @@ const AppHome = () => {
   // Water tracking screen state
   const [waterTask, setWaterTask] = useState<UserTask | null>(null);
 
-  // App tour hook
+  // Week swipe gesture state
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  const minSwipeDistance = 50;
   const {
     run: runTour,
     stepIndex,
@@ -302,6 +305,37 @@ const AppHome = () => {
     setShowCalendar(!showCalendar);
     haptic.light();
   }, [showCalendar, selectedDate]);
+
+  // Week swipe handlers
+  const handleWeekTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = null;
+  }, []);
+
+  const handleWeekTouchMove = useCallback((e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleWeekTouchEnd = useCallback(() => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+    
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      // Swipe left = next week
+      setSelectedDate(prev => addWeeks(prev, 1));
+      haptic.light();
+    } else if (isRightSwipe) {
+      // Swipe right = previous week
+      setSelectedDate(prev => subWeeks(prev, 1));
+      haptic.light();
+    }
+    
+    touchStartX.current = null;
+    touchEndX.current = null;
+  }, []);
   const isLoading = tasksLoading || completionsLoading || programEventsLoading;
 
   // Check if viewing a future date
@@ -398,10 +432,14 @@ const AppHome = () => {
               </div>
             </div>
 
-            {/* Week strip - Me+ style with pill around day name + number */}
-            <div className={cn("grid overflow-hidden")} style={{
-            gridTemplateRows: showCalendar ? '0fr' : '1fr'
-          }}>
+            {/* Week strip - Me+ style with swipe navigation */}
+            <div 
+              className={cn("grid overflow-hidden touch-pan-y")} 
+              style={{ gridTemplateRows: showCalendar ? '0fr' : '1fr' }}
+              onTouchStart={handleWeekTouchStart}
+              onTouchMove={handleWeekTouchMove}
+              onTouchEnd={handleWeekTouchEnd}
+            >
               <div className="min-h-0">
                 <div className={cn("flex mt-1 transition-opacity duration-200", showCalendar ? "opacity-0" : "opacity-100")}>
                   {weekDays.map(day => {
