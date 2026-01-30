@@ -1,99 +1,83 @@
 
-# Migration Plan: Pro Task Templates → Tasks Bank
+# Plan: Enhance Tasks Bank with Admin Controls
 
 ## Overview
-Migrate all 14 Pro Task Templates from the legacy `routine_task_templates` table to the unified `admin_task_bank` table. These are special tasks that deep-link to app features like playlists, breathing exercises, journal, water tracking, and channels.
+Add admin-specific controls to the Tasks Bank that allow managing `is_popular`, `is_active`, `description`, and `duration_minutes` fields. Also add the missing `repeat_interval` column to the schema for full feature parity.
 
-## Current Pro Task Templates (14 total)
+## Changes
 
-| Type | Count | Examples |
-|------|-------|----------|
-| Playlist | 7 | Relaxing Rain, Ladyboss Inner-Strength, Courageous Character |
-| Breathe | 4 | Calm Breathing, Box Breathing, Energy Boost, Simora Breathing |
-| Journal | 1 | Journal Writings |
-| Water | 1 | Drink Water |
-| Channel | 1 | Channel Check-in |
-
-## Migration Details
-
-### Field Mapping
-
-```text
-routine_task_templates     →  admin_task_bank
-──────────────────────────────────────────────────
-title                      →  title
-icon (may be emoji/text)   →  emoji (convert legacy icons)
-duration_minutes           →  duration_minutes
-pro_link_type              →  pro_link_type
-pro_link_value             →  pro_link_value
-linked_playlist_id         →  linked_playlist_id
-description                →  description
-category ('Pro')           →  category ('pro' lowercase)
-is_active                  →  is_active
-is_popular                 →  is_popular
-display_order              →  sort_order
-(default)                  →  color = 'amber' (Pro color)
-(default)                  →  goal_enabled = false
-(default)                  →  repeat_pattern = 'none'
-```
-
-### Icon Conversion
-Some Pro Task Templates use legacy Lucide icon names (e.g., "BookOpen", "Music", "Mic", "Users"). These will be converted to appropriate emojis:
-- `BookOpen` → 📖
-- `Music` → 🎵
-- `Mic` → 🎙️
-- `Users` → 👥
-
-### SQL Migration
+### 1. Database: Add Missing Column
+Add `repeat_interval` to `admin_task_bank` for parity with user tasks.
 
 ```sql
-INSERT INTO admin_task_bank (
-  title, emoji, color, category, description,
-  duration_minutes, pro_link_type, pro_link_value, 
-  linked_playlist_id, is_active, is_popular, 
-  sort_order, goal_enabled, repeat_pattern
-)
-SELECT 
-  title,
-  CASE 
-    WHEN icon = 'BookOpen' THEN '📖'
-    WHEN icon = 'Music' THEN '🎵'
-    WHEN icon = 'Mic' THEN '🎙️'
-    WHEN icon = 'Users' THEN '👥'
-    ELSE icon  -- Already an emoji
-  END,
-  'amber',  -- Pro tasks use amber color
-  'pro',    -- Normalized category
-  description,
-  duration_minutes,
-  pro_link_type,
-  pro_link_value,
-  linked_playlist_id,
-  is_active,
-  is_popular,
-  (SELECT COALESCE(MAX(sort_order), 0) FROM admin_task_bank) + display_order,
-  false,
-  'none'
-FROM routine_task_templates
-ORDER BY display_order;
+ALTER TABLE admin_task_bank 
+ADD COLUMN repeat_interval integer DEFAULT 1;
 ```
 
-## Execution Steps
+### 2. UI: Add Admin Controls to Task List
+Add quick-action buttons directly on each task row in the list:
+- **Star toggle** - Click the star icon to toggle `is_popular`
+- **Active toggle** - Add an eye/visibility icon to toggle `is_active`
 
-1. **Run migration query** - Insert all 14 Pro Task Templates into admin_task_bank
-2. **Verify counts** - Confirm 14 new records with `pro_link_type IS NOT NULL`
-3. **Verify icon conversion** - Ensure legacy icon names are converted to emojis
-4. **Test in UI** - Open Tasks Bank and filter by "Pro" category
-5. **Spot check** - Verify playlist-linked tasks have correct `linked_playlist_id`
+### 3. UI: Extend Edit Sheet with Admin Section
+Add an "Admin Settings" collapsible section at the bottom of the task edit sheet with:
+- **Description** - Text area for optional description
+- **Duration** - Number input for estimated duration in minutes
+- **Popular** - Switch to mark as featured/popular
+- **Active** - Switch to enable/disable the template
 
-## Post-Migration
+### 4. Update Mutations
+Modify `createTask` and `updateTask` mutations to include:
+- `is_popular`
+- `is_active`
+- `description`
+- `duration_minutes`
+- `repeat_interval`
 
-After migration:
-- Tasks Bank will contain **250 templates** (236 legacy + 14 Pro)
-- Pro category tab will show all 14 deep-linked tasks
-- Legacy `ProTaskTemplatesManager` can be deprecated (future cleanup)
+## Technical Details
 
-## Risk Mitigation
-- Additive migration only (no deletions)
-- Original `routine_task_templates` data remains intact
-- Can be rolled back by deleting Pro category tasks from `admin_task_bank`
+### File Changes
+
+**src/pages/admin/TasksBank.tsx**
+- Add `togglePopular` mutation for quick star toggle
+- Add `toggleActive` mutation for quick visibility toggle
+- Add click handlers on star icon to toggle popular status
+- Add visibility icon with click handler to toggle active status
+- Extend `TaskFormData` interface or add admin-specific fields
+- Add admin settings section to the sheet content
+
+**Database Migration**
+- Add `repeat_interval` column to `admin_task_bank`
+
+### UI Layout for Admin Settings Section
+
+```text
+┌─────────────────────────────────────────┐
+│ Admin Settings                      [v] │
+├─────────────────────────────────────────┤
+│ Description                             │
+│ ┌─────────────────────────────────────┐ │
+│ │ Optional task description...        │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+│ Duration          ┌──────┐              │
+│                   │  5   │ minutes      │
+│                   └──────┘              │
+│                                         │
+│ Popular (Featured)        [  Toggle  ]  │
+│ Active                    [  Toggle  ]  │
+└─────────────────────────────────────────┘
+```
+
+### Quick Toggle Behavior in List
+- Clicking star icon toggles `is_popular` immediately (optimistic update)
+- Inactive tasks show at 50% opacity with strikethrough or badge
+- Add eye/eye-off icon for active status toggle
+
+## Implementation Order
+1. Run database migration to add `repeat_interval` column
+2. Add quick-toggle mutations for `is_popular` and `is_active`
+3. Update task list row with clickable star and visibility icons
+4. Add admin settings section to the edit sheet
+5. Update create/update mutations with new fields
+6. Test end-to-end
