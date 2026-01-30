@@ -174,35 +174,35 @@ const AppPeriod = () => {
           </button>
         </header>
 
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+        {/* Content - no scroll needed */}
+        <div className="flex-1 flex flex-col min-h-0">
           {/* Cycle status display */}
           <PeriodCycleInsights status={status} />
 
           {/* Month navigation */}
-          <div className="relative z-10 flex items-center justify-between px-6 py-3">
+          <div className="relative z-10 flex items-center justify-between px-6 py-2">
             <button
               onClick={handlePrevMonth}
-              className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
+              className="w-9 h-9 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
             >
               <ChevronLeft className="h-5 w-5 text-pink-700" />
             </button>
             
-            <h2 className="text-lg font-semibold text-pink-800">
+            <h2 className="text-base font-semibold text-pink-800">
               {format(currentMonth, 'MMMM yyyy')}
             </h2>
             
             <button
               onClick={handleNextMonth}
-              className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
+              className="w-9 h-9 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
             >
               <ChevronRight className="h-5 w-5 text-pink-700" />
             </button>
           </div>
 
           {/* Calendar */}
-          <div className="relative z-10 px-4">
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-4 shadow-sm">
+          <div className="relative z-10 flex-1 px-4 flex flex-col">
+            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-3 shadow-sm flex-1">
               <PeriodCalendar
                 currentMonth={currentMonth}
                 loggedPeriodDays={loggedPeriodDays}
@@ -213,24 +213,21 @@ const AppPeriod = () => {
             </div>
             
             {/* Legend */}
-            <div className="flex items-center justify-center gap-6 mt-4 pb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-pink-500" />
-                <span className="text-xs text-pink-700">Period</span>
+            <div className="flex items-center justify-center gap-4 py-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-pink-500" />
+                <span className="text-[10px] text-pink-700">Period</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full border-2 border-dashed border-pink-400" />
-                <span className="text-xs text-pink-600">Predicted</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full border-2 border-dashed border-pink-400" />
+                <span className="text-[10px] text-pink-600">Predicted</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-amber-400" />
-                <span className="text-xs text-amber-700">Ovulation</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-amber-400" />
+                <span className="text-[10px] text-amber-700">Ovulation</span>
               </div>
             </div>
           </div>
-          
-          {/* Spacer for bottom button */}
-          <div className="h-24" />
         </div>
 
         {/* Fixed Bottom action */}
