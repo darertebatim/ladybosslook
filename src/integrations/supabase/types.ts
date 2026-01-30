@@ -34,6 +34,7 @@ export type Database = {
           pro_link_value: string | null
           reminder_enabled: boolean
           repeat_days: number[] | null
+          repeat_interval: number | null
           repeat_pattern: string
           sort_order: number
           tag: string | null
@@ -59,6 +60,7 @@ export type Database = {
           pro_link_value?: string | null
           reminder_enabled?: boolean
           repeat_days?: number[] | null
+          repeat_interval?: number | null
           repeat_pattern?: string
           sort_order?: number
           tag?: string | null
@@ -84,6 +86,7 @@ export type Database = {
           pro_link_value?: string | null
           reminder_enabled?: boolean
           repeat_days?: number[] | null
+          repeat_interval?: number | null
           repeat_pattern?: string
           sort_order?: number
           tag?: string | null

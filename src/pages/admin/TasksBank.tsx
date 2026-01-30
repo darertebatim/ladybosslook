@@ -5,11 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Plus, Sparkles, Star, ChevronRight, Trash2 } from 'lucide-react';
+import { Plus, Sparkles, Star, ChevronRight, Trash2, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 // Color options matching the app
 const COLOR_OPTIONS = [
   { name: 'pink', hex: '#FFD6E8' },
@@ -37,6 +41,7 @@ interface TaskBankItem {
   category: string;
   duration_minutes: number | null;
   repeat_pattern: string;
+  repeat_interval: number | null;
   repeat_days: number[] | null;
   reminder_enabled: boolean;
   goal_enabled: boolean;
@@ -52,11 +57,28 @@ interface TaskBankItem {
   sort_order: number;
 }
 
+// Admin settings for task bank items
+interface AdminSettings {
+  description: string;
+  duration_minutes: number;
+  is_popular: boolean;
+  is_active: boolean;
+}
+
 export default function TasksBank() {
   const queryClient = useQueryClient();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskBankItem | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  
+  // Admin settings state (separate from AppTaskCreate form)
+  const [adminSettings, setAdminSettings] = useState<AdminSettings>({
+    description: '',
+    duration_minutes: 5,
+    is_popular: false,
+    is_active: true,
+  });
+  const [adminSettingsOpen, setAdminSettingsOpen] = useState(false);
 
   // Fetch routine categories from database
   const { data: routineCategories = [] } = useQuery({
@@ -87,6 +109,34 @@ export default function TasksBank() {
     },
   });
 
+  // Quick toggle for is_popular
+  const togglePopular = useMutation({
+    mutationFn: async ({ id, is_popular }: { id: string; is_popular: boolean }) => {
+      const { error } = await supabase
+        .from('admin_task_bank')
+        .update({ is_popular })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
+    },
+  });
+
+  // Quick toggle for is_active
+  const toggleActive = useMutation({
+    mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
+      const { error } = await supabase
+        .from('admin_task_bank')
+        .update({ is_active })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
+    },
+  });
+
   // Fetch subtasks for a task
   const fetchSubtasks = async (taskId: string): Promise<string[]> => {
     const { data } = await supabase
@@ -97,15 +147,16 @@ export default function TasksBank() {
     return (data || []).map(s => s.title);
   };
 
-  // Create task mutation
+  // Create task mutation - includes admin settings
   const createTask = useMutation({
-    mutationFn: async (data: { formData: TaskFormData; subtasks: string[]; category: string }) => {
+    mutationFn: async (data: { formData: TaskFormData; subtasks: string[]; category: string; adminSettings: AdminSettings }) => {
       const taskData = {
         title: data.formData.title,
         emoji: data.formData.icon,
         color: data.formData.color,
         category: data.category,
         repeat_pattern: data.formData.repeatEnabled ? data.formData.repeatPattern : 'none',
+        repeat_interval: data.formData.repeatInterval,
         repeat_days: data.formData.repeatDays,
         reminder_enabled: data.formData.reminderEnabled,
         goal_enabled: data.formData.goalEnabled,
@@ -116,8 +167,11 @@ export default function TasksBank() {
         pro_link_value: data.formData.proLinkValue,
         linked_playlist_id: data.formData.proLinkType === 'playlist' ? data.formData.proLinkValue : data.formData.linkedPlaylistId,
         tag: data.formData.tag,
-        is_active: true,
-        is_popular: false,
+        // Admin settings
+        description: data.adminSettings.description || null,
+        duration_minutes: data.adminSettings.duration_minutes,
+        is_active: data.adminSettings.is_active,
+        is_popular: data.adminSettings.is_popular,
       };
 
       const { data: newTask, error } = await supabase
@@ -150,15 +204,16 @@ export default function TasksBank() {
     },
   });
 
-  // Update task mutation
+  // Update task mutation - includes admin settings
   const updateTask = useMutation({
-    mutationFn: async (data: { id: string; formData: TaskFormData; subtasks: string[]; category: string }) => {
+    mutationFn: async (data: { id: string; formData: TaskFormData; subtasks: string[]; category: string; adminSettings: AdminSettings }) => {
       const taskData = {
         title: data.formData.title,
         emoji: data.formData.icon,
         color: data.formData.color,
         category: data.category,
         repeat_pattern: data.formData.repeatEnabled ? data.formData.repeatPattern : 'none',
+        repeat_interval: data.formData.repeatInterval,
         repeat_days: data.formData.repeatDays,
         reminder_enabled: data.formData.reminderEnabled,
         goal_enabled: data.formData.goalEnabled,
@@ -169,6 +224,11 @@ export default function TasksBank() {
         pro_link_value: data.formData.proLinkValue,
         linked_playlist_id: data.formData.proLinkType === 'playlist' ? data.formData.proLinkValue : data.formData.linkedPlaylistId,
         tag: data.formData.tag,
+        // Admin settings
+        description: data.adminSettings.description || null,
+        duration_minutes: data.adminSettings.duration_minutes,
+        is_active: data.adminSettings.is_active,
+        is_popular: data.adminSettings.is_popular,
       };
 
       const { error } = await supabase
@@ -242,6 +302,13 @@ export default function TasksBank() {
       goalTarget: 2,
       goalUnit: 'times',
     });
+    setAdminSettings({
+      description: '',
+      duration_minutes: 5,
+      is_popular: false,
+      is_active: true,
+    });
+    setAdminSettingsOpen(false);
     setEditSubtasks([]);
     setEditCategory('general');
     setSheetOpen(true);
@@ -268,7 +335,7 @@ export default function TasksBank() {
       repeatPattern: ['daily', 'weekly', 'monthly'].includes(task.repeat_pattern) 
         ? task.repeat_pattern as 'daily' | 'weekly' | 'monthly' 
         : 'daily',
-      repeatInterval: 1,
+      repeatInterval: task.repeat_interval || 1,
       repeatDays: task.repeat_days || [],
       reminderEnabled: task.reminder_enabled,
       reminderTime: '09:00',
@@ -283,6 +350,15 @@ export default function TasksBank() {
       goalTarget: task.goal_target || 2,
       goalUnit: task.goal_unit || 'times',
     });
+    
+    // Set admin settings from existing task
+    setAdminSettings({
+      description: task.description || '',
+      duration_minutes: task.duration_minutes || 5,
+      is_popular: task.is_popular,
+      is_active: task.is_active,
+    });
+    setAdminSettingsOpen(false);
     
     setSheetOpen(true);
   };
@@ -301,12 +377,14 @@ export default function TasksBank() {
         formData,
         subtasks: formData.subtasks,
         category: editCategory,
+        adminSettings,
       });
     } else {
       createTask.mutate({
         formData,
         subtasks: formData.subtasks,
         category: editCategory,
+        adminSettings,
       });
     }
   };
@@ -395,15 +473,47 @@ export default function TasksBank() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium truncate">{task.title}</span>
-                      {task.is_popular && <Star className="h-3 w-3 text-amber-500 fill-amber-500 shrink-0" />}
+                      <span className={cn("font-medium truncate", !task.is_active && "line-through")}>{task.title}</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><TaskIcon iconName={catInfo.icon} size={12} /> {catInfo.label}</span>
                       {task.goal_enabled && <span>• Goal</span>}
                       {task.pro_link_type && <span>• Pro</span>}
+                      {task.duration_minutes && <span>• {task.duration_minutes}m</span>}
                     </div>
                   </div>
+                  {/* Quick toggle: Popular */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      togglePopular.mutate({ id: task.id, is_popular: !task.is_popular });
+                    }}
+                    className={cn(
+                      "p-2 transition-all",
+                      task.is_popular 
+                        ? "text-amber-500" 
+                        : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                    )}
+                    title={task.is_popular ? "Remove from popular" : "Mark as popular"}
+                  >
+                    <Star className={cn("h-4 w-4", task.is_popular && "fill-amber-500")} />
+                  </button>
+                  {/* Quick toggle: Active */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleActive.mutate({ id: task.id, is_active: !task.is_active });
+                    }}
+                    className={cn(
+                      "p-2 transition-all",
+                      !task.is_active 
+                        ? "text-muted-foreground" 
+                        : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                    )}
+                    title={task.is_active ? "Deactivate task" : "Activate task"}
+                  >
+                    {task.is_active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                  </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -420,6 +530,95 @@ export default function TasksBank() {
           </div>
         )}
       </CardContent>
+
+      {/* Admin Settings Dialog */}
+      <Dialog open={adminSettingsOpen} onOpenChange={setAdminSettingsOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              Admin Settings
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                placeholder="Optional task description..."
+                value={adminSettings.description}
+                onChange={(e) => setAdminSettings(prev => ({ ...prev, description: e.target.value }))}
+                className="min-h-[80px]"
+              />
+            </div>
+            
+            {/* Duration */}
+            <div className="space-y-2">
+              <Label htmlFor="duration">Duration (minutes)</Label>
+              <Input
+                id="duration"
+                type="number"
+                min={1}
+                max={480}
+                value={adminSettings.duration_minutes}
+                onChange={(e) => setAdminSettings(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) || 5 }))}
+                className="w-24"
+              />
+            </div>
+            
+            {/* Popular Toggle */}
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <div className="flex items-center gap-2">
+                <Star className={cn("h-4 w-4", adminSettings.is_popular && "text-amber-500 fill-amber-500")} />
+                <div>
+                  <p className="font-medium text-sm">Popular (Featured)</p>
+                  <p className="text-xs text-muted-foreground">Show star icon and prioritize</p>
+                </div>
+              </div>
+              <Switch
+                checked={adminSettings.is_popular}
+                onCheckedChange={(checked) => setAdminSettings(prev => ({ ...prev, is_popular: checked }))}
+              />
+            </div>
+            
+            {/* Active Toggle */}
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <div className="flex items-center gap-2">
+                {adminSettings.is_active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                <div>
+                  <p className="font-medium text-sm">Active</p>
+                  <p className="text-xs text-muted-foreground">Inactive tasks are hidden from users</p>
+                </div>
+              </div>
+              <Switch
+                checked={adminSettings.is_active}
+                onCheckedChange={(checked) => setAdminSettings(prev => ({ ...prev, is_active: checked }))}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAdminSettingsOpen(false)}>Done</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Floating Admin Settings Button when sheet is open */}
+      {sheetOpen && (
+        <div className="fixed bottom-4 right-4 z-[60]">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="shadow-lg gap-2"
+            onClick={() => setAdminSettingsOpen(true)}
+          >
+            <Sparkles className="h-4 w-4" />
+            Admin Settings
+          </Button>
+        </div>
+      )}
 
       {/* Use AppTaskCreate in sheet mode */}
       <AppTaskCreate
