@@ -7,10 +7,10 @@ interface SuggestedRoutineCardProps {
   routine: {
     id: string;
     title: string;
-    subtitle?: string;
-    estimated_minutes: number;
-    icon: string;
-    color: string;
+    subtitle?: string | null;
+    totalDuration?: number;
+    emoji?: string | null;
+    color?: string | null;
   };
 }
 
@@ -19,7 +19,11 @@ export function SuggestedRoutineCard({ routine }: SuggestedRoutineCardProps) {
     <Card className="p-4 border-dashed border-2 border-violet-200 dark:border-violet-800 bg-violet-50/50 dark:bg-violet-950/20">
       <div className="flex items-center gap-3">
         <div className="h-12 w-12 rounded-xl bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
-          <Sparkles className="h-6 w-6 text-violet-600 dark:text-violet-400" />
+          {routine.emoji ? (
+            <span className="text-2xl">{routine.emoji}</span>
+          ) : (
+            <Sparkles className="h-6 w-6 text-violet-600 dark:text-violet-400" />
+          )}
         </div>
         
         <div className="flex-1 min-w-0">
@@ -31,7 +35,7 @@ export function SuggestedRoutineCard({ routine }: SuggestedRoutineCardProps) {
           </h4>
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
-            <span>{routine.estimated_minutes} min</span>
+            <span>{routine.totalDuration || 0} min</span>
           </div>
         </div>
 

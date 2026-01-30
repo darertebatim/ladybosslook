@@ -1,0 +1,415 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+
+// Types for Routines Bank
+export interface RoutineBankItem {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  description: string | null;
+  cover_image_url: string | null;
+  category: string;
+  color: string | null;
+  emoji: string | null;
+  is_active: boolean | null;
+  is_popular: boolean | null;
+  sort_order: number | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface RoutineBankSection {
+  id: string;
+  routine_id: string;
+  title: string;
+  content: string | null;
+  image_url: string | null;
+  section_order: number | null;
+  is_active: boolean | null;
+  created_at: string | null;
+}
+
+export interface RoutineBankTask {
+  id: string;
+  routine_id: string;
+  task_id: string | null;
+  title: string;
+  emoji: string | null;
+  duration_minutes: number | null;
+  section_id: string | null;
+  section_title: string | null;
+  task_order: number | null;
+  created_at: string | null;
+  // Fields from joined admin_task_bank
+  pro_link_type?: string | null;
+  pro_link_value?: string | null;
+  linked_playlist_id?: string | null;
+  color?: string | null;
+}
+
+export interface RoutineBankWithDetails extends RoutineBankItem {
+  sections: RoutineBankSection[];
+  tasks: RoutineBankTask[];
+  totalDuration: number;
+}
+
+// Unique categories from routines_bank
+export interface RoutineBankCategory {
+  slug: string;
+  name: string;
+  color: string;
+  icon: string;
+}
+
+// Map category slugs to display info
+const CATEGORY_DISPLAY: Record<string, { name: string; icon: string; color: string }> = {
+  general: { name: 'General', icon: 'Sparkles', color: 'purple' },
+  morning: { name: 'Morning', icon: 'Sunrise', color: 'orange' },
+  evening: { name: 'Evening', icon: 'Moon', color: 'indigo' },
+  productivity: { name: 'Productivity', icon: 'Target', color: 'blue' },
+  wellness: { name: 'Wellness', icon: 'Heart', color: 'pink' },
+  fitness: { name: 'Fitness', icon: 'Dumbbell', color: 'green' },
+  mindfulness: { name: 'Mindfulness', icon: 'Brain', color: 'teal' },
+  sleep: { name: 'Sleep', icon: 'Moon', color: 'indigo' },
+  pro: { name: 'Pro', icon: 'Crown', color: 'amber' },
+};
+
+// Fetch unique categories from routines_bank
+export function useRoutineBankCategories() {
+  return useQuery({
+    queryKey: ['routines-bank-categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('category')
+        .eq('is_active', true);
+
+      if (error) throw error;
+
+      // Get unique categories
+      const uniqueCategories = [...new Set(data.map(r => r.category))];
+      
+      return uniqueCategories.map(cat => ({
+        slug: cat,
+        name: CATEGORY_DISPLAY[cat]?.name || cat.charAt(0).toUpperCase() + cat.slice(1),
+        icon: CATEGORY_DISPLAY[cat]?.icon || 'Sparkles',
+        color: CATEGORY_DISPLAY[cat]?.color || 'purple',
+      })) as RoutineBankCategory[];
+    },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+  });
+}
+
+// Fetch all active routines from bank
+export function useRoutinesBank(categorySlug?: string) {
+  return useQuery({
+    queryKey: ['routines-bank', categorySlug],
+    queryFn: async () => {
+      let query = supabase
+        .from('routines_bank')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (categorySlug) {
+        query = query.eq('category', categorySlug);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      // Get task counts and durations for each routine
+      const routineIds = data.map(r => r.id);
+      const { data: tasksData } = await supabase
+        .from('routines_bank_tasks')
+        .select('routine_id, duration_minutes')
+        .in('routine_id', routineIds);
+
+      // Calculate total duration per routine
+      const durationByRoutine: Record<string, number> = {};
+      tasksData?.forEach(t => {
+        durationByRoutine[t.routine_id] = (durationByRoutine[t.routine_id] || 0) + (t.duration_minutes || 0);
+      });
+
+      return data.map(routine => ({
+        ...routine,
+        totalDuration: durationByRoutine[routine.id] || 0,
+      })) as (RoutineBankItem & { totalDuration: number })[];
+    },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+  });
+}
+
+// Fetch popular routines
+export function usePopularRoutinesBank() {
+  return useQuery({
+    queryKey: ['routines-bank-popular'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_popular', true)
+        .order('sort_order', { ascending: true })
+        .limit(6);
+
+      if (error) throw error;
+
+      // Get durations
+      const routineIds = data.map(r => r.id);
+      const { data: tasksData } = await supabase
+        .from('routines_bank_tasks')
+        .select('routine_id, duration_minutes')
+        .in('routine_id', routineIds);
+
+      const durationByRoutine: Record<string, number> = {};
+      tasksData?.forEach(t => {
+        durationByRoutine[t.routine_id] = (durationByRoutine[t.routine_id] || 0) + (t.duration_minutes || 0);
+      });
+
+      return data.map(routine => ({
+        ...routine,
+        totalDuration: durationByRoutine[routine.id] || 0,
+      })) as (RoutineBankItem & { totalDuration: number })[];
+    },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+  });
+}
+
+// Fetch featured routines (for banner)
+export function useFeaturedRoutinesBank() {
+  return useQuery({
+    queryKey: ['routines-bank-featured'],
+    queryFn: async () => {
+      // For now, use popular routines as featured
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_popular', true)
+        .order('sort_order', { ascending: true })
+        .limit(3);
+
+      if (error) throw error;
+      return data as RoutineBankItem[];
+    },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+  });
+}
+
+// Fetch single routine with all details
+export function useRoutineBankDetail(routineId: string | undefined) {
+  return useQuery({
+    queryKey: ['routine-bank-detail', routineId],
+    queryFn: async () => {
+      if (!routineId) return null;
+
+      // Fetch routine
+      const { data: routine, error: routineError } = await supabase
+        .from('routines_bank')
+        .select('*')
+        .eq('id', routineId)
+        .single();
+
+      if (routineError) throw routineError;
+
+      // Fetch sections
+      const { data: sections, error: sectionsError } = await supabase
+        .from('routines_bank_sections')
+        .select('*')
+        .eq('routine_id', routineId)
+        .eq('is_active', true)
+        .order('section_order', { ascending: true });
+
+      if (sectionsError) throw sectionsError;
+
+      // Fetch tasks
+      const { data: tasks, error: tasksError } = await supabase
+        .from('routines_bank_tasks')
+        .select('*')
+        .eq('routine_id', routineId)
+        .order('task_order', { ascending: true });
+
+      if (tasksError) throw tasksError;
+
+      // Get pro_link info from admin_task_bank for each task
+      const taskIds = tasks.filter(t => t.task_id).map(t => t.task_id);
+      let taskDetails: Record<string, { pro_link_type: string | null; pro_link_value: string | null; linked_playlist_id: string | null; color: string | null }> = {};
+      
+      if (taskIds.length > 0) {
+        const { data: bankTasks } = await supabase
+          .from('admin_task_bank')
+          .select('id, pro_link_type, pro_link_value, linked_playlist_id, color')
+          .in('id', taskIds);
+
+        bankTasks?.forEach(bt => {
+          taskDetails[bt.id] = {
+            pro_link_type: bt.pro_link_type,
+            pro_link_value: bt.pro_link_value,
+            linked_playlist_id: bt.linked_playlist_id,
+            color: bt.color,
+          };
+        });
+      }
+
+      // Enrich tasks with pro_link info
+      const enrichedTasks = tasks.map(task => ({
+        ...task,
+        pro_link_type: task.task_id ? taskDetails[task.task_id]?.pro_link_type : null,
+        pro_link_value: task.task_id ? taskDetails[task.task_id]?.pro_link_value : null,
+        linked_playlist_id: task.task_id ? taskDetails[task.task_id]?.linked_playlist_id : null,
+        color: task.task_id ? taskDetails[task.task_id]?.color : null,
+      }));
+
+      const totalDuration = enrichedTasks.reduce((sum, t) => sum + (t.duration_minutes || 0), 0);
+
+      return {
+        ...routine,
+        sections: sections || [],
+        tasks: enrichedTasks || [],
+        totalDuration,
+      } as RoutineBankWithDetails;
+    },
+    enabled: !!routineId,
+  });
+}
+
+// Color cycle for variety in planner
+const ROUTINE_COLOR_CYCLE = [
+  'peach',
+  'sky',
+  'pink',
+  'yellow',
+  'lavender',
+  'mint',
+  'lime',
+] as const;
+
+// Add routine from bank to user's planner
+export function useAddRoutineFromBank() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({
+      routineId,
+      selectedTaskIds,
+      editedTasks,
+    }: {
+      routineId: string;
+      selectedTaskIds?: string[];
+      editedTasks?: {
+        id: string;
+        title?: string;
+        icon?: string;
+        color?: string;
+        repeatPattern?: 'daily' | 'weekly' | 'monthly' | 'none';
+        scheduledTime?: string | null;
+        tag?: string | null;
+        pro_link_type?: string | null;
+        pro_link_value?: string | null;
+      }[];
+    }) => {
+      if (!user) throw new Error('Must be logged in');
+
+      // Get routine details
+      const { data: routine, error: routineError } = await supabase
+        .from('routines_bank')
+        .select('*')
+        .eq('id', routineId)
+        .single();
+
+      if (routineError) throw routineError;
+
+      // Get tasks
+      const { data: allTasks, error: tasksError } = await supabase
+        .from('routines_bank_tasks')
+        .select('*')
+        .eq('routine_id', routineId)
+        .order('task_order', { ascending: true });
+
+      if (tasksError) throw tasksError;
+
+      // Get pro_link info from admin_task_bank
+      const taskIds = allTasks?.filter(t => t.task_id).map(t => t.task_id) || [];
+      let taskDetails: Record<string, { pro_link_type: string | null; pro_link_value: string | null; linked_playlist_id: string | null; color: string | null }> = {};
+      
+      if (taskIds.length > 0) {
+        const { data: bankTasks } = await supabase
+          .from('admin_task_bank')
+          .select('id, pro_link_type, pro_link_value, linked_playlist_id, color')
+          .in('id', taskIds);
+
+        bankTasks?.forEach(bt => {
+          taskDetails[bt.id] = {
+            pro_link_type: bt.pro_link_type,
+            pro_link_value: bt.pro_link_value,
+            linked_playlist_id: bt.linked_playlist_id,
+            color: bt.color,
+          };
+        });
+      }
+
+      // Filter tasks if selectedTaskIds provided
+      let tasks = selectedTaskIds
+        ? allTasks?.filter(t => selectedTaskIds.includes(t.id)) || []
+        : allTasks || [];
+
+      // Create edited tasks map
+      const editedTasksMap = new Map(editedTasks?.map(t => [t.id, t]) || []);
+
+      // Get current max order_index
+      const { data: existingTasks } = await supabase
+        .from('user_tasks')
+        .select('order_index')
+        .eq('user_id', user.id)
+        .order('order_index', { ascending: false })
+        .limit(1);
+
+      const startOrderIndex = (existingTasks?.[0]?.order_index ?? -1) + 1;
+
+      // Create user tasks
+      if (tasks.length > 0) {
+        const userTasks = tasks.map((task, index) => {
+          const edited = editedTasksMap.get(task.id);
+          const bankTask = task.task_id ? taskDetails[task.task_id] : null;
+          
+          const proLinkType = edited?.pro_link_type ?? bankTask?.pro_link_type ?? null;
+          const proLinkValue = edited?.pro_link_value ?? bankTask?.pro_link_value ?? bankTask?.linked_playlist_id ?? null;
+
+          return {
+            user_id: user.id,
+            title: edited?.title || task.title,
+            emoji: edited?.icon || task.emoji || routine.emoji || '✨',
+            color: edited?.color || bankTask?.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
+            repeat_pattern: edited?.repeatPattern || 'daily',
+            scheduled_time: edited?.scheduledTime || null,
+            tag: edited?.tag ?? routine.title,
+            linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : null,
+            pro_link_type: proLinkType,
+            pro_link_value: proLinkValue,
+            is_active: true,
+            order_index: startOrderIndex + index,
+          };
+        });
+
+        const { error: insertError } = await supabase
+          .from('user_tasks')
+          .insert(userTasks);
+
+        if (insertError) throw insertError;
+      }
+
+      return { success: true, taskCount: tasks.length };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+    },
+  });
+}

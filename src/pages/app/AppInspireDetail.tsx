@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, Clock, Star, CheckCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Heart, Share2, Clock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { StarRating } from '@/components/app/StarRating';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
-import { useRoutinePlan, useAddRoutinePlan, useRateRoutinePlan } from '@/hooks/useRoutinePlans';
+import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask } from '@/hooks/useRoutinesBank';
+import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -19,19 +19,43 @@ const colorGradients: Record<string, string> = {
   teal: 'from-teal-400 to-teal-600',
   indigo: 'from-indigo-400 to-indigo-600',
   rose: 'from-rose-400 to-rose-600',
+  amber: 'from-amber-400 to-amber-600',
+  mint: 'from-teal-300 to-teal-500',
 };
+
+// Helper to check if string is emoji
+const isEmoji = (str: string) => 
+  /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
+
+// Convert RoutineBankTask to RoutinePlanTask format for preview sheet
+function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask {
+  return {
+    id: task.id,
+    plan_id: task.routine_id,
+    title: task.title,
+    duration_minutes: task.duration_minutes || 1,
+    icon: task.emoji || '✨',
+    color: task.color || undefined,
+    task_order: task.task_order || 0,
+    is_active: true,
+    created_at: task.created_at || new Date().toISOString(),
+    linked_playlist_id: task.linked_playlist_id || null,
+    pro_link_type: task.pro_link_type as RoutinePlanTask['pro_link_type'] || null,
+    pro_link_value: task.pro_link_value || null,
+    linked_playlist: null,
+  };
+}
 
 export default function AppInspireDetail() {
   const { planId } = useParams<{ planId: string }>();
   const navigate = useNavigate();
   const [showPreviewSheet, setShowPreviewSheet] = useState(false);
   
-  const { data: plan, isLoading } = useRoutinePlan(planId);
-  const addRoutinePlan = useAddRoutinePlan();
-  const rateRoutinePlan = useRateRoutinePlan();
+  const { data: routine, isLoading } = useRoutineBankDetail(planId);
+  const addRoutineFromBank = useAddRoutineFromBank();
 
   const handleAddClick = () => {
-    if (!plan?.tasks?.length) {
+    if (!routine?.tasks?.length) {
       toast.error('No tasks in this routine');
       return;
     }
@@ -42,7 +66,15 @@ export default function AppInspireDetail() {
     if (!planId) return;
     
     try {
-      await addRoutinePlan.mutateAsync({ planId, selectedTaskIds, editedTasks });
+      await addRoutineFromBank.mutateAsync({ 
+        routineId: planId, 
+        selectedTaskIds, 
+        editedTasks: editedTasks.map(t => ({
+          ...t,
+          pro_link_type: t.pro_link_type as string | null,
+          pro_link_value: t.pro_link_value as string | null,
+        })),
+      });
       setShowPreviewSheet(false);
       toast.success(`${selectedTaskIds.length} tasks added!`);
       navigate('/app/home');
@@ -51,24 +83,13 @@ export default function AppInspireDetail() {
     }
   };
 
-  const handleRate = async (rating: number) => {
-    if (!planId) return;
-    
-    try {
-      await rateRoutinePlan.mutateAsync({ planId, rating });
-      toast.success('Thanks for your rating!');
-    } catch (error) {
-      toast.error('Failed to submit rating');
-    }
-  };
-
   const handleShare = async () => {
-    if (!plan) return;
+    if (!routine) return;
     
     try {
       await navigator.share({
-        title: plan.title,
-        text: plan.subtitle || plan.description || '',
+        title: routine.title,
+        text: routine.subtitle || routine.description || '',
         url: window.location.href,
       });
     } catch {
@@ -84,7 +105,7 @@ export default function AppInspireDetail() {
     );
   }
 
-  if (!plan) {
+  if (!routine) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
         <p className="text-muted-foreground">Routine not found</p>
@@ -95,12 +116,22 @@ export default function AppInspireDetail() {
     );
   }
 
-  const gradient = colorGradients[plan.color] || colorGradients.purple;
-  
-  // Check if icon is an emoji or a legacy Lucide icon name
-  const isEmoji = (str: string) => 
-    /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
-  const planIcon = plan.icon && isEmoji(plan.icon) ? plan.icon : '✨';
+  const color = routine.color || 'purple';
+  const gradient = colorGradients[color] || colorGradients.purple;
+  const routineIcon = routine.emoji && isEmoji(routine.emoji) ? routine.emoji : '✨';
+
+  // Convert tasks for preview sheet
+  const previewTasks = routine.tasks?.map(convertToRoutinePlanTask) || [];
+
+  // Group tasks by section
+  const tasksBySection: Record<string, RoutineBankTask[]> = {};
+  routine.tasks?.forEach(task => {
+    const sectionId = task.section_id || 'unsorted';
+    if (!tasksBySection[sectionId]) {
+      tasksBySection[sectionId] = [];
+    }
+    tasksBySection[sectionId].push(task);
+  });
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
@@ -138,15 +169,15 @@ export default function AppInspireDetail() {
           'relative w-full bg-gradient-to-br',
           gradient
         )} style={{ height: 'calc(224px + env(safe-area-inset-top, 0px))' }}>
-          {plan.cover_image_url ? (
+          {routine.cover_image_url ? (
             <img
-              src={plan.cover_image_url}
-              alt={plan.title}
+              src={routine.cover_image_url}
+              alt={routine.title}
               className="w-full h-full object-cover"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center pt-12">
-              <span className="text-8xl opacity-30">{planIcon}</span>
+              <span className="text-8xl opacity-30">{routineIcon}</span>
             </div>
           )}
         </div>
@@ -154,89 +185,104 @@ export default function AppInspireDetail() {
         <div className="px-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 160px)' }}>
           {/* Title & Badges */}
           <div className="pt-4">
-            <h1 className="text-2xl font-bold text-foreground">{plan.title}</h1>
-            {plan.subtitle && (
-              <p className="text-muted-foreground mt-1">{plan.subtitle}</p>
+            <h1 className="text-2xl font-bold text-foreground">{routine.title}</h1>
+            {routine.subtitle && (
+              <p className="text-muted-foreground mt-1">{routine.subtitle}</p>
             )}
             
             <div className="flex items-center gap-3 mt-3">
-              <div className="flex items-center gap-1 bg-amber-100 text-amber-700 text-sm font-medium px-2.5 py-1 rounded-full">
-                <Star className="w-4 h-4 fill-amber-400" />
-                <span>{plan.points} pts</span>
-              </div>
               <div className="flex items-center gap-1 bg-muted text-muted-foreground text-sm font-medium px-2.5 py-1 rounded-full">
                 <Clock className="w-4 h-4" />
-                <span>{plan.estimated_minutes} min</span>
+                <span>{routine.totalDuration} min</span>
               </div>
+              {routine.tasks && routine.tasks.length > 0 && (
+                <div className="text-sm text-muted-foreground">
+                  {routine.tasks.length} tasks
+                </div>
+              )}
             </div>
           </div>
 
           {/* Description */}
-          {plan.description && (
+          {routine.description && (
             <div className="mt-6">
-              <p className="text-muted-foreground leading-relaxed">{plan.description}</p>
+              <p className="text-muted-foreground leading-relaxed">{routine.description}</p>
             </div>
           )}
 
-          {/* Tasks Catalog */}
-          {plan.tasks && plan.tasks.length > 0 && (
+          {/* Tasks by Section */}
+          {routine.sections && routine.sections.length > 0 ? (
+            <div className="mt-6 space-y-6">
+              {routine.sections.map((section) => {
+                const sectionTasks = tasksBySection[section.id] || [];
+                return (
+                  <div key={section.id}>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                      {section.title}
+                    </h3>
+                    {section.content && (
+                      <p className="text-sm text-muted-foreground mb-3">{section.content}</p>
+                    )}
+                    {section.image_url && (
+                      <img
+                        src={section.image_url}
+                        alt={section.title}
+                        className="w-full h-40 object-cover rounded-xl mb-3"
+                      />
+                    )}
+                    {sectionTasks.length > 0 && (
+                      <div className="space-y-2">
+                        {sectionTasks.map((task, index) => (
+                          <div
+                            key={task.id}
+                            className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+                              {index + 1}
+                            </div>
+                            <span className="text-xl">
+                              {task.emoji && isEmoji(task.emoji) ? task.emoji : '✨'}
+                            </span>
+                            <div className="flex-1">
+                              <span className="text-foreground">{task.title}</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {task.duration_minutes || 1} min
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : routine.tasks && routine.tasks.length > 0 ? (
             <div className="mt-6">
               <h2 className="text-lg font-semibold text-foreground mb-3">What's Included</h2>
               <div className="space-y-2">
-              {plan.tasks.map((task, index) => {
-                  // Check if icon is an emoji or a legacy Lucide icon name
-                  const isEmoji = (str: string) => 
-                    /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
-                  
-                  return (
-                    <div
-                      key={task.id}
-                      className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl"
-                    >
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-                        {index + 1}
-                      </div>
-                      <span className="text-xl">
-                        {isEmoji(task.icon) ? task.icon : '✨'}
-                      </span>
-                      <div className="flex-1">
-                        <span className="text-foreground">{task.title}</span>
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {task.duration_minutes} min
-                      </span>
+                {routine.tasks.map((task, index) => (
+                  <div
+                    key={task.id}
+                    className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+                      {index + 1}
                     </div>
-                  );
-                })}
+                    <span className="text-xl">
+                      {task.emoji && isEmoji(task.emoji) ? task.emoji : '✨'}
+                    </span>
+                    <div className="flex-1">
+                      <span className="text-foreground">{task.title}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {task.duration_minutes || 1} min
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
-          )}
-
-          {/* Educational Sections */}
-          {plan.sections && plan.sections.length > 0 && (
-            <div className="mt-8 space-y-6">
-              {plan.sections.map((section) => (
-                <div key={section.id}>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    {section.title}
-                  </h3>
-                  {section.image_url && (
-                    <img
-                      src={section.image_url}
-                      alt={section.title}
-                      className="w-full h-40 object-cover rounded-xl mb-3"
-                    />
-                  )}
-                  {section.content && (
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                      {section.content}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
+          ) : null}
         </div>
       </div>
 
@@ -250,19 +296,19 @@ export default function AppInspireDetail() {
           className="w-full h-12 text-base font-semibold"
           size="lg"
         >
-          {plan.isAdded ? '+ Add again' : '+ Add to my routine'}
+          + Add to my routine
         </Button>
       </div>
 
       {/* Preview Sheet */}
-      {plan.tasks && (
+      {previewTasks.length > 0 && (
         <RoutinePreviewSheet
           open={showPreviewSheet}
           onOpenChange={setShowPreviewSheet}
-          tasks={plan.tasks}
-          routineTitle={plan.title}
+          tasks={previewTasks}
+          routineTitle={routine.title}
           onSave={handleSaveRoutine}
-          isSaving={addRoutinePlan.isPending}
+          isSaving={addRoutineFromBank.isPending}
         />
       )}
     </div>
