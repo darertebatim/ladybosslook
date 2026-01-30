@@ -2,6 +2,9 @@ import { Outlet, Navigate } from 'react-router-dom';
 import { AdminNav } from '@/components/admin/AdminNav';
 import { SEOHead } from '@/components/SEOHead';
 import { useAuth } from '@/hooks/useAuth';
+import { AIAssistantProvider } from '@/contexts/AIAssistantContext';
+import { AIAssistantButton } from '@/components/admin/AIAssistantButton';
+import { AIAssistantPanel } from '@/components/admin/AIAssistantPanel';
 
 export const AdminLayout = () => {
   const { loading, hasAdminAccess } = useAuth();
@@ -19,7 +22,7 @@ export const AdminLayout = () => {
   }
 
   return (
-    <>
+    <AIAssistantProvider>
       <SEOHead />
       <div className="min-h-screen bg-background">
         <AdminNav />
@@ -27,6 +30,8 @@ export const AdminLayout = () => {
           <Outlet />
         </main>
       </div>
-    </>
+      <AIAssistantButton />
+      <AIAssistantPanel />
+    </AIAssistantProvider>
   );
 };
