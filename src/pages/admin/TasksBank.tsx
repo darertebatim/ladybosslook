@@ -351,7 +351,7 @@ export default function TasksBank() {
 
   const getCategoryInfo = (cat: string) => {
     const found = routineCategories.find(c => c.slug === cat);
-    return found ? { value: found.slug, label: found.name, emoji: found.icon || '📋' } : { value: cat, label: cat, emoji: '📋' };
+    return found ? { value: found.slug, label: found.name, icon: found.icon || '📋' } : { value: cat, label: cat, icon: '📋' };
   };
 
   const filteredTasks = selectedCategory === 'all' 
@@ -390,7 +390,7 @@ export default function TasksBank() {
                 value={cat.slug}
                 className="flex items-center gap-1"
               >
-                <span>{cat.icon || '📋'}</span>
+                <TaskIcon iconName={cat.icon || '📋'} size={14} />
                 {cat.name}
                 {usedCategories.includes(cat.slug) && (
                   <span className="text-xs text-muted-foreground">
@@ -431,7 +431,7 @@ export default function TasksBank() {
                       {task.is_popular && <Star className="h-3 w-3 text-amber-500 fill-amber-500 shrink-0" />}
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>{catInfo.emoji} {catInfo.label}</span>
+                      <span className="flex items-center gap-1"><TaskIcon iconName={catInfo.icon} size={12} /> {catInfo.label}</span>
                       {task.goal_enabled && <span>• Goal</span>}
                       {task.pro_link_type && <span>• Pro</span>}
                     </div>
@@ -495,7 +495,10 @@ export default function TasksBank() {
                   <SelectContent>
                     {routineCategories.map((cat) => (
                       <SelectItem key={cat.slug} value={cat.slug}>
-                        {cat.icon || '📋'} {cat.name}
+                        <span className="flex items-center gap-2">
+                          <TaskIcon iconName={cat.icon || '📋'} size={14} />
+                          {cat.name}
+                        </span>
                       </SelectItem>
                     ))}
                   </SelectContent>
