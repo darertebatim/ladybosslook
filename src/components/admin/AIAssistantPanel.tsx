@@ -226,7 +226,7 @@ export function AIAssistantPanel() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed right-6 bottom-24 w-[400px] h-[600px] bg-background border rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden">
+    <div className="fixed right-6 bottom-24 w-[420px] max-w-[calc(100vw-3rem)] h-[600px] bg-background border rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b bg-muted/50">
         <div className="flex items-center gap-2">
@@ -281,29 +281,29 @@ export function AIAssistantPanel() {
               >
                 <div
                   className={cn(
-                    "max-w-[85%] rounded-lg px-3 py-2",
+                    "max-w-[90%] rounded-lg px-3 py-2 overflow-hidden",
                     message.role === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
                   )}
                 >
                   {message.role === 'assistant' ? (
-                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                    <div className="prose prose-sm dark:prose-invert max-w-none break-words">
                       <ReactMarkdown>{message.content}</ReactMarkdown>
                     </div>
                   ) : (
-                    <p className="text-sm">{message.content}</p>
+                    <p className="text-sm break-words">{message.content}</p>
                   )}
 
                   {/* Tool call card */}
                   {message.toolCall && (
                     <Card className="mt-3 p-3 bg-background">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium text-muted-foreground">
+                        <span className="text-xs font-medium text-muted-foreground capitalize">
                           {message.toolCall.name.replace(/_/g, ' ')}
                         </span>
                       </div>
-                      <pre className="text-xs bg-muted p-2 rounded overflow-x-auto max-h-32">
+                      <pre className="text-xs bg-muted p-2 rounded overflow-x-auto max-h-40 whitespace-pre-wrap break-words">
                         {JSON.stringify(message.toolCall.data, null, 2)}
                       </pre>
                       <div className="flex gap-2 mt-2">
