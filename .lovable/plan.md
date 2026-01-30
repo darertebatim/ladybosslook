@@ -1,164 +1,101 @@
 
-# Plan: Fix and Complete the Routine Management System
 
-## Issues Identified
+# Migration Plan: Task Templates → Tasks Bank
 
-Based on my analysis, the current RoutineManagement.tsx has several critical gaps:
+## Overview
+Migrate all 236 task templates from the legacy `task_templates` table to the new `admin_task_bank` table, which now supports the full app feature set (goals, subtasks, pro links).
 
-### 1. Task Editor Missing App Features
-**Current state:** Task editing only has: title, icon, duration, pro_link_type, pro_link_value, is_active
-**Missing from app (`AppTaskCreate.tsx`):**
-- `linked_playlist_id` field (separate from pro_link_value)
-- Description field
-- Color selection
-- Goal settings (goal_enabled, goal_type, goal_target, goal_unit)
+## Current Data Summary
 
-However, checking the DB schema for `routine_plan_tasks`, the table only has:
-- id, plan_id, title, duration_minutes, icon, task_order, is_active, linked_playlist_id, pro_link_type, pro_link_value
+| Category | Count |
+|----------|-------|
+| calm | 24 |
+| connection | 26 (+5 with "Connection") |
+| easy-win | 14 |
+| gratitude | 21 |
+| hygiene | 20 |
+| inner-strength | 23 |
+| movement | 20 |
+| nutrition | 20 |
+| productivity | 20 |
+| self-kindness | 21 |
+| sleep | 22 |
 
-So the current fields are actually correct for this table. The main issues are:
-- **No "Add from Template" button** to quickly add tasks from existing templates
-- **No linked_playlist_id handling** (only pro_link_value is being used)
+**Note:** There's a data inconsistency - some templates use "Connection" (capitalized) instead of "connection". These will be normalized during migration.
 
-### 2. Plan Editor Missing Cover Image Field
-**Current state:** Plan dialog has no cover image input
-**In database:** `cover_image_url` column exists
-**Needed:** Cover image URL input field
+## Migration Approach
 
-### 3. Pro Templates Manager Uses Lucide Icons, Not Emojis
-The `ProTaskTemplatesManager.tsx` still uses:
-```javascript
-const ICON_OPTIONS = ['Sun', 'Moon', 'Heart', 'Brain', 'Dumbbell', ...];
-```
-Should use `EmojiPicker` like the rest of the system.
+### Step 1: Data Migration SQL
+Run a single INSERT statement that:
+1. Maps all compatible fields directly
+2. Normalizes category names (lowercase)
+3. Sets sensible defaults for new fields (goal_enabled=false, duration_minutes=5)
 
-### 4. Task Templates Manager Has Limited Emoji Picker
-`TaskTemplatesManager.tsx` has only 20 hardcoded emojis:
-```javascript
-const EMOJI_OPTIONS = ['☀️', '🌙', '💪', '📚', ...]; // Only 20 emojis
-```
-Should use full `EmojiPicker`.
+### Step 2: Verification
+After migration, verify:
+- All 236 records migrated successfully
+- Category distribution matches
+- Popular tasks flagged correctly
 
-### 5. No "Add Task from Template" Feature
-In the plan tasks editor, there's no way to quickly add a task from existing `routine_task_templates` (Pro Templates).
-
----
-
-## Implementation Plan
-
-### Step 1: Fix Plan Editor - Add Cover Image Field
-
-In `PlansManager` dialog, add cover image URL input field after the toggles.
-
-### Step 2: Fix Task Editor - Add Template Selection
-
-Add a button/dropdown to quickly add tasks from `routine_task_templates` to the current plan.
-
-### Step 3: Update ProTaskTemplatesManager - Use EmojiPicker
-
-Replace the Lucide icon grid with the app's `EmojiPicker` component.
-
-### Step 4: Update TaskTemplatesManager - Use Full EmojiPicker
-
-Replace the 20-emoji grid with the app's `EmojiPicker` component.
-
-### Step 5: Fix linked_playlist_id Handling
-
-When pro_link_type is 'playlist', properly set both `linked_playlist_id` AND `pro_link_value` for consistency.
-
----
+### Step 3: Remove Legacy Manager (Optional)
+Once confirmed, the `TaskTemplatesManager` component can be deprecated or removed from the admin UI.
 
 ## Technical Details
 
-### Changes to RoutineManagement.tsx
-
-**Plan Dialog (lines ~637-781):**
-Add cover image field:
-```tsx
-<div>
-  <Label>Cover Image URL (optional)</Label>
-  <Input
-    value={formData.cover_image_url || ''}
-    onChange={(e) => setFormData(prev => ({ ...prev, cover_image_url: e.target.value || null }))}
-    placeholder="https://..."
-  />
-</div>
+### Field Mapping
+```text
+task_templates          →  admin_task_bank
+─────────────────────────────────────────────
+title                   →  title
+emoji                   →  emoji
+color                   →  color
+LOWER(category)         →  category (normalized)
+description             →  description
+repeat_pattern          →  repeat_pattern
+display_order           →  sort_order
+is_active               →  is_active
+is_popular              →  is_popular
+(default)               →  goal_enabled = false
+(default)               →  duration_minutes = 5
+(default)               →  reminder_enabled = false
+(default)               →  repeat_days = []
 ```
 
-**PlanTasksEditor (lines ~816-1148):**
-Add "Add from Template" button that shows a dropdown of available `routine_task_templates`:
-- Fetch templates from `routine_task_templates` table
-- Show dropdown/sheet to select a template
-- Pre-fill task form with template data
-
-Fix playlist linking:
-```tsx
-// When saving task with playlist type:
-if (formData.pro_link_type === 'playlist') {
-  data.linked_playlist_id = formData.pro_link_value;
-}
+### Migration SQL
+```sql
+INSERT INTO admin_task_bank (
+  title, emoji, color, category, description,
+  repeat_pattern, sort_order, is_active, is_popular,
+  goal_enabled, duration_minutes, reminder_enabled, repeat_days
+)
+SELECT 
+  title,
+  emoji,
+  color,
+  LOWER(category),  -- Normalize category names
+  description,
+  repeat_pattern,
+  display_order,
+  is_active,
+  is_popular,
+  false,            -- goal_enabled
+  5,                -- duration_minutes default
+  false,            -- reminder_enabled
+  '{}'::integer[]   -- repeat_days empty
+FROM task_templates
+ORDER BY category, display_order;
 ```
 
-### Changes to ProTaskTemplatesManager.tsx
+## Execution Steps
 
-Replace icon selection (lines ~470-500):
-```tsx
-// Before: Grid of Lucide icon names
-const ICON_OPTIONS = ['Sun', 'Moon', ...];
+1. **Run migration query** - Insert all task_templates into admin_task_bank
+2. **Verify counts** - Confirm 236 records exist in admin_task_bank
+3. **Verify categories** - Confirm all categories are lowercase and valid
+4. **Test in UI** - Open Tasks Bank in admin panel and verify display
+5. **Review individual tasks** - Spot check popular tasks for correct data
 
-// After: EmojiPicker button
-<Label>Icon (Emoji)</Label>
-<Button variant="outline" onClick={() => setShowEmojiPicker(true)}>
-  {formData.icon}
-</Button>
-<EmojiPicker 
-  open={showEmojiPicker}
-  onOpenChange={setShowEmojiPicker}
-  selectedEmoji={formData.icon}
-  onSelect={(emoji) => setFormData(prev => ({ ...prev, icon: emoji }))}
-/>
-```
+## Risk Mitigation
+- This is an additive migration (no deletions)
+- Original task_templates data remains intact
+- Can be rolled back by deleting from admin_task_bank if issues arise
 
-Update icon default from 'Sparkles' to '✨'.
-
-### Changes to TaskTemplatesManager.tsx
-
-Replace emoji grid (lines ~469-486):
-```tsx
-// Before: 20-emoji hardcoded grid
-const EMOJI_OPTIONS = [...];
-
-// After: EmojiPicker button
-<Label>Emoji</Label>
-<Button variant="outline" onClick={() => setShowEmojiPicker(true)}>
-  {formData.emoji}
-</Button>
-<EmojiPicker 
-  open={showEmojiPicker}
-  onOpenChange={setShowEmojiPicker}
-  selectedEmoji={formData.emoji}
-  onSelect={(emoji) => setFormData(prev => ({ ...prev, emoji }))}
-/>
-```
-
----
-
-## Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/components/admin/RoutineManagement.tsx` | Add cover image field, add template selector, fix playlist linking |
-| `src/components/admin/ProTaskTemplatesManager.tsx` | Replace Lucide icons with EmojiPicker |
-| `src/components/admin/TaskTemplatesManager.tsx` | Replace 20-emoji grid with EmojiPicker |
-
----
-
-## Summary of Fixes
-
-1. **Plan editor**: Add missing cover image URL field
-2. **Task editor**: Add "Add from Template" feature to quickly populate tasks
-3. **Task editor**: Fix linked_playlist_id to be set when pro_link_type is 'playlist'
-4. **Pro Templates**: Replace Lucide icon picker with EmojiPicker (full emoji support)
-5. **Task Templates**: Replace limited 20-emoji picker with full EmojiPicker
-
-These changes will ensure the admin interface has full feature parity with the app.
