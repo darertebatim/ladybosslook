@@ -17,9 +17,12 @@ import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConf
 const categoryConfig = [
   { id: 'all', name: 'All', icon: 'LayoutGrid', color: 'purple' },
   { id: 'course', name: 'Courses', icon: 'BookOpen', color: 'purple' },
+  { id: 'audiobook', name: 'Audiobook', icon: 'Headphones', color: 'orange' },
+  { id: 'meditate', name: 'Meditate', icon: 'Brain', color: 'indigo' },
+  { id: 'soundscape', name: 'Sounds', icon: 'Waves', color: 'teal' },
+  { id: 'workout', name: 'Workout', icon: 'Dumbbell', color: 'rose' },
   { id: 'group-coaching', name: 'Coaching', icon: 'Users', color: 'pink' },
   { id: '1o1-session', name: '1-on-1', icon: 'UserCheck', color: 'blue' },
-  { id: 'audiobook', name: 'Audiobook', icon: 'Headphones', color: 'orange' },
   { id: 'webinar', name: 'Webinar', icon: 'Video', color: 'green' },
   { id: 'event', name: 'Events', icon: 'Calendar', color: 'rose' },
 ];
