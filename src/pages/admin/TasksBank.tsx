@@ -77,7 +77,7 @@ export default function TasksBank() {
   // Admin settings state (separate from AppTaskCreate form)
   const [adminSettings, setAdminSettings] = useState<AdminSettings>({
     description: '',
-    duration_minutes: 5,
+    duration_minutes: 1,
     is_popular: false,
     is_active: true,
   });
@@ -340,7 +340,7 @@ export default function TasksBank() {
     });
     setAdminSettings({
       description: '',
-      duration_minutes: 5,
+      duration_minutes: 1,
       is_popular: false,
       is_active: true,
     });
@@ -391,7 +391,7 @@ export default function TasksBank() {
     // Set admin settings from existing task
     setAdminSettings({
       description: task.description || '',
-      duration_minutes: task.duration_minutes || 5,
+      duration_minutes: task.duration_minutes || 1,
       is_popular: task.is_popular,
       is_active: task.is_active,
     });
@@ -404,7 +404,7 @@ export default function TasksBank() {
   const openAdminSettingsForTask = (task: TaskBankItem) => {
     setAdminSettings({
       description: task.description || '',
-      duration_minutes: task.duration_minutes || 5,
+      duration_minutes: task.duration_minutes || 1,
       is_popular: task.is_popular,
       is_active: task.is_active,
     });
@@ -765,7 +765,7 @@ export default function TasksBank() {
                 min={1}
                 max={480}
                 value={adminSettings.duration_minutes}
-                onChange={(e) => setAdminSettings(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) || 5 }))}
+                onChange={(e) => setAdminSettings(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) || 1 }))}
                 className="w-24"
               />
             </div>
