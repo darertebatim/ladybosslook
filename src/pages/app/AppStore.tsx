@@ -142,25 +142,15 @@ const AppStore = () => {
   const comingSoonTools = getVisibleComingSoon();
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-gradient-to-b from-violet-50/50 via-background to-background dark:from-violet-950/20">
+    <div className="min-h-full bg-background pb-24">
       <SEOHead 
         title="Browse - LadyBoss Academy"
         description="Browse tools, audio experiences, and educational programs"
       />
 
-      {/* Floating decorative elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-20 -left-20 w-64 h-64 bg-gradient-to-br from-violet-200/30 to-purple-200/20 dark:from-violet-800/10 dark:to-purple-800/5 rounded-full blur-3xl animate-[pulse_8s_ease-in-out_infinite]" />
-        <div className="absolute top-40 -right-20 w-48 h-48 bg-gradient-to-br from-pink-200/30 to-rose-200/20 dark:from-pink-800/10 dark:to-rose-800/5 rounded-full blur-3xl animate-[pulse_6s_ease-in-out_infinite_1s]" />
-        <div className="absolute bottom-40 left-1/4 w-56 h-56 bg-gradient-to-br from-sky-200/20 to-cyan-200/10 dark:from-sky-800/10 dark:to-cyan-800/5 rounded-full blur-3xl animate-[pulse_10s_ease-in-out_infinite_2s]" />
-      </div>
-
-      {/* Fixed Header */}
-      <div 
-        className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-b from-violet-100/90 via-violet-50/80 to-transparent dark:from-violet-950/90 dark:via-violet-950/60 dark:to-transparent backdrop-blur-md"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
-      >
-        <div className="h-14 px-4 flex items-center justify-between">
+      {/* Header */}
+      <div className="bg-gradient-to-b from-violet-50 to-background dark:from-violet-950/20 dark:to-background px-4 pt-4 pb-6">
+        <div className="flex items-center justify-between mb-1">
           {showSearch ? (
             <div className="flex-1 flex items-center gap-2">
               <Input
@@ -168,7 +158,7 @@ const AppStore = () => {
                 placeholder="Search tools & programs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 h-10 bg-white/60 dark:bg-black/20 border-white/40 backdrop-blur-sm rounded-xl"
+                className="flex-1 h-10 bg-white/80 dark:bg-black/20 border-border/50 rounded-xl"
                 autoFocus
               />
               <button 
@@ -176,19 +166,22 @@ const AppStore = () => {
                   setShowSearch(false);
                   setSearchQuery('');
                 }}
-                className="p-2.5 hover:bg-white/40 dark:hover:bg-white/10 rounded-xl transition-colors"
+                className="p-2 rounded-full transition-transform active:scale-95"
               >
                 <X className="h-5 w-5 text-muted-foreground" />
               </button>
             </div>
           ) : (
             <>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 dark:from-violet-400 dark:to-purple-400 bg-clip-text text-transparent">
-                Browse
-              </h1>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Browse</h1>
+                <p className="text-sm text-muted-foreground">
+                  Explore tools and content
+                </p>
+              </div>
               <button 
                 onClick={() => setShowSearch(true)}
-                className="p-2.5 hover:bg-white/40 dark:hover:bg-white/10 rounded-xl transition-colors"
+                className="p-2.5 rounded-full transition-transform active:scale-95"
               >
                 <Search className="h-5 w-5 text-muted-foreground" />
               </button>
@@ -197,134 +190,129 @@ const AppStore = () => {
         </div>
       </div>
 
-      {/* Spacer for fixed header */}
-      <div className="shrink-0 h-14" style={{ marginTop: 'env(safe-area-inset-top)' }} />
+      {/* Content */}
+      <div className="px-4 space-y-6 -mt-2">
+        {programsLoading ? (
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <>
+            {/* Wellness Tools Section */}
+            {(!searchQuery || filteredWellnessTools.length > 0) && (
+              <section>
+                <h2 className="text-base font-semibold text-foreground mb-3 px-1">
+                  Wellness Tools
+                </h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {filteredWellnessTools.map((tool) => (
+                    <ToolCard key={tool.id} tool={tool} />
+                  ))}
+                </div>
+              </section>
+            )}
 
-      {/* Scroll container */}
-      <div className="flex-1 overflow-y-auto overscroll-contain relative z-10">
-        <div className="pb-safe">
-          {programsLoading ? (
-            <div className="flex items-center justify-center min-h-[60vh]">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : (
-            <div className="px-4 py-4 space-y-6">
-              {/* Wellness Tools Section */}
-              {(!searchQuery || filteredWellnessTools.length > 0) && (
-                <div className="space-y-3">
-                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">
-                    Wellness Tools
-                  </h2>
-                  <div className="grid grid-cols-2 gap-3">
-                    {filteredWellnessTools.map((tool) => (
-                      <ToolCard key={tool.id} tool={tool} />
+            {/* Audio & Video Section */}
+            {(!searchQuery || filteredAudioTools.length > 0) && (
+              <section>
+                <h2 className="text-base font-semibold text-foreground mb-3 px-1">
+                  Audio & Video
+                </h2>
+                <div className="grid grid-cols-3 gap-3">
+                  {filteredAudioTools.map((tool) => (
+                    <ToolCard key={tool.id} tool={tool} size="compact" />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Coming Soon Section */}
+            {comingSoonTools.length > 0 && !searchQuery && (
+              <section>
+                <h2 className="text-base font-semibold text-foreground mb-3 px-1">
+                  Coming Soon
+                </h2>
+                <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+                  {comingSoonTools.map((tool) => (
+                    <ToolCard key={tool.id} tool={tool} size="teaser" />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Programs Section */}
+            {(!searchQuery || hasProgramMatches) && freePrograms.length > 0 && (
+              <section>
+                <h2 className="text-base font-semibold text-foreground mb-3 px-1">
+                  Browse Programs
+                </h2>
+
+                {/* Category Filters - only show if multiple categories and not searching */}
+                {!searchQuery && availableCategories.length > 2 && (
+                  <div className="flex gap-3 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
+                    {availableCategories.map((category) => (
+                      <CategoryCircle
+                        key={category.id}
+                        name={category.name}
+                        icon={category.icon}
+                        color={category.color}
+                        isSelected={selectedCategory === (category.id === 'all' ? null : category.id)}
+                        onClick={() => setSelectedCategory(category.id === 'all' ? null : category.id)}
+                      />
                     ))}
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Audio & Video Section */}
-              {(!searchQuery || filteredAudioTools.length > 0) && (
-                <div className="space-y-3">
-                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">
-                    Audio & Video
-                  </h2>
-                  <div className="grid grid-cols-3 gap-2.5">
-                    {filteredAudioTools.map((tool) => (
-                      <ToolCard key={tool.id} tool={tool} size="compact" />
-                    ))}
+                {/* Programs Grid */}
+                {filteredPrograms.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground text-sm">
+                      No programs found
+                    </p>
                   </div>
-                </div>
-              )}
-
-              {/* Coming Soon Section */}
-              {comingSoonTools.length > 0 && !searchQuery && (
-                <div className="space-y-3">
-                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">
-                    Coming Soon
-                  </h2>
-                  <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-                    {comingSoonTools.map((tool) => (
-                      <ToolCard key={tool.id} tool={tool} size="teaser" />
-                    ))}
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    {filteredPrograms.map((program) => {
+                      const enrolled = isEnrolled(program.slug);
+                      const isEnrolling = enrollingSlug === program.slug;
+                      
+                      return (
+                        <div key={program.slug} className="relative">
+                          <ProgramCard
+                            title={program.title}
+                            image={program.image}
+                            type={program.type}
+                            isFree={program.isFree || program.priceAmount === 0}
+                            isEnrolled={enrolled}
+                            onClick={() => navigate(`/app/course/${program.slug}`)}
+                          />
+                          {isEnrolling && (
+                            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
+                )}
+              </section>
+            )}
+
+            {/* No Results */}
+            {searchQuery && !hasToolMatches && !hasProgramMatches && (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-muted flex items-center justify-center">
+                  <Search className="w-7 h-7 text-muted-foreground" />
                 </div>
-              )}
-
-              {/* Programs Section */}
-              {(!searchQuery || hasProgramMatches) && freePrograms.length > 0 && (
-                <div className="space-y-3">
-                  <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">
-                    Browse Programs
-                  </h2>
-
-                  {/* Category Filters - only show if multiple categories and not searching */}
-                  {!searchQuery && availableCategories.length > 2 && (
-                    <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-                      {availableCategories.map((category) => (
-                        <CategoryCircle
-                          key={category.id}
-                          name={category.name}
-                          icon={category.icon}
-                          color={category.color}
-                          isSelected={selectedCategory === (category.id === 'all' ? null : category.id)}
-                          onClick={() => setSelectedCategory(category.id === 'all' ? null : category.id)}
-                        />
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Programs Grid */}
-                  {filteredPrograms.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground text-sm">
-                        No programs found
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-4">
-                      {filteredPrograms.map((program) => {
-                        const enrolled = isEnrolled(program.slug);
-                        const isEnrolling = enrollingSlug === program.slug;
-                        
-                        return (
-                          <div key={program.slug} className="relative">
-                            <ProgramCard
-                              title={program.title}
-                              image={program.image}
-                              type={program.type}
-                              isFree={program.isFree || program.priceAmount === 0}
-                              isEnrolled={enrolled}
-                              onClick={() => navigate(`/app/course/${program.slug}`)}
-                            />
-                            {isEnrolling && (
-                              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                                <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* No Results */}
-              {searchQuery && !hasToolMatches && !hasProgramMatches && (
-                <div className="text-center py-12">
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30 flex items-center justify-center">
-                    <Search className="w-8 h-8 text-muted-foreground" />
-                  </div>
-                  <h2 className="text-lg font-semibold mb-1">No Results Found</h2>
-                  <p className="text-muted-foreground text-sm">
-                    No tools or programs match "{searchQuery}"
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+                <h2 className="text-lg font-semibold mb-1">No Results Found</h2>
+                <p className="text-muted-foreground text-sm">
+                  No tools or programs match "{searchQuery}"
+                </p>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
