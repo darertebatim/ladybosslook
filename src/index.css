@@ -186,6 +186,7 @@ html.native-app [data-scroll-container="true"] {
     /* Typography Scale */
     --font-display: 'Playfair Display', serif;
     --font-body: 'Inter', sans-serif;
+    --font-app: 'Nunito', sans-serif;
     --font-farsi: 'Vazirmatn', sans-serif;
 
     /* Animation */
@@ -271,6 +272,7 @@ html.native-app [data-scroll-container="true"] {
   .app-theme {
     --background: 0 0% 100%;
     --foreground: 0 0% 9%;
+    font-family: var(--font-app), sans-serif;
 
     --card: 0 0% 100%;
     --card-foreground: 0 0% 9%;
@@ -313,6 +315,7 @@ html.native-app [data-scroll-container="true"] {
   .dark .app-theme {
     --background: 0 0% 4%;
     --foreground: 0 0% 98%;
+    font-family: var(--font-app), sans-serif;
 
     --card: 0 0% 7%;
     --card-foreground: 0 0% 98%;
