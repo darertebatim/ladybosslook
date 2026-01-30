@@ -2,18 +2,17 @@ import { useState, useRef } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useTaskTemplates, TaskTemplate, TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
+import { Plus } from 'lucide-react';
+import { useTaskTemplates, TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { cn } from '@/lib/utils';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
+
 interface TaskQuickStartSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onContinue: (taskName: string, template?: TaskTemplate) => void;
 }
-
-// Pastel colors for suggestion cards
-const SUGGESTION_COLORS: TaskColor[] = ['sky', 'yellow', 'mint', 'lavender', 'peach', 'pink'];
 
 export const TaskQuickStartSheet = ({
   open,
@@ -113,25 +112,27 @@ export const TaskQuickStartSheet = ({
                 {taskName.trim() ? 'Similar tasks 💡' : 'Need some idea? 💡'}
               </p>
               <div className="space-y-2">
-                {suggestions.map((template, index) => {
+                {suggestions.map((template) => {
+                  const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.sky;
                   return (
                     <button
                       key={template.id}
                       onClick={() => handleTemplateSelect(template)}
-                      className={cn(
-                        'flex items-center gap-3 w-full p-4 rounded-2xl text-left transition-all active:scale-[0.98]',
-                        TASK_COLOR_CLASSES[SUGGESTION_COLORS[index % SUGGESTION_COLORS.length]]
-                      )}
+                      className="flex items-center gap-3 w-full p-4 rounded-2xl text-left transition-all active:scale-[0.98]"
+                      style={{ backgroundColor: bgColor }}
                     >
                       <span className="text-2xl flex-shrink-0">{template.emoji}</span>
-                      <span className="font-medium text-foreground/90 flex-1">
-                        {template.title}
-                      </span>
-                      {template.duration_minutes && (
-                        <span className="text-sm text-foreground/50 flex-shrink-0">
-                          {template.duration_minutes}m
-                        </span>
-                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-foreground/90 truncate">
+                          {template.title}
+                        </p>
+                        <p className="text-xs text-foreground/60 truncate">
+                          {template.category || template.tag}
+                        </p>
+                      </div>
+                      <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-foreground/50">
+                        <Plus className="w-5 h-5" />
+                      </div>
                     </button>
                   );
                 })}
