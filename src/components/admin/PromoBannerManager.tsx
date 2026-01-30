@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { Trash2, Plus, Upload, ExternalLink, Sparkles, Loader2, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 
-type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub';
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
 
 interface PromoBanner {
@@ -120,6 +120,20 @@ export function PromoBannerManager() {
     },
   });
 
+  // Fetch breathing exercises for destination selector
+  const { data: breathingExercises } = useQuery({
+    queryKey: ['breathing-exercises-for-promo'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('breathing_exercises')
+        .select('id, name, emoji')
+        .eq('is_active', true)
+        .order('name');
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Upload image
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -205,12 +219,13 @@ export function PromoBannerManager() {
   // Create banner mutation
   const createMutation = useMutation({
     mutationFn: async () => {
-      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub'].includes(destinationType);
+      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise'].includes(destinationType);
+      const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
       const { error } = await supabase.from('promo_banners').insert({
         cover_image_url: coverImageUrl,
         destination_type: destinationType,
         destination_id: needsDestinationId ? destinationId || null : null,
-        custom_url: destinationType === 'custom_url' ? customUrl : null,
+        custom_url: needsCustomUrl ? customUrl : null,
         display_frequency: displayFrequency,
         is_active: isActive,
         priority,
@@ -233,12 +248,13 @@ export function PromoBannerManager() {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!editingBanner) return;
-      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub'].includes(destinationType);
+      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise'].includes(destinationType);
+      const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
       const { error } = await supabase.from('promo_banners').update({
         cover_image_url: coverImageUrl,
         destination_type: destinationType,
         destination_id: needsDestinationId ? destinationId || null : null,
-        custom_url: destinationType === 'custom_url' ? customUrl : null,
+        custom_url: needsCustomUrl ? customUrl : null,
         display_frequency: displayFrequency,
         is_active: isActive,
         priority,
@@ -329,6 +345,11 @@ export function PromoBannerManager() {
       case 'routines_hub':
         const routineBank = routinesBank?.find(r => r.id === banner.destination_id);
         return routineBank ? `${routineBank.emoji || '📋'} ${routineBank.title}` : 'Unknown Routine';
+      case 'breathe_exercise':
+        const exercise = breathingExercises?.find(e => e.id === banner.destination_id);
+        return exercise ? `${exercise.emoji || '🫁'} ${exercise.name}` : 'Unknown Exercise';
+      case 'tasks_bank':
+        return 'Tasks Bank Page';
       case 'journal':
         return 'Journal';
       case 'programs':
@@ -345,6 +366,8 @@ export function PromoBannerManager() {
         return 'Inspire/Routines';
       case 'custom_url':
         return banner.custom_url || 'Custom URL';
+      case 'external_url':
+        return banner.custom_url || 'External URL';
       default:
         return 'Unknown';
     }
@@ -449,26 +472,30 @@ export function PromoBannerManager() {
                     <SelectItem value="playlist">Playlist (specific)</SelectItem>
                     <SelectItem value="tasks">Task Template (specific)</SelectItem>
                     <SelectItem value="routines_hub">Routine Bank (specific)</SelectItem>
+                    <SelectItem value="breathe_exercise">Breathing Exercise (specific)</SelectItem>
+                    <SelectItem value="tasks_bank">Tasks Bank Page</SelectItem>
                     <SelectItem value="inspire">Inspire / Routines Hub</SelectItem>
                     <SelectItem value="journal">Journal</SelectItem>
                     <SelectItem value="programs">Programs / Store</SelectItem>
-                    <SelectItem value="breathe">Breathe</SelectItem>
+                    <SelectItem value="breathe">Breathe Page</SelectItem>
                     <SelectItem value="water">Water Tracking</SelectItem>
                     <SelectItem value="channels">Feed / Channels</SelectItem>
                     <SelectItem value="home">Home</SelectItem>
-                    <SelectItem value="custom_url">Custom URL</SelectItem>
+                    <SelectItem value="custom_url">Custom URL (in-app)</SelectItem>
+                    <SelectItem value="external_url">External URL (opens browser)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Destination ID - for types that need specific selection */}
-              {['routine', 'playlist', 'tasks', 'routines_hub'].includes(destinationType) && (
+              {['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise'].includes(destinationType) && (
                 <div className="space-y-2">
                   <Label>
                     {destinationType === 'routine' && 'Select Routine Plan'}
                     {destinationType === 'playlist' && 'Select Playlist'}
                     {destinationType === 'tasks' && 'Select Task Template'}
                     {destinationType === 'routines_hub' && 'Select Routine from Bank'}
+                    {destinationType === 'breathe_exercise' && 'Select Breathing Exercise'}
                   </Label>
                   <Select value={destinationId} onValueChange={setDestinationId}>
                     <SelectTrigger>
@@ -487,6 +514,9 @@ export function PromoBannerManager() {
                       {destinationType === 'routines_hub' && routinesBank?.map(r => (
                         <SelectItem key={r.id} value={r.id}>{r.emoji || '📋'} {r.title}</SelectItem>
                       ))}
+                      {destinationType === 'breathe_exercise' && breathingExercises?.map(e => (
+                        <SelectItem key={e.id} value={e.id}>{e.emoji || '🫁'} {e.name}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -501,6 +531,21 @@ export function PromoBannerManager() {
                     onChange={(e) => setCustomUrl(e.target.value)}
                     placeholder="/app/..."
                   />
+                </div>
+              )}
+
+              {/* External URL */}
+              {destinationType === 'external_url' && (
+                <div className="space-y-2">
+                  <Label>External URL (opens in browser)</Label>
+                  <Input
+                    value={customUrl}
+                    onChange={(e) => setCustomUrl(e.target.value)}
+                    placeholder="https://apps.apple.com/..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Full URL including https:// - opens in device browser
+                  </p>
                 </div>
               )}
 
