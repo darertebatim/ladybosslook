@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
-import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Wind, Droplets, ListChecks } from 'lucide-react';
+import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Wind, Droplets } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
@@ -337,7 +337,7 @@ const AppHome = () => {
                 <NotebookPen className="h-5 w-5" />
               </button>
               <button onClick={() => navigate('/app/routines')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
-                <ListChecks className="h-5 w-5" />
+                <Sparkles className="h-5 w-5" />
               </button>
               <button onClick={() => navigate('/app/profile')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
                 <User className="h-5 w-5" />
