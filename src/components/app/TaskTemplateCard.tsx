@@ -24,6 +24,9 @@ export function TaskTemplateCard({ template, onAdd }: TaskTemplateCardProps) {
       
       <div className="flex-1 min-w-0">
         <p className="font-medium text-foreground truncate">{template.title}</p>
+        <p className="text-xs text-muted-foreground truncate">
+          {template.duration_minutes ? `${template.duration_minutes}m` : template.category}
+        </p>
       </div>
 
       <button
