@@ -43,7 +43,7 @@ import {
 } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { 
-  Plus, Pencil, Trash2, Sparkles, FolderOpen, ListTodo, Star, 
+  Plus, Pencil, Trash2, Sparkles, FolderOpen, Star, 
   ChevronDown, ChevronUp, GripVertical, Crown
 } from 'lucide-react';
 import { EmojiPicker } from '@/components/app/EmojiPicker';
@@ -356,10 +356,6 @@ export function RoutineManagement() {
             <Crown className="h-3 w-3" />
             Pro Templates
           </TabsTrigger>
-          <TabsTrigger value="task-templates" className="flex items-center gap-1">
-            <ListTodo className="h-3 w-3" />
-            Task Templates
-          </TabsTrigger>
           <TabsTrigger value="statistics" className="flex items-center gap-1">
             <Star className="h-3 w-3" />
             Stats
@@ -378,9 +374,6 @@ export function RoutineManagement() {
           <ProTemplatesManager />
         </TabsContent>
 
-        <TabsContent value="task-templates" className="mt-4">
-          <TaskTemplatesManager />
-        </TabsContent>
 
         <TabsContent value="statistics" className="mt-4">
           <StatisticsManager />
@@ -1568,15 +1561,6 @@ function ProTemplatesManager() {
   return <ExistingProTaskTemplatesManager />;
 }
 
-// =====================================
-// TASK TEMPLATES MANAGER (reuses existing)
-// =====================================
-
-import { TaskTemplatesManager as ExistingTaskTemplatesManager } from './TaskTemplatesManager';
-
-function TaskTemplatesManager() {
-  return <ExistingTaskTemplatesManager />;
-}
 
 // =====================================
 // STATISTICS MANAGER (reuses existing)

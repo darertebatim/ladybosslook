@@ -7,7 +7,7 @@ import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { RoutinePlanCard } from '@/components/app/RoutinePlanCard';
 import { InspireBanner } from '@/components/app/InspireBanner';
 import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
-import { toast } from 'sonner';
+import { AddTaskSheet } from '@/components/app/AddTaskSheet';
 import {
   useRoutineCategories,
   useRoutinePlans,
@@ -15,14 +15,15 @@ import {
   usePopularPlans,
   useProRoutinePlans,
 } from '@/hooks/useRoutinePlans';
-import { useTaskTemplates, useCreateTaskFromTemplate } from '@/hooks/useTaskPlanner';
+import { useTaskTemplates, TaskTemplate } from '@/hooks/useTaskPlanner';
 
 export default function AppInspire() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>('popular');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
-  const [addingTemplateId, setAddingTemplateId] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null);
+  const [addSheetOpen, setAddSheetOpen] = useState(false);
 
   const { data: categories, isLoading: categoriesLoading } = useRoutineCategories();
   const { data: featuredPlans } = useFeaturedPlans();
@@ -32,7 +33,6 @@ export default function AppInspire() {
     selectedCategory || undefined
   );
   const { data: taskTemplates, isLoading: templatesLoading } = useTaskTemplates();
-  const createFromTemplate = useCreateTaskFromTemplate();
 
   // Determine which plans to display based on selected category
   const displayPlans = useMemo(() => {
@@ -68,7 +68,7 @@ export default function AppInspire() {
       return [];
     }
     if (!selectedCategory) return taskTemplates;
-    // Compare against the category slug stored in task_templates
+    // Compare against the category slug stored in admin_task_bank
     return taskTemplates.filter(t => t.category === selectedCategory);
   }, [taskTemplates, selectedCategory]);
 
@@ -79,19 +79,9 @@ export default function AppInspire() {
     plan.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddTemplate = async (template: typeof taskTemplates[0]) => {
-    setAddingTemplateId(template.id);
-    try {
-      await createFromTemplate.mutateAsync({
-        template,
-        date: new Date(),
-      });
-      toast.success('Task added! ✨');
-    } catch (error) {
-      toast.error('Failed to add task');
-    } finally {
-      setAddingTemplateId(null);
-    }
+  const handleAddTemplate = (template: TaskTemplate) => {
+    setSelectedTemplate(template);
+    setAddSheetOpen(true);
   };
 
   return (
@@ -268,7 +258,6 @@ export default function AppInspire() {
                       key={template.id}
                       template={template}
                       onAdd={() => handleAddTemplate(template)}
-                      isAdding={addingTemplateId === template.id}
                     />
                   ))}
                 </div>
@@ -281,6 +270,13 @@ export default function AppInspire() {
           )}
         </div>
       </div>
+
+      {/* Add Task Sheet */}
+      <AddTaskSheet
+        open={addSheetOpen}
+        onOpenChange={setAddSheetOpen}
+        template={selectedTemplate}
+      />
     </div>
   );
 }

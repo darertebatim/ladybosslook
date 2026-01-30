@@ -175,7 +175,7 @@ Return ONLY valid JSON in this exact format:
 
       if (tasksError) console.error('Error inserting tasks:', tasksError);
 
-      // Also add tasks to task_templates for the Task Ideas section
+      // Also add tasks to admin_task_bank for the Task Ideas section
       // Map icon to emoji (simple mapping for common icons)
       const iconToEmoji: Record<string, string> = {
         Sun: '☀️', Moon: '🌙', Heart: '❤️', Brain: '🧠', Dumbbell: '💪',
@@ -191,14 +191,14 @@ Return ONLY valid JSON in this exact format:
         purple: 'lavender', green: 'mint', orange: 'peach',
       };
 
-      // Get next display order for task_templates
+      // Get next sort_order for admin_task_bank
       const { data: existingTemplates } = await supabase
-        .from('task_templates')
-        .select('display_order')
-        .order('display_order', { ascending: false })
+        .from('admin_task_bank')
+        .select('sort_order')
+        .order('sort_order', { ascending: false })
         .limit(1);
       
-      let templateOrder = (existingTemplates?.[0]?.display_order || 0) + 1;
+      let templateOrder = (existingTemplates?.[0]?.sort_order || 0) + 1;
 
       const templatesToInsert = planData.tasks.map((task: any) => {
         const template = {
@@ -208,14 +208,15 @@ Return ONLY valid JSON in this exact format:
           category: categoryName,
           description: `From routine: ${planData.title}`,
           repeat_pattern: 'daily',
-          display_order: templateOrder++,
+          sort_order: templateOrder++,
+          duration_minutes: task.duration_minutes || 1,
           is_active: true,
         };
         return template;
       });
 
       const { error: templatesError } = await supabase
-        .from('task_templates')
+        .from('admin_task_bank')
         .insert(templatesToInsert);
 
       if (templatesError) {

@@ -114,15 +114,6 @@ export const TaskQuickStartSheet = ({
               </p>
               <div className="space-y-2">
                 {suggestions.map((template, index) => {
-                  // Format time nicely (e.g., "07:00:00" -> "7:00 AM")
-                  const formatTime = (time: string | null) => {
-                    if (!time) return null;
-                    const [hours, minutes] = time.split(':').map(Number);
-                    const period = hours >= 12 ? 'PM' : 'AM';
-                    const displayHour = hours % 12 || 12;
-                    return `${displayHour}:${minutes.toString().padStart(2, '0')} ${period}`;
-                  };
-
                   return (
                     <button
                       key={template.id}
@@ -136,9 +127,9 @@ export const TaskQuickStartSheet = ({
                       <span className="font-medium text-foreground/90 flex-1">
                         {template.title}
                       </span>
-                      {template.suggested_time && (
+                      {template.duration_minutes && (
                         <span className="text-sm text-foreground/50 flex-shrink-0">
-                          {formatTime(template.suggested_time)}
+                          {template.duration_minutes}m
                         </span>
                       )}
                     </button>

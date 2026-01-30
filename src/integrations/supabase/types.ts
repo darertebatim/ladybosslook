@@ -2531,51 +2531,6 @@ export type Database = {
         }
         Relationships: []
       }
-      task_templates: {
-        Row: {
-          category: string
-          color: string
-          created_at: string
-          description: string | null
-          display_order: number
-          emoji: string
-          id: string
-          is_active: boolean
-          is_popular: boolean
-          repeat_pattern: string
-          suggested_time: string | null
-          title: string
-        }
-        Insert: {
-          category: string
-          color?: string
-          created_at?: string
-          description?: string | null
-          display_order?: number
-          emoji?: string
-          id?: string
-          is_active?: boolean
-          is_popular?: boolean
-          repeat_pattern?: string
-          suggested_time?: string | null
-          title: string
-        }
-        Update: {
-          category?: string
-          color?: string
-          created_at?: string
-          description?: string | null
-          display_order?: number
-          emoji?: string
-          id?: string
-          is_active?: boolean
-          is_popular?: boolean
-          repeat_pattern?: string
-          suggested_time?: string | null
-          title?: string
-        }
-        Relationships: []
-      }
       user_admin_permissions: {
         Row: {
           created_at: string | null
