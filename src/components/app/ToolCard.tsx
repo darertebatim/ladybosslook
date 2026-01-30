@@ -37,19 +37,19 @@ export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
         onClick={handleClick}
         disabled={tool.comingSoon}
         className={cn(
-          'flex flex-col items-center gap-2 p-3 w-20 shrink-0',
+          'flex flex-col items-center gap-1.5 w-16 shrink-0',
           'transition-transform active:scale-95',
           tool.comingSoon && 'opacity-70'
         )}
       >
         <div className={cn(
-          'w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm',
+          'w-10 h-10 rounded-xl flex items-center justify-center',
           tool.bgColor
         )}>
-          <IconComponent className={cn('h-6 w-6', tool.iconColor)} />
+          <IconComponent className={cn('h-5 w-5', tool.iconColor)} />
         </div>
         <div className="text-center">
-          <span className="text-xs font-medium text-foreground block leading-tight">
+          <span className="text-[10px] font-medium text-foreground block leading-tight">
             {tool.name}
           </span>
           {tool.comingSoon && (
@@ -69,51 +69,51 @@ export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
         onClick={handleClick}
         disabled={tool.comingSoon}
         className={cn(
-          'flex flex-col items-center gap-2',
+          'flex flex-col items-center gap-1.5',
           'transition-transform active:scale-95',
           tool.comingSoon && 'opacity-60'
         )}
       >
         <div className={cn(
-          'w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm',
+          'w-12 h-12 rounded-xl flex items-center justify-center',
           tool.bgColor
         )}>
-          <IconComponent className={cn('h-6 w-6', tool.iconColor)} />
+          <IconComponent className={cn('h-5 w-5', tool.iconColor)} />
         </div>
-        <span className="text-xs font-medium text-muted-foreground">
+        <span className="text-[11px] font-medium text-muted-foreground">
           {tool.name}
         </span>
       </button>
     );
   }
 
-  // Default size for Wellness Tools (2-column grid cards)
+  // Default size for Wellness Tools (2-column grid cards) - compact version
   return (
     <button
       onClick={handleClick}
       disabled={tool.comingSoon}
       className={cn(
-        'flex items-start gap-3 p-4 rounded-2xl bg-card',
-        'border border-border/50 shadow-sm',
+        'flex items-center gap-2.5 p-3 rounded-xl bg-card',
+        'border border-border/40 shadow-sm',
         'transition-transform active:scale-[0.97]',
         tool.comingSoon && 'opacity-60'
       )}
     >
       <div className={cn(
-        'w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm',
+        'w-10 h-10 rounded-xl flex items-center justify-center shrink-0',
         tool.bgColor
       )}>
-        <IconComponent className={cn('h-6 w-6', tool.iconColor)} />
+        <IconComponent className={cn('h-5 w-5', tool.iconColor)} />
       </div>
-      <div className="flex flex-col items-start min-w-0 pt-1">
-        <h3 className="font-semibold text-foreground text-sm leading-tight">
+      <div className="flex flex-col items-start min-w-0">
+        <h3 className="font-semibold text-foreground text-[13px] leading-tight">
           {tool.name}
         </h3>
-        <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
+        <p className="text-[11px] text-muted-foreground leading-tight">
           {tool.description}
         </p>
         {tool.comingSoon && (
-          <span className="text-[10px] font-medium text-muted-foreground mt-1">
+          <span className="text-[9px] font-medium text-muted-foreground">
             Coming Soon
           </span>
         )}
