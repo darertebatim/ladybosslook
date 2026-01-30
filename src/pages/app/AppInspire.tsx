@@ -230,45 +230,37 @@ export default function AppInspire() {
             </div>
           )}
 
-          {/* Routines Grid */}
-          <div className="mt-5 px-4 w-full max-w-full overflow-hidden">
-            <h2 className="text-sm font-semibold text-muted-foreground mb-3">
-              {selectedCategory === 'popular'
-                ? 'POPULAR ROUTINES'
-                : selectedCategory === 'all-routines'
-                ? 'ALL ROUTINES'
-                : selectedCategory === 'all-tasks'
-                ? 'ALL TASKS'
-                : categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'ROUTINES'
-              }
-            </h2>
+          {/* Routines Grid - only show if there are routines */}
+          {searchedRoutines && searchedRoutines.length > 0 && (
+            <div className="mt-5 px-4 w-full max-w-full overflow-hidden">
+              <h2 className="text-sm font-semibold text-muted-foreground mb-3">
+                {selectedCategory === 'popular'
+                  ? 'POPULAR ROUTINES'
+                  : selectedCategory === 'all-routines'
+                  ? 'ALL ROUTINES'
+                  : selectedCategory === 'all-tasks'
+                  ? 'ALL TASKS'
+                  : categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'ROUTINES'
+                }
+              </h2>
 
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : searchedRoutines && searchedRoutines.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3 w-full max-w-full">
-                {searchedRoutines.map((routine) => (
-                  <RoutineBankCard
-                    key={routine.id}
-                    routine={routine}
-                    onClick={() => navigate(`/app/routines/${routine.id}`)}
-                  />
-                ))}
-              </div>
-            ) : selectedCategory !== 'all-tasks' ? (
-              <div className="text-center py-12">
-                <Sparkles className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
-                <p className="text-muted-foreground">
-                  {searchQuery ? 'No routines found' : 'No routines available yet'}
-                </p>
-                <p className="text-sm text-muted-foreground/70 mt-1">
-                  {searchQuery ? 'Try a different search term' : 'Check back soon for new content!'}
-                </p>
-              </div>
-            ) : null}
-          </div>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3 w-full max-w-full">
+                  {searchedRoutines.map((routine) => (
+                    <RoutineBankCard
+                      key={routine.id}
+                      routine={routine}
+                      onClick={() => navigate(`/app/routines/${routine.id}`)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Task Ideas Section - hide for Pro category and all-routines since they focus on routines only */}
           {taskTemplates && taskTemplates.length > 0 && selectedCategory !== 'pro' && selectedCategory !== 'all-routines' && (
