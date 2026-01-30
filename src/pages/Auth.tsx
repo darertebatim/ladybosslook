@@ -150,11 +150,11 @@ export default function Auth() {
         <div className="flex-shrink-0 pt-16 pb-8 px-6 flex flex-col items-center">
           {/* Decorative hearts pattern could be added via CSS */}
           <div className="relative">
-            <div className="w-32 h-32 rounded-3xl overflow-hidden shadow-xl bg-white p-2">
+            <div className="w-32 h-32 rounded-3xl overflow-hidden shadow-xl">
               <img 
                 src={appIcon} 
-                alt="LadyBoss Academy" 
-                className="w-full h-full object-contain"
+                alt="Simora" 
+                className="w-full h-full object-cover"
               />
             </div>
           </div>
@@ -184,7 +184,7 @@ export default function Auth() {
                   ? 'Reset Password' 
                   : showEmailForm 
                     ? (isLogin ? 'Sign in with Email' : 'Sign up with Email')
-                    : (isLogin ? 'Welcome back!' : 'Sign up for LadyBoss')
+                    : (isLogin ? 'Welcome back!' : 'Sign up for Simora')
                 }
               </h1>
               <p className="text-muted-foreground text-sm">
