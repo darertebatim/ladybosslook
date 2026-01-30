@@ -11,6 +11,7 @@ import { CompactStatsPills } from '@/components/dashboard/CompactStatsPills';
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { QuickActionsGrid } from '@/components/dashboard/QuickActionsGrid';
 import { SuggestedRoutineCard } from '@/components/dashboard/SuggestedRoutineCard';
+import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { format } from 'date-fns';
 
 export default function AppNewHome() {
@@ -26,6 +27,7 @@ export default function AppNewHome() {
     activeRounds,
     nextSessionMap,
     suggestedRoutine,
+    periodSettings,
   } = useNewHomeData();
 
   if (isLoading) {
@@ -130,6 +132,11 @@ export default function AppNewHome() {
           {/* Suggested Routine (conditional) */}
           {showSuggestion && (
             <SuggestedRoutineCard routine={suggestedRoutine} />
+          )}
+
+          {/* Period Status Card (shows if onboarding done and show_on_home enabled) */}
+          {periodSettings?.onboarding_done && periodSettings?.show_on_home && (
+            <PeriodStatusCard />
           )}
 
           {/* Compact Stats */}
