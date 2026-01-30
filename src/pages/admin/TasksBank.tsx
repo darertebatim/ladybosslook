@@ -4,16 +4,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Sparkles, Star, ChevronRight, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Plus, Sparkles, Star, ChevronRight, Trash2, Eye, EyeOff, CheckSquare, Square, Layers, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+
 // Color options matching the app
 const COLOR_OPTIONS = [
   { name: 'pink', hex: '#FFD6E8' },
@@ -80,6 +83,13 @@ export default function TasksBank() {
   });
   const [adminSettingsOpen, setAdminSettingsOpen] = useState(false);
   const [adminSettingsTaskId, setAdminSettingsTaskId] = useState<string | null>(null);
+
+  // Selection mode for creating routines
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
+  const [createRoutineOpen, setCreateRoutineOpen] = useState(false);
+  const [newRoutineName, setNewRoutineName] = useState('');
+  const [newRoutineCategory, setNewRoutineCategory] = useState('general');
 
   // Fetch routine categories from database
   const { data: routineCategories = [] } = useQuery({
@@ -445,6 +455,72 @@ export default function TasksBank() {
 
   const usedCategories = [...new Set(tasks.map(t => t.category))];
 
+  // Selection handlers
+  const toggleTaskSelection = (taskId: string) => {
+    const newSet = new Set(selectedTaskIds);
+    if (newSet.has(taskId)) {
+      newSet.delete(taskId);
+    } else {
+      newSet.add(taskId);
+    }
+    setSelectedTaskIds(newSet);
+  };
+
+  const clearSelection = () => {
+    setSelectedTaskIds(new Set());
+    setSelectionMode(false);
+  };
+
+  const selectedTasks = tasks.filter(t => selectedTaskIds.has(t.id));
+
+  // Create routine from selected tasks
+  const createRoutineFromSelection = useMutation({
+    mutationFn: async () => {
+      if (!newRoutineName.trim()) throw new Error('Routine name is required');
+      if (selectedTasks.length === 0) throw new Error('No tasks selected');
+
+      // Create the routine
+      const { data: newRoutine, error: routineError } = await supabase
+        .from('routines_bank')
+        .insert({
+          title: newRoutineName.trim(),
+          category: newRoutineCategory,
+          emoji: '✨',
+          color: 'yellow',
+        })
+        .select()
+        .single();
+      if (routineError) throw routineError;
+
+      // Create routine tasks
+      const taskRecords = selectedTasks.map((task, idx) => ({
+        routine_id: newRoutine.id,
+        task_id: task.id,
+        title: task.title,
+        emoji: task.emoji,
+        duration_minutes: task.duration_minutes || 1,
+        section_title: null,
+        task_order: idx,
+      }));
+      const { error: tasksError } = await supabase.from('routines_bank_tasks').insert(taskRecords);
+      if (tasksError) throw tasksError;
+
+      return newRoutine;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
+      toast.success('Routine created! Go to Routines Bank to edit it.');
+      setCreateRoutineOpen(false);
+      setNewRoutineName('');
+      setNewRoutineCategory('general');
+      clearSelection();
+    },
+    onError: (error) => {
+      toast.error('Failed to create routine: ' + error.message);
+    },
+  });
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -457,12 +533,57 @@ export default function TasksBank() {
             Reusable task templates for routine planning
           </CardDescription>
         </div>
-        <Button onClick={openNewSheet} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Task
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={selectionMode ? "secondary" : "outline"}
+            size="sm"
+            onClick={() => {
+              if (selectionMode) {
+                clearSelection();
+              } else {
+                setSelectionMode(true);
+              }
+            }}
+            className="gap-2"
+          >
+            {selectionMode ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+            {selectionMode ? 'Cancel' : 'Select'}
+          </Button>
+          <Button onClick={openNewSheet} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add Task
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
+        {/* Selection bar */}
+        {selectionMode && selectedTaskIds.size > 0 && (
+          <div className="flex items-center justify-between p-3 mb-4 rounded-lg bg-primary/10 border border-primary/20">
+            <div className="flex items-center gap-2">
+              <CheckSquare className="h-4 w-4 text-primary" />
+              <span className="font-medium">{selectedTaskIds.size} selected</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                onClick={() => setCreateRoutineOpen(true)}
+                className="gap-2"
+              >
+                <Layers className="h-4 w-4" />
+                Create Routine
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={clearSelection}
+              >
+                <X className="h-4 w-4" />
+                Clear
+              </Button>
+            </div>
+          </div>
+        )}
+
         <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-4">
           <TabsList className="flex-wrap h-auto gap-1">
             <TabsTrigger value="all" className="flex items-center gap-1">
@@ -497,16 +618,33 @@ export default function TasksBank() {
           <div className="space-y-2">
             {filteredTasks.map((task) => {
               const catInfo = getCategoryInfo(task.category);
+              const isSelected = selectedTaskIds.has(task.id);
               return (
                 <div
                   key={task.id}
                   className={cn(
                     'flex items-center gap-3 p-3 rounded-xl border cursor-pointer hover:shadow-sm transition-shadow group',
-                    !task.is_active && 'opacity-50'
+                    !task.is_active && 'opacity-50',
+                    isSelected && 'ring-2 ring-primary'
                   )}
                   style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === task.color)?.hex + '40' }}
-                  onClick={() => openEditSheet(task)}
+                  onClick={() => {
+                    if (selectionMode) {
+                      toggleTaskSelection(task.id);
+                    } else {
+                      openEditSheet(task);
+                    }
+                  }}
                 >
+                  {/* Checkbox for selection mode */}
+                  {selectionMode && (
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => toggleTaskSelection(task.id)}
+                      />
+                    </div>
+                  )}
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === task.color)?.hex }}>
                     <TaskIcon iconName={task.emoji} size={20} />
                   </div>
@@ -694,6 +832,83 @@ export default function TasksBank() {
         initialData={sheetInitialData}
         onSaveSheet={handleSaveSheet}
       />
+
+      {/* Create Routine from Selection Dialog */}
+      <Dialog open={createRoutineOpen} onOpenChange={setCreateRoutineOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Layers className="h-4 w-4" />
+              Create Routine from Selection
+            </DialogTitle>
+            <DialogDescription>
+              Create a new routine with {selectedTaskIds.size} selected task{selectedTaskIds.size !== 1 ? 's' : ''}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="routineName">Routine Name *</Label>
+              <Input
+                id="routineName"
+                value={newRoutineName}
+                onChange={(e) => setNewRoutineName(e.target.value)}
+                placeholder="Morning Energy Boost"
+                autoFocus
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Category</Label>
+              <Select value={newRoutineCategory} onValueChange={setNewRoutineCategory}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {routineCategories.map((cat) => (
+                    <SelectItem key={cat.slug} value={cat.slug}>
+                      <span className="flex items-center gap-2">
+                        <TaskIcon iconName={cat.icon || '📋'} size={14} />
+                        {cat.name}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Preview selected tasks */}
+            <div className="space-y-2">
+              <Label>Selected Tasks</Label>
+              <div className="border rounded-lg p-2 max-h-40 overflow-y-auto space-y-1">
+                {selectedTasks.map((task, idx) => (
+                  <div key={task.id} className="flex items-center gap-2 text-sm">
+                    <span className="text-muted-foreground w-4">{idx + 1}.</span>
+                    <TaskIcon iconName={task.emoji} size={14} />
+                    <span className="truncate flex-1">{task.title}</span>
+                    <span className="text-xs text-muted-foreground">{task.duration_minutes || 1}m</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Total: {selectedTasks.reduce((sum, t) => sum + (t.duration_minutes || 1), 0)} minutes
+              </p>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateRoutineOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => createRoutineFromSelection.mutate()}
+              disabled={!newRoutineName.trim() || createRoutineFromSelection.isPending}
+            >
+              Create Routine
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

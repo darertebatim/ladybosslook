@@ -2083,6 +2083,7 @@ export type Database = {
           plan_id: string
           pro_link_type: string | null
           pro_link_value: string | null
+          source_task_id: string | null
           task_order: number
           title: string
         }
@@ -2096,6 +2097,7 @@ export type Database = {
           plan_id: string
           pro_link_type?: string | null
           pro_link_value?: string | null
+          source_task_id?: string | null
           task_order?: number
           title: string
         }
@@ -2109,6 +2111,7 @@ export type Database = {
           plan_id?: string
           pro_link_type?: string | null
           pro_link_value?: string | null
+          source_task_id?: string | null
           task_order?: number
           title?: string
         }
@@ -2125,6 +2128,13 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "routine_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "routine_plan_tasks_source_task_id_fkey"
+            columns: ["source_task_id"]
+            isOneToOne: false
+            referencedRelation: "admin_task_bank"
             referencedColumns: ["id"]
           },
         ]
@@ -2246,6 +2256,105 @@ export type Database = {
             columns: ["linked_playlist_id"]
             isOneToOne: false
             referencedRelation: "audio_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      routines_bank: {
+        Row: {
+          category: string
+          color: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          description: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          is_popular: boolean | null
+          sort_order: number | null
+          subtitle: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string
+          color?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          sort_order?: number | null
+          subtitle?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          color?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          sort_order?: number | null
+          subtitle?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      routines_bank_tasks: {
+        Row: {
+          created_at: string | null
+          duration_minutes: number | null
+          emoji: string | null
+          id: string
+          routine_id: string
+          section_title: string | null
+          task_id: string | null
+          task_order: number | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          emoji?: string | null
+          id?: string
+          routine_id: string
+          section_title?: string | null
+          task_id?: string | null
+          task_order?: number | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          emoji?: string | null
+          id?: string
+          routine_id?: string
+          section_title?: string | null
+          task_id?: string | null
+          task_order?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routines_bank_tasks_routine_id_fkey"
+            columns: ["routine_id"]
+            isOneToOne: false
+            referencedRelation: "routines_bank"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "routines_bank_tasks_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "admin_task_bank"
             referencedColumns: ["id"]
           },
         ]
