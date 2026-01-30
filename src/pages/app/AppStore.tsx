@@ -152,7 +152,7 @@ const AppStore = () => {
       />
 
       {/* Header */}
-      <div className="bg-gradient-to-b from-violet-50 to-background dark:from-violet-950/20 dark:to-background px-4 pt-3 pb-4">
+      <div className="bg-gradient-to-b from-violet-50 to-background dark:from-violet-950/20 dark:to-background px-4 pt-4 pb-6">
         <div className="flex items-center justify-between">
           {showSearch ? (
             <div className="flex-1 flex items-center gap-2">
