@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
@@ -35,6 +35,8 @@ export const PeriodDaySheet = ({
   const [flowIntensity, setFlowIntensity] = useState<'light' | 'medium' | 'heavy' | null>(null);
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
+  const notesRef = useRef<HTMLTextAreaElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Reset form when sheet opens or existing log changes
   useEffect(() => {
@@ -52,6 +54,13 @@ export const PeriodDaySheet = ({
       }
     }
   }, [open, existingLog]);
+
+  // Handle keyboard for notes - scroll into view when focused
+  const handleNotesFocus = () => {
+    setTimeout(() => {
+      notesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  };
 
   const toggleSymptom = (symptomId: string) => {
     haptic.light();
@@ -80,14 +89,18 @@ export const PeriodDaySheet = ({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90vh]">
-        <DrawerHeader className="border-b border-pink-100">
+      <DrawerContent className="max-h-[85vh]">
+        <DrawerHeader className="border-b border-pink-100 shrink-0">
           <DrawerTitle className="text-pink-800">
             {format(date, 'EEEE, MMMM d')}
           </DrawerTitle>
         </DrawerHeader>
 
-        <div className="p-4 space-y-6 overflow-y-auto">
+        <div 
+          ref={scrollContainerRef}
+          className="flex-1 p-4 space-y-6 overflow-y-auto overscroll-contain"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
           {/* Period day toggle */}
           <div className="flex items-center justify-between">
             <div>
@@ -156,8 +169,10 @@ export const PeriodDaySheet = ({
               <div>
                 <p className="font-medium text-foreground mb-3">Notes (optional)</p>
                 <Textarea
+                  ref={notesRef}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
+                  onFocus={handleNotesFocus}
                   placeholder="Add any notes about today..."
                   className="resize-none h-24 border-pink-200 focus:border-pink-400"
                 />
@@ -166,8 +181,11 @@ export const PeriodDaySheet = ({
           )}
         </div>
 
-        {/* Actions */}
-        <div className="p-4 border-t border-pink-100 flex gap-3">
+        {/* Actions - with safe area */}
+        <div 
+          className="shrink-0 p-4 border-t border-pink-100 flex gap-3"
+          style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
+        >
           {existingLog && (
             <Button
               variant="outline"

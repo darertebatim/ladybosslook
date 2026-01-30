@@ -62,12 +62,15 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[90vh]">
-        <DrawerHeader className="border-b border-pink-100">
+      <DrawerContent className="max-h-[85vh]">
+        <DrawerHeader className="border-b border-pink-100 shrink-0">
           <DrawerTitle className="text-pink-800">Period Settings</DrawerTitle>
         </DrawerHeader>
 
-        <div className="p-4 space-y-6 overflow-y-auto">
+        <div 
+          className="flex-1 p-4 space-y-6 overflow-y-auto overscroll-contain"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
           {/* Last period start */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -203,8 +206,11 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
           </div>
         </div>
 
-        {/* Save button */}
-        <div className="p-4 border-t border-pink-100">
+        {/* Save button - with safe area */}
+        <div 
+          className="shrink-0 p-4 border-t border-pink-100"
+          style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
+        >
           <Button
             onClick={handleSave}
             disabled={upsertSettings.isPending}
