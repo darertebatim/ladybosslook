@@ -1,105 +1,163 @@
 
-# Plan: Create Routines Bank with Task Selection
+
+# Plan: Create NEW Routines Bank System
 
 ## Overview
-Add a "Routines Bank" tab to /admin/tools that allows managing routine templates (routine_plans). Additionally, enable multi-select in the Tasks Bank to create routines from selected tasks.
+Build a completely new **Routines Bank** feature from scratch at `/admin/tools` with dedicated database tables. This is separate from the existing routine_plans system.
 
 ## Database Changes
 
-### 1. Add source_task_id to routine_plan_tasks
-Link routine tasks back to their source in admin_task_bank:
+### 1. Create New `routines_bank` Table
+A new table to store routine templates:
 
 ```sql
-ALTER TABLE routine_plan_tasks 
-ADD COLUMN source_task_id uuid REFERENCES admin_task_bank(id) ON DELETE SET NULL;
+CREATE TABLE routines_bank (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  subtitle text,
+  description text,
+  cover_image_url text,
+  category text NOT NULL DEFAULT 'general',
+  color text DEFAULT 'yellow',
+  emoji text DEFAULT '✨',
+  is_active boolean DEFAULT true,
+  is_popular boolean DEFAULT false,
+  sort_order integer DEFAULT 0,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
 ```
 
-This allows tracking which bank task was used to create each routine task.
+### 2. Create `routines_bank_tasks` Table
+Links tasks from admin_task_bank to routines, with section support:
 
-## UI Changes
+```sql
+CREATE TABLE routines_bank_tasks (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  routine_id uuid NOT NULL REFERENCES routines_bank(id) ON DELETE CASCADE,
+  task_id uuid REFERENCES admin_task_bank(id) ON DELETE SET NULL,
+  title text NOT NULL,
+  emoji text DEFAULT '☀️',
+  duration_minutes integer DEFAULT 1,
+  section_title text,  -- Optional section header before this task
+  task_order integer DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+```
+
+### 3. RLS Policies
+Standard admin-only policies for both tables.
+
+## UI Components
 
 ### 1. Add "Routines Bank" Tab to Tools.tsx
-Add a new tab alongside "Routines", "Tasks Bank", and "Breathing":
-- Tab with Layers icon labeled "Routines Bank"
-- This will be a simplified routine management focused on creating/editing routine templates
+- New tab with Layers icon
+- Renders `RoutinesBank` component
 
-### 2. Create RoutinesBank Component
-New component at `src/components/admin/RoutinesBank.tsx`:
+### 2. Create `RoutinesBank.tsx` Component
+Location: `src/components/admin/RoutinesBank.tsx`
 
 **Features:**
-- List of routine_plans with card-based view (similar to Tasks Bank)
-- Quick toggles for is_popular, is_active
-- Create/Edit dialog with:
-  - Title, subtitle, description
-  - Cover image URL
-  - Category selection (from routine_categories)
-  - Color picker
-  - Emoji picker for icon
-- Inline task management:
-  - Add tasks from admin_task_bank via searchable picker
-  - Reorder tasks with drag-and-drop
-  - Edit task duration
-  - Add section headers (routine_plan_sections)
-- Duration auto-calculated from task durations
+- Card-based list of routines (like Tasks Bank style)
+- Category filter tabs (reuse routine_categories)
+- Quick toggles: Popular (star), Active (eye)
+- Each card shows: Emoji, Title, Duration (sum of tasks), Category, Task count
 
-### 3. Add Multi-Select to Tasks Bank
-Enhance TasksBank.tsx:
+**Create/Edit Dialog:**
+- Title (required)
+- Subtitle (optional)
+- Description (optional)
+- Cover Image URL (optional)
+- Category dropdown
+- Color picker
+- Emoji picker
 
-**Selection Mode:**
-- Add checkbox column to each task row
-- "Select Mode" toggle button
-- Selection counter badge
-- "Create Routine" button (appears when tasks selected)
+**Task Management (inline in edit view):**
+- List of tasks in the routine
+- Add task button with searchable picker (from admin_task_bank)
+- Reorder tasks with drag handles
+- Add section header before any task
+- Remove task button
+- Duration auto-calculated
 
-**Create Routine Flow:**
-1. User selects multiple tasks
-2. Clicks "Create Routine" button
-3. Dialog opens with:
-   - Name input (required)
-   - Category selector
-   - Tasks preview (ordered by selection)
-4. Creates new routine_plan and links tasks via routine_plan_tasks
+### 3. Enhance TasksBank.tsx with Multi-Select
 
-## Technical Details
+**New UI Elements:**
+- "Select" toggle button in header
+- Checkbox on each task row when in select mode
+- Selection counter bar: "X selected" with "Create Routine" and "Clear" buttons
 
-### File Changes
+**Create Routine Dialog (from selection):**
+- Name input (required)
+- Category dropdown
+- Preview of selected tasks (ordered)
+- Creates new routine in routines_bank with linked tasks
 
-**src/pages/admin/Tools.tsx**
-- Add "Routines Bank" tab trigger with Layers icon
-- Add TabsContent that renders RoutinesBank component
+## File Changes
 
-**src/components/admin/RoutinesBank.tsx** (new file)
-- Query routine_plans with category join
-- Query routine_plan_tasks for each plan
-- CRUD mutations for plans
-- Task picker that queries admin_task_bank
-- Create tasks from bank items (copy title, icon, duration)
+```text
+src/pages/admin/Tools.tsx
+├── Add "Routines Bank" tab trigger (Layers icon)
+└── Add TabsContent rendering RoutinesBank
 
-**src/pages/admin/TasksBank.tsx**
-- Add selection state: `selectedTaskIds: Set<string>`
-- Add checkbox UI on each task row
-- Add "Create Routine" floating action button
-- Add CreateRoutineDialog component
-- Mutation to create routine_plan with tasks
+src/components/admin/RoutinesBank.tsx (NEW)
+├── Query routines_bank with tasks count
+├── Category filter tabs
+├── Routine cards with quick toggles
+├── Create/Edit dialog with form
+└── Task management section
 
-### UI Layout for Routines Bank
+src/pages/admin/TasksBank.tsx
+├── Add selection mode state
+├── Add checkbox column UI
+├── Add selection bar with counter
+├── Add Create Routine dialog
+└── Mutation to create routine from selected tasks
+```
+
+## UI Wireframes
+
+### Routines Bank Tab
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
 │ Routines Bank                            [+ New Routine]│
 ├─────────────────────────────────────────────────────────┤
-│ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐                │
-│ │ All │ │Focus│ │Calm │ │Care │ │Grow │ ...             │
-│ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘                │
+│ [All] [Focus] [Calm] [Self-Care] [Productivity] ...     │
 ├─────────────────────────────────────────────────────────┤
-│ ┌───────────────────────────────────────────────────┐  │
-│ │ ☀️ Morning Mindfulness    ⭐ 👁 ✏️               │  │
-│ │ 15 min • Focus • 3 tasks                          │  │
-│ └───────────────────────────────────────────────────┘  │
-│ ┌───────────────────────────────────────────────────┐  │
-│ │ 🌙 Evening Wind Down      👁 ✏️                   │  │
-│ │ 10 min • Calm • 4 tasks                           │  │
-│ └───────────────────────────────────────────────────┘  │
+│ ┌───────────────────────────────────────────────────┐   │
+│ │ ✨ Morning Energy Boost         ⭐ 👁 ✏️ 🗑️      │   │
+│ │    15 min • Focus • 5 tasks                       │   │
+│ └───────────────────────────────────────────────────┘   │
+│ ┌───────────────────────────────────────────────────┐   │
+│ │ 🌙 Evening Wind Down               👁 ✏️ 🗑️      │   │
+│ │    10 min • Calm • 4 tasks                        │   │
+│ └───────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Routine Edit Dialog
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│ Edit Routine                                     [X]    │
+├─────────────────────────────────────────────────────────┤
+│ Title: [Morning Energy Boost____________]               │
+│ Subtitle: [Start your day right_________]               │
+│ Category: [Focus v]   Color: [●●●●●●●]   Emoji: [✨]    │
+│ Cover URL: [https://..._________________]               │
+│ Description: [_____________________________]            │
+│                                                         │
+│ Tasks (Total: 15 min)                    [+ Add Task]   │
+│ ├─────────────────────────────────────────────────────┤ │
+│ │ Section: "Get Moving"               [Edit] [Remove] │ │
+│ │ ☀️ Morning Stretch          5m      [≡] [X]         │ │
+│ │ 🏃 Light Exercise           5m      [≡] [X]         │ │
+│ │ Section: "Mindfulness"              [Edit] [Remove] │ │
+│ │ 🧘 Meditation               5m      [≡] [X]         │ │
+│ └─────────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────────┤
+│                              [Cancel]  [Save Routine]   │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -107,23 +165,32 @@ Enhance TasksBank.tsx:
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
-│ Tasks Bank                     [Select] [+ Add Task]    │
+│ Tasks Bank                       [Select] [+ Add Task]  │
 ├─────────────────────────────────────────────────────────┤
-│ ☑ 3 selected         [Create Routine]  [Clear]         │
+│ ☑ 3 selected              [Create Routine] [Clear]     │
 ├─────────────────────────────────────────────────────────┤
-│ ☑ ☀️ Morning stretch        ⭐ 👁 ⚙️ 🗑️ >          │
-│ ☑ 🧘 Meditation             ⭐ 👁 ⚙️ 🗑️ >          │
-│ ☐ ☕ Make coffee            ⭐ 👁 ⚙️ 🗑️ >          │
-│ ☑ 📝 Journal                ⭐ 👁 ⚙️ 🗑️ >          │
+│ ☑ ☀️ Morning Stretch      ⭐ 👁 ⚙️ 🗑️ >               │
+│ ☑ 🧘 Meditation           ⭐ 👁 ⚙️ 🗑️ >               │
+│ ☐ ☕ Make Coffee          ⭐ 👁 ⚙️ 🗑️ >               │
+│ ☑ 📝 Journal              ⭐ 👁 ⚙️ 🗑️ >               │
 └─────────────────────────────────────────────────────────┘
 ```
 
 ## Implementation Order
 
-1. **Database migration** - Add source_task_id column
-2. **Create RoutinesBank.tsx** - Basic CRUD for routine_plans
-3. **Add to Tools.tsx** - New tab with RoutinesBank
-4. **Add task management to RoutinesBank** - Task picker, inline editing
+1. **Database migration** - Create routines_bank and routines_bank_tasks tables with RLS
+2. **Create RoutinesBank.tsx** - Basic CRUD for routines
+3. **Add to Tools.tsx** - New tab
+4. **Add task management to RoutinesBank** - Task picker, sections, reordering
 5. **Add multi-select to TasksBank.tsx** - Checkboxes, selection state
-6. **Create routine dialog in TasksBank** - Link selected tasks to new routine
+6. **Create routine dialog in TasksBank** - Quick routine creation from selection
 7. **Test end-to-end**
+
+## Technical Notes
+
+- Duration is auto-calculated by summing task durations in routines_bank_tasks
+- When adding a task from admin_task_bank, copy title/emoji/duration to routines_bank_tasks
+- Section headers are stored as section_title on the task that follows the header
+- Reordering updates task_order field
+- Uses same category system (routine_categories) as Tasks Bank for consistency
+
