@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, MessageCircle, ShoppingBag, Music, Users, Headset } from 'lucide-react';
+import { Home, MessageCircle, Compass, Music, Users, Headset } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
@@ -115,7 +115,7 @@ const NativeAppLayout = () => {
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
-    { path: '/app/browse', icon: ShoppingBag, label: 'Explore', tourClass: 'tour-nav-browse' },
+    { path: '/app/browse', icon: Compass, label: 'Explore', tourClass: 'tour-nav-browse' },
     { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
     { path: '/app/channels', icon: Users, label: 'Channels', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
     { path: '/app/chat', icon: Headset, label: 'Support', tourClass: 'tour-nav-chat' },
