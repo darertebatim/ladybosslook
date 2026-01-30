@@ -227,13 +227,6 @@ export const TaskCard = memo(function TaskCard({
             )}>
               {task.title}
             </p>
-            
-            {/* Linked content name subtitle */}
-            {proLinkType === 'playlist' && task.linked_playlist?.name && (
-              <p className="text-xs text-foreground/60 truncate mt-0.5">
-                {task.linked_playlist.name}
-              </p>
-            )}
           </div>
 
           {/* Quick navigation button - prominent action button */}
