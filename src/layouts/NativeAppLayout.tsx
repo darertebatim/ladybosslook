@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { useChatNotifications } from '@/hooks/useChatNotifications';
+import { useUnreadFeedCount } from '@/hooks/useFeed';
 import { cn } from '@/lib/utils';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { usePushNotificationFlow } from '@/hooks/usePushNotificationFlow';
@@ -104,15 +105,8 @@ const NativeAppLayout = () => {
     // Provider not available, ignore
   }
 
-  // Get unread feed count for Community badge
-  let unreadFeedCount = 0;
-  try {
-    const { useUnreadFeedCount } = require('@/hooks/useFeed');
-    const { data } = useUnreadFeedCount();
-    unreadFeedCount = data || 0;
-  } catch {
-    // Hook not available
-  }
+  // Get unread feed count for Channels badge
+  const { data: unreadFeedCount = 0 } = useUnreadFeedCount();
 
   // Check if we're on the audio player page - don't show mini player there
   const isOnPlayerPage = location.pathname.match(/^\/app\/player\/[^/]+$/);
