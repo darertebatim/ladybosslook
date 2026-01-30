@@ -390,14 +390,14 @@ const AppHome = () => {
             {/* Center: Title - changes to month/year when expanded */}
             <div className="flex justify-center">
               {showCalendar ? (
-                <div className="flex items-center gap-2">
-                  <button onClick={handlePrevMonth} className="p-1.5 rounded-full hover:bg-white/50 transition-colors">
+                <div className="flex items-center gap-1">
+                  <button onClick={handlePrevMonth} className="p-2.5 -m-1 rounded-full hover:bg-white/50 active:bg-white/70 transition-colors">
                     <ChevronLeft className="h-5 w-5" />
                   </button>
                   <h1 className="text-lg font-bold text-foreground min-w-[140px] text-center">
                     {format(currentMonth, 'MMMM yyyy')}
                   </h1>
-                  <button onClick={handleNextMonth} className="p-1.5 rounded-full hover:bg-white/50 transition-colors">
+                  <button onClick={handleNextMonth} className="p-2.5 -m-1 rounded-full hover:bg-white/50 active:bg-white/70 transition-colors">
                     <ChevronRight className="h-5 w-5" />
                   </button>
                 </div>
@@ -486,10 +486,10 @@ const AppHome = () => {
             </div>
 
             {/* Calendar expand/collapse handle + Today button */}
-            <div className="flex items-center justify-center pt-1.5 pb-1">
-              {/* Center: Drag handle */}
-              <button onClick={handleToggleCalendar} className="flex-1 flex justify-center">
-                <div className="w-10 h-1 rounded-full bg-foreground/20" />
+            <div className="flex items-center justify-center pt-2 pb-2">
+              {/* Center: Drag handle - larger tap area */}
+              <button onClick={handleToggleCalendar} className="flex-1 flex justify-center py-2 -my-2">
+                <div className="w-12 h-1.5 rounded-full bg-foreground/25" />
               </button>
               
               {/* Right: Today button - more prominent */}
