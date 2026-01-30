@@ -323,10 +323,10 @@ const AppHome = () => {
         <header className="tour-header fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-xl shadow-sm" style={{
         paddingTop: 'max(12px, env(safe-area-inset-top))'
       }}>
-          {/* Title bar */}
-          <div className="flex items-center justify-between px-4 h-12">
-            {/* Left: Water + Breathe + Journal + Routines + Profile buttons - hidden when calendar expanded */}
-            <div className={cn("flex items-center gap-1 transition-opacity duration-200", showCalendar ? "opacity-0 pointer-events-none" : "opacity-100")}>
+          {/* Title bar - three column layout for balanced centering */}
+          <div className="grid grid-cols-3 items-center px-4 h-12">
+            {/* Left: Quick action buttons when collapsed, empty when expanded */}
+            <div className={cn("flex items-center gap-1 justify-start transition-opacity duration-200", showCalendar ? "opacity-0 pointer-events-none" : "opacity-100")}>
               <button onClick={() => navigate('/app/water')} className="p-2 -ml-2 text-sky-500 hover:text-sky-600 transition-colors">
                 <Droplets className="h-5 w-5" />
               </button>
@@ -336,35 +336,47 @@ const AppHome = () => {
               <button onClick={() => navigate('/app/journal')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
                 <NotebookPen className="h-5 w-5" />
               </button>
-              <button onClick={() => navigate('/app/routines')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
-                <Sparkles className="h-5 w-5" />
-              </button>
-              <button onClick={() => navigate('/app/profile')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
-                <User className="h-5 w-5" />
-              </button>
             </div>
 
-            {/* Title - changes to month/year when expanded */}
-            {showCalendar ? <div className="flex items-center gap-2">
-                <button onClick={handlePrevMonth} className="p-1.5 rounded-full hover:bg-white/50 transition-colors">
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <h1 className="text-lg font-bold text-foreground min-w-[140px] text-center">
-                  {format(currentMonth, 'MMMM yyyy')}
+            {/* Center: Title - changes to month/year when expanded */}
+            <div className="flex justify-center">
+              {showCalendar ? (
+                <div className="flex items-center gap-2">
+                  <button onClick={handlePrevMonth} className="p-1.5 rounded-full hover:bg-white/50 transition-colors">
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <h1 className="text-lg font-bold text-foreground min-w-[140px] text-center">
+                    {format(currentMonth, 'MMMM yyyy')}
+                  </h1>
+                  <button onClick={handleNextMonth} className="p-1.5 rounded-full hover:bg-white/50 transition-colors">
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </div>
+              ) : (
+                <h1 className="text-lg font-bold text-foreground flex items-center gap-1">
+                  {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
+                  <Star className="h-3 w-3 text-red-500 fill-red-500" />
                 </h1>
-                <button onClick={handleNextMonth} className="p-1.5 rounded-full hover:bg-white/50 transition-colors">
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              </div> : <h1 className="text-lg font-bold text-foreground flex items-center gap-1">
-                {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
-                <Star className="h-3 w-3 text-red-500 fill-red-500" />
-              </h1>}
+              )}
+            </div>
 
-            {/* Streak badge */}
-            <button onClick={() => setShowStreakModal(true)} className="tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-sm">
-              <Flame className="h-4 w-4 fill-current" />
-              <span className="text-sm font-semibold">{streak?.current_streak || 0}</span>
-            </button>
+            {/* Right: Additional buttons when collapsed + streak badge */}
+            <div className="flex items-center gap-1 justify-end">
+              {/* Extra buttons when collapsed */}
+              <div className={cn("flex items-center transition-opacity duration-200", showCalendar ? "opacity-0 pointer-events-none" : "opacity-100")}>
+                <button onClick={() => navigate('/app/routines')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
+                  <Sparkles className="h-5 w-5" />
+                </button>
+                <button onClick={() => navigate('/app/profile')} className="p-2 text-foreground/70 hover:text-foreground transition-colors">
+                  <User className="h-5 w-5" />
+                </button>
+              </div>
+              {/* Streak badge - always visible */}
+              <button onClick={() => setShowStreakModal(true)} className="tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-sm">
+                <Flame className="h-4 w-4 fill-current" />
+                <span className="text-sm font-semibold">{streak?.current_streak || 0}</span>
+              </button>
+            </div>
           </div>
 
           {/* Calendar area - compact spacing */}
