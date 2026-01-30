@@ -58,6 +58,7 @@ const AppIconGenerator = lazy(() => import("@/pages/admin/AppIconGenerator"));
 const Support = lazy(() => import("@/pages/admin/Support"));
 const Community = lazy(() => import("@/pages/admin/Community"));
 const Tools = lazy(() => import("@/pages/admin/Tools"));
+const TasksBank = lazy(() => import("@/pages/admin/TasksBank"));
 
 // Lazy load marketing/landing pages
 const Programs = lazy(() => import("@/pages/Programs"));
@@ -260,6 +261,7 @@ const App = () => (
                       <Route path="system" element={<ProtectedRoute requiredPage="system"><System /></ProtectedRoute>} />
                       <Route path="app-icon" element={<ProtectedRoute requiredPage="system"><AppIconGenerator /></ProtectedRoute>} />
                       <Route path="tools" element={<ProtectedRoute requiredPage="tools"><Tools /></ProtectedRoute>} />
+                      <Route path="tools/tasks" element={<ProtectedRoute requiredPage="tools"><TasksBank /></ProtectedRoute>} />
                     </Route>
                   )}
                   
