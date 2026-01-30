@@ -120,7 +120,6 @@ const NativeAppLayout = () => {
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
-    { path: '/app/programs', icon: GraduationCap, label: 'Programs', tourClass: 'tour-nav-programs' },
     { path: '/app/browse', icon: ShoppingBag, label: 'Browse', tourClass: 'tour-nav-browse' },
     { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
     { path: '/app/channels', icon: Users, label: 'Channels', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
@@ -152,7 +151,7 @@ const NativeAppLayout = () => {
       {/* Bottom Navigation - hidden on chat page for full-screen experience */}
       {!isOnChatPage && (
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg pb-safe">
-        <div className="grid grid-cols-6 pt-1.5 pb-1.5">
+        <div className="grid grid-cols-5 pt-1.5 pb-1.5">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || 
               (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
