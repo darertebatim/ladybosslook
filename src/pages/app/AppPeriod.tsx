@@ -146,17 +146,17 @@ const AppPeriod = () => {
         <div className="absolute top-32 right-8 w-6 h-6 bg-rose-200/50 rounded-full blur-sm pointer-events-none animate-float-delayed" />
         <div className="absolute top-24 right-24 w-4 h-4 bg-pink-300/30 rounded-full blur-sm pointer-events-none animate-float" />
 
-        {/* Header */}
-        <div 
-          className="relative z-10 flex items-center justify-between px-4 pt-3"
-          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
+        {/* Fixed Header */}
+        <header 
+          className="relative z-10 shrink-0 flex items-center justify-between px-4"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)', paddingBottom: '12px' }}
         >
           <button
             onClick={() => {
               haptic.light();
               navigate('/app/home');
             }}
-            className="w-10 h-10 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center shadow-sm"
+            className="w-10 h-10 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center shadow-sm active:scale-95 transition-transform"
           >
             <X className="h-5 w-5 text-pink-700" />
           </button>
@@ -168,69 +168,75 @@ const AppPeriod = () => {
               haptic.light();
               setShowSettingsSheet(true);
             }}
-            className="w-10 h-10 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center shadow-sm"
+            className="w-10 h-10 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center shadow-sm active:scale-95 transition-transform"
           >
             <Settings className="h-5 w-5 text-pink-700" />
           </button>
-        </div>
+        </header>
 
-        {/* Cycle status display */}
-        <PeriodCycleInsights status={status} />
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+          {/* Cycle status display */}
+          <PeriodCycleInsights status={status} />
 
-        {/* Month navigation */}
-        <div className="relative z-10 flex items-center justify-between px-6 py-3">
-          <button
-            onClick={handlePrevMonth}
-            className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
-          >
-            <ChevronLeft className="h-5 w-5 text-pink-700" />
-          </button>
-          
-          <h2 className="text-lg font-semibold text-pink-800">
-            {format(currentMonth, 'MMMM yyyy')}
-          </h2>
-          
-          <button
-            onClick={handleNextMonth}
-            className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
-          >
-            <ChevronRight className="h-5 w-5 text-pink-700" />
-          </button>
-        </div>
+          {/* Month navigation */}
+          <div className="relative z-10 flex items-center justify-between px-6 py-3">
+            <button
+              onClick={handlePrevMonth}
+              className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <ChevronLeft className="h-5 w-5 text-pink-700" />
+            </button>
+            
+            <h2 className="text-lg font-semibold text-pink-800">
+              {format(currentMonth, 'MMMM yyyy')}
+            </h2>
+            
+            <button
+              onClick={handleNextMonth}
+              className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <ChevronRight className="h-5 w-5 text-pink-700" />
+            </button>
+          </div>
 
-        {/* Calendar */}
-        <div className="relative z-10 flex-1 px-4 overflow-auto">
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-4 shadow-sm">
-            <PeriodCalendar
-              currentMonth={currentMonth}
-              loggedPeriodDays={loggedPeriodDays}
-              predictedPeriodDays={predictedPeriodDays}
-              ovulationDays={ovulationDays}
-              onDateSelect={handleDateSelect}
-            />
+          {/* Calendar */}
+          <div className="relative z-10 px-4">
+            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-4 shadow-sm">
+              <PeriodCalendar
+                currentMonth={currentMonth}
+                loggedPeriodDays={loggedPeriodDays}
+                predictedPeriodDays={predictedPeriodDays}
+                ovulationDays={ovulationDays}
+                onDateSelect={handleDateSelect}
+              />
+            </div>
+            
+            {/* Legend */}
+            <div className="flex items-center justify-center gap-6 mt-4 pb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-pink-500" />
+                <span className="text-xs text-pink-700">Period</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full border-2 border-dashed border-pink-400" />
+                <span className="text-xs text-pink-600">Predicted</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-amber-400" />
+                <span className="text-xs text-amber-700">Ovulation</span>
+              </div>
+            </div>
           </div>
           
-          {/* Legend */}
-          <div className="flex items-center justify-center gap-6 mt-4 pb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-pink-500" />
-              <span className="text-xs text-pink-700">Period</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full border-2 border-dashed border-pink-400" />
-              <span className="text-xs text-pink-600">Predicted</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-amber-400" />
-              <span className="text-xs text-amber-700">Ovulation</span>
-            </div>
-          </div>
+          {/* Spacer for bottom button */}
+          <div className="h-24" />
         </div>
 
-        {/* Bottom action */}
+        {/* Fixed Bottom action */}
         <div 
-          className="relative z-10 flex items-center justify-center gap-4 pb-8 px-6"
-          style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}
+          className="absolute bottom-0 left-0 right-0 z-20 flex items-center justify-center gap-4 px-6 bg-gradient-to-t from-white/90 to-transparent pt-6"
+          style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
         >
           <button
             onClick={() => {
