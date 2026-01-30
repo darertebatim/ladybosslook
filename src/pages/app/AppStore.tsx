@@ -196,11 +196,11 @@ const AppStore = () => {
           </div>
         ) : (
           <>
-            {/* Wellness Tools Section */}
+            {/* Tools Section */}
             {(!searchQuery || filteredWellnessTools.length > 0) && (
               <section>
                 <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
-                  Wellness Tools
+                  Tools
                 </h2>
                 <div className="grid grid-cols-2 gap-2">
                   {filteredWellnessTools.map((tool) => (

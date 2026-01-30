@@ -47,6 +47,24 @@ export const wellnessTools: ToolConfig[] = [
     route: '/app/routines',
     description: 'Daily habits',
   },
+  {
+    id: 'programs',
+    name: 'My Programs',
+    icon: 'GraduationCap',
+    bgColor: 'bg-[#FCE4EC]',
+    iconColor: 'text-pink-600',
+    route: '/app/programs',
+    description: 'Courses & coaching',
+  },
+  {
+    id: 'profile',
+    name: 'My Profile',
+    icon: 'User',
+    bgColor: 'bg-[#F1F5F9]',
+    iconColor: 'text-slate-600',
+    route: '/app/profile',
+    description: 'Settings & account',
+  },
 ];
 
 export const audioTools: ToolConfig[] = [
