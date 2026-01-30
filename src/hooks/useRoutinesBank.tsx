@@ -75,22 +75,38 @@ const CATEGORY_DISPLAY: Record<string, { name: string; icon: string; color: stri
   pro: { name: 'Pro', icon: 'Crown', color: 'amber' },
 };
 
-// Fetch unique categories from routines_bank
+// Fetch unique categories from both routines_bank AND admin_task_bank
 export function useRoutineBankCategories() {
   return useQuery({
     queryKey: ['routines-bank-categories'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch categories from routines_bank
+      const { data: routineCategories } = await supabase
         .from('routines_bank')
         .select('category')
         .eq('is_active', true);
 
-      if (error) throw error;
+      // Fetch categories from admin_task_bank (tasks)
+      const { data: taskCategories } = await supabase
+        .from('admin_task_bank')
+        .select('category')
+        .eq('is_active', true);
 
-      // Get unique categories
-      const uniqueCategories = [...new Set(data.map(r => r.category))];
+      // Merge and get unique categories
+      const allCategories = [
+        ...(routineCategories?.map(r => r.category) || []),
+        ...(taskCategories?.map(t => t.category) || []),
+      ];
+      const uniqueCategories = [...new Set(allCategories)];
       
-      return uniqueCategories.map(cat => ({
+      // Sort with 'pro' at the end
+      const sorted = uniqueCategories.sort((a, b) => {
+        if (a === 'pro') return 1;
+        if (b === 'pro') return -1;
+        return a.localeCompare(b);
+      });
+      
+      return sorted.map(cat => ({
         slug: cat,
         name: CATEGORY_DISPLAY[cat]?.name || cat.charAt(0).toUpperCase() + cat.slice(1),
         icon: CATEGORY_DISPLAY[cat]?.icon || 'Sparkles',
