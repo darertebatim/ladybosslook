@@ -9,7 +9,7 @@ import { Plus, Sparkles, Star, ChevronRight, Trash2, Eye, EyeOff, ChevronDown } 
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -531,14 +531,17 @@ export default function TasksBank() {
         )}
       </CardContent>
 
-      {/* Admin Settings Dialog */}
+      {/* Admin Settings Dialog - higher z-index to appear above sheet */}
       <Dialog open={adminSettingsOpen} onOpenChange={setAdminSettingsOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md z-[100]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
               Admin Settings
             </DialogTitle>
+            <DialogDescription>
+              Configure template visibility and metadata
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
@@ -605,14 +608,18 @@ export default function TasksBank() {
         </DialogContent>
       </Dialog>
 
-      {/* Floating Admin Settings Button when sheet is open */}
+      {/* Floating Admin Settings Button when sheet is open - very high z-index */}
       {sheetOpen && (
-        <div className="fixed bottom-4 right-4 z-[60]">
+        <div className="fixed bottom-4 right-4 z-[100]">
           <Button
             variant="secondary"
             size="sm"
             className="shadow-lg gap-2"
-            onClick={() => setAdminSettingsOpen(true)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setAdminSettingsOpen(true);
+            }}
           >
             <Sparkles className="h-4 w-4" />
             Admin Settings
