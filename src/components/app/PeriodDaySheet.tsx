@@ -75,7 +75,7 @@ export const PeriodDaySheet = ({
     onSave({
       is_period_day: isPeriodDay,
       flow_intensity: isPeriodDay ? flowIntensity : null,
-      symptoms: isPeriodDay ? symptoms : [],
+      symptoms, // Keep symptoms regardless of period day (for PMS tracking)
       notes: notes.trim() || null,
     });
   };
@@ -117,68 +117,68 @@ export const PeriodDaySheet = ({
             />
           </div>
 
+          {/* Flow intensity - only show when period day */}
           {isPeriodDay && (
-            <>
-              {/* Flow intensity */}
-              <div>
-                <p className="font-medium text-foreground text-sm mb-2">Flow Intensity</p>
-                <div className="flex gap-2">
-                  {FLOW_OPTIONS.map((option) => (
-                    <button
-                      key={option.id}
-                      onClick={() => {
-                        haptic.light();
-                        setFlowIntensity(option.id);
-                      }}
-                      className={cn(
-                        'flex-1 py-2 px-3 rounded-xl border-2 transition-all text-center',
-                        flowIntensity === option.id
-                          ? 'border-pink-500 bg-pink-50 text-pink-700'
-                          : 'border-border bg-background hover:border-pink-200'
-                      )}
-                    >
-                      <span className="text-base block">{option.emoji}</span>
-                      <span className="text-xs font-medium">{option.label}</span>
-                    </button>
-                  ))}
-                </div>
+            <div>
+              <p className="font-medium text-foreground text-sm mb-2">Flow Intensity</p>
+              <div className="flex gap-2">
+                {FLOW_OPTIONS.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => {
+                      haptic.light();
+                      setFlowIntensity(option.id);
+                    }}
+                    className={cn(
+                      'flex-1 py-2 px-3 rounded-xl border-2 transition-all text-center',
+                      flowIntensity === option.id
+                        ? 'border-pink-500 bg-pink-50 text-pink-700'
+                        : 'border-border bg-background hover:border-pink-200'
+                    )}
+                  >
+                    <span className="text-base block">{option.emoji}</span>
+                    <span className="text-xs font-medium">{option.label}</span>
+                  </button>
+                ))}
               </div>
-
-              {/* Symptoms */}
-              <div>
-                <p className="font-medium text-foreground text-sm mb-2">Symptoms</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {SYMPTOM_OPTIONS.map((symptom) => (
-                    <button
-                      key={symptom.id}
-                      onClick={() => toggleSymptom(symptom.id)}
-                      className={cn(
-                        'px-2.5 py-1.5 rounded-full border text-xs font-medium transition-all',
-                        symptoms.includes(symptom.id)
-                          ? 'border-pink-500 bg-pink-50 text-pink-700'
-                          : 'border-border bg-background hover:border-pink-200 text-muted-foreground'
-                      )}
-                    >
-                      {symptom.emoji} {symptom.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div>
-                <p className="font-medium text-foreground text-sm mb-2">Notes (optional)</p>
-                <Textarea
-                  ref={notesRef}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  onFocus={handleNotesFocus}
-                  placeholder="Add any notes about today..."
-                  className="resize-none h-20 border-pink-200 focus:border-pink-400 text-sm"
-                />
-              </div>
-            </>
+            </div>
           )}
+
+          {/* Symptoms - always visible for PMS/any day tracking */}
+          <div>
+            <p className="font-medium text-foreground text-sm mb-2">
+              Symptoms {!isPeriodDay && <span className="text-muted-foreground font-normal">(PMS, etc.)</span>}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {SYMPTOM_OPTIONS.map((symptom) => (
+                <button
+                  key={symptom.id}
+                  onClick={() => toggleSymptom(symptom.id)}
+                  className={cn(
+                    'px-2.5 py-1.5 rounded-full border text-xs font-medium transition-all',
+                    symptoms.includes(symptom.id)
+                      ? 'border-pink-500 bg-pink-50 text-pink-700'
+                      : 'border-border bg-background hover:border-pink-200 text-muted-foreground'
+                  )}
+                >
+                  {symptom.emoji} {symptom.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Notes - always visible */}
+          <div>
+            <p className="font-medium text-foreground text-sm mb-2">Notes (optional)</p>
+            <Textarea
+              ref={notesRef}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              onFocus={handleNotesFocus}
+              placeholder="Add any notes about today..."
+              className="resize-none h-20 border-pink-200 focus:border-pink-400 text-sm"
+            />
+          </div>
         </div>
 
         {/* Actions - with safe area */}
