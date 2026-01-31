@@ -11,11 +11,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image } from 'lucide-react';
+import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
 import EmojiPicker from '@/components/app/EmojiPicker';
 import { ImageUploader } from '@/components/admin/ImageUploader';
+import { AITextGenerator } from '@/components/admin/AITextGenerator';
 
 const COLOR_OPTIONS = [
   { name: 'pink', hex: '#FFD6E8' },
@@ -752,7 +753,15 @@ export default function RoutinesBank() {
 
                   {/* Subtitle */}
                   <div className="space-y-2">
-                    <Label htmlFor="subtitle">Subtitle</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="subtitle">Subtitle</Label>
+                      <AITextGenerator
+                        context={formData.title}
+                        fieldType="subtitle"
+                        onGenerate={(text) => setFormData({ ...formData, subtitle: text })}
+                        disabled={!formData.title.trim()}
+                      />
+                    </div>
                     <Input
                       id="subtitle"
                       value={formData.subtitle}
@@ -824,7 +833,15 @@ export default function RoutinesBank() {
 
                   {/* Description */}
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="description">Description</Label>
+                      <AITextGenerator
+                        context={`${formData.title} - ${formData.subtitle}`}
+                        fieldType="description"
+                        onGenerate={(text) => setFormData({ ...formData, description: text })}
+                        disabled={!formData.title.trim()}
+                      />
+                    </div>
                     <Textarea
                       id="description"
                       value={formData.description}
@@ -936,6 +953,30 @@ export default function RoutinesBank() {
                                 <TaskIcon iconName={task.emoji} size={16} />
                                 <span className="flex-1 text-sm truncate">{task.title}</span>
                                 <span className="text-xs text-muted-foreground">{task.duration_minutes}m</span>
+                                {/* Move to section dropdown */}
+                                <Select
+                                  value=""
+                                  onValueChange={(targetSectionId) => {
+                                    const newSectionId = targetSectionId === '_uncategorized' ? null : targetSectionId;
+                                    setLocalTasks(localTasks.map(t =>
+                                      t.id === task.id ? { ...t, section_id: newSectionId } : t
+                                    ));
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[100px] h-7 text-xs">
+                                    <span className="text-muted-foreground">Move to...</span>
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="_uncategorized" className="text-xs">
+                                      Uncategorized
+                                    </SelectItem>
+                                    {localSections.filter(s => s.id !== section.id).map((s) => (
+                                      <SelectItem key={s.id} value={s.id} className="text-xs">
+                                        {s.title}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                                 <button
                                   type="button"
                                   onClick={() => removeTask(task.id)}
@@ -1052,6 +1093,28 @@ export default function RoutinesBank() {
                             <TaskIcon iconName={task.emoji} size={16} />
                             <span className="flex-1 text-sm truncate">{task.title}</span>
                             <span className="text-xs text-muted-foreground">{task.duration_minutes}m</span>
+                            {/* Move to section dropdown */}
+                            {localSections.length > 0 && (
+                              <Select
+                                value=""
+                                onValueChange={(sectionId) => {
+                                  setLocalTasks(localTasks.map(t =>
+                                    t.id === task.id ? { ...t, section_id: sectionId } : t
+                                  ));
+                                }}
+                              >
+                                <SelectTrigger className="w-[100px] h-7 text-xs">
+                                  <span className="text-muted-foreground">Move to...</span>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {localSections.map((s) => (
+                                    <SelectItem key={s.id} value={s.id} className="text-xs">
+                                      {s.title}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
                             <button
                               type="button"
                               onClick={() => removeTask(task.id)}
@@ -1155,7 +1218,15 @@ export default function RoutinesBank() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="section-content">Content</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="section-content">Content</Label>
+                  <AITextGenerator
+                    context={`Section "${editingSection.title}" in routine "${formData.title}"`}
+                    fieldType="section_content"
+                    onGenerate={(text) => setEditingSection({ ...editingSection, content: text })}
+                    disabled={!editingSection.title.trim()}
+                  />
+                </div>
                 <Textarea
                   id="section-content"
                   value={editingSection.content}
