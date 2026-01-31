@@ -15,6 +15,7 @@ import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, File
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
 import EmojiPicker from '@/components/app/EmojiPicker';
+import { ImageUploader } from '@/components/admin/ImageUploader';
 
 const COLOR_OPTIONS = [
   { name: 'pink', hex: '#FFD6E8' },
@@ -717,7 +718,7 @@ export default function RoutinesBank() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent className="sm:max-w-3xl max-h-[85vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{editingRoutine ? 'Edit Routine' : 'New Routine'}</DialogTitle>
             <DialogDescription>
@@ -725,7 +726,7 @@ export default function RoutinesBank() {
             </DialogDescription>
           </DialogHeader>
           
-          <Tabs value={dialogTab} onValueChange={(v) => setDialogTab(v as 'basic' | 'sections')} className="flex-1 flex flex-col overflow-hidden">
+          <Tabs value={dialogTab} onValueChange={(v) => setDialogTab(v as 'basic' | 'sections')} className="flex-1 flex flex-col min-h-0">
             <TabsList className="w-fit">
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
               <TabsTrigger value="sections">
@@ -736,9 +737,8 @@ export default function RoutinesBank() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="basic" className="flex-1 overflow-auto">
-              <ScrollArea className="h-full pr-4">
-                <div className="space-y-4 py-2">
+            <TabsContent value="basic" className="flex-1 min-h-0 overflow-auto mt-0" style={{ maxHeight: 'calc(85vh - 240px)' }}>
+              <div className="space-y-4 py-2 pr-4">
                   {/* Title */}
                   <div className="space-y-2">
                     <Label htmlFor="title">Title *</Label>
@@ -814,16 +814,13 @@ export default function RoutinesBank() {
                     </div>
                   </div>
 
-                  {/* Cover Image URL */}
-                  <div className="space-y-2">
-                    <Label htmlFor="cover">Cover Image URL</Label>
-                    <Input
-                      id="cover"
-                      value={formData.cover_image_url}
-                      onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
-                      placeholder="https://..."
-                    />
-                  </div>
+                  {/* Cover Image */}
+                  <ImageUploader
+                    label="Cover Image"
+                    value={formData.cover_image_url}
+                    onChange={(url) => setFormData({ ...formData, cover_image_url: url })}
+                    folder="routine-covers"
+                  />
 
                   {/* Description */}
                   <div className="space-y-2">
@@ -853,14 +850,12 @@ export default function RoutinesBank() {
                     </span>
                   </div>
                 </div>
-              </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="sections" className="flex-1 overflow-hidden flex flex-col">
-              <ScrollArea className="flex-1 pr-4">
-                <div className="space-y-4 py-2">
-                  {/* Sections */}
-                  {localSections.map((section, sIdx) => {
+            <TabsContent value="sections" className="flex-1 min-h-0 overflow-auto mt-0" style={{ maxHeight: 'calc(85vh - 240px)' }}>
+              <div className="space-y-4 py-2 pr-4">
+                {/* Sections */}
+                {localSections.map((section, sIdx) => {
                     const sectionTasks = getTasksForSection(section.id);
                     const sectionDuration = getSectionDuration(section.id);
                     return (
@@ -1123,9 +1118,8 @@ export default function RoutinesBank() {
                         )}
                       </div>
                     </div>
-                  )}
-                </div>
-              </ScrollArea>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
 
@@ -1171,27 +1165,12 @@ export default function RoutinesBank() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="section-image">Image URL (optional)</Label>
-                <Input
-                  id="section-image"
-                  value={editingSection.image_url}
-                  onChange={(e) => setEditingSection({ ...editingSection, image_url: e.target.value })}
-                  placeholder="https://..."
-                />
-                {editingSection.image_url && (
-                  <div className="mt-2 rounded-lg overflow-hidden border">
-                    <img 
-                      src={editingSection.image_url} 
-                      alt="Section preview" 
-                      className="w-full h-32 object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
+              <ImageUploader
+                label="Section Image (optional)"
+                value={editingSection.image_url}
+                onChange={(url) => setEditingSection({ ...editingSection, image_url: url })}
+                folder="routine-sections"
+              />
             </div>
           )}
 
