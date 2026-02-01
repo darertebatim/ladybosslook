@@ -89,6 +89,10 @@ export function PromoBanner() {
 
   const handleTap = () => {
     if (!activeBanner) return;
+    
+    // Also dismiss the banner when tapped (not just when X is clicked)
+    setDismissal(activeBanner.id);
+    setDismissedIds(prev => new Set([...prev, activeBanner.id]));
 
     switch (activeBanner.destination_type) {
       case 'routine':
