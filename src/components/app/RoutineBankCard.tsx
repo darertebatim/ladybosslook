@@ -1,12 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { RoutineBankItem } from '@/hooks/useRoutinesBank';
 
 interface RoutineBankCardProps {
-  routine: RoutineBankItem & { totalDuration?: number };
+  routine: RoutineBankItem;
   onClick?: () => void;
   variant?: 'default' | 'compact';
 }
@@ -54,7 +53,6 @@ export function RoutineBankCard({
   const gradient = colorGradients[color] || colorGradients.purple;
   const bgColor = colorBackgrounds[color] || colorBackgrounds.purple;
   const routineEmoji = routine.emoji && isEmoji(routine.emoji) ? routine.emoji : '✨';
-  const duration = routine.totalDuration || 0;
 
   const handleClick = () => {
     haptic.light();
@@ -81,10 +79,6 @@ export function RoutineBankCard({
           {routine.subtitle && (
             <p className="text-xs text-muted-foreground truncate">{routine.subtitle}</p>
           )}
-        </div>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Clock className="w-3.5 h-3.5" />
-          <span>{duration}m</span>
         </div>
       </button>
     );
@@ -131,17 +125,10 @@ export function RoutineBankCard({
       </div>
       
       {/* Content Section */}
-      <div className="p-3 space-y-2">
+      <div className="p-3">
         {routine.subtitle && (
           <p className="text-xs text-muted-foreground line-clamp-2">{routine.subtitle}</p>
         )}
-        
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            <span>{duration} min</span>
-          </div>
-        </div>
       </div>
     </Card>
   );
