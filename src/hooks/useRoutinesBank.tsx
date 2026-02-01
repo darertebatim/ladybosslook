@@ -270,6 +270,29 @@ const ROUTINE_COLOR_CYCLE = [
   'lime',
 ] as const;
 
+// Fetch user's added bank routines (for filtering)
+export function useUserAddedBankRoutines() {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['user-routines-bank', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('user_routines_bank')
+        .select('routine_id')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (error) throw error;
+      return data.map(d => d.routine_id);
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
 // Add routine from bank to user's planner
 export function useAddRoutineFromBank() {
   const queryClient = useQueryClient();
@@ -385,11 +408,29 @@ export function useAddRoutineFromBank() {
         if (insertError) throw insertError;
       }
 
+      // Track that user added this routine from bank
+      const { error: trackError } = await supabase
+        .from('user_routines_bank')
+        .upsert({
+          user_id: user.id,
+          routine_id: routineId,
+          is_active: true,
+        }, {
+          onConflict: 'user_id,routine_id',
+        });
+
+      if (trackError) {
+        console.error('Error tracking routine addition:', trackError);
+        // Don't throw - the tasks were already added successfully
+      }
+
       return { success: true, taskCount: tasks.length };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['user-routines-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
     },
   });
 }
