@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { RoutinePlan } from '@/hooks/useRoutinePlans';
@@ -76,10 +76,6 @@ export function RoutinePlanCard({
             <p className="text-xs text-muted-foreground truncate">{plan.subtitle}</p>
           )}
         </div>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Clock className="w-3.5 h-3.5" />
-          <span>{plan.estimated_minutes}m</span>
-        </div>
       </button>
     );
   }
@@ -135,13 +131,6 @@ export function RoutinePlanCard({
         {plan.subtitle && (
           <p className="text-xs text-muted-foreground line-clamp-2">{plan.subtitle}</p>
         )}
-        
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            <span>{plan.estimated_minutes} min</span>
-          </div>
-        </div>
         
         {plan.average_rating && plan.average_rating > 0 && (
           <div className="flex items-center gap-1 text-xs">
