@@ -78,7 +78,6 @@ export function createWaterRoutineTask(): RoutinePlanTask {
     title: 'Drink Water 💧',
     icon: '💧',
     color: 'sky', // Match the water theme
-    duration_minutes: 0,
     task_order: 0,
     is_active: true,
     created_at: new Date().toISOString(),

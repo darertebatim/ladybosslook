@@ -42,7 +42,6 @@ interface TaskBankItem {
   emoji: string;
   color: string;
   category: string;
-  duration_minutes: number | null;
   repeat_pattern: string;
   repeat_interval: number | null;
   repeat_days: number[] | null;
@@ -63,7 +62,6 @@ interface TaskBankItem {
 // Admin settings for task bank items
 interface AdminSettings {
   description: string;
-  duration_minutes: number;
   is_popular: boolean;
   is_active: boolean;
 }
@@ -77,7 +75,6 @@ export default function TasksBank() {
   // Admin settings state (separate from AppTaskCreate form)
   const [adminSettings, setAdminSettings] = useState<AdminSettings>({
     description: '',
-    duration_minutes: 1,
     is_popular: false,
     is_active: true,
   });
@@ -154,7 +151,6 @@ export default function TasksBank() {
         .from('admin_task_bank')
         .update({
           description: payload.settings.description || null,
-          duration_minutes: payload.settings.duration_minutes,
           is_popular: payload.settings.is_popular,
           is_active: payload.settings.is_active,
         })
@@ -205,7 +201,6 @@ export default function TasksBank() {
         tag: data.formData.tag,
         // Admin settings
         description: data.adminSettings.description || null,
-        duration_minutes: data.adminSettings.duration_minutes,
         is_active: data.adminSettings.is_active,
         is_popular: data.adminSettings.is_popular,
       };
@@ -262,7 +257,6 @@ export default function TasksBank() {
         tag: data.formData.tag,
         // Admin settings
         description: data.adminSettings.description || null,
-        duration_minutes: data.adminSettings.duration_minutes,
         is_active: data.adminSettings.is_active,
         is_popular: data.adminSettings.is_popular,
       };
@@ -340,7 +334,6 @@ export default function TasksBank() {
     });
     setAdminSettings({
       description: '',
-      duration_minutes: 1,
       is_popular: false,
       is_active: true,
     });
@@ -391,7 +384,6 @@ export default function TasksBank() {
     // Set admin settings from existing task
     setAdminSettings({
       description: task.description || '',
-      duration_minutes: task.duration_minutes || 1,
       is_popular: task.is_popular,
       is_active: task.is_active,
     });
@@ -404,7 +396,6 @@ export default function TasksBank() {
   const openAdminSettingsForTask = (task: TaskBankItem) => {
     setAdminSettings({
       description: task.description || '',
-      duration_minutes: task.duration_minutes || 1,
       is_popular: task.is_popular,
       is_active: task.is_active,
     });
@@ -498,7 +489,6 @@ export default function TasksBank() {
         task_id: task.id,
         title: task.title,
         emoji: task.emoji,
-        duration_minutes: task.duration_minutes || 1,
         section_title: null,
         task_order: idx,
       }));
@@ -656,7 +646,6 @@ export default function TasksBank() {
                       <span className="flex items-center gap-1"><TaskIcon iconName={catInfo.icon} size={12} /> {catInfo.label}</span>
                       {task.goal_enabled && <span>• Goal</span>}
                       {task.pro_link_type && <span>• Pro</span>}
-                      {task.duration_minutes && <span>• {task.duration_minutes}m</span>}
                     </div>
                   </div>
                   {/* Quick toggle: Popular */}
@@ -757,18 +746,7 @@ export default function TasksBank() {
             </div>
             
             {/* Duration */}
-            <div className="space-y-2">
-              <Label htmlFor="duration">Duration (minutes)</Label>
-              <Input
-                id="duration"
-                type="number"
-                min={1}
-                max={480}
-                value={adminSettings.duration_minutes}
-                onChange={(e) => setAdminSettings(prev => ({ ...prev, duration_minutes: parseInt(e.target.value) || 1 }))}
-                className="w-24"
-              />
-            </div>
+            
             
             {/* Popular Toggle */}
             <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -886,12 +864,11 @@ export default function TasksBank() {
                     <span className="text-muted-foreground w-4">{idx + 1}.</span>
                     <TaskIcon iconName={task.emoji} size={14} />
                     <span className="truncate flex-1">{task.title}</span>
-                    <span className="text-xs text-muted-foreground">{task.duration_minutes || 1}m</span>
                   </div>
                 ))}
               </div>
               <p className="text-xs text-muted-foreground">
-                Total: {selectedTasks.reduce((sum, t) => sum + (t.duration_minutes || 1), 0)} minutes
+                {selectedTasks.length} tasks selected
               </p>
             </div>
           </div>
