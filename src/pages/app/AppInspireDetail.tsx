@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, Clock, Loader2 } from 'lucide-react';
+import { ArrowLeft, Heart, Share2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask } from '@/hooks/useRoutinesBank';
@@ -33,7 +33,6 @@ function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask {
     id: task.id,
     plan_id: task.routine_id,
     title: task.title,
-    duration_minutes: task.duration_minutes || 1,
     icon: task.emoji || '✨',
     color: task.color || undefined,
     task_order: task.task_order || 0,
@@ -191,10 +190,6 @@ export default function AppInspireDetail() {
             )}
             
             <div className="flex items-center gap-3 mt-3">
-              <div className="flex items-center gap-1 bg-muted text-muted-foreground text-sm font-medium px-2.5 py-1 rounded-full">
-                <Clock className="w-4 h-4" />
-                <span>{routine.totalDuration} min</span>
-              </div>
               {routine.tasks && routine.tasks.length > 0 && (
                 <div className="text-sm text-muted-foreground">
                   {routine.tasks.length} tasks
@@ -246,9 +241,6 @@ export default function AppInspireDetail() {
                             <div className="flex-1">
                               <span className="text-foreground">{task.title}</span>
                             </div>
-                            <span className="text-xs text-muted-foreground">
-                              {task.duration_minutes || 1} min
-                            </span>
                           </div>
                         ))}
                       </div>
@@ -275,9 +267,6 @@ export default function AppInspireDetail() {
                     <div className="flex-1">
                       <span className="text-foreground">{task.title}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {task.duration_minutes || 1} min
-                    </span>
                   </div>
                 ))}
               </div>

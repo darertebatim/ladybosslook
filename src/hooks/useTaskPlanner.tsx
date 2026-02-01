@@ -91,7 +91,6 @@ export interface TaskTemplate {
   sort_order: number;
   is_active: boolean;
   is_popular: boolean;
-  duration_minutes: number | null;
   pro_link_type: string | null;
   pro_link_value: string | null;
   goal_enabled: boolean;

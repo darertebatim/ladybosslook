@@ -88,7 +88,6 @@ export default function AppInspire() {
     id: selectedTemplate.id,
     plan_id: `synthetic-task-${selectedTemplate.id}`,
     title: selectedTemplate.title,
-    duration_minutes: selectedTemplate.duration_minutes || 1,
     icon: selectedTemplate.emoji || '✨',
     color: selectedTemplate.color as TaskColor,
     task_order: 0,

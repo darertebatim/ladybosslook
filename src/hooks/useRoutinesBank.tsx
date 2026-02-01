@@ -36,7 +36,6 @@ export interface RoutineBankTask {
   task_id: string | null;
   title: string;
   emoji: string | null;
-  duration_minutes: number | null;
   section_id: string | null;
   section_title: string | null;
   task_order: number | null;
@@ -51,7 +50,6 @@ export interface RoutineBankTask {
 export interface RoutineBankWithDetails extends RoutineBankItem {
   sections: RoutineBankSection[];
   tasks: RoutineBankTask[];
-  totalDuration: number;
 }
 
 // Unique categories from routines_bank
@@ -136,23 +134,7 @@ export function useRoutinesBank(categorySlug?: string) {
       const { data, error } = await query;
       if (error) throw error;
 
-      // Get task counts and durations for each routine
-      const routineIds = data.map(r => r.id);
-      const { data: tasksData } = await supabase
-        .from('routines_bank_tasks')
-        .select('routine_id, duration_minutes')
-        .in('routine_id', routineIds);
-
-      // Calculate total duration per routine
-      const durationByRoutine: Record<string, number> = {};
-      tasksData?.forEach(t => {
-        durationByRoutine[t.routine_id] = (durationByRoutine[t.routine_id] || 0) + (t.duration_minutes || 0);
-      });
-
-      return data.map(routine => ({
-        ...routine,
-        totalDuration: durationByRoutine[routine.id] || 0,
-      })) as (RoutineBankItem & { totalDuration: number })[];
+      return data as RoutineBankItem[];
     },
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
@@ -174,22 +156,7 @@ export function usePopularRoutinesBank() {
 
       if (error) throw error;
 
-      // Get durations
-      const routineIds = data.map(r => r.id);
-      const { data: tasksData } = await supabase
-        .from('routines_bank_tasks')
-        .select('routine_id, duration_minutes')
-        .in('routine_id', routineIds);
-
-      const durationByRoutine: Record<string, number> = {};
-      tasksData?.forEach(t => {
-        durationByRoutine[t.routine_id] = (durationByRoutine[t.routine_id] || 0) + (t.duration_minutes || 0);
-      });
-
-      return data.map(routine => ({
-        ...routine,
-        totalDuration: durationByRoutine[routine.id] || 0,
-      })) as (RoutineBankItem & { totalDuration: number })[];
+      return data as RoutineBankItem[];
     },
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
@@ -282,13 +249,10 @@ export function useRoutineBankDetail(routineId: string | undefined) {
         color: task.task_id ? taskDetails[task.task_id]?.color : null,
       }));
 
-      const totalDuration = enrichedTasks.reduce((sum, t) => sum + (t.duration_minutes || 0), 0);
-
       return {
         ...routine,
         sections: sections || [],
         tasks: enrichedTasks || [],
-        totalDuration,
       } as RoutineBankWithDetails;
     },
     enabled: !!routineId,

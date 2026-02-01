@@ -17,7 +17,6 @@ const SYNTHETIC_JOURNAL_TASK: RoutinePlanTask = {
   id: 'synthetic-journal-task',
   plan_id: 'synthetic-journal',
   title: 'Daily Journaling',
-  duration_minutes: 5,
   icon: '📓',
   color: 'purple',
   task_order: 0,

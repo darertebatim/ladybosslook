@@ -17,7 +17,6 @@ const FALLBACK_BREATHING_TASKS: RoutinePlanTask[] = [
     plan_id: 'synthetic-breathe',
     title: 'Morning Breathing Exercise',
     icon: '🌬️',
-    duration_minutes: 5,
     task_order: 0,
     is_active: true,
     created_at: new Date().toISOString(),

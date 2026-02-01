@@ -68,7 +68,6 @@ interface RoutineBankTask {
   task_id: string | null;
   title: string;
   emoji: string;
-  duration_minutes: number;
   section_id: string | null;
   section_title: string | null;
   task_order: number;
@@ -78,7 +77,6 @@ interface TaskBankItem {
   id: string;
   title: string;
   emoji: string;
-  duration_minutes: number | null;
   category: string;
   is_active: boolean;
 }
@@ -99,7 +97,6 @@ interface LocalTask {
   task_id: string | null;
   title: string;
   emoji: string;
-  duration_minutes: number;
   section_id: string | null;
   task_order: number;
 }
@@ -165,16 +162,15 @@ export default function RoutinesBank() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('routines_bank_tasks')
-        .select('routine_id, duration_minutes');
+        .select('routine_id');
       if (error) throw error;
       
-      const counts: Record<string, { count: number; duration: number }> = {};
+      const counts: Record<string, { count: number }> = {};
       data.forEach((task) => {
         if (!counts[task.routine_id]) {
-          counts[task.routine_id] = { count: 0, duration: 0 };
+          counts[task.routine_id] = { count: 0 };
         }
         counts[task.routine_id].count++;
-        counts[task.routine_id].duration += task.duration_minutes || 0;
       });
       return counts;
     },
@@ -186,7 +182,7 @@ export default function RoutinesBank() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('admin_task_bank')
-        .select('id, title, emoji, duration_minutes, category, is_active')
+        .select('id, title, emoji, category, is_active')
         .eq('is_active', true)
         .order('title', { ascending: true });
       if (error) throw error;
@@ -244,7 +240,6 @@ export default function RoutinesBank() {
           task_id: t.task_id,
           title: t.title,
           emoji: t.emoji,
-          duration_minutes: t.duration_minutes,
           section_id: t.section_id ? sectionIdMap[t.section_id] || null : null,
           task_order: idx,
         }));
@@ -313,7 +308,6 @@ export default function RoutinesBank() {
           task_id: t.task_id,
           title: t.title,
           emoji: t.emoji,
-          duration_minutes: t.duration_minutes,
           section_id: t.section_id ? sectionIdMap[t.section_id] || null : null,
           task_order: idx,
         }));
@@ -387,7 +381,6 @@ export default function RoutinesBank() {
       task_id: t.task_id,
       title: t.title,
       emoji: t.emoji,
-      duration_minutes: t.duration_minutes,
       section_id: t.section_id,
       task_order: t.task_order,
     }));
@@ -519,7 +512,6 @@ export default function RoutinesBank() {
       task_id: task.id,
       title: task.title,
       emoji: task.emoji,
-      duration_minutes: task.duration_minutes || 1,
       section_id: sectionId,
       task_order: localTasks.filter(t => t.section_id === sectionId).length,
     };
@@ -568,7 +560,7 @@ export default function RoutinesBank() {
     return found ? { value: found.slug, label: found.name, icon: found.icon || '📋' } : { value: cat, label: cat, icon: '📋' };
   };
 
-  const totalDuration = localTasks.reduce((sum, t) => sum + (t.duration_minutes || 0), 0);
+  const totalTaskCount = localTasks.length;
 
   const filteredRoutines = selectedCategory === 'all' 
     ? routines 
@@ -587,10 +579,8 @@ export default function RoutinesBank() {
 
   const uncategorizedTasks = getTasksForSection(null);
 
-  const getSectionDuration = (sectionId: string) => {
-    return localTasks
-      .filter(t => t.section_id === sectionId)
-      .reduce((sum, t) => sum + (t.duration_minutes || 0), 0);
+  const getSectionTaskCount = (sectionId: string) => {
+    return localTasks.filter(t => t.section_id === sectionId).length;
   };
 
   return (
@@ -659,8 +649,6 @@ export default function RoutinesBank() {
                       <span className={cn("font-medium truncate", !routine.is_active && "line-through")}>{routine.title}</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>{stats.duration}m</span>
-                      <span>•</span>
                       <span className="flex items-center gap-1"><TaskIcon iconName={catInfo.icon} size={12} /> {catInfo.label}</span>
                       <span>•</span>
                       <span>{stats.count} task{stats.count !== 1 ? 's' : ''}</span>
@@ -861,10 +849,6 @@ export default function RoutinesBank() {
                       <Layers className="h-4 w-4" />
                       {localTasks.length} task{localTasks.length !== 1 ? 's' : ''}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {totalDuration}m total
-                    </span>
                   </div>
                 </div>
             </TabsContent>
@@ -874,7 +858,7 @@ export default function RoutinesBank() {
                 {/* Sections */}
                 {localSections.map((section, sIdx) => {
                     const sectionTasks = getTasksForSection(section.id);
-                    const sectionDuration = getSectionDuration(section.id);
+                    const sectionTaskCount = getSectionTaskCount(section.id);
                     return (
                       <div key={section.id} className="border rounded-lg overflow-hidden">
                         {/* Section Header */}
@@ -904,7 +888,7 @@ export default function RoutinesBank() {
                             )}
                           </div>
                           <span className="text-xs text-muted-foreground">
-                            {sectionTasks.length} task{sectionTasks.length !== 1 ? 's' : ''} • {sectionDuration}m
+                            {sectionTasks.length} task{sectionTasks.length !== 1 ? 's' : ''}
                           </span>
                           {section.image_url && (
                             <Image className="h-4 w-4 text-muted-foreground" />
@@ -952,7 +936,6 @@ export default function RoutinesBank() {
                                 </div>
                                 <TaskIcon iconName={task.emoji} size={16} />
                                 <span className="flex-1 text-sm truncate">{task.title}</span>
-                                <span className="text-xs text-muted-foreground">{task.duration_minutes}m</span>
                                 {/* Move to section dropdown */}
                                 <Select
                                   value=""
@@ -1008,11 +991,10 @@ export default function RoutinesBank() {
                                       key={task.id}
                                       type="button"
                                       onClick={() => addTaskToSection(task, section.id)}
-                                      className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-accent text-left text-xs"
+                                    className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-accent text-left text-xs"
                                     >
                                       <TaskIcon iconName={task.emoji} size={14} />
                                       <span className="flex-1 truncate">{task.title}</span>
-                                      <span className="text-muted-foreground">{task.duration_minutes || 1}m</span>
                                     </button>
                                   ))}
                                 </div>
@@ -1092,7 +1074,6 @@ export default function RoutinesBank() {
                             </div>
                             <TaskIcon iconName={task.emoji} size={16} />
                             <span className="flex-1 text-sm truncate">{task.title}</span>
-                            <span className="text-xs text-muted-foreground">{task.duration_minutes}m</span>
                             {/* Move to section dropdown */}
                             {localSections.length > 0 && (
                               <Select
@@ -1149,7 +1130,6 @@ export default function RoutinesBank() {
                                   >
                                     <TaskIcon iconName={task.emoji} size={14} />
                                     <span className="flex-1 truncate">{task.title}</span>
-                                    <span className="text-muted-foreground">{task.duration_minutes || 1}m</span>
                                   </button>
                                 ))}
                               </div>

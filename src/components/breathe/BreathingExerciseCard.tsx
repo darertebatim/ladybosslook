@@ -29,7 +29,6 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
     plan_id: 'synthetic-breathe',
     title: exercise.name,
     icon: exercise.emoji || '🌬️',
-    duration_minutes: 5,
     task_order: 0,
     is_active: true,
     created_at: new Date().toISOString(),
