@@ -37,6 +37,7 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     enrollmentsRes,
     routineRes,
     periodSettingsRes,
+    addedBankRoutinesRes,
   ] = await Promise.all([
     supabase
       .from('profiles')
@@ -83,12 +84,12 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
       .eq('status', 'active')
       .not('program_rounds', 'is', null)
       .order('enrolled_at', { ascending: false }),
-    // Random Pro Routine
+    // Random Pro Routine - get from routines_bank
     supabase
-      .from('routine_plans')
+      .from('routines_bank')
       .select('*')
       .eq('is_active', true)
-      .eq('is_pro_routine', true)
+      .eq('is_popular', true)
       .limit(10),
     // Period settings
     supabase
@@ -96,6 +97,12 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
       .select('*')
       .eq('user_id', userId)
       .single(),
+    // User's added bank routines (to filter out already-added ones)
+    supabase
+      .from('user_routines_bank')
+      .select('routine_id')
+      .eq('user_id', userId)
+      .eq('is_active', true),
   ]);
 
   // Calculate listening stats
@@ -204,10 +211,12 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     return new Date(aDate!).getTime() - new Date(bDate!).getTime();
   });
 
-  // Pick a random pro routine
-  const routines = routineRes.data || [];
-  const suggestedRoutine = routines.length > 0 
-    ? routines[Math.floor(Math.random() * routines.length)] 
+  // Pick a random routine that user hasn't already added
+  const allRoutines = routineRes.data || [];
+  const addedRoutineIds = new Set((addedBankRoutinesRes.data || []).map(r => r.routine_id));
+  const availableRoutines = allRoutines.filter(r => !addedRoutineIds.has(r.id));
+  const suggestedRoutine = availableRoutines.length > 0 
+    ? availableRoutines[Math.floor(Math.random() * availableRoutines.length)] 
     : null;
 
   return {

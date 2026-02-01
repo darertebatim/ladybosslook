@@ -2742,6 +2742,38 @@ export type Database = {
           },
         ]
       }
+      user_routines_bank: {
+        Row: {
+          added_at: string
+          id: string
+          is_active: boolean
+          routine_id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          id?: string
+          is_active?: boolean
+          routine_id: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          id?: string
+          is_active?: boolean
+          routine_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_routines_bank_routine_id_fkey"
+            columns: ["routine_id"]
+            isOneToOne: false
+            referencedRelation: "routines_bank"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_streaks: {
         Row: {
           current_streak: number

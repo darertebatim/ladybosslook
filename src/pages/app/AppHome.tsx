@@ -23,7 +23,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
-import { usePopularRoutinesBank } from '@/hooks/useRoutinesBank';
+import { usePopularRoutinesBank, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
 import { RoutineBankCard } from '@/components/app/RoutineBankCard';
 import { haptic } from '@/lib/haptics';
 import { GoalInputSheet } from '@/components/app/GoalInputSheet';
@@ -115,11 +115,18 @@ const AppHome = () => {
     isLoading: homeLoading
   } = useNewHomeData();
 
-  // Popular routines for suggestions
+  // Popular routines for suggestions (filter out already-added ones)
   const {
     data: popularRoutines = []
   } = usePopularRoutinesBank();
-  const suggestedRoutines = useMemo(() => popularRoutines.slice(0, 4), [popularRoutines]);
+  const {
+    data: addedRoutineIds = []
+  } = useUserAddedBankRoutines();
+  const addedRoutineIdsSet = useMemo(() => new Set(addedRoutineIds), [addedRoutineIds]);
+  const suggestedRoutines = useMemo(() => 
+    popularRoutines.filter(r => !addedRoutineIdsSet.has(r.id)).slice(0, 4), 
+    [popularRoutines, addedRoutineIdsSet]
+  );
 
   // Generate week days
   const weekDays = useMemo(() => {
