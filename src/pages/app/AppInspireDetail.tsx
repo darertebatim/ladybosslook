@@ -240,6 +240,12 @@ export default function AppInspireDetail() {
                       <div className="space-y-3">
                         {sectionTasks.map((task) => {
                           const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
+                          const repeatLabel = task.repeat_pattern && task.repeat_pattern !== 'none' 
+                            ? task.repeat_pattern === 'daily' ? 'Daily' 
+                              : task.repeat_pattern === 'weekly' ? 'Weekly' 
+                              : task.repeat_pattern === 'monthly' ? 'Monthly'
+                              : task.repeat_pattern === 'weekend' ? 'Weekends' : ''
+                            : 'Once';
                           return (
                             <div
                               key={task.id}
@@ -250,7 +256,13 @@ export default function AppInspireDetail() {
                                 <span className="text-2xl shrink-0">
                                   {task.emoji && isEmoji(task.emoji) ? task.emoji : '📝'}
                                 </span>
-                                <p className="font-medium text-black truncate flex-1">{task.title}</p>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-black truncate">{task.title}</p>
+                                  <p className="text-xs text-black/70 truncate">
+                                    {task.category || 'General'}
+                                    <span className="ml-1">• {repeatLabel}</span>
+                                  </p>
+                                </div>
                               </div>
                               {task.description && (
                                 <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
@@ -274,6 +286,12 @@ export default function AppInspireDetail() {
               <div className="space-y-3">
                 {routine.tasks.map((task) => {
                   const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
+                  const repeatLabel = task.repeat_pattern && task.repeat_pattern !== 'none' 
+                    ? task.repeat_pattern === 'daily' ? 'Daily' 
+                      : task.repeat_pattern === 'weekly' ? 'Weekly' 
+                      : task.repeat_pattern === 'monthly' ? 'Monthly'
+                      : task.repeat_pattern === 'weekend' ? 'Weekends' : ''
+                    : 'Once';
                   return (
                     <div
                       key={task.id}
@@ -284,7 +302,13 @@ export default function AppInspireDetail() {
                         <span className="text-2xl shrink-0">
                           {task.emoji && isEmoji(task.emoji) ? task.emoji : '📝'}
                         </span>
-                        <p className="font-medium text-black truncate flex-1">{task.title}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-black truncate">{task.title}</p>
+                          <p className="text-xs text-black/70 truncate">
+                            {task.category || 'General'}
+                            <span className="ml-1">• {repeatLabel}</span>
+                          </p>
+                        </div>
                       </div>
                       {task.description && (
                         <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
