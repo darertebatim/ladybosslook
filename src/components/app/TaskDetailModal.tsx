@@ -144,15 +144,6 @@ export const TaskDetailModal = ({
           colorClass
         )}
       >
-        {/* Header - Close button only */}
-        <div className="absolute right-4 top-4 z-10">
-          <button 
-            onClick={onClose}
-            className="w-8 h-8 rounded-full border border-foreground/30 flex items-center justify-center hover:bg-white/30 transition-colors"
-          >
-            <X className="h-4 w-4" strokeWidth={1.5} />
-          </button>
-        </div>
 
         {/* Task header - Me+ style with emoji, time, title */}
         <div className="px-6 pt-6 pb-4">
