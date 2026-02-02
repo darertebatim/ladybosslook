@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { CONTEXT_OPTIONS, getValenceColor, getCategoryByValue, getCategoryColor, getEmotionLabel, NEUTRAL_EMOTIONS, type Valence } from '@/lib/emotionData';
+import { CONTEXT_OPTIONS, getEmotionLabel, type Valence } from '@/lib/emotionData';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 
 interface EmotionContextProps {
   valence: Valence;
   category: string;
-  emotion: string;
+  emotions: string[]; // Now accepts array
   onSave: (contexts: string[], notes: string) => void;
   onBack: () => void;
   isSaving: boolean;
@@ -18,7 +18,7 @@ interface EmotionContextProps {
 export const EmotionContext = ({ 
   valence, 
   category, 
-  emotion, 
+  emotions, 
   onSave, 
   onBack,
   isSaving 
@@ -26,12 +26,9 @@ export const EmotionContext = ({
   const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
 
-  const valenceColor = getValenceColor(valence);
-  const categoryData = getCategoryByValue(valence, category);
-  const categoryColor = getCategoryColor(valence, category);
-  
-  // Get emotion label using the helper
-  const emotionLabel = getEmotionLabel(valence, category, emotion);
+  // Get labels for all selected emotions
+  const emotionLabels = emotions.map(e => getEmotionLabel(valence, category, e));
+  const emotionDisplayText = emotionLabels.join(', ').toLowerCase();
 
   const toggleContext = (context: string) => {
     haptic.light();
@@ -53,7 +50,7 @@ export const EmotionContext = ({
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* Header */}
-      <header className="shrink-0 flex items-center px-4 py-3 border-b border-border/30">
+      <header className="shrink-0 flex items-center px-4 py-3">
         <Button 
           variant="ghost" 
           size="icon" 
@@ -62,47 +59,18 @@ export const EmotionContext = ({
         >
           <ChevronLeft className="w-5 h-5" />
         </Button>
-        <span className="text-sm text-muted-foreground">Add context</span>
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-5">
-        {/* Selected emotion display */}
-        <div className="flex items-center gap-2 mb-5 flex-wrap">
-          <div className={cn(
-            "px-3 py-1.5 rounded-full text-xs font-medium",
-            valenceColor.bg, valenceColor.text
-          )}>
-            {valence.charAt(0).toUpperCase() + valence.slice(1)}
-          </div>
-          <span className="text-muted-foreground text-sm">→</span>
-          <div className={cn(
-            "px-3 py-1.5 rounded-full text-xs font-medium",
-            categoryColor.bg, categoryColor.text
-          )}>
-            {categoryData?.label}
-          </div>
-          <span className="text-muted-foreground text-sm">→</span>
-          <div className={cn(
-            "px-3 py-1.5 rounded-full text-xs font-medium",
-            categoryColor.bgActive, categoryColor.textActive
-          )}>
-            {emotionLabel}
-          </div>
-        </div>
+      <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-2">
+        {/* Title with emotions highlighted */}
+        <h2 className="text-xl font-semibold text-foreground mb-6">
+          What made you feel{' '}
+          <span className="text-[#6A1B9A]">{emotionDisplayText}</span>?
+        </h2>
 
-        {/* Context prompt */}
-        <div className="mb-5">
-          <h2 className="text-lg font-semibold text-foreground mb-1">
-            What made you feel {emotionLabel.toLowerCase()}?
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            Select any that apply (optional)
-          </p>
-        </div>
-
-        {/* Context grid */}
-        <div className="grid grid-cols-3 gap-2 mb-6">
+        {/* Context grid - Finch style */}
+        <div className="flex flex-wrap gap-2 mb-6">
           {CONTEXT_OPTIONS.map((context) => {
             const isSelected = selectedContexts.includes(context.value);
             return (
@@ -110,11 +78,11 @@ export const EmotionContext = ({
                 key={context.value}
                 onClick={() => toggleContext(context.value)}
                 className={cn(
-                  "px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                  "px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200",
                   "active:scale-95",
                   isSelected
-                    ? "bg-[#4CAF50] text-white"
-                    : "bg-white text-slate-600 border border-slate-200"
+                    ? "bg-[#78909C] text-white"
+                    : "bg-[#ECEFF1] text-[#546E7A]"
                 )}
               >
                 {context.label}
@@ -123,22 +91,17 @@ export const EmotionContext = ({
           })}
         </div>
 
-        {/* Notes */}
-        <div className="mb-4">
-          <label className="text-sm font-medium text-foreground mb-2 block">
-            Add details or more reflection... (optional)
-          </label>
-          <Textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="What was happening? What were you thinking?"
-            className="min-h-[100px] resize-none rounded-xl bg-white border-slate-200"
-          />
-        </div>
+        {/* Notes textarea */}
+        <Textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Add details or more reflection..."
+          className="min-h-[140px] resize-none rounded-2xl bg-white border-slate-200 text-base"
+        />
       </div>
 
       {/* Save button */}
-      <div className="shrink-0 p-5 pb-safe border-t border-border/30 bg-[#F8F9FA]">
+      <div className="shrink-0 p-5 pb-safe">
         <Button 
           onClick={handleSave}
           disabled={isSaving}

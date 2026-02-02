@@ -12,7 +12,7 @@ type Step = 'intro' | 'select' | 'context' | 'complete';
 interface EmotionState {
   valence: Valence | null;
   category: string | null;
-  emotion: string | null;
+  emotions: string[]; // Now supports multiple emotions
 }
 
 const AppEmotion = () => {
@@ -23,24 +23,25 @@ const AppEmotion = () => {
   const [state, setState] = useState<EmotionState>({
     valence: null,
     category: null,
-    emotion: null,
+    emotions: [],
   });
 
   // Navigation handlers
   const handleStart = useCallback(() => setStep('select'), []);
   
-  const handleEmotionComplete = useCallback((valence: Valence, category: string, emotion: string) => {
-    setState({ valence, category, emotion });
+  const handleEmotionComplete = useCallback((valence: Valence, category: string, emotions: string[]) => {
+    setState({ valence, category, emotions });
     setStep('context');
   }, []);
 
   const handleSave = useCallback(async (contexts: string[], notes: string) => {
-    if (!state.valence || !state.category || !state.emotion) return;
+    if (!state.valence || !state.category || state.emotions.length === 0) return;
 
+    // Store multiple emotions as comma-separated string
     await createLog.mutateAsync({
       valence: state.valence,
       category: state.category,
-      emotion: state.emotion,
+      emotion: state.emotions.join(','),
       contexts,
       notes: notes || undefined,
     });
@@ -79,12 +80,12 @@ const AppEmotion = () => {
       );
     
     case 'context':
-      if (!state.valence || !state.category || !state.emotion) return null;
+      if (!state.valence || !state.category || state.emotions.length === 0) return null;
       return (
         <EmotionContext
           valence={state.valence}
           category={state.category}
-          emotion={state.emotion}
+          emotions={state.emotions}
           onSave={handleSave}
           onBack={handleBack}
           isSaving={createLog.isPending}
