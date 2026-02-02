@@ -700,7 +700,7 @@ const AppTaskCreate = ({
           }}
           placeholder="Add a description or notes..."
           className="w-full bg-white/60 dark:bg-slate-700/60 border-0 rounded-xl resize-none text-sm placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-foreground/20 min-h-0"
-          rows={1}
+          rows={2}
         />
       </div>
 
