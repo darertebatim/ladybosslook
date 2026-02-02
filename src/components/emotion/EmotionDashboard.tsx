@@ -146,9 +146,14 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl font-semibold text-white text-center mb-4">
-            How are you feeling?
+          <h2 className="text-2xl font-semibold text-white text-center mb-3">
+            Name your emotion
           </h2>
+
+          {/* Description */}
+          <p className="text-white/80 text-center text-base leading-relaxed max-w-xs mx-auto mb-6">
+            Sometimes, what we feel is not so obvious. Naming the emotion can help us gain better control and understanding of ourselves.
+          </p>
 
           {/* Today's check-ins */}
           {todayLogs.length > 0 && (

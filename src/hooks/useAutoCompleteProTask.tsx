@@ -173,10 +173,18 @@ export const useAutoCompleteProTask = () => {
     return autoComplete('breathe', exerciseId);
   }, [autoComplete]);
 
+  /**
+   * Auto-complete emotion pro tasks
+   */
+  const autoCompleteEmotion = useCallback(async (): Promise<number> => {
+    return autoComplete('emotion');
+  }, [autoComplete]);
+
   return {
     autoComplete,
     autoCompleteJournal,
     autoCompletePlaylist,
     autoCompleteBreathe,
+    autoCompleteEmotion,
   };
 };
