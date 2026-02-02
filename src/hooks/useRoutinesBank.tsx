@@ -427,7 +427,7 @@ export function useAddRoutineFromBank() {
             color: edited?.color || bankTask?.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
             repeat_pattern: edited?.repeatPattern || 'daily',
             scheduled_time: edited?.scheduledTime || null,
-            tag: edited?.tag ?? routine.title,
+            tag: edited?.tag ?? routine.category,
             linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : null,
             pro_link_type: proLinkType,
             pro_link_value: proLinkValue,

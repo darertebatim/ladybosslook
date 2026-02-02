@@ -167,6 +167,11 @@ export function RoutinePreviewSheet({
       linkedPlaylistId: proLinkType === 'playlist' ? proLinkValue : null,
       proLinkType: proLinkType as ProLinkType | null,
       proLinkValue: proLinkValue,
+      // Goal fields from task template
+      goalEnabled: task.goal_enabled ?? false,
+      goalType: (task.goal_type as 'count' | 'timer') ?? 'count',
+      goalTarget: task.goal_target ?? 1,
+      goalUnit: task.goal_unit ?? 'times',
     };
   };
 
