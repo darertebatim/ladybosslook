@@ -227,6 +227,13 @@ export const TaskCard = memo(function TaskCard({
             )}>
               {task.title}
             </p>
+            
+            {/* Description - single line truncated */}
+            {task.description && (
+              <p className="text-[13px] text-black/60 truncate">
+                {task.description}
+              </p>
+            )}
           </div>
 
           {/* Quick navigation button - prominent action button */}
@@ -337,6 +344,13 @@ export const TaskCard = memo(function TaskCard({
           )}>
             {task.title}
           </p>
+          
+          {/* Description - single line truncated */}
+          {task.description && (
+            <p className="text-[13px] text-black/60 truncate">
+              {task.description}
+            </p>
+          )}
         </div>
 
         {/* Timer goal: Play button, Count goal: + button, Regular: Checkbox */}
