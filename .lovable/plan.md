@@ -1,346 +1,273 @@
 
+# Simora Product Pivot: Complete Strategic Proposal
 
-# Period Tracker - Complete Implementation Plan (Updated)
-
-## Answers to Your Questions
-
-### 1. Can users add previous cycle history?
-**Yes!** The app will include an onboarding flow where users can:
-- Enter their last period start date
-- Input their average cycle length (or use default 28 days)
-- Optionally log previous period dates to improve prediction accuracy
-
-This gives the app historical data from day one for better predictions.
-
-### 2. Does it have its own calendar view?
-**Yes!** The Period tracker page includes:
-- A beautiful full-month calendar (reusing `MonthCalendar` component)
-- Period days marked with pink filled circles
-- Predicted period days shown with pink dashed/outlined circles
-- Ovulation window marked with a subtle indicator
-- Swipe between months to view history
-
-### 3. Is the design beautiful with effects?
-**Absolutely!** Following the app's established patterns:
-- **Pink/Rose gradient backgrounds** (like Water's sky gradient)
-- **Animated cycle visualization** (similar to Breathing circle)
-- **Floating decorative elements** (soft petal/flower shapes)
-- **Haptic feedback** on all interactions
-- **Confetti celebration** when logging a new cycle
-- **Smooth transitions** between screens
-
-### 4. What other internal functions do users need?
-Here's the complete feature set:
+## Document Purpose
+This document captures the complete philosophy, strategy, and implementation roadmap for transforming Simora from a productivity-focused habit tracker into a **"Strength Companion"** centered on building self-trust through rituals.
 
 ---
 
-## Complete Feature List
+## Part 1: Strategic Analysis
 
-### Core Logging
-| Feature | Description |
-|---------|-------------|
-| Period day toggle | One-tap to mark day as period/not period |
-| Flow intensity | Light / Medium / Heavy selector |
-| Symptom tracking | Chips: Cramps, Bloating, Headache, Fatigue, Mood swings, Cravings, Back pain |
-| Notes | Optional text notes for any day |
+### The Core Problem with Current Approach
+The existing app follows the standard habit-tracker model:
+- 249 tasks in `admin_task_bank` across 12 categories
+- Streak-based motivation (current streak counts, "days in a row")
+- Productivity-focused language ("Complete task", "Daily habits")
+- Guilt-inducing patterns (missed days, broken streaks)
 
-### Predictions & Insights
-| Feature | Description |
-|---------|-------------|
-| Next period prediction | Based on rolling average of last 3-6 cycles |
-| Ovulation window | Calculated as ~14 days before next predicted period |
-| Cycle phase display | Menstrual, Follicular, Ovulation, Luteal |
-| Cycle length stats | Average cycle length, average period length |
-| Cycle history | View past cycles in calendar or list format |
+### The Pivot Philosophy: "Return Without Shame"
+**Central Insight**: Women don't need another app that makes them feel bad about themselves. They need a companion that helps them rebuild trust with themselves after life inevitably gets in the way.
 
-### Onboarding & Settings
-| Feature | Description |
-|---------|-------------|
-| First-time setup | Enter last period date + average cycle length |
-| Import history | Log up to 3 past periods for better predictions |
-| Reminder settings | Notify X days before predicted period |
-| Privacy mode | Option to hide from Home screen entirely |
-
-### Home Integration
-| Feature | Description |
-|---------|-------------|
-| Status card | Shows current phase/prediction (like ProgramEventCard) |
-| Calendar markers | Optional pink dots on planner week strip |
+**Core Shift**: From "Did you do the thing?" to "You're here. That matters."
 
 ---
 
-## Visual Design Spec
+## Part 2: The New Framework
 
-### Color Palette
-```text
-Primary Pink:   #EC4899 (pink-500)
-Light Pink:     #FCE7F3 (pink-100)
-Rose Accent:    #F43F5E (rose-500)
-Soft Rose:      #FEE2E2 (rose-100)
-```
+### 2.1 Terminology Changes
 
-### Tool Page Layout
-Following `AppWater.tsx` pattern with pink/rose theme:
+| Old Term | New Term | Rationale |
+|----------|----------|-----------|
+| Tasks | Rituals | Rituals are sacred, intentional acts vs. checkboxes |
+| Habits | Practices | Practices evolve; habits imply obligation |
+| Streaks | Momentum | Momentum can pause and resume without "breaking" |
+| Complete | Honor | You "honor" a ritual, not "complete" it |
+| Missed | Paused | No judgment, just acknowledgment |
+
+### 2.2 Five Ritual Categories (Replacing 12 Generic Categories)
+
+1. **Pause Rituals** (Emotional Regulation)
+   - Breathing exercises
+   - Body scans
+   - "Name how I'm feeling"
+   
+2. **Micro Follow-Throughs** (Building Trust)
+   - Ultra-small commitments you can't fail
+   - "Get out of bed" → "Stand up for 10 seconds"
+   - Designed to prove "I do what I say I'll do"
+
+3. **Choice Awareness Rituals** (Agency)
+   - "Today I choose to..." declarations
+   - Conscious decision-making moments
+   - Boundary-setting practices
+
+4. **Gentle Completions** (Self-Kindness)
+   - Self-care without guilt
+   - Permission-giving rituals
+   - "I gave myself permission to rest"
+
+5. **Strength Reminders** (Identity)
+   - "I am the woman who..." affirmations
+   - Proof collection (journaling wins)
+   - Pattern recognition of personal strength
+
+### 2.3 "Return Without Shame" Logic
+
+When a user returns after 3+ days of inactivity:
 
 ```text
-+------------------------------------------+
-|   [X]           Today            [Settings] |  <- Header
-+------------------------------------------+
-|                                          |
-|        [Rose gradient background]        |
-|                                          |
-|              ♥  (heart icon)             |
-|                                          |
-|           "Day 14 of 28"                 |
-|           Ovulation Window               |  <- Dynamic phase display
-|                                          |
-|    [Monthly Calendar with markers]       |
-|     Period days = pink filled            |
-|     Predicted = pink outlined            |
-|                                          |
-+------------------------------------------+
-|   [Settings]  [Log Today]  [History]     |  <- Bottom actions
-+------------------------------------------+
+IF last_active_date < (today - 3 days):
+  1. Show "Welcome Back" screen (NOT streak-loss screen)
+  2. Message: "You're here. That's what matters."
+  3. Offer: "Start fresh today" (reset daily view)
+  4. NO mention of missed days or broken streaks
+  5. Optional: Gentle question "What brought you back?"
 ```
 
-### Day Logging Sheet (Bottom Sheet)
-```text
-+------------------------------------------+
-|             Log Period Day               |
-+------------------------------------------+
-|                                          |
-|   Flow:  [Light] [Medium] [Heavy]        |
-|                                          |
-|   Symptoms:                              |
-|   [Cramps] [Bloating] [Headache]         |
-|   [Fatigue] [Mood] [Cravings]            |
-|                                          |
-|   Notes:                                 |
-|   [_____________________________]        |
-|                                          |
-|           [Save]                         |
-+------------------------------------------+
-```
-
-### Home Status Card (ProgramEventCard style)
-```text
-+------------------------------------------+
-|  [♥ pink circle]   Period in 3 days      |
-|                    Day 25 · Luteal       |
-+------------------------------------------+
-```
-
-- **No checkbox** (not completable, just informative)
-- **Tappable** (opens /app/period)
-- **Gradient background**: `from-pink-100 to-rose-100`
+**Technical Implementation**:
+- Track `last_active_date` in user profile
+- Replace StreakCelebration with "Return Celebration"
+- Remove streak-loss notifications
+- Add `return_count` field (celebrate returns, not streaks)
 
 ---
 
-## Onboarding Flow (First-Time Setup)
+## Part 3: What This Means for the Codebase
 
-When user opens Period tracker for the first time:
+### 3.1 UI Language Surgery (Phase 1)
 
-```text
-Screen 1: Welcome
-+------------------------------------------+
-|                                          |
-|         🌸 Period Tracker                |
-|                                          |
-|    Track your cycle with ease.           |
-|    Get predictions and insights.         |
-|                                          |
-|           [Get Started]                  |
-+------------------------------------------+
+**Files requiring terminology updates**:
+- `AppInspire.tsx`: "Routines" → stays as "Rituals" section
+- `TaskTemplateCard.tsx`: Update labels
+- `StreakCelebration.tsx`: Complete redesign needed
+- Navigation labels throughout
 
-Screen 2: Last Period
-+------------------------------------------+
-|                                          |
-|    When did your last period start?      |
-|                                          |
-|         [Calendar Picker]                |
-|                                          |
-|    [Skip]              [Continue]        |
-+------------------------------------------+
+**Estimated scope**: ~15-20 files with text changes
 
-Screen 3: Cycle Length
-+------------------------------------------+
-|                                          |
-|    What's your average cycle length?     |
-|                                          |
-|           [28] days                      |
-|         (slider: 21-40 days)             |
-|                                          |
-|    Don't know? We'll learn from          |
-|    your data over time.                  |
-|                                          |
-|    [Skip]              [Finish]          |
-+------------------------------------------+
+### 3.2 Ritual Bank Curation (Phase 2)
+
+**Current state**: 249 active tasks across 12 categories
+**Target state**: 25-30 curated "Core Rituals" + archived rest
+
+**Recommendation**:
+- Mark ~220 tasks as `is_active: false` (archive, don't delete)
+- Elevate 25-30 high-impact rituals aligned with 5 new categories
+- Keep existing user data intact (no breaking changes)
+
+**Core Rituals to Elevate** (examples):
+- "Take 3 deep breaths" → Pause Ritual
+- "Name how I'm feeling" → Pause Ritual  
+- "Stand up for 10 seconds" → Micro Follow-Through
+- "Thank myself for one thing" → Strength Reminder
+- "Write 3 things I'm grateful for" → Strength Reminder
+
+### 3.3 Database Schema Implications
+
+**No breaking changes required**. Additions only:
+
+```sql
+-- Add to profiles table
+ALTER TABLE profiles ADD COLUMN last_active_date date;
+ALTER TABLE profiles ADD COLUMN return_count integer DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN strength_archetype text;
+
+-- Future: Strength Vault
+CREATE TABLE strength_vault (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES profiles(id),
+  title text NOT NULL,
+  description text,
+  evidence_type text, -- 'ritual', 'journal', 'manual'
+  created_at timestamptz DEFAULT now()
+);
 ```
 
----
+### 3.4 Features to Remove/Hide
 
-## Database Schema
+| Feature | Action | Rationale |
+|---------|--------|-----------|
+| Streak counter | Remove from UI | Shame-based motivation |
+| "Missed days" messaging | Remove | Judgment language |
+| Daily completion % | Replace with "Rituals honored" | Softer framing |
+| Streak celebration popup | Replace with "Return celebration" | Different trigger |
 
-### Table: `period_logs`
-```text
-| Column           | Type        | Notes                        |
-|------------------|-------------|------------------------------|
-| id               | uuid (PK)   | gen_random_uuid()            |
-| user_id          | uuid        | References auth.users        |
-| date             | date        | Unique per user              |
-| is_period_day    | boolean     | true = period day            |
-| flow_intensity   | text        | 'light' | 'medium' | 'heavy' |
-| symptoms         | text[]      | Array of symptom strings     |
-| notes            | text        | Optional                     |
-| created_at       | timestamptz | Default: now()               |
-| updated_at       | timestamptz | Default: now()               |
-```
+### 3.5 Features to Preserve
 
-**Constraints:**
-- UNIQUE (user_id, date)
-- RLS: Users can only access their own data
-- No admin access (maximum privacy)
-
-### Table: `period_settings`
-```text
-| Column             | Type        | Notes                        |
-|--------------------|-------------|------------------------------|
-| id                 | uuid (PK)   | gen_random_uuid()            |
-| user_id            | uuid        | References auth.users (unique)|
-| average_cycle      | integer     | Rolling average, default 28  |
-| average_period     | integer     | Average period length, default 5 |
-| last_period_start  | date        | Most recent period start     |
-| reminder_enabled   | boolean     | Notify before period         |
-| reminder_days      | integer     | Days before to remind (1-7)  |
-| show_on_home       | boolean     | Show status card on home     |
-| onboarding_done    | boolean     | Has completed setup          |
-| created_at         | timestamptz | Default: now()               |
-| updated_at         | timestamptz | Default: now()               |
-```
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Audio playlists | Keep as-is | Core value |
+| Journal | Keep, rename prompts | Align with "Strength Reminder" |
+| Breathing exercises | Keep as-is | Core "Pause Ritual" |
+| Water tracking | Keep as-is | Simple utility |
+| Period tracker | Keep as-is | Practical feature |
+| Programs/Courses | Keep as-is | Revenue driver |
 
 ---
 
-## File Structure
+## Part 4: Future Vision (Don't Build Yet)
 
-```text
-src/
-├── pages/app/
-│   └── AppPeriod.tsx                    # Main tool page
-├── components/app/
-│   ├── PeriodStatusCard.tsx             # Home page card
-│   ├── PeriodOnboarding.tsx             # First-time setup flow
-│   ├── PeriodCalendar.tsx               # Month calendar with markers
-│   ├── PeriodDaySheet.tsx               # Day logging bottom sheet
-│   ├── PeriodSymptomChips.tsx           # Symptom selector
-│   ├── PeriodFlowSelector.tsx           # Flow intensity picker
-│   ├── PeriodCycleInsights.tsx          # Stats & predictions display
-│   └── PeriodSettingsSheet.tsx          # Reminder & privacy settings
-├── hooks/
-│   └── usePeriodTracker.tsx             # All data logic
-├── lib/
-│   ├── periodTracking.ts                # Cycle calculations
-│   ├── proTaskTypes.ts                  # Add 'period' type
-│   └── toolsConfig.ts                   # Add to wellness tools
+### 4.1 Strength Archetypes (V2+)
 
-supabase/
-└── migrations/
-    └── XXXXXX_create_period_tracking.sql
-```
+Behavioral patterns that reveal themselves over time:
 
----
+- **The Steady One**: Consistent small rituals
+- **The Returner**: Keeps coming back despite breaks  
+- **The Depth-Seeker**: Journals extensively
+- **The Calm-Builder**: Focuses on breathing/pause rituals
+- **The Connector**: Engages with community features
 
-## Cycle Phase Calculation Logic
+**Implementation complexity**: High (requires ML pattern detection)
+**Recommendation**: Save for V2.0
 
-```typescript
-function getCyclePhase(dayOfCycle: number, cycleLength: number): CyclePhase {
-  const ovulationDay = cycleLength - 14; // ~14 days before next period
-  
-  if (dayOfCycle <= 5) {
-    return { name: 'Menstrual', emoji: '🩸', color: 'rose' };
-  }
-  if (dayOfCycle < ovulationDay - 2) {
-    return { name: 'Follicular', emoji: '🌱', color: 'green' };
-  }
-  if (dayOfCycle <= ovulationDay + 2) {
-    return { name: 'Ovulation', emoji: '✨', color: 'amber' };
-  }
-  return { name: 'Luteal', emoji: '🌙', color: 'purple' };
-}
-```
+### 4.2 Proof of Strength Vault (V2+)
 
-### Prediction Algorithm
-- Uses weighted average of last 3-6 cycles
-- Most recent cycles have higher weight
-- Recalculates when new period is logged
-- Shows confidence level (higher with more data)
+A personal collection of evidence that "I am strong":
+- Auto-collected from journal entries
+- Manual additions ("Today I...")
+- Surfaced during difficult moments
+
+**Implementation complexity**: Medium
+**Recommendation**: Save for V1.5
+
+### 4.3 AI Strength Coach (V3+)
+
+Contextual encouragement based on patterns:
+- "I notice you've returned 5 times this month. That's resilience."
+- "Your pause rituals have increased. You're learning to regulate."
+
+**Implementation complexity**: Very High (requires AI integration)
+**Recommendation**: Save for V3.0
 
 ---
 
-## Animations & Effects
+## Part 5: Phased Implementation Roadmap
 
-### Page Background
-- Soft rose gradient: `linear-gradient(180deg, #FDF2F8 0%, #FCE7F3 50%, #FFF 100%)`
-- Floating petal shapes (like Water's clouds)
+### Phase 0: Pre-Pivot (Current)
+Complete 2-3 features the user wants to add first, then begin pivot.
 
-### Calendar Interactions
-- `active:scale-95` on date taps
-- Haptic feedback on every tap
-- Confetti when logging first day of new cycle
+### Phase 1: Language Surgery (1-2 weeks)
+- Rename "Tasks" to "Rituals" throughout UI
+- Update 25-30 ritual titles with new voice
+- Remove streak-shame language
+- Update empty states and error messages
 
-### Transitions
-- Sheet slides up smoothly (Vaul drawer)
-- Phase badge animates on change
-- Progress ring for cycle visualization
+### Phase 2: Return Without Shame (1 week)
+- Implement `last_active_date` tracking
+- Build "Welcome Back" flow for 3+ day absence
+- Replace StreakCelebration with ReturnCelebration
+- Add `return_count` celebration logic
 
----
+### Phase 3: Ritual Bank Curation (1 week)
+- Archive 220+ tasks (set `is_active: false`)
+- Remap 12 categories to 5 new categories
+- Update admin interface for new category structure
+- Quality-check remaining 25-30 core rituals
 
-## Pro Task Integration
-
-Add to `proTaskTypes.ts`:
-```typescript
-period: {
-  value: 'period',
-  label: 'Period Tracker',
-  icon: Heart,
-  badgeText: 'Log',
-  color: 'pink',
-  gradientClass: 'bg-gradient-to-br from-pink-100 to-rose-100',
-  iconColorClass: 'text-pink-600',
-  description: 'Open the period tracker',
-  requiresValue: false,
-}
-```
+### Phase 4: Observation Period (2-4 weeks)
+- Gather user feedback
+- Monitor engagement patterns
+- Refine ritual language based on response
+- Plan V2 features based on learnings
 
 ---
 
-## Privacy & Security
+## Part 6: Risk Assessment
 
-- **Strict RLS**: Only user can see their own data
-- **No admin access**: Unlike other tables, admins cannot view period data
-- **Hide from Home**: Optional setting to completely hide status card
-- **Local-first feel**: Data syncs silently, no loading spinners for privacy
+| Risk | Severity | Mitigation |
+|------|----------|------------|
+| Users confused by terminology change | Medium | Gradual rollout, in-app explanation |
+| Engagement drops without streaks | Medium | A/B test before full removal |
+| Archived tasks were popular | Low | Data-driven curation, easy restore |
+| Feature creep (building V2 too early) | High | Strict phase discipline |
+| App feels "less feature-rich" | Medium | Quality > quantity messaging |
 
 ---
 
-## Implementation Order
+## Part 7: Success Metrics
 
-1. **Database migration** - Create tables with RLS
-2. **Hook** (`usePeriodTracker`) - CRUD operations + calculations
-3. **Tool page** (`AppPeriod`) - Main UI with calendar
-4. **Onboarding** (`PeriodOnboarding`) - First-time setup
-5. **Day sheet** (`PeriodDaySheet`) - Logging interface
-6. **Home card** (`PeriodStatusCard`) - Status display
-7. **Pro task type** - Add to proTaskTypes.ts
-8. **Browse integration** - Add to toolsConfig.ts
+### Phase 1 Success Indicators
+- No increase in support tickets about confusion
+- Positive feedback on new language (manual review)
+
+### Phase 2 Success Indicators
+- 30%+ of returning users (after 3+ day gap) engage same day
+- Decrease in app uninstalls after absence periods
+
+### Phase 3 Success Indicators
+- 80%+ of active users engage with curated rituals
+- No complaints about missing archived tasks
+
+### Long-term Vision Metrics
+- Retention after 30-day gap: Target 40%+ (vs. industry ~10%)
+- User sentiment: "This app gets me" (qualitative)
+- Return rate: Users who leave and come back (celebrate this!)
 
 ---
 
 ## Summary
 
-This Period Tracker will be:
-- Beautiful with gradient backgrounds and smooth animations
-- Feature-complete with symptom tracking, predictions, and history
-- Privacy-first with strict RLS and no admin access
-- Well-integrated with Home status card and routine tasks
-- Smart from day one by allowing historical data entry
+This pivot transforms Simora from another productivity app into a unique "Strength Companion" that:
 
+1. **Welcomes you back** instead of shaming absence
+2. **Uses ritual language** that feels sacred, not obligatory
+3. **Focuses on 25-30 high-impact practices** instead of overwhelming with 250 options
+4. **Builds self-trust** through micro follow-throughs
+5. **Delays complex features** until core philosophy is proven
+
+The technical implementation is deliberately conservative—mostly UI language changes and database additions, no breaking schema changes. This allows rapid iteration while protecting existing user data.
+
+---
+
+*Document created: February 2026*
+*Status: Ready for review before implementation*
+*Next step: User to specify 2-3 features to build before pivot begins*
