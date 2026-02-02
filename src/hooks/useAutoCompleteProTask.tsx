@@ -166,9 +166,17 @@ export const useAutoCompleteProTask = () => {
     return autoComplete('playlist', playlistId);
   }, [autoComplete]);
 
+  /**
+   * Auto-complete breathing pro tasks for a specific exercise
+   */
+  const autoCompleteBreathe = useCallback(async (exerciseId: string): Promise<number> => {
+    return autoComplete('breathe', exerciseId);
+  }, [autoComplete]);
+
   return {
     autoComplete,
     autoCompleteJournal,
     autoCompletePlaylist,
+    autoCompleteBreathe,
   };
 };
