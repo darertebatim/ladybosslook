@@ -145,7 +145,13 @@ export default function AppInspireDetail() {
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate('/app/routines');
+            }
+          }}
           className="p-2 rounded-full bg-black/30 backdrop-blur-sm text-white"
         >
           <ArrowLeft className="w-5 h-5" />
