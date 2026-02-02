@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { BreathingCircle } from './BreathingCircle';
 import { BreathingInfoSheet } from './BreathingInfoSheet';
 import { BreathingExercise, useSaveBreathingSession } from '@/hooks/useBreathingExercises';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -48,6 +49,7 @@ export function BreathingExerciseScreen({
   const [countdown, setCountdown] = useState(3);
   
   const saveSession = useSaveBreathingSession();
+  const { autoCompleteBreathe } = useAutoCompleteProTask();
   const startTimeRef = useRef<number>(0);
 
   // Always show info sheet when exercise opens
@@ -149,12 +151,14 @@ export function BreathingExerciseScreen({
     return () => clearInterval(timer);
   }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedDuration]);
 
-  const handleComplete = useCallback((elapsed: number) => {
+  const handleComplete = useCallback(async (elapsed: number) => {
     // Save session to database
     saveSession.mutate(
       { exerciseId: exercise.id, durationSeconds: elapsed },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          // Auto-complete any breathing pro tasks linked to this exercise
+          await autoCompleteBreathe(exercise.id);
           toast.success('Breathing session complete! 🧘');
         },
       }
@@ -162,7 +166,7 @@ export function BreathingExerciseScreen({
     setIsActive(false);
     setTotalElapsed(0);
     setCurrentPhaseIndex(0);
-  }, [exercise.id, saveSession]);
+  }, [exercise.id, saveSession, autoCompleteBreathe]);
 
   const handleStart = useCallback(() => {
     setCountdown(3);
