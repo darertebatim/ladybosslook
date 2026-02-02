@@ -301,6 +301,7 @@ export default function AppInspireDetail() {
           onOpenChange={setShowPreviewSheet}
           tasks={previewTasks}
           routineTitle={routine.title}
+          defaultTag={routine.category}
           onSave={handleSaveRoutine}
           isSaving={addRoutineFromBank.isPending}
         />
