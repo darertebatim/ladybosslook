@@ -655,7 +655,7 @@ const AppTaskCreate = ({
             <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
           </div>
         </button>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 flex items-start gap-2">
           <textarea
             value={title}
             onChange={(e) => {
@@ -670,10 +670,10 @@ const AppTaskCreate = ({
             }}
             placeholder="Task name"
             rows={2}
-            className="w-full text-lg font-semibold border-0 bg-transparent focus:outline-none focus-visible:ring-0 placeholder:text-muted-foreground/50 py-1 px-0 resize-none leading-snug"
+            className="flex-1 text-lg font-semibold border-0 bg-transparent focus:outline-none focus-visible:ring-0 placeholder:text-muted-foreground/50 py-1 px-0 resize-none leading-snug"
             maxLength={50}
           />
-          <span className="text-xs text-muted-foreground/60">Tap to rename</span>
+          <Pencil className="h-4 w-4 text-muted-foreground/50 mt-2 flex-shrink-0" />
         </div>
       </div>
 
