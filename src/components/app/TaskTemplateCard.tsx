@@ -23,8 +23,8 @@ export function TaskTemplateCard({ template, onAdd }: TaskTemplateCardProps) {
       <span className="text-2xl shrink-0">{template.emoji || '📝'}</span>
       
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-foreground truncate">{template.title}</p>
-        <p className="text-xs text-foreground/70 truncate">
+        <p className="font-medium text-black truncate">{template.title}</p>
+        <p className="text-xs text-black/70 truncate">
           {template.category}
           {template.repeat_pattern && template.repeat_pattern !== 'none' && (
             <span className="ml-1">
