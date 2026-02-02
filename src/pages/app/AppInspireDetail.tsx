@@ -41,6 +41,11 @@ function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask {
     linked_playlist_id: task.linked_playlist_id || null,
     pro_link_type: task.pro_link_type as RoutinePlanTask['pro_link_type'] || null,
     pro_link_value: task.pro_link_value || null,
+    // Include goal fields
+    goal_enabled: task.goal_enabled ?? false,
+    goal_target: task.goal_target ?? null,
+    goal_type: task.goal_type ?? null,
+    goal_unit: task.goal_unit ?? null,
     linked_playlist: null,
   };
 }
