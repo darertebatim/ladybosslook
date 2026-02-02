@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { startOfDay, differenceInDays } from 'date-fns';
 import type { Valence } from '@/lib/emotionData';
 
 export interface EmotionLog {
@@ -22,6 +23,38 @@ export interface CreateEmotionLogInput {
   contexts: string[];
   notes?: string;
 }
+
+// Calculate streak (consecutive days with at least one log)
+const calculateStreak = (logs: EmotionLog[]): number => {
+  if (logs.length === 0) return 0;
+  
+  // Get unique days, sorted descending (most recent first)
+  const uniqueDays = [...new Set(logs.map(log => 
+    startOfDay(new Date(log.created_at)).toISOString()
+  ))].sort().reverse();
+  
+  if (uniqueDays.length === 0) return 0;
+  
+  const today = startOfDay(new Date());
+  const mostRecent = new Date(uniqueDays[0]);
+  
+  // If no log today or yesterday, streak is 0
+  const daysSinceMostRecent = differenceInDays(today, mostRecent);
+  if (daysSinceMostRecent > 1) return 0;
+  
+  let streak = 1;
+  for (let i = 1; i < uniqueDays.length; i++) {
+    const current = new Date(uniqueDays[i - 1]);
+    const prev = new Date(uniqueDays[i]);
+    if (differenceInDays(current, prev) === 1) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+  
+  return streak;
+};
 
 export const useEmotionLogs = () => {
   const { user } = useAuth();
@@ -112,6 +145,25 @@ export const useEmotionLogs = () => {
     return new Date(log.created_at) >= weekAgo;
   });
 
+  // Calculate streak
+  const streak = calculateStreak(logs);
+
+  // Stats helpers
+  const thisWeekCount = recentLogs.length;
+  
+  const thisMonthCount = logs.filter(log => {
+    const monthAgo = new Date();
+    monthAgo.setDate(monthAgo.getDate() - 30);
+    return new Date(log.created_at) >= monthAgo;
+  }).length;
+
+  // Valence breakdown for this week
+  const valenceBreakdown = {
+    pleasant: recentLogs.filter(l => l.valence === 'pleasant').length,
+    neutral: recentLogs.filter(l => l.valence === 'neutral').length,
+    unpleasant: recentLogs.filter(l => l.valence === 'unpleasant').length,
+  };
+
   return {
     logs,
     todayLogs,
@@ -120,5 +172,10 @@ export const useEmotionLogs = () => {
     error,
     createLog,
     deleteLog,
+    // Stats
+    streak,
+    thisWeekCount,
+    thisMonthCount,
+    valenceBreakdown,
   };
 };
