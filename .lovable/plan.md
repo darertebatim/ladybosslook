@@ -1,291 +1,303 @@
 
-# Pre-Pivot Feature: "Name Your Emotion" Tool
+# UI Redesign: Name Your Emotion (Finch-Style)
 
 ## Overview
 
-Building a standalone wellness tool inspired by Finch's emotion-naming feature. This is a **guided, multi-step flow** that helps users identify and articulate their feelings with increasing specificity. This aligns perfectly with the upcoming pivot philosophy of building self-awareness and emotional literacy.
+Complete redesign of the emotion selection flow to match Finch's two-column, progressive-drilling UI pattern. The key change is moving from **separate pages per step** to a **single-screen column layout** where selections expand to the right.
 
 ---
 
-## The User Flow
+## Current vs. Finch Comparison
+
+| Aspect | Current Implementation | Finch Design |
+|--------|----------------------|--------------|
+| Layout | Separate pages for each step | Single screen with columns |
+| Navigation | Page-by-page steps | Drill right, back collapses |
+| Valence | Full-width stacked buttons | Small pills on left column |
+| Categories | Flex-wrap grid on new page | Vertical list on right column |
+| Specific emotions | Flex-wrap on new page | Vertical list, replaces categories |
+| Sub-sub emotions | Not implemented | 3rd level for some unpleasant emotions |
+| Scrolling | Required on many screens | Minimal/no scroll |
+| Colors | Uniform per valence | Unique colors per category in unpleasant |
+
+---
+
+## New UI Architecture
+
+### Single-Screen Column Layout
 
 ```text
-[Intro Screen] → [Valence: Pleasant/Neutral/Unpleasant] → [Category] → [Specific Emotion] → [Context + Notes] → [Confirmation]
++--------------------------------------------------+
+|  < (back)           Try to dig a little deeper   |
++--------------------------------------------------+
+|                                                  |
+|                        [ Optimistic ]            |
+|                        [ Accepted   ]            |
+|  [ Pleasant  ]         [ Content    ]            |
+|  [ Neutral   ]         [ Powerful   ]            |
+|  [ Unpleasant]         [ Interested ]            |
+|                        [ Playful    ]            |
+|                        [ Proud      ]            |
+|                        [ Peaceful   ]            |
+|                        [ Trusting   ]            |
+|                                                  |
++--------------------------------------------------+
 ```
 
-### Step-by-Step Breakdown
+### Column Expansion Flow
 
-**Step 1: Intro Screen**
-- Full-screen with soft background color
-- Icon/illustration representing emotions
-- Title: "Name Your Emotion"
-- Description: "Sometimes, what we feel is not so obvious. Naming the emotion can help gain better control and understanding of ourselves."
-- "Start" button
-
-**Step 2: Valence Selection**
-- "Start by taking a minute to pause and notice what you are feeling"
-- Three large pill buttons stacked vertically:
-  - Pleasant (warm yellow/orange)
-  - Neutral (soft gray)
-  - Unpleasant (muted purple)
-- Tapping advances to next step
-
-**Step 3: Category Drill-down**
-- Shows selected valence on left side (highlighted)
-- Shows 6-9 sub-categories on right side as pills
-- Categories vary by valence:
-  - **Pleasant**: Optimistic, Accepted, Content, Powerful, Interested, Playful, Proud, Peaceful, Trusting
-  - **Neutral**: Bored, Busy, Stressed, Tired, Numb (with "More..." option)
-  - **Unpleasant**: Sad, Angry, Fearful, Down, Surprised, Disgusted
-
-**Step 4: Specific Emotion**
-- Similar layout with selected category on left
-- More specific emotions on right:
-  - **Sad**: Lonely, Vulnerable, Depressed, Hurt, Despair, Guilty, More...
-  - **Angry**: Mad, Aggressive, Frustrated, Bitter, Distant, Critical, More...
-  - **Fearful**: Scared, Anxious, Insecure, Weak, Rejected, Threatened, More...
-  - etc.
-
-**Step 5: Context & Notes**
-- "What made you feel [selected emotion]?"
-- Context chips in 3-column grid: Family, Myself, Health, Pets, Co-workers, Friends, Partner, Acquaintances, Work, Home, School, Hobby, Commuting, Outside
-- Multi-select allowed
-- Optional text area: "Add details or more reflection..."
-- "Save" button
-
-**Step 6: Confirmation**
-- Celebratory screen
-- "You are getting closer to understanding yourself even more!"
-- "Your emotion has been saved in your history."
-- "Done" button → returns to home or emotions history
+1. **Initial**: Show 3 valence buttons (left column only)
+2. **After selecting valence**: Keep valence buttons (selected highlighted), show categories in middle column
+3. **After selecting category**: Show specific emotions in right column (or replace middle column)
+4. **For Unpleasant emotions**: Some have a "More..." button that reveals additional sub-sub emotions
 
 ---
 
-## Technical Implementation
+## Implementation Changes
 
-### Files to Create
+### 1. New Combined Selection Component
 
-| File | Purpose |
-|------|---------|
-| `src/pages/app/AppEmotion.tsx` | Main page component (handles routing/state) |
-| `src/components/emotion/EmotionIntro.tsx` | Intro screen with Start button |
-| `src/components/emotion/EmotionValence.tsx` | Pleasant/Neutral/Unpleasant selection |
-| `src/components/emotion/EmotionCategory.tsx` | Category drill-down step |
-| `src/components/emotion/EmotionSpecific.tsx` | Specific emotion selection |
-| `src/components/emotion/EmotionContext.tsx` | Context chips + notes + save |
-| `src/components/emotion/EmotionComplete.tsx` | Completion celebration screen |
-| `src/lib/emotionData.ts` | All emotion hierarchies and context options |
-| `src/hooks/useEmotionLogs.tsx` | CRUD operations for emotion entries |
-
-### Database Schema
-
-New table: `emotion_logs`
-
-```sql
-CREATE TABLE emotion_logs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES auth.users NOT NULL,
-  valence text NOT NULL, -- 'pleasant', 'neutral', 'unpleasant'
-  category text NOT NULL, -- e.g., 'sad', 'angry', 'optimistic'
-  emotion text NOT NULL, -- specific emotion e.g., 'lonely', 'frustrated'
-  contexts text[] DEFAULT '{}', -- array of context selections
-  notes text, -- optional reflection text
-  created_at timestamptz DEFAULT now()
-);
-
--- Enable RLS
-ALTER TABLE emotion_logs ENABLE ROW LEVEL SECURITY;
-
--- Users can only see their own logs
-CREATE POLICY "Users can view own emotion logs" ON emotion_logs
-  FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert own emotion logs" ON emotion_logs
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete own emotion logs" ON emotion_logs
-  FOR DELETE USING (auth.uid() = user_id);
-```
-
-### Emotion Hierarchy Data Structure
+Create `EmotionSelector.tsx` - replaces separate Valence/Category/Specific components:
 
 ```typescript
-// src/lib/emotionData.ts
+interface EmotionSelectorProps {
+  onComplete: (valence: Valence, category: string, emotion: string) => void;
+  onBack: () => void;
+}
+```
 
-export type Valence = 'pleasant' | 'neutral' | 'unpleasant';
+**State Machine:**
+- `depth: 0` = Only valence shown
+- `depth: 1` = Valence + categories (for Pleasant/Neutral, or categories for Unpleasant)
+- `depth: 2` = Valence + category + emotions
+- `depth: 3` = Valence + category + emotion + sub-emotions (only for some Unpleasant)
 
-export interface EmotionCategory {
+### 2. Layout Structure (No Scroll)
+
+```jsx
+<div className="h-full flex flex-col bg-[#F8F9FA]">
+  {/* Header - fixed */}
+  <header className="shrink-0 flex items-center px-4 py-3">
+    <BackButton />
+    <h1>Try to dig a little deeper</h1>
+  </header>
+  
+  {/* Content - flex columns, centered vertically */}
+  <div className="flex-1 flex items-center justify-center px-4 gap-6">
+    {/* Column 1: Valence */}
+    <div className="flex flex-col gap-3">
+      {VALENCE_OPTIONS.map(v => <ValencePill />)}
+    </div>
+    
+    {/* Column 2: Categories (conditionally shown) */}
+    {selectedValence && (
+      <div className="flex flex-col gap-2">
+        {categories.map(c => <CategoryPill />)}
+      </div>
+    )}
+    
+    {/* Column 3: Emotions (conditionally shown) */}
+    {selectedCategory && (
+      <div className="flex flex-col gap-2">
+        {emotions.map(e => <EmotionPill />)}
+      </div>
+    )}
+  </div>
+</div>
+```
+
+### 3. Updated Color System
+
+Finch uses distinct colors for each emotion category. New color mapping:
+
+**Pleasant (warm oranges/yellows):**
+- Optimistic, Accepted, Content, Powerful, etc.: `bg-[#FFF3E0] text-[#E65100]`
+
+**Neutral (blue-grays):**
+- Bored, Busy, Stressed, Tired, Numb: `bg-[#E3F2FD] text-[#1565C0]`
+
+**Unpleasant (varied by category):**
+- Sad: `bg-[#CFD8DC] text-[#37474F]` (blue-gray)
+- Angry: `bg-[#FFCDD2] text-[#C62828]` (red tint)
+- Fearful: `bg-[#455A64] text-white` (dark slate - solid bg)
+- Down: `bg-[#ECEFF1] text-[#546E7A]` (light gray)
+- Surprised: `bg-[#FCE4EC] text-[#AD1457]` (pink)
+- Disgusted: `bg-[#EFEBE9] text-[#5D4037]` (brown tint)
+
+### 4. Updated Data Structure
+
+Add sub-sub emotions for "Unpleasant" categories and "More..." expansion:
+
+```typescript
+interface EmotionCategory {
   value: string;
   label: string;
-  emotions: { value: string; label: string }[];
+  color: { bg: string; text: string; bgActive: string };
+  emotions: EmotionOption[];
+  subEmotions?: Record<string, EmotionOption[]>; // For "Lonely" → [Isolated, Abandoned, etc.]
 }
-
-export const VALENCE_OPTIONS = [
-  { value: 'pleasant', label: 'Pleasant', color: 'bg-amber-100 text-amber-700 border-amber-200' },
-  { value: 'neutral', label: 'Neutral', color: 'bg-slate-100 text-slate-700 border-slate-200' },
-  { value: 'unpleasant', label: 'Unpleasant', color: 'bg-violet-100 text-violet-700 border-violet-200' },
-];
-
-export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
-  pleasant: [
-    { 
-      value: 'optimistic', 
-      label: 'Optimistic',
-      emotions: [
-        { value: 'hopeful', label: 'Hopeful' },
-        { value: 'inspired', label: 'Inspired' },
-        { value: 'eager', label: 'Eager' },
-        // ... more
-      ]
-    },
-    { 
-      value: 'content', 
-      label: 'Content',
-      emotions: [
-        { value: 'fulfilled', label: 'Fulfilled' },
-        { value: 'calm', label: 'Calm' },
-        { value: 'peaceful', label: 'Peaceful' },
-        { value: 'balanced', label: 'Balanced' },
-        // ... more
-      ]
-    },
-    // ... more categories
-  ],
-  neutral: [ /* ... */ ],
-  unpleasant: [
-    {
-      value: 'sad',
-      label: 'Sad',
-      emotions: [
-        { value: 'lonely', label: 'Lonely' },
-        { value: 'vulnerable', label: 'Vulnerable' },
-        { value: 'depressed', label: 'Depressed' },
-        { value: 'hurt', label: 'Hurt' },
-        { value: 'despair', label: 'Despair' },
-        { value: 'guilty', label: 'Guilty' },
-        // ... more
-      ]
-    },
-    // ... more categories
-  ],
-};
-
-export const CONTEXT_OPTIONS = [
-  { value: 'family', label: 'Family' },
-  { value: 'myself', label: 'Myself' },
-  { value: 'health', label: 'Health' },
-  { value: 'pets', label: 'Pets' },
-  { value: 'coworkers', label: 'Co-workers' },
-  { value: 'friends', label: 'Friends' },
-  { value: 'partner', label: 'Partner' },
-  { value: 'acquaintances', label: 'Acquaintances' },
-  { value: 'work', label: 'Work' },
-  { value: 'home', label: 'Home' },
-  { value: 'school', label: 'School' },
-  { value: 'hobby', label: 'Hobby' },
-  { value: 'commuting', label: 'Commuting' },
-  { value: 'outside', label: 'Outside' },
-];
 ```
 
-### Routing Updates
-
-In `App.tsx`:
-```tsx
-// Add lazy import
-const AppEmotion = lazy(() => import("@/pages/app/AppEmotion"));
-
-// Add route (full-screen, outside AppLayout)
-<Route path="/app/emotion" element={<ProtectedRoute><AppEmotion /></ProtectedRoute>} />
-```
-
-### ToolsConfig Update
-
-Update `src/lib/toolsConfig.ts` to make the Emotions tool visible:
+**Example - Sad category with nested structure:**
 ```typescript
 {
-  id: 'emotions',
-  name: 'Emotions',
-  icon: 'Heart', // or 'Sparkles' for a softer feel
-  bgColor: 'bg-[#EDE9FE]',
-  iconColor: 'text-violet-600',
-  route: '/app/emotion',
-  description: 'Name your feelings',
-  comingSoon: false, // ← Enable
-  hidden: false,     // ← Make visible
-},
+  value: 'sad',
+  label: 'Sad',
+  color: { bg: 'bg-slate-200', text: 'text-slate-700', bgActive: 'bg-slate-500' },
+  emotions: [
+    { value: 'lonely', label: 'Lonely', hasSubEmotions: true },
+    { value: 'vulnerable', label: 'Vulnerable' },
+    { value: 'depressed', label: 'Depressed' },
+    { value: 'hurt', label: 'Hurt' },
+    { value: 'despair', label: 'Despair' },
+    { value: 'guilty', label: 'Guilty', hasSubEmotions: true },
+  ],
+  subEmotions: {
+    lonely: [
+      { value: 'isolated', label: 'Isolated' },
+      { value: 'abandoned', label: 'Abandoned' },
+      { value: 'forlorn', label: 'Forlorn' },
+      { value: 'alienated', label: 'Alienated' },
+      { value: 'nostalgic', label: 'Nostalgic' },
+      { value: 'victimized', label: 'Victimized' },
+      { value: 'fragile', label: 'Fragile' },
+      { value: 'lost', label: 'Lost' },
+    ],
+    guilty: [
+      { value: 'embarrassed', label: 'Embarrassed' },
+      { value: 'disappointed', label: 'Disappointed' },
+      { value: 'powerless', label: 'Powerless' },
+      { value: 'grief', label: 'Grief' },
+      { value: 'trapped', label: 'Trapped' },
+      { value: 'discouraged', label: 'Discouraged' },
+      { value: 'ashamed', label: 'Ashamed' },
+      { value: 'remorseful', label: 'Remorseful' },
+    ],
+  }
+}
 ```
 
----
+### 5. Pill Button Sizes
 
-## UI Design Notes
-
-### Visual Style (Matching Finch)
-- Clean, minimal white background for selection screens
-- Soft rounded pill buttons for emotion options
-- Left-side "breadcrumb" showing previous selections
-- Smooth transitions between steps
-- Haptic feedback on selections
-- Green "Save" button at the bottom of context screen
-- Celebratory completion screen with soft animation
-
-### Color Coding
-- **Pleasant**: Warm yellows/oranges (bg-amber-100, text-amber-700)
-- **Neutral**: Soft grays/blues (bg-slate-100, text-slate-600)
-- **Unpleasant**: Muted purples/blues (bg-violet-100, text-violet-700)
-
-### Animations
-- Step transitions with slide animation
-- Button press feedback
-- Completion screen with subtle bounce/celebration
+Matching Finch's compact design:
+- **Valence pills**: `px-5 py-2.5 text-sm rounded-full`
+- **Category pills**: `px-4 py-2 text-sm rounded-full`  
+- **Emotion pills**: `px-4 py-2 text-sm rounded-full`
+- Active state: Solid background color, white or dark text
+- Inactive state: Light tinted background, colored text
 
 ---
 
-## Future Enhancements (Not in V1)
+## Files to Modify
 
-1. **Emotion History View**: See past entries in a timeline or calendar view
-2. **Pattern Recognition**: "You tend to feel anxious on Mondays"
-3. **Integration with Journal**: Auto-suggest starting a journal entry after logging emotion
-4. **Mood Trends**: Weekly/monthly charts showing emotional patterns
-5. **Connection to Pivot**: Link emotions to "Strength Reminders" - "Even when you felt anxious, you still showed up"
+| File | Changes |
+|------|---------|
+| `src/lib/emotionData.ts` | Add colors per category, add subEmotions structure, complete emotion lists from PDF |
+| `src/components/emotion/EmotionValence.tsx` | Redesign as part of column layout OR merge into new EmotionSelector |
+| `src/components/emotion/EmotionCategory.tsx` | Merge into EmotionSelector |
+| `src/components/emotion/EmotionSpecific.tsx` | Merge into EmotionSelector |
+| `src/pages/app/AppEmotion.tsx` | Simplify step management - fewer steps |
+| `src/components/emotion/EmotionContext.tsx` | Keep but update styling to match |
+| `src/components/emotion/EmotionComplete.tsx` | Keep as-is (green Done button matches Finch) |
+
+### New File
+
+`src/components/emotion/EmotionSelector.tsx` - Main two-column selection UI
+
+---
+
+## Technical Approach
+
+### Single-Screen vs. Multi-Page
+
+**Recommended approach**: Create a new `EmotionSelector.tsx` that handles all the column-based drilling in a single component with internal state. This replaces EmotionValence, EmotionCategory, and EmotionSpecific.
+
+Benefits:
+- Smoother transitions (CSS animations between columns)
+- Single viewport without page navigation
+- Matches Finch's UX exactly
+- Easier to manage back navigation (just collapse column)
+
+### Animation
+
+- Columns slide in from right when drilling deeper
+- Columns slide out to right when going back
+- Use `transition-all duration-200` for smooth feel
+
+### Height Management
+
+- Use `h-[100dvh]` for iOS viewport stability
+- Content vertically centered with `items-center justify-center`
+- No scroll needed if pills are compact enough
+
+---
+
+## Complete Emotion List from PDF
+
+### Pleasant
+
+- **Optimistic**: Hopeful, Inspired, Eager, Open, Curious
+- **Accepted**: Respected, Valued, Fulfilled, Appreciated
+- **Content**: Calm, Mellow, Good, Fulfilled, Peaceful, Comfortable, Balanced
+- **Powerful**: Confident, Courageous, Creative, Successful
+- **Interested**: Inquisitive, Amused, Fascinated, Absorbed
+- **Playful**: Aroused, Cheeky, Energetic, Free
+- **Proud**: Important, Worthy, Accomplished, Triumphant
+- **Peaceful**: Loving, Thankful, Trusting, Hopeful
+- **Trusting**: Sensitive, Intimate, Secure
+
+### Neutral
+
+- **Bored**: Indifferent, Apathetic
+- **Busy**: Rushed, Pressured
+- **Stressed**: Overwhelmed, Out of control
+- **Tired**: Sleepy, Unfocused
+- **Numb**: (direct select, no sub-emotions shown in PDF)
+
+### Unpleasant (3 levels for some)
+
+- **Sad**:
+  - Lonely → [Isolated, Abandoned, Forlorn, Alienated, Nostalgic, Victimized, Fragile, Lost]
+  - Vulnerable, Depressed, Hurt, Despair
+  - Guilty → [Embarrassed, Disappointed, Powerless, Grief, Trapped, Discouraged, Ashamed, Remorseful]
+
+- **Angry**:
+  - Mad, Aggressive, Frustrated, Bitter, Distant
+  - Critical → [Betrayed, Humiliated, Infuriated, Annoyed, Furious, Provoked, Jealous, Hostile]
+
+- **Fearful**:
+  - Scared, Anxious, Insecure, Weak, Rejected
+  - Threatened → [Helpless, Frightened, Terrified, Panicked, Overwhelmed, Worried, Jittery, FOMO]
+
+- **Down**:
+  - Insecure, Inferior, Pessimistic
+  - Miserable → [Embarrassed, Disappointed, Powerless, Grief, Trapped, Discouraged, Ashamed, Remorseful]
+  - Empty
+
+- **Surprised**:
+  - Startled, Shocked, Dismayed, Confused, Disillusioned, Perplexed
+
+- **Disgusted**:
+  - Disapproving, Disappointed, Repelled
+  - Awful → [Judgemental, Embarrassed, Appalled, Revolted, Horrified, Hesitant, Nauseated, Detestable]
 
 ---
 
 ## Implementation Order
 
-1. Create database table `emotion_logs` with RLS policies
-2. Create `src/lib/emotionData.ts` with full emotion hierarchy
-3. Create `src/hooks/useEmotionLogs.tsx` for CRUD operations
-4. Build components in order:
-   - `EmotionIntro.tsx`
-   - `EmotionValence.tsx`
-   - `EmotionCategory.tsx`
-   - `EmotionSpecific.tsx`
-   - `EmotionContext.tsx`
-   - `EmotionComplete.tsx`
-5. Create main page `AppEmotion.tsx` with step state management
-6. Add route in `App.tsx`
-7. Update `toolsConfig.ts` to make visible
-8. Test end-to-end flow
-
----
-
-## Alignment with Pivot Philosophy
-
-This feature aligns perfectly with the "Strength Companion" vision:
-- **Pause Ritual**: The intro encourages users to "take a minute to pause"
-- **Self-Awareness**: Naming emotions builds emotional literacy
-- **No Judgment**: All emotions are valid (Pleasant, Neutral, Unpleasant - not Good/Bad)
-- **Context Understanding**: Helps users understand triggers
-- **Data for Future Features**: Emotion logs can feed into "Strength Vault" evidence
+1. **Update `emotionData.ts`** with complete emotion hierarchy, colors, and sub-sub-emotions
+2. **Create `EmotionSelector.tsx`** with two-column layout and state machine
+3. **Update `AppEmotion.tsx`** to use new component flow
+4. **Update `EmotionContext.tsx`** to match styling (gray pills, green Save button)
+5. **Test on iOS** to ensure no scroll issues and proper safe area handling
 
 ---
 
 ## Summary
 
-This is a well-scoped pre-pivot feature that:
-- Adds immediate user value
-- Uses existing UI patterns (full-screen tool like Breathe)
-- Creates foundation for future emotional intelligence features
-- Aligns with the pivot philosophy of self-understanding without shame
-- Estimated effort: 2-3 focused implementation sessions
+This redesign transforms the emotion selection from a multi-page wizard into a single-screen, column-based drilling experience that:
+- Matches Finch's UI exactly
+- Eliminates unnecessary page navigation
+- Fits on iOS screen without scrolling
+- Supports 3-level depth for complex unpleasant emotions
+- Uses color-coded pills for visual clarity
