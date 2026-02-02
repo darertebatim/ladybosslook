@@ -59,9 +59,8 @@ interface TaskBankItem {
   sort_order: number;
 }
 
-// Admin settings for task bank items
+// Admin settings for task bank items (visibility only - description is inline)
 interface AdminSettings {
-  description: string;
   is_popular: boolean;
   is_active: boolean;
 }
@@ -74,7 +73,6 @@ export default function TasksBank() {
   
   // Admin settings state (separate from AppTaskCreate form)
   const [adminSettings, setAdminSettings] = useState<AdminSettings>({
-    description: '',
     is_popular: false,
     is_active: true,
   });
@@ -150,7 +148,6 @@ export default function TasksBank() {
       const { error } = await supabase
         .from('admin_task_bank')
         .update({
-          description: payload.settings.description || null,
           is_popular: payload.settings.is_popular,
           is_active: payload.settings.is_active,
         })
@@ -199,8 +196,8 @@ export default function TasksBank() {
         pro_link_value: data.formData.proLinkValue,
         linked_playlist_id: data.formData.proLinkType === 'playlist' ? data.formData.proLinkValue : data.formData.linkedPlaylistId,
         tag: data.formData.tag,
-        // Admin settings
-        description: data.adminSettings.description || null,
+        // Description from inline form, admin settings for visibility
+        description: data.formData.description || null,
         is_active: data.adminSettings.is_active,
         is_popular: data.adminSettings.is_popular,
       };
@@ -255,8 +252,8 @@ export default function TasksBank() {
         pro_link_value: data.formData.proLinkValue,
         linked_playlist_id: data.formData.proLinkType === 'playlist' ? data.formData.proLinkValue : data.formData.linkedPlaylistId,
         tag: data.formData.tag,
-        // Admin settings
-        description: data.adminSettings.description || null,
+        // Description from inline form, admin settings for visibility
+        description: data.formData.description || null,
         is_active: data.adminSettings.is_active,
         is_popular: data.adminSettings.is_popular,
       };
@@ -311,8 +308,9 @@ export default function TasksBank() {
     setEditingTask(null);
     setSheetInitialData({
       title: '',
+      description: null,
       icon: '☀️',
-      color: 'yellow',
+      color: 'mint',
       scheduledDate: new Date(),
       scheduledTime: null,
       repeatEnabled: false,
@@ -333,7 +331,6 @@ export default function TasksBank() {
       goalUnit: 'times',
     });
     setAdminSettings({
-      description: '',
       is_popular: false,
       is_active: true,
     });
@@ -357,6 +354,7 @@ export default function TasksBank() {
     
     setSheetInitialData({
       title: task.title,
+      description: task.description || null,
       icon: task.emoji,
       color: task.color as any,
       scheduledDate: new Date(),
@@ -383,7 +381,6 @@ export default function TasksBank() {
     
     // Set admin settings from existing task
     setAdminSettings({
-      description: task.description || '',
       is_popular: task.is_popular,
       is_active: task.is_active,
     });
@@ -395,7 +392,6 @@ export default function TasksBank() {
 
   const openAdminSettingsForTask = (task: TaskBankItem) => {
     setAdminSettings({
-      description: task.description || '',
       is_popular: task.is_popular,
       is_active: task.is_active,
     });
@@ -733,21 +729,6 @@ export default function TasksBank() {
           </DialogHeader>
           
           <div className="space-y-4 py-4">
-            {/* Description */}
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Optional task description..."
-                value={adminSettings.description}
-                onChange={(e) => setAdminSettings(prev => ({ ...prev, description: e.target.value }))}
-                className="min-h-[80px]"
-              />
-            </div>
-            
-            {/* Duration */}
-            
-            
             {/* Popular Toggle */}
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-2">
