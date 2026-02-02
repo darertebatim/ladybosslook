@@ -822,6 +822,39 @@ export type Database = {
           },
         ]
       }
+      emotion_logs: {
+        Row: {
+          category: string
+          contexts: string[] | null
+          created_at: string | null
+          emotion: string
+          id: string
+          notes: string | null
+          user_id: string
+          valence: string
+        }
+        Insert: {
+          category: string
+          contexts?: string[] | null
+          created_at?: string | null
+          emotion: string
+          id?: string
+          notes?: string | null
+          user_id: string
+          valence: string
+        }
+        Update: {
+          category?: string
+          contexts?: string[] | null
+          created_at?: string | null
+          emotion?: string
+          id?: string
+          notes?: string | null
+          user_id?: string
+          valence?: string
+        }
+        Relationships: []
+      }
       feed_channels: {
         Row: {
           allow_comments: boolean

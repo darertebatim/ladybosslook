@@ -151,13 +151,13 @@ export const comingSoonTools: ToolConfig[] = [
   {
     id: 'emotions',
     name: 'Emotions',
-    icon: 'Palette',
+    icon: 'Heart',
     bgColor: 'bg-[#EDE9FE]',
     iconColor: 'text-violet-600',
-    route: '/app/emotions',
+    route: '/app/emotion',
     description: 'Name your feelings',
-    comingSoon: true,
-    hidden: true,
+    comingSoon: false,
+    hidden: false,
   },
   {
     id: 'reflections',
