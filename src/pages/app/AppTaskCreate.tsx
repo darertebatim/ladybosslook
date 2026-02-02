@@ -649,7 +649,7 @@ const AppTaskCreate = ({
           onClick={() => setShowIconPicker(true)}
           className="flex-shrink-0 active:scale-95 transition-transform"
         >
-          <TaskIcon iconName={icon} size={32} className="text-foreground/70" />
+          <TaskIcon iconName={icon} size={48} className="text-foreground/70" />
         </button>
         <Input
           value={title}
@@ -660,28 +660,28 @@ const AppTaskCreate = ({
             }
           }}
           placeholder="Task name"
-          className="flex-1 text-lg font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0"
+          className="flex-1 text-xl font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0"
           maxLength={50}
         />
         <span className="flex-shrink-0 text-xs text-muted-foreground/60">Tap to rename</span>
       </div>
 
-      {/* Color picker - Smaller circles */}
-      <div className="px-4 pb-3">
-        <div className="flex justify-center gap-3">
+      {/* Color picker - Horizontal circles with checkmark */}
+      <div className="px-6 pb-4">
+        <div className="flex justify-center gap-4">
           {COLOR_OPTIONS.map((c) => (
             <button
               key={c.name}
               onClick={() => setColor(c.name)}
               className={cn(
-                'w-9 h-9 rounded-full transition-all flex items-center justify-center',
+                'w-12 h-12 rounded-full transition-all flex items-center justify-center',
                 'border-2 border-transparent',
-                color === c.name && 'ring-2 ring-foreground/20 ring-offset-1'
+                color === c.name && 'ring-2 ring-foreground/20 ring-offset-2'
               )}
               style={{ backgroundColor: c.hex }}
             >
               {color === c.name && (
-                <Check className="h-4 w-4 text-foreground/70" />
+                <Check className="h-5 w-5 text-foreground/70" />
               )}
             </button>
           ))}
