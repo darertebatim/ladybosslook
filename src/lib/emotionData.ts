@@ -3,7 +3,6 @@ export type Valence = 'pleasant' | 'neutral' | 'unpleasant';
 export interface EmotionOption {
   value: string;
   label: string;
-  hasSubEmotions?: boolean;
 }
 
 export interface CategoryColor {
@@ -18,7 +17,6 @@ export interface EmotionCategory {
   label: string;
   color: CategoryColor;
   emotions: EmotionOption[];
-  subEmotions?: Record<string, EmotionOption[]>;
 }
 
 // Valence options with Finch-style colors
@@ -127,6 +125,26 @@ export const getCategoryColor = (valence: Valence, categoryValue?: string): Cate
   return CATEGORY_COLORS[valence] || CATEGORY_COLORS.pleasant;
 };
 
+// Neutral emotions - flat list (no categories)
+export const NEUTRAL_EMOTIONS: EmotionOption[] = [
+  { value: 'content', label: 'Content' },
+  { value: 'fulfilled', label: 'Fulfilled' },
+  { value: 'accepted', label: 'Accepted' },
+  { value: 'good', label: 'Good' },
+  { value: 'calm', label: 'Calm' },
+  { value: 'mellow', label: 'Mellow' },
+  { value: 'peaceful', label: 'Peaceful' },
+  { value: 'comfortable', label: 'Comfortable' },
+  { value: 'balanced', label: 'Balanced' },
+  { value: 'thoughtful', label: 'Thoughtful' },
+  { value: 'interested', label: 'Interested' },
+  { value: 'trusting', label: 'Trusting' },
+  { value: 'bored', label: 'Bored' },
+  { value: 'meh', label: 'Meh' },
+  { value: 'indifferent', label: 'Indifferent' },
+  { value: 'tired', label: 'Tired' },
+];
+
 export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
   pleasant: [
     { 
@@ -232,110 +250,64 @@ export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
       ]
     },
   ],
-  neutral: [
-    { 
-      value: 'bored', 
-      label: 'Bored',
-      color: CATEGORY_COLORS.neutral,
-      emotions: [
-        { value: 'indifferent', label: 'Indifferent' },
-        { value: 'apathetic', label: 'Apathetic' },
-      ]
-    },
-    { 
-      value: 'busy', 
-      label: 'Busy',
-      color: CATEGORY_COLORS.neutral,
-      emotions: [
-        { value: 'rushed', label: 'Rushed' },
-        { value: 'pressured', label: 'Pressured' },
-      ]
-    },
-    { 
-      value: 'stressed', 
-      label: 'Stressed',
-      color: CATEGORY_COLORS.neutral,
-      emotions: [
-        { value: 'overwhelmed', label: 'Overwhelmed' },
-        { value: 'out-of-control', label: 'Out of control' },
-      ]
-    },
-    { 
-      value: 'tired', 
-      label: 'Tired',
-      color: CATEGORY_COLORS.neutral,
-      emotions: [
-        { value: 'sleepy', label: 'Sleepy' },
-        { value: 'unfocused', label: 'Unfocused' },
-      ]
-    },
-    { 
-      value: 'numb', 
-      label: 'Numb',
-      color: CATEGORY_COLORS.neutral,
-      emotions: [] // Direct select, no sub-emotions
-    },
-  ],
+  neutral: [], // Neutral uses flat list (NEUTRAL_EMOTIONS)
   unpleasant: [
     { 
       value: 'sad', 
       label: 'Sad',
       color: CATEGORY_COLORS.sad,
       emotions: [
-        { value: 'lonely', label: 'Lonely', hasSubEmotions: true },
+        { value: 'lonely', label: 'Lonely' },
         { value: 'vulnerable', label: 'Vulnerable' },
         { value: 'depressed', label: 'Depressed' },
         { value: 'hurt', label: 'Hurt' },
         { value: 'despair', label: 'Despair' },
-        { value: 'guilty', label: 'Guilty', hasSubEmotions: true },
-      ],
-      subEmotions: {
-        lonely: [
-          { value: 'isolated', label: 'Isolated' },
-          { value: 'abandoned', label: 'Abandoned' },
-          { value: 'forlorn', label: 'Forlorn' },
-          { value: 'alienated', label: 'Alienated' },
-          { value: 'nostalgic', label: 'Nostalgic' },
-          { value: 'victimized', label: 'Victimized' },
-          { value: 'fragile', label: 'Fragile' },
-          { value: 'lost', label: 'Lost' },
-        ],
-        guilty: [
-          { value: 'embarrassed', label: 'Embarrassed' },
-          { value: 'disappointed', label: 'Disappointed' },
-          { value: 'powerless', label: 'Powerless' },
-          { value: 'grief', label: 'Grief' },
-          { value: 'trapped', label: 'Trapped' },
-          { value: 'discouraged', label: 'Discouraged' },
-          { value: 'ashamed', label: 'Ashamed' },
-          { value: 'remorseful', label: 'Remorseful' },
-        ],
-      }
+        { value: 'guilty', label: 'Guilty' },
+        { value: 'isolated', label: 'Isolated' },
+        { value: 'abandoned', label: 'Abandoned' },
+        { value: 'forlorn', label: 'Forlorn' },
+        { value: 'alienated', label: 'Alienated' },
+        { value: 'nostalgic', label: 'Nostalgic' },
+        { value: 'victimized', label: 'Victimized' },
+        { value: 'fragile', label: 'Fragile' },
+        { value: 'lost', label: 'Lost' },
+        { value: 'miserable', label: 'Miserable' },
+        { value: 'embarrassed', label: 'Embarrassed' },
+        { value: 'disappointed', label: 'Disappointed' },
+        { value: 'powerless', label: 'Powerless' },
+        { value: 'grief', label: 'Grief' },
+        { value: 'trapped', label: 'Trapped' },
+        { value: 'discouraged', label: 'Discouraged' },
+        { value: 'ashamed', label: 'Ashamed' },
+        { value: 'remorseful', label: 'Remorseful' },
+        { value: 'insecure', label: 'Insecure' },
+        { value: 'empty', label: 'Empty' },
+        { value: 'inferior', label: 'Inferior' },
+        { value: 'pessimistic', label: 'Pessimistic' },
+      ]
     },
     { 
       value: 'angry', 
       label: 'Angry',
       color: CATEGORY_COLORS.angry,
       emotions: [
+        { value: 'let-down', label: 'Let down' },
+        { value: 'disrespected', label: 'Disrespected' },
         { value: 'mad', label: 'Mad' },
         { value: 'aggressive', label: 'Aggressive' },
         { value: 'frustrated', label: 'Frustrated' },
         { value: 'bitter', label: 'Bitter' },
         { value: 'distant', label: 'Distant' },
-        { value: 'critical', label: 'Critical', hasSubEmotions: true },
-      ],
-      subEmotions: {
-        critical: [
-          { value: 'betrayed', label: 'Betrayed' },
-          { value: 'humiliated', label: 'Humiliated' },
-          { value: 'infuriated', label: 'Infuriated' },
-          { value: 'annoyed', label: 'Annoyed' },
-          { value: 'furious', label: 'Furious' },
-          { value: 'provoked', label: 'Provoked' },
-          { value: 'jealous', label: 'Jealous' },
-          { value: 'hostile', label: 'Hostile' },
-        ],
-      }
+        { value: 'critical', label: 'Critical' },
+        { value: 'betrayed', label: 'Betrayed' },
+        { value: 'humiliated', label: 'Humiliated' },
+        { value: 'infuriated', label: 'Infuriated' },
+        { value: 'annoyed', label: 'Annoyed' },
+        { value: 'furious', label: 'Furious' },
+        { value: 'jealous', label: 'Jealous' },
+        { value: 'provoked', label: 'Provoked' },
+        { value: 'hostile', label: 'Hostile' },
+      ]
     },
     { 
       value: 'fearful', 
@@ -345,46 +317,38 @@ export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
         { value: 'scared', label: 'Scared' },
         { value: 'anxious', label: 'Anxious' },
         { value: 'insecure', label: 'Insecure' },
-        { value: 'weak', label: 'Weak' },
         { value: 'rejected', label: 'Rejected' },
-        { value: 'threatened', label: 'Threatened', hasSubEmotions: true },
-      ],
-      subEmotions: {
-        threatened: [
-          { value: 'helpless', label: 'Helpless' },
-          { value: 'frightened', label: 'Frightened' },
-          { value: 'terrified', label: 'Terrified' },
-          { value: 'panicked', label: 'Panicked' },
-          { value: 'overwhelmed', label: 'Overwhelmed' },
-          { value: 'worried', label: 'Worried' },
-          { value: 'jittery', label: 'Jittery' },
-          { value: 'fomo', label: 'FOMO' },
-        ],
-      }
+        { value: 'threatened', label: 'Threatened' },
+        { value: 'weak', label: 'Weak' },
+        { value: 'helpless', label: 'Helpless' },
+        { value: 'frightened', label: 'Frightened' },
+        { value: 'worried', label: 'Worried' },
+        { value: 'jittery', label: 'Jittery' },
+        { value: 'overwhelmed', label: 'Overwhelmed' },
+        { value: 'terrified', label: 'Terrified' },
+        { value: 'panicked', label: 'Panicked' },
+        { value: 'fomo', label: 'FOMO' },
+      ]
     },
     { 
       value: 'down', 
       label: 'Down',
       color: CATEGORY_COLORS.down,
       emotions: [
-        { value: 'insecure', label: 'Insecure' },
-        { value: 'inferior', label: 'Inferior' },
-        { value: 'pessimistic', label: 'Pessimistic' },
-        { value: 'miserable', label: 'Miserable', hasSubEmotions: true },
-        { value: 'empty', label: 'Empty' },
-      ],
-      subEmotions: {
-        miserable: [
-          { value: 'embarrassed', label: 'Embarrassed' },
-          { value: 'disappointed', label: 'Disappointed' },
-          { value: 'powerless', label: 'Powerless' },
-          { value: 'grief', label: 'Grief' },
-          { value: 'trapped', label: 'Trapped' },
-          { value: 'discouraged', label: 'Discouraged' },
-          { value: 'ashamed', label: 'Ashamed' },
-          { value: 'remorseful', label: 'Remorseful' },
-        ],
-      }
+        { value: 'bored', label: 'Bored' },
+        { value: 'busy', label: 'Busy' },
+        { value: 'stressed', label: 'Stressed' },
+        { value: 'tired', label: 'Tired' },
+        { value: 'numb', label: 'Numb' },
+        { value: 'indifferent', label: 'Indifferent' },
+        { value: 'apathetic', label: 'Apathetic' },
+        { value: 'rushed', label: 'Rushed' },
+        { value: 'pressured', label: 'Pressured' },
+        { value: 'overwhelmed', label: 'Overwhelmed' },
+        { value: 'out-of-control', label: 'Out of control' },
+        { value: 'sleepy', label: 'Sleepy' },
+        { value: 'unfocused', label: 'Unfocused' },
+      ]
     },
     { 
       value: 'surprised', 
@@ -407,20 +371,16 @@ export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
         { value: 'disapproving', label: 'Disapproving' },
         { value: 'disappointed', label: 'Disappointed' },
         { value: 'repelled', label: 'Repelled' },
-        { value: 'awful', label: 'Awful', hasSubEmotions: true },
-      ],
-      subEmotions: {
-        awful: [
-          { value: 'judgemental', label: 'Judgemental' },
-          { value: 'embarrassed', label: 'Embarrassed' },
-          { value: 'appalled', label: 'Appalled' },
-          { value: 'revolted', label: 'Revolted' },
-          { value: 'horrified', label: 'Horrified' },
-          { value: 'hesitant', label: 'Hesitant' },
-          { value: 'nauseated', label: 'Nauseated' },
-          { value: 'detestable', label: 'Detestable' },
-        ],
-      }
+        { value: 'awful', label: 'Awful' },
+        { value: 'judgemental', label: 'Judgemental' },
+        { value: 'embarrassed', label: 'Embarrassed' },
+        { value: 'appalled', label: 'Appalled' },
+        { value: 'revolted', label: 'Revolted' },
+        { value: 'horrified', label: 'Horrified' },
+        { value: 'hesitant', label: 'Hesitant' },
+        { value: 'nauseated', label: 'Nauseated' },
+        { value: 'detestable', label: 'Detestable' },
+      ]
     },
   ],
 };
@@ -447,23 +407,17 @@ export const getCategoryByValue = (valence: Valence, categoryValue: string): Emo
   return EMOTION_CATEGORIES[valence]?.find(cat => cat.value === categoryValue);
 };
 
-// Helper to get emotion label (supports sub-emotions)
+// Helper to get emotion label
 export const getEmotionLabel = (valence: Valence, categoryValue: string, emotionValue: string): string => {
-  const category = getCategoryByValue(valence, categoryValue);
-  
-  // Check direct emotions first
-  const emotion = category?.emotions.find(e => e.value === emotionValue);
-  if (emotion) return emotion.label;
-  
-  // Check sub-emotions
-  if (category?.subEmotions) {
-    for (const subList of Object.values(category.subEmotions)) {
-      const subEmotion = subList.find(e => e.value === emotionValue);
-      if (subEmotion) return subEmotion.label;
-    }
+  // For neutral, check the flat list
+  if (valence === 'neutral') {
+    const emotion = NEUTRAL_EMOTIONS.find(e => e.value === emotionValue);
+    return emotion?.label || emotionValue;
   }
   
-  return emotionValue;
+  const category = getCategoryByValue(valence, categoryValue);
+  const emotion = category?.emotions.find(e => e.value === emotionValue);
+  return emotion?.label || emotionValue;
 };
 
 // Get valence color
