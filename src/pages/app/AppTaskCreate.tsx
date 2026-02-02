@@ -655,19 +655,21 @@ const AppTaskCreate = ({
             <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
           </div>
         </button>
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value.slice(0, 50))}
-          onFocus={(e) => {
-            if (Capacitor.isNativePlatform()) {
-              focusedInputRef.current = e.target;
-            }
-          }}
-          placeholder="Task name"
-          className="flex-1 text-2xl font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0"
-          maxLength={50}
-        />
-        <span className="flex-shrink-0 text-xs text-muted-foreground/60">Tap to rename</span>
+        <div className="flex-1 flex items-center gap-1.5 min-w-0">
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value.slice(0, 50))}
+            onFocus={(e) => {
+              if (Capacitor.isNativePlatform()) {
+                focusedInputRef.current = e.target;
+              }
+            }}
+            placeholder="Task name"
+            className="flex-1 text-lg font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0 min-w-0"
+            maxLength={50}
+          />
+          <Pencil className="h-3.5 w-3.5 text-muted-foreground/50 flex-shrink-0" />
+        </div>
       </div>
 
       {/* Color picker - Horizontal circles with checkmark */}
