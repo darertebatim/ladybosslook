@@ -1,9 +1,12 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Check } from 'lucide-react';
 import { useRoutinePlan, useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
+import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface JournalReminderSettingsProps {
   className?: string;
@@ -29,10 +32,15 @@ const SYNTHETIC_JOURNAL_TASK: RoutinePlanTask = {
 };
 
 export const JournalReminderSettings = ({ className }: JournalReminderSettingsProps) => {
+  const navigate = useNavigate();
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
   
   const { data: routinePlan, isLoading } = useRoutinePlan(JOURNAL_ROUTINE_ID);
+  const { data: existingTask } = useExistingProTask('journal');
   const addRoutinePlan = useAddRoutinePlan();
+
+  const isAdded = existingTask || justAdded;
 
   // Use Pro Routine tasks if available, otherwise fall back to synthetic
   const tasksToShow = useMemo(() => {
@@ -54,6 +62,7 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
       });
       toast.success('Journal routine added to your planner!');
       setShowRoutineSheet(false);
+      setJustAdded(true);
     } catch (error) {
       console.error('Failed to add routine:', error);
       toast.error('Failed to add routine');
@@ -65,12 +74,26 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
       <Button
         variant="outline"
         size="sm"
-        onClick={() => setShowRoutineSheet(true)}
+        onClick={isAdded ? () => navigate('/app/home') : () => setShowRoutineSheet(true)}
         disabled={isLoading}
-        className="w-full gap-2 bg-[#F4ECFE] hover:bg-[#E9DCFC] border-[#E9DCFC] text-foreground"
+        className={cn(
+          "w-full gap-2",
+          isAdded 
+            ? "bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700"
+            : "bg-[#F4ECFE] hover:bg-[#E9DCFC] border-[#E9DCFC] text-foreground"
+        )}
       >
-        <Sparkles className="h-4 w-4" />
-        Add Journaling to My Routine
+        {isAdded ? (
+          <>
+            <Check className="h-4 w-4" />
+            Added — Go to Planner
+          </>
+        ) : (
+          <>
+            <Sparkles className="h-4 w-4" />
+            Add Journaling to My Routine
+          </>
+        )}
       </Button>
 
       <RoutinePreviewSheet

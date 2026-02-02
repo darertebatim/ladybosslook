@@ -18,6 +18,7 @@ import { useRoutinePlan, useAddRoutinePlan } from "@/hooks/useRoutinePlans";
 import { useQuickAddPlaylistTask } from "@/hooks/useTaskPlanner";
 import { RoutinePreviewSheet } from "@/components/app/RoutinePreviewSheet";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
   const navigate = useNavigate();
@@ -633,16 +634,26 @@ export default function AppPlaylistDetail() {
             <Button 
               variant="ghost" 
               size="lg"
-              onClick={handleAddToRoutine}
+              onClick={existingTask ? () => navigate('/app/home') : handleAddToRoutine}
               disabled={quickAddTask.isPending}
-              className="w-full gap-2 bg-[#F4ECFE] hover:bg-[#E8DCF8]"
+              className={cn(
+                "w-full gap-2",
+                existingTask 
+                  ? "bg-emerald-50 hover:bg-emerald-100 text-emerald-700" 
+                  : "bg-[#F4ECFE] hover:bg-[#E8DCF8]"
+              )}
             >
               {existingTask ? (
-                <Check className="h-4 w-4 text-green-600" />
+                <>
+                  <Check className="h-4 w-4" />
+                  <span className="text-sm">Added — Go to Planner</span>
+                </>
               ) : (
-                <CalendarPlus className="h-4 w-4" />
+                <>
+                  <CalendarPlus className="h-4 w-4" />
+                  <span className="text-sm">Add to My Routine</span>
+                </>
               )}
-              <span className="text-sm">Add to My Routine</span>
             </Button>
           </div>
         )}

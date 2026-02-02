@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Heart, Share2, Loader2, Check, CalendarPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
-import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask } from '@/hooks/useRoutinesBank';
+import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -54,9 +54,15 @@ export default function AppInspireDetail() {
   const { planId } = useParams<{ planId: string }>();
   const navigate = useNavigate();
   const [showPreviewSheet, setShowPreviewSheet] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
   
   const { data: routine, isLoading } = useRoutineBankDetail(planId);
+  const { data: addedRoutineIds = [] } = useUserAddedBankRoutines();
   const addRoutineFromBank = useAddRoutineFromBank();
+  
+  // Check if routine was already added
+  const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
+  const isAdded = isAlreadyAdded || justAdded;
 
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
@@ -80,8 +86,9 @@ export default function AppInspireDetail() {
         })),
       });
       setShowPreviewSheet(false);
+      setJustAdded(true);
       toast.success(`${selectedTaskIds.length} tasks added!`);
-      navigate('/app/home');
+      // Don't navigate away - let user see the button change
     } catch (error) {
       toast.error('Failed to add routine');
     }
@@ -331,13 +338,26 @@ export default function AppInspireDetail() {
         className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
       >
-        <Button
-          onClick={handleAddClick}
-          className="w-full h-12 text-base font-semibold"
-          size="lg"
-        >
-          + Add to my routine
-        </Button>
+        {isAdded ? (
+          <Button
+            variant="outline"
+            onClick={() => navigate('/app/home')}
+            className="w-full h-12 text-base font-semibold gap-2 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100"
+            size="lg"
+          >
+            <Check className="h-5 w-5" />
+            Added — Go to Planner
+          </Button>
+        ) : (
+          <Button
+            onClick={handleAddClick}
+            className="w-full h-12 text-base font-semibold gap-2"
+            size="lg"
+          >
+            <CalendarPlus className="h-5 w-5" />
+            Add to my routine
+          </Button>
+        )}
       </div>
 
       {/* Preview Sheet */}
