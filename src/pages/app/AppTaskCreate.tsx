@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format, addDays, nextMonday, startOfDay } from 'date-fns';
-import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target, Wind } from 'lucide-react';
+import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target, Wind, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -647,9 +647,13 @@ const AppTaskCreate = ({
       <div className="flex items-center gap-3 pt-5 pb-3 px-4">
         <button
           onClick={() => setShowIconPicker(true)}
-          className="flex-shrink-0 active:scale-95 transition-transform"
+          className="relative flex-shrink-0 active:scale-95 transition-transform"
         >
           <TaskIcon iconName={icon} size={48} className="text-foreground/70" />
+          {/* Tiny pen indicator */}
+          <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-muted flex items-center justify-center">
+            <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+          </div>
         </button>
         <Input
           value={title}
@@ -660,7 +664,7 @@ const AppTaskCreate = ({
             }
           }}
           placeholder="Task name"
-          className="flex-1 text-4xl font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0"
+          className="flex-1 text-2xl font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0"
           maxLength={50}
         />
         <span className="flex-shrink-0 text-xs text-muted-foreground/60">Tap to rename</span>
