@@ -2861,6 +2861,7 @@ export type Database = {
         Row: {
           color: string
           created_at: string
+          description: string | null
           emoji: string
           goal_enabled: boolean
           goal_target: number | null
@@ -2889,6 +2890,7 @@ export type Database = {
         Insert: {
           color?: string
           created_at?: string
+          description?: string | null
           emoji?: string
           goal_enabled?: boolean
           goal_target?: number | null
@@ -2917,6 +2919,7 @@ export type Database = {
         Update: {
           color?: string
           created_at?: string
+          description?: string | null
           emoji?: string
           goal_enabled?: boolean
           goal_target?: number | null
