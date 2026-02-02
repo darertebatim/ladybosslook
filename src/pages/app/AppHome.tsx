@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
 import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Wind, Droplets, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress } from '@/hooks/useTaskPlanner';
+import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { useNewHomeData } from '@/hooks/useNewHomeData';
 import { TaskCard } from '@/components/app/TaskCard';
@@ -304,6 +304,17 @@ const AppHome = () => {
     setSelectedTask(null);
     navigate(`/app/home/edit/${task.id}`);
   }, [navigate]);
+
+  const deleteTask = useDeleteTask();
+  const handleDeleteTask = useCallback((task: UserTask) => {
+    setSelectedTask(null);
+    deleteTask.mutate(task.id, {
+      onSuccess: () => {
+        toast.success('Task deleted');
+        haptic.light();
+      }
+    });
+  }, [deleteTask]);
   const handleTaskTap = useCallback((task: UserTask) => {
     setSelectedTask(task);
   }, []);
@@ -602,6 +613,7 @@ const AppHome = () => {
           completedSubtaskIds={completedSubtaskIds}
           goalProgress={selectedTask ? (goalProgressMap.get(selectedTask.id) || 0) : 0}
           onEdit={handleEditTask}
+          onDelete={handleDeleteTask}
           onStreakIncrease={() => setShowStreakModal(true)}
           onOpenGoalInput={handleOpenGoalInput}
           onOpenTimer={handleOpenTimer}

@@ -1,4 +1,4 @@
-import { Check, X, Pencil, Plus, Play, Droplets } from 'lucide-react';
+import { Check, X, Pencil, Plus, Play, Droplets, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
@@ -26,6 +26,7 @@ interface TaskDetailModalProps {
   completedSubtaskIds: string[];
   goalProgress?: number;
   onEdit: (task: UserTask) => void;
+  onDelete?: (task: UserTask) => void;
   onStreakIncrease?: () => void;
   onOpenGoalInput?: (task: UserTask) => void;
   onOpenTimer?: (task: UserTask) => void;
@@ -41,6 +42,7 @@ export const TaskDetailModal = ({
   completedSubtaskIds,
   goalProgress = 0,
   onEdit,
+  onDelete,
   onStreakIncrease,
   onOpenGoalInput,
   onOpenTimer,
@@ -142,13 +144,26 @@ export const TaskDetailModal = ({
           colorClass
         )}
       >
-        {/* Close button */}
-        <button 
-          onClick={onClose}
-          className="absolute right-4 top-4 w-8 h-8 rounded-full border border-foreground/30 flex items-center justify-center hover:bg-white/30 transition-colors z-10"
-        >
-          <X className="h-4 w-4" strokeWidth={1.5} />
-        </button>
+        {/* Header buttons - Delete and Close */}
+        <div className="absolute right-4 top-4 flex items-center gap-2 z-10">
+          {onDelete && (
+            <button 
+              onClick={() => {
+                onClose();
+                onDelete(task);
+              }}
+              className="w-8 h-8 rounded-full border border-red-400/50 flex items-center justify-center hover:bg-red-100/50 transition-colors"
+            >
+              <Trash2 className="h-4 w-4 text-red-500" strokeWidth={1.5} />
+            </button>
+          )}
+          <button 
+            onClick={onClose}
+            className="w-8 h-8 rounded-full border border-foreground/30 flex items-center justify-center hover:bg-white/30 transition-colors"
+          >
+            <X className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+        </div>
 
         {/* Task header - Me+ style with emoji, time, title */}
         <div className="px-6 pt-6 pb-4">
