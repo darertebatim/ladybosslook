@@ -1,12 +1,13 @@
 import { useState, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   VALENCE_OPTIONS, 
-  EMOTION_CATEGORIES, 
+  EMOTION_CATEGORIES,
+  NEUTRAL_EMOTIONS,
   getCategoryColor,
   type Valence, 
-  type EmotionCategory,
   type CategoryColor 
 } from '@/lib/emotionData';
 import { haptic } from '@/lib/haptics';
@@ -20,89 +21,57 @@ interface EmotionSelectorProps {
 type SelectionState = {
   valence: Valence | null;
   category: string | null;
-  emotion: string | null; // For emotions with sub-emotions
 };
 
 export const EmotionSelector = ({ onComplete, onBack }: EmotionSelectorProps) => {
   const [selection, setSelection] = useState<SelectionState>({
     valence: null,
     category: null,
-    emotion: null,
   });
 
   const categories = selection.valence ? EMOTION_CATEGORIES[selection.valence] : [];
   const selectedCategoryData = categories.find(c => c.value === selection.category);
-  const emotions = selectedCategoryData?.emotions || [];
-  const subEmotions = selection.emotion && selectedCategoryData?.subEmotions?.[selection.emotion] 
-    ? selectedCategoryData.subEmotions[selection.emotion] 
-    : [];
+  
+  // For neutral, use flat emotion list; for others, use category emotions
+  const emotions = selection.valence === 'neutral' 
+    ? NEUTRAL_EMOTIONS 
+    : (selectedCategoryData?.emotions || []);
 
-  // Determine current depth
-  const getDepth = (): number => {
-    if (!selection.valence) return 0;
-    if (!selection.category) return 1;
-    if (!selection.emotion && subEmotions.length === 0) return 2;
-    if (selection.emotion && subEmotions.length > 0) return 3;
-    return 2;
-  };
+  // Neutral skips category step
+  const isNeutral = selection.valence === 'neutral';
 
   const handleValenceSelect = useCallback((valence: Valence) => {
     haptic.light();
-    setSelection({ valence, category: null, emotion: null });
+    setSelection({ valence, category: null });
   }, []);
 
   const handleCategorySelect = useCallback((categoryValue: string) => {
     haptic.light();
-    const category = categories.find(c => c.value === categoryValue);
-    
-    // If category has no emotions (like "Numb"), complete immediately
-    if (category && category.emotions.length === 0) {
-      if (selection.valence) {
-        onComplete(selection.valence, categoryValue, categoryValue);
-      }
-      return;
-    }
-    
-    setSelection(prev => ({ ...prev, category: categoryValue, emotion: null }));
-  }, [categories, selection.valence, onComplete]);
+    setSelection(prev => ({ ...prev, category: categoryValue }));
+  }, []);
 
   const handleEmotionSelect = useCallback((emotionValue: string) => {
-    haptic.light();
-    const emotionOption = emotions.find(e => e.value === emotionValue);
-    
-    // If emotion has sub-emotions, drill deeper
-    if (emotionOption?.hasSubEmotions && selectedCategoryData?.subEmotions?.[emotionValue]) {
-      setSelection(prev => ({ ...prev, emotion: emotionValue }));
-      return;
-    }
-    
-    // Otherwise, complete the flow
-    if (selection.valence && selection.category) {
-      haptic.medium();
-      onComplete(selection.valence, selection.category, emotionValue);
-    }
-  }, [emotions, selectedCategoryData, selection.valence, selection.category, onComplete]);
-
-  const handleSubEmotionSelect = useCallback((subEmotionValue: string) => {
     haptic.medium();
-    if (selection.valence && selection.category) {
-      onComplete(selection.valence, selection.category, subEmotionValue);
+    if (selection.valence) {
+      // For neutral, use the emotion value as both category and emotion
+      const category = isNeutral ? 'neutral' : selection.category;
+      if (category) {
+        onComplete(selection.valence, category, emotionValue);
+      }
     }
-  }, [selection.valence, selection.category, onComplete]);
+  }, [selection.valence, selection.category, isNeutral, onComplete]);
 
   const handleBack = useCallback(() => {
-    if (selection.emotion) {
-      setSelection(prev => ({ ...prev, emotion: null }));
-    } else if (selection.category) {
-      setSelection(prev => ({ ...prev, category: null, emotion: null }));
+    if (selection.category) {
+      setSelection(prev => ({ ...prev, category: null }));
     } else if (selection.valence) {
-      setSelection(prev => ({ valence: null, category: null, emotion: null }));
+      setSelection({ valence: null, category: null });
     } else {
       onBack();
     }
   }, [selection, onBack]);
 
-  const getValenceColor = (valence: Valence, isSelected: boolean): string => {
+  const getValencePillColor = (valence: Valence, isSelected: boolean): string => {
     const option = VALENCE_OPTIONS.find(v => v.value === valence);
     if (!option) return '';
     return isSelected 
@@ -119,6 +88,9 @@ export const EmotionSelector = ({ onComplete, onBack }: EmotionSelectorProps) =>
   const currentColor = selection.valence 
     ? getCategoryColor(selection.valence, selection.category || undefined)
     : VALENCE_OPTIONS[0].color;
+
+  // Show emotions when: neutral is selected OR a category is selected
+  const showEmotions = (isNeutral && selection.valence) || selection.category;
 
   return (
     <div 
@@ -141,7 +113,7 @@ export const EmotionSelector = ({ onComplete, onBack }: EmotionSelectorProps) =>
       </header>
 
       {/* Content - Columns */}
-      <div className="flex-1 flex items-center justify-center px-4 gap-3 overflow-hidden">
+      <div className="flex-1 flex items-center justify-center px-3 gap-2 overflow-hidden">
         {/* Column 1: Valence */}
         <div className="flex flex-col gap-2.5 shrink-0">
           {VALENCE_OPTIONS.map((option) => (
@@ -151,7 +123,7 @@ export const EmotionSelector = ({ onComplete, onBack }: EmotionSelectorProps) =>
               className={cn(
                 "px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200",
                 "active:scale-95",
-                getValenceColor(option.value, selection.valence === option.value)
+                getValencePillColor(option.value, selection.valence === option.value)
               )}
             >
               {option.label}
@@ -159,77 +131,54 @@ export const EmotionSelector = ({ onComplete, onBack }: EmotionSelectorProps) =>
           ))}
         </div>
 
-        {/* Column 2: Categories */}
-        {selection.valence && categories.length > 0 && (
+        {/* Column 2: Categories (not shown for Neutral) */}
+        {selection.valence && !isNeutral && categories.length > 0 && (
           <div className="flex flex-col gap-2 shrink-0 animate-in slide-in-from-right-4 duration-200">
             {categories.map((category) => (
               <button
                 key={category.value}
                 onClick={() => handleCategorySelect(category.value)}
                 className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
+                  "px-3.5 py-2 rounded-full text-sm font-medium transition-all duration-200",
                   "active:scale-95 flex items-center gap-1",
                   getPillColor(category.color, selection.category === category.value)
                 )}
               >
                 {category.label}
-                {category.emotions.length > 0 && (
-                  <ChevronRight className="w-3.5 h-3.5 opacity-60" />
-                )}
+                <ChevronRight className="w-3.5 h-3.5 opacity-60" />
               </button>
             ))}
           </div>
         )}
 
-        {/* Column 3: Emotions */}
-        {selection.category && emotions.length > 0 && !selection.emotion && (
-          <div className="flex flex-col gap-2 shrink-0 animate-in slide-in-from-right-4 duration-200">
-            {emotions.map((emotion) => (
-              <button
-                key={emotion.value}
-                onClick={() => handleEmotionSelect(emotion.value)}
-                className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
-                  "active:scale-95 flex items-center gap-1",
-                  getPillColor(currentColor, false)
-                )}
-              >
-                {emotion.label}
-                {emotion.hasSubEmotions && (
-                  <ChevronRight className="w-3.5 h-3.5 opacity-60" />
-                )}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Column 4: Sub-emotions (only for 3-level deep emotions) */}
-        {selection.emotion && subEmotions.length > 0 && (
-          <div className="flex flex-col gap-2 shrink-0 animate-in slide-in-from-right-4 duration-200 max-h-[60vh] overflow-y-auto">
-            {subEmotions.map((subEmotion) => (
-              <button
-                key={subEmotion.value}
-                onClick={() => handleSubEmotionSelect(subEmotion.value)}
-                className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
-                  "active:scale-95",
-                  getPillColor(currentColor, false)
-                )}
-              >
-                {subEmotion.label}
-              </button>
-            ))}
-          </div>
+        {/* Column 3: Emotions (scrollable for long lists) */}
+        {showEmotions && emotions.length > 0 && (
+          <ScrollArea className="h-[60vh] shrink-0 animate-in slide-in-from-right-4 duration-200">
+            <div className="flex flex-col gap-2 pr-2">
+              {emotions.map((emotion) => (
+                <button
+                  key={emotion.value}
+                  onClick={() => handleEmotionSelect(emotion.value)}
+                  className={cn(
+                    "px-3.5 py-2 rounded-full text-sm font-medium transition-all duration-200",
+                    "active:scale-95 whitespace-nowrap",
+                    getPillColor(currentColor, false)
+                  )}
+                >
+                  {emotion.label}
+                </button>
+              ))}
+            </div>
+          </ScrollArea>
         )}
       </div>
 
       {/* Bottom hint */}
       <div className="shrink-0 pb-safe px-6 py-4">
         <p className="text-xs text-center text-muted-foreground">
-          {getDepth() === 0 && "Start by selecting how you're feeling overall"}
-          {getDepth() === 1 && "What type of feeling is it?"}
-          {getDepth() === 2 && "Which word best captures your emotion?"}
-          {getDepth() === 3 && "Let's get even more specific"}
+          {!selection.valence && "Start by selecting how you're feeling overall"}
+          {selection.valence && !showEmotions && "What type of feeling is it?"}
+          {showEmotions && "Which word best captures your emotion?"}
         </p>
       </div>
     </div>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { CONTEXT_OPTIONS, getValenceColor, getCategoryByValue, getCategoryColor, type Valence } from '@/lib/emotionData';
+import { CONTEXT_OPTIONS, getValenceColor, getCategoryByValue, getCategoryColor, getEmotionLabel, NEUTRAL_EMOTIONS, type Valence } from '@/lib/emotionData';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 
@@ -30,20 +30,8 @@ export const EmotionContext = ({
   const categoryData = getCategoryByValue(valence, category);
   const categoryColor = getCategoryColor(valence, category);
   
-  // Find emotion label - check both direct emotions and sub-emotions
-  let emotionLabel = emotion;
-  const directEmotion = categoryData?.emotions.find(e => e.value === emotion);
-  if (directEmotion) {
-    emotionLabel = directEmotion.label;
-  } else if (categoryData?.subEmotions) {
-    for (const subList of Object.values(categoryData.subEmotions)) {
-      const subEmotion = subList.find(e => e.value === emotion);
-      if (subEmotion) {
-        emotionLabel = subEmotion.label;
-        break;
-      }
-    }
-  }
+  // Get emotion label using the helper
+  const emotionLabel = getEmotionLabel(valence, category, emotion);
 
   const toggleContext = (context: string) => {
     haptic.light();
