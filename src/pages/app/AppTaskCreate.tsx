@@ -655,7 +655,7 @@ const AppTaskCreate = ({
             <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
           </div>
         </button>
-        <div className="flex-1 flex items-center gap-1.5 min-w-0">
+        <div className="relative flex-1 min-w-0">
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value.slice(0, 50))}
@@ -665,10 +665,13 @@ const AppTaskCreate = ({
               }
             }}
             placeholder="Task name"
-            className="flex-1 text-lg font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0 min-w-0"
+            className="w-full text-lg font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0 pr-6"
             maxLength={50}
           />
-          <Pencil className="h-3.5 w-3.5 text-muted-foreground/50 flex-shrink-0" />
+          {/* Tiny pen indicator for title */}
+          <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-muted flex items-center justify-center">
+            <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+          </div>
         </div>
       </div>
 
