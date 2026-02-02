@@ -5,6 +5,7 @@ import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Che
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -75,6 +76,7 @@ const REMINDER_TIMES = Array.from({ length: 24 * 4 }, (_, i) => {
 // Data type for sheet mode callback
 export interface TaskFormData {
   title: string;
+  description: string | null;
   icon: string;
   color: TaskColor;
   scheduledDate: Date;
@@ -148,6 +150,7 @@ const AppTaskCreate = ({
 
   // Form state - prioritize URL params for new tasks
   const [title, setTitle] = useState(initialData?.title || urlName || '');
+  const [description, setDescription] = useState<string | null>(initialData?.description ?? null);
   const [icon, setIcon] = useState(initialData?.icon || urlEmoji || '☀️');
   const [color, setColor] = useState<TaskColor>(initialData?.color || urlColor || 'yellow');
   const [scheduledDate, setScheduledDate] = useState<Date>(initialData?.scheduledDate || new Date());
@@ -327,6 +330,7 @@ const AppTaskCreate = ({
   useEffect(() => {
     if (isSheet && initialData) {
       setTitle(initialData.title || '');
+      setDescription(initialData.description ?? null);
       setIcon(initialData.icon || '☀️');
       setColor(initialData.color || 'yellow');
       setScheduledDate(initialData.scheduledDate || new Date());
@@ -358,6 +362,7 @@ const AppTaskCreate = ({
   useEffect(() => {
     if (!isSheet && existingTask) {
       setTitle(existingTask.title);
+      setDescription(existingTask.description ?? null);
       setIcon(existingTask.emoji);
       setColor(existingTask.color as TaskColor);
       if (existingTask.scheduled_date) {
@@ -408,6 +413,7 @@ const AppTaskCreate = ({
     if (isSheet && onSaveSheet) {
       onSaveSheet({
         title: title.trim(),
+        description,
         icon,
         color,
         scheduledDate,
@@ -435,6 +441,7 @@ const AppTaskCreate = ({
     // Page mode - save to database
     const taskData = {
       title: title.trim(),
+      description,
       emoji: icon,
       color,
       scheduled_date: format(scheduledDate, 'yyyy-MM-dd'),
@@ -640,9 +647,9 @@ const AppTaskCreate = ({
       <div className="px-6 pt-6 pb-4 text-center">
         <button
           onClick={() => setShowIconPicker(true)}
-          className="mx-auto mb-3 active:scale-95 transition-transform"
+          className="mx-auto mb-2 active:scale-95 transition-transform"
         >
-          <TaskIcon iconName={icon} size={64} className="text-foreground/70" />
+          <TaskIcon iconName={icon} size={48} className="text-foreground/70" />
         </button>
         <Input
           value={title}
@@ -679,6 +686,22 @@ const AppTaskCreate = ({
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Description - Simple textarea with placeholder */}
+      <div className="px-4 pb-4">
+        <Textarea
+          value={description || ''}
+          onChange={(e) => setDescription(e.target.value || null)}
+          onFocus={(e) => {
+            if (Capacitor.isNativePlatform()) {
+              focusedInputRef.current = e.target as unknown as HTMLInputElement;
+            }
+          }}
+          placeholder="Add a description or notes..."
+          className="w-full bg-white/60 dark:bg-slate-700/60 border-0 rounded-xl resize-none text-sm placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-foreground/20"
+          rows={2}
+        />
       </div>
 
       {/* Settings Card - White rounded card with list */}

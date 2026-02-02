@@ -171,6 +171,11 @@ export const TaskDetailModal = ({
               <h3 className="text-xl font-bold text-foreground leading-tight">
                 {task.title}
               </h3>
+              {task.description && (
+                <p className="text-sm text-foreground/70 mt-1 line-clamp-2">
+                  {task.description}
+                </p>
+              )}
             </div>
 
             {/* Timer goal: Play button, Count goal: + button, Regular: Checkbox */}

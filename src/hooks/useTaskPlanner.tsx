@@ -14,6 +14,7 @@ export interface UserTask {
   id: string;
   user_id: string;
   title: string;
+  description: string | null;
   emoji: string;
   color: TaskColor;
   scheduled_date: string | null;
@@ -117,6 +118,7 @@ export type TemplateCategory = 'morning' | 'evening' | 'selfcare' | 'business' |
 
 export interface CreateTaskInput {
   title: string;
+  description?: string | null;
   emoji?: string;
   color?: TaskColor;
   scheduled_date?: string | null;
@@ -139,6 +141,7 @@ export interface CreateTaskInput {
 
 export interface UpdateTaskInput extends Partial<CreateTaskInput> {
   id: string;
+  description?: string | null;
   is_active?: boolean;
   order_index?: number;
   is_urgent?: boolean;
@@ -491,6 +494,7 @@ export const useCreateTask = () => {
         .insert({
           user_id: user.id,
           title: taskData.title,
+          description: taskData.description || null,
           emoji: taskData.emoji || '☀️',
           color: taskData.color || 'yellow',
           scheduled_date: taskData.scheduled_date || null,

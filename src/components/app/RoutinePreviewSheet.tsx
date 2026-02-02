@@ -35,6 +35,7 @@ export const getProLinkColor = (proLinkType: ProLinkType | null | undefined, ind
 export interface EditedTask {
   id: string;
   title: string;
+  description?: string | null;
   icon?: string;
   color?: TaskColor;
   repeatPattern?: 'daily' | 'weekly' | 'monthly' | 'none';
@@ -112,6 +113,7 @@ export function RoutinePreviewSheet({
       [editingTaskId]: {
         id: editingTaskId,
         title: data.title,
+        description: data.description,
         icon: data.icon,
         color: data.color,
         repeatPattern: data.repeatEnabled ? data.repeatPattern : 'none',
