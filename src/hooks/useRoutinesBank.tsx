@@ -45,6 +45,11 @@ export interface RoutineBankTask {
   pro_link_value?: string | null;
   linked_playlist_id?: string | null;
   color?: string | null;
+  // Goal fields from admin_task_bank
+  goal_enabled?: boolean;
+  goal_target?: number | null;
+  goal_type?: string | null;
+  goal_unit?: string | null;
 }
 
 export interface RoutineBankWithDetails extends RoutineBankItem {
@@ -220,14 +225,23 @@ export function useRoutineBankDetail(routineId: string | undefined) {
 
       if (tasksError) throw tasksError;
 
-      // Get pro_link info from admin_task_bank for each task
+      // Get pro_link info and goal info from admin_task_bank for each task
       const taskIds = tasks.filter(t => t.task_id).map(t => t.task_id);
-      let taskDetails: Record<string, { pro_link_type: string | null; pro_link_value: string | null; linked_playlist_id: string | null; color: string | null }> = {};
+      let taskDetails: Record<string, { 
+        pro_link_type: string | null; 
+        pro_link_value: string | null; 
+        linked_playlist_id: string | null; 
+        color: string | null;
+        goal_enabled: boolean;
+        goal_target: number | null;
+        goal_type: string | null;
+        goal_unit: string | null;
+      }> = {};
       
       if (taskIds.length > 0) {
         const { data: bankTasks } = await supabase
           .from('admin_task_bank')
-          .select('id, pro_link_type, pro_link_value, linked_playlist_id, color')
+          .select('id, pro_link_type, pro_link_value, linked_playlist_id, color, goal_enabled, goal_target, goal_type, goal_unit')
           .in('id', taskIds);
 
         bankTasks?.forEach(bt => {
@@ -236,17 +250,25 @@ export function useRoutineBankDetail(routineId: string | undefined) {
             pro_link_value: bt.pro_link_value,
             linked_playlist_id: bt.linked_playlist_id,
             color: bt.color,
+            goal_enabled: bt.goal_enabled ?? false,
+            goal_target: bt.goal_target,
+            goal_type: bt.goal_type,
+            goal_unit: bt.goal_unit,
           };
         });
       }
 
-      // Enrich tasks with pro_link info
+      // Enrich tasks with pro_link info and goal info
       const enrichedTasks = tasks.map(task => ({
         ...task,
         pro_link_type: task.task_id ? taskDetails[task.task_id]?.pro_link_type : null,
         pro_link_value: task.task_id ? taskDetails[task.task_id]?.pro_link_value : null,
         linked_playlist_id: task.task_id ? taskDetails[task.task_id]?.linked_playlist_id : null,
         color: task.task_id ? taskDetails[task.task_id]?.color : null,
+        goal_enabled: task.task_id ? taskDetails[task.task_id]?.goal_enabled : false,
+        goal_target: task.task_id ? taskDetails[task.task_id]?.goal_target : null,
+        goal_type: task.task_id ? taskDetails[task.task_id]?.goal_type : null,
+        goal_unit: task.task_id ? taskDetails[task.task_id]?.goal_unit : null,
       }));
 
       return {
