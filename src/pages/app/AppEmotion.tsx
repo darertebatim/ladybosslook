@@ -5,6 +5,7 @@ import { EmotionSelector } from '@/components/emotion/EmotionSelector';
 import { EmotionContext } from '@/components/emotion/EmotionContext';
 import { EmotionComplete } from '@/components/emotion/EmotionComplete';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import type { Valence } from '@/lib/emotionData';
 
 type Step = 'dashboard' | 'select' | 'context' | 'complete';
@@ -18,6 +19,7 @@ interface EmotionState {
 const AppEmotion = () => {
   const navigate = useNavigate();
   const { createLog } = useEmotionLogs();
+  const { autoCompleteEmotion } = useAutoCompleteProTask();
   
   const [step, setStep] = useState<Step>('dashboard');
   const [state, setState] = useState<EmotionState>({
@@ -46,8 +48,11 @@ const AppEmotion = () => {
       notes: notes || undefined,
     });
 
+    // Auto-complete any emotion pro tasks for today
+    await autoCompleteEmotion();
+
     setStep('complete');
-  }, [state, createLog]);
+  }, [state, createLog, autoCompleteEmotion]);
 
   const handleDone = useCallback(() => {
     // Reset state and go back to dashboard
