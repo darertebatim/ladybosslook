@@ -144,19 +144,8 @@ export const TaskDetailModal = ({
           colorClass
         )}
       >
-        {/* Header buttons - Delete and Close */}
-        <div className="absolute right-4 top-4 flex items-center gap-2 z-10">
-          {onDelete && (
-            <button 
-              onClick={() => {
-                onClose();
-                onDelete(task);
-              }}
-              className="w-8 h-8 rounded-full border border-red-400/50 flex items-center justify-center hover:bg-red-100/50 transition-colors"
-            >
-              <Trash2 className="h-4 w-4 text-red-500" strokeWidth={1.5} />
-            </button>
-          )}
+        {/* Header - Close button only */}
+        <div className="absolute right-4 top-4 z-10">
           <button 
             onClick={onClose}
             className="w-8 h-8 rounded-full border border-foreground/30 flex items-center justify-center hover:bg-white/30 transition-colors"
@@ -305,48 +294,48 @@ export const TaskDetailModal = ({
         {/* Action buttons */}
         <div className="px-6 pb-6 pt-2 space-y-3">
           {/* Pro Task: Navigation button */}
-          {isProTask && proConfig ? (
-            <>
-              <Button
-                onClick={() => {
-                  onClose();
-                  navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
-                }}
-                className={cn('w-full gap-2 h-12 rounded-2xl', proConfig.buttonClass)}
-              >
-                {(() => {
-                  const ProIcon = proConfig.icon;
-                  return <ProIcon className="h-5 w-5" />;
-                })()}
-                {proConfig.badgeText}
-              </Button>
-              {/* Edit button */}
-              <Button
-                variant="outline"
-                onClick={() => {
-                  onClose();
-                  onEdit(task);
-                }}
-                className="w-full gap-2 h-12 rounded-full border-2 border-foreground/30 bg-transparent hover:bg-white/30 text-foreground"
-              >
-                <Pencil className="h-4 w-4" />
-                Edit Task
-              </Button>
-            </>
-          ) : (
-            /* Regular Task: Edit button - Me+ style rounded pill */
+          {isProTask && proConfig && (
+            <Button
+              onClick={() => {
+                onClose();
+                navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
+              }}
+              className={cn('w-full gap-2 h-12 rounded-2xl', proConfig.buttonClass)}
+            >
+              {(() => {
+                const ProIcon = proConfig.icon;
+                return <ProIcon className="h-5 w-5" />;
+              })()}
+              {proConfig.badgeText}
+            </Button>
+          )}
+          
+          {/* Edit and Delete buttons row */}
+          <div className="flex gap-2">
             <Button
               variant="outline"
               onClick={() => {
                 onClose();
                 onEdit(task);
               }}
-              className="w-full gap-2 h-12 rounded-full border-2 border-foreground/30 bg-transparent hover:bg-white/30 text-foreground"
+              className="flex-1 gap-2 h-12 rounded-full border-2 border-foreground/30 bg-transparent hover:bg-white/30 text-foreground"
             >
               <Pencil className="h-4 w-4" />
               Edit Task
             </Button>
-          )}
+            {onDelete && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  onClose();
+                  onDelete(task);
+                }}
+                className="w-12 h-12 p-0 rounded-xl border-2 border-red-300 bg-transparent hover:bg-red-50 text-red-500"
+              >
+                <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
