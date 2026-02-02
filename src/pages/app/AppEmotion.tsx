@@ -1,13 +1,13 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EmotionIntro } from '@/components/emotion/EmotionIntro';
+import { EmotionDashboard } from '@/components/emotion/EmotionDashboard';
 import { EmotionSelector } from '@/components/emotion/EmotionSelector';
 import { EmotionContext } from '@/components/emotion/EmotionContext';
 import { EmotionComplete } from '@/components/emotion/EmotionComplete';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import type { Valence } from '@/lib/emotionData';
 
-type Step = 'intro' | 'select' | 'context' | 'complete';
+type Step = 'dashboard' | 'select' | 'context' | 'complete';
 
 interface EmotionState {
   valence: Valence | null;
@@ -19,7 +19,7 @@ const AppEmotion = () => {
   const navigate = useNavigate();
   const { createLog } = useEmotionLogs();
   
-  const [step, setStep] = useState<Step>('intro');
+  const [step, setStep] = useState<Step>('dashboard');
   const [state, setState] = useState<EmotionState>({
     valence: null,
     category: null,
@@ -27,7 +27,7 @@ const AppEmotion = () => {
   });
 
   // Navigation handlers
-  const handleStart = useCallback(() => setStep('select'), []);
+  const handleStartCheckIn = useCallback(() => setStep('select'), []);
   
   const handleEmotionComplete = useCallback((valence: Valence, category: string, emotions: string[]) => {
     setState({ valence, category, emotions });
@@ -50,13 +50,15 @@ const AppEmotion = () => {
   }, [state, createLog]);
 
   const handleDone = useCallback(() => {
-    navigate('/app/home');
-  }, [navigate]);
+    // Reset state and go back to dashboard
+    setState({ valence: null, category: null, emotions: [] });
+    setStep('dashboard');
+  }, []);
 
   const handleBack = useCallback(() => {
     switch (step) {
       case 'select':
-        setStep('intro');
+        setStep('dashboard');
         break;
       case 'context':
         setStep('select');
@@ -68,8 +70,8 @@ const AppEmotion = () => {
 
   // Render current step
   switch (step) {
-    case 'intro':
-      return <EmotionIntro onStart={handleStart} />;
+    case 'dashboard':
+      return <EmotionDashboard onStartCheckIn={handleStartCheckIn} />;
     
     case 'select':
       return (
