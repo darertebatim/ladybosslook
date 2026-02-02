@@ -7,7 +7,7 @@ import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask } from '@/
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-
+import { TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
   pink: 'from-pink-400 to-pink-600',
@@ -231,23 +231,31 @@ export default function AppInspireDetail() {
                       />
                     )}
                     {sectionTasks.length > 0 && (
-                      <div className="space-y-2">
-                        {sectionTasks.map((task, index) => (
-                          <div
-                            key={task.id}
-                            className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl"
-                          >
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-                              {index + 1}
+                      <div className="space-y-3">
+                        {sectionTasks.map((task) => {
+                          const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
+                          return (
+                            <div
+                              key={task.id}
+                              className="rounded-xl border border-border/50 overflow-hidden"
+                              style={{ backgroundColor: bgColor }}
+                            >
+                              <div className="flex items-center gap-3 p-3">
+                                <span className="text-2xl shrink-0">
+                                  {task.emoji && isEmoji(task.emoji) ? task.emoji : '📝'}
+                                </span>
+                                <p className="font-medium text-black truncate flex-1">{task.title}</p>
+                              </div>
+                              {task.description && (
+                                <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
+                                  <p className="text-xs text-black/80 leading-relaxed">
+                                    {task.description}
+                                  </p>
+                                </div>
+                              )}
                             </div>
-                            <span className="text-xl">
-                              {task.emoji && isEmoji(task.emoji) ? task.emoji : '✨'}
-                            </span>
-                            <div className="flex-1">
-                              <span className="text-foreground">{task.title}</span>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -257,23 +265,31 @@ export default function AppInspireDetail() {
           ) : routine.tasks && routine.tasks.length > 0 ? (
             <div className="mt-6">
               <h2 className="text-lg font-semibold text-foreground mb-3">What's Included</h2>
-              <div className="space-y-2">
-                {routine.tasks.map((task, index) => (
-                  <div
-                    key={task.id}
-                    className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-                      {index + 1}
+              <div className="space-y-3">
+                {routine.tasks.map((task) => {
+                  const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
+                  return (
+                    <div
+                      key={task.id}
+                      className="rounded-xl border border-border/50 overflow-hidden"
+                      style={{ backgroundColor: bgColor }}
+                    >
+                      <div className="flex items-center gap-3 p-3">
+                        <span className="text-2xl shrink-0">
+                          {task.emoji && isEmoji(task.emoji) ? task.emoji : '📝'}
+                        </span>
+                        <p className="font-medium text-black truncate flex-1">{task.title}</p>
+                      </div>
+                      {task.description && (
+                        <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
+                          <p className="text-xs text-black/80 leading-relaxed">
+                            {task.description}
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    <span className="text-xl">
-                      {task.emoji && isEmoji(task.emoji) ? task.emoji : '✨'}
-                    </span>
-                    <div className="flex-1">
-                      <span className="text-foreground">{task.title}</span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ) : null}
