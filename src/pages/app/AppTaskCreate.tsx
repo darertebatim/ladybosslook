@@ -152,7 +152,7 @@ const AppTaskCreate = ({
   const [title, setTitle] = useState(initialData?.title || urlName || '');
   const [description, setDescription] = useState<string | null>(initialData?.description ?? null);
   const [icon, setIcon] = useState(initialData?.icon || urlEmoji || '☀️');
-  const [color, setColor] = useState<TaskColor>(initialData?.color || urlColor || 'yellow');
+  const [color, setColor] = useState<TaskColor>(initialData?.color || urlColor || 'mint');
   const [scheduledDate, setScheduledDate] = useState<Date>(initialData?.scheduledDate || new Date());
   const [scheduledTime, setScheduledTime] = useState<string | null>(initialData?.scheduledTime ?? null);
   const [scheduledEndTime, setScheduledEndTime] = useState<string | null>(null);
@@ -801,10 +801,10 @@ const AppTaskCreate = ({
         >
           <div className="flex items-center gap-3">
             <Tag className="h-5 w-5 text-foreground/70" />
-            <span className="font-medium">Tag</span>
+            <span className="font-medium">Category</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
-            <span>{tag || 'No tag'}</span>
+            <span>{tag || 'No category'}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
         </button>
@@ -1574,7 +1574,7 @@ const AppTaskCreate = ({
               <button onClick={() => setShowTagPicker(false)} className="p-2 -ml-2">
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <span className="text-lg font-medium">Tag</span>
+              <span className="text-lg font-medium">Category</span>
               <Button
                 variant="ghost"
                 onClick={() => setShowTagPicker(false)}
@@ -1586,7 +1586,7 @@ const AppTaskCreate = ({
 
             {/* Title */}
             <div className="px-6 pb-2">
-              <h2 className="text-3xl font-bold">Tag</h2>
+              <h2 className="text-3xl font-bold">Category</h2>
             </div>
 
             {/* Tag list */}
