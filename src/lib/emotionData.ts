@@ -3,45 +3,136 @@ export type Valence = 'pleasant' | 'neutral' | 'unpleasant';
 export interface EmotionOption {
   value: string;
   label: string;
+  hasSubEmotions?: boolean;
+}
+
+export interface CategoryColor {
+  bg: string;
+  bgActive: string;
+  text: string;
+  textActive: string;
 }
 
 export interface EmotionCategory {
   value: string;
   label: string;
+  color: CategoryColor;
   emotions: EmotionOption[];
+  subEmotions?: Record<string, EmotionOption[]>;
 }
 
+// Valence options with Finch-style colors
 export const VALENCE_OPTIONS: Array<{
   value: Valence;
   label: string;
-  color: string;
-  bgClass: string;
+  color: CategoryColor;
 }> = [
   { 
     value: 'pleasant', 
     label: 'Pleasant', 
-    color: 'hsl(38, 92%, 50%)',
-    bgClass: 'bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-200' 
+    color: {
+      bg: 'bg-[#FFF3E0]',
+      bgActive: 'bg-[#FF9800]',
+      text: 'text-[#E65100]',
+      textActive: 'text-white',
+    }
   },
   { 
     value: 'neutral', 
     label: 'Neutral', 
-    color: 'hsl(215, 16%, 47%)',
-    bgClass: 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200' 
+    color: {
+      bg: 'bg-[#E3F2FD]',
+      bgActive: 'bg-[#1976D2]',
+      text: 'text-[#1565C0]',
+      textActive: 'text-white',
+    }
   },
   { 
     value: 'unpleasant', 
     label: 'Unpleasant', 
-    color: 'hsl(263, 70%, 50%)',
-    bgClass: 'bg-violet-100 text-violet-700 border-violet-200 hover:bg-violet-200' 
+    color: {
+      bg: 'bg-[#F3E5F5]',
+      bgActive: 'bg-[#7B1FA2]',
+      text: 'text-[#6A1B9A]',
+      textActive: 'text-white',
+    }
   },
 ];
+
+// Category colors for Unpleasant emotions (Finch-style)
+const CATEGORY_COLORS: Record<string, CategoryColor> = {
+  // Pleasant - warm orange/yellow
+  pleasant: {
+    bg: 'bg-[#FFF3E0]',
+    bgActive: 'bg-[#FF9800]',
+    text: 'text-[#E65100]',
+    textActive: 'text-white',
+  },
+  // Neutral - blue-gray
+  neutral: {
+    bg: 'bg-[#E3F2FD]',
+    bgActive: 'bg-[#1976D2]',
+    text: 'text-[#1565C0]',
+    textActive: 'text-white',
+  },
+  // Sad - blue-gray
+  sad: {
+    bg: 'bg-[#CFD8DC]',
+    bgActive: 'bg-[#546E7A]',
+    text: 'text-[#37474F]',
+    textActive: 'text-white',
+  },
+  // Angry - red tint
+  angry: {
+    bg: 'bg-[#FFCDD2]',
+    bgActive: 'bg-[#E53935]',
+    text: 'text-[#C62828]',
+    textActive: 'text-white',
+  },
+  // Fearful - dark slate
+  fearful: {
+    bg: 'bg-[#455A64]',
+    bgActive: 'bg-[#263238]',
+    text: 'text-white',
+    textActive: 'text-white',
+  },
+  // Down - light gray
+  down: {
+    bg: 'bg-[#ECEFF1]',
+    bgActive: 'bg-[#78909C]',
+    text: 'text-[#546E7A]',
+    textActive: 'text-white',
+  },
+  // Surprised - pink
+  surprised: {
+    bg: 'bg-[#FCE4EC]',
+    bgActive: 'bg-[#E91E63]',
+    text: 'text-[#AD1457]',
+    textActive: 'text-white',
+  },
+  // Disgusted - brown tint
+  disgusted: {
+    bg: 'bg-[#EFEBE9]',
+    bgActive: 'bg-[#795548]',
+    text: 'text-[#5D4037]',
+    textActive: 'text-white',
+  },
+};
+
+// Helper to get category color
+export const getCategoryColor = (valence: Valence, categoryValue?: string): CategoryColor => {
+  if (valence === 'unpleasant' && categoryValue) {
+    return CATEGORY_COLORS[categoryValue] || CATEGORY_COLORS.sad;
+  }
+  return CATEGORY_COLORS[valence] || CATEGORY_COLORS.pleasant;
+};
 
 export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
   pleasant: [
     { 
       value: 'optimistic', 
       label: 'Optimistic',
+      color: CATEGORY_COLORS.pleasant,
       emotions: [
         { value: 'hopeful', label: 'Hopeful' },
         { value: 'inspired', label: 'Inspired' },
@@ -53,6 +144,7 @@ export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
     { 
       value: 'accepted', 
       label: 'Accepted',
+      color: CATEGORY_COLORS.pleasant,
       emotions: [
         { value: 'respected', label: 'Respected' },
         { value: 'valued', label: 'Valued' },
@@ -63,28 +155,32 @@ export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
     { 
       value: 'content', 
       label: 'Content',
+      color: CATEGORY_COLORS.pleasant,
       emotions: [
         { value: 'calm', label: 'Calm' },
+        { value: 'mellow', label: 'Mellow' },
+        { value: 'good', label: 'Good' },
+        { value: 'fulfilled', label: 'Fulfilled' },
         { value: 'peaceful', label: 'Peaceful' },
+        { value: 'comfortable', label: 'Comfortable' },
         { value: 'balanced', label: 'Balanced' },
-        { value: 'satisfied', label: 'Satisfied' },
-        { value: 'relaxed', label: 'Relaxed' },
       ]
     },
     { 
       value: 'powerful', 
       label: 'Powerful',
+      color: CATEGORY_COLORS.pleasant,
       emotions: [
         { value: 'confident', label: 'Confident' },
         { value: 'courageous', label: 'Courageous' },
         { value: 'creative', label: 'Creative' },
         { value: 'successful', label: 'Successful' },
-        { value: 'provocative', label: 'Provocative' },
       ]
     },
     { 
       value: 'interested', 
       label: 'Interested',
+      color: CATEGORY_COLORS.pleasant,
       emotions: [
         { value: 'inquisitive', label: 'Inquisitive' },
         { value: 'amused', label: 'Amused' },
@@ -95,6 +191,7 @@ export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
     { 
       value: 'playful', 
       label: 'Playful',
+      color: CATEGORY_COLORS.pleasant,
       emotions: [
         { value: 'aroused', label: 'Aroused' },
         { value: 'cheeky', label: 'Cheeky' },
@@ -105,6 +202,7 @@ export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
     { 
       value: 'proud', 
       label: 'Proud',
+      color: CATEGORY_COLORS.pleasant,
       emotions: [
         { value: 'important', label: 'Important' },
         { value: 'worthy', label: 'Worthy' },
@@ -115,6 +213,7 @@ export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
     { 
       value: 'peaceful', 
       label: 'Peaceful',
+      color: CATEGORY_COLORS.pleasant,
       emotions: [
         { value: 'loving', label: 'Loving' },
         { value: 'thankful', label: 'Thankful' },
@@ -125,6 +224,7 @@ export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
     { 
       value: 'trusting', 
       label: 'Trusting',
+      color: CATEGORY_COLORS.pleasant,
       emotions: [
         { value: 'sensitive', label: 'Sensitive' },
         { value: 'intimate', label: 'Intimate' },
@@ -136,123 +236,191 @@ export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
     { 
       value: 'bored', 
       label: 'Bored',
+      color: CATEGORY_COLORS.neutral,
       emotions: [
         { value: 'indifferent', label: 'Indifferent' },
         { value: 'apathetic', label: 'Apathetic' },
-        { value: 'unfocused', label: 'Unfocused' },
-        { value: 'detached', label: 'Detached' },
       ]
     },
     { 
       value: 'busy', 
       label: 'Busy',
+      color: CATEGORY_COLORS.neutral,
       emotions: [
         { value: 'rushed', label: 'Rushed' },
         { value: 'pressured', label: 'Pressured' },
-        { value: 'occupied', label: 'Occupied' },
-        { value: 'preoccupied', label: 'Preoccupied' },
       ]
     },
     { 
       value: 'stressed', 
       label: 'Stressed',
+      color: CATEGORY_COLORS.neutral,
       emotions: [
         { value: 'overwhelmed', label: 'Overwhelmed' },
-        { value: 'tense', label: 'Tense' },
-        { value: 'out-of-control', label: 'Out of Control' },
-        { value: 'restless', label: 'Restless' },
+        { value: 'out-of-control', label: 'Out of control' },
       ]
     },
     { 
       value: 'tired', 
       label: 'Tired',
+      color: CATEGORY_COLORS.neutral,
       emotions: [
-        { value: 'exhausted', label: 'Exhausted' },
         { value: 'sleepy', label: 'Sleepy' },
-        { value: 'drained', label: 'Drained' },
         { value: 'unfocused', label: 'Unfocused' },
       ]
     },
     { 
       value: 'numb', 
       label: 'Numb',
-      emotions: [
-        { value: 'empty', label: 'Empty' },
-        { value: 'disconnected', label: 'Disconnected' },
-        { value: 'spaced-out', label: 'Spaced Out' },
-        { value: 'flat', label: 'Flat' },
-      ]
+      color: CATEGORY_COLORS.neutral,
+      emotions: [] // Direct select, no sub-emotions
     },
   ],
   unpleasant: [
     { 
       value: 'sad', 
       label: 'Sad',
+      color: CATEGORY_COLORS.sad,
       emotions: [
-        { value: 'lonely', label: 'Lonely' },
+        { value: 'lonely', label: 'Lonely', hasSubEmotions: true },
         { value: 'vulnerable', label: 'Vulnerable' },
         { value: 'depressed', label: 'Depressed' },
         { value: 'hurt', label: 'Hurt' },
         { value: 'despair', label: 'Despair' },
-        { value: 'guilty', label: 'Guilty' },
-      ]
+        { value: 'guilty', label: 'Guilty', hasSubEmotions: true },
+      ],
+      subEmotions: {
+        lonely: [
+          { value: 'isolated', label: 'Isolated' },
+          { value: 'abandoned', label: 'Abandoned' },
+          { value: 'forlorn', label: 'Forlorn' },
+          { value: 'alienated', label: 'Alienated' },
+          { value: 'nostalgic', label: 'Nostalgic' },
+          { value: 'victimized', label: 'Victimized' },
+          { value: 'fragile', label: 'Fragile' },
+          { value: 'lost', label: 'Lost' },
+        ],
+        guilty: [
+          { value: 'embarrassed', label: 'Embarrassed' },
+          { value: 'disappointed', label: 'Disappointed' },
+          { value: 'powerless', label: 'Powerless' },
+          { value: 'grief', label: 'Grief' },
+          { value: 'trapped', label: 'Trapped' },
+          { value: 'discouraged', label: 'Discouraged' },
+          { value: 'ashamed', label: 'Ashamed' },
+          { value: 'remorseful', label: 'Remorseful' },
+        ],
+      }
     },
     { 
       value: 'angry', 
       label: 'Angry',
+      color: CATEGORY_COLORS.angry,
       emotions: [
         { value: 'mad', label: 'Mad' },
         { value: 'aggressive', label: 'Aggressive' },
         { value: 'frustrated', label: 'Frustrated' },
         { value: 'bitter', label: 'Bitter' },
         { value: 'distant', label: 'Distant' },
-        { value: 'critical', label: 'Critical' },
-      ]
+        { value: 'critical', label: 'Critical', hasSubEmotions: true },
+      ],
+      subEmotions: {
+        critical: [
+          { value: 'betrayed', label: 'Betrayed' },
+          { value: 'humiliated', label: 'Humiliated' },
+          { value: 'infuriated', label: 'Infuriated' },
+          { value: 'annoyed', label: 'Annoyed' },
+          { value: 'furious', label: 'Furious' },
+          { value: 'provoked', label: 'Provoked' },
+          { value: 'jealous', label: 'Jealous' },
+          { value: 'hostile', label: 'Hostile' },
+        ],
+      }
     },
     { 
       value: 'fearful', 
       label: 'Fearful',
+      color: CATEGORY_COLORS.fearful,
       emotions: [
         { value: 'scared', label: 'Scared' },
         { value: 'anxious', label: 'Anxious' },
         { value: 'insecure', label: 'Insecure' },
         { value: 'weak', label: 'Weak' },
         { value: 'rejected', label: 'Rejected' },
-        { value: 'threatened', label: 'Threatened' },
-      ]
+        { value: 'threatened', label: 'Threatened', hasSubEmotions: true },
+      ],
+      subEmotions: {
+        threatened: [
+          { value: 'helpless', label: 'Helpless' },
+          { value: 'frightened', label: 'Frightened' },
+          { value: 'terrified', label: 'Terrified' },
+          { value: 'panicked', label: 'Panicked' },
+          { value: 'overwhelmed', label: 'Overwhelmed' },
+          { value: 'worried', label: 'Worried' },
+          { value: 'jittery', label: 'Jittery' },
+          { value: 'fomo', label: 'FOMO' },
+        ],
+      }
     },
     { 
       value: 'down', 
       label: 'Down',
+      color: CATEGORY_COLORS.down,
       emotions: [
-        { value: 'disappointed', label: 'Disappointed' },
+        { value: 'insecure', label: 'Insecure' },
         { value: 'inferior', label: 'Inferior' },
-        { value: 'inadequate', label: 'Inadequate' },
+        { value: 'pessimistic', label: 'Pessimistic' },
+        { value: 'miserable', label: 'Miserable', hasSubEmotions: true },
         { value: 'empty', label: 'Empty' },
-        { value: 'embarrassed', label: 'Embarrassed' },
-      ]
+      ],
+      subEmotions: {
+        miserable: [
+          { value: 'embarrassed', label: 'Embarrassed' },
+          { value: 'disappointed', label: 'Disappointed' },
+          { value: 'powerless', label: 'Powerless' },
+          { value: 'grief', label: 'Grief' },
+          { value: 'trapped', label: 'Trapped' },
+          { value: 'discouraged', label: 'Discouraged' },
+          { value: 'ashamed', label: 'Ashamed' },
+          { value: 'remorseful', label: 'Remorseful' },
+        ],
+      }
     },
     { 
       value: 'surprised', 
       label: 'Surprised',
+      color: CATEGORY_COLORS.surprised,
       emotions: [
         { value: 'startled', label: 'Startled' },
-        { value: 'confused', label: 'Confused' },
-        { value: 'amazed', label: 'Amazed' },
-        { value: 'dismayed', label: 'Dismayed' },
         { value: 'shocked', label: 'Shocked' },
+        { value: 'dismayed', label: 'Dismayed' },
+        { value: 'confused', label: 'Confused' },
+        { value: 'disillusioned', label: 'Disillusioned' },
+        { value: 'perplexed', label: 'Perplexed' },
       ]
     },
     { 
       value: 'disgusted', 
       label: 'Disgusted',
+      color: CATEGORY_COLORS.disgusted,
       emotions: [
         { value: 'disapproving', label: 'Disapproving' },
-        { value: 'judgmental', label: 'Judgmental' },
-        { value: 'awful', label: 'Awful' },
-        { value: 'revulsion', label: 'Revulsion' },
-        { value: 'loathing', label: 'Loathing' },
-      ]
+        { value: 'disappointed', label: 'Disappointed' },
+        { value: 'repelled', label: 'Repelled' },
+        { value: 'awful', label: 'Awful', hasSubEmotions: true },
+      ],
+      subEmotions: {
+        awful: [
+          { value: 'judgemental', label: 'Judgemental' },
+          { value: 'embarrassed', label: 'Embarrassed' },
+          { value: 'appalled', label: 'Appalled' },
+          { value: 'revolted', label: 'Revolted' },
+          { value: 'horrified', label: 'Horrified' },
+          { value: 'hesitant', label: 'Hesitant' },
+          { value: 'nauseated', label: 'Nauseated' },
+          { value: 'detestable', label: 'Detestable' },
+        ],
+      }
     },
   ],
 };
@@ -279,14 +447,26 @@ export const getCategoryByValue = (valence: Valence, categoryValue: string): Emo
   return EMOTION_CATEGORIES[valence]?.find(cat => cat.value === categoryValue);
 };
 
-// Helper to get emotion label
+// Helper to get emotion label (supports sub-emotions)
 export const getEmotionLabel = (valence: Valence, categoryValue: string, emotionValue: string): string => {
   const category = getCategoryByValue(valence, categoryValue);
+  
+  // Check direct emotions first
   const emotion = category?.emotions.find(e => e.value === emotionValue);
-  return emotion?.label || emotionValue;
+  if (emotion) return emotion.label;
+  
+  // Check sub-emotions
+  if (category?.subEmotions) {
+    for (const subList of Object.values(category.subEmotions)) {
+      const subEmotion = subList.find(e => e.value === emotionValue);
+      if (subEmotion) return subEmotion.label;
+    }
+  }
+  
+  return emotionValue;
 };
 
-// Get valence color class
-export const getValenceClass = (valence: Valence): string => {
-  return VALENCE_OPTIONS.find(v => v.value === valence)?.bgClass || '';
+// Get valence color
+export const getValenceColor = (valence: Valence): CategoryColor => {
+  return VALENCE_OPTIONS.find(v => v.value === valence)?.color || VALENCE_OPTIONS[0].color;
 };

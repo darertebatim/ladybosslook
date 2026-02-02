@@ -1,15 +1,13 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EmotionIntro } from '@/components/emotion/EmotionIntro';
-import { EmotionValence } from '@/components/emotion/EmotionValence';
-import { EmotionCategory } from '@/components/emotion/EmotionCategory';
-import { EmotionSpecific } from '@/components/emotion/EmotionSpecific';
+import { EmotionSelector } from '@/components/emotion/EmotionSelector';
 import { EmotionContext } from '@/components/emotion/EmotionContext';
 import { EmotionComplete } from '@/components/emotion/EmotionComplete';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import type { Valence } from '@/lib/emotionData';
 
-type Step = 'intro' | 'valence' | 'category' | 'specific' | 'context' | 'complete';
+type Step = 'intro' | 'select' | 'context' | 'complete';
 
 interface EmotionState {
   valence: Valence | null;
@@ -29,20 +27,10 @@ const AppEmotion = () => {
   });
 
   // Navigation handlers
-  const handleStart = useCallback(() => setStep('valence'), []);
+  const handleStart = useCallback(() => setStep('select'), []);
   
-  const handleValenceSelect = useCallback((valence: Valence) => {
-    setState(prev => ({ ...prev, valence }));
-    setStep('category');
-  }, []);
-
-  const handleCategorySelect = useCallback((category: string) => {
-    setState(prev => ({ ...prev, category }));
-    setStep('specific');
-  }, []);
-
-  const handleEmotionSelect = useCallback((emotion: string) => {
-    setState(prev => ({ ...prev, emotion }));
+  const handleEmotionComplete = useCallback((valence: Valence, category: string, emotion: string) => {
+    setState({ valence, category, emotion });
     setStep('context');
   }, []);
 
@@ -66,19 +54,11 @@ const AppEmotion = () => {
 
   const handleBack = useCallback(() => {
     switch (step) {
-      case 'valence':
+      case 'select':
         setStep('intro');
         break;
-      case 'category':
-        setStep('valence');
-        setState(prev => ({ ...prev, category: null }));
-        break;
-      case 'specific':
-        setStep('category');
-        setState(prev => ({ ...prev, emotion: null }));
-        break;
       case 'context':
-        setStep('specific');
+        setStep('select');
         break;
       default:
         navigate('/app/home');
@@ -90,27 +70,11 @@ const AppEmotion = () => {
     case 'intro':
       return <EmotionIntro onStart={handleStart} />;
     
-    case 'valence':
-      return <EmotionValence onSelect={handleValenceSelect} onBack={handleBack} />;
-    
-    case 'category':
-      if (!state.valence) return null;
+    case 'select':
       return (
-        <EmotionCategory 
-          valence={state.valence} 
-          onSelect={handleCategorySelect} 
+        <EmotionSelector 
+          onComplete={handleEmotionComplete} 
           onBack={handleBack} 
-        />
-      );
-    
-    case 'specific':
-      if (!state.valence || !state.category) return null;
-      return (
-        <EmotionSpecific 
-          valence={state.valence}
-          category={state.category}
-          onSelect={handleEmotionSelect}
-          onBack={handleBack}
         />
       );
     
