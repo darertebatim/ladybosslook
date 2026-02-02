@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { CalendarPlus } from 'lucide-react';
+import { CalendarPlus, Check } from 'lucide-react';
 import { BreathingExercise } from '@/hooks/useBreathingExercises';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
+import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
@@ -14,7 +15,12 @@ interface BreathingExerciseCardProps {
 
 export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCardProps) {
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
   const addRoutinePlan = useAddRoutinePlan();
+  
+  // Check if this specific exercise is already added
+  const { data: existingTask } = useExistingProTask('breathe', exercise.id);
+  const isAdded = existingTask || justAdded;
 
   // Calculate total cycle duration
   const cycleDuration = 
@@ -40,7 +46,9 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
   const handleAddToRoutine = (e: React.MouseEvent) => {
     e.stopPropagation(); // Don't trigger card click
     haptic.light();
-    setShowRoutineSheet(true);
+    if (!isAdded) {
+      setShowRoutineSheet(true);
+    }
   };
 
   const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
@@ -53,6 +61,7 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
       });
       toast.success(`${exercise.name} added to your routine!`);
       setShowRoutineSheet(false);
+      setJustAdded(true);
     } catch (error) {
       console.error('Failed to add routine:', error);
       toast.error('Failed to add to routine');
@@ -96,10 +105,19 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
           {/* Add to routine button */}
           <button
             onClick={handleAddToRoutine}
-            className="flex-shrink-0 p-2.5 rounded-full bg-foreground hover:bg-foreground/90 transition-colors"
-            aria-label="Add to routine"
+            className={cn(
+              "flex-shrink-0 p-2.5 rounded-full transition-colors",
+              isAdded 
+                ? "bg-emerald-500 hover:bg-emerald-600" 
+                : "bg-foreground hover:bg-foreground/90"
+            )}
+            aria-label={isAdded ? "Added to routine" : "Add to routine"}
           >
-            <CalendarPlus className="h-5 w-5 text-background" />
+            {isAdded ? (
+              <Check className="h-5 w-5 text-white" />
+            ) : (
+              <CalendarPlus className="h-5 w-5 text-background" />
+            )}
           </button>
         </div>
       </button>

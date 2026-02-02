@@ -73,3 +73,33 @@ export function useExistingPlaylistTask(playlistId: string | undefined) {
     enabled: !!playlistId && !!user,
   });
 }
+
+// Check if user already has a task with a specific pro_link_type (and optionally pro_link_value)
+export function useExistingProTask(linkType: string | undefined, linkValue?: string | null) {
+  const { user } = useAuth();
+  
+  return useQuery({
+    queryKey: ['pro-task-exists', linkType, linkValue, user?.id],
+    queryFn: async () => {
+      if (!linkType || !user) return false;
+
+      let query = supabase
+        .from('user_tasks')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('pro_link_type', linkType)
+        .eq('is_active', true);
+
+      // If linkValue is provided, also filter by it
+      if (linkValue) {
+        query = query.eq('pro_link_value', linkValue);
+      }
+
+      const { data, error } = await query.limit(1);
+
+      if (error) return false;
+      return data && data.length > 0;
+    },
+    enabled: !!linkType && !!user,
+  });
+}

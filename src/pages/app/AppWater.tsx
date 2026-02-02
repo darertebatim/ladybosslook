@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Plus, Settings, Droplets, CalendarPlus } from 'lucide-react';
+import { X, Plus, Settings, Droplets, CalendarPlus, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useTasksForDate, useCompletionsForDate, useAddGoalProgress, useCreateTask, UserTask } from '@/hooks/useTaskPlanner';
 import { isWaterTask, createWaterRoutineTask } from '@/lib/waterTracking';
@@ -340,11 +341,20 @@ const AppWater = () => {
           <button
             onClick={() => {
               haptic.light();
-              handleOpenRoutineSheet();
+              if (!waterTask) {
+                handleOpenRoutineSheet();
+              }
             }}
-            className="w-14 h-14 rounded-full bg-foreground shadow-lg flex items-center justify-center"
+            className={cn(
+              "w-14 h-14 rounded-full shadow-lg flex items-center justify-center",
+              waterTask ? "bg-emerald-500" : "bg-foreground"
+            )}
           >
-            <CalendarPlus className="h-6 w-6 text-background" />
+            {waterTask ? (
+              <Check className="h-6 w-6 text-white" />
+            ) : (
+              <CalendarPlus className="h-6 w-6 text-background" />
+            )}
           </button>
         </div>
 
