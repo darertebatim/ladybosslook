@@ -5,13 +5,13 @@ import type { ToolConfig } from '@/lib/toolsConfig';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
-  GraduationCap, User, LucideIcon
+  GraduationCap, User, HeartHandshake, LucideIcon
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle,
-  GraduationCap, User
+  GraduationCap, User, HeartHandshake
 };
 
 interface ToolCardProps {
