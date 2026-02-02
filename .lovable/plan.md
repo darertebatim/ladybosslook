@@ -1,190 +1,163 @@
 
-# UI Redesign: Name Your Emotion (Finch-Style)
+
+# Redesign Emotion Intro Page + Add Pro Task Integration
 
 ## Overview
 
-Complete redesign of the emotion selection flow to match Finch's two-column, progressive-drilling UI pattern. The key change is moving from **separate pages per step** to a **single-screen column layout** where selections expand to the right.
+Three main changes requested:
+1. **Redesign EmotionIntro** to match Finch's beautiful intro style (blue gradient background, emoji cloud illustration, clean typography, white Start button)
+2. **Add "emotion" as a Pro Link type** so emotion logging can be linked from tasks
+3. **Add "Add to My Routine" button** beside the Start button on the intro page
 
 ---
 
-## Current vs. Finch Comparison
+## Part 1: EmotionIntro Redesign (Finch-Style)
 
-| Aspect | Current Implementation | Finch Design |
-|--------|----------------------|--------------|
-| Layout | Separate pages for each step | Single screen with columns |
-| Navigation | Page-by-page steps | Drill right, back collapses |
-| Valence | Full-width stacked buttons | Small pills on left column |
-| Categories | Flex-wrap grid on new page | Vertical list on right column |
-| Specific emotions | Flex-wrap on new page | Vertical list, replaces categories |
-| Sub-sub emotions | Not implemented | 3rd level for some unpleasant emotions |
-| Scrolling | Required on many screens | Minimal/no scroll |
-| Colors | Uniform per valence | Unique colors per category in unpleasant |
+### Current vs. Target Design
 
----
+| Aspect | Current | Target (Finch-style) |
+|--------|---------|---------------------|
+| Background | Light violet gradient | Solid blue (`#6B7CFF` / indigo-500) |
+| Layout | Benefits list, bullet points | Clean and minimal, no bullets |
+| Icon | Simple Heart in circle | Emoji cloud (⚡💖😊) illustration |
+| Title style | Dark text on light bg | White text on blue bg |
+| Description | Black/gray text | White/light blue text |
+| Button | Violet button | White pill button with blue text |
 
-## New UI Architecture
-
-### Single-Screen Column Layout
+### UI Implementation
 
 ```text
-+--------------------------------------------------+
-|  < (back)           Try to dig a little deeper   |
-+--------------------------------------------------+
-|                                                  |
-|                        [ Optimistic ]            |
-|                        [ Accepted   ]            |
-|  [ Pleasant  ]         [ Content    ]            |
-|  [ Neutral   ]         [ Powerful   ]            |
-|  [ Unpleasant]         [ Interested ]            |
-|                        [ Playful    ]            |
-|                        [ Proud      ]            |
-|                        [ Peaceful   ]            |
-|                        [ Trusting   ]            |
-|                                                  |
-+--------------------------------------------------+
++------------------------------------------+
+|  (X)                                     |
+|                                          |
+|                                          |
+|           ☁️ ⚡💖😊                       |
+|                                          |
+|        Name your emotion                 |
+|                                          |
+|   Sometimes, what we feel is not so      |
+|   obvious. Naming the emotion can help   |
+|   us gain better control and             |
+|   understanding of ourselves.            |
+|                                          |
+|                                          |
+|                                          |
+|  +------------------------------------+  |
+|  |              Start                 |  |
+|  +------------------------------------+  |
+|  +------------------------------------+  |
+|  |       Add to My Routine            |  |
+|  +------------------------------------+  |
++------------------------------------------+
 ```
 
-### Column Expansion Flow
+### Design Details
 
-1. **Initial**: Show 3 valence buttons (left column only)
-2. **After selecting valence**: Keep valence buttons (selected highlighted), show categories in middle column
-3. **After selecting category**: Show specific emotions in right column (or replace middle column)
-4. **For Unpleasant emotions**: Some have a "More..." button that reveals additional sub-sub emotions
+- **Background**: Solid `bg-[#6B7CFF]` (indigo-like blue matching Finch)
+- **Close button**: Top-left X icon in a gray circle with 50% opacity
+- **Emoji cloud**: Create using overlapping divs with emojis (⚡, 💖, 😊) inside a soft purple cloud shape
+- **Title**: "Name your emotion" - white, 2xl font, semibold
+- **Description**: White text with 80% opacity, centered, max-width for readability
+- **Start button**: White background, blue text, full-width pill, rounded-full
+- **Add to Routine button**: Transparent/outline style below Start, or same white style
 
 ---
 
-## Implementation Changes
+## Part 2: Add "emotion" to Pro Link Types
 
-### 1. New Combined Selection Component
+### Database Migration
 
-Create `EmotionSelector.tsx` - replaces separate Valence/Category/Specific components:
+Add `emotion` to the pro_link_type check constraints on both tables:
+
+```sql
+-- Update user_tasks constraint
+ALTER TABLE public.user_tasks DROP CONSTRAINT IF EXISTS user_tasks_pro_link_type_check;
+ALTER TABLE public.user_tasks ADD CONSTRAINT user_tasks_pro_link_type_check 
+CHECK (pro_link_type IS NULL OR pro_link_type IN (
+  'playlist', 'journal', 'channel', 'program', 'planner', 
+  'inspire', 'route', 'breathe', 'water', 'period', 'emotion'
+));
+
+-- Update routine_plan_tasks constraint  
+ALTER TABLE public.routine_plan_tasks DROP CONSTRAINT IF EXISTS routine_plan_tasks_pro_link_type_check;
+ALTER TABLE public.routine_plan_tasks ADD CONSTRAINT routine_plan_tasks_pro_link_type_check 
+CHECK (pro_link_type IS NULL OR pro_link_type IN (
+  'playlist', 'journal', 'channel', 'program', 'planner', 
+  'inspire', 'route', 'breathe', 'water', 'period', 'emotion'
+));
+```
+
+### Update TypeScript Types
+
+**File: `src/lib/proTaskTypes.ts`**
+
+Add new `emotion` type:
 
 ```typescript
-interface EmotionSelectorProps {
-  onComplete: (valence: Valence, category: string, emotion: string) => void;
-  onBack: () => void;
-}
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 
+  'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion';
+
+// Add to PRO_LINK_CONFIGS
+emotion: {
+  value: 'emotion',
+  label: 'Name Your Emotion',
+  icon: HeartHandshake, // or Heart
+  badgeText: 'Feel',
+  color: 'violet',
+  gradientClass: 'bg-gradient-to-br from-violet-100 to-purple-100',
+  iconColorClass: 'text-violet-600',
+  badgeColorClass: 'bg-violet-500/20 text-violet-700',
+  buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+  description: 'Open the emotion naming tool',
+  requiresValue: false,
+},
 ```
 
-**State Machine:**
-- `depth: 0` = Only valence shown
-- `depth: 1` = Valence + categories (for Pleasant/Neutral, or categories for Unpleasant)
-- `depth: 2` = Valence + category + emotions
-- `depth: 3` = Valence + category + emotion + sub-emotions (only for some Unpleasant)
+### Update Navigation Path
 
-### 2. Layout Structure (No Scroll)
-
-```jsx
-<div className="h-full flex flex-col bg-[#F8F9FA]">
-  {/* Header - fixed */}
-  <header className="shrink-0 flex items-center px-4 py-3">
-    <BackButton />
-    <h1>Try to dig a little deeper</h1>
-  </header>
-  
-  {/* Content - flex columns, centered vertically */}
-  <div className="flex-1 flex items-center justify-center px-4 gap-6">
-    {/* Column 1: Valence */}
-    <div className="flex flex-col gap-3">
-      {VALENCE_OPTIONS.map(v => <ValencePill />)}
-    </div>
-    
-    {/* Column 2: Categories (conditionally shown) */}
-    {selectedValence && (
-      <div className="flex flex-col gap-2">
-        {categories.map(c => <CategoryPill />)}
-      </div>
-    )}
-    
-    {/* Column 3: Emotions (conditionally shown) */}
-    {selectedCategory && (
-      <div className="flex flex-col gap-2">
-        {emotions.map(e => <EmotionPill />)}
-      </div>
-    )}
-  </div>
-</div>
-```
-
-### 3. Updated Color System
-
-Finch uses distinct colors for each emotion category. New color mapping:
-
-**Pleasant (warm oranges/yellows):**
-- Optimistic, Accepted, Content, Powerful, etc.: `bg-[#FFF3E0] text-[#E65100]`
-
-**Neutral (blue-grays):**
-- Bored, Busy, Stressed, Tired, Numb: `bg-[#E3F2FD] text-[#1565C0]`
-
-**Unpleasant (varied by category):**
-- Sad: `bg-[#CFD8DC] text-[#37474F]` (blue-gray)
-- Angry: `bg-[#FFCDD2] text-[#C62828]` (red tint)
-- Fearful: `bg-[#455A64] text-white` (dark slate - solid bg)
-- Down: `bg-[#ECEFF1] text-[#546E7A]` (light gray)
-- Surprised: `bg-[#FCE4EC] text-[#AD1457]` (pink)
-- Disgusted: `bg-[#EFEBE9] text-[#5D4037]` (brown tint)
-
-### 4. Updated Data Structure
-
-Add sub-sub emotions for "Unpleasant" categories and "More..." expansion:
+**File: `src/lib/proTaskTypes.ts`** - `getProTaskNavigationPath`:
 
 ```typescript
-interface EmotionCategory {
-  value: string;
-  label: string;
-  color: { bg: string; text: string; bgActive: string };
-  emotions: EmotionOption[];
-  subEmotions?: Record<string, EmotionOption[]>; // For "Lonely" → [Isolated, Abandoned, etc.]
-}
+case 'emotion':
+  return '/app/emotion';
 ```
 
-**Example - Sad category with nested structure:**
+---
+
+## Part 3: "Add to My Routine" Button
+
+### Component Pattern
+
+Follow the same pattern as `JournalReminderSettings.tsx`:
+
+1. Create a new component or add button logic directly to `EmotionIntro.tsx`
+2. Use `useExistingProTask('emotion')` to check if already added
+3. On click, either:
+   - Open `RoutinePreviewSheet` with synthetic task
+   - Or navigate to planner if already added
+4. Synthetic task definition:
+
 ```typescript
-{
-  value: 'sad',
-  label: 'Sad',
-  color: { bg: 'bg-slate-200', text: 'text-slate-700', bgActive: 'bg-slate-500' },
-  emotions: [
-    { value: 'lonely', label: 'Lonely', hasSubEmotions: true },
-    { value: 'vulnerable', label: 'Vulnerable' },
-    { value: 'depressed', label: 'Depressed' },
-    { value: 'hurt', label: 'Hurt' },
-    { value: 'despair', label: 'Despair' },
-    { value: 'guilty', label: 'Guilty', hasSubEmotions: true },
-  ],
-  subEmotions: {
-    lonely: [
-      { value: 'isolated', label: 'Isolated' },
-      { value: 'abandoned', label: 'Abandoned' },
-      { value: 'forlorn', label: 'Forlorn' },
-      { value: 'alienated', label: 'Alienated' },
-      { value: 'nostalgic', label: 'Nostalgic' },
-      { value: 'victimized', label: 'Victimized' },
-      { value: 'fragile', label: 'Fragile' },
-      { value: 'lost', label: 'Lost' },
-    ],
-    guilty: [
-      { value: 'embarrassed', label: 'Embarrassed' },
-      { value: 'disappointed', label: 'Disappointed' },
-      { value: 'powerless', label: 'Powerless' },
-      { value: 'grief', label: 'Grief' },
-      { value: 'trapped', label: 'Trapped' },
-      { value: 'discouraged', label: 'Discouraged' },
-      { value: 'ashamed', label: 'Ashamed' },
-      { value: 'remorseful', label: 'Remorseful' },
-    ],
-  }
-}
+const SYNTHETIC_EMOTION_TASK: RoutinePlanTask = {
+  id: 'synthetic-emotion-task',
+  plan_id: 'synthetic-emotion',
+  title: 'Name Your Emotion',
+  icon: '💜',
+  color: 'lavender',
+  task_order: 0,
+  is_active: true,
+  created_at: new Date().toISOString(),
+  linked_playlist_id: null,
+  pro_link_type: 'emotion',
+  pro_link_value: null,
+  linked_playlist: null,
+};
 ```
 
-### 5. Pill Button Sizes
+### Button States
 
-Matching Finch's compact design:
-- **Valence pills**: `px-5 py-2.5 text-sm rounded-full`
-- **Category pills**: `px-4 py-2 text-sm rounded-full`  
-- **Emotion pills**: `px-4 py-2 text-sm rounded-full`
-- Active state: Solid background color, white or dark text
-- Inactive state: Light tinted background, colored text
+- **Not added**: "Add to My Routine" with Sparkles icon, white/outline style
+- **Added**: "Added — Go to Planner" with Check icon, green tint
 
 ---
 
@@ -192,112 +165,28 @@ Matching Finch's compact design:
 
 | File | Changes |
 |------|---------|
-| `src/lib/emotionData.ts` | Add colors per category, add subEmotions structure, complete emotion lists from PDF |
-| `src/components/emotion/EmotionValence.tsx` | Redesign as part of column layout OR merge into new EmotionSelector |
-| `src/components/emotion/EmotionCategory.tsx` | Merge into EmotionSelector |
-| `src/components/emotion/EmotionSpecific.tsx` | Merge into EmotionSelector |
-| `src/pages/app/AppEmotion.tsx` | Simplify step management - fewer steps |
-| `src/components/emotion/EmotionContext.tsx` | Keep but update styling to match |
-| `src/components/emotion/EmotionComplete.tsx` | Keep as-is (green Done button matches Finch) |
-
-### New File
-
-`src/components/emotion/EmotionSelector.tsx` - Main two-column selection UI
+| `src/components/emotion/EmotionIntro.tsx` | Complete UI redesign + Add to Routine button |
+| `src/lib/proTaskTypes.ts` | Add `emotion` type definition and navigation |
+| New migration SQL file | Add `emotion` to database constraints |
 
 ---
 
-## Technical Approach
+## Implementation Summary
 
-### Single-Screen vs. Multi-Page
+1. **Redesign EmotionIntro.tsx**:
+   - Blue gradient background (`bg-[#6B7CFF]`)
+   - Emoji cloud illustration (⚡💖😊)
+   - White text, clean minimal layout
+   - White pill "Start" button
+   - White "Add to My Routine" button below
 
-**Recommended approach**: Create a new `EmotionSelector.tsx` that handles all the column-based drilling in a single component with internal state. This replaces EmotionValence, EmotionCategory, and EmotionSpecific.
+2. **Add pro_link_type support**:
+   - Database migration to add `emotion` to constraints
+   - TypeScript type updates in proTaskTypes.ts
+   - Navigation path for emotion tasks
 
-Benefits:
-- Smoother transitions (CSS animations between columns)
-- Single viewport without page navigation
-- Matches Finch's UX exactly
-- Easier to manage back navigation (just collapse column)
+3. **Routine integration**:
+   - Use existing patterns from JournalReminderSettings
+   - State-aware button (shows "Added — Go to Planner" if exists)
+   - Opens RoutinePreviewSheet for customization
 
-### Animation
-
-- Columns slide in from right when drilling deeper
-- Columns slide out to right when going back
-- Use `transition-all duration-200` for smooth feel
-
-### Height Management
-
-- Use `h-[100dvh]` for iOS viewport stability
-- Content vertically centered with `items-center justify-center`
-- No scroll needed if pills are compact enough
-
----
-
-## Complete Emotion List from PDF
-
-### Pleasant
-
-- **Optimistic**: Hopeful, Inspired, Eager, Open, Curious
-- **Accepted**: Respected, Valued, Fulfilled, Appreciated
-- **Content**: Calm, Mellow, Good, Fulfilled, Peaceful, Comfortable, Balanced
-- **Powerful**: Confident, Courageous, Creative, Successful
-- **Interested**: Inquisitive, Amused, Fascinated, Absorbed
-- **Playful**: Aroused, Cheeky, Energetic, Free
-- **Proud**: Important, Worthy, Accomplished, Triumphant
-- **Peaceful**: Loving, Thankful, Trusting, Hopeful
-- **Trusting**: Sensitive, Intimate, Secure
-
-### Neutral
-
-- **Bored**: Indifferent, Apathetic
-- **Busy**: Rushed, Pressured
-- **Stressed**: Overwhelmed, Out of control
-- **Tired**: Sleepy, Unfocused
-- **Numb**: (direct select, no sub-emotions shown in PDF)
-
-### Unpleasant (3 levels for some)
-
-- **Sad**:
-  - Lonely → [Isolated, Abandoned, Forlorn, Alienated, Nostalgic, Victimized, Fragile, Lost]
-  - Vulnerable, Depressed, Hurt, Despair
-  - Guilty → [Embarrassed, Disappointed, Powerless, Grief, Trapped, Discouraged, Ashamed, Remorseful]
-
-- **Angry**:
-  - Mad, Aggressive, Frustrated, Bitter, Distant
-  - Critical → [Betrayed, Humiliated, Infuriated, Annoyed, Furious, Provoked, Jealous, Hostile]
-
-- **Fearful**:
-  - Scared, Anxious, Insecure, Weak, Rejected
-  - Threatened → [Helpless, Frightened, Terrified, Panicked, Overwhelmed, Worried, Jittery, FOMO]
-
-- **Down**:
-  - Insecure, Inferior, Pessimistic
-  - Miserable → [Embarrassed, Disappointed, Powerless, Grief, Trapped, Discouraged, Ashamed, Remorseful]
-  - Empty
-
-- **Surprised**:
-  - Startled, Shocked, Dismayed, Confused, Disillusioned, Perplexed
-
-- **Disgusted**:
-  - Disapproving, Disappointed, Repelled
-  - Awful → [Judgemental, Embarrassed, Appalled, Revolted, Horrified, Hesitant, Nauseated, Detestable]
-
----
-
-## Implementation Order
-
-1. **Update `emotionData.ts`** with complete emotion hierarchy, colors, and sub-sub-emotions
-2. **Create `EmotionSelector.tsx`** with two-column layout and state machine
-3. **Update `AppEmotion.tsx`** to use new component flow
-4. **Update `EmotionContext.tsx`** to match styling (gray pills, green Save button)
-5. **Test on iOS** to ensure no scroll issues and proper safe area handling
-
----
-
-## Summary
-
-This redesign transforms the emotion selection from a multi-page wizard into a single-screen, column-based drilling experience that:
-- Matches Finch's UI exactly
-- Eliminates unnecessary page navigation
-- Fits on iOS screen without scrolling
-- Supports 3-level depth for complex unpleasant emotions
-- Uses color-coded pills for visual clarity
