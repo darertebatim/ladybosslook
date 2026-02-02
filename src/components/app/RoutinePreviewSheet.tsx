@@ -240,34 +240,40 @@ export function RoutinePreviewSheet({
                         {isSelected && <Check className="w-4 h-4 text-white" />}
                       </button>
 
-                      {/* Task Card */}
+                      {/* Task Card - matches TaskTemplateCard style */}
                       <div className={cn(
-                        'flex-1 rounded-2xl overflow-hidden',
+                        'flex-1 rounded-xl border border-border/50 overflow-hidden',
                         colorClass
                       )}>
-                        <div className="p-3">
-                          <div className="flex items-center gap-2 text-xs text-foreground/70 mb-1">
-                            <span className="text-base">{display.icon || '✨'}</span>
-                            <span>Anytime</span>
+                        {/* Main content row */}
+                        <div className="flex items-center gap-3 p-3">
+                          <span className="text-2xl shrink-0">{display.icon || '📝'}</span>
+                          
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-black truncate">{display.title}</p>
+                            <p className="text-xs text-black/70 truncate">
+                              {getRepeatLabel(display.repeatPattern)}
+                            </p>
                           </div>
-                          <p className="font-medium text-foreground">{display.title}</p>
-                        </div>
-                        {/* Footer bar */}
-                        <div className="px-3 py-2 bg-black/5 flex items-center gap-1.5">
-                          <Clock className="w-3 h-3 text-foreground/60" />
-                          <span className="text-xs text-foreground/60">
-                            {getRepeatLabel(display.repeatPattern)}
-                          </span>
-                        </div>
-                      </div>
 
-                      {/* Edit button - opens full editor */}
-                      <button 
-                        className="p-2 mt-2 text-muted-foreground hover:text-foreground"
-                        onClick={() => openTaskEditor(task, index)}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
+                          {/* Edit button */}
+                          <button 
+                            className="shrink-0 p-2 text-black/60 hover:text-black"
+                            onClick={() => openTaskEditor(task, index)}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Description box */}
+                        {task.description && (
+                          <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
+                            <p className="text-xs text-black/80 leading-relaxed">
+                              {task.description}
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
