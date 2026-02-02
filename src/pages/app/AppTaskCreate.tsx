@@ -643,11 +643,11 @@ const AppTaskCreate = ({
   const bgColor = getColorHex(color);
   const content = (
     <div className="min-h-full transition-colors duration-300" style={{ backgroundColor: bgColor }}>
-      {/* Task Icon & Name - Compact inline layout */}
-      <div className="flex items-center gap-3 pt-5 pb-3 px-4">
+      {/* Task Icon & Name - Wrapping layout for long names */}
+      <div className="flex items-start gap-3 pt-5 pb-3 px-4">
         <button
           onClick={() => setShowIconPicker(true)}
-          className="relative flex-shrink-0 active:scale-95 transition-transform"
+          className="relative flex-shrink-0 active:scale-95 transition-transform mt-1"
         >
           <TaskIcon iconName={icon} size={48} className="text-foreground/70" />
           {/* Tiny pen indicator */}
@@ -655,19 +655,26 @@ const AppTaskCreate = ({
             <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
           </div>
         </button>
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value.slice(0, 50))}
-          onFocus={(e) => {
-            if (Capacitor.isNativePlatform()) {
-              focusedInputRef.current = e.target;
-            }
-          }}
-          placeholder="Task name"
-          className="flex-1 text-2xl font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0"
-          maxLength={50}
-        />
-        <span className="flex-shrink-0 text-xs text-muted-foreground/60">Tap to rename</span>
+        <div className="flex-1 min-w-0">
+          <textarea
+            value={title}
+            onChange={(e) => {
+              // Remove newlines and limit length
+              const newValue = e.target.value.replace(/\n/g, ' ').slice(0, 50);
+              setTitle(newValue);
+            }}
+            onFocus={(e) => {
+              if (Capacitor.isNativePlatform()) {
+                focusedInputRef.current = e.target as unknown as HTMLInputElement;
+              }
+            }}
+            placeholder="Task name"
+            rows={2}
+            className="w-full text-lg font-semibold border-0 bg-transparent focus:outline-none focus-visible:ring-0 placeholder:text-muted-foreground/50 py-1 px-0 resize-none leading-snug"
+            maxLength={50}
+          />
+          <span className="text-xs text-muted-foreground/60">Tap to rename</span>
+        </div>
       </div>
 
       {/* Color picker - Horizontal circles with checkmark */}
