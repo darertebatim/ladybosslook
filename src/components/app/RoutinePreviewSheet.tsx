@@ -153,6 +153,7 @@ export function RoutinePreviewSheet({
     
     return {
       title: existing?.title || task.title,
+      description: existing?.description ?? task.description ?? null,
       icon: existing?.icon || task.icon,
       color: existing?.color || defaultColor,
       scheduledDate: new Date(),

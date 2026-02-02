@@ -50,6 +50,7 @@ export interface RoutinePlanTask {
   id: string;
   plan_id: string;
   title: string;
+  description?: string | null;
   icon: string;
   color?: string; // Task color for display
   task_order: number;
