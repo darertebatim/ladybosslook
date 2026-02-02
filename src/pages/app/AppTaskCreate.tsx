@@ -660,7 +660,7 @@ const AppTaskCreate = ({
             }
           }}
           placeholder="Task name"
-          className="flex-1 text-xl font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0"
+          className="flex-1 text-4xl font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0"
           maxLength={50}
         />
         <span className="flex-shrink-0 text-xs text-muted-foreground/60">Tap to rename</span>
