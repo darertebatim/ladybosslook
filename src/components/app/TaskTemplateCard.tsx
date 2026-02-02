@@ -24,8 +24,19 @@ export function TaskTemplateCard({ template, onAdd }: TaskTemplateCardProps) {
       
       <div className="flex-1 min-w-0">
         <p className="font-medium text-foreground truncate">{template.title}</p>
-        <p className="text-xs text-foreground truncate">
+        <p className="text-xs text-foreground/70 truncate">
           {template.category}
+          {template.repeat_pattern && template.repeat_pattern !== 'none' && (
+            <span className="ml-1">
+              • {template.repeat_pattern === 'daily' ? 'Daily' : 
+                 template.repeat_pattern === 'weekly' ? 'Weekly' : 
+                 template.repeat_pattern === 'monthly' ? 'Monthly' :
+                 template.repeat_pattern === 'weekend' ? 'Weekends' : ''}
+            </span>
+          )}
+          {(!template.repeat_pattern || template.repeat_pattern === 'none') && (
+            <span className="ml-1">• Once</span>
+          )}
         </p>
       </div>
 
