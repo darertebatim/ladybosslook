@@ -1,273 +1,291 @@
 
-# Simora Product Pivot: Complete Strategic Proposal
+# Pre-Pivot Feature: "Name Your Emotion" Tool
 
-## Document Purpose
-This document captures the complete philosophy, strategy, and implementation roadmap for transforming Simora from a productivity-focused habit tracker into a **"Strength Companion"** centered on building self-trust through rituals.
+## Overview
 
----
-
-## Part 1: Strategic Analysis
-
-### The Core Problem with Current Approach
-The existing app follows the standard habit-tracker model:
-- 249 tasks in `admin_task_bank` across 12 categories
-- Streak-based motivation (current streak counts, "days in a row")
-- Productivity-focused language ("Complete task", "Daily habits")
-- Guilt-inducing patterns (missed days, broken streaks)
-
-### The Pivot Philosophy: "Return Without Shame"
-**Central Insight**: Women don't need another app that makes them feel bad about themselves. They need a companion that helps them rebuild trust with themselves after life inevitably gets in the way.
-
-**Core Shift**: From "Did you do the thing?" to "You're here. That matters."
+Building a standalone wellness tool inspired by Finch's emotion-naming feature. This is a **guided, multi-step flow** that helps users identify and articulate their feelings with increasing specificity. This aligns perfectly with the upcoming pivot philosophy of building self-awareness and emotional literacy.
 
 ---
 
-## Part 2: The New Framework
-
-### 2.1 Terminology Changes
-
-| Old Term | New Term | Rationale |
-|----------|----------|-----------|
-| Tasks | Rituals | Rituals are sacred, intentional acts vs. checkboxes |
-| Habits | Practices | Practices evolve; habits imply obligation |
-| Streaks | Momentum | Momentum can pause and resume without "breaking" |
-| Complete | Honor | You "honor" a ritual, not "complete" it |
-| Missed | Paused | No judgment, just acknowledgment |
-
-### 2.2 Five Ritual Categories (Replacing 12 Generic Categories)
-
-1. **Pause Rituals** (Emotional Regulation)
-   - Breathing exercises
-   - Body scans
-   - "Name how I'm feeling"
-   
-2. **Micro Follow-Throughs** (Building Trust)
-   - Ultra-small commitments you can't fail
-   - "Get out of bed" → "Stand up for 10 seconds"
-   - Designed to prove "I do what I say I'll do"
-
-3. **Choice Awareness Rituals** (Agency)
-   - "Today I choose to..." declarations
-   - Conscious decision-making moments
-   - Boundary-setting practices
-
-4. **Gentle Completions** (Self-Kindness)
-   - Self-care without guilt
-   - Permission-giving rituals
-   - "I gave myself permission to rest"
-
-5. **Strength Reminders** (Identity)
-   - "I am the woman who..." affirmations
-   - Proof collection (journaling wins)
-   - Pattern recognition of personal strength
-
-### 2.3 "Return Without Shame" Logic
-
-When a user returns after 3+ days of inactivity:
+## The User Flow
 
 ```text
-IF last_active_date < (today - 3 days):
-  1. Show "Welcome Back" screen (NOT streak-loss screen)
-  2. Message: "You're here. That's what matters."
-  3. Offer: "Start fresh today" (reset daily view)
-  4. NO mention of missed days or broken streaks
-  5. Optional: Gentle question "What brought you back?"
+[Intro Screen] → [Valence: Pleasant/Neutral/Unpleasant] → [Category] → [Specific Emotion] → [Context + Notes] → [Confirmation]
 ```
 
-**Technical Implementation**:
-- Track `last_active_date` in user profile
-- Replace StreakCelebration with "Return Celebration"
-- Remove streak-loss notifications
-- Add `return_count` field (celebrate returns, not streaks)
+### Step-by-Step Breakdown
+
+**Step 1: Intro Screen**
+- Full-screen with soft background color
+- Icon/illustration representing emotions
+- Title: "Name Your Emotion"
+- Description: "Sometimes, what we feel is not so obvious. Naming the emotion can help gain better control and understanding of ourselves."
+- "Start" button
+
+**Step 2: Valence Selection**
+- "Start by taking a minute to pause and notice what you are feeling"
+- Three large pill buttons stacked vertically:
+  - Pleasant (warm yellow/orange)
+  - Neutral (soft gray)
+  - Unpleasant (muted purple)
+- Tapping advances to next step
+
+**Step 3: Category Drill-down**
+- Shows selected valence on left side (highlighted)
+- Shows 6-9 sub-categories on right side as pills
+- Categories vary by valence:
+  - **Pleasant**: Optimistic, Accepted, Content, Powerful, Interested, Playful, Proud, Peaceful, Trusting
+  - **Neutral**: Bored, Busy, Stressed, Tired, Numb (with "More..." option)
+  - **Unpleasant**: Sad, Angry, Fearful, Down, Surprised, Disgusted
+
+**Step 4: Specific Emotion**
+- Similar layout with selected category on left
+- More specific emotions on right:
+  - **Sad**: Lonely, Vulnerable, Depressed, Hurt, Despair, Guilty, More...
+  - **Angry**: Mad, Aggressive, Frustrated, Bitter, Distant, Critical, More...
+  - **Fearful**: Scared, Anxious, Insecure, Weak, Rejected, Threatened, More...
+  - etc.
+
+**Step 5: Context & Notes**
+- "What made you feel [selected emotion]?"
+- Context chips in 3-column grid: Family, Myself, Health, Pets, Co-workers, Friends, Partner, Acquaintances, Work, Home, School, Hobby, Commuting, Outside
+- Multi-select allowed
+- Optional text area: "Add details or more reflection..."
+- "Save" button
+
+**Step 6: Confirmation**
+- Celebratory screen
+- "You are getting closer to understanding yourself even more!"
+- "Your emotion has been saved in your history."
+- "Done" button → returns to home or emotions history
 
 ---
 
-## Part 3: What This Means for the Codebase
+## Technical Implementation
 
-### 3.1 UI Language Surgery (Phase 1)
+### Files to Create
 
-**Files requiring terminology updates**:
-- `AppInspire.tsx`: "Routines" → stays as "Rituals" section
-- `TaskTemplateCard.tsx`: Update labels
-- `StreakCelebration.tsx`: Complete redesign needed
-- Navigation labels throughout
+| File | Purpose |
+|------|---------|
+| `src/pages/app/AppEmotion.tsx` | Main page component (handles routing/state) |
+| `src/components/emotion/EmotionIntro.tsx` | Intro screen with Start button |
+| `src/components/emotion/EmotionValence.tsx` | Pleasant/Neutral/Unpleasant selection |
+| `src/components/emotion/EmotionCategory.tsx` | Category drill-down step |
+| `src/components/emotion/EmotionSpecific.tsx` | Specific emotion selection |
+| `src/components/emotion/EmotionContext.tsx` | Context chips + notes + save |
+| `src/components/emotion/EmotionComplete.tsx` | Completion celebration screen |
+| `src/lib/emotionData.ts` | All emotion hierarchies and context options |
+| `src/hooks/useEmotionLogs.tsx` | CRUD operations for emotion entries |
 
-**Estimated scope**: ~15-20 files with text changes
+### Database Schema
 
-### 3.2 Ritual Bank Curation (Phase 2)
-
-**Current state**: 249 active tasks across 12 categories
-**Target state**: 25-30 curated "Core Rituals" + archived rest
-
-**Recommendation**:
-- Mark ~220 tasks as `is_active: false` (archive, don't delete)
-- Elevate 25-30 high-impact rituals aligned with 5 new categories
-- Keep existing user data intact (no breaking changes)
-
-**Core Rituals to Elevate** (examples):
-- "Take 3 deep breaths" → Pause Ritual
-- "Name how I'm feeling" → Pause Ritual  
-- "Stand up for 10 seconds" → Micro Follow-Through
-- "Thank myself for one thing" → Strength Reminder
-- "Write 3 things I'm grateful for" → Strength Reminder
-
-### 3.3 Database Schema Implications
-
-**No breaking changes required**. Additions only:
+New table: `emotion_logs`
 
 ```sql
--- Add to profiles table
-ALTER TABLE profiles ADD COLUMN last_active_date date;
-ALTER TABLE profiles ADD COLUMN return_count integer DEFAULT 0;
-ALTER TABLE profiles ADD COLUMN strength_archetype text;
-
--- Future: Strength Vault
-CREATE TABLE strength_vault (
+CREATE TABLE emotion_logs (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES profiles(id),
-  title text NOT NULL,
-  description text,
-  evidence_type text, -- 'ritual', 'journal', 'manual'
+  user_id uuid REFERENCES auth.users NOT NULL,
+  valence text NOT NULL, -- 'pleasant', 'neutral', 'unpleasant'
+  category text NOT NULL, -- e.g., 'sad', 'angry', 'optimistic'
+  emotion text NOT NULL, -- specific emotion e.g., 'lonely', 'frustrated'
+  contexts text[] DEFAULT '{}', -- array of context selections
+  notes text, -- optional reflection text
   created_at timestamptz DEFAULT now()
 );
+
+-- Enable RLS
+ALTER TABLE emotion_logs ENABLE ROW LEVEL SECURITY;
+
+-- Users can only see their own logs
+CREATE POLICY "Users can view own emotion logs" ON emotion_logs
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own emotion logs" ON emotion_logs
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own emotion logs" ON emotion_logs
+  FOR DELETE USING (auth.uid() = user_id);
 ```
 
-### 3.4 Features to Remove/Hide
+### Emotion Hierarchy Data Structure
 
-| Feature | Action | Rationale |
-|---------|--------|-----------|
-| Streak counter | Remove from UI | Shame-based motivation |
-| "Missed days" messaging | Remove | Judgment language |
-| Daily completion % | Replace with "Rituals honored" | Softer framing |
-| Streak celebration popup | Replace with "Return celebration" | Different trigger |
+```typescript
+// src/lib/emotionData.ts
 
-### 3.5 Features to Preserve
+export type Valence = 'pleasant' | 'neutral' | 'unpleasant';
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Audio playlists | Keep as-is | Core value |
-| Journal | Keep, rename prompts | Align with "Strength Reminder" |
-| Breathing exercises | Keep as-is | Core "Pause Ritual" |
-| Water tracking | Keep as-is | Simple utility |
-| Period tracker | Keep as-is | Practical feature |
-| Programs/Courses | Keep as-is | Revenue driver |
+export interface EmotionCategory {
+  value: string;
+  label: string;
+  emotions: { value: string; label: string }[];
+}
+
+export const VALENCE_OPTIONS = [
+  { value: 'pleasant', label: 'Pleasant', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+  { value: 'neutral', label: 'Neutral', color: 'bg-slate-100 text-slate-700 border-slate-200' },
+  { value: 'unpleasant', label: 'Unpleasant', color: 'bg-violet-100 text-violet-700 border-violet-200' },
+];
+
+export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
+  pleasant: [
+    { 
+      value: 'optimistic', 
+      label: 'Optimistic',
+      emotions: [
+        { value: 'hopeful', label: 'Hopeful' },
+        { value: 'inspired', label: 'Inspired' },
+        { value: 'eager', label: 'Eager' },
+        // ... more
+      ]
+    },
+    { 
+      value: 'content', 
+      label: 'Content',
+      emotions: [
+        { value: 'fulfilled', label: 'Fulfilled' },
+        { value: 'calm', label: 'Calm' },
+        { value: 'peaceful', label: 'Peaceful' },
+        { value: 'balanced', label: 'Balanced' },
+        // ... more
+      ]
+    },
+    // ... more categories
+  ],
+  neutral: [ /* ... */ ],
+  unpleasant: [
+    {
+      value: 'sad',
+      label: 'Sad',
+      emotions: [
+        { value: 'lonely', label: 'Lonely' },
+        { value: 'vulnerable', label: 'Vulnerable' },
+        { value: 'depressed', label: 'Depressed' },
+        { value: 'hurt', label: 'Hurt' },
+        { value: 'despair', label: 'Despair' },
+        { value: 'guilty', label: 'Guilty' },
+        // ... more
+      ]
+    },
+    // ... more categories
+  ],
+};
+
+export const CONTEXT_OPTIONS = [
+  { value: 'family', label: 'Family' },
+  { value: 'myself', label: 'Myself' },
+  { value: 'health', label: 'Health' },
+  { value: 'pets', label: 'Pets' },
+  { value: 'coworkers', label: 'Co-workers' },
+  { value: 'friends', label: 'Friends' },
+  { value: 'partner', label: 'Partner' },
+  { value: 'acquaintances', label: 'Acquaintances' },
+  { value: 'work', label: 'Work' },
+  { value: 'home', label: 'Home' },
+  { value: 'school', label: 'School' },
+  { value: 'hobby', label: 'Hobby' },
+  { value: 'commuting', label: 'Commuting' },
+  { value: 'outside', label: 'Outside' },
+];
+```
+
+### Routing Updates
+
+In `App.tsx`:
+```tsx
+// Add lazy import
+const AppEmotion = lazy(() => import("@/pages/app/AppEmotion"));
+
+// Add route (full-screen, outside AppLayout)
+<Route path="/app/emotion" element={<ProtectedRoute><AppEmotion /></ProtectedRoute>} />
+```
+
+### ToolsConfig Update
+
+Update `src/lib/toolsConfig.ts` to make the Emotions tool visible:
+```typescript
+{
+  id: 'emotions',
+  name: 'Emotions',
+  icon: 'Heart', // or 'Sparkles' for a softer feel
+  bgColor: 'bg-[#EDE9FE]',
+  iconColor: 'text-violet-600',
+  route: '/app/emotion',
+  description: 'Name your feelings',
+  comingSoon: false, // ← Enable
+  hidden: false,     // ← Make visible
+},
+```
 
 ---
 
-## Part 4: Future Vision (Don't Build Yet)
+## UI Design Notes
 
-### 4.1 Strength Archetypes (V2+)
+### Visual Style (Matching Finch)
+- Clean, minimal white background for selection screens
+- Soft rounded pill buttons for emotion options
+- Left-side "breadcrumb" showing previous selections
+- Smooth transitions between steps
+- Haptic feedback on selections
+- Green "Save" button at the bottom of context screen
+- Celebratory completion screen with soft animation
 
-Behavioral patterns that reveal themselves over time:
+### Color Coding
+- **Pleasant**: Warm yellows/oranges (bg-amber-100, text-amber-700)
+- **Neutral**: Soft grays/blues (bg-slate-100, text-slate-600)
+- **Unpleasant**: Muted purples/blues (bg-violet-100, text-violet-700)
 
-- **The Steady One**: Consistent small rituals
-- **The Returner**: Keeps coming back despite breaks  
-- **The Depth-Seeker**: Journals extensively
-- **The Calm-Builder**: Focuses on breathing/pause rituals
-- **The Connector**: Engages with community features
-
-**Implementation complexity**: High (requires ML pattern detection)
-**Recommendation**: Save for V2.0
-
-### 4.2 Proof of Strength Vault (V2+)
-
-A personal collection of evidence that "I am strong":
-- Auto-collected from journal entries
-- Manual additions ("Today I...")
-- Surfaced during difficult moments
-
-**Implementation complexity**: Medium
-**Recommendation**: Save for V1.5
-
-### 4.3 AI Strength Coach (V3+)
-
-Contextual encouragement based on patterns:
-- "I notice you've returned 5 times this month. That's resilience."
-- "Your pause rituals have increased. You're learning to regulate."
-
-**Implementation complexity**: Very High (requires AI integration)
-**Recommendation**: Save for V3.0
+### Animations
+- Step transitions with slide animation
+- Button press feedback
+- Completion screen with subtle bounce/celebration
 
 ---
 
-## Part 5: Phased Implementation Roadmap
+## Future Enhancements (Not in V1)
 
-### Phase 0: Pre-Pivot (Current)
-Complete 2-3 features the user wants to add first, then begin pivot.
-
-### Phase 1: Language Surgery (1-2 weeks)
-- Rename "Tasks" to "Rituals" throughout UI
-- Update 25-30 ritual titles with new voice
-- Remove streak-shame language
-- Update empty states and error messages
-
-### Phase 2: Return Without Shame (1 week)
-- Implement `last_active_date` tracking
-- Build "Welcome Back" flow for 3+ day absence
-- Replace StreakCelebration with ReturnCelebration
-- Add `return_count` celebration logic
-
-### Phase 3: Ritual Bank Curation (1 week)
-- Archive 220+ tasks (set `is_active: false`)
-- Remap 12 categories to 5 new categories
-- Update admin interface for new category structure
-- Quality-check remaining 25-30 core rituals
-
-### Phase 4: Observation Period (2-4 weeks)
-- Gather user feedback
-- Monitor engagement patterns
-- Refine ritual language based on response
-- Plan V2 features based on learnings
+1. **Emotion History View**: See past entries in a timeline or calendar view
+2. **Pattern Recognition**: "You tend to feel anxious on Mondays"
+3. **Integration with Journal**: Auto-suggest starting a journal entry after logging emotion
+4. **Mood Trends**: Weekly/monthly charts showing emotional patterns
+5. **Connection to Pivot**: Link emotions to "Strength Reminders" - "Even when you felt anxious, you still showed up"
 
 ---
 
-## Part 6: Risk Assessment
+## Implementation Order
 
-| Risk | Severity | Mitigation |
-|------|----------|------------|
-| Users confused by terminology change | Medium | Gradual rollout, in-app explanation |
-| Engagement drops without streaks | Medium | A/B test before full removal |
-| Archived tasks were popular | Low | Data-driven curation, easy restore |
-| Feature creep (building V2 too early) | High | Strict phase discipline |
-| App feels "less feature-rich" | Medium | Quality > quantity messaging |
+1. Create database table `emotion_logs` with RLS policies
+2. Create `src/lib/emotionData.ts` with full emotion hierarchy
+3. Create `src/hooks/useEmotionLogs.tsx` for CRUD operations
+4. Build components in order:
+   - `EmotionIntro.tsx`
+   - `EmotionValence.tsx`
+   - `EmotionCategory.tsx`
+   - `EmotionSpecific.tsx`
+   - `EmotionContext.tsx`
+   - `EmotionComplete.tsx`
+5. Create main page `AppEmotion.tsx` with step state management
+6. Add route in `App.tsx`
+7. Update `toolsConfig.ts` to make visible
+8. Test end-to-end flow
 
 ---
 
-## Part 7: Success Metrics
+## Alignment with Pivot Philosophy
 
-### Phase 1 Success Indicators
-- No increase in support tickets about confusion
-- Positive feedback on new language (manual review)
-
-### Phase 2 Success Indicators
-- 30%+ of returning users (after 3+ day gap) engage same day
-- Decrease in app uninstalls after absence periods
-
-### Phase 3 Success Indicators
-- 80%+ of active users engage with curated rituals
-- No complaints about missing archived tasks
-
-### Long-term Vision Metrics
-- Retention after 30-day gap: Target 40%+ (vs. industry ~10%)
-- User sentiment: "This app gets me" (qualitative)
-- Return rate: Users who leave and come back (celebrate this!)
+This feature aligns perfectly with the "Strength Companion" vision:
+- **Pause Ritual**: The intro encourages users to "take a minute to pause"
+- **Self-Awareness**: Naming emotions builds emotional literacy
+- **No Judgment**: All emotions are valid (Pleasant, Neutral, Unpleasant - not Good/Bad)
+- **Context Understanding**: Helps users understand triggers
+- **Data for Future Features**: Emotion logs can feed into "Strength Vault" evidence
 
 ---
 
 ## Summary
 
-This pivot transforms Simora from another productivity app into a unique "Strength Companion" that:
-
-1. **Welcomes you back** instead of shaming absence
-2. **Uses ritual language** that feels sacred, not obligatory
-3. **Focuses on 25-30 high-impact practices** instead of overwhelming with 250 options
-4. **Builds self-trust** through micro follow-throughs
-5. **Delays complex features** until core philosophy is proven
-
-The technical implementation is deliberately conservative—mostly UI language changes and database additions, no breaking schema changes. This allows rapid iteration while protecting existing user data.
-
----
-
-*Document created: February 2026*
-*Status: Ready for review before implementation*
-*Next step: User to specify 2-3 features to build before pivot begins*
+This is a well-scoped pre-pivot feature that:
+- Adds immediate user value
+- Uses existing UI patterns (full-screen tool like Breathe)
+- Creates foundation for future emotional intelligence features
+- Aligns with the pivot philosophy of self-understanding without shame
+- Estimated effort: 2-3 focused implementation sessions
