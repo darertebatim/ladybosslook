@@ -1,138 +1,137 @@
 
 
-# Fluent Emoji 3D Integration Plan
+## Plan: Unify Category System (Single Source of Truth)
 
-## Overview
+### Problem Summary
+Categories are currently defined in multiple places:
+- **Database table** `routine_categories` (admin-managed)
+- **Hardcoded** `CATEGORY_DISPLAY` mapping in code
+- **Text fields** in `admin_task_bank.category` and `routines_bank.category`
 
-Replace all native emojis with Microsoft Fluent Emoji 3D style throughout the app, giving it a premium "Me+" aesthetic. This involves creating a reusable component that fetches 3D emoji images from a CDN and updating all existing emoji usage.
+When you change a category name in the admin panel, tasks and routines using the old slug don't update.
 
 ---
 
-## Technical Approach
+## Solution Overview
 
-### CDN Source
-Use the **lobehub CDN** which hosts Microsoft Fluent Emoji assets:
-- **3D Style URL Pattern**: `https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/{unicode}.webp`
-- Example: For 🤯 (unicode `1f92f`) → `https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/1f92f.webp`
+Create a single source of truth: **The `routine_categories` table** drives everything.
 
-### Conversion Logic
-Convert emoji characters to their unicode hex codes:
+---
+
+## Phase 1: Database Cleanup
+
+**Fix the immediate issue:**
+- Update `routines_bank` where `category = 'inner-strength'` to use `category = 'strength'`
+
+---
+
+## Phase 2: Refactor App Category Logic
+
+**Current:** `useRoutineBankCategories()` pulls unique category slugs from `admin_task_bank` + `routines_bank`, then maps through hardcoded `CATEGORY_DISPLAY`
+
+**New:** Fetch categories directly from `routine_categories` table (the same source admin uses)
+
 ```text
-☀️ (sun) → "2600" or "2600-fe0f"
-💧 (droplet) → "1f4a7"
-🎯 (target) → "1f3af"
+┌─────────────────────────────────────────┐
+│         routine_categories              │
+│  (slug, name, icon, color, is_active)   │
+│              ▲                          │
+│              │                          │
+│   Single Source of Truth                │
+│              │                          │
+├──────────────┼──────────────────────────┤
+│              │                          │
+│   ┌──────────┴──────────┐               │
+│   │                     │               │
+│   ▼                     ▼               │
+│ Admin UI            App UI              │
+│ (RoutineManagement) (AppInspire)        │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Changes to `src/hooks/useRoutinesBank.tsx`:**
+1. **Remove** the hardcoded `CATEGORY_DISPLAY` mapping entirely
+2. **Rewrite** `useRoutineBankCategories()` to fetch from `routine_categories` table
+3. Return categories with proper fields from database (slug, name, icon as emoji, color)
+
+---
+
+## Phase 3: Ensure Admin Updates Cascade
+
+When a category slug changes in admin, tasks/routines using it should update.
+
+**Option A (Recommended for now):** Add a database trigger that cascades slug updates
+**Option B:** Add UI warning when editing categories that have associated content
+
+For immediate fix, use database trigger:
+```sql
+CREATE OR REPLACE FUNCTION cascade_category_slug_update()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF OLD.slug IS DISTINCT FROM NEW.slug THEN
+    UPDATE admin_task_bank SET category = NEW.slug WHERE category = OLD.slug;
+    UPDATE routines_bank SET category = NEW.slug WHERE category = OLD.slug;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 ```
 
 ---
-
-## Implementation Steps
-
-### Step 1: Create FluentEmoji Component
-Create a new reusable component at `src/components/ui/FluentEmoji.tsx`:
-
-- Accept `emoji` (string - native emoji character) and `size` (number) props
-- Convert emoji to unicode hex code
-- Render as an `<img>` tag fetching from CDN
-- Include loading state (optional blur/skeleton)
-- Fallback to native emoji if image fails to load
-
-```text
-Example usage:
-<FluentEmoji emoji="☀️" size={32} />
-```
-
-### Step 2: Create Emoji-to-Unicode Utility
-Add a helper function in `src/lib/fluentEmoji.ts`:
-
-- `emojiToUnicode(emoji: string): string` - converts emoji to hex codes
-- Handle compound emojis (like 👨‍👩‍👧 which have multiple codepoints joined by ZWJ)
-- Handle variation selectors (fe0f)
-
-### Step 3: Update EmojiPicker Component
-Modify `src/components/app/EmojiPicker.tsx`:
-
-- Replace native emoji text with `<FluentEmoji>` component in the grid
-- Show 3D previews when selecting emojis
-- Keep selection value as native emoji character (for database storage compatibility)
-
-### Step 4: Update TaskIcon Component  
-Modify `src/components/app/IconPicker.tsx`:
-
-- Update `TaskIcon` to use `FluentEmoji` when rendering emojis
-- Keep fallback to Lucide icons for legacy icon names
-
-### Step 5: Update Task Bank in Database
-Create a script/migration to update `admin_task_bank` table:
-- Emojis remain stored as native characters (no DB change needed)
-- The rendering layer handles converting to 3D visually
-
-### Step 6: Update All Emoji Display Locations
-
-The following components render emojis and need updates:
-
-| Component | Current Rendering | Change |
-|-----------|-------------------|--------|
-| `TaskCard.tsx` | `<TaskIcon>` | Already uses TaskIcon - will auto-update |
-| `TaskDetailModal.tsx` | `<TaskIcon>` | Already uses TaskIcon - will auto-update |
-| `TaskQuickStartSheet.tsx` | `{template.emoji}` text | Use `<FluentEmoji>` |
-| `TaskTemplateCard.tsx` | `{template.emoji}` text | Use `<FluentEmoji>` |
-| `RoutineBankCard.tsx` | `{routineEmoji}` text | Use `<FluentEmoji>` |
-| `RoutinePlanCard.tsx` | `{planEmoji}` text | Use `<FluentEmoji>` |
-| `AppTaskCreate.tsx` | `<TaskIcon>` + emoji picker | Already uses TaskIcon |
-| `RoutinesBank.tsx` (admin) | `<TaskIcon>` | Already uses TaskIcon |
-
----
-
-## Data Flow
-
-```text
-Database (stores native emoji: "☀️")
-       ↓
-Component receives emoji prop
-       ↓
-FluentEmoji component
-       ↓
-emojiToUnicode("☀️") → "2600"
-       ↓
-Fetch: registry.npmmirror.com/...3d/.../2600.webp
-       ↓
-Render <img> with 3D emoji
-       ↓
-Fallback to native "☀️" if load fails
-```
-
----
-
-## Files to Create
-
-| File | Purpose |
-|------|---------|
-| `src/lib/fluentEmoji.ts` | Emoji-to-unicode conversion utility |
-| `src/components/ui/FluentEmoji.tsx` | Reusable 3D emoji component |
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/components/app/IconPicker.tsx` | Update `TaskIcon` to use `FluentEmoji` |
-| `src/components/app/EmojiPicker.tsx` | Show 3D previews in picker grid |
-| `src/components/app/TaskQuickStartSheet.tsx` | Use `FluentEmoji` for template display |
-| `src/components/app/TaskTemplateCard.tsx` | Use `FluentEmoji` for emoji display |
-| `src/components/app/RoutineBankCard.tsx` | Use `FluentEmoji` for routine emoji |
-| `src/components/app/RoutinePlanCard.tsx` | Use `FluentEmoji` for plan emoji |
+| `src/hooks/useRoutinesBank.tsx` | Remove `CATEGORY_DISPLAY`, rewrite `useRoutineBankCategories()` to fetch from `routine_categories` |
+| Database migration | Fix remaining `inner-strength` → `strength` in `routines_bank`, add cascade trigger |
 
 ---
 
-## Performance Considerations
+## Technical Details
 
-1. **Lazy Loading**: Use `loading="lazy"` on images
-2. **Caching**: Browser will cache CDN images automatically
-3. **Size Optimization**: WebP format is already optimized (~10-50KB per emoji)
-4. **Fallback**: Native emoji shown instantly if CDN is slow/fails
+### New `useRoutineBankCategories()` Implementation
+
+```typescript
+export function useRoutineBankCategories() {
+  return useQuery({
+    queryKey: ['routine-categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routine_categories')
+        .select('slug, name, icon, color, display_order')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+
+      // Pro category goes last
+      const sorted = (data || []).sort((a, b) => {
+        if (a.slug === 'pro') return 1;
+        if (b.slug === 'pro') return -1;
+        return a.display_order - b.display_order;
+      });
+
+      return sorted.map(cat => ({
+        slug: cat.slug,
+        name: cat.name,
+        icon: cat.icon || 'Sparkles',  // icon column stores emoji
+        color: cat.color || 'purple',
+        emoji: cat.icon,  // same as icon for FluentEmoji
+      }));
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+}
+```
 
 ---
 
-## No Database Changes Required
+## Benefits After This Change
 
-Emojis continue to be stored as native characters (e.g., "☀️"). Only the display layer changes to fetch 3D images from CDN.
+1. **One place to edit categories** - Admin → Tools → Routine Management
+2. **Automatic updates** - Change a category slug, all tasks/routines update via trigger
+3. **No code changes needed** - Add new categories in admin, they appear in app instantly
+4. **Consistent emoji/icon** - Whatever you set in admin shows everywhere
 
