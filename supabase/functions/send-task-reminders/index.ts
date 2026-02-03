@@ -255,19 +255,19 @@ Deno.serve(async (req) => {
     const completedTaskIds = new Set(completedTasks?.map(c => c.task_id) || []);
     console.log(`[Task Reminder] Found ${completedTaskIds.size} tasks already completed today`);
     
-    // Get user profiles for timezone info (including their stored timezone if available)
+    // Get user profiles for timezone info from profiles table (centralized timezone storage)
     const userIds = [...new Set(tasks.map(t => t.user_id))];
     
-    // Also fetch journal reminder settings which stores user timezone
-    const { data: reminderSettings } = await supabase
-      .from('journal_reminder_settings')
-      .select('user_id, timezone')
-      .in('user_id', userIds);
+    // Fetch timezone from profiles table (auto-synced on app open)
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, timezone')
+      .in('id', userIds);
     
     const userTimezoneMap = new Map<string, string>();
-    for (const setting of reminderSettings || []) {
-      if (setting.timezone) {
-        userTimezoneMap.set(setting.user_id, setting.timezone);
+    for (const profile of profiles || []) {
+      if (profile.timezone) {
+        userTimezoneMap.set(profile.id, profile.timezone);
       }
     }
     

@@ -4,6 +4,8 @@ import { useAuth } from './useAuth';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ProLinkType } from '@/lib/proTaskTypes';
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { Capacitor } from '@capacitor/core';
 
 /**
  * Hook to auto-complete pro tasks when user performs the related action.
@@ -12,7 +14,90 @@ import { ProLinkType } from '@/lib/proTaskTypes';
  * - When user completes an audio track → complete all 'playlist' pro tasks linked to that playlist
  * 
  * Also handles goal progress: if the task has a count goal, it increments goal_progress.
+ * Triggers celebration notifications at 50% and 100% milestones.
  */
+
+// Helper to check and trigger milestone celebrations
+const checkAndCelebrateMilestone = async (
+  taskId: string,
+  taskTitle: string,
+  previousProgress: number,
+  newProgress: number,
+  goalTarget: number
+): Promise<void> => {
+  if (!Capacitor.isNativePlatform() || goalTarget <= 0) return;
+
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const storageKey = `milestone_${taskId}_${today}`;
+  
+  // Get already celebrated milestones for this task today
+  const celebratedMilestones = JSON.parse(localStorage.getItem(storageKey) || '[]') as string[];
+  
+  const previousPercent = Math.floor((previousProgress / goalTarget) * 100);
+  const newPercent = Math.floor((newProgress / goalTarget) * 100);
+  
+  // Check 50% milestone
+  if (previousPercent < 50 && newPercent >= 50 && !celebratedMilestones.includes('50')) {
+    await triggerMilestoneNotification(
+      taskTitle,
+      newProgress,
+      goalTarget,
+      '50'
+    );
+    celebratedMilestones.push('50');
+    localStorage.setItem(storageKey, JSON.stringify(celebratedMilestones));
+  }
+  
+  // Check 100% milestone
+  if (previousPercent < 100 && newPercent >= 100 && !celebratedMilestones.includes('100')) {
+    await triggerMilestoneNotification(
+      taskTitle,
+      newProgress,
+      goalTarget,
+      '100'
+    );
+    celebratedMilestones.push('100');
+    localStorage.setItem(storageKey, JSON.stringify(celebratedMilestones));
+  }
+};
+
+// Trigger local notification for milestone
+const triggerMilestoneNotification = async (
+  taskTitle: string,
+  progress: number,
+  target: number,
+  milestone: '50' | '100'
+): Promise<void> => {
+  try {
+    const title = milestone === '100' 
+      ? '🏆 Goal complete!' 
+      : '🎉 Halfway there!';
+    
+    const body = milestone === '100'
+      ? `You finished all ${target} on "${taskTitle}"! Amazing work ✨`
+      : `${progress}/${target} done on "${taskTitle}"`;
+
+    await LocalNotifications.schedule({
+      notifications: [{
+        title,
+        body,
+        id: Date.now(),
+        schedule: { at: new Date(Date.now() + 500) }, // Immediate
+        sound: 'default',
+        extra: {
+          type: 'goal_milestone',
+          milestone,
+          url: '/app/home',
+        },
+      }],
+    });
+    
+    console.log(`[Milestone] Celebrated ${milestone}% for "${taskTitle}"`);
+  } catch (error) {
+    console.error('[Milestone] Failed to send notification:', error);
+  }
+};
+
 export const useAutoCompleteProTask = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -96,6 +181,7 @@ export const useAutoCompleteProTask = () => {
         const currentProgress = completionMap.get(task.id) || 0;
         const hasGoal = task.goal_enabled && task.goal_target && task.goal_target > 0;
         const isCountGoal = hasGoal && task.goal_type === 'count';
+        const goalTarget = task.goal_target || 0;
         
         if (isCountGoal) {
           // For count goals, increment progress by 1
@@ -120,6 +206,10 @@ export const useAutoCompleteProTask = () => {
                 goal_progress: 1,
               });
           }
+          
+          // Check for milestone celebrations (50% and 100%)
+          await checkAndCelebrateMilestone(task.id, task.title, currentProgress, newProgress, goalTarget);
+          
           tasksCompleted++;
         } else {
           // For non-goal tasks, just mark complete if not already

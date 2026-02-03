@@ -14,6 +14,7 @@ import { useUnreadFeedCount } from '@/hooks/useFeed';
 import { cn } from '@/lib/utils';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { usePushNotificationFlow } from '@/hooks/usePushNotificationFlow';
+import { useTimezoneSync } from '@/hooks/useTimezoneSync';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
@@ -39,6 +40,9 @@ const NativeAppLayout = () => {
     completeOnboarding, 
     dismissOnboarding 
   } = usePushNotificationFlow(user?.id);
+  
+  // Auto-detect and sync user's timezone on app open
+  useTimezoneSync(user?.id);
   
   // Custom hooks after useState declarations
   const { unreadCount } = useUnreadChat();
