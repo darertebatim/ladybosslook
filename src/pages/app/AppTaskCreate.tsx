@@ -860,7 +860,7 @@ const AppTaskCreate = ({
         >
           <div className="flex items-center gap-3">
             <Sparkles className={cn("h-5 w-5", proLinkType ? "text-violet-600" : "text-foreground/70")} />
-            <span className="font-medium">Pro Task Link</span>
+            <span className="font-medium">Pro Action Link</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             {proConfig ? (
@@ -1707,7 +1707,7 @@ const AppTaskCreate = ({
       <Sheet open={showProLinkPicker} onOpenChange={setShowProLinkPicker}>
         <SheetContent side="bottom" className="h-[75vh] rounded-t-3xl">
           <SheetHeader>
-            <SheetTitle>Pro Task Link</SheetTitle>
+            <SheetTitle>Pro Action Link</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <p className="text-sm text-muted-foreground">
@@ -1726,7 +1726,7 @@ const AppTaskCreate = ({
                 className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive/20"
               >
                 <XCircle className="h-5 w-5" />
-                <span>Remove Pro Task link</span>
+                <span>Remove Pro Action link</span>
               </button>
             )}
 
