@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { JournalStats } from '@/components/app/JournalStats';
 import { checkCalendarPermission, requestCalendarPermission, isCalendarAvailable } from '@/lib/calendarIntegration';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
 import { useState, useEffect, useMemo } from 'react';
@@ -38,6 +38,13 @@ import { clearTourCompleted } from '@/hooks/useAppTour';
 import { Capacitor } from '@capacitor/core';
 import { format, differenceInDays, startOfDay, subDays } from 'date-fns';
 import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
+
+// Debug mode to preview iOS-only components in web browser
+const useShowNativeSettings = () => {
+  const [searchParams] = useSearchParams();
+  const debugNative = searchParams.get('debugNative') === 'true';
+  return Capacitor.isNativePlatform() || debugNative;
+};
 
 // Stats Pill Component
 const StatPill = ({ label, value, icon: Icon }: { label: string; value: number | string; icon?: React.ComponentType<{ className?: string }> }) => (
@@ -85,6 +92,7 @@ const AppProfile = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { unreadCount } = useUnreadChat();
+  const showNativeSettings = useShowNativeSettings();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -1168,7 +1176,7 @@ const AppProfile = () => {
           </Card>
 
           {/* Push Notifications Card - Native Only */}
-          {Capacitor.isNativePlatform() && (
+          {showNativeSettings && (
             <Card className="rounded-2xl shadow-sm border-0 bg-card">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -1291,7 +1299,7 @@ const AppProfile = () => {
           )}
 
           {/* Calendar Sync Card - Native Only */}
-          {Capacitor.isNativePlatform() && isCalendarAvailable() && (
+          {showNativeSettings && (
             <Card className="rounded-2xl shadow-sm border-0 bg-card">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
