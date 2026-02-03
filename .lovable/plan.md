@@ -1,216 +1,130 @@
 
+# Complete Terminology Update: Task to Action, Routine to Ritual
 
-# Profile Page Redesign Plan
-
-## Overview
-Redesign the AppProfile page to be more professional, visually consistent with other app pages (like AppPlayer, AppJournal, AppHome), and follow the established Me+ inspired aesthetic with better information hierarchy and modern UI patterns.
+Based on my comprehensive audit of the codebase, I found **multiple remaining instances** that need to be updated across both the user-facing app and admin panel. The screenshots you shared confirm the issue - the Admin Tools page still shows "Routines", "Routines Bank", "Tasks Bank" and the home screen modal shows "Edit Task".
 
 ---
 
-## Design Analysis
+## Summary of Changes
 
-### Current Issues
-1. **Long scrolling page** with 10+ cards stacked vertically - overwhelming
-2. **Quick navigation grid** at top uses small icon-only buttons - hard to scan
-3. **Inconsistent card styling** - some cards are heavy, others minimal
-4. **No visual grouping** - all sections look the same
-5. **Header is plain** - just text, doesn't match the immersive headers on other pages
-6. **Profile avatar area** is separate from header - wastes vertical space
+### User-Facing App (High Priority)
 
-### Design Inspiration from Other Pages
-- **AppPlayer**: Category circles, tabbed filtering, clean header with search
-- **AppJournal**: Stats pills in header, grouped entries by date
-- **AppHome**: Gradient header with greeting, compact stat pills, card-based sections
-- **HomeMenu**: Pill-based navigation groups
+| File | Current Text | New Text |
+|------|-------------|----------|
+| `HomeMenu.tsx` | "Routines" menu item | "Rituals" |
+| `TaskDetailModal.tsx` | "Edit Task" button | "Edit Action" |
+| `AppTaskCreate.tsx` | "Edit Task" header | "Edit Action" |
+| `AppTour.tsx` | "add new tasks", "Track your daily tasks", "Complete tasks" | "add new actions", "Track your daily actions", "Honor actions" |
+| `TaskCard.tsx` | "today's routine" toast, "complete this task" | "today's rituals", "honor this action" |
+| `EmotionDashboard.tsx` | "Add to My Routine" button | "Add to My Rituals" |
+| `useTaskPlanner.tsx` | All toast messages with "Task created", "Failed to create task", etc. | "Action created", "Failed to create action", etc. |
 
----
+### Admin Panel (Lower Priority - Internal)
 
-## New Design Structure
-
-### 1. Hero Header with Profile Card (Lines 631-650)
-Replace the plain header with an immersive header containing the user's profile info.
-
-```text
-┌────────────────────────────────────────┐
-│  ← (back)           Profile    ⚙️      │ ← Header row
-├────────────────────────────────────────┤
-│    ┌──────┐                            │
-│    │  JD  │   John Doe                 │ ← Avatar + Name
-│    └──────┘   john@email.com           │
-│                                        │
-│   ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐  │
-│   │ 5    │ │ 12   │ │ 28   │ │ $50  │  │ ← Stats row
-│   │Prog. │ │Streak│ │Posts │ │Credit│  │
-│   └──────┘ └──────┘ └──────┘ └──────┘  │
-└────────────────────────────────────────┘
-```
-
-### 2. Tab-Based Content Organization (Lines 653-760)
-Use tabs to organize content into logical groups instead of a single long scroll.
-
-**Tab Structure:**
-- **Account** - Personal info, password, actions
-- **Activity** - Programs, journal stats, orders
-- **Settings** - Notifications, calendar, support
-
-### 3. Modernized Section Cards
-Each section uses consistent card styling with:
-- Icon + title in a row
-- Subtle background tint for status areas
-- Chevron indicators for expandable items
+| File | Current Text | New Text |
+|------|-------------|----------|
+| `Tools.tsx` | "Routines", "Routines Bank", "Tasks Bank" tabs | "Rituals", "Rituals Bank", "Actions Bank" |
+| `TasksBank.tsx` | "Tasks Bank" title, "Add Task" button, toast messages | "Actions Bank", "Add Action", updated toasts |
+| `RoutinesBank.tsx` | "Routines Bank" title, "New Routine", "Create Routine" | "Rituals Bank", "New Ritual", "Create Ritual" |
 
 ---
 
-## Technical Implementation
+## Detailed File-by-File Changes
 
-### File Changes
+### 1. HomeMenu.tsx (User-facing menu)
+- Line 32: Change `name: 'Routines'` to `name: 'Rituals'`
 
-**`src/pages/app/AppProfile.tsx`** - Complete restructure:
+### 2. TaskDetailModal.tsx (Action detail popup)
+- Line 335: Change `Edit Task` button text to `Edit Action`
 
-1. **New Header Component** (embedded):
-   - Gradient background matching other pages (`bg-[#F4ECFE]`)
-   - Centered avatar with name/email below
-   - Horizontal stats pills (programs, journal streak, credits)
+### 3. AppTaskCreate.tsx (Edit action sheet)
+- Line 1960: Change `Edit Task` header to `Edit Action`
 
-2. **Tabs Structure**:
-   - Use existing `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from shadcn
-   - Three tabs: Account, Activity, Settings
-   - Content wrapped in scroll container per tab
+### 4. AppTour.tsx (Onboarding tour)
+- Line 8: "Track your daily tasks" to "Track your daily actions"
+- Line 14: "see your tasks" to "see your actions"
+- Line 19: "completed tasks" to "honored actions"
+- Line 24: "add new tasks" to "add new actions"
+- Line 34: "ready-made routines" to "ready-made rituals"
 
-3. **Account Tab Contents**:
-   - Profile Info Card (editable fields)
-   - Password Management Card
-   - Actions Card (sign out, delete, replay tour)
+### 5. TaskCard.tsx (Future date toast messages)
+- Lines 84, 115, 140: "today's routine" to "today's rituals"
+- Lines 85, 116, 141: "complete this task" to "honor this action"
 
-4. **Activity Tab Contents**:
-   - JournalStats component (already exists)
-   - My Programs Card (with list)
-   - Orders Card (with list)
-   - Wallet Card (balance + transactions)
+### 6. EmotionDashboard.tsx (Emotion check-in page)
+- Line 233: "Add to My Routine" to "Add to My Rituals"
 
-5. **Settings Tab Contents**:
-   - Push Notifications Card (native only)
-   - Calendar Sync Card (native only)
-   - Support Card (chat button + telegram form)
+### 7. useTaskPlanner.tsx (Hook with toast messages)
+- Line 601: "Task created!" to "Action created!"
+- Line 605: "Failed to create task" to "Failed to create action"
+- Line 659: "Added to your routine!" to "Added to your rituals!"
+- Line 663: "Failed to add to routine" to "Failed to add to rituals"
+- Line 772: "Failed to update task" to "Failed to update action"
+- Line 800: "Task deleted" to "Action deleted"
+- Line 804: "Failed to delete task" to "Failed to delete action"
+- Line 1094: "Task added from template!" to "Action added from template!"
+- Line 1098: "Failed to add task" to "Failed to add action"
+- Line 1231: "Failed to reorder tasks" to "Failed to reorder actions"
+- Line 1307: "Task skipped for today" to "Action skipped for today"
+- Line 1311: "Failed to skip task" to "Failed to skip action"
+- Line 1373: "Failed to reschedule task" to "Failed to reschedule action"
 
-### Color & Styling Updates
+### 8. Tools.tsx (Admin panel tabs)
+- Line 21: "Routines" to "Rituals"
+- Line 25: "Routines Bank" to "Rituals Bank"
+- Line 29: "Tasks Bank" to "Actions Bank"
 
-| Element | Current | New |
-|---------|---------|-----|
-| Header | Plain white | `bg-[#F4ECFE] rounded-b-3xl` |
-| Avatar | Small 64px | Larger 80px with ring |
-| Stats | Not visible | Pill badges below name |
-| Cards | Heavy borders | Subtle shadows, rounded-2xl |
-| Tabs | N/A | Pill-style tabs matching app theme |
+### 9. TasksBank.tsx (Admin actions bank)
+- Line 516: "Tasks Bank" title to "Actions Bank"
+- Line 519: "task templates" to "action templates"
+- Line 540: "Add Task" button to "Add Action"
+- Line 601: "No tasks yet" to "No actions yet"
+- Line 559: "Create Routine" to "Create Ritual"
+- Line 499: Toast "Routine created! Go to Routines Bank" to "Ritual created! Go to Rituals Bank"
+- Lines 227, 281, 298: Task toast messages to action messages
 
-### Component Structure
-
-```tsx
-// Simplified structure
-<div className="flex flex-col h-full">
-  {/* Fixed Hero Header */}
-  <header className="bg-[#F4ECFE] rounded-b-3xl shadow-sm">
-    <div className="flex items-center justify-between px-4 pt-safe">
-      <BackButton />
-      <h1>Profile</h1>
-      <SettingsButton />
-    </div>
-    
-    {/* Avatar + Name */}
-    <div className="flex flex-col items-center py-4">
-      <Avatar className="h-20 w-20" />
-      <h2 className="font-bold">{name}</h2>
-      <p className="text-muted">{email}</p>
-    </div>
-    
-    {/* Stats Pills */}
-    <div className="flex justify-center gap-3 pb-4">
-      <StatPill label="Programs" value={5} />
-      <StatPill label="Streak" value={12} />
-      <StatPill label="Credits" value={50} />
-    </div>
-  </header>
-
-  {/* Tabs */}
-  <Tabs defaultValue="account" className="flex-1 overflow-hidden">
-    <TabsList className="sticky px-4 py-2 bg-background">
-      <TabsTrigger value="account">Account</TabsTrigger>
-      <TabsTrigger value="activity">Activity</TabsTrigger>
-      <TabsTrigger value="settings">Settings</TabsTrigger>
-    </TabsList>
-    
-    <TabsContent value="account" className="overflow-y-auto">
-      {/* Account cards */}
-    </TabsContent>
-    
-    <TabsContent value="activity" className="overflow-y-auto">
-      {/* Activity cards */}
-    </TabsContent>
-    
-    <TabsContent value="settings" className="overflow-y-auto">
-      {/* Settings cards */}
-    </TabsContent>
-  </Tabs>
-</div>
-```
+### 10. RoutinesBank.tsx (Admin rituals bank)
+- Line 592: "Routines Bank" title to "Rituals Bank"
+- Line 595: "routine templates" to "ritual templates"
+- Line 600: "New Routine" button to "New Ritual"
+- Line 627: "No routines yet. Click New Routine" to "No rituals yet. Click New Ritual"
+- Line 712-714: Dialog titles "Edit Routine"/"New Routine" to "Edit Ritual"/"New Ritual"
+- Line 1172: "Create Routine" button to "Create Ritual"
+- Lines 256, 506: Toast messages updated
 
 ---
 
-## Visual Improvements
+## Files NOT Changed (Internal Code)
 
-### Stats Pill Component (new)
-```tsx
-const StatPill = ({ label, value, icon }) => (
-  <div className="flex flex-col items-center bg-white/60 px-4 py-2 rounded-xl">
-    <span className="text-lg font-bold">{value}</span>
-    <span className="text-xs text-muted-foreground">{label}</span>
-  </div>
-);
-```
-
-### Card Styling Updates
-- Remove heavy `CardHeader` borders
-- Use `rounded-2xl` for softer corners
-- Add subtle `shadow-sm` instead of borders
-- Group related items with `bg-muted/30` backgrounds
-
-### Quick Actions Removal
-Remove the icon-only quick navigation grid at the top - the tabs replace this functionality with better UX.
+The following will remain unchanged as they are internal code, not user-facing:
+- Variable names (`task`, `routine`, `useTaskPlanner`, etc.)
+- Database table names (`user_tasks`, `routines_bank`)
+- TypeScript interfaces and types
+- Route paths (`/app/routines`)
 
 ---
 
-## Implementation Phases
+## Implementation Order
 
-### Phase 1: Restructure Layout
-- Add tabs component
-- Move content into appropriate tabs
-- Remove old quick navigation grid
+1. **User-facing app files first** (what users see):
+   - HomeMenu.tsx
+   - TaskDetailModal.tsx
+   - AppTaskCreate.tsx
+   - TaskCard.tsx
+   - EmotionDashboard.tsx
+   - AppTour.tsx
+   - useTaskPlanner.tsx (toasts)
 
-### Phase 2: Hero Header
-- Redesign header with gradient background
-- Move avatar into header
-- Add stats pills row
-
-### Phase 3: Card Polish
-- Update card styling across all sections
-- Improve spacing and visual hierarchy
-- Add status indicators with consistent colors
-
----
-
-## Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/pages/app/AppProfile.tsx` | Complete redesign with tabs, hero header, reorganized content |
+2. **Admin panel files second** (internal tools):
+   - Tools.tsx
+   - TasksBank.tsx
+   - RoutinesBank.tsx
 
 ---
 
-## Expected Outcome
-A cleaner, more organized profile page that:
-- Reduces cognitive load with tabbed navigation
-- Puts key user info (name, stats) front and center
-- Matches the visual style of other app pages
-- Improves discoverability of settings and actions
-- Feels more "app-like" and professional
+## Result
 
+After these changes:
+- Users will see "Actions" and "Rituals" consistently everywhere
+- Admin panel will also use the new terminology for consistency
+- The Simora philosophy of gentle, intention-based language will be fully reflected in the UI
