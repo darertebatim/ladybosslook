@@ -4,6 +4,8 @@ import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { RoutinePlan } from '@/hooks/useRoutinePlans';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { isEmoji } from '@/lib/fluentEmoji';
 
 interface RoutinePlanCardProps {
   plan: RoutinePlan;
@@ -11,9 +13,6 @@ interface RoutinePlanCardProps {
   variant?: 'default' | 'compact';
 }
 
-// Helper to check if string is emoji
-const isEmoji = (str: string) => 
-  /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400/80 to-amber-600/90',
@@ -68,7 +67,7 @@ export function RoutinePlanCard({
           'w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br',
           gradient
         )}>
-          <span className="text-2xl">{planEmoji}</span>
+          <FluentEmoji emoji={planEmoji} size={28} />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-foreground truncate">{plan.title}</h3>
@@ -100,7 +99,7 @@ export function RoutinePlanCard({
             'w-full h-full bg-gradient-to-br flex items-center justify-center',
             gradient
           )}>
-            <span className="text-6xl opacity-40">{planEmoji}</span>
+            <FluentEmoji emoji={planEmoji} size={72} className="opacity-40" />
           </div>
         )}
         

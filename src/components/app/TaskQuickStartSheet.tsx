@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { useTaskTemplates, TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/
 import { cn } from '@/lib/utils';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface TaskQuickStartSheetProps {
   open: boolean;
@@ -121,7 +122,7 @@ export const TaskQuickStartSheet = ({
                       className="flex items-center gap-3 w-full p-4 rounded-2xl text-left transition-all active:scale-[0.98]"
                       style={{ backgroundColor: bgColor }}
                     >
-                      <span className="text-2xl flex-shrink-0">{template.emoji}</span>
+                      <FluentEmoji emoji={template.emoji || '📝'} size={28} className="flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-[15px] text-foreground/90 truncate">
                           {template.title}

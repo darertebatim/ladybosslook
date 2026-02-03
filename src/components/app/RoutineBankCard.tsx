@@ -3,16 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { RoutineBankItem } from '@/hooks/useRoutinesBank';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { isEmoji } from '@/lib/fluentEmoji';
 
 interface RoutineBankCardProps {
   routine: RoutineBankItem;
   onClick?: () => void;
   variant?: 'default' | 'compact';
 }
-
-// Helper to check if string is emoji
-const isEmoji = (str: string) => 
-  /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400/80 to-amber-600/90',
@@ -72,7 +70,7 @@ export function RoutineBankCard({
           'w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br',
           gradient
         )}>
-          <span className="text-2xl">{routineEmoji}</span>
+          <FluentEmoji emoji={routineEmoji} size={28} />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-foreground truncate">{routine.title}</h3>
@@ -104,7 +102,7 @@ export function RoutineBankCard({
             'w-full h-full bg-gradient-to-br flex items-center justify-center',
             gradient
           )}>
-            <span className="text-6xl opacity-40">{routineEmoji}</span>
+            <FluentEmoji emoji={routineEmoji} size={72} className="opacity-40" />
           </div>
         )}
         
