@@ -16,6 +16,7 @@ import { haptic } from '@/lib/haptics';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 import { isWaterTask } from '@/lib/waterTracking';
+import { formatTimeLabel } from '@/lib/taskScheduling';
 
 interface TaskDetailModalProps {
   task: UserTask | null;
@@ -167,7 +168,7 @@ export const TaskDetailModal = ({
                     }
                   </span>
                 ) : (
-                  <span className="text-[13px] text-black/80">{formatTime(task.scheduled_time)}</span>
+                  <span className="text-[13px] text-black/80">{formatTimeLabel(task)}</span>
                 )}
               </div>
               
@@ -315,22 +316,7 @@ export const TaskDetailModal = ({
             </Button>
           )}
           
-          {/* Skip button - show if not completed */}
-          {!isCompleted && !goalReached && onSkip && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                onClose();
-                onSkip(task);
-              }}
-              className="w-full gap-2 h-10 rounded-xl border-black/20 bg-white/50 hover:bg-white/70 text-black/70 text-sm"
-            >
-              <FastForward className="h-4 w-4" />
-              Skip for Today
-            </Button>
-          )}
-          
-          {/* Edit and Delete buttons row */}
+          {/* Edit, Skip, and Delete buttons row */}
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -343,6 +329,21 @@ export const TaskDetailModal = ({
               <Pencil className="h-4 w-4" />
               Edit Task
             </Button>
+            
+            {/* Skip button - show if not completed */}
+            {!isCompleted && !goalReached && onSkip && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  onClose();
+                  onSkip(task);
+                }}
+                className="w-12 h-10 p-0 rounded-xl border-2 border-black/20 bg-white/50 hover:bg-white/70 text-black/70"
+              >
+                <FastForward className="h-4 w-4" />
+              </Button>
+            )}
+            
             {onDelete && (
               <Button
                 variant="outline"
