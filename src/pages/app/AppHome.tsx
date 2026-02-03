@@ -472,8 +472,8 @@ const AppHome = () => {
                             {format(day, 'EEE')}
                           </span>
                           
-                          {/* Number with outline circle for selected */}
-                          <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5', isSelected ? 'bg-violet-300 text-foreground dark:bg-violet-700 dark:text-violet-100' // Lavender background like Me+
+                          {/* Number with white circle for selected, lavender for today */}
+                          <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5', isSelected ? 'bg-white text-foreground dark:bg-white dark:text-foreground' // White circle inside lavender pill
                       : isTodayDate ? 'bg-violet-200/70 text-foreground/80 dark:bg-violet-800/50 dark:text-violet-300' : 'text-foreground/70')}>
                             {hasCompletions && !isSelected && <Flame className="absolute h-5 w-5 text-orange-400 opacity-50" />}
                             {hasProgramEvents && <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />}
