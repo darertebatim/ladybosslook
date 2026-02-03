@@ -84,7 +84,7 @@ const CATEGORY_DISPLAY: Record<string, { name: string; icon: string; color: stri
   // Extended categories
   gratitude: { name: 'Gratitude', icon: 'Heart', color: 'pink', emoji: '🙏' },
   hygiene: { name: 'Hygiene', icon: 'Sparkles', color: 'blue', emoji: '🧼' },
-  'inner-strength': { name: 'Inner Strength', icon: 'Flame', color: 'orange', emoji: '🔥' },
+  strength: { name: 'Strength', icon: 'Flame', color: 'orange', emoji: '🔥' },
   movement: { name: 'Movement', icon: 'Activity', color: 'green', emoji: '🏃' },
   nutrition: { name: 'Nutrition', icon: 'Apple', color: 'red', emoji: '🍎' },
   selfcare: { name: 'Self Care', icon: 'Heart', color: 'rose', emoji: '💆' },
