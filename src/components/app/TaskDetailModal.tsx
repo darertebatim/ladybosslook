@@ -1,4 +1,4 @@
-import { Check, Plus, Play, Droplets, FastForward } from 'lucide-react';
+import { Check, Plus, Play, Droplets, FastForward, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
@@ -178,6 +178,13 @@ export const TaskDetailModal = ({
               )}>
                 {task.title}
               </p>
+              
+              {/* Description - shown below title */}
+              {task.description && (
+                <p className="text-[13px] text-black/60 mt-0.5">
+                  {task.description}
+                </p>
+              )}
             </div>
 
             {/* Timer goal: Play button, Count goal: + button, Regular: Checkbox - same size as TaskCard (w-9 h-9) */}
@@ -323,17 +330,32 @@ export const TaskDetailModal = ({
             </Button>
           )}
           
-          {/* Edit Task button - simple like Me+ */}
-          <Button
-            variant="outline"
-            onClick={() => {
-              onClose();
-              onEdit(task);
-            }}
-            className="w-full gap-2 h-10 rounded-full border-2 border-black/30 bg-transparent hover:bg-white/30 text-black text-sm"
-          >
-            Edit Task
-          </Button>
+          {/* Edit and Delete buttons row */}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                onClose();
+                onEdit(task);
+              }}
+              className="flex-1 gap-2 h-10 rounded-full border-2 border-black/30 bg-transparent hover:bg-white/30 text-black text-sm"
+            >
+              <Pencil className="h-4 w-4" />
+              Edit Task
+            </Button>
+            {onDelete && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  onClose();
+                  onDelete(task);
+                }}
+                className="w-12 h-10 p-0 rounded-xl border-2 border-red-300 bg-transparent hover:bg-red-50 text-red-500"
+              >
+                <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
