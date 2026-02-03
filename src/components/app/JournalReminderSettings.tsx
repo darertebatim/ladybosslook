@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
+import { useState, useMemo } from 'react';
+import { useRoutinePlan, useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
@@ -9,7 +9,10 @@ interface JournalReminderSettingsProps {
   className?: string;
 }
 
-// Synthetic task for journal - no longer using database routine plans
+// The journal Pro Routine ID - contains the "Daily Reflection & Gratitude" pro task
+const JOURNAL_ROUTINE_ID = '51be0466-99fb-4357-b48d-b584376046c5';
+
+// Fallback synthetic task if no Pro Routine exists
 const SYNTHETIC_JOURNAL_TASK: RoutinePlanTask = {
   id: 'synthetic-journal-task',
   plan_id: 'synthetic-journal',
@@ -29,18 +32,29 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   
+  const { data: routinePlan, isLoading } = useRoutinePlan(JOURNAL_ROUTINE_ID);
   const { data: existingTask } = useExistingProTask('journal');
   const addRoutinePlan = useAddRoutinePlan();
 
   const isAdded = existingTask || justAdded;
 
+  // Use Pro Routine tasks if available, otherwise fall back to synthetic
+  const tasksToShow = useMemo(() => {
+    if (routinePlan?.tasks && routinePlan.tasks.length > 0) {
+      return routinePlan.tasks;
+    }
+    return [SYNTHETIC_JOURNAL_TASK];
+  }, [routinePlan?.tasks]);
+
+  const usingSynthetic = !routinePlan?.tasks || routinePlan.tasks.length === 0;
+
   const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
     try {
       await addRoutinePlan.mutateAsync({
-        planId: 'synthetic-journal',
+        planId: usingSynthetic ? 'synthetic-journal' : JOURNAL_ROUTINE_ID,
         selectedTaskIds,
         editedTasks,
-        syntheticTasks: [SYNTHETIC_JOURNAL_TASK],
+        syntheticTasks: usingSynthetic ? [SYNTHETIC_JOURNAL_TASK] : undefined,
       });
       toast.success('Journal routine added to your planner!');
       setShowRoutineSheet(false);
@@ -56,7 +70,7 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
       <AddedToRoutineButton
         isAdded={isAdded}
         onAddClick={() => setShowRoutineSheet(true)}
-        isLoading={addRoutinePlan.isPending}
+        isLoading={isLoading || addRoutinePlan.isPending}
         addText="Add Journaling to My Routine"
         size="sm"
         variant="outline"
@@ -65,8 +79,8 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
       <RoutinePreviewSheet
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
-        tasks={[SYNTHETIC_JOURNAL_TASK]}
-        routineTitle="Journaling"
+        tasks={tasksToShow}
+        routineTitle={routinePlan?.title || 'Journaling'}
         defaultTag="Journal"
         onSave={handleSaveRoutine}
         isSaving={addRoutinePlan.isPending}
