@@ -41,10 +41,7 @@ export function StarRating({ rating = 0, onRate, readonly = false, size = 'md' }
             key={star}
             type="button"
             disabled={readonly}
-            className={cn(
-              'transition-transform',
-              !readonly && 'hover:scale-110 active:scale-95'
-            )}
+            className="transition-colors"
             onMouseEnter={() => !readonly && setHoverRating(star)}
             onMouseLeave={() => !readonly && setHoverRating(0)}
             onClick={() => handleStarClick(star)}
