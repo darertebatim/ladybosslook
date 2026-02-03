@@ -16,6 +16,7 @@ import { isToday, isBefore, startOfDay } from 'date-fns';
 import { toast } from 'sonner';
 import { isWaterTask } from '@/lib/waterTracking';
 import { formatTimeLabelWithEmoji } from '@/lib/taskScheduling';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface TaskCardProps {
   task: UserTask;
@@ -191,6 +192,9 @@ export const TaskCard = memo(function TaskCard({
   // Pro Task - uses user's chosen color but shows Pro icon and badge
   if (isProTask && proConfig) {
     const ProIcon = proConfig.icon;
+    // Use task's emoji if available for 3D display, otherwise fall back to ProIcon
+    const hasTaskEmoji = task.emoji && task.emoji.length > 0;
+    
     return (
       <div
         onClick={handleCardClick}
@@ -201,9 +205,13 @@ export const TaskCard = memo(function TaskCard({
       >
         {/* Main row */}
         <div className="flex items-center gap-2">
-          {/* Icon - larger emoji display */}
+          {/* Icon - use 3D emoji if available, else Lucide icon */}
           <div className="w-10 h-10 flex items-center justify-center shrink-0">
-            <ProIcon className={cn('h-6 w-6', proConfig.iconColorClass)} />
+            {hasTaskEmoji ? (
+              <FluentEmoji emoji={task.emoji} size={32} />
+            ) : (
+              <ProIcon className={cn('h-6 w-6', proConfig.iconColorClass)} />
+            )}
           </div>
 
           {/* Content */}
