@@ -9,6 +9,10 @@ const buildId = `B${Date.now().toString(36).toUpperCase()}`;
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // IMPORTANT for Capacitor/iOS: bundled builds load from the app's file:// scheme.
+  // Using a relative base prevents requests like /assets/... which resolve to the wrong origin.
+  // (This is a common cause of a black screen after the splash screen.)
+  base: mode === 'development' ? '/' : './',
   define: {
     __BUILD_TIME__: JSON.stringify(buildTime),
     __BUILD_ID__: JSON.stringify(buildId),
