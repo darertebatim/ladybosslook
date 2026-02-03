@@ -5,6 +5,7 @@ import { toast } from '@/hooks/use-toast';
 import { format, subDays, isEqual, parseISO } from 'date-fns';
 import { scheduleUrgentAlarm, cancelUrgentAlarms, isUrgentAlarmAvailable } from '@/lib/taskAlarm';
 import { scheduleTaskReminder, cancelTaskReminder, isLocalNotificationsAvailable } from '@/lib/localNotifications';
+import { getTimePeriodSortOrder } from '@/lib/taskScheduling';
 
 // ============================================
 // TYPES
@@ -19,6 +20,7 @@ export interface UserTask {
   color: TaskColor;
   scheduled_date: string | null;
   scheduled_time: string | null;
+  time_period: 'start_of_day' | 'morning' | 'afternoon' | 'evening' | 'night' | null;
   repeat_pattern: RepeatPattern;
   repeat_days: number[];
   reminder_enabled: boolean;
@@ -123,6 +125,7 @@ export interface CreateTaskInput {
   color?: TaskColor;
   scheduled_date?: string | null;
   scheduled_time?: string | null;
+  time_period?: 'start_of_day' | 'morning' | 'afternoon' | 'evening' | 'night' | null;
   repeat_pattern?: RepeatPattern;
   repeat_days?: number[];
   reminder_enabled?: boolean;
@@ -148,6 +151,7 @@ export interface UpdateTaskInput extends Partial<CreateTaskInput> {
   linked_playlist_id?: string | null;
   pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | null;
   pro_link_value?: string | null;
+  time_period?: 'start_of_day' | 'morning' | 'afternoon' | 'evening' | 'night' | null;
 }
 
 // Color mapping for UI - Me+ style brighter pastels
@@ -260,21 +264,36 @@ export const useTasksForDate = (date: Date) => {
     return false;
   });
 
-  // Sort tasks: scheduled times first (chronologically), then "Anytime" tasks by order_index
+  // Sort tasks: specific times first (chronologically), then time periods (by category order), then Anytime by order_index
   const sortedTasks = [...tasksForDate].sort((a, b) => {
     const aHasTime = !!a.scheduled_time;
     const bHasTime = !!b.scheduled_time;
+    const aHasPeriod = !!a.time_period;
+    const bHasPeriod = !!b.time_period;
     
-    // Both have times - sort chronologically
+    // Both have specific times - sort chronologically
     if (aHasTime && bHasTime) {
       return a.scheduled_time!.localeCompare(b.scheduled_time!);
     }
     
-    // One has time, one doesn't - timed tasks come first
+    // Specific time comes before time_period and Anytime
     if (aHasTime && !bHasTime) return -1;
     if (!aHasTime && bHasTime) return 1;
     
-    // Neither has time - sort by order_index
+    // Both have time_periods - sort by category order
+    if (aHasPeriod && bHasPeriod) {
+      const aOrder = getTimePeriodSortOrder(a.time_period);
+      const bOrder = getTimePeriodSortOrder(b.time_period);
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      // Same period - sort by order_index
+      return a.order_index - b.order_index;
+    }
+    
+    // Time period before Anytime
+    if (aHasPeriod && !bHasPeriod) return -1;
+    if (!aHasPeriod && bHasPeriod) return 1;
+    
+    // Both Anytime - sort by order_index
     return a.order_index - b.order_index;
   });
 

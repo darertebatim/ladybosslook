@@ -15,6 +15,7 @@ import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/p
 import { isToday, isBefore, startOfDay } from 'date-fns';
 import { toast } from 'sonner';
 import { isWaterTask } from '@/lib/waterTracking';
+import { formatTimeLabelWithEmoji } from '@/lib/taskScheduling';
 
 interface TaskCardProps {
   task: UserTask;
@@ -68,14 +69,9 @@ export const TaskCard = memo(function TaskCard({
   const isWater = isWaterTask(task);
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
   
-  // Format time display
-  const formatTime = (time: string | null) => {
-    if (!time) return 'Anytime';
-    const [hours, minutes] = time.split(':');
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+  // Format time display using task scheduling helper
+  const formatTime = (task: UserTask) => {
+    return formatTimeLabelWithEmoji(task);
   };
 
   const handleToggleComplete = async (e: React.MouseEvent) => {
@@ -214,7 +210,7 @@ export const TaskCard = memo(function TaskCard({
           <div className="flex-1 min-w-0">
             {/* Top line: Time + Goal (if applicable) */}
             <div className="flex items-center gap-2">
-              <span className="text-[13px] text-black/80">{formatTime(task.scheduled_time)}</span>
+              <span className="text-[13px] text-black/80">{formatTime(task)}</span>
               {hasGoal && (
                 <span className="text-[13px] text-black/80 font-medium">• {formatProGoalLabel()}</span>
               )}
@@ -326,7 +322,7 @@ export const TaskCard = memo(function TaskCard({
             {hasGoal ? (
               <span className="text-[13px] text-black/80 font-medium">{formatGoalLabel()}</span>
             ) : (
-              <span className="text-[13px] text-black/80">{formatTime(task.scheduled_time)}</span>
+              <span className="text-[13px] text-black/80">{formatTime(task)}</span>
             )}
           </div>
           
