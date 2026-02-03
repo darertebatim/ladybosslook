@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { CONTEXT_OPTIONS, getEmotionLabel, type Valence } from '@/lib/emotionData';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { useKeyboard } from '@/hooks/useKeyboard';
 
 interface EmotionContextProps {
   valence: Valence;
@@ -25,10 +26,35 @@ export const EmotionContext = ({
 }: EmotionContextProps) => {
   const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
+  const notesRef = useRef<HTMLTextAreaElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { isKeyboardOpen } = useKeyboard();
 
   // Get labels for all selected emotions
   const emotionLabels = emotions.map(e => getEmotionLabel(valence, category, e));
   const emotionDisplayText = emotionLabels.join(', ').toLowerCase();
+
+  // Handle keyboard - scroll textarea into view when focused
+  const handleNotesFocus = () => {
+    // Multi-stage scroll to ensure visibility on iOS
+    const scrollIntoView = () => {
+      notesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    
+    // Initial delay for keyboard to start appearing
+    setTimeout(scrollIntoView, 100);
+    // After keyboard animation
+    setTimeout(scrollIntoView, 300);
+  };
+
+  // Auto-scroll when keyboard opens while textarea is focused
+  useEffect(() => {
+    if (isKeyboardOpen && document.activeElement === notesRef.current) {
+      setTimeout(() => {
+        notesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [isKeyboardOpen]);
 
   const toggleContext = (context: string) => {
     haptic.light();
@@ -62,7 +88,11 @@ export const EmotionContext = ({
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-2">
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto overscroll-contain px-5 py-2"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
         {/* Title with emotions highlighted */}
         <h2 className="text-xl font-semibold text-foreground mb-6">
           What made you feel{' '}
@@ -93,8 +123,10 @@ export const EmotionContext = ({
 
         {/* Notes textarea */}
         <Textarea
+          ref={notesRef}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
+          onFocus={handleNotesFocus}
           placeholder="Add details or more reflection..."
           className="min-h-[140px] resize-none rounded-2xl bg-white border-slate-200 text-base"
         />
