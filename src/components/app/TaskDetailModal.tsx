@@ -158,17 +158,22 @@ export const TaskDetailModal = ({
             
             {/* Time/Goal and title - matching TaskCard exactly */}
             <div className="flex-1 min-w-0">
-              {/* Top line: time or goal - same as TaskCard */}
-              <div className="flex items-center gap-2">
-                {hasGoal ? (
-                  <span className="text-[13px] text-black/80 font-medium">
-                    {isTimerGoal
-                      ? `Goal: ${Math.floor(goalProgress / 60)}/${Math.floor((task.goal_target || 0) / 60)} min`
-                      : `Goal: ${goalProgress}/${task.goal_target} ${task.goal_unit || 'times'}`
-                    }
-                  </span>
-                ) : (
-                  <span className="text-[13px] text-black/80">{formatTimeLabel(task)}</span>
+              {/* Top line: time + goal (like TaskCard shows both) */}
+              <div className="flex items-center gap-1.5">
+                {/* Always show time period/time first */}
+                <span className="text-[13px] text-black/80">{formatTimeLabel(task)}</span>
+                
+                {/* Show goal after time if task has a goal */}
+                {hasGoal && (
+                  <>
+                    <span className="text-[13px] text-black/80">•</span>
+                    <span className="text-[13px] text-black/80 font-medium">
+                      {isTimerGoal
+                        ? `${Math.floor(goalProgress / 60)}/${Math.floor((task.goal_target || 0) / 60)} min`
+                        : `${goalProgress}/${task.goal_target} ${task.goal_unit || 'times'}`
+                      }
+                    </span>
+                  </>
                 )}
               </div>
               
