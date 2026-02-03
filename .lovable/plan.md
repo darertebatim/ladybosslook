@@ -1,189 +1,216 @@
 
 
-# Plan: Smart Task Push Notification System
+# Profile Page Redesign Plan
 
-## Summary
-Implement a balanced, timezone-aware push notification strategy for tasks that maximizes user engagement without overwhelming them. The system will:
-- Send 3-4 PNs per day maximum
-- Remind users of Anytime tasks (morning + evening)
-- Celebrate goal milestones (50%, 100%)
-- Auto-detect and store user timezone on app open
+## Overview
+Redesign the AppProfile page to be more professional, visually consistent with other app pages (like AppPlayer, AppJournal, AppHome), and follow the established Me+ inspired aesthetic with better information hierarchy and modern UI patterns.
 
 ---
 
-## Notification Schedule Design
+## Design Analysis
+
+### Current Issues
+1. **Long scrolling page** with 10+ cards stacked vertically - overwhelming
+2. **Quick navigation grid** at top uses small icon-only buttons - hard to scan
+3. **Inconsistent card styling** - some cards are heavy, others minimal
+4. **No visual grouping** - all sections look the same
+5. **Header is plain** - just text, doesn't match the immersive headers on other pages
+6. **Profile avatar area** is separate from header - wastes vertical space
+
+### Design Inspiration from Other Pages
+- **AppPlayer**: Category circles, tabbed filtering, clean header with search
+- **AppJournal**: Stats pills in header, grouped entries by date
+- **AppHome**: Gradient header with greeting, compact stat pills, card-based sections
+- **HomeMenu**: Pill-based navigation groups
+
+---
+
+## New Design Structure
+
+### 1. Hero Header with Profile Card (Lines 631-650)
+Replace the plain header with an immersive header containing the user's profile info.
 
 ```text
-Daily PN Timeline (max 3-4 per day):
-
- 7:00 AM   Morning Kickoff (1 PN)
-           "☀️ Good morning! You have 5 tasks for today"
-           - Lists incomplete tasks with time periods
-           - Only if user has tasks for today
-           
-10:00 AM   Specific Time Task (if any)
-           "📝 Journal - It's time!"
-           - Only for tasks with scheduled_time
-           - Per-task individual PNs
-
- 6:00 PM   Evening Check-in (1 PN)
-           "🌅 3 tasks left today - you've got this!"
-           - Only if incomplete Anytime tasks remain
-           - Shows count + first task name
-
- 9:00 PM   Goal Milestone (when achieved)
-           "🎉 2/3 chapters done! Keep going!"
-           - When user hits 50% or 100% of count goal
-           - Triggered by auto-complete hook
+┌────────────────────────────────────────┐
+│  ← (back)           Profile    ⚙️      │ ← Header row
+├────────────────────────────────────────┤
+│    ┌──────┐                            │
+│    │  JD  │   John Doe                 │ ← Avatar + Name
+│    └──────┘   john@email.com           │
+│                                        │
+│   ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐  │
+│   │ 5    │ │ 12   │ │ 28   │ │ $50  │  │ ← Stats row
+│   │Prog. │ │Streak│ │Posts │ │Credit│  │
+│   └──────┘ └──────┘ └──────┘ └──────┘  │
+└────────────────────────────────────────┘
 ```
+
+### 2. Tab-Based Content Organization (Lines 653-760)
+Use tabs to organize content into logical groups instead of a single long scroll.
+
+**Tab Structure:**
+- **Account** - Personal info, password, actions
+- **Activity** - Programs, journal stats, orders
+- **Settings** - Notifications, calendar, support
+
+### 3. Modernized Section Cards
+Each section uses consistent card styling with:
+- Icon + title in a row
+- Subtle background tint for status areas
+- Chevron indicators for expandable items
 
 ---
 
 ## Technical Implementation
 
-### 1. Add Timezone to Profiles Table
-**Migration**: `add_timezone_to_profiles.sql`
+### File Changes
 
-Add `timezone` column to `profiles` table for centralized timezone storage.
+**`src/pages/app/AppProfile.tsx`** - Complete restructure:
 
-```sql
-ALTER TABLE profiles 
-ADD COLUMN timezone text DEFAULT 'America/Los_Angeles';
-```
+1. **New Header Component** (embedded):
+   - Gradient background matching other pages (`bg-[#F4ECFE]`)
+   - Centered avatar with name/email below
+   - Horizontal stats pills (programs, journal streak, credits)
 
-### 2. Auto-Detect Timezone on App Open
-**File**: `src/hooks/useTimezoneSync.ts` (new)
+2. **Tabs Structure**:
+   - Use existing `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from shadcn
+   - Three tabs: Account, Activity, Settings
+   - Content wrapped in scroll container per tab
 
-Creates a hook that:
-- Runs once on app launch
-- Gets browser/device timezone via `Intl.DateTimeFormat().resolvedOptions().timeZone`
-- Updates `profiles.timezone` if different
-- Uses a debounced update to avoid excessive writes
+3. **Account Tab Contents**:
+   - Profile Info Card (editable fields)
+   - Password Management Card
+   - Actions Card (sign out, delete, replay tour)
 
-### 3. Integrate Timezone Sync in App Layout
-**File**: `src/layouts/NativeAppLayout.tsx` (modify)
+4. **Activity Tab Contents**:
+   - JournalStats component (already exists)
+   - My Programs Card (with list)
+   - Orders Card (with list)
+   - Wallet Card (balance + transactions)
 
-Add the new hook to run on every app open.
+5. **Settings Tab Contents**:
+   - Push Notifications Card (native only)
+   - Calendar Sync Card (native only)
+   - Support Card (chat button + telegram form)
 
-### 4. Create Summary PN Edge Function
-**File**: `supabase/functions/send-task-summary/index.ts` (new)
+### Color & Styling Updates
 
-New edge function that handles:
-- **Morning Kickoff** (7 AM local time)
-- **Evening Check-in** (6 PM local time)
+| Element | Current | New |
+|---------|---------|-----|
+| Header | Plain white | `bg-[#F4ECFE] rounded-b-3xl` |
+| Avatar | Small 64px | Larger 80px with ring |
+| Stats | Not visible | Pill badges below name |
+| Cards | Heavy borders | Subtle shadows, rounded-2xl |
+| Tabs | N/A | Pill-style tabs matching app theme |
 
-Logic:
-1. Query all users with their timezone
-2. For each user where current hour matches target hour:
-   - Fetch today's incomplete tasks
-   - Skip if no tasks or all completed
-   - Send appropriate summary PN
+### Component Structure
 
-Runs hourly via cron to catch users in different timezones.
+```tsx
+// Simplified structure
+<div className="flex flex-col h-full">
+  {/* Fixed Hero Header */}
+  <header className="bg-[#F4ECFE] rounded-b-3xl shadow-sm">
+    <div className="flex items-center justify-between px-4 pt-safe">
+      <BackButton />
+      <h1>Profile</h1>
+      <SettingsButton />
+    </div>
+    
+    {/* Avatar + Name */}
+    <div className="flex flex-col items-center py-4">
+      <Avatar className="h-20 w-20" />
+      <h2 className="font-bold">{name}</h2>
+      <p className="text-muted">{email}</p>
+    </div>
+    
+    {/* Stats Pills */}
+    <div className="flex justify-center gap-3 pb-4">
+      <StatPill label="Programs" value={5} />
+      <StatPill label="Streak" value={12} />
+      <StatPill label="Credits" value={50} />
+    </div>
+  </header>
 
-### 5. Modify Existing Task Reminders
-**File**: `supabase/functions/send-task-reminders/index.ts` (modify)
-
-Update to:
-- Use `profiles.timezone` instead of `journal_reminder_settings.timezone`
-- Handle `time_period` tasks by using their `defaultReminder` time
-- Skip users who already received a summary PN in the same period
-
-### 6. Add Goal Milestone Notifications
-**File**: `src/hooks/useAutoCompleteProTask.tsx` (modify)
-
-When goal progress is updated:
-- Check if 50% or 100% milestone reached
-- Trigger local notification for celebration
-- Store milestone in `localStorage` to avoid duplicate celebrations
-
-### 7. Cron Job for Summary PNs
-**SQL**: Add new cron schedule
-
-```sql
--- Run hourly to catch users in all timezones
-cron.schedule(
-  'send-task-summary-hourly',
-  '0 * * * *', -- every hour at :00
-  ...
-)
-```
-
----
-
-## Files to Create/Modify
-
-| File | Action | Purpose |
-|------|--------|---------|
-| `add_timezone_to_profiles.sql` | Migration | Add timezone column |
-| `src/hooks/useTimezoneSync.ts` | Create | Auto-detect and sync timezone |
-| `src/layouts/NativeAppLayout.tsx` | Modify | Call timezone sync on app load |
-| `supabase/functions/send-task-summary/index.ts` | Create | Morning/evening summary PNs |
-| `supabase/functions/send-task-reminders/index.ts` | Modify | Use profiles.timezone, handle time_period |
-| `src/hooks/useAutoCompleteProTask.tsx` | Modify | Goal milestone celebrations |
-
----
-
-## PN Logic Summary Table
-
-| Task Type | When Reminded | PN Type |
-|-----------|---------------|---------|
-| Specific Time (`scheduled_time`) | At scheduled time minus offset | Individual task PN |
-| Part of Day (`time_period`) | Morning summary OR evening check-in | Grouped summary PN |
-| Anytime (no time set) | Morning summary + evening if incomplete | Grouped summary PN |
-| Count Goals | When 50% or 100% reached | Celebration PN (local) |
-
----
-
-## Timezone-Aware Logic
-
-```text
-Server runs hourly at :00
-
-For each user:
-  1. Get user's timezone from profiles.timezone
-  2. Convert server UTC time → user's local time
-  3. If local hour = 7 → Send morning kickoff
-  4. If local hour = 18 → Send evening check-in
-  5. Track sent PNs in pn_schedule_logs to avoid duplicates
+  {/* Tabs */}
+  <Tabs defaultValue="account" className="flex-1 overflow-hidden">
+    <TabsList className="sticky px-4 py-2 bg-background">
+      <TabsTrigger value="account">Account</TabsTrigger>
+      <TabsTrigger value="activity">Activity</TabsTrigger>
+      <TabsTrigger value="settings">Settings</TabsTrigger>
+    </TabsList>
+    
+    <TabsContent value="account" className="overflow-y-auto">
+      {/* Account cards */}
+    </TabsContent>
+    
+    <TabsContent value="activity" className="overflow-y-auto">
+      {/* Activity cards */}
+    </TabsContent>
+    
+    <TabsContent value="settings" className="overflow-y-auto">
+      {/* Settings cards */}
+    </TabsContent>
+  </Tabs>
+</div>
 ```
 
 ---
 
-## Rate Limiting Built-In
+## Visual Improvements
 
-| Control | Implementation |
-|---------|----------------|
-| Max 1 morning PN | Check `pn_schedule_logs` for today's 'morning_summary' |
-| Max 1 evening PN | Check `pn_schedule_logs` for today's 'evening_summary' |
-| Skip if all complete | Don't send if user has 0 incomplete tasks |
-| Individual task PNs | Limited to tasks with specific times only |
+### Stats Pill Component (new)
+```tsx
+const StatPill = ({ label, value, icon }) => (
+  <div className="flex flex-col items-center bg-white/60 px-4 py-2 rounded-xl">
+    <span className="text-lg font-bold">{value}</span>
+    <span className="text-xs text-muted-foreground">{label}</span>
+  </div>
+);
+```
+
+### Card Styling Updates
+- Remove heavy `CardHeader` borders
+- Use `rounded-2xl` for softer corners
+- Add subtle `shadow-sm` instead of borders
+- Group related items with `bg-muted/30` backgrounds
+
+### Quick Actions Removal
+Remove the icon-only quick navigation grid at the top - the tabs replace this functionality with better UX.
 
 ---
 
-## Example PN Copy
+## Implementation Phases
 
-**Morning Kickoff (7 AM)**
-```
-Title: ☀️ Good morning, {name}!
-Body: You have 5 tasks today. Start with "Morning Journaling" ✨
-```
+### Phase 1: Restructure Layout
+- Add tabs component
+- Move content into appropriate tabs
+- Remove old quick navigation grid
 
-**Evening Check-in (6 PM)**
-```
-Title: 🌅 Almost done!
-Body: 2 tasks left today. You've got this! 💪
-```
+### Phase 2: Hero Header
+- Redesign header with gradient background
+- Move avatar into header
+- Add stats pills row
 
-**Goal Milestone (50%)**
-```
-Title: 🎉 Halfway there!
-Body: 2/4 chapters done on "Listen to Audiobook"
-```
+### Phase 3: Card Polish
+- Update card styling across all sections
+- Improve spacing and visual hierarchy
+- Add status indicators with consistent colors
 
-**Goal Milestone (100%)**
-```
-Title: 🏆 Goal complete!
-Body: You finished all 4 chapters! Amazing work ✨
-```
+---
+
+## Files to Modify
+
+| File | Changes |
+|------|---------|
+| `src/pages/app/AppProfile.tsx` | Complete redesign with tabs, hero header, reorganized content |
+
+---
+
+## Expected Outcome
+A cleaner, more organized profile page that:
+- Reduces cognitive load with tabbed navigation
+- Puts key user info (name, stats) front and center
+- Matches the visual style of other app pages
+- Improves discoverability of settings and actions
+- Feels more "app-like" and professional
 
