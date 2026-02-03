@@ -1,10 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BreathingExercisesManager } from '@/components/admin/BreathingExercisesManager';
-import { RoutineManagement } from '@/components/admin/RoutineManagement';
 import TasksBank from '@/pages/admin/TasksBank';
-import RoutinesBank from '@/components/admin/RoutinesBank';
-import { Wind, Sparkles, ListTodo, Layers } from 'lucide-react';
+import { Wind, ListTodo } from 'lucide-react';
 
 export default function Tools() {
   return (
@@ -14,16 +12,8 @@ export default function Tools() {
         <p className="text-muted-foreground">Manage app tools and wellness features</p>
       </div>
 
-      <Tabs defaultValue="routines" className="space-y-4">
+      <Tabs defaultValue="tasks" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="routines" className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4" />
-            Routines
-          </TabsTrigger>
-          <TabsTrigger value="routines-bank" className="flex items-center gap-2">
-            <Layers className="h-4 w-4" />
-            Routines Bank
-          </TabsTrigger>
           <TabsTrigger value="tasks" className="flex items-center gap-2">
             <ListTodo className="h-4 w-4" />
             Tasks Bank
@@ -33,14 +23,6 @@ export default function Tools() {
             Breathing
           </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="routines">
-          <RoutineManagement />
-        </TabsContent>
-
-        <TabsContent value="routines-bank">
-          <RoutinesBank />
-        </TabsContent>
 
         <TabsContent value="tasks">
           <TasksBank />
