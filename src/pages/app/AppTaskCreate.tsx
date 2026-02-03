@@ -41,6 +41,7 @@ import { TaskIcon } from '@/components/app/IconPicker';
 import { TimeWheelPicker } from '@/components/app/TimeWheelPicker';
 import { PRO_LINK_TYPES, ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
 import { GoalSettingsSheet, GoalSettings, formatGoalTarget } from '@/components/app/GoalSettingsSheet';
+import { TimePeriod, TIME_PERIODS, TimeMode, getTimeMode, formatTimeLabel, formatTimeRange, getTimePeriodConfig } from '@/lib/taskScheduling';
 
 // Me+ style pastel color options with hex values
 const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
@@ -81,6 +82,7 @@ export interface TaskFormData {
   color: TaskColor;
   scheduledDate: Date;
   scheduledTime: string | null;
+  timePeriod: TimePeriod | null;
   repeatEnabled: boolean;
   repeatPattern: 'daily' | 'weekly' | 'monthly';
   repeatInterval: number;
@@ -155,8 +157,10 @@ const AppTaskCreate = ({
   const [color, setColor] = useState<TaskColor>(initialData?.color || urlColor || 'mint');
   const [scheduledDate, setScheduledDate] = useState<Date>(initialData?.scheduledDate || new Date());
   const [scheduledTime, setScheduledTime] = useState<string | null>(initialData?.scheduledTime ?? null);
+  const [timePeriod, setTimePeriod] = useState<TimePeriod | null>(null);
   const [scheduledEndTime, setScheduledEndTime] = useState<string | null>(null);
-  const [timeMode, setTimeMode] = useState<'point' | 'period'>('point');
+  // Derive time mode from state
+  const derivedTimeMode: TimeMode = timePeriod ? 'part_of_day' : scheduledTime ? 'specific' : 'anytime';
   const [repeatEnabled, setRepeatEnabled] = useState(
     initialData?.repeatEnabled ?? (urlRepeatPattern && urlRepeatPattern !== 'none') ?? false
   );
@@ -369,6 +373,7 @@ const AppTaskCreate = ({
         setScheduledDate(new Date(existingTask.scheduled_date));
       }
       setScheduledTime(existingTask.scheduled_time);
+      setTimePeriod(existingTask.time_period ?? null);
       
       if (existingTask.repeat_pattern !== 'none') {
         setRepeatEnabled(true);
@@ -418,6 +423,7 @@ const AppTaskCreate = ({
         color,
         scheduledDate,
         scheduledTime,
+        timePeriod,
         repeatEnabled,
         repeatPattern,
         repeatInterval,
@@ -446,6 +452,7 @@ const AppTaskCreate = ({
       color,
       scheduled_date: format(scheduledDate, 'yyyy-MM-dd'),
       scheduled_time: scheduledTime,
+      time_period: timePeriod,
       repeat_pattern: (repeatEnabled ? repeatPattern : 'none') as RepeatPattern,
       repeat_days: repeatDays,
       reminder_enabled: reminderEnabled,
@@ -514,8 +521,14 @@ const AppTaskCreate = ({
     setSubtasks(subtasks.filter((_, i) => i !== index));
   };
 
-  // Format time for display
+  // Format time for display - handles time_period, scheduled_time, or Anytime
   const formatTimeDisplay = (time: string | null) => {
+    // Check for time period first
+    if (timePeriod) {
+      const config = getTimePeriodConfig(timePeriod);
+      return config ? `${config.emoji} ${config.label}` : 'Anytime';
+    }
+    // Check for specific time
     if (!time) return 'Anytime';
     const [hours, minutes] = time.split(':');
     const hour = parseInt(hours);
@@ -1010,9 +1023,9 @@ const AppTaskCreate = ({
         </SheetContent>
       </Sheet>
 
-      {/* Time Picker Sheet - Me+ Style with Wheel */}
+      {/* Time Picker Sheet - Finch-Style with 3 Modes */}
       <Sheet open={showTimePicker} onOpenChange={setShowTimePicker}>
-        <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
+        <SheetContent side="bottom" className="h-auto max-h-[85vh] rounded-t-3xl" hideCloseButton>
           <div className="flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
@@ -1029,91 +1042,99 @@ const AppTaskCreate = ({
               </Button>
             </div>
 
-            {/* Dynamic title */}
+            {/* Dynamic title based on selection */}
             <div className="text-center pb-4 px-6">
               <h2 className="text-2xl font-bold">
-                {scheduledTime 
-                  ? timeMode === 'period' && scheduledEndTime
-                    ? `Do it at ${formatTimeDisplay(scheduledTime)} ~ ${formatTimeDisplay(scheduledEndTime)} of the day`
-                    : `Do it at ${formatTimeDisplay(scheduledTime)} of the day`
-                  : 'Anytime'}
+                {derivedTimeMode === 'part_of_day' && timePeriod
+                  ? `Do it in the ${getTimePeriodConfig(timePeriod)?.label || 'Day'}`
+                  : derivedTimeMode === 'specific' && scheduledTime
+                    ? `Do it at ${formatTimeDisplay(scheduledTime)}`
+                    : 'Anytime'}
               </h2>
             </div>
 
-            {/* Toggle */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-b">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-foreground flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-background" />
-                </div>
-                <div>
-                  <p className="font-medium">Specified time</p>
-                  <p className="text-sm text-muted-foreground">Set a specific time to do it</p>
-                </div>
-              </div>
-              <Switch
-                checked={scheduledTime !== null}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setScheduledTime('09:00');
-                    setScheduledEndTime('10:00');
-                  } else {
-                    setScheduledTime(null);
-                    setScheduledEndTime(null);
-                  }
+            {/* Three-mode toggle */}
+            <div className="flex gap-1 p-1 mx-6 bg-muted rounded-xl">
+              <button 
+                onClick={() => {
+                  setScheduledTime(null);
+                  setTimePeriod(null);
                 }}
-              />
+                className={cn(
+                  "flex-1 py-3 rounded-lg text-sm font-medium transition-colors",
+                  derivedTimeMode === 'anytime' ? "bg-[#B8F5E4] text-foreground" : "text-muted-foreground"
+                )}
+              >
+                🕐 Anytime
+              </button>
+              <button 
+                onClick={() => {
+                  setScheduledTime(null);
+                  if (!timePeriod) setTimePeriod('morning');
+                }}
+                className={cn(
+                  "flex-1 py-3 rounded-lg text-sm font-medium transition-colors",
+                  derivedTimeMode === 'part_of_day' ? "bg-[#FFF59D] text-foreground" : "text-muted-foreground"
+                )}
+              >
+                🌤️ Part of Day
+              </button>
+              <button 
+                onClick={() => {
+                  setTimePeriod(null);
+                  if (!scheduledTime) setScheduledTime('09:00');
+                }}
+                className={cn(
+                  "flex-1 py-3 rounded-lg text-sm font-medium transition-colors",
+                  derivedTimeMode === 'specific' ? "bg-[#C5E8FA] text-foreground" : "text-muted-foreground"
+                )}
+              >
+                🎯 Specific
+              </button>
             </div>
 
-            {scheduledTime && (
-              <>
-                {/* Time type selector */}
-                <div className="flex gap-1 p-1 mx-6 mt-6 bg-muted rounded-xl">
-                  <button 
-                    onClick={() => setTimeMode('point')}
+            {/* Part of Day - Show category list */}
+            {derivedTimeMode === 'part_of_day' && (
+              <div className="mt-4 mx-4 space-y-2 max-h-[300px] overflow-y-auto">
+                {TIME_PERIODS.map((period) => (
+                  <button
+                    key={period.id}
+                    onClick={() => setTimePeriod(period.id)}
                     className={cn(
-                      "flex-1 py-3 rounded-lg text-sm font-medium transition-colors",
-                      timeMode === 'point' ? "bg-[#FFF59D] text-foreground" : "text-muted-foreground"
+                      "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all",
+                      timePeriod === period.id 
+                        ? "bg-[#FFF59D] border-2 border-foreground/20" 
+                        : "bg-white dark:bg-slate-800 border border-muted/30"
                     )}
                   >
-                    Point time
-                  </button>
-                  <button 
-                    onClick={() => setTimeMode('period')}
-                    className={cn(
-                      "flex-1 py-3 rounded-lg text-sm font-medium transition-colors",
-                      timeMode === 'period' ? "bg-[#FFF59D] text-foreground" : "text-muted-foreground"
-                    )}
-                  >
-                    Time period
-                  </button>
-                </div>
-
-                {/* Scroll container for time pickers */}
-                <div className={cn(
-                  "overflow-y-auto",
-                  timeMode === 'period' ? "max-h-[400px]" : ""
-                )}>
-                  {/* Scroll wheel picker(s) */}
-                  <TimeWheelPicker
-                    value={scheduledTime}
-                    onChange={setScheduledTime}
-                  />
-
-                  {/* Time period - show second picker with TO label */}
-                  {timeMode === 'period' && (
-                    <>
-                      <div className="text-center py-2">
-                        <span className="text-lg font-bold text-foreground">TO</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{period.emoji}</span>
+                      <div className="text-left">
+                        <p className="font-semibold text-foreground">{period.label}</p>
+                        <p className="text-sm text-muted-foreground">{formatTimeRange(period)}</p>
                       </div>
-                      <TimeWheelPicker
-                        value={scheduledEndTime || '10:00'}
-                        onChange={setScheduledEndTime}
-                      />
-                    </>
-                  )}
-                </div>
-              </>
+                    </div>
+                    <div className={cn(
+                      "w-5 h-5 rounded-full border-2 flex items-center justify-center",
+                      timePeriod === period.id ? "border-foreground" : "border-muted-foreground/50"
+                    )}>
+                      {timePeriod === period.id && (
+                        <div className="w-2.5 h-2.5 rounded-full bg-foreground" />
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Specific Time - Show wheel picker */}
+            {derivedTimeMode === 'specific' && scheduledTime && (
+              <div className="mt-4">
+                <TimeWheelPicker
+                  value={scheduledTime}
+                  onChange={setScheduledTime}
+                />
+              </div>
             )}
 
             <div className="pb-safe h-4" />

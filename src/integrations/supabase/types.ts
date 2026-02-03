@@ -38,6 +38,7 @@ export type Database = {
           repeat_pattern: string
           sort_order: number
           tag: string | null
+          time_period: string | null
           title: string
           updated_at: string
         }
@@ -64,6 +65,7 @@ export type Database = {
           repeat_pattern?: string
           sort_order?: number
           tag?: string | null
+          time_period?: string | null
           title: string
           updated_at?: string
         }
@@ -90,6 +92,7 @@ export type Database = {
           repeat_pattern?: string
           sort_order?: number
           tag?: string | null
+          time_period?: string | null
           title?: string
           updated_at?: string
         }
@@ -2916,6 +2919,7 @@ export type Database = {
           scheduled_date: string | null
           scheduled_time: string | null
           tag: string | null
+          time_period: string | null
           title: string
           updated_at: string
           user_id: string
@@ -2945,6 +2949,7 @@ export type Database = {
           scheduled_date?: string | null
           scheduled_time?: string | null
           tag?: string | null
+          time_period?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -2974,6 +2979,7 @@ export type Database = {
           scheduled_date?: string | null
           scheduled_time?: string | null
           tag?: string | null
+          time_period?: string | null
           title?: string
           updated_at?: string
           user_id?: string
