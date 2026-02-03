@@ -220,7 +220,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => isAdded ? navigate('/app/home') : handleRoutineClick()}
-              className="flex-1 h-12 rounded-full flex items-center justify-center gap-2 font-medium transition-all active:scale-[0.98] bg-emerald-500/30 text-white"
+              className="flex-1 h-12 rounded-full flex items-center justify-center gap-2 font-medium transition-all active:scale-[0.98] bg-success/30 text-white"
             >
               {isAdded ? (
                 <>

@@ -252,7 +252,7 @@ const AppWater = () => {
 
           {/* Goal reached badge */}
           {goalReached && (
-            <div className="mt-4 px-4 py-2 bg-emerald-500 text-white rounded-full text-sm font-semibold flex items-center gap-2">
+            <div className="mt-4 px-4 py-2 bg-success text-white rounded-full text-sm font-semibold flex items-center gap-2">
               <span>🎉</span>
               Goal Reached!
             </div>
@@ -346,7 +346,7 @@ const AppWater = () => {
                   haptic.light();
                   navigate('/app/home');
                 }}
-                className="w-14 h-14 rounded-full bg-emerald-500 shadow-lg flex items-center justify-center"
+                className="w-14 h-14 rounded-full bg-success shadow-lg flex items-center justify-center"
                 title="Added — Go to Planner"
               >
                 <Check className="h-6 w-6 text-white" />
