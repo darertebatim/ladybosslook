@@ -66,19 +66,20 @@ export interface RoutineBankCategory {
   name: string;
   color: string;
   icon: string;
+  emoji?: string;
 }
 
-// Map category slugs to display info
-const CATEGORY_DISPLAY: Record<string, { name: string; icon: string; color: string }> = {
-  general: { name: 'General', icon: 'Sparkles', color: 'purple' },
-  morning: { name: 'Morning', icon: 'Sunrise', color: 'orange' },
-  evening: { name: 'Evening', icon: 'Moon', color: 'indigo' },
-  productivity: { name: 'Productivity', icon: 'Target', color: 'blue' },
-  wellness: { name: 'Wellness', icon: 'Heart', color: 'pink' },
-  fitness: { name: 'Fitness', icon: 'Dumbbell', color: 'green' },
-  mindfulness: { name: 'Mindfulness', icon: 'Brain', color: 'teal' },
-  sleep: { name: 'Sleep', icon: 'Moon', color: 'indigo' },
-  pro: { name: 'Pro', icon: 'Crown', color: 'amber' },
+// Map category slugs to display info with 3D emojis
+const CATEGORY_DISPLAY: Record<string, { name: string; icon: string; color: string; emoji?: string }> = {
+  general: { name: 'General', icon: 'Sparkles', color: 'purple', emoji: '✨' },
+  morning: { name: 'Morning', icon: 'Sunrise', color: 'orange', emoji: '🌅' },
+  evening: { name: 'Evening', icon: 'Moon', color: 'indigo', emoji: '🌙' },
+  productivity: { name: 'Productivity', icon: 'Target', color: 'blue', emoji: '🎯' },
+  wellness: { name: 'Wellness', icon: 'Heart', color: 'pink', emoji: '💖' },
+  fitness: { name: 'Fitness', icon: 'Dumbbell', color: 'green', emoji: '💪' },
+  mindfulness: { name: 'Mindfulness', icon: 'Brain', color: 'teal', emoji: '🧘' },
+  sleep: { name: 'Sleep', icon: 'Moon', color: 'indigo', emoji: '😴' },
+  pro: { name: 'Pro', icon: 'Crown', color: 'amber', emoji: '👑' },
 };
 
 // Fetch unique categories from both routines_bank AND admin_task_bank
@@ -117,6 +118,7 @@ export function useRoutineBankCategories() {
         name: CATEGORY_DISPLAY[cat]?.name || cat.charAt(0).toUpperCase() + cat.slice(1),
         icon: CATEGORY_DISPLAY[cat]?.icon || 'Sparkles',
         color: CATEGORY_DISPLAY[cat]?.color || 'purple',
+        emoji: CATEGORY_DISPLAY[cat]?.emoji,
       })) as RoutineBankCategory[];
     },
     staleTime: 1000 * 60 * 5,
