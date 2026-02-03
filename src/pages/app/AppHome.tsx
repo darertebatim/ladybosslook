@@ -466,7 +466,7 @@ const AppHome = () => {
                   const hasProgramEvents = programEventDates?.has(dateStr);
                   return <button key={day.toISOString()} onClick={() => setSelectedDate(day)} className="flex-1 flex justify-center">
                         {/* Pill wraps around both day name and number for selected */}
-                        <div className={cn('flex flex-col items-center px-2 py-1 rounded-full transition-all', isSelected && 'bg-violet-200 dark:bg-violet-800/60')}>
+                        <div className={cn('flex flex-col items-center px-2 py-1 rounded-full transition-all', isSelected && 'bg-chip-lavender')}>
                           {/* Day name */}
                           <span className={cn('text-[11px] font-medium leading-tight', isSelected ? 'text-foreground/70' : 'text-foreground/50')}>
                             {format(day, 'EEE')}
@@ -526,10 +526,10 @@ const AppHome = () => {
             {/* Tag filter chips */}
             {taskTags.length > 0 && <div className="py-2 -mx-4 px-4 bg-background overflow-x-auto">
                 <div className="flex gap-2">
-                  <button onClick={() => setSelectedTag(null)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all font-medium', selectedTag === null ? 'bg-[#D8C0F3] text-foreground' : 'bg-transparent border border-foreground/20 text-foreground/60')}>
+                  <button onClick={() => setSelectedTag(null)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all font-medium', selectedTag === null ? 'bg-chip-lavender text-foreground' : 'bg-transparent border border-foreground/20 text-foreground/60')}>
                     All
                   </button>
-                  {taskTags.map(tag => <button key={tag} onClick={() => setSelectedTag(tag === selectedTag ? null : tag)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all capitalize font-medium', selectedTag === tag ? 'bg-[#D8C0F3] text-foreground' : 'bg-transparent border border-foreground/20 text-foreground/60')}>
+                  {taskTags.map(tag => <button key={tag} onClick={() => setSelectedTag(tag === selectedTag ? null : tag)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all capitalize font-medium', selectedTag === tag ? 'bg-chip-lavender text-foreground' : 'bg-transparent border border-foreground/20 text-foreground/60')}>
                       {tag}
                     </button>)}
                 </div>
