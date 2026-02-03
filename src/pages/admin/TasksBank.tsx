@@ -750,7 +750,7 @@ export default function TasksBank() {
                 {adminSettings.is_active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 <div>
                   <p className="font-medium text-sm">Active</p>
-                  <p className="text-xs text-muted-foreground">Inactive tasks are hidden from users</p>
+                  <p className="text-xs text-muted-foreground">Inactive actions are hidden from users</p>
                 </div>
               </div>
               <Switch
