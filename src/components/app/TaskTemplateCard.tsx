@@ -1,6 +1,7 @@
 import { CalendarPlus } from 'lucide-react';
 import { TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { haptic } from '@/lib/haptics';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface TaskTemplateCardProps {
   template: TaskTemplate;
@@ -22,7 +23,7 @@ export function TaskTemplateCard({ template, onAdd }: TaskTemplateCardProps) {
     >
       {/* Main content row */}
       <div className="flex items-center gap-3 p-3">
-        <span className="text-2xl shrink-0">{template.emoji || '📝'}</span>
+        <FluentEmoji emoji={template.emoji || '📝'} size={32} className="shrink-0" />
         
         <div className="flex-1 min-w-0">
           <p className="font-medium text-black truncate">{template.title}</p>

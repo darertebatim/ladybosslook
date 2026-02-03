@@ -3,6 +3,7 @@ import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 // Curated emoji categories for task planner
 const EMOJI_CATEGORIES = {
@@ -121,12 +122,12 @@ export function EmojiPicker({
                 key={`${emoji}-${index}`}
                 onClick={() => handleSelect(emoji)}
                 className={cn(
-                  'aspect-square rounded-2xl flex items-center justify-center text-2xl transition-all active:scale-95',
+                  'aspect-square rounded-2xl flex items-center justify-center transition-all active:scale-95',
                   'bg-muted/60 hover:bg-muted',
                   selectedEmoji === emoji && 'bg-violet-100 ring-2 ring-violet-500'
                 )}
               >
-                {emoji}
+                <FluentEmoji emoji={emoji} size={28} />
               </button>
             ))}
           </div>

@@ -4,6 +4,8 @@ import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { icons, LucideIcon } from 'lucide-react';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { isEmoji } from '@/lib/fluentEmoji';
 
 // Curated icon categories for task planner
 const ICON_CATEGORIES = {
@@ -169,13 +171,11 @@ interface TaskIconProps {
 }
 
 export const TaskIcon = ({ iconName, className, size = 24 }: TaskIconProps) => {
-  // Check if it's an emoji - more comprehensive check
-  // Emojis include: emoticons, symbols, pictographs, transport symbols, etc.
-  const emojiRegex = /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{1FA00}-\u{1FAFF}]/u;
-  const isEmoji = emojiRegex.test(iconName) || (!icons[iconName as keyof typeof icons] && iconName.length <= 4);
+  // Check if it's an emoji using the utility
+  const isEmojiIcon = isEmoji(iconName) || (!icons[iconName as keyof typeof icons] && iconName.length <= 4);
   
-  if (isEmoji && iconName) {
-    return <span className={cn('flex items-center justify-center', className)} style={{ fontSize: size * 0.8 }}>{iconName}</span>;
+  if (isEmojiIcon && iconName) {
+    return <FluentEmoji emoji={iconName} size={size} className={className} />;
   }
   
   const IconComponent = getIconComponent(iconName);
