@@ -44,6 +44,7 @@ import { Plus, Pencil, Trash2, FolderOpen, Star } from 'lucide-react';
 import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
 import { RoutineStatisticsManager } from './RoutineStatisticsManager';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 // =====================================
 // TYPES
@@ -77,11 +78,11 @@ const COLOR_OPTIONS = [
 ];
 
 // Helper to display icons - handles both emojis and legacy Lucide icon names
-function DisplayIcon({ icon, className = "text-2xl" }: { icon: string; className?: string }) {
+function DisplayIcon({ icon, size = 24 }: { icon: string; size?: number }) {
   const isEmoji = /[\p{Emoji_Presentation}\p{Extended_Pictographic}]/u.test(icon);
   
   if (isEmoji) {
-    return <span className={className}>{icon}</span>;
+    return <FluentEmoji emoji={icon} size={size} />;
   }
   
   // Fallback: show the icon name in a badge-like style
@@ -275,7 +276,7 @@ function CategoriesManager() {
             <TableBody>
               {categories.map((cat) => (
                 <TableRow key={cat.id}>
-                  <TableCell><DisplayIcon icon={cat.icon} /></TableCell>
+                  <TableCell><DisplayIcon icon={cat.icon} size={28} /></TableCell>
                   <TableCell className="font-medium">{cat.name}</TableCell>
                   <TableCell className="text-muted-foreground">{cat.slug}</TableCell>
                   <TableCell>

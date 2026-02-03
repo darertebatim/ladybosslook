@@ -18,6 +18,7 @@ import {
   BREATHING_CATEGORIES,
 } from '@/hooks/useBreathingExercises';
 import { Skeleton } from '@/components/ui/skeleton';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 type FormData = Omit<BreathingExercise, 'id' | 'created_at' | 'updated_at'>;
 
@@ -142,7 +143,7 @@ export function BreathingExercisesManager() {
               <div className="flex items-center gap-3">
                 <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
                 
-                <span className="text-2xl">{exercise.emoji}</span>
+                <FluentEmoji emoji={exercise.emoji || '🫁'} size={28} />
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">

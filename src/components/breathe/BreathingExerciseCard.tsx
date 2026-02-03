@@ -7,6 +7,7 @@ import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface BreathingExerciseCardProps {
   exercise: BreathingExercise;
@@ -80,7 +81,7 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
       >
         <div className="flex items-start gap-3">
           {/* Emoji */}
-          <div className="text-3xl flex-shrink-0">{exercise.emoji}</div>
+          <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} className="flex-shrink-0" />
           
           {/* Content */}
           <div className="flex-1 min-w-0">
