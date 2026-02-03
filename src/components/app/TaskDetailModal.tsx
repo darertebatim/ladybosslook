@@ -343,9 +343,10 @@ export const TaskDetailModal = ({
                   onClose();
                   onSkip(task);
                 }}
-                className="w-12 h-10 p-0 rounded-xl border-2 border-black/20 bg-white/50 hover:bg-white/70 text-black/70"
+                className="gap-1.5 h-10 px-3 rounded-xl border-2 border-black/20 bg-white/50 hover:bg-white/70 text-black/70 text-sm"
               >
                 <FastForward className="h-4 w-4" />
+                Skip
               </Button>
             )}
             
@@ -356,9 +357,10 @@ export const TaskDetailModal = ({
                   onClose();
                   onDelete(task);
                 }}
-                className="w-12 h-10 p-0 rounded-xl border-2 border-red-300 bg-transparent hover:bg-red-50 text-red-500"
+                className="gap-1.5 h-10 px-3 rounded-xl border-2 border-red-300 bg-transparent hover:bg-red-50 text-red-500 text-sm"
               >
                 <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+                Delete
               </Button>
             )}
           </div>
