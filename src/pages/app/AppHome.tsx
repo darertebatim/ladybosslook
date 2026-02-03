@@ -473,8 +473,8 @@ const AppHome = () => {
                           </span>
                           
                           {/* Number with outline circle for selected */}
-                          <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5', isSelected ? 'bg-[#F4ECFE] text-foreground' // Same as header background, no border
-                      : isTodayDate ? 'bg-white/60 text-foreground/80 dark:bg-violet-900/50 dark:text-violet-300' : 'text-foreground/70')}>
+                          <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5', isSelected ? 'bg-violet-300 text-foreground dark:bg-violet-700 dark:text-violet-100' // Lavender background like Me+
+                      : isTodayDate ? 'bg-violet-200/70 text-foreground/80 dark:bg-violet-800/50 dark:text-violet-300' : 'text-foreground/70')}>
                             {hasCompletions && !isSelected && <Flame className="absolute h-5 w-5 text-orange-400 opacity-50" />}
                             {hasProgramEvents && <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />}
                             <span className="relative z-10">{format(day, 'd')}</span>
