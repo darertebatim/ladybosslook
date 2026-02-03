@@ -65,18 +65,9 @@ export function ActiveRoundsCarousel({
     setIsCollapsed(!isCollapsed);
   };
 
-  // When no programs, show a minimal collapsed state
+  // When no programs, hide the section completely
   if (activeRounds.length === 0) {
-    return <Link to="/app/browse" className="flex items-center justify-between px-0 py-0 rounded-sm bg-muted/60 border border-border/50">
-        <div className="flex items-center gap-2">
-          <GraduationCap className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">No active programs</span>
-        </div>
-        <div className="flex items-center gap-1 text-xs text-primary font-medium">
-          Browse
-          <ChevronRight className="h-3.5 w-3.5" />
-        </div>
-      </Link>;
+    return null;
   }
   return <div className={`tour-programs-carousel ${isCollapsed ? '' : 'space-y-2'}`}>
       {/* Header - always visible, acts as expand/collapse toggle */}
