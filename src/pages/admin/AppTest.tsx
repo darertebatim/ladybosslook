@@ -14,7 +14,8 @@ import {
   Sparkles,
   AlertCircle,
   Info,
-  CheckCircle2
+  CheckCircle2,
+  Download
 } from 'lucide-react';
 
 // Import all testable components
@@ -26,6 +27,7 @@ import { TrackCompletionCelebration } from '@/components/audio/TrackCompletionCe
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { PushNotificationPrompt } from '@/components/app/PushNotificationPrompt';
 import { CourseNotificationPrompt } from '@/components/app/CourseNotificationPrompt';
+import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
 
 export default function AppTest() {
   const { toast: shadcnToast } = useToast();
@@ -134,6 +136,28 @@ export default function AppTest() {
               Course Notification Prompt
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* App Update Banner */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Download className="h-5 w-5 text-green-500" />
+            App Update Banner
+          </CardTitle>
+          <CardDescription>
+            Preview the update available banner (shown on home screen when new version exists)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 bg-muted/50 rounded-lg">
+            <AppUpdateBanner />
+          </div>
+          <p className="text-xs text-muted-foreground mt-3">
+            Note: This banner only appears on native iOS when a newer version is available in the App Store. 
+            The check runs every 24 hours and can be dismissed for 24 hours.
+          </p>
         </CardContent>
       </Card>
 

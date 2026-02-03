@@ -12,6 +12,7 @@ import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarouse
 import { QuickActionsGrid } from '@/components/dashboard/QuickActionsGrid';
 import { SuggestedRoutineCard } from '@/components/dashboard/SuggestedRoutineCard';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
+import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
 import { format } from 'date-fns';
 
 export default function AppNewHome() {
@@ -121,6 +122,9 @@ export default function AppNewHome() {
         </div>
 
         <div className="px-4 space-y-6 -mt-2">
+          {/* App Update Banner */}
+          <AppUpdateBanner />
+
           {/* Today's Focus */}
           <TodayFocusCard
             todayTasksCount={todayTasksCount}

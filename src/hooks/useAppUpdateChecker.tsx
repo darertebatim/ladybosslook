@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { isNativeApp, isIOSApp } from '@/lib/platform';
 import { BUILD_INFO } from '@/lib/buildInfo';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,8 +21,11 @@ const DISMISS_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 export function useAppUpdateChecker(): UpdateStatus {
   const { user } = useAuth();
-  const [updateAvailable, setUpdateAvailable] = useState(false);
-  const [latestVersion, setLatestVersion] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  const debugUpdate = searchParams.get('debugUpdate') === 'true';
+  
+  const [updateAvailable, setUpdateAvailable] = useState(debugUpdate);
+  const [latestVersion, setLatestVersion] = useState<string | null>(debugUpdate ? '99.0.0' : null);
   const [storeUrl, setStoreUrl] = useState('https://apps.apple.com/app/id6746970920');
   const [isChecking, setIsChecking] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -37,6 +41,9 @@ export function useAppUpdateChecker(): UpdateStatus {
   };
 
   useEffect(() => {
+    // Skip API check if in debug mode (already showing mock update)
+    if (debugUpdate) return;
+    
     // Only run on native iOS
     if (!isNativeApp() || !isIOSApp()) {
       return;
@@ -132,7 +139,7 @@ export function useAppUpdateChecker(): UpdateStatus {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [debugUpdate]);
 
   return {
     updateAvailable: updateAvailable && !isDismissed,
