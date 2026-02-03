@@ -185,7 +185,10 @@ export default function AppTest() {
                 Warning
               </Button>
               <Button 
-                onClick={() => toast.loading('Loading...', { duration: 2000 })} 
+                onClick={() => {
+                  const loadingId = toast.loading('Loading...');
+                  setTimeout(() => toast.dismiss(loadingId), 2000);
+                }} 
                 variant="outline"
                 size="sm"
               >
