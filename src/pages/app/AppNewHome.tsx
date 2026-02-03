@@ -22,7 +22,7 @@ export default function AppNewHome() {
     listeningMinutes,
     completedTracks,
     unreadPosts,
-    journalStreak,
+    daysThisMonth,
     todayTasksCount,
     todayCompletedCount,
     activeRounds,
@@ -148,7 +148,7 @@ export default function AppNewHome() {
             listeningMinutes={listeningMinutes}
             unreadPosts={unreadPosts}
             completedTracks={completedTracks}
-            journalStreak={journalStreak}
+            daysThisMonth={daysThisMonth}
           />
 
           {/* Active Rounds Carousel */}

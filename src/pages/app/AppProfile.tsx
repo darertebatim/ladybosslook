@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell,
-  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, Trash2, AlertTriangle, Settings, PlayCircle, Flame
+  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, Trash2, AlertTriangle, Settings, PlayCircle
 } from 'lucide-react';
 import { NativeSettings, IOSSettings, AndroidSettings } from 'capacitor-native-settings';
 import {
@@ -36,7 +36,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications, unsubscribeFromPushNotifications } from '@/lib/pushNotifications';
 import { clearTourCompleted } from '@/hooks/useAppTour';
 import { Capacitor } from '@capacitor/core';
-import { format, differenceInDays, startOfDay, subDays } from 'date-fns';
+import { format, startOfMonth } from 'date-fns';
 import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
 
 // Debug mode to preview iOS-only components in web browser
@@ -55,35 +55,23 @@ const StatPill = ({ label, value, icon: Icon }: { label: string; value: number |
   </div>
 );
 
-// Calculate journal streak
-const calculateStreak = (entries: JournalEntry[]): number => {
+// Calculate monthly presence (replaces streak - strength-first philosophy)
+const calculateMonthlyPresence = (entries: JournalEntry[]): number => {
   if (!entries || entries.length === 0) return 0;
 
-  const sortedDates = entries
-    .map(e => startOfDay(new Date(e.created_at)))
-    .sort((a, b) => b.getTime() - a.getTime());
-
-  const uniqueDates = sortedDates.filter((date, index, self) => 
-    index === 0 || self[index - 1].getTime() !== date.getTime()
-  );
-
-  const today = startOfDay(new Date());
-  const mostRecent = uniqueDates[0];
-  if (differenceInDays(today, mostRecent) > 1) {
-    return 0;
-  }
-
-  let streak = 1;
-  for (let i = 1; i < uniqueDates.length; i++) {
-    const diff = differenceInDays(uniqueDates[i - 1], uniqueDates[i]);
-    if (diff === 1) {
-      streak++;
-    } else {
-      break;
+  const now = new Date();
+  const monthStart = startOfMonth(now);
+  
+  const uniqueDays = new Set<string>();
+  
+  entries.forEach(entry => {
+    const entryDate = new Date(entry.created_at);
+    if (entryDate >= monthStart) {
+      uniqueDays.add(format(entryDate, 'yyyy-MM-dd'));
     }
-  }
+  });
 
-  return streak;
+  return uniqueDays.size;
 };
 
 const AppProfile = () => {
@@ -120,9 +108,9 @@ const AppProfile = () => {
   const [editedCity, setEditedCity] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
-  // Journal entries for streak calculation
+  // Journal entries for monthly presence calculation
   const { data: journalEntries } = useJournalEntries();
-  const journalStreak = useMemo(() => calculateStreak(journalEntries || []), [journalEntries]);
+  const daysThisMonth = useMemo(() => calculateMonthlyPresence(journalEntries || []), [journalEntries]);
 
   // Test push notification
   const handleTestNotification = async () => {
@@ -694,10 +682,10 @@ const AppProfile = () => {
           <p className="text-sm text-muted-foreground">{user?.email}</p>
         </div>
         
-        {/* Stats Pills */}
+        {/* Stats Pills - Strength-first: shows days this month, not streak */}
         <div className="flex justify-center gap-3 pb-4 px-4">
           <StatPill label="Programs" value={programCount} icon={BookOpen} />
-          <StatPill label="Streak" value={journalStreak} icon={Flame} />
+          <StatPill label="This Month" value={daysThisMonth} icon={Calendar} />
           <StatPill label="Credits" value={`$${creditBalance}`} icon={Wallet} />
         </div>
       </header>

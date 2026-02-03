@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, History, Flame, BarChart2, Heart } from 'lucide-react';
+import { X, History, Calendar, BarChart2, Heart } from 'lucide-react';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
@@ -36,7 +36,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   
-  const { todayLogs, streak, thisWeekCount, isLoading } = useEmotionLogs();
+  const { todayLogs, thisMonthDays, thisWeekCount, thisMonthCount, isLoading } = useEmotionLogs();
   const { data: existingTask } = useExistingProTask('emotion');
   const addRoutinePlan = useAddRoutinePlan();
 
@@ -172,14 +172,14 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
             </div>
           )}
 
-          {/* Stats pills */}
+          {/* Stats pills - Strength-first: monthly presence, not streak */}
           <div className="flex justify-center gap-3 mb-6">
             <div className="flex flex-col items-center px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl min-w-[72px]">
               <div className="flex items-center gap-1 mb-1">
-                <Flame className="h-4 w-4 text-orange-300" />
-                <span className="text-xl font-bold text-white">{streak}</span>
+                <Calendar className="h-4 w-4 text-violet-300" />
+                <span className="text-xl font-bold text-white">{thisMonthCount}</span>
               </div>
-              <span className="text-white/70 text-xs">Streak</span>
+              <span className="text-white/70 text-xs">This Month</span>
             </div>
             
             <div className="flex flex-col items-center px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl min-w-[72px]">
