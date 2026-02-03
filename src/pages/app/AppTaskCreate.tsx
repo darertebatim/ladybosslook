@@ -41,7 +41,7 @@ import { TaskIcon } from '@/components/app/IconPicker';
 import { TimeWheelPicker } from '@/components/app/TimeWheelPicker';
 import { PRO_LINK_TYPES, ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
 import { GoalSettingsSheet, GoalSettings, formatGoalTarget } from '@/components/app/GoalSettingsSheet';
-import { TimePeriod, TIME_PERIODS, TimeMode, getTimeMode, formatTimeLabel, formatTimeRange, getTimePeriodConfig } from '@/lib/taskScheduling';
+import { TimePeriod, TIME_PERIODS, TimeMode, getTimeMode, formatTimeLabel, formatTimeRange, getTimePeriodConfig, normalizeTimePeriod } from '@/lib/taskScheduling';
 
 // Me+ style pastel color options with hex values
 const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
@@ -373,7 +373,8 @@ const AppTaskCreate = ({
         setScheduledDate(new Date(existingTask.scheduled_date));
       }
       setScheduledTime(existingTask.scheduled_time);
-      setTimePeriod(existingTask.time_period ?? null);
+      // Map legacy time_period values to new 4-period system using helper
+      setTimePeriod(normalizeTimePeriod(existingTask.time_period as string | null));
       
       if (existingTask.repeat_pattern !== 'none') {
         setRepeatEnabled(true);
@@ -1042,100 +1043,121 @@ const AppTaskCreate = ({
               </Button>
             </div>
 
-            {/* Dynamic title based on selection */}
-            <div className="text-center pb-4 px-6">
-              <h2 className="text-2xl font-bold">
-                {derivedTimeMode === 'part_of_day' && timePeriod
-                  ? `Do it in the ${getTimePeriodConfig(timePeriod)?.label || 'Day'}`
-                  : derivedTimeMode === 'specific' && scheduledTime
-                    ? `Do it at ${formatTimeDisplay(scheduledTime)}`
-                    : 'Anytime'}
-              </h2>
-            </div>
-
-            {/* Three-mode toggle */}
-            <div className="flex gap-1 p-1 mx-6 bg-muted rounded-xl">
-              <button 
-                onClick={() => {
-                  setScheduledTime(null);
-                  setTimePeriod(null);
-                }}
-                className={cn(
-                  "flex-1 py-3 rounded-lg text-sm font-medium transition-colors",
-                  derivedTimeMode === 'anytime' ? "bg-[#B8F5E4] text-foreground" : "text-muted-foreground"
-                )}
-              >
-                🕐 Anytime
-              </button>
-              <button 
-                onClick={() => {
-                  setScheduledTime(null);
-                  if (!timePeriod) setTimePeriod('morning');
-                }}
-                className={cn(
-                  "flex-1 py-3 rounded-lg text-sm font-medium transition-colors",
-                  derivedTimeMode === 'part_of_day' ? "bg-[#FFF59D] text-foreground" : "text-muted-foreground"
-                )}
-              >
-                🌤️ Part of Day
-              </button>
-              <button 
-                onClick={() => {
-                  setTimePeriod(null);
-                  if (!scheduledTime) setScheduledTime('09:00');
-                }}
-                className={cn(
-                  "flex-1 py-3 rounded-lg text-sm font-medium transition-colors",
-                  derivedTimeMode === 'specific' ? "bg-[#C5E8FA] text-foreground" : "text-muted-foreground"
-                )}
-              >
-                🎯 Specific
-              </button>
-            </div>
-
-            {/* Part of Day - Show category list */}
-            {derivedTimeMode === 'part_of_day' && (
-              <div className="mt-4 mx-4 space-y-2 max-h-[300px] overflow-y-auto">
-                {TIME_PERIODS.map((period) => (
-                  <button
-                    key={period.id}
-                    onClick={() => setTimePeriod(period.id)}
-                    className={cn(
-                      "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all",
-                      timePeriod === period.id 
-                        ? "bg-[#FFF59D] border-2 border-foreground/20" 
-                        : "bg-white dark:bg-slate-800 border border-muted/30"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{period.emoji}</span>
-                      <div className="text-left">
-                        <p className="font-semibold text-foreground">{period.label}</p>
-                        <p className="text-sm text-muted-foreground">{formatTimeRange(period)}</p>
-                      </div>
-                    </div>
-                    <div className={cn(
-                      "w-5 h-5 rounded-full border-2 flex items-center justify-center",
-                      timePeriod === period.id ? "border-foreground" : "border-muted-foreground/50"
-                    )}>
-                      {timePeriod === period.id && (
-                        <div className="w-2.5 h-2.5 rounded-full bg-foreground" />
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Specific Time - Show wheel picker */}
-            {derivedTimeMode === 'specific' && scheduledTime && (
-              <div className="mt-4">
-                <TimeWheelPicker
-                  value={scheduledTime}
-                  onChange={setScheduledTime}
+            {/* Time of day section - Finch style */}
+            <div className="px-6 pb-4">
+              {/* Specific time toggle */}
+              <div className="flex items-center justify-between py-3 mb-4 border-b border-muted/30">
+                <span className="font-medium text-foreground">Specific time</span>
+                <Switch
+                  checked={derivedTimeMode === 'specific'}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setTimePeriod(null);
+                      if (!scheduledTime) setScheduledTime('09:00');
+                    } else {
+                      setScheduledTime(null);
+                    }
+                  }}
                 />
               </div>
-            )}
+
+              {/* Specific Time - Show wheel picker */}
+              {derivedTimeMode === 'specific' && scheduledTime && (
+                <div className="mb-4">
+                  <TimeWheelPicker
+                    value={scheduledTime}
+                    onChange={setScheduledTime}
+                  />
+                </div>
+              )}
+
+              {/* Part of Day - 2x2 grid (only when not in specific mode) */}
+              {derivedTimeMode !== 'specific' && (
+                <>
+                  {/* 2x2 Grid of time periods */}
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    {TIME_PERIODS.map((period) => (
+                      <button
+                        key={period.id}
+                        onClick={() => {
+                          setScheduledTime(null);
+                          setTimePeriod(period.id);
+                        }}
+                        className={cn(
+                          "flex flex-col items-center justify-center py-5 rounded-2xl transition-all border",
+                          timePeriod === period.id 
+                            ? "bg-white dark:bg-slate-800 border-muted/50 shadow-sm" 
+                            : "bg-muted/30 border-transparent"
+                        )}
+                      >
+                        {/* Icon based on period */}
+                        <div className="mb-2">
+                          {period.icon === 'sun' && (
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                              <circle cx="20" cy="20" r="8" fill="#FFB800"/>
+                              <g stroke="#FFB800" strokeWidth="2.5" strokeLinecap="round">
+                                <line x1="20" y1="4" x2="20" y2="8"/>
+                                <line x1="20" y1="32" x2="20" y2="36"/>
+                                <line x1="4" y1="20" x2="8" y2="20"/>
+                                <line x1="32" y1="20" x2="36" y2="20"/>
+                                <line x1="8.69" y1="8.69" x2="11.52" y2="11.52"/>
+                                <line x1="28.48" y1="28.48" x2="31.31" y2="31.31"/>
+                                <line x1="8.69" y1="31.31" x2="11.52" y2="28.48"/>
+                                <line x1="28.48" y1="11.52" x2="31.31" y2="8.69"/>
+                              </g>
+                            </svg>
+                          )}
+                          {period.icon === 'mountains' && (
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                              <circle cx="28" cy="10" r="3" fill="#FFB800"/>
+                              <path d="M8 32L18 16L24 24L28 18L36 32H8Z" fill="#4CAF50"/>
+                              <path d="M14 32L22 20L28 28L32 22L38 32H14Z" fill="#66BB6A"/>
+                            </svg>
+                          )}
+                          {period.icon === 'sunset' && (
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                              <circle cx="20" cy="22" r="8" fill="#FF9800"/>
+                              <rect x="4" y="26" width="32" height="8" fill="#64B5F6"/>
+                              <path d="M4 26C10 26 14 22 20 22C26 22 30 26 36 26" stroke="#2196F3" strokeWidth="2"/>
+                            </svg>
+                          )}
+                          {period.icon === 'moon' && (
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                              <path d="M28 8C22 10 18 16 18 23C18 30 22 34 28 36C20 38 12 32 12 22C12 12 20 6 28 8Z" fill="#7C4DFF"/>
+                              <circle cx="30" cy="12" r="1.5" fill="#7C4DFF"/>
+                              <circle cx="34" cy="18" r="1" fill="#7C4DFF"/>
+                              <circle cx="32" cy="26" r="1.2" fill="#7C4DFF"/>
+                            </svg>
+                          )}
+                        </div>
+                        <span className={cn(
+                          "text-sm font-medium",
+                          timePeriod === period.id ? "text-foreground" : "text-muted-foreground"
+                        )}>
+                          {period.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Any time button - full width with green border when selected */}
+                  <button
+                    onClick={() => {
+                      setScheduledTime(null);
+                      setTimePeriod(null);
+                    }}
+                    className={cn(
+                      "w-full py-3.5 rounded-2xl text-center font-medium transition-all border-2",
+                      derivedTimeMode === 'anytime'
+                        ? "border-emerald-500 text-emerald-600 bg-white dark:bg-slate-800"
+                        : "border-muted/50 text-muted-foreground bg-muted/30"
+                    )}
+                  >
+                    Any time
+                  </button>
+                </>
+              )}
+            </div>
 
             <div className="pb-safe h-4" />
           </div>
