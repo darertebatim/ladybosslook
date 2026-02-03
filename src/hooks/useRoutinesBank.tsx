@@ -71,6 +71,7 @@ export interface RoutineBankCategory {
 
 // Map category slugs to display info with 3D emojis
 const CATEGORY_DISPLAY: Record<string, { name: string; icon: string; color: string; emoji?: string }> = {
+  // Core categories
   general: { name: 'General', icon: 'Sparkles', color: 'purple', emoji: '✨' },
   morning: { name: 'Morning', icon: 'Sunrise', color: 'orange', emoji: '🌅' },
   evening: { name: 'Evening', icon: 'Moon', color: 'indigo', emoji: '🌙' },
@@ -80,6 +81,29 @@ const CATEGORY_DISPLAY: Record<string, { name: string; icon: string; color: stri
   mindfulness: { name: 'Mindfulness', icon: 'Brain', color: 'teal', emoji: '🧘' },
   sleep: { name: 'Sleep', icon: 'Moon', color: 'indigo', emoji: '😴' },
   pro: { name: 'Pro', icon: 'Crown', color: 'amber', emoji: '👑' },
+  // Extended categories
+  gratitude: { name: 'Gratitude', icon: 'Heart', color: 'pink', emoji: '🙏' },
+  hygiene: { name: 'Hygiene', icon: 'Sparkles', color: 'blue', emoji: '🧼' },
+  'inner-strength': { name: 'Inner Strength', icon: 'Flame', color: 'orange', emoji: '🔥' },
+  movement: { name: 'Movement', icon: 'Activity', color: 'green', emoji: '🏃' },
+  nutrition: { name: 'Nutrition', icon: 'Apple', color: 'red', emoji: '🍎' },
+  selfcare: { name: 'Self Care', icon: 'Heart', color: 'rose', emoji: '💆' },
+  focus: { name: 'Focus', icon: 'Target', color: 'blue', emoji: '🧠' },
+  creativity: { name: 'Creativity', icon: 'Palette', color: 'purple', emoji: '🎨' },
+  social: { name: 'Social', icon: 'Users', color: 'teal', emoji: '👥' },
+  learning: { name: 'Learning', icon: 'BookOpen', color: 'blue', emoji: '📚' },
+  finance: { name: 'Finance', icon: 'DollarSign', color: 'green', emoji: '💰' },
+  home: { name: 'Home', icon: 'Home', color: 'orange', emoji: '🏠' },
+  work: { name: 'Work', icon: 'Briefcase', color: 'blue', emoji: '💼' },
+  health: { name: 'Health', icon: 'Heart', color: 'red', emoji: '❤️' },
+  meditation: { name: 'Meditation', icon: 'Wind', color: 'teal', emoji: '🧘‍♀️' },
+  journaling: { name: 'Journaling', icon: 'BookOpen', color: 'purple', emoji: '📝' },
+  hydration: { name: 'Hydration', icon: 'Droplet', color: 'blue', emoji: '💧' },
+  skincare: { name: 'Skincare', icon: 'Sparkles', color: 'pink', emoji: '✨' },
+  exercise: { name: 'Exercise', icon: 'Activity', color: 'green', emoji: '🏋️' },
+  reading: { name: 'Reading', icon: 'Book', color: 'amber', emoji: '📖' },
+  planning: { name: 'Planning', icon: 'Calendar', color: 'blue', emoji: '📅' },
+  relaxation: { name: 'Relaxation', icon: 'Wind', color: 'teal', emoji: '🌿' },
 };
 
 // Fetch unique categories from both routines_bank AND admin_task_bank
