@@ -58,9 +58,13 @@ export function StarRating({ rating = 0, onRate, readonly = false, size = 'md' }
           </button>
         ))}
       </div>
-      {!readonly && displayRating > 0 && (
-        <span className="text-sm font-medium text-primary animate-in fade-in duration-200">
-          {ratingLabels[displayRating]}
+      {/* Always reserve space for the label to prevent layout shift */}
+      {!readonly && (
+        <span className={cn(
+          'text-sm font-medium text-primary h-5 transition-opacity duration-200',
+          displayRating > 0 ? 'opacity-100' : 'opacity-0'
+        )}>
+          {displayRating > 0 ? ratingLabels[displayRating] : '\u00A0'}
         </span>
       )}
     </div>
