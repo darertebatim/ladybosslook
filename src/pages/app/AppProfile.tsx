@@ -10,9 +10,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell,
-  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, NotebookPen, Trash2, AlertTriangle, Settings, PlayCircle
+  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, Trash2, AlertTriangle, Settings, PlayCircle, Flame
 } from 'lucide-react';
 import { NativeSettings, IOSSettings, AndroidSettings } from 'capacitor-native-settings';
 import {
@@ -31,12 +32,52 @@ import { checkCalendarPermission, requestCalendarPermission, isCalendarAvailable
 import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications, unsubscribeFromPushNotifications } from '@/lib/pushNotifications';
 import { clearTourCompleted } from '@/hooks/useAppTour';
 import { Capacitor } from '@capacitor/core';
+import { format, differenceInDays, startOfDay, subDays } from 'date-fns';
+import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
 
-import { format } from 'date-fns';
+// Stats Pill Component
+const StatPill = ({ label, value, icon: Icon }: { label: string; value: number | string; icon?: React.ComponentType<{ className?: string }> }) => (
+  <div className="flex flex-col items-center bg-background/60 dark:bg-background/30 px-4 py-2.5 rounded-xl backdrop-blur-sm min-w-[70px]">
+    {Icon && <Icon className="h-4 w-4 text-muted-foreground mb-0.5" />}
+    <span className="text-lg font-bold">{value}</span>
+    <span className="text-[10px] text-muted-foreground">{label}</span>
+  </div>
+);
+
+// Calculate journal streak
+const calculateStreak = (entries: JournalEntry[]): number => {
+  if (!entries || entries.length === 0) return 0;
+
+  const sortedDates = entries
+    .map(e => startOfDay(new Date(e.created_at)))
+    .sort((a, b) => b.getTime() - a.getTime());
+
+  const uniqueDates = sortedDates.filter((date, index, self) => 
+    index === 0 || self[index - 1].getTime() !== date.getTime()
+  );
+
+  const today = startOfDay(new Date());
+  const mostRecent = uniqueDates[0];
+  if (differenceInDays(today, mostRecent) > 1) {
+    return 0;
+  }
+
+  let streak = 1;
+  for (let i = 1; i < uniqueDates.length; i++) {
+    const diff = differenceInDays(uniqueDates[i - 1], uniqueDates[i]);
+    if (diff === 1) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+};
 
 const AppProfile = () => {
   const { user, signOut } = useAuth();
@@ -64,7 +105,18 @@ const AppProfile = () => {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  // Test push notification - sends a test notification to the user's device
+  // Editable profile state
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editedName, setEditedName] = useState('');
+  const [editedPhone, setEditedPhone] = useState('');
+  const [editedCity, setEditedCity] = useState('');
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  // Journal entries for streak calculation
+  const { data: journalEntries } = useJournalEntries();
+  const journalStreak = useMemo(() => calculateStreak(journalEntries || []), [journalEntries]);
+
+  // Test push notification
   const handleTestNotification = async () => {
     if (!user?.id) {
       toast({
@@ -118,22 +170,13 @@ const AppProfile = () => {
     }
   };
 
-  // Editable profile state
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [editedName, setEditedName] = useState('');
-  const [editedPhone, setEditedPhone] = useState('');
-  const [editedCity, setEditedCity] = useState('');
-  const [isSavingProfile, setIsSavingProfile] = useState(false);
-
   // Check notification permission and subscription status on mount
   useEffect(() => {
     const checkStatus = async () => {
       if (Capacitor.isNativePlatform() && user?.id) {
-        // Check push notification permission
         const status = await checkPermissionStatus();
         setNotificationPermission(status);
 
-        // Check if user has active subscription in database
         const { data, error } = await supabase
           .from('push_subscriptions')
           .select('id, endpoint, created_at')
@@ -145,14 +188,11 @@ const AppProfile = () => {
           console.error('[Profile] Error checking subscription:', error);
           setSubscriptionStatus('none');
         } else if (data && data.length > 0) {
-          console.log('[Profile] Active subscription found:', data[0]);
           setSubscriptionStatus('active');
         } else {
-          console.log('[Profile] No active subscription found');
           setSubscriptionStatus('none');
         }
         
-        // Check calendar permission
         if (isCalendarAvailable()) {
           const calStatus = await checkCalendarPermission();
           setCalendarPermission(calStatus);
@@ -196,7 +236,6 @@ const AppProfile = () => {
   // Handle auto-sync toggle
   const handleAutoSyncToggle = async (enabled: boolean) => {
     if (enabled && calendarPermission !== 'granted') {
-      // Request permission first
       const result = await requestCalendarPermission();
       setCalendarPermission(result);
       
@@ -394,7 +433,6 @@ const AppProfile = () => {
           title: 'Account Deleted',
           description: 'Your account has been permanently deleted',
         });
-        // Sign out and redirect
         await signOut();
         navigate('/auth');
       } else {
@@ -482,20 +520,7 @@ const AppProfile = () => {
     }
   };
 
-  const initials = profile?.full_name
-    ?.split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase() || user?.email?.[0].toUpperCase() || 'U';
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  };
-
-  // Enable notifications - Updated to refresh subscription status and provide better feedback
+  // Enable notifications
   const handleEnableNotifications = async () => {
     setIsEnablingNotifications(true);
     try {
@@ -506,7 +531,6 @@ const AppProfile = () => {
         
         if (result.success) {
           setNotificationPermission('granted');
-          // Check if already enabled vs newly enabled
           if (subscriptionStatus === 'active') {
             toast({
               title: 'Already Enabled',
@@ -519,10 +543,8 @@ const AppProfile = () => {
               description: 'You will now receive push notifications',
             });
           }
-          // Refetch subscription status
           queryClient.invalidateQueries({ queryKey: ['push-subscription', user?.id] });
         } else {
-          // Specific error handling
           if (result.error === 'Permission denied') {
             toast({
               title: 'Permission Denied',
@@ -562,7 +584,7 @@ const AppProfile = () => {
     }
   };
 
-  // Disable notifications - Updated to refresh subscription status
+  // Disable notifications
   const handleDisableNotifications = async () => {
     try {
       const result = await unsubscribeFromPushNotifications(user?.id || '');
@@ -628,6 +650,15 @@ const AppProfile = () => {
     }
   };
 
+  const initials = profile?.full_name
+    ?.split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase() || user?.email?.[0].toUpperCase() || 'U';
+
+  const programCount = enrollments?.length || 0;
+  const creditBalance = wallet?.credits_balance || 0;
+
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
       <SEOHead 
@@ -635,184 +666,98 @@ const AppProfile = () => {
         description="Your profile settings"
       />
       
-      {/* Fixed Header with safe area */}
+      {/* Hero Header with Profile */}
       <header 
-        className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
+        className="shrink-0 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-3 pb-2 px-4">
+        <div className="pt-3 pb-1 px-4 text-center">
           <h1 className="font-semibold text-lg">Profile</h1>
-          <p className="text-xs text-muted-foreground">Manage your account</p>
+        </div>
+        
+        {/* Avatar + Name */}
+        <div className="flex flex-col items-center py-3">
+          <Avatar className="h-20 w-20 ring-4 ring-background/50 shadow-lg">
+            <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <h2 className="font-bold text-lg mt-3">{profile?.full_name || 'User'}</h2>
+          <p className="text-sm text-muted-foreground">{user?.email}</p>
+        </div>
+        
+        {/* Stats Pills */}
+        <div className="flex justify-center gap-3 pb-4 px-4">
+          <StatPill label="Programs" value={programCount} icon={BookOpen} />
+          <StatPill label="Streak" value={journalStreak} icon={Flame} />
+          <StatPill label="Credits" value={`$${creditBalance}`} icon={Wallet} />
         </div>
       </header>
-      
-      {/* Header spacer */}
-      <div className="shrink-0" style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} />
-      
-      {/* Scroll container */}
-      <div className="flex-1 overflow-y-auto overscroll-contain">
-        <div className="container max-w-4xl py-4 px-4 pb-safe">
-      <div className="space-y-6">
 
-        {/* Quick Navigation */}
-        <div className="grid gap-2 grid-cols-4 sm:grid-cols-5">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToSection('info-section')}
-            className="flex flex-col h-auto py-3 gap-1"
-          >
-            <User className="h-4 w-4" />
-            <span className="text-xs">Info</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToSection('courses-section')}
-            className="flex flex-col h-auto py-3 gap-1"
-          >
-            <BookOpen className="h-4 w-4" />
-            <span className="text-xs">Programs</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToSection('journal-section')}
-            className="flex flex-col h-auto py-3 gap-1"
-          >
-            <NotebookPen className="h-4 w-4" />
-            <span className="text-xs">Journal</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToSection('wallet-section')}
-            className="flex flex-col h-auto py-3 gap-1"
-          >
-            <Wallet className="h-4 w-4" />
-            <span className="text-xs">Wallet</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToSection('orders-section')}
-            className="flex flex-col h-auto py-3 gap-1"
-          >
-            <Receipt className="h-4 w-4" />
-            <span className="text-xs">Orders</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToSection('support-section')}
-            className="flex flex-col h-auto py-3 gap-1 relative"
-          >
-            <MessageCircle className="h-4 w-4" />
-            <span className="text-xs">Support</span>
+      {/* Tabs */}
+      <Tabs defaultValue="account" className="flex-1 flex flex-col overflow-hidden">
+        <TabsList className="shrink-0 mx-4 mt-4 mb-2 grid grid-cols-3 h-11 bg-muted/50 p-1 rounded-xl">
+          <TabsTrigger value="account" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            Account
+          </TabsTrigger>
+          <TabsTrigger value="activity" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            Activity
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm relative">
+            Settings
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
                 {unreadCount}
               </span>
             )}
-          </Button>
-          {Capacitor.isNativePlatform() && (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => scrollToSection('notifications-section')}
-                className="flex flex-col h-auto py-3 gap-1"
-              >
-                <Bell className="h-4 w-4" />
-                <span className="text-xs">Notifications</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => scrollToSection('calendar-section')}
-                className="flex flex-col h-auto py-3 gap-1"
-              >
-                <Calendar className="h-4 w-4" />
-                <span className="text-xs">Calendar</span>
-              </Button>
-            </>
-          )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToSection('password-section')}
-            className="flex flex-col h-auto py-3 gap-1"
-          >
-            <Lock className="h-4 w-4" />
-            <span className="text-xs">Password</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToSection('actions-section')}
-            className="flex flex-col h-auto py-3 gap-1"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="text-xs">Sign Out</span>
-          </Button>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16">
-                <AvatarFallback className="text-lg">{initials}</AvatarFallback>
-              </Avatar>
-              <div>
-                <CardTitle>{profile?.full_name || 'User'}</CardTitle>
-                <CardDescription>{user?.email}</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-
-        {/* Editable Account Information */}
-        <Card id="info-section">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle>Account Information</CardTitle>
-            {!isEditingProfile ? (
-              <Button variant="ghost" size="sm" onClick={() => setIsEditingProfile(true)}>
-                <Pencil className="h-4 w-4 mr-1" />
-                Edit
-              </Button>
-            ) : (
-              <div className="flex gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleCancelEdit}
-                  disabled={isSavingProfile}
-                >
-                  <X className="h-4 w-4" />
+          </TabsTrigger>
+        </TabsList>
+        
+        {/* Account Tab */}
+        <TabsContent value="account" className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe mt-0 space-y-4">
+          {/* Profile Info Card */}
+          <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Personal Info
+              </CardTitle>
+              {!isEditingProfile ? (
+                <Button variant="ghost" size="sm" onClick={() => setIsEditingProfile(true)}>
+                  <Pencil className="h-4 w-4 mr-1" />
+                  Edit
                 </Button>
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  onClick={handleSaveProfile}
-                  disabled={isSavingProfile}
-                >
-                  <Check className="h-4 w-4 mr-1" />
-                  {isSavingProfile ? 'Saving...' : 'Save'}
-                </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleCancelEdit}
+                    disabled={isSavingProfile}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    onClick={handleSaveProfile}
+                    disabled={isSavingProfile}
+                  >
+                    <Check className="h-4 w-4 mr-1" />
+                    {isSavingProfile ? 'Saving...' : 'Save'}
+                  </Button>
+                </div>
+              )}
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
+                <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{profile?.email || user?.email}</span>
               </div>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3 text-sm">
-              <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span>{profile?.email || user?.email}</span>
-            </div>
-            
-            {isEditingProfile ? (
-              <>
-                <div className="flex items-start gap-3">
-                  <User className="h-4 w-4 text-muted-foreground mt-3 flex-shrink-0" />
-                  <div className="flex-1 space-y-1">
+              
+              {isEditingProfile ? (
+                <>
+                  <div className="space-y-1.5">
                     <Label htmlFor="editName" className="text-xs text-muted-foreground">Full Name</Label>
                     <Input
                       id="editName"
@@ -821,10 +766,7 @@ const AppProfile = () => {
                       placeholder="Your full name"
                     />
                   </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Phone className="h-4 w-4 text-muted-foreground mt-3 flex-shrink-0" />
-                  <div className="flex-1 space-y-1">
+                  <div className="space-y-1.5">
                     <Label htmlFor="editPhone" className="text-xs text-muted-foreground">Phone</Label>
                     <Input
                       id="editPhone"
@@ -833,10 +775,7 @@ const AppProfile = () => {
                       placeholder="Your phone number"
                     />
                   </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-4 w-4 text-muted-foreground mt-3 flex-shrink-0" />
-                  <div className="flex-1 space-y-1">
+                  <div className="space-y-1.5">
                     <Label htmlFor="editCity" className="text-xs text-muted-foreground">City</Label>
                     <Input
                       id="editCity"
@@ -845,364 +784,473 @@ const AppProfile = () => {
                       placeholder="Your city"
                     />
                   </div>
-                </div>
-              </>
-            ) : (
-              <>
-                {profile?.full_name && (
-                  <div className="flex items-center gap-3 text-sm">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <span>{profile.full_name}</span>
-                  </div>
-                )}
-                {profile?.phone && (
-                  <div className="flex items-center gap-3 text-sm">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span>{profile.phone}</span>
-                  </div>
-                )}
-                {profile?.city && (
-                  <div className="flex items-center gap-3 text-sm">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span>{profile.city}</span>
-                  </div>
-                )}
-                {!profile?.full_name && !profile?.phone && !profile?.city && (
-                  <p className="text-sm text-muted-foreground">Tap Edit to add your details</p>
-                )}
-              </>
-            )}
-          </CardContent>
-        </Card>
+                </>
+              ) : (
+                <>
+                  {profile?.full_name && (
+                    <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      <span>{profile.full_name}</span>
+                    </div>
+                  )}
+                  {profile?.phone && (
+                    <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span>{profile.phone}</span>
+                    </div>
+                  )}
+                  {profile?.city && (
+                    <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span>{profile.city}</span>
+                    </div>
+                  )}
+                  {!profile?.full_name && !profile?.phone && !profile?.city && (
+                    <p className="text-sm text-muted-foreground p-2">Tap Edit to add your details</p>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
 
-        {/* Journal Stats Section */}
-        <div id="journal-section">
-          <JournalStats />
-        </div>
+          {/* Password Card */}
+          <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Lock className="h-4 w-4" />
+                Password
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="newPassword" className="text-xs text-muted-foreground">New Password</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  placeholder="Enter new password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  disabled={isChangingPassword}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="confirmPassword" className="text-xs text-muted-foreground">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={isChangingPassword}
+                />
+              </div>
+              <Button
+                onClick={handlePasswordChange}
+                disabled={isChangingPassword || !newPassword || !confirmPassword}
+                className="w-full"
+              >
+                <Lock className="mr-2 h-4 w-4" />
+                {isChangingPassword ? 'Updating...' : 'Update Password'}
+              </Button>
+            </CardContent>
+          </Card>
 
-        {/* My Courses Section */}
-        <Card id="courses-section">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
+          {/* Actions Card */}
+          <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-12 rounded-xl bg-muted/30"
+                onClick={() => {
+                  clearTourCompleted();
+                  navigate('/app/home');
+                  toast({ title: 'Tour will restart', description: 'Navigate to the home page to start the app tour.' });
+                }}
+              >
+                <PlayCircle className="mr-3 h-4 w-4" />
+                Replay App Tour
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-12 rounded-xl bg-muted/30"
+                onClick={handleSignOut}
+              >
+                <LogOut className="mr-3 h-4 w-4" />
+                Sign Out
+              </Button>
+              
+              <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start h-12 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="mr-3 h-4 w-4" />
+                    Delete Account
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                      <AlertTriangle className="h-5 w-5" />
+                      Delete Your Account?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="space-y-3">
+                      <p>
+                        This action is <strong>permanent and cannot be undone</strong>. 
+                        All your data will be immediately deleted, including:
+                      </p>
+                      <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
+                        <li>Your profile and account information</li>
+                        <li>All course enrollments and progress</li>
+                        <li>Journal entries and chat history</li>
+                        <li>Audio bookmarks and listening history</li>
+                        <li>Wallet balance and transaction history</li>
+                      </ul>
+                      <div className="pt-2">
+                        <Label htmlFor="deleteConfirm" className="text-sm font-medium">
+                          Type <span className="font-bold text-destructive">DELETE</span> to confirm:
+                        </Label>
+                        <Input
+                          id="deleteConfirm"
+                          value={deleteConfirmText}
+                          onChange={(e) => setDeleteConfirmText(e.target.value.toUpperCase())}
+                          placeholder="Type DELETE"
+                          className="mt-2"
+                          disabled={isDeletingAccount}
+                        />
+                      </div>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel 
+                      disabled={isDeletingAccount}
+                      onClick={() => setDeleteConfirmText('')}
+                    >
+                      Cancel
+                    </AlertDialogCancel>
+                    <Button
+                      variant="destructive"
+                      onClick={handleDeleteAccount}
+                      disabled={deleteConfirmText !== 'DELETE' || isDeletingAccount}
+                    >
+                      {isDeletingAccount ? 'Deleting...' : 'Delete My Account'}
+                    </Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Activity Tab */}
+        <TabsContent value="activity" className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe mt-0 space-y-4">
+          {/* Journal Stats */}
+          <JournalStats className="rounded-2xl shadow-sm border-0" />
+
+          {/* My Programs Card */}
+          <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
                 My Programs
               </CardTitle>
-              <CardDescription>Your enrolled programs</CardDescription>
-            </div>
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/app/programs">
-                View All
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {enrollments && enrollments.length > 0 ? (
-              <div className="space-y-3">
-                {enrollments.map((enrollment) => (
-                  <Link
-                    key={enrollment.id}
-                    to={`/app/course/${enrollment.program_slug || enrollment.course_name}`}
-                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{enrollment.course_name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Enrolled {format(new Date(enrollment.enrolled_at), 'MMM d, yyyy')}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-xs">
-                        {(enrollment.program_rounds as any)?.status || 'active'}
-                      </Badge>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-6">
-                <BookOpen className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">No courses yet</p>
-                <Button variant="link" size="sm" asChild>
-                  <Link to="/app/store">Browse Programs</Link>
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Wallet & Credits Section */}
-        <Card id="wallet-section">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Wallet className="h-5 w-5" />
-              Wallet & Credits
-            </CardTitle>
-            <CardDescription>Your credit balance and transactions</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Balance Display */}
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-              <div>
-                <p className="text-sm text-muted-foreground">Current Balance</p>
-                <p className="text-2xl font-bold">{wallet?.credits_balance || 0} Credits</p>
-              </div>
-              <Wallet className="h-8 w-8 text-muted-foreground" />
-            </div>
-
-            {/* Recent Transactions */}
-            {transactions && transactions.length > 0 ? (
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Recent Transactions</p>
-                {transactions.map((tx) => (
-                  <div key={tx.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                    <div className="flex items-center gap-3">
-                      {tx.transaction_type === 'credit' ? (
-                        <TrendingUp className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <TrendingDown className="h-4 w-4 text-red-500" />
-                      )}
-                      <div>
-                        <p className="text-sm">{tx.description || tx.transaction_type}</p>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/app/programs">
+                  View All
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {enrollments && enrollments.length > 0 ? (
+                <div className="space-y-2">
+                  {enrollments.map((enrollment) => (
+                    <Link
+                      key={enrollment.id}
+                      to={`/app/course/${enrollment.program_slug || enrollment.course_name}`}
+                      className="flex items-center justify-between p-3 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">{enrollment.course_name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {format(new Date(tx.created_at), 'MMM d, yyyy')}
+                          Enrolled {format(new Date(enrollment.enrolled_at), 'MMM d, yyyy')}
                         </p>
                       </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {(enrollment.program_rounds as any)?.status || 'active'}
+                        </Badge>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <BookOpen className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">No courses yet</p>
+                  <Button variant="link" size="sm" asChild>
+                    <Link to="/app/store">Browse Programs</Link>
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Wallet Card */}
+          <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Wallet className="h-4 w-4" />
+                Wallet & Credits
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl">
+                <div>
+                  <p className="text-xs text-muted-foreground">Current Balance</p>
+                  <p className="text-2xl font-bold">{wallet?.credits_balance || 0} Credits</p>
+                </div>
+                <Wallet className="h-8 w-8 text-primary/30" />
+              </div>
+
+              {transactions && transactions.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">Recent Transactions</p>
+                  {transactions.map((tx) => (
+                    <div key={tx.id} className="flex items-center justify-between py-2 px-3 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        {tx.amount > 0 ? (
+                          <TrendingUp className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-red-500" />
+                        )}
+                        <span className="text-sm truncate max-w-[140px]">{tx.description || tx.transaction_type}</span>
+                      </div>
+                      <span className={`text-sm font-medium ${tx.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {tx.amount > 0 ? '+' : ''}{tx.amount}
+                      </span>
                     </div>
-                    <span className={`text-sm font-medium ${tx.transaction_type === 'credit' ? 'text-green-500' : 'text-red-500'}`}>
-                      {tx.transaction_type === 'credit' ? '+' : '-'}{Math.abs(tx.amount)}
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Orders Card */}
+          <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Receipt className="h-4 w-4" />
+                Order History
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {orders && orders.length > 0 ? (
+                <div className="space-y-2">
+                  {orders.map((order) => (
+                    <div key={order.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">{order.product_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(new Date(order.created_at), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-sm font-medium">
+                          {formatCurrency(order.amount, order.currency || 'usd')}
+                        </span>
+                        <Badge variant={getStatusBadgeVariant(order.status || 'completed')}>
+                          {order.refunded ? 'Refunded' : (order.status || 'Completed')}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <Receipt className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">No orders yet</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Settings Tab */}
+        <TabsContent value="settings" className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe mt-0 space-y-4">
+          {/* Support Card */}
+          <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" />
+                Support
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button
+                className="w-full relative"
+                onClick={() => navigate('/app/chat')}
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Chat with Support
+                {unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </Button>
+
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">or via Telegram</span>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="subject" className="text-xs text-muted-foreground">Subject</Label>
+                <select
+                  id="subject"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  value={contactSubject}
+                  onChange={(e) => setContactSubject(e.target.value)}
+                >
+                  <option value="">Select a topic...</option>
+                  <option value="General Inquiry">General Inquiry</option>
+                  <option value="Technical Support">Technical Support</option>
+                  <option value="Refund Request">Refund Request</option>
+                  <option value="Cancel Subscription">Cancel Subscription</option>
+                  <option value="Course Question">Course Question</option>
+                  <option value="Billing Issue">Billing Issue</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              
+              <div className="space-y-1.5">
+                <Label htmlFor="message" className="text-xs text-muted-foreground">Message</Label>
+                <Textarea
+                  id="message"
+                  placeholder="Type your message here..."
+                  value={contactMessage}
+                  onChange={(e) => setContactMessage(e.target.value)}
+                  rows={3}
+                />
+              </div>
+
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  if (!contactSubject || !contactMessage.trim()) {
+                    toast({
+                      title: 'Error',
+                      description: 'Please select a subject and enter a message',
+                      variant: 'destructive',
+                    });
+                    return;
+                  }
+                  const telegramMessage = `Subject: ${contactSubject}\n\nMessage:\n${contactMessage}`;
+                  window.open(`https://t.me/ladybosslook?text=${encodeURIComponent(telegramMessage)}`, '_blank');
+                }}
+              >
+                <Send className="mr-2 h-4 w-4" />
+                Send via Telegram
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Push Notifications Card - Native Only */}
+          {Capacitor.isNativePlatform() && (
+            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Bell className="h-4 w-4" />
+                  Push Notifications
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {/* Status Badge */}
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <div className={`h-2 w-2 rounded-full ${
+                      notificationPermission === 'granted' && subscriptionStatus === 'active' 
+                        ? 'bg-green-500' 
+                        : notificationPermission === 'denied'
+                        ? 'bg-red-500'
+                        : 'bg-yellow-500'
+                    }`} />
+                    <span className="text-sm font-medium">
+                      {subscriptionStatus === 'checking' 
+                        ? 'Checking status...'
+                        : notificationPermission === 'granted' && subscriptionStatus === 'active'
+                        ? 'Active'
+                        : notificationPermission === 'denied'
+                        ? 'Denied'
+                        : 'Not Enabled'}
                     </span>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">No transactions yet</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Order History Section */}
-        <Card id="orders-section">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Receipt className="h-5 w-5" />
-              Order History
-            </CardTitle>
-            <CardDescription>Your past purchases</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {orders && orders.length > 0 ? (
-              <div className="space-y-3">
-                {orders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{order.product_name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(order.created_at), 'MMM d, yyyy')}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-sm font-medium">
-                        {formatCurrency(order.amount, order.currency || 'usd')}
-                      </span>
-                      <Badge variant={getStatusBadgeVariant(order.status || 'completed')}>
-                        {order.refunded ? 'Refunded' : (order.status || 'Completed')}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-6">
-                <Receipt className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">No orders yet</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Support Section with In-App Chat Button */}
-        <Card id="support-section">
-          <CardHeader>
-            <CardTitle>Contact & Support</CardTitle>
-            <CardDescription>Get help from our team</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* In-App Chat Button - Primary */}
-            <Button
-              className="w-full relative"
-              onClick={() => navigate('/app/chat')}
-            >
-              <MessageCircle className="mr-2 h-4 w-4" />
-              Chat with Support
-              {unreadCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {unreadCount}
-                </span>
-              )}
-            </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">or via Telegram</span>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="subject">Subject</Label>
-              <select
-                id="subject"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                value={contactSubject}
-                onChange={(e) => setContactSubject(e.target.value)}
-              >
-                <option value="">Select a topic...</option>
-                <option value="General Inquiry">General Inquiry</option>
-                <option value="Technical Support">Technical Support</option>
-                <option value="Refund Request">Refund Request</option>
-                <option value="Cancel Subscription">Cancel Subscription</option>
-                <option value="Course Question">Course Question</option>
-                <option value="Billing Issue">Billing Issue</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="message">Message</Label>
-              <Textarea
-                id="message"
-                placeholder="Type your message here..."
-                value={contactMessage}
-                onChange={(e) => setContactMessage(e.target.value)}
-                rows={4}
-              />
-            </div>
-
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                if (!contactSubject || !contactMessage.trim()) {
-                  toast({
-                    title: 'Error',
-                    description: 'Please select a subject and enter a message',
-                    variant: 'destructive',
-                  });
-                  return;
-                }
-                const telegramMessage = `Subject: ${contactSubject}\n\nMessage:\n${contactMessage}`;
-                window.open(`https://t.me/ladybosslook?text=${encodeURIComponent(telegramMessage)}`, '_blank');
-              }}
-            >
-              <Send className="mr-2 h-4 w-4" />
-              Send via Telegram
-            </Button>
-          </CardContent>
-        </Card>
-
-        {Capacitor.isNativePlatform() && (
-          <Card id="notifications-section">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Push Notifications
-              </CardTitle>
-              <CardDescription>
-                Manage your notification preferences and stay updated
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Status Badge */}
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <div className={`h-2 w-2 rounded-full ${
-                    notificationPermission === 'granted' && subscriptionStatus === 'active' 
-                      ? 'bg-green-500' 
+                  <span className="text-xs text-muted-foreground">
+                    {notificationPermission === 'granted' && subscriptionStatus === 'active' 
+                      ? 'Receiving notifications'
                       : notificationPermission === 'denied'
-                      ? 'bg-red-500'
-                      : 'bg-yellow-500'
-                  }`} />
-                  <span className="text-sm font-medium">
-                    {subscriptionStatus === 'checking' 
-                      ? 'Checking status...'
-                      : notificationPermission === 'granted' && subscriptionStatus === 'active'
-                      ? 'Active'
-                      : notificationPermission === 'denied'
-                      ? 'Denied'
-                      : 'Not Enabled'}
+                      ? 'Permission denied'
+                      : 'No notifications'}
                   </span>
                 </div>
-                <span className="text-xs text-muted-foreground">
-                  {notificationPermission === 'granted' && subscriptionStatus === 'active' 
-                    ? 'Receiving notifications'
-                    : notificationPermission === 'denied'
-                    ? 'Permission denied'
-                    : 'No notifications'}
-                </span>
-              </div>
 
-              {/* Enabled State */}
-              {notificationPermission === 'granted' && subscriptionStatus === 'active' && (
-                <div className="space-y-3">
+                {/* Enabled State */}
+                {notificationPermission === 'granted' && subscriptionStatus === 'active' && (
                   <div className="space-y-2">
-                    <p className="text-sm font-medium">✅ Notifications Enabled</p>
-                    <p className="text-sm text-muted-foreground">
-                      You'll receive course updates, reminders, and announcements
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        onClick={handleDisableNotifications}
+                        className="flex-1"
+                        size="sm"
+                      >
+                        Disable
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={handleEnableNotifications}
+                        disabled={isEnablingNotifications}
+                        className="flex-1"
+                        size="sm"
+                      >
+                        {isEnablingNotifications ? 'Re-registering...' : 'Re-register'}
+                      </Button>
+                    </div>
                     <Button 
-                      variant="outline" 
-                      onClick={handleDisableNotifications}
-                      className="flex-1"
+                      onClick={handleTestNotification}
+                      disabled={isTestingNotification}
+                      className="w-full"
+                      size="sm"
                     >
-                      Disable
+                      <Bell className="mr-2 h-4 w-4" />
+                      {isTestingNotification ? 'Sending...' : 'Send Test Notification'}
                     </Button>
                     <Button 
-                      variant="outline" 
-                      onClick={handleEnableNotifications}
-                      disabled={isEnablingNotifications}
-                      className="flex-1"
+                      variant="ghost" 
+                      onClick={handleOpenAppSettings}
+                      className="w-full text-muted-foreground"
+                      size="sm"
                     >
-                      {isEnablingNotifications ? 'Re-registering...' : 'Re-register'}
+                      <Settings className="mr-2 h-4 w-4" />
+                      Open Settings
                     </Button>
                   </div>
-                  <Button 
-                    onClick={handleTestNotification}
-                    disabled={isTestingNotification}
-                    className="w-full"
-                  >
-                    <Bell className="mr-2 h-4 w-4" />
-                    {isTestingNotification ? 'Sending...' : 'Send Test Notification'}
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    onClick={handleOpenAppSettings}
-                    className="w-full text-muted-foreground"
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    Open Settings
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    💡 Use "Re-register" if you're not receiving notifications
-                  </p>
-                </div>
-              )}
-              
-              {/* Disabled State (permission granted but subscription removed) */}
-              {notificationPermission === 'granted' && subscriptionStatus === 'none' && (
-                <div className="space-y-3">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">🟡 Not Enabled</p>
-                    <p className="text-sm text-muted-foreground">
-                      No notifications
-                    </p>
-                  </div>
+                )}
+                
+                {/* Disabled State */}
+                {notificationPermission === 'granted' && subscriptionStatus === 'none' && (
                   <Button 
                     onClick={handleEnableNotifications} 
                     className="w-full"
@@ -1211,109 +1259,81 @@ const AppProfile = () => {
                     <Bell className="mr-2 h-4 w-4" />
                     {isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
                   </Button>
-                </div>
-              )}
+                )}
 
-              {/* Not Enabled State (no permission) */}
-              {notificationPermission !== 'granted' && (
-                <div className="space-y-4">
+                {/* Not Enabled State */}
+                {notificationPermission !== 'granted' && (
                   <div className="space-y-2">
-                    <p className="text-sm font-medium">
-                      {notificationPermission === 'denied' 
-                        ? '⚠️ Permission Denied' 
-                        : '🔔 Enable Notifications'}
-                    </p>
                     <p className="text-sm text-muted-foreground">
                       {notificationPermission === 'denied'
-                        ? 'Notifications are disabled. Enable them in Settings > LadyBoss Academy > Notifications'
-                        : 'Get notified about new courses, content updates, and important announcements'}
+                        ? 'Notifications are disabled. Enable them in Settings.'
+                        : 'Get notified about new content and updates'}
                     </p>
-                  </div>
-                  {notificationPermission === 'denied' ? (
-                    <>
-                      <Button 
-                        onClick={handleOpenAppSettings} 
-                        className="w-full"
-                      >
+                    {notificationPermission === 'denied' ? (
+                      <Button onClick={handleOpenAppSettings} className="w-full">
                         <Settings className="mr-2 h-4 w-4" />
                         Open Settings
                       </Button>
-                      <p className="text-xs text-muted-foreground text-center">
-                        Tap Notifications → Enable "Allow Notifications"
-                      </p>
-                    </>
-                  ) : (
-                    <Button 
-                      onClick={handleEnableNotifications} 
-                      className="w-full"
-                      disabled={isEnablingNotifications}
-                    >
-                      <Bell className="mr-2 h-4 w-4" />
-                      {isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
-                    </Button>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
+                    ) : (
+                      <Button 
+                        onClick={handleEnableNotifications} 
+                        className="w-full"
+                        disabled={isEnablingNotifications}
+                      >
+                        <Bell className="mr-2 h-4 w-4" />
+                        {isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-        {/* Calendar Sync Section - Native Only */}
-        {Capacitor.isNativePlatform() && isCalendarAvailable() && (
-          <Card id="calendar-section">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Calendar Sync
-              </CardTitle>
-              <CardDescription>
-                Add course sessions directly to your iOS Calendar
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Status Badge */}
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <div className={`h-2 w-2 rounded-full ${
-                    calendarPermission === 'granted' 
-                      ? 'bg-green-500' 
+          {/* Calendar Sync Card - Native Only */}
+          {Capacitor.isNativePlatform() && isCalendarAvailable() && (
+            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Calendar Sync
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {/* Status Badge */}
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <div className={`h-2 w-2 rounded-full ${
+                      calendarPermission === 'granted' 
+                        ? 'bg-green-500' 
+                        : calendarPermission === 'denied'
+                        ? 'bg-red-500'
+                        : 'bg-yellow-500'
+                    }`} />
+                    <span className="text-sm font-medium">
+                      {calendarPermission === 'granted'
+                        ? 'Enabled'
+                        : calendarPermission === 'denied'
+                        ? 'Denied'
+                        : 'Not Enabled'}
+                    </span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {calendarPermission === 'granted' 
+                      ? 'Can add events'
                       : calendarPermission === 'denied'
-                      ? 'bg-red-500'
-                      : 'bg-yellow-500'
-                  }`} />
-                  <span className="text-sm font-medium">
-                    {calendarPermission === 'granted'
-                      ? 'Enabled'
-                      : calendarPermission === 'denied'
-                      ? 'Denied'
-                      : 'Not Enabled'}
+                      ? 'Permission denied'
+                      : 'Tap to enable'}
                   </span>
                 </div>
-                <span className="text-xs text-muted-foreground">
-                  {calendarPermission === 'granted' 
-                    ? 'Can add events'
-                    : calendarPermission === 'denied'
-                    ? 'Permission denied'
-                    : 'Tap to enable'}
-                </span>
-              </div>
 
-              {/* Enabled State */}
-              {calendarPermission === 'granted' && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">✅ Calendar Access Enabled</p>
-                    <p className="text-sm text-muted-foreground">
-                      When you tap "Add to Calendar" in a course, sessions will be added directly to your iOS Calendar with reminders.
-                    </p>
-                  </div>
-                  
-                  {/* Auto-sync toggle */}
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                {/* Enabled State */}
+                {calendarPermission === 'granted' && (
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
                     <div className="space-y-0.5">
                       <p className="text-sm font-medium">Auto-Sync on Enrollment</p>
                       <p className="text-xs text-muted-foreground">
-                        Automatically add all sessions when you enroll
+                        Automatically add sessions when you enroll
                       </p>
                     </div>
                     <Switch
@@ -1321,187 +1341,38 @@ const AppProfile = () => {
                       onCheckedChange={handleAutoSyncToggle}
                     />
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Not Enabled State */}
-              {calendarPermission !== 'granted' && (
-                <div className="space-y-4">
+                {/* Not Enabled State */}
+                {calendarPermission !== 'granted' && (
                   <div className="space-y-2">
-                    <p className="text-sm font-medium">
-                      {calendarPermission === 'denied' 
-                        ? '⚠️ Permission Denied' 
-                        : '📅 Enable Calendar Sync'}
-                    </p>
                     <p className="text-sm text-muted-foreground">
                       {calendarPermission === 'denied'
-                        ? 'Calendar access is disabled. Enable it in Settings > LadyBoss Academy > Calendars'
-                        : 'Allow calendar access to add course sessions directly to your iPhone calendar with automatic reminders'}
+                        ? 'Calendar access is disabled. Enable it in Settings.'
+                        : 'Add course sessions directly to your calendar'}
                     </p>
-                  </div>
-                  {calendarPermission === 'denied' ? (
-                    <>
-                      <Button 
-                        onClick={handleOpenAppSettings} 
-                        className="w-full"
-                      >
+                    {calendarPermission === 'denied' ? (
+                      <Button onClick={handleOpenAppSettings} className="w-full">
                         <Settings className="mr-2 h-4 w-4" />
                         Open Settings
                       </Button>
-                      <p className="text-xs text-muted-foreground text-center">
-                        Tap Calendars → Enable calendar access
-                      </p>
-                    </>
-                  ) : (
-                    <Button 
-                      onClick={handleEnableCalendar} 
-                      className="w-full"
-                      disabled={isRequestingCalendar}
-                    >
-                      <Calendar className="mr-2 h-4 w-4" />
-                      {isRequestingCalendar ? 'Requesting...' : 'Enable Calendar Access'}
-                    </Button>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        <Card id="password-section">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5" />
-              Change Password
-            </CardTitle>
-            <CardDescription>Update your account password</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                placeholder="Enter new password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                disabled={isChangingPassword}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={isChangingPassword}
-              />
-            </div>
-            <Button
-              onClick={handlePasswordChange}
-              disabled={isChangingPassword || !newPassword || !confirmPassword}
-              className="w-full"
-            >
-              <Lock className="mr-2 h-4 w-4" />
-              {isChangingPassword ? 'Updating...' : 'Update Password'}
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card id="actions-section">
-          <CardHeader>
-            <CardTitle>Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => {
-                clearTourCompleted();
-                navigate('/app/home');
-                toast({ title: 'Tour will restart', description: 'Navigate to the home page to start the app tour.' });
-              }}
-            >
-              <PlayCircle className="mr-2 h-4 w-4" />
-              Replay App Tour
-            </Button>
-            
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={handleSignOut}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </Button>
-            
-            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Account
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="flex items-center gap-2 text-destructive">
-                    <AlertTriangle className="h-5 w-5" />
-                    Delete Your Account?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription className="space-y-3">
-                    <p>
-                      This action is <strong>permanent and cannot be undone</strong>. 
-                      All your data will be immediately deleted, including:
-                    </p>
-                    <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
-                      <li>Your profile and account information</li>
-                      <li>All course enrollments and progress</li>
-                      <li>Journal entries and chat history</li>
-                      <li>Audio bookmarks and listening history</li>
-                      <li>Wallet balance and transaction history</li>
-                    </ul>
-                    <div className="pt-2">
-                      <Label htmlFor="deleteConfirm" className="text-sm font-medium">
-                        Type <span className="font-bold text-destructive">DELETE</span> to confirm:
-                      </Label>
-                      <Input
-                        id="deleteConfirm"
-                        value={deleteConfirmText}
-                        onChange={(e) => setDeleteConfirmText(e.target.value.toUpperCase())}
-                        placeholder="Type DELETE"
-                        className="mt-2"
-                        disabled={isDeletingAccount}
-                      />
-                    </div>
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel 
-                    disabled={isDeletingAccount}
-                    onClick={() => setDeleteConfirmText('')}
-                  >
-                    Cancel
-                  </AlertDialogCancel>
-                  <Button
-                    variant="destructive"
-                    onClick={handleDeleteAccount}
-                    disabled={deleteConfirmText !== 'DELETE' || isDeletingAccount}
-                  >
-                    {isDeletingAccount ? 'Deleting...' : 'Delete My Account'}
-                  </Button>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </CardContent>
-        </Card>
-      </div>
-      </div>
-      </div>
+                    ) : (
+                      <Button 
+                        onClick={handleEnableCalendar} 
+                        className="w-full"
+                        disabled={isRequestingCalendar}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {isRequestingCalendar ? 'Requesting...' : 'Enable Calendar Access'}
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
