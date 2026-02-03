@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle2, Trophy, Star, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { haptic } from '@/lib/haptics';
+import { useAppReview } from '@/hooks/useAppReview';
+import { AppReviewPrompt } from '@/components/app/AppReviewPrompt';
+import { FeedbackSheet } from '@/components/app/FeedbackSheet';
 
 interface CompletionCelebrationProps {
   isOpen: boolean;
@@ -19,6 +22,15 @@ export function CompletionCelebration({
   roundName 
 }: CompletionCelebrationProps) {
   const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
+  const {
+    isPromptOpen,
+    isFeedbackOpen,
+    checkAndPromptReview,
+    handleRating,
+    handleFeedbackSubmit,
+    handleDismiss,
+    closeFeedback,
+  } = useAppReview();
 
   useEffect(() => {
     if (isOpen && !hasTriggeredConfetti) {
@@ -66,6 +78,17 @@ export function CompletionCelebration({
       }, 500);
     }
   }, [isOpen, hasTriggeredConfetti]);
+
+  // Trigger review prompt after course completion
+  useEffect(() => {
+    if (isOpen) {
+      // Delay to let celebration show first
+      const timer = setTimeout(() => {
+        checkAndPromptReview('course_complete');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, checkAndPromptReview]);
 
   // Reset confetti trigger when dialog closes
   useEffect(() => {
@@ -129,6 +152,20 @@ export function CompletionCelebration({
           </Button>
         </div>
       </DialogContent>
+
+      {/* App Review Prompt */}
+      <AppReviewPrompt
+        isOpen={isPromptOpen}
+        onRate={handleRating}
+        onDismiss={handleDismiss}
+      />
+
+      {/* Feedback Sheet for unhappy users */}
+      <FeedbackSheet
+        isOpen={isFeedbackOpen}
+        onSubmit={handleFeedbackSubmit}
+        onClose={closeFeedback}
+      />
     </Dialog>
   );
 }
