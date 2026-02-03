@@ -60,7 +60,7 @@ export interface RoutineBankWithDetails extends RoutineBankItem {
   tasks: RoutineBankTask[];
 }
 
-// Unique categories from routines_bank
+// Unique categories from routine_categories table (single source of truth)
 export interface RoutineBankCategory {
   slug: string;
   name: string;
@@ -69,80 +69,32 @@ export interface RoutineBankCategory {
   emoji?: string;
 }
 
-// Map category slugs to display info with 3D emojis
-const CATEGORY_DISPLAY: Record<string, { name: string; icon: string; color: string; emoji?: string }> = {
-  // Core categories
-  general: { name: 'General', icon: 'Sparkles', color: 'purple', emoji: '✨' },
-  morning: { name: 'Morning', icon: 'Sunrise', color: 'orange', emoji: '🌅' },
-  evening: { name: 'Evening', icon: 'Moon', color: 'indigo', emoji: '🌙' },
-  productivity: { name: 'Productivity', icon: 'Target', color: 'blue', emoji: '🎯' },
-  wellness: { name: 'Wellness', icon: 'Heart', color: 'pink', emoji: '💖' },
-  fitness: { name: 'Fitness', icon: 'Dumbbell', color: 'green', emoji: '💪' },
-  mindfulness: { name: 'Mindfulness', icon: 'Brain', color: 'teal', emoji: '🧘' },
-  sleep: { name: 'Sleep', icon: 'Moon', color: 'indigo', emoji: '😴' },
-  pro: { name: 'Pro', icon: 'Crown', color: 'amber', emoji: '👑' },
-  // Extended categories
-  gratitude: { name: 'Gratitude', icon: 'Heart', color: 'pink', emoji: '🙏' },
-  hygiene: { name: 'Hygiene', icon: 'Sparkles', color: 'blue', emoji: '🧼' },
-  strength: { name: 'Strength', icon: 'Flame', color: 'orange', emoji: '🔥' },
-  movement: { name: 'Movement', icon: 'Activity', color: 'green', emoji: '🏃' },
-  nutrition: { name: 'Nutrition', icon: 'Apple', color: 'red', emoji: '🍎' },
-  selfcare: { name: 'Self Care', icon: 'Heart', color: 'rose', emoji: '💆' },
-  focus: { name: 'Focus', icon: 'Target', color: 'blue', emoji: '🧠' },
-  creativity: { name: 'Creativity', icon: 'Palette', color: 'purple', emoji: '🎨' },
-  social: { name: 'Social', icon: 'Users', color: 'teal', emoji: '👥' },
-  learning: { name: 'Learning', icon: 'BookOpen', color: 'blue', emoji: '📚' },
-  finance: { name: 'Finance', icon: 'DollarSign', color: 'green', emoji: '💰' },
-  home: { name: 'Home', icon: 'Home', color: 'orange', emoji: '🏠' },
-  work: { name: 'Work', icon: 'Briefcase', color: 'blue', emoji: '💼' },
-  health: { name: 'Health', icon: 'Heart', color: 'red', emoji: '❤️' },
-  meditation: { name: 'Meditation', icon: 'Wind', color: 'teal', emoji: '🧘‍♀️' },
-  journaling: { name: 'Journaling', icon: 'BookOpen', color: 'purple', emoji: '📝' },
-  hydration: { name: 'Hydration', icon: 'Droplet', color: 'blue', emoji: '💧' },
-  skincare: { name: 'Skincare', icon: 'Sparkles', color: 'pink', emoji: '✨' },
-  exercise: { name: 'Exercise', icon: 'Activity', color: 'green', emoji: '🏋️' },
-  reading: { name: 'Reading', icon: 'Book', color: 'amber', emoji: '📖' },
-  planning: { name: 'Planning', icon: 'Calendar', color: 'blue', emoji: '📅' },
-  relaxation: { name: 'Relaxation', icon: 'Wind', color: 'teal', emoji: '🌿' },
-};
-
-// Fetch unique categories from both routines_bank AND admin_task_bank
+// Fetch categories directly from routine_categories table (admin-managed)
 export function useRoutineBankCategories() {
   return useQuery({
-    queryKey: ['routines-bank-categories'],
+    queryKey: ['routine-categories'],
     queryFn: async () => {
-      // Fetch categories from routines_bank
-      const { data: routineCategories } = await supabase
-        .from('routines_bank')
-        .select('category')
-        .eq('is_active', true);
+      const { data, error } = await supabase
+        .from('routine_categories')
+        .select('slug, name, icon, color, display_order')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
 
-      // Fetch categories from admin_task_bank (tasks)
-      const { data: taskCategories } = await supabase
-        .from('admin_task_bank')
-        .select('category')
-        .eq('is_active', true);
+      if (error) throw error;
 
-      // Merge and get unique categories
-      const allCategories = [
-        ...(routineCategories?.map(r => r.category) || []),
-        ...(taskCategories?.map(t => t.category) || []),
-      ];
-      const uniqueCategories = [...new Set(allCategories)];
-      
-      // Sort with 'pro' at the end
-      const sorted = uniqueCategories.sort((a, b) => {
-        if (a === 'pro') return 1;
-        if (b === 'pro') return -1;
-        return a.localeCompare(b);
+      // Pro category goes last
+      const sorted = (data || []).sort((a, b) => {
+        if (a.slug === 'pro') return 1;
+        if (b.slug === 'pro') return -1;
+        return (a.display_order || 0) - (b.display_order || 0);
       });
-      
+
       return sorted.map(cat => ({
-        slug: cat,
-        name: CATEGORY_DISPLAY[cat]?.name || cat.charAt(0).toUpperCase() + cat.slice(1),
-        icon: CATEGORY_DISPLAY[cat]?.icon || 'Sparkles',
-        color: CATEGORY_DISPLAY[cat]?.color || 'purple',
-        emoji: CATEGORY_DISPLAY[cat]?.emoji,
+        slug: cat.slug,
+        name: cat.name,
+        icon: cat.icon || 'Sparkles',  // icon column stores emoji
+        color: cat.color || 'purple',
+        emoji: cat.icon,  // same as icon for FluentEmoji
       })) as RoutineBankCategory[];
     },
     staleTime: 1000 * 60 * 5,
