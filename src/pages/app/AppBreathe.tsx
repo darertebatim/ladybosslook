@@ -87,6 +87,7 @@ export default function AppBreathe() {
                 key={category.value}
                 name={category.label}
                 icon={category.icon}
+                emoji={category.emoji}
                 color={category.color}
                 isSelected={selectedCategory === category.value}
                 onClick={() => {

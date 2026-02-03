@@ -1,9 +1,11 @@
 import * as LucideIcons from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface CategoryCircleProps {
   name: string;
   icon: string;
+  emoji?: string; // Optional emoji for 3D display
   color: string;
   isSelected?: boolean;
   onClick?: () => void;
@@ -22,7 +24,7 @@ const colorMap: Record<string, { bg: string; text: string }> = {
   rose: { bg: 'bg-rose-100', text: 'text-rose-600' },
 };
 
-export function CategoryCircle({ name, icon, color, isSelected, onClick }: CategoryCircleProps) {
+export function CategoryCircle({ name, icon, emoji, color, isSelected, onClick }: CategoryCircleProps) {
   const IconComponent = (LucideIcons as any)[icon] || LucideIcons.Sparkles;
   const colors = colorMap[color] || colorMap.yellow;
 
@@ -38,7 +40,11 @@ export function CategoryCircle({ name, icon, color, isSelected, onClick }: Categ
           isSelected && 'ring-2 ring-primary ring-offset-2'
         )}
       >
-        <IconComponent className={cn('w-7 h-7', colors.text)} />
+        {emoji ? (
+          <FluentEmoji emoji={emoji} size={28} />
+        ) : (
+          <IconComponent className={cn('w-7 h-7', colors.text)} />
+        )}
       </div>
       <span className={cn(
         'text-xs text-center font-medium max-w-[72px] truncate',
