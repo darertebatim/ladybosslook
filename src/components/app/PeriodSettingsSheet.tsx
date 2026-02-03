@@ -5,12 +5,14 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Bell, Eye, RotateCcw } from 'lucide-react';
+import { Calendar as CalendarIcon, Bell, Eye, RotateCcw, Power } from 'lucide-react';
 import { usePeriodSettings, useUpsertPeriodSettings } from '@/hooks/usePeriodTracker';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 interface PeriodSettingsSheetProps {
   open: boolean;
@@ -18,6 +20,7 @@ interface PeriodSettingsSheetProps {
 }
 
 export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetProps) => {
+  const navigate = useNavigate();
   const { data: settings } = usePeriodSettings();
   const upsertSettings = useUpsertPeriodSettings();
 
@@ -57,6 +60,23 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
     } catch (error) {
       console.error('Error saving settings:', error);
       toast.error('Failed to save settings');
+    }
+  };
+
+  const handleDeactivate = async () => {
+    try {
+      await upsertSettings.mutateAsync({
+        onboarding_done: false,
+        show_on_home: false,
+        reminder_enabled: false,
+      });
+      haptic.success();
+      toast.success('Period tracker deactivated');
+      onOpenChange(false);
+      navigate('/app/home');
+    } catch (error) {
+      console.error('Error deactivating:', error);
+      toast.error('Failed to deactivate');
     }
   };
 
@@ -203,6 +223,38 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
               }}
               className="data-[state=checked]:bg-pink-500"
             />
+          </div>
+
+          {/* Deactivate section */}
+          <div className="border-t border-pink-100 pt-4">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full text-destructive border-destructive/30 hover:bg-destructive/10"
+                >
+                  <Power className="h-4 w-4 mr-2" />
+                  Deactivate Period Tracker
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Deactivate Period Tracker?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will hide the period tracker from your app. Your data will be kept and you can reactivate it anytime from Tools.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeactivate}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Deactivate
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
 
