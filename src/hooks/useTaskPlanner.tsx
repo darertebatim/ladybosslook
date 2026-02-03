@@ -102,6 +102,7 @@ export interface TaskTemplate {
   goal_unit: string | null;
   tag: string | null;
   linked_playlist_id: string | null;
+  time_period: string | null;
   created_at: string;
   updated_at: string;
 }

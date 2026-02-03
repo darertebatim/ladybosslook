@@ -8,6 +8,14 @@ interface TaskTemplateCardProps {
   onAdd: () => void;
 }
 
+// Map time_period values to display labels
+const TIME_PERIOD_LABELS: Record<string, string> = {
+  morning: 'Morning',
+  afternoon: 'Afternoon',
+  evening: 'Evening',
+  night: 'Bedtime',
+};
+
 export function TaskTemplateCard({ template, onAdd }: TaskTemplateCardProps) {
   const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
 
@@ -15,6 +23,11 @@ export function TaskTemplateCard({ template, onAdd }: TaskTemplateCardProps) {
     haptic.light();
     onAdd();
   };
+
+  // Get time period label
+  const timePeriodLabel = template.time_period 
+    ? TIME_PERIOD_LABELS[template.time_period] || template.time_period
+    : 'Anytime';
 
   return (
     <div 
@@ -30,16 +43,18 @@ export function TaskTemplateCard({ template, onAdd }: TaskTemplateCardProps) {
           <p className="text-xs text-black/70 truncate">
             {template.category}
             {template.repeat_pattern && template.repeat_pattern !== 'none' && (
-              <span className="ml-1">
-                • {template.repeat_pattern === 'daily' ? 'Daily' : 
-                   template.repeat_pattern === 'weekly' ? 'Weekly' : 
-                   template.repeat_pattern === 'monthly' ? 'Monthly' :
-                   template.repeat_pattern === 'weekend' ? 'Weekends' : ''}
+              <span>
+                {' • '}
+                {template.repeat_pattern === 'daily' ? 'Daily' : 
+                 template.repeat_pattern === 'weekly' ? 'Weekly' : 
+                 template.repeat_pattern === 'monthly' ? 'Monthly' :
+                 template.repeat_pattern === 'weekend' ? 'Weekends' : ''}
               </span>
             )}
             {(!template.repeat_pattern || template.repeat_pattern === 'none') && (
-              <span className="ml-1">• Once</span>
+              <span>{' • '}Once</span>
             )}
+            <span>{' • '}{timePeriodLabel}</span>
           </p>
         </div>
 
