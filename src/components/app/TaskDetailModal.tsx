@@ -1,4 +1,4 @@
-import { Check, X, Pencil, Plus, Play, Droplets, Trash2, FastForward } from 'lucide-react';
+import { Check, Plus, Play, Droplets, FastForward } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
@@ -147,35 +147,40 @@ export const TaskDetailModal = ({
         )}
       >
 
-        {/* Task header - Me+ style with emoji, time, title */}
-        <div className="px-6 pt-6 pb-4">
-          <div className="flex items-center gap-4">
-            {/* Large emoji */}
-            <div className="w-16 h-16 flex items-center justify-center shrink-0">
-              <TaskIcon iconName={task.emoji} size={40} className="text-foreground/80" />
+        {/* Task header - matches TaskCard styling exactly */}
+        <div className="px-4 pt-4 pb-3">
+          <div className="flex items-center gap-2">
+            {/* Icon - same size as TaskCard (32px) */}
+            <div className="w-10 h-10 flex items-center justify-center shrink-0">
+              <TaskIcon iconName={task.emoji} size={32} className="text-black/80" />
             </div>
             
-            {/* Time/Goal and title */}
-            <div className="flex-1 min-w-0 pr-8">
-              <p className="text-sm text-foreground/60 mb-0.5">
-                {hasGoal 
-                  ? isTimerGoal
-                    ? `Goal: ${Math.floor(goalProgress / 60)}/${Math.floor((task.goal_target || 0) / 60)} min`
-                    : `Goal: ${goalProgress}/${task.goal_target} ${task.goal_unit || 'times'}`
-                  : `Time: ${formatTime(task.scheduled_time)}`
-                }
-              </p>
-              <h3 className="text-xl font-bold text-foreground leading-tight">
+            {/* Time/Goal and title - matching TaskCard exactly */}
+            <div className="flex-1 min-w-0">
+              {/* Top line: time or goal - same as TaskCard */}
+              <div className="flex items-center gap-2">
+                {hasGoal ? (
+                  <span className="text-[13px] text-black/80 font-medium">
+                    {isTimerGoal
+                      ? `Goal: ${Math.floor(goalProgress / 60)}/${Math.floor((task.goal_target || 0) / 60)} min`
+                      : `Goal: ${goalProgress}/${task.goal_target} ${task.goal_unit || 'times'}`
+                    }
+                  </span>
+                ) : (
+                  <span className="text-[13px] text-black/80">{formatTime(task.scheduled_time)}</span>
+                )}
+              </div>
+              
+              {/* Title - 15px font-semibold like TaskCard */}
+              <p className={cn(
+                'text-black text-[15px] font-semibold transition-all',
+                (hasGoal ? goalReached : isCompleted) && 'line-through'
+              )}>
                 {task.title}
-              </h3>
-              {task.description && (
-                <p className="text-sm text-foreground/70 mt-1 line-clamp-2">
-                  {task.description}
-                </p>
-              )}
+              </p>
             </div>
 
-            {/* Timer goal: Play button, Count goal: + button, Regular: Checkbox */}
+            {/* Timer goal: Play button, Count goal: + button, Regular: Checkbox - same size as TaskCard (w-9 h-9) */}
             {isTimerGoal ? (
               <button
                 onClick={() => {
@@ -184,16 +189,16 @@ export const TaskDetailModal = ({
                   onClose();
                 }}
                 className={cn(
-                  'w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all',
+                  'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all',
                   goalReached
-                    ? 'bg-emerald-500 border-emerald-500 text-white'
-                    : 'border-foreground/30 bg-white/40 hover:bg-white/60'
+                    ? 'bg-emerald-500 text-white shadow-md'
+                    : 'border-2 border-foreground/30 bg-white/60'
                 )}
               >
                 {goalReached ? (
-                  <Check className="h-5 w-5" strokeWidth={3} />
+                  <Check className="h-4 w-4" strokeWidth={3} />
                 ) : (
-                  <Play className="h-5 w-5 ml-0.5" fill="currentColor" />
+                  <Play className="h-5 w-5 text-foreground/70 ml-0.5" fill="currentColor" />
                 )}
               </button>
             ) : isCountGoal ? (
@@ -208,63 +213,72 @@ export const TaskDetailModal = ({
                   onClose();
                 }}
                 className={cn(
-                  'w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all',
+                  'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all',
                   goalReached
-                    ? 'bg-emerald-500 border-emerald-500 text-white'
+                    ? 'bg-emerald-500 text-white shadow-md'
                     : isWater
-                      ? 'border-sky-400 bg-sky-100'
-                      : 'border-foreground/30 bg-white/40 hover:bg-white/60'
+                      ? 'border-2 border-sky-400 bg-sky-100'
+                      : 'border-2 border-foreground/30 bg-white/60'
                 )}
               >
                 {goalReached ? (
-                  <Check className="h-5 w-5" strokeWidth={3} />
+                  <Check className="h-4 w-4" strokeWidth={3} />
                 ) : isWater ? (
                   <Droplets className="h-5 w-5 text-sky-500" />
                 ) : (
-                  <Plus className="h-5 w-5" strokeWidth={2} />
+                  <Plus className="h-5 w-5 text-foreground/70" strokeWidth={2} />
                 )}
               </button>
             ) : (
               <button
                 onClick={handleToggleComplete}
                 className={cn(
-                  'w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all',
+                  'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all',
                   isCompleted
-                    ? 'bg-emerald-500 border-emerald-500 text-white'
-                    : 'border-foreground/30 bg-white/40 hover:bg-white/60'
+                    ? 'bg-emerald-500 text-white shadow-md'
+                    : 'border-2 border-foreground/30 bg-white/60'
                 )}
               >
-                {isCompleted && <Check className="h-5 w-5" strokeWidth={3} />}
+                {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
               </button>
             )}
           </div>
         </div>
 
-        {/* Subtasks section - white background card */}
+        {/* Repeat/Reminder info - centered text matching Me+ */}
+        {combinedText && (
+          <div className="px-4 pb-3">
+            <p className="text-[13px] text-black/70 text-center">
+              {combinedText}.
+            </p>
+          </div>
+        )}
+
+        {/* Subtasks section */}
         {subtasks.length > 0 && (
-          <div className="px-6 pb-4">
-            <div className="bg-white/80 rounded-2xl p-4 space-y-0 divide-y divide-foreground/10">
+          <div className="px-4 pb-3">
+            <div className="bg-white/80 rounded-2xl p-3 space-y-0 divide-y divide-black/10">
               {subtasks.map((subtask) => {
-                const isCompleted = completedSubtaskIds.includes(subtask.id);
+                const isSubtaskCompleted = completedSubtaskIds.includes(subtask.id);
                 return (
                   <button
                     key={subtask.id}
                     onClick={() => handleToggleSubtask(subtask.id)}
-                    className="flex items-center gap-3 w-full text-left py-3 first:pt-0 last:pb-0"
+                    className="flex items-center gap-3 w-full text-left py-2.5 first:pt-0 last:pb-0"
                   >
                     <div
                       className={cn(
-                        'w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all shrink-0',
-                        isCompleted
+                        'w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0',
+                        isSubtaskCompleted
                           ? 'bg-emerald-500 border-emerald-500 text-white'
-                          : 'border-foreground/30 bg-white/50'
+                          : 'border-black/30 bg-white/50'
                       )}
                     >
-                      {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
+                      {isSubtaskCompleted && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
                     </div>
                     <span className={cn(
-                      'flex-1 text-foreground',
-                      isCompleted && 'line-through text-foreground/50'
+                      'flex-1 text-black text-[14px]',
+                      isSubtaskCompleted && 'line-through text-black/50'
                     )}>
                       {subtask.title}
                     </span>
@@ -275,17 +289,8 @@ export const TaskDetailModal = ({
           </div>
         )}
 
-        {/* Repeat/Reminder info - centered text */}
-        {combinedText && (
-          <div className="px-6 pb-4">
-            <p className="text-sm text-foreground/70 text-center">
-              {combinedText}.
-            </p>
-          </div>
-        )}
-
-        {/* Action buttons */}
-        <div className="px-6 pb-6 pt-2 space-y-3">
+        {/* Action buttons - compact like Me+ */}
+        <div className="px-4 pb-4 pt-1 space-y-2">
           {/* Pro Task: Navigation button */}
           {isProTask && proConfig && (
             <Button
@@ -293,11 +298,11 @@ export const TaskDetailModal = ({
                 onClose();
                 navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
               }}
-              className={cn('w-full gap-2 h-12 rounded-2xl', proConfig.buttonClass)}
+              className={cn('w-full gap-2 h-10 rounded-xl text-sm', proConfig.buttonClass)}
             >
               {(() => {
                 const ProIcon = proConfig.icon;
-                return <ProIcon className="h-5 w-5" />;
+                return <ProIcon className="h-4 w-4" />;
               })()}
               {proConfig.badgeText}
             </Button>
@@ -311,39 +316,24 @@ export const TaskDetailModal = ({
                 onClose();
                 onSkip(task);
               }}
-              className="w-full gap-2 h-12 rounded-2xl border-foreground/20 bg-white/50 hover:bg-white/70 text-foreground/70"
+              className="w-full gap-2 h-10 rounded-xl border-black/20 bg-white/50 hover:bg-white/70 text-black/70 text-sm"
             >
               <FastForward className="h-4 w-4" />
               Skip for Today
             </Button>
           )}
           
-          {/* Edit and Delete buttons row */}
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                onClose();
-                onEdit(task);
-              }}
-              className="flex-1 gap-2 h-12 rounded-full border-2 border-foreground/30 bg-transparent hover:bg-white/30 text-foreground"
-            >
-              <Pencil className="h-4 w-4" />
-              Edit Task
-            </Button>
-            {onDelete && (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  onClose();
-                  onDelete(task);
-                }}
-                className="w-12 h-12 p-0 rounded-xl border-2 border-red-300 bg-transparent hover:bg-red-50 text-red-500"
-              >
-                <Trash2 className="h-4 w-4" strokeWidth={1.5} />
-              </Button>
-            )}
-          </div>
+          {/* Edit Task button - simple like Me+ */}
+          <Button
+            variant="outline"
+            onClick={() => {
+              onClose();
+              onEdit(task);
+            }}
+            className="w-full gap-2 h-10 rounded-full border-2 border-black/30 bg-transparent hover:bg-white/30 text-black text-sm"
+          >
+            Edit Task
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
