@@ -31,6 +31,9 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				chip: {
+					lavender: 'hsl(var(--chip-lavender) / <alpha-value>)',
+				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					light: 'hsl(var(--primary-light))',
