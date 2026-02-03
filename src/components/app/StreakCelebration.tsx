@@ -4,6 +4,9 @@ import { useUserStreak } from '@/hooks/useTaskPlanner';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { useAppReview, isStreakMilestone } from '@/hooks/useAppReview';
+import { AppReviewPrompt } from '@/components/app/AppReviewPrompt';
+import { FeedbackSheet } from '@/components/app/FeedbackSheet';
 
 interface StreakCelebrationProps {
   open: boolean;
@@ -13,6 +16,17 @@ interface StreakCelebrationProps {
 export const StreakCelebration = ({ open, onClose }: StreakCelebrationProps) => {
   const { data: streak } = useUserStreak();
   const [isAnimating, setIsAnimating] = useState(false);
+  const {
+    isPromptOpen,
+    isFeedbackOpen,
+    checkAndPromptReview,
+    handleRating,
+    handleFeedbackSubmit,
+    handleDismiss,
+    closeFeedback,
+  } = useAppReview();
+
+  const currentStreak = streak?.current_streak || 1;
 
   useEffect(() => {
     if (open) {
@@ -21,9 +35,19 @@ export const StreakCelebration = ({ open, onClose }: StreakCelebrationProps) => 
     }
   }, [open]);
 
+  // Trigger review prompt on streak milestones
+  useEffect(() => {
+    if (open && isStreakMilestone(currentStreak)) {
+      // Delay slightly to let celebration show first
+      const timer = setTimeout(() => {
+        checkAndPromptReview('streak_milestone');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [open, currentStreak, checkAndPromptReview]);
+
   if (!open) return null;
 
-  const currentStreak = streak?.current_streak || 1;
   const lastCompletionDate = streak?.last_completion_date 
     ? new Date(streak.last_completion_date)
     : new Date();
@@ -119,6 +143,20 @@ export const StreakCelebration = ({ open, onClose }: StreakCelebrationProps) => 
           I'm committed 💪
         </Button>
       </div>
+
+      {/* App Review Prompt */}
+      <AppReviewPrompt
+        isOpen={isPromptOpen}
+        onRate={handleRating}
+        onDismiss={handleDismiss}
+      />
+
+      {/* Feedback Sheet for unhappy users */}
+      <FeedbackSheet
+        isOpen={isFeedbackOpen}
+        onSubmit={handleFeedbackSubmit}
+        onClose={closeFeedback}
+      />
     </div>
   );
 };
