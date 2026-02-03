@@ -1,130 +1,221 @@
 
-# Complete Terminology Update: Task to Action, Routine to Ritual
+# Strength-First Metrics: Replace Streaks with Depth of Return
 
-Based on my comprehensive audit of the codebase, I found **multiple remaining instances** that need to be updated across both the user-facing app and admin panel. The screenshots you shared confirm the issue - the Admin Tools page still shows "Routines", "Routines Bank", "Tasks Bank" and the home screen modal shows "Edit Task".
-
----
-
-## Summary of Changes
-
-### User-Facing App (High Priority)
-
-| File | Current Text | New Text |
-|------|-------------|----------|
-| `HomeMenu.tsx` | "Routines" menu item | "Rituals" |
-| `TaskDetailModal.tsx` | "Edit Task" button | "Edit Action" |
-| `AppTaskCreate.tsx` | "Edit Task" header | "Edit Action" |
-| `AppTour.tsx` | "add new tasks", "Track your daily tasks", "Complete tasks" | "add new actions", "Track your daily actions", "Honor actions" |
-| `TaskCard.tsx` | "today's routine" toast, "complete this task" | "today's rituals", "honor this action" |
-| `EmotionDashboard.tsx` | "Add to My Routine" button | "Add to My Rituals" |
-| `useTaskPlanner.tsx` | All toast messages with "Task created", "Failed to create task", etc. | "Action created", "Failed to create action", etc. |
-
-### Admin Panel (Lower Priority - Internal)
-
-| File | Current Text | New Text |
-|------|-------------|----------|
-| `Tools.tsx` | "Routines", "Routines Bank", "Tasks Bank" tabs | "Rituals", "Rituals Bank", "Actions Bank" |
-| `TasksBank.tsx` | "Tasks Bank" title, "Add Task" button, toast messages | "Actions Bank", "Add Action", updated toasts |
-| `RoutinesBank.tsx` | "Routines Bank" title, "New Routine", "Create Routine" | "Rituals Bank", "New Ritual", "Create Ritual" |
+Based on my analysis of the codebase, I found streak-related code in **9 components** across the app. This plan transforms the metric system from "streak counting" to "depth of return" - measuring how often users come back, not how long they stay without breaking.
 
 ---
 
-## Detailed File-by-File Changes
+## Philosophy Summary
 
-### 1. HomeMenu.tsx (User-facing menu)
-- Line 32: Change `name: 'Routines'` to `name: 'Rituals'`
+**Current Model (Streak-Based)**:
+- Tracks consecutive days
+- Resets to 1 when broken
+- Creates anxiety about stopping
+- Punishes life interruptions
 
-### 2. TaskDetailModal.tsx (Action detail popup)
-- Line 335: Change `Edit Task` button text to `Edit Action`
+**New Model (Depth of Return)**:
+- Tracks total days present this month
+- Celebrates each return
+- No "breaking" concept
+- Measures strength through return, not continuity
 
-### 3. AppTaskCreate.tsx (Edit action sheet)
-- Line 1960: Change `Edit Task` header to `Edit Action`
-
-### 4. AppTour.tsx (Onboarding tour)
-- Line 8: "Track your daily tasks" to "Track your daily actions"
-- Line 14: "see your tasks" to "see your actions"
-- Line 19: "completed tasks" to "honored actions"
-- Line 24: "add new tasks" to "add new actions"
-- Line 34: "ready-made routines" to "ready-made rituals"
-
-### 5. TaskCard.tsx (Future date toast messages)
-- Lines 84, 115, 140: "today's routine" to "today's rituals"
-- Lines 85, 116, 141: "complete this task" to "honor this action"
-
-### 6. EmotionDashboard.tsx (Emotion check-in page)
-- Line 233: "Add to My Routine" to "Add to My Rituals"
-
-### 7. useTaskPlanner.tsx (Hook with toast messages)
-- Line 601: "Task created!" to "Action created!"
-- Line 605: "Failed to create task" to "Failed to create action"
-- Line 659: "Added to your routine!" to "Added to your rituals!"
-- Line 663: "Failed to add to routine" to "Failed to add to rituals"
-- Line 772: "Failed to update task" to "Failed to update action"
-- Line 800: "Task deleted" to "Action deleted"
-- Line 804: "Failed to delete task" to "Failed to delete action"
-- Line 1094: "Task added from template!" to "Action added from template!"
-- Line 1098: "Failed to add task" to "Failed to add action"
-- Line 1231: "Failed to reorder tasks" to "Failed to reorder actions"
-- Line 1307: "Task skipped for today" to "Action skipped for today"
-- Line 1311: "Failed to skip task" to "Failed to skip action"
-- Line 1373: "Failed to reschedule task" to "Failed to reschedule action"
-
-### 8. Tools.tsx (Admin panel tabs)
-- Line 21: "Routines" to "Rituals"
-- Line 25: "Routines Bank" to "Rituals Bank"
-- Line 29: "Tasks Bank" to "Actions Bank"
-
-### 9. TasksBank.tsx (Admin actions bank)
-- Line 516: "Tasks Bank" title to "Actions Bank"
-- Line 519: "task templates" to "action templates"
-- Line 540: "Add Task" button to "Add Action"
-- Line 601: "No tasks yet" to "No actions yet"
-- Line 559: "Create Routine" to "Create Ritual"
-- Line 499: Toast "Routine created! Go to Routines Bank" to "Ritual created! Go to Rituals Bank"
-- Lines 227, 281, 298: Task toast messages to action messages
-
-### 10. RoutinesBank.tsx (Admin rituals bank)
-- Line 592: "Routines Bank" title to "Rituals Bank"
-- Line 595: "routine templates" to "ritual templates"
-- Line 600: "New Routine" button to "New Ritual"
-- Line 627: "No routines yet. Click New Routine" to "No rituals yet. Click New Ritual"
-- Line 712-714: Dialog titles "Edit Routine"/"New Routine" to "Edit Ritual"/"New Ritual"
-- Line 1172: "Create Routine" button to "Create Ritual"
-- Lines 256, 506: Toast messages updated
+**The Core Shift**: "Simora measures depth of return, not length of absence."
 
 ---
 
-## Files NOT Changed (Internal Code)
+## Database Changes
 
-The following will remain unchanged as they are internal code, not user-facing:
-- Variable names (`task`, `routine`, `useTaskPlanner`, etc.)
-- Database table names (`user_tasks`, `routines_bank`)
-- TypeScript interfaces and types
-- Route paths (`/app/routines`)
+### 1. Add New Columns to `profiles` Table
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| `total_active_days` | integer | All-time count of days with activity |
+| `return_count` | integer | Number of times user returned after 2+ day gap |
+| `last_active_date` | date | Last date user showed up |
+| `this_month_active_days` | integer | Days active in current month (cached, recalculated monthly) |
+
+### 2. Keep `user_streaks` Table (Internal Only)
+
+The table stays for internal analytics but values are no longer shown to users. This gives us historical data without displaying pressure-inducing numbers.
+
+---
+
+## UI Changes Summary
+
+| Component | Current | New |
+|-----------|---------|-----|
+| StreakCelebration | "🔥 7" big number, streak counter | "You showed up today" with gentle checkmarks |
+| JournalHeaderStats | "day streak" label | "this month" (days active) |
+| JournalStats | "Day Streak" with flame | "Days This Month" with calendar |
+| CompactStatsPills | "🔥 7d streak" pill | "✓ 12 days" (this month) |
+| StatsCards | "🔥 7 days" | "Showed up 12 times this month" |
+| EmotionDashboard | "Streak" label | "This Month" label |
+
+---
+
+## Component-by-Component Changes
+
+### 1. StreakCelebration.tsx → ReturnCelebration.tsx
+
+**Current**: Shows big streak number with fire emoji, week calendar highlighting consecutive days, "I'm committed 💪" button
+
+**New Design**:
+- Gentle illustration (leaf, sun, or heart) instead of fire
+- Message: "You showed up today" or "Welcome back" (after gap)
+- Show simple week view with checkmarks (not streak-based)
+- Button: "I'm here ✨" (present-focused, not commitment-focused)
+- For returning users (gap > 2 days): "Your strength is still here. Welcome back."
+
+### 2. JournalHeaderStats.tsx
+
+**Current**:
+```text
+📈 Total Entries | 🔥 Streak | 📅 This Month
+```
+
+**New**:
+```text
+📈 Total Entries | 📅 This Month | ✨ Returns
+```
+
+Changes:
+- Replace "streak" with "this month" (days with entries)
+- Replace flame icon with calendar or sparkle
+- Remove "day streak" label, use "this month" instead
+
+### 3. JournalStats.tsx
+
+**Current**: Shows "Day Streak" with flame icon in stats grid
+
+**New**: 
+- Change "Day Streak" to "Days This Month"
+- Replace Flame icon with Calendar icon
+- calculateStreak() function repurposed to count unique days this month
+
+### 4. CompactStatsPills.tsx
+
+**Current**: `{ icon: Flame, value: "7d", label: "streak" }`
+
+**New**: 
+- Icon: CheckCircle2 or Calendar (not Flame)
+- Value: "12 days" (this month count)
+- Label: "this month"
+- Remove "highlight: journalStreak >= 7" logic (no streak milestones)
+
+### 5. StatsCards.tsx
+
+**Current**: 
+```tsx
+{journalStreak > 0 ? `🔥 ${journalStreak} days` : 'Start today'}
+```
+
+**New**:
+```tsx
+{daysThisMonth > 0 ? `${daysThisMonth} days this month` : 'Start today'}
+```
+
+Remove fire emoji entirely.
+
+### 6. EmotionDashboard.tsx
+
+**Current**: Shows "Streak" label under flame icon
+
+**New**: 
+- Replace "Streak" with "This Month"
+- Replace Flame icon with Calendar or Sparkles icon
+- Keep the count but reframe it as presence, not continuity
+
+---
+
+## Hook Changes
+
+### useTaskPlanner.tsx
+
+**Current `updateStreak` function** (lines 1107-1164):
+- Resets `current_streak` to 1 if gap > 1 day
+- Increments streak on consecutive days
+
+**New `updatePresence` function**:
+- Never "resets" anything
+- Increments `total_active_days` on each unique day
+- Updates `last_active_date`
+- If gap > 2 days: increment `return_count` (celebrate the return)
+- Updates `this_month_active_days` cache
+
+**useUserStreak hook** (lines 398-417):
+- Rename to `useUserPresence`
+- Return `{ totalDays, thisMonthDays, returnCount, lastActiveDate }` instead of streak
+
+### useJournal.tsx / JournalStats
+
+Replace `calculateStreak()` with `calculateMonthlyPresence()`:
+- Count unique days with entries in current month
+- No concept of "breaking"
+
+### useEmotionLogs.tsx
+
+Replace streak calculation with monthly presence count.
+
+---
+
+## New Messages (StreakCelebration → ReturnCelebration)
+
+| Scenario | Current Message | New Message |
+|----------|----------------|-------------|
+| First activity | "Great start! Keep it going!" | "You showed up. That's strength." |
+| Same day return | (not triggered) | (no change) |
+| After 1 day | "Two days in a row!" | "You're here again. ✨" |
+| After 2+ day gap | Streak reset to 1 | "Welcome back. Your strength is still here." |
+| Weekly presence | "One full week!" | "7 days this month. You keep showing up." |
+| High presence | "30+ day streak!" | "You've shown up so many times. That's real strength." |
+
+---
+
+## Files to Modify
+
+### Components (UI Changes)
+1. `src/components/app/StreakCelebration.tsx` - Complete redesign
+2. `src/components/app/JournalHeaderStats.tsx` - Replace streak with monthly
+3. `src/components/app/JournalStats.tsx` - Replace streak calculation
+4. `src/components/dashboard/CompactStatsPills.tsx` - Replace streak pill
+5. `src/components/dashboard/StatsCards.tsx` - Replace journal streak display
+6. `src/components/emotion/EmotionDashboard.tsx` - Replace streak label
+
+### Hooks (Logic Changes)
+7. `src/hooks/useTaskPlanner.tsx` - Replace updateStreak with updatePresence
+8. `src/hooks/useEmotionLogs.tsx` - Replace streak with monthly count
+
+### Database
+9. Create migration to add new columns to `profiles` table
+10. Update TypeScript types
 
 ---
 
 ## Implementation Order
 
-1. **User-facing app files first** (what users see):
-   - HomeMenu.tsx
-   - TaskDetailModal.tsx
-   - AppTaskCreate.tsx
-   - TaskCard.tsx
-   - EmotionDashboard.tsx
-   - AppTour.tsx
-   - useTaskPlanner.tsx (toasts)
+**Phase 1: Database & Types**
+1. Create migration for new `profiles` columns
+2. Update Supabase types
 
-2. **Admin panel files second** (internal tools):
-   - Tools.tsx
-   - TasksBank.tsx
-   - RoutinesBank.tsx
+**Phase 2: Core Hook Changes**
+3. Modify `useTaskPlanner.tsx` - rename hook, change logic
+4. Modify `useEmotionLogs.tsx` - replace streak calculation
+
+**Phase 3: UI Updates**
+5. Transform `StreakCelebration.tsx` to `ReturnCelebration.tsx`
+6. Update `JournalHeaderStats.tsx`
+7. Update `JournalStats.tsx`
+8. Update `CompactStatsPills.tsx`
+9. Update `StatsCards.tsx`
+10. Update `EmotionDashboard.tsx`
 
 ---
 
 ## Result
 
-After these changes:
-- Users will see "Actions" and "Rituals" consistently everywhere
-- Admin panel will also use the new terminology for consistency
-- The Simora philosophy of gentle, intention-based language will be fully reflected in the UI
+After implementation:
+- No more "streak broken" anxiety
+- Returning after a gap is celebrated, not punished
+- Users see "You've shown up 15 days this month" instead of "🔥 3 day streak"
+- The celebration modal says "Your strength is still here" instead of counting consecutive days
+- Engagement comes from feeling welcomed, not from fear of loss
