@@ -466,7 +466,7 @@ const AppHome = () => {
                   const hasProgramEvents = programEventDates?.has(dateStr);
                   return <button key={day.toISOString()} onClick={() => setSelectedDate(day)} className="flex-1 flex justify-center">
                         {/* Pill wraps around both day name and number for selected */}
-                        <div className={cn('flex flex-col items-center px-2 py-1 rounded-full transition-all', isSelected && 'bg-[#E5D4F1] dark:bg-violet-800')}>
+                        <div className={cn('flex flex-col items-center px-2 py-1 rounded-full transition-all', isSelected && 'bg-violet-100 dark:bg-violet-900/40')}>
                           {/* Day name */}
                           <span className={cn('text-[11px] font-medium leading-tight', isSelected ? 'text-foreground/70' : 'text-foreground/50')}>
                             {format(day, 'EEE')}
