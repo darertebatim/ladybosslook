@@ -1084,11 +1084,16 @@ const AppTaskCreate = ({
                           setTimePeriod(period.id);
                         }}
                         className={cn(
-                          "flex flex-col items-center justify-center py-5 rounded-2xl transition-all",
-                          timePeriod === period.id 
-                            ? "bg-white dark:bg-slate-800 shadow-sm border-[1.5px] border-[#d1d5db]" 
-                            : "bg-[#f5f5f5] dark:bg-slate-800/50 border-[1.5px] border-[#e5e7eb]"
+                          "relative flex flex-col items-center justify-center py-5 rounded-2xl transition-all border outline-none",
+                          // Always show a base border so cards never look borderless
+                          "bg-muted/30 border-border",
+                          // Persistently show selection (not focus-only)
+                          timePeriod === period.id &&
+                            "bg-background shadow-sm border-primary ring-2 ring-primary ring-offset-2 ring-offset-background",
+                          // Keep keyboard accessibility without relying on browser default outline
+                          "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         )}
+                        aria-pressed={timePeriod === period.id}
                       >
                         {/* Icon based on period */}
                         <div className="mb-2">
@@ -1147,11 +1152,13 @@ const AppTaskCreate = ({
                       setTimePeriod(null);
                     }}
                     className={cn(
-                      "w-full py-3.5 rounded-2xl text-center font-medium transition-all border-2",
+                      "w-full py-3.5 rounded-2xl text-center font-medium transition-all border-2 outline-none",
                       derivedTimeMode === 'anytime'
-                        ? "border-emerald-500 text-emerald-600 bg-white dark:bg-slate-800"
-                        : "border-muted/50 text-muted-foreground bg-muted/30"
+                        ? "bg-background border-primary ring-2 ring-primary ring-offset-2 ring-offset-background"
+                        : "bg-muted/30 border-border text-muted-foreground",
+                      "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     )}
+                    aria-pressed={derivedTimeMode === 'anytime'}
                   >
                     Any time
                   </button>
