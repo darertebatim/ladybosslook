@@ -5,7 +5,7 @@ import { toast } from '@/hooks/use-toast';
 import { format, subDays, isEqual, parseISO } from 'date-fns';
 import { scheduleUrgentAlarm, cancelUrgentAlarms, isUrgentAlarmAvailable } from '@/lib/taskAlarm';
 import { scheduleTaskReminder, cancelTaskReminder, isLocalNotificationsAvailable } from '@/lib/localNotifications';
-import { getTimePeriodSortOrder } from '@/lib/taskScheduling';
+import { getTimePeriodSortOrder, TimePeriod } from '@/lib/taskScheduling';
 
 // ============================================
 // TYPES
@@ -20,7 +20,7 @@ export interface UserTask {
   color: TaskColor;
   scheduled_date: string | null;
   scheduled_time: string | null;
-  time_period: 'start_of_day' | 'morning' | 'afternoon' | 'evening' | 'night' | null;
+  time_period: TimePeriod | null;
   repeat_pattern: RepeatPattern;
   repeat_days: number[];
   reminder_enabled: boolean;
@@ -125,7 +125,7 @@ export interface CreateTaskInput {
   color?: TaskColor;
   scheduled_date?: string | null;
   scheduled_time?: string | null;
-  time_period?: 'start_of_day' | 'morning' | 'afternoon' | 'evening' | 'night' | null;
+  time_period?: TimePeriod | null;
   repeat_pattern?: RepeatPattern;
   repeat_days?: number[];
   reminder_enabled?: boolean;
@@ -151,7 +151,7 @@ export interface UpdateTaskInput extends Partial<CreateTaskInput> {
   linked_playlist_id?: string | null;
   pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | null;
   pro_link_value?: string | null;
-  time_period?: 'start_of_day' | 'morning' | 'afternoon' | 'evening' | 'night' | null;
+  time_period?: TimePeriod | null;
 }
 
 // Color mapping for UI - Me+ style brighter pastels

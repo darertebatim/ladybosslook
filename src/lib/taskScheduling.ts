@@ -7,10 +7,9 @@
 
 export type TimePeriod = 
   | 'start_of_day' 
-  | 'morning' 
   | 'afternoon' 
   | 'evening' 
-  | 'night';
+  | 'bedtime';
 
 export type TimeMode = 'anytime' | 'part_of_day' | 'specific';
 
@@ -18,6 +17,7 @@ export interface TimePeriodConfig {
   id: TimePeriod;
   label: string;
   emoji: string;
+  icon: 'sun' | 'mountains' | 'sunset' | 'moon';
   timeRange: { start: string; end: string }; // HH:mm format
   defaultReminder: string; // HH:mm format for push notifications
 }
@@ -25,22 +25,17 @@ export interface TimePeriodConfig {
 export const TIME_PERIODS: TimePeriodConfig[] = [
   { 
     id: 'start_of_day', 
-    label: 'Start of Day', 
+    label: 'Start the day', 
     emoji: '☀️', 
-    timeRange: { start: '06:00', end: '09:00' },
+    icon: 'sun',
+    timeRange: { start: '06:00', end: '12:00' },
     defaultReminder: '07:00' 
-  },
-  { 
-    id: 'morning', 
-    label: 'Morning', 
-    emoji: '🌤️', 
-    timeRange: { start: '09:00', end: '12:00' },
-    defaultReminder: '09:00' 
   },
   { 
     id: 'afternoon', 
     label: 'Afternoon', 
-    emoji: '🌞', 
+    emoji: '🏔️', 
+    icon: 'mountains',
     timeRange: { start: '12:00', end: '17:00' },
     defaultReminder: '12:00' 
   },
@@ -48,13 +43,15 @@ export const TIME_PERIODS: TimePeriodConfig[] = [
     id: 'evening', 
     label: 'Evening', 
     emoji: '🌅', 
+    icon: 'sunset',
     timeRange: { start: '17:00', end: '21:00' },
     defaultReminder: '18:00' 
   },
   { 
-    id: 'night', 
-    label: 'Night', 
+    id: 'bedtime', 
+    label: 'Bedtime', 
     emoji: '🌙', 
+    icon: 'moon',
     timeRange: { start: '21:00', end: '24:00' },
     defaultReminder: '21:00' 
   },
@@ -67,6 +64,18 @@ export function getTimeMode(task: { scheduled_time?: string | null; time_period?
   if (task.time_period) return 'part_of_day';
   if (task.scheduled_time) return 'specific';
   return 'anytime';
+}
+
+/**
+ * Normalize legacy time_period values to new 4-period system
+ */
+export function normalizeTimePeriod(timePeriod: string | null): TimePeriod | null {
+  if (!timePeriod) return null;
+  if (timePeriod === 'morning' || timePeriod === 'start_of_day') return 'start_of_day';
+  if (timePeriod === 'afternoon') return 'afternoon';
+  if (timePeriod === 'evening') return 'evening';
+  if (timePeriod === 'night' || timePeriod === 'bedtime') return 'bedtime';
+  return null;
 }
 
 /**
