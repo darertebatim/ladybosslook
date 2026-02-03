@@ -1084,10 +1084,10 @@ const AppTaskCreate = ({
                           setTimePeriod(period.id);
                         }}
                         className={cn(
-                          "flex flex-col items-center justify-center py-5 rounded-2xl transition-all border",
+                          "flex flex-col items-center justify-center py-5 rounded-2xl transition-all",
                           timePeriod === period.id 
-                            ? "bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 shadow-sm" 
-                            : "bg-muted/30 border-gray-200 dark:border-slate-700"
+                            ? "bg-white dark:bg-slate-800 shadow-sm border-[1.5px] border-[#d1d5db]" 
+                            : "bg-[#f5f5f5] dark:bg-slate-800/50 border-[1.5px] border-[#e5e7eb]"
                         )}
                       >
                         {/* Icon based on period */}
