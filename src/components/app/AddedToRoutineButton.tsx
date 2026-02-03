@@ -46,11 +46,11 @@ export const AddedToRoutineButton = ({
   const getAddedStyles = () => {
     switch (variant) {
       case 'emotion':
-        return "bg-emerald-500/30 text-white";
+        return "bg-success/30 text-white";
       case 'outline':
-        return "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100";
+        return "bg-success/10 border-success/30 text-success hover:bg-success/20";
       default:
-        return "bg-emerald-50 hover:bg-emerald-100 text-emerald-700";
+        return "bg-success/10 hover:bg-success/20 text-success";
     }
   };
 

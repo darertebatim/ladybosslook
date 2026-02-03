@@ -109,7 +109,7 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
             className={cn(
               "flex-shrink-0 p-2.5 rounded-full transition-colors",
               isAdded 
-                ? "bg-emerald-500 hover:bg-emerald-600" 
+                ? "bg-success hover:bg-success/90" 
                 : "bg-foreground hover:bg-foreground/90"
             )}
             aria-label={isAdded ? "Added to routine" : "Add to routine"}
