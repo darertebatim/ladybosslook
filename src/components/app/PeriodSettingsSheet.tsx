@@ -82,34 +82,32 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh]">
-        <DrawerHeader className="border-b border-pink-100 shrink-0">
+      <DrawerContent className="max-h-[80vh]">
+        <DrawerHeader className="border-b border-pink-100 shrink-0 py-3">
           <DrawerTitle className="text-pink-800">Period Settings</DrawerTitle>
         </DrawerHeader>
 
-        <div 
-          className="flex-1 p-4 space-y-6 overflow-y-auto overscroll-contain"
-          style={{ WebkitOverflowScrolling: 'touch' }}
-        >
+        <div className="p-4 space-y-4">
           {/* Last period start */}
-          <div className="space-y-2">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CalendarIcon className="h-4 w-4 text-pink-500" />
-              <span className="font-medium text-foreground">Last Period Start</span>
+              <span className="font-medium text-foreground text-sm">Last Period Start</span>
             </div>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
+                  size="sm"
                   className={cn(
-                    'w-full justify-start text-left font-normal border-pink-200',
+                    'font-normal border-pink-200 h-8',
                     !lastPeriodStart && 'text-muted-foreground'
                   )}
                 >
-                  {lastPeriodStart ? format(lastPeriodStart, 'PPP') : 'Select date'}
+                  {lastPeriodStart ? format(lastPeriodStart, 'MMM d, yyyy') : 'Select'}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0" align="end">
                 <Calendar
                   mode="single"
                   selected={lastPeriodStart}
@@ -125,11 +123,11 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
           </div>
 
           {/* Average cycle length */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <RotateCcw className="h-4 w-4 text-pink-500" />
-                <span className="font-medium text-foreground">Average Cycle Length</span>
+                <span className="font-medium text-foreground text-sm">Cycle Length</span>
               </div>
               <span className="text-sm font-semibold text-pink-600">{averageCycle} days</span>
             </div>
@@ -147,9 +145,9 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
           </div>
 
           {/* Average period length */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="font-medium text-foreground">Average Period Length</span>
+              <span className="font-medium text-foreground text-sm">Period Length</span>
               <span className="text-sm font-semibold text-pink-600">{averagePeriod} days</span>
             </div>
             <Slider
@@ -166,53 +164,51 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
           </div>
 
           {/* Reminder settings */}
-          <div className="space-y-4 border-t border-pink-100 pt-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Bell className="h-4 w-4 text-pink-500" />
-                <div>
-                  <p className="font-medium text-foreground">Period Reminders</p>
-                  <p className="text-xs text-muted-foreground">Get notified before your period</p>
-                </div>
+          <div className="flex items-center justify-between border-t border-pink-100 pt-3">
+            <div className="flex items-center gap-2">
+              <Bell className="h-4 w-4 text-pink-500" />
+              <div>
+                <p className="font-medium text-foreground text-sm">Reminders</p>
+                <p className="text-xs text-muted-foreground">Notify before period</p>
               </div>
-              <Switch
-                checked={reminderEnabled}
-                onCheckedChange={(checked) => {
-                  haptic.light();
-                  setReminderEnabled(checked);
-                }}
-                className="data-[state=checked]:bg-pink-500"
-              />
             </div>
-
-            {reminderEnabled && (
-              <div className="space-y-2 ml-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground">Days before to remind</span>
-                  <span className="text-sm font-semibold text-pink-600">{reminderDays} days</span>
-                </div>
-                <Slider
-                  value={[reminderDays]}
-                  onValueChange={(value) => {
-                    haptic.light();
-                    setReminderDays(value[0]);
-                  }}
-                  min={1}
-                  max={7}
-                  step={1}
-                  className="[&_[role=slider]]:bg-pink-500"
-                />
-              </div>
-            )}
+            <Switch
+              checked={reminderEnabled}
+              onCheckedChange={(checked) => {
+                haptic.light();
+                setReminderEnabled(checked);
+              }}
+              className="data-[state=checked]:bg-pink-500"
+            />
           </div>
 
+          {reminderEnabled && (
+            <div className="space-y-1 ml-6">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-foreground">Days before</span>
+                <span className="text-xs font-semibold text-pink-600">{reminderDays}</span>
+              </div>
+              <Slider
+                value={[reminderDays]}
+                onValueChange={(value) => {
+                  haptic.light();
+                  setReminderDays(value[0]);
+                }}
+                min={1}
+                max={7}
+                step={1}
+                className="[&_[role=slider]]:bg-pink-500"
+              />
+            </div>
+          )}
+
           {/* Show on home */}
-          <div className="flex items-center justify-between border-t border-pink-100 pt-4">
+          <div className="flex items-center justify-between border-t border-pink-100 pt-3">
             <div className="flex items-center gap-2">
               <Eye className="h-4 w-4 text-pink-500" />
               <div>
-                <p className="font-medium text-foreground">Show on Home</p>
-                <p className="text-xs text-muted-foreground">Display status card on home page</p>
+                <p className="font-medium text-foreground text-sm">Show on Home</p>
+                <p className="text-xs text-muted-foreground">Display on home page</p>
               </div>
             </div>
             <Switch
@@ -225,23 +221,24 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
             />
           </div>
 
-          {/* Deactivate section */}
-          <div className="border-t border-pink-100 pt-4">
+          {/* Actions */}
+          <div className="flex gap-3 pt-3 border-t border-pink-100">
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full text-destructive border-destructive/30 hover:bg-destructive/10"
+                  size="sm"
+                  className="text-destructive border-destructive/30 hover:bg-destructive/10"
                 >
-                  <Power className="h-4 w-4 mr-2" />
-                  Deactivate Period Tracker
+                  <Power className="h-4 w-4 mr-1" />
+                  Deactivate
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Deactivate Period Tracker?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will hide the period tracker from your app. Your data will be kept and you can reactivate it anytime from Tools.
+                    This will hide the tracker. Your data will be kept and you can reactivate anytime from Tools.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -255,21 +252,15 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+            
+            <Button
+              onClick={handleSave}
+              disabled={upsertSettings.isPending}
+              className="flex-1 bg-pink-500 hover:bg-pink-600 text-white"
+            >
+              {upsertSettings.isPending ? 'Saving...' : 'Save Settings'}
+            </Button>
           </div>
-        </div>
-
-        {/* Save button - with safe area */}
-        <div 
-          className="shrink-0 p-4 border-t border-pink-100"
-          style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
-        >
-          <Button
-            onClick={handleSave}
-            disabled={upsertSettings.isPending}
-            className="w-full bg-pink-500 hover:bg-pink-600 text-white"
-          >
-            {upsertSettings.isPending ? 'Saving...' : 'Save Settings'}
-          </Button>
         </div>
       </DrawerContent>
     </Drawer>
