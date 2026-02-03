@@ -2645,6 +2645,41 @@ export type Database = {
         }
         Relationships: []
       }
+      task_skips: {
+        Row: {
+          created_at: string
+          id: string
+          skipped_date: string
+          snoozed_to_date: string | null
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          skipped_date: string
+          snoozed_to_date?: string | null
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          skipped_date?: string
+          snoozed_to_date?: string | null
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_skips_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "user_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_admin_permissions: {
         Row: {
           created_at: string | null

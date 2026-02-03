@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
 import { User, NotebookPen, Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Wind, Droplets, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask } from '@/hooks/useTaskPlanner';
+import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { useNewHomeData } from '@/hooks/useNewHomeData';
 import { TaskCard } from '@/components/app/TaskCard';
@@ -31,6 +31,7 @@ import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
 import { WaterTrackingScreen } from '@/components/app/WaterTrackingScreen';
 import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
+import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
 import { toast } from 'sonner';
 const AppHome = () => {
   const navigate = useNavigate();
@@ -55,6 +56,9 @@ const AppHome = () => {
   
   // Water tracking screen state
   const [waterTask, setWaterTask] = useState<UserTask | null>(null);
+  
+  // Skip task state
+  const [skipTask, setSkipTask] = useState<UserTask | null>(null);
 
   const {
     run: runTour,
@@ -101,6 +105,9 @@ const AppHome = () => {
     data: completions,
     isLoading: completionsLoading
   } = useCompletionsForDate(selectedDate);
+  const {
+    data: skippedTaskIds = new Set<string>()
+  } = useSkipsForDate(selectedDate);
   const {
     data: streak
   } = useUserStreak();
@@ -168,11 +175,14 @@ const AppHome = () => {
     data: programEventDates
   } = useProgramEventDates(dateRange.start, dateRange.end);
 
-  // Filter tasks by tag
+  // Filter tasks by tag and exclude skipped tasks
   const filteredTasks = useMemo(() => {
-    if (!selectedTag) return tasks;
-    return tasks.filter(task => task.tag === selectedTag);
-  }, [tasks, selectedTag]);
+    let result = tasks.filter(task => !skippedTaskIds.has(task.id));
+    if (selectedTag) {
+      result = result.filter(task => task.tag === selectedTag);
+    }
+    return result;
+  }, [tasks, selectedTag, skippedTaskIds]);
 
   // Get unique tags from tasks
   const taskTags = useMemo(() => {
@@ -315,6 +325,12 @@ const AppHome = () => {
       }
     });
   }, [deleteTask]);
+  
+  const handleSkipTask = useCallback((task: UserTask) => {
+    setSelectedTask(null);
+    setSkipTask(task);
+  }, []);
+  
   const handleTaskTap = useCallback((task: UserTask) => {
     setSelectedTask(task);
   }, []);
@@ -620,10 +636,19 @@ const AppHome = () => {
           onOpenGoalInput={handleOpenGoalInput}
           onOpenTimer={handleOpenTimer}
           onOpenWaterTracking={handleOpenWaterTracking}
+          onSkip={handleSkipTask}
         />
 
         {/* Streak celebration modal */}
         <StreakCelebration open={showStreakModal} onClose={() => setShowStreakModal(false)} />
+
+        {/* Task Skip Sheet */}
+        <TaskSkipSheet
+          task={skipTask}
+          open={!!skipTask}
+          onClose={() => setSkipTask(null)}
+          date={selectedDate}
+        />
 
         {/* Goal Input Sheet */}
         <GoalInputSheet

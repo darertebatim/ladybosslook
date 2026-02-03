@@ -1,4 +1,4 @@
-import { Check, X, Pencil, Plus, Play, Droplets, Trash2 } from 'lucide-react';
+import { Check, X, Pencil, Plus, Play, Droplets, Trash2, FastForward } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
@@ -31,6 +31,7 @@ interface TaskDetailModalProps {
   onOpenGoalInput?: (task: UserTask) => void;
   onOpenTimer?: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
+  onSkip?: (task: UserTask) => void;
 }
 
 export const TaskDetailModal = ({
@@ -47,6 +48,7 @@ export const TaskDetailModal = ({
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
+  onSkip,
 }: TaskDetailModalProps) => {
   const navigate = useNavigate();
   const { data: subtasks = [] } = useSubtasks(task?.id);
@@ -298,6 +300,21 @@ export const TaskDetailModal = ({
                 return <ProIcon className="h-5 w-5" />;
               })()}
               {proConfig.badgeText}
+            </Button>
+          )}
+          
+          {/* Skip button - show if not completed */}
+          {!isCompleted && !goalReached && onSkip && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                onClose();
+                onSkip(task);
+              }}
+              className="w-full gap-2 h-12 rounded-2xl border-foreground/20 bg-white/50 hover:bg-white/70 text-foreground/70"
+            >
+              <FastForward className="h-4 w-4" />
+              Skip for Today
             </Button>
           )}
           
