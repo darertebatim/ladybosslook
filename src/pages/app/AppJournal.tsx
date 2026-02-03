@@ -11,37 +11,25 @@ import { JournalReminderSettings } from '@/components/app/JournalReminderSetting
 import { JournalHeaderStats } from '@/components/app/JournalHeaderStats';
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
-import { format, startOfDay, differenceInDays, subDays, isAfter } from 'date-fns';
+import { format, startOfDay, startOfMonth, subDays, isAfter } from 'date-fns';
 
-// Calculate streak from entries
-const calculateStreak = (entries: any[]): number => {
+// Calculate monthly presence - unique days with entries this month
+// Replaces streak calculation (strength-first philosophy)
+const calculateMonthlyPresence = (entries: any[]): number => {
   if (!entries || entries.length === 0) return 0;
 
-  const sortedDates = entries
-    .map(e => startOfDay(new Date(e.created_at)))
-    .sort((a, b) => b.getTime() - a.getTime());
-
-  const uniqueDates = sortedDates.filter((date, index, self) => 
-    index === 0 || self[index - 1].getTime() !== date.getTime()
-  );
-
-  const today = startOfDay(new Date());
-  const mostRecent = uniqueDates[0];
-  if (differenceInDays(today, mostRecent) > 1) {
-    return 0;
-  }
-
-  let streak = 1;
-  for (let i = 1; i < uniqueDates.length; i++) {
-    const diff = differenceInDays(uniqueDates[i - 1], uniqueDates[i]);
-    if (diff === 1) {
-      streak++;
-    } else {
-      break;
+  const monthStart = startOfMonth(new Date());
+  
+  const uniqueDays = new Set<string>();
+  
+  entries.forEach(entry => {
+    const entryDate = new Date(entry.created_at);
+    if (entryDate >= monthStart) {
+      uniqueDays.add(format(entryDate, 'yyyy-MM-dd'));
     }
-  }
+  });
 
-  return streak;
+  return uniqueDays.size;
 };
 
 const AppJournal = () => {
@@ -51,9 +39,9 @@ const AppJournal = () => {
   
   const { data: entries, isLoading } = useJournalEntries(searchQuery);
 
-  // Calculate stats
+  // Calculate stats - strength-first: monthly presence, not streak
   const stats = useMemo(() => {
-    if (!entries) return { totalEntries: 0, streak: 0, thisMonth: 0 };
+    if (!entries) return { totalEntries: 0, daysThisMonth: 0, thisMonth: 0 };
 
     const today = startOfDay(new Date());
     const thirtyDaysAgo = subDays(today, 30);
@@ -64,7 +52,7 @@ const AppJournal = () => {
 
     return {
       totalEntries: entries.length,
-      streak: calculateStreak(entries),
+      daysThisMonth: calculateMonthlyPresence(entries),
       thisMonth,
     };
   }, [entries]);
@@ -141,8 +129,7 @@ const AppJournal = () => {
         <div className="px-4 pb-3">
           <JournalHeaderStats 
             totalEntries={stats.totalEntries}
-            streak={stats.streak}
-            thisMonth={stats.thisMonth}
+            thisMonth={stats.daysThisMonth}
           />
         </div>
         

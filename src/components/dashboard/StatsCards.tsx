@@ -1,19 +1,23 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Headphones, Newspaper, CheckCircle2, NotebookPen } from "lucide-react";
+import { Headphones, Newspaper, CheckCircle2, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface StatsCardsProps {
   listeningMinutes: number;
   unreadPosts: number;
   completedTracks: number;
-  journalStreak: number;
+  daysThisMonth: number; // Renamed from journalStreak - depth of return
 }
 
+/**
+ * Stats Cards - Strength-first metrics
+ * Replaced streak display with "days this month" (depth of return)
+ */
 export function StatsCards({ 
   listeningMinutes, 
   unreadPosts, 
   completedTracks, 
-  journalStreak 
+  daysThisMonth 
 }: StatsCardsProps) {
   const navigate = useNavigate();
 
@@ -82,7 +86,7 @@ export function StatsCards({
         </CardContent>
       </Card>
 
-      {/* Journal */}
+      {/* Journal - Days This Month (not streak) */}
       <Card 
         className="overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors"
         onClick={() => navigate('/app/journal')}
@@ -92,11 +96,11 @@ export function StatsCards({
             <div>
               <p className="text-xs lg:text-sm font-medium text-muted-foreground">Journal</p>
               <h3 className="text-xl lg:text-2xl font-bold mt-0.5 lg:mt-2">
-                {journalStreak > 0 ? `🔥 ${journalStreak} days` : 'Start today'}
+                {daysThisMonth > 0 ? `${daysThisMonth} days` : 'Start today'}
               </h3>
             </div>
             <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-violet-500/10 flex items-center justify-center">
-              <NotebookPen className="h-4 w-4 lg:h-6 lg:w-6 text-violet-600" />
+              <Calendar className="h-4 w-4 lg:h-6 lg:w-6 text-violet-600" />
             </div>
           </div>
         </CardContent>

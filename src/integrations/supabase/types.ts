@@ -1618,9 +1618,13 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          last_active_date: string | null
           phone: string | null
+          return_count: number | null
           state: string | null
+          this_month_active_days: number | null
           timezone: string | null
+          total_active_days: number | null
           updated_at: string
         }
         Insert: {
@@ -1632,9 +1636,13 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          last_active_date?: string | null
           phone?: string | null
+          return_count?: number | null
           state?: string | null
+          this_month_active_days?: number | null
           timezone?: string | null
+          total_active_days?: number | null
           updated_at?: string
         }
         Update: {
@@ -1646,9 +1654,13 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          last_active_date?: string | null
           phone?: string | null
+          return_count?: number | null
           state?: string | null
+          this_month_active_days?: number | null
           timezone?: string | null
+          total_active_days?: number | null
           updated_at?: string
         }
         Relationships: []

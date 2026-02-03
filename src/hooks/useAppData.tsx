@@ -56,7 +56,7 @@ interface HomeData {
   listeningMinutes: number;
   completedTracks: number;
   unreadPosts: number;
-  journalStreak: number;
+  daysThisMonth: number; // Renamed from journalStreak - strength-first
 }
 
 interface CoursesData {
@@ -138,29 +138,22 @@ async function fetchHomeData(userId: string): Promise<HomeData> {
   const readPostIds = new Set((readPostsRes.data || []).map(r => r.post_id));
   const unreadPosts = (allPostsRes.data || []).filter(p => !readPostIds.has(p.id)).length;
 
-  // Calculate journal streak
-  let journalStreak = 0;
+  // Calculate monthly presence (replaces streak - strength-first philosophy)
+  let daysThisMonth = 0;
   const entries = journalEntriesRes.data || [];
   if (entries.length > 0) {
-    // Get unique dates with entries
-    const entryDates = new Set(
-      entries.map(e => new Date(e.created_at).toDateString())
-    );
-    
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    let checkDate = new Date(today);
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const uniqueDays = new Set<string>();
     
-    // Allow streak to continue if wrote today OR yesterday
-    if (!entryDates.has(checkDate.toDateString())) {
-      checkDate.setDate(checkDate.getDate() - 1);
-    }
+    entries.forEach(e => {
+      const entryDate = new Date(e.created_at);
+      if (entryDate >= monthStart) {
+        uniqueDays.add(entryDate.toDateString());
+      }
+    });
     
-    // Count consecutive days
-    while (entryDates.has(checkDate.toDateString())) {
-      journalStreak++;
-      checkDate.setDate(checkDate.getDate() - 1);
-    }
+    daysThisMonth = uniqueDays.size;
   }
 
   return {
@@ -171,7 +164,7 @@ async function fetchHomeData(userId: string): Promise<HomeData> {
     listeningMinutes: Math.floor(listeningSeconds / 60),
     completedTracks,
     unreadPosts,
-    journalStreak,
+    daysThisMonth,
   };
 }
 
@@ -207,7 +200,7 @@ export function useHomeData() {
     listeningMinutes: query.data?.listeningMinutes || 0,
     completedTracks: query.data?.completedTracks || 0,
     unreadPosts: query.data?.unreadPosts || 0,
-    journalStreak: query.data?.journalStreak || 0,
+    daysThisMonth: query.data?.daysThisMonth || 0,
   };
 }
 

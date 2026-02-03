@@ -357,12 +357,12 @@ const AppHome = () => {
 
   // Check if viewing a future date
   const isFutureDate = !isToday(selectedDate) && !isBefore(startOfDay(selectedDate), startOfDay(new Date()));
-  // Home data defaults
+  // Home data defaults - strength-first: daysThisMonth replaces journalStreak
   const {
     listeningMinutes = 0,
     unreadPosts = 0,
     completedTracks = 0,
-    journalStreak = 0,
+    daysThisMonth = 0,
     activeRounds = [],
     nextSessionMap = new Map()
   } = homeData || {};

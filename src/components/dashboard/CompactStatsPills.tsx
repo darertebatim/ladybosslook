@@ -1,18 +1,22 @@
 import { Link } from 'react-router-dom';
-import { Headphones, MessageCircle, CheckCircle2, Flame } from 'lucide-react';
+import { Headphones, MessageCircle, CheckCircle2, Calendar } from 'lucide-react';
 
 interface CompactStatsPillsProps {
   listeningMinutes: number;
   unreadPosts: number;
   completedTracks: number;
-  journalStreak: number;
+  daysThisMonth: number; // Renamed from journalStreak
 }
 
+/**
+ * Compact Stats Pills - Strength-first metrics
+ * Replaced streak (consecutive days) with "days this month" (depth of return)
+ */
 export function CompactStatsPills({
   listeningMinutes,
   unreadPosts,
   completedTracks,
-  journalStreak,
+  daysThisMonth,
 }: CompactStatsPillsProps) {
   const formatListening = (minutes: number) => {
     if (minutes < 60) return `${minutes}m`;
@@ -45,12 +49,11 @@ export function CompactStatsPills({
       color: 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300',
     },
     {
-      icon: Flame,
-      value: journalStreak > 0 ? `${journalStreak}d` : '0d',
-      label: 'streak',
+      icon: Calendar,
+      value: daysThisMonth > 0 ? `${daysThisMonth}d` : '0d',
+      label: 'this month',
       to: '/app/journal',
-      color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300',
-      highlight: journalStreak >= 7,
+      color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300',
     },
   ];
 

@@ -11,7 +11,7 @@ interface NewHomeData {
   listeningMinutes: number;
   completedTracks: number;
   unreadPosts: number;
-  journalStreak: number;
+  daysThisMonth: number; // Renamed from journalStreak - strength-first
   todayTasksCount: number;
   todayCompletedCount: number;
   activeRounds: any[];
@@ -114,22 +114,21 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
   const readPostIds = new Set((readPostsRes.data || []).map(r => r.post_id));
   const unreadPosts = (allPostsRes.data || []).filter(p => !readPostIds.has(p.id)).length;
 
-  // Calculate journal streak
-  let journalStreak = 0;
+  // Calculate monthly presence (replaces streak - strength-first philosophy)
+  let daysThisMonth = 0;
   const entries = journalEntriesRes.data || [];
   if (entries.length > 0) {
-    const entryDates = new Set(
-      entries.map(e => new Date(e.created_at).toDateString())
-    );
-    const checkDate = new Date(today);
-    checkDate.setHours(0, 0, 0, 0);
-    if (!entryDates.has(checkDate.toDateString())) {
-      checkDate.setDate(checkDate.getDate() - 1);
-    }
-    while (entryDates.has(checkDate.toDateString())) {
-      journalStreak++;
-      checkDate.setDate(checkDate.getDate() - 1);
-    }
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const uniqueDays = new Set<string>();
+    
+    entries.forEach(e => {
+      const entryDate = new Date(e.created_at);
+      if (entryDate >= monthStart) {
+        uniqueDays.add(entryDate.toDateString());
+      }
+    });
+    
+    daysThisMonth = uniqueDays.size;
   }
 
   // Filter tasks for today
@@ -224,7 +223,7 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     listeningMinutes: Math.floor(listeningSeconds / 60),
     completedTracks,
     unreadPosts,
-    journalStreak,
+    daysThisMonth,
     todayTasksCount: todayTasks.length,
     todayCompletedCount,
     activeRounds,
@@ -252,7 +251,7 @@ export function useNewHomeData() {
     listeningMinutes: query.data?.listeningMinutes || 0,
     completedTracks: query.data?.completedTracks || 0,
     unreadPosts: query.data?.unreadPosts || 0,
-    journalStreak: query.data?.journalStreak || 0,
+    daysThisMonth: query.data?.daysThisMonth || 0,
     todayTasksCount: query.data?.todayTasksCount || 0,
     todayCompletedCount: query.data?.todayCompletedCount || 0,
     activeRounds: query.data?.activeRounds || [],

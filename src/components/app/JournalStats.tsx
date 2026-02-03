@@ -2,48 +2,35 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { NotebookPen, Flame, Calendar, TrendingUp, ChevronRight } from 'lucide-react';
+import { NotebookPen, Calendar, TrendingUp, ChevronRight, Sparkles } from 'lucide-react';
 import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
-import { format, differenceInDays, startOfDay, subDays, isAfter } from 'date-fns';
+import { format, startOfMonth, startOfDay, subDays, isAfter } from 'date-fns';
 import { getMoodEmoji } from './MoodSelector';
 
 interface JournalStatsProps {
   className?: string;
 }
 
-const calculateStreak = (entries: JournalEntry[]): number => {
+/**
+ * Calculate monthly presence - unique days with entries this month
+ * Replaces streak calculation (strength-first philosophy)
+ */
+const calculateMonthlyPresence = (entries: JournalEntry[]): number => {
   if (!entries || entries.length === 0) return 0;
 
-  // Sort by date descending
-  const sortedDates = entries
-    .map(e => startOfDay(new Date(e.created_at)))
-    .sort((a, b) => b.getTime() - a.getTime());
-
-  // Remove duplicates (multiple entries same day)
-  const uniqueDates = sortedDates.filter((date, index, self) => 
-    index === 0 || self[index - 1].getTime() !== date.getTime()
-  );
-
-  const today = startOfDay(new Date());
-  const yesterday = subDays(today, 1);
+  const monthStart = startOfMonth(new Date());
   
-  // Check if most recent entry is today or yesterday
-  const mostRecent = uniqueDates[0];
-  if (differenceInDays(today, mostRecent) > 1) {
-    return 0; // Streak broken
-  }
-
-  let streak = 1;
-  for (let i = 1; i < uniqueDates.length; i++) {
-    const diff = differenceInDays(uniqueDates[i - 1], uniqueDates[i]);
-    if (diff === 1) {
-      streak++;
-    } else {
-      break;
+  // Get unique days this month
+  const uniqueDays = new Set<string>();
+  
+  entries.forEach(entry => {
+    const entryDate = new Date(entry.created_at);
+    if (entryDate >= monthStart) {
+      uniqueDays.add(format(entryDate, 'yyyy-MM-dd'));
     }
-  }
+  });
 
-  return streak;
+  return uniqueDays.size;
 };
 
 const getMoodStats = (entries: JournalEntry[]): { emoji: string; count: number }[] => {
@@ -63,12 +50,16 @@ const getMoodStats = (entries: JournalEntry[]): { emoji: string; count: number }
     .slice(0, 4);
 };
 
+/**
+ * Journal Stats - Strength-first metrics
+ * Replaced "Day Streak" with "Days This Month" (depth of return)
+ */
 export const JournalStats = ({ className }: JournalStatsProps) => {
   const navigate = useNavigate();
   const { data: entries, isLoading } = useJournalEntries();
 
   const stats = useMemo(() => {
-    if (!entries) return { totalEntries: 0, streak: 0, thisMonth: 0, moodStats: [] };
+    if (!entries) return { totalEntries: 0, daysThisMonth: 0, thisMonth: 0, moodStats: [] };
 
     const today = startOfDay(new Date());
     const thirtyDaysAgo = subDays(today, 30);
@@ -79,7 +70,7 @@ export const JournalStats = ({ className }: JournalStatsProps) => {
 
     return {
       totalEntries: entries.length,
-      streak: calculateStreak(entries),
+      daysThisMonth: calculateMonthlyPresence(entries),
       thisMonth,
       moodStats: getMoodStats(entries),
     };
@@ -130,7 +121,7 @@ export const JournalStats = ({ className }: JournalStatsProps) => {
           </div>
         ) : (
           <>
-            {/* Stats Grid */}
+            {/* Stats Grid - Strength-first: no streak, just presence */}
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <div className="flex items-center justify-center gap-1 text-primary mb-1">
@@ -140,15 +131,15 @@ export const JournalStats = ({ className }: JournalStatsProps) => {
                 <p className="text-xs text-muted-foreground">Total Entries</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3 text-center">
-                <div className="flex items-center justify-center gap-1 text-orange-500 mb-1">
-                  <Flame className="h-4 w-4" />
+                <div className="flex items-center justify-center gap-1 text-violet-500 mb-1">
+                  <Calendar className="h-4 w-4" />
                 </div>
-                <p className="text-xl font-bold">{stats.streak}</p>
-                <p className="text-xs text-muted-foreground">Day Streak</p>
+                <p className="text-xl font-bold">{stats.daysThisMonth}</p>
+                <p className="text-xs text-muted-foreground">Days This Month</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3 text-center">
-                <div className="flex items-center justify-center gap-1 text-blue-500 mb-1">
-                  <Calendar className="h-4 w-4" />
+                <div className="flex items-center justify-center gap-1 text-amber-500 mb-1">
+                  <Sparkles className="h-4 w-4" />
                 </div>
                 <p className="text-xl font-bold">{stats.thisMonth}</p>
                 <p className="text-xs text-muted-foreground">This Month</p>

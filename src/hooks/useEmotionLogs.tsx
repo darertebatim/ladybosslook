@@ -24,36 +24,25 @@ export interface CreateEmotionLogInput {
   notes?: string;
 }
 
-// Calculate streak (consecutive days with at least one log)
-const calculateStreak = (logs: EmotionLog[]): number => {
+// Calculate monthly presence (unique days with logs this month)
+// Replaces streak calculation - strength-first philosophy
+const calculateMonthlyPresence = (logs: EmotionLog[]): number => {
   if (logs.length === 0) return 0;
   
-  // Get unique days, sorted descending (most recent first)
-  const uniqueDays = [...new Set(logs.map(log => 
-    startOfDay(new Date(log.created_at)).toISOString()
-  ))].sort().reverse();
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   
-  if (uniqueDays.length === 0) return 0;
+  // Get unique days this month
+  const uniqueDays = new Set<string>();
   
-  const today = startOfDay(new Date());
-  const mostRecent = new Date(uniqueDays[0]);
-  
-  // If no log today or yesterday, streak is 0
-  const daysSinceMostRecent = differenceInDays(today, mostRecent);
-  if (daysSinceMostRecent > 1) return 0;
-  
-  let streak = 1;
-  for (let i = 1; i < uniqueDays.length; i++) {
-    const current = new Date(uniqueDays[i - 1]);
-    const prev = new Date(uniqueDays[i]);
-    if (differenceInDays(current, prev) === 1) {
-      streak++;
-    } else {
-      break;
+  logs.forEach(log => {
+    const logDate = new Date(log.created_at);
+    if (logDate >= monthStart) {
+      uniqueDays.add(startOfDay(logDate).toISOString());
     }
-  }
+  });
   
-  return streak;
+  return uniqueDays.size;
 };
 
 export const useEmotionLogs = () => {
@@ -145,8 +134,8 @@ export const useEmotionLogs = () => {
     return new Date(log.created_at) >= weekAgo;
   });
 
-  // Calculate streak
-  const streak = calculateStreak(logs);
+  // Calculate monthly presence (replaces streak)
+  const thisMonthDays = calculateMonthlyPresence(logs);
 
   // Stats helpers
   const thisWeekCount = recentLogs.length;
@@ -172,8 +161,8 @@ export const useEmotionLogs = () => {
     error,
     createLog,
     deleteLog,
-    // Stats
-    streak,
+    // Stats - strength-first: monthly presence, not streak
+    thisMonthDays,
     thisWeekCount,
     thisMonthCount,
     valenceBreakdown,
