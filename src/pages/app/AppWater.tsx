@@ -338,24 +338,42 @@ const AppWater = () => {
           </button>
 
           {/* Add to Routine button */}
-          <button
-            onClick={() => {
-              haptic.light();
-              if (!waterTask) {
+          {waterTask ? (
+            <>
+              {/* Added state - show check with re-add option */}
+              <button
+                onClick={() => {
+                  haptic.light();
+                  navigate('/app/home');
+                }}
+                className="w-14 h-14 rounded-full bg-emerald-500 shadow-lg flex items-center justify-center"
+                title="Added — Go to Planner"
+              >
+                <Check className="h-6 w-6 text-white" />
+              </button>
+              {/* Re-add button */}
+              <button
+                onClick={() => {
+                  haptic.light();
+                  setShowRoutineSheet(true);
+                }}
+                className="w-10 h-10 rounded-full bg-foreground shadow-lg flex items-center justify-center"
+                title="Add again"
+              >
+                <CalendarPlus className="h-5 w-5 text-background" />
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => {
+                haptic.light();
                 handleOpenRoutineSheet();
-              }
-            }}
-            className={cn(
-              "w-14 h-14 rounded-full shadow-lg flex items-center justify-center",
-              waterTask ? "bg-emerald-500" : "bg-foreground"
-            )}
-          >
-            {waterTask ? (
-              <Check className="h-6 w-6 text-white" />
-            ) : (
+              }}
+              className="w-14 h-14 rounded-full bg-foreground shadow-lg flex items-center justify-center"
+            >
               <CalendarPlus className="h-6 w-6 text-background" />
-            )}
-          </button>
+            </button>
+          )}
         </div>
 
         {/* Animation styles */}

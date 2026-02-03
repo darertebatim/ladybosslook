@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Settings, Heart, ChevronLeft, ChevronRight, CalendarPlus } from 'lucide-react';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, isSameDay, isToday } from 'date-fns';
+import { X, Settings, Heart, ChevronLeft, ChevronRight, CalendarPlus, Check } from 'lucide-react';
+import { format, addMonths, subMonths } from 'date-fns';
 import { 
   usePeriodSettings, 
   usePeriodLogsForMonth, 
@@ -10,29 +10,94 @@ import {
   useLogPeriodDay,
   useDeletePeriodLog
 } from '@/hooks/usePeriodTracker';
+import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
+import { useCreateTask } from '@/hooks/useTaskPlanner';
 import { PeriodOnboarding } from '@/components/app/PeriodOnboarding';
 import { PeriodDaySheet } from '@/components/app/PeriodDaySheet';
 import { PeriodSettingsSheet } from '@/components/app/PeriodSettingsSheet';
 import { PeriodCalendar } from '@/components/app/PeriodCalendar';
 import { PeriodCycleInsights } from '@/components/app/PeriodCycleInsights';
+import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
+import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 import { cn } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
+
+// Synthetic task for period routine
+const SYNTHETIC_PERIOD_TASK: RoutinePlanTask = {
+  id: 'period-routine-template',
+  plan_id: 'synthetic-period',
+  title: 'Period Tracker',
+  icon: '❤️',
+  color: 'pink',
+  task_order: 0,
+  is_active: true,
+  created_at: new Date().toISOString(),
+  linked_playlist_id: null,
+  pro_link_type: 'period',
+  pro_link_value: null,
+  linked_playlist: null,
+};
 
 const AppPeriod = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDaySheet, setShowDaySheet] = useState(false);
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
+  const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
+  const [isSavingRoutine, setIsSavingRoutine] = useState(false);
   
   const { status, settings, isLoading, hasCompletedOnboarding } = useCycleStatusWithLoading();
   const { data: monthLogs = [] } = usePeriodLogsForMonth(currentMonth);
   const { predictedPeriodDays, ovulationDays } = usePredictedDays(currentMonth);
+  const { data: existingTask } = useExistingProTask('period');
   
   const logPeriodDay = useLogPeriodDay();
   const deletePeriodLog = useDeletePeriodLog();
+  const createTask = useCreateTask();
+
+  const isAdded = existingTask || justAdded;
+
+  // Handle saving routine - create period task directly
+  const handleSaveRoutine = useCallback((selectedTaskIds: string[], editedTasks: EditedTask[]) => {
+    const editedPeriod = editedTasks.find(t => t.id === 'period-routine-template');
+    
+    setIsSavingRoutine(true);
+    
+    createTask.mutate(
+      {
+        title: editedPeriod?.title || 'Period Tracker ❤️',
+        emoji: editedPeriod?.icon || '❤️',
+        color: (editedPeriod?.color || 'pink') as 'pink',
+        repeat_pattern: editedPeriod?.repeatPattern || 'daily',
+        scheduled_time: editedPeriod?.scheduledTime || null,
+        tag: editedPeriod?.tag || 'Period',
+        reminder_enabled: editedPeriod?.reminderEnabled || false,
+        pro_link_type: 'period',
+        pro_link_value: null,
+      },
+      {
+        onSuccess: () => {
+          haptic.success();
+          toast.success('Period tracking added to your routine!');
+          setShowRoutineSheet(false);
+          setJustAdded(true);
+          setIsSavingRoutine(false);
+          queryClient.invalidateQueries({ queryKey: ['planner-tasks-for-date'] });
+        },
+        onError: (error) => {
+          console.error('Error adding period task:', error);
+          toast.error('Failed to add period tracking');
+          setIsSavingRoutine(false);
+        },
+      }
+    );
+  }, [createTask, queryClient]);
 
   // Get logged period days for current month
   const loggedPeriodDays = useMemo(() => {
@@ -232,7 +297,7 @@ const AppPeriod = () => {
 
         {/* Fixed Bottom action */}
         <div 
-          className="absolute bottom-0 left-0 right-0 z-20 flex items-center justify-center gap-4 px-6 bg-gradient-to-t from-white/90 to-transparent pt-6"
+          className="absolute bottom-0 left-0 right-0 z-20 flex items-center justify-center gap-3 px-6 bg-gradient-to-t from-white/90 to-transparent pt-6"
           style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
         >
           <button
@@ -241,11 +306,50 @@ const AppPeriod = () => {
               setSelectedDate(new Date());
               setShowDaySheet(true);
             }}
-            className="flex-1 max-w-[280px] h-14 rounded-full bg-pink-500 shadow-lg flex items-center justify-center gap-2 text-white font-semibold active:scale-[0.98] transition-transform"
+            className="flex-1 max-w-[220px] h-14 rounded-full bg-pink-500 shadow-lg flex items-center justify-center gap-2 text-white font-semibold active:scale-[0.98] transition-transform"
           >
             <Heart className="h-5 w-5" />
             Log Today
           </button>
+
+          {/* Add to Routine button */}
+          {isAdded ? (
+            <>
+              {/* Added state - show check with re-add option */}
+              <button
+                onClick={() => {
+                  haptic.light();
+                  navigate('/app/home');
+                }}
+                className="w-12 h-12 rounded-full bg-emerald-500 shadow-lg flex items-center justify-center active:scale-95 transition-transform"
+                title="Added — Go to Planner"
+              >
+                <Check className="h-5 w-5 text-white" />
+              </button>
+              {/* Re-add button */}
+              <button
+                onClick={() => {
+                  haptic.light();
+                  setShowRoutineSheet(true);
+                }}
+                className="w-10 h-10 rounded-full bg-foreground shadow-lg flex items-center justify-center active:scale-95 transition-transform"
+                title="Add again"
+              >
+                <CalendarPlus className="h-4 w-4 text-background" />
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => {
+                haptic.light();
+                setShowRoutineSheet(true);
+              }}
+              className="w-12 h-12 rounded-full bg-foreground shadow-lg flex items-center justify-center active:scale-95 transition-transform"
+              title="Add to Routine"
+            >
+              <CalendarPlus className="h-5 w-5 text-background" />
+            </button>
+          )}
         </div>
 
         {/* Animation styles */}
@@ -281,6 +385,16 @@ const AppPeriod = () => {
       <PeriodSettingsSheet
         open={showSettingsSheet}
         onOpenChange={setShowSettingsSheet}
+      />
+
+      {/* Routine preview sheet */}
+      <RoutinePreviewSheet
+        open={showRoutineSheet}
+        onOpenChange={setShowRoutineSheet}
+        tasks={[SYNTHETIC_PERIOD_TASK]}
+        routineTitle="Period Tracking"
+        onSave={handleSaveRoutine}
+        isSaving={isSavingRoutine}
       />
     </>
   );
