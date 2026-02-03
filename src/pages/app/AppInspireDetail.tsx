@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, Loader2, Check, CalendarPlus } from 'lucide-react';
+import { ArrowLeft, Heart, Share2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
+import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
@@ -338,26 +339,14 @@ export default function AppInspireDetail() {
         className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
       >
-        {isAdded ? (
-          <Button
-            variant="outline"
-            onClick={() => navigate('/app/home')}
-            className="w-full h-12 text-base font-semibold gap-2 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100"
-            size="lg"
-          >
-            <Check className="h-5 w-5" />
-            Added — Go to Planner
-          </Button>
-        ) : (
-          <Button
-            onClick={handleAddClick}
-            className="w-full h-12 text-base font-semibold gap-2"
-            size="lg"
-          >
-            <CalendarPlus className="h-5 w-5" />
-            Add to my routine
-          </Button>
-        )}
+        <AddedToRoutineButton
+          isAdded={isAdded}
+          onAddClick={handleAddClick}
+          isLoading={addRoutineFromBank.isPending}
+          size="lg"
+          variant="outline"
+          addText="Add to my routine"
+        />
       </div>
 
       {/* Preview Sheet */}

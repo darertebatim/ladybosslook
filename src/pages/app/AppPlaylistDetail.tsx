@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink, CalendarPlus, Check } from "lucide-react";
+import { Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { SupplementViewer } from "@/components/app/SupplementViewer";
 import { BackButton } from "@/components/app/BackButton";
@@ -17,6 +17,7 @@ import { usePlaylistRoutine, useExistingPlaylistTask } from "@/hooks/usePlaylist
 import { useRoutinePlan, useAddRoutinePlan } from "@/hooks/useRoutinePlans";
 import { useQuickAddPlaylistTask } from "@/hooks/useTaskPlanner";
 import { RoutinePreviewSheet } from "@/components/app/RoutinePreviewSheet";
+import { AddedToRoutineButton } from "@/components/app/AddedToRoutineButton";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 export default function AppPlaylistDetail() {
@@ -631,30 +632,13 @@ export default function AppPlaylistDetail() {
               <Play className="h-5 w-5 mr-1" />
               {getNextPlayableItem() ? 'Continue' : 'Play'}
             </Button>
-            <Button 
-              variant="ghost" 
+            <AddedToRoutineButton
+              isAdded={!!existingTask}
+              onAddClick={handleAddToRoutine}
+              isLoading={quickAddTask.isPending}
               size="lg"
-              onClick={existingTask ? () => navigate('/app/home') : handleAddToRoutine}
-              disabled={quickAddTask.isPending}
-              className={cn(
-                "w-full gap-2",
-                existingTask 
-                  ? "bg-emerald-50 hover:bg-emerald-100 text-emerald-700" 
-                  : "bg-[#F4ECFE] hover:bg-[#E8DCF8]"
-              )}
-            >
-              {existingTask ? (
-                <>
-                  <Check className="h-4 w-4" />
-                  <span className="text-sm">Added — Go to Planner</span>
-                </>
-              ) : (
-                <>
-                  <CalendarPlus className="h-4 w-4" />
-                  <span className="text-sm">Add to My Routine</span>
-                </>
-              )}
-            </Button>
+              variant="outline"
+            />
           </div>
         )}
 
