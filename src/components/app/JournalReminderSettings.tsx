@@ -1,12 +1,9 @@
 import { useState, useMemo } from 'react';
-import { Button } from '@/components/ui/button';
-import { Sparkles, Check } from 'lucide-react';
 import { useRoutinePlan, useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
+import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 
 interface JournalReminderSettingsProps {
   className?: string;
@@ -32,7 +29,6 @@ const SYNTHETIC_JOURNAL_TASK: RoutinePlanTask = {
 };
 
 export const JournalReminderSettings = ({ className }: JournalReminderSettingsProps) => {
-  const navigate = useNavigate();
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   
@@ -71,30 +67,14 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
 
   return (
     <div className={className}>
-      <Button
-        variant="outline"
+      <AddedToRoutineButton
+        isAdded={isAdded}
+        onAddClick={() => setShowRoutineSheet(true)}
+        isLoading={isLoading || addRoutinePlan.isPending}
+        addText="Add Journaling to My Routine"
         size="sm"
-        onClick={isAdded ? () => navigate('/app/home') : () => setShowRoutineSheet(true)}
-        disabled={isLoading}
-        className={cn(
-          "w-full gap-2",
-          isAdded 
-            ? "bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700"
-            : "bg-[#F4ECFE] hover:bg-[#E9DCFC] border-[#E9DCFC] text-foreground"
-        )}
-      >
-        {isAdded ? (
-          <>
-            <Check className="h-4 w-4" />
-            Added — Go to Planner
-          </>
-        ) : (
-          <>
-            <Sparkles className="h-4 w-4" />
-            Add Journaling to My Routine
-          </>
-        )}
-      </Button>
+        variant="outline"
+      />
 
       <RoutinePreviewSheet
         open={showRoutineSheet}
