@@ -250,10 +250,10 @@ export default function RoutinesBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success('Routine created');
+      toast.success('Ritual created');
       closeDialog();
     },
-    onError: (error) => toast.error('Failed to create routine: ' + error.message),
+    onError: (error) => toast.error('Failed to create ritual: ' + error.message),
   });
 
   // Update routine
@@ -317,10 +317,10 @@ export default function RoutinesBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success('Routine updated');
+      toast.success('Ritual updated');
       closeDialog();
     },
-    onError: (error) => toast.error('Failed to update routine: ' + error.message),
+    onError: (error) => toast.error('Failed to update ritual: ' + error.message),
   });
 
   // Delete routine
@@ -332,7 +332,7 @@ export default function RoutinesBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success('Routine deleted');
+      toast.success('Ritual deleted');
     },
   });
 
@@ -589,15 +589,15 @@ export default function RoutinesBank() {
         <div>
           <CardTitle className="flex items-center gap-2">
             <Layers className="h-5 w-5" />
-            Routines Bank
+            Rituals Bank
           </CardTitle>
           <CardDescription>
-            Create and manage routine templates with rich sections
+            Create and manage ritual templates with rich sections
           </CardDescription>
         </div>
         <Button onClick={openNewDialog} className="gap-2">
           <Plus className="h-4 w-4" />
-          New Routine
+          New Ritual
         </Button>
       </CardHeader>
       <CardContent>
@@ -624,7 +624,7 @@ export default function RoutinesBank() {
           <div className="text-center py-8 text-muted-foreground">Loading...</div>
         ) : filteredRoutines.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            No routines yet. Click "New Routine" to create one.
+            No rituals yet. Click "New Ritual" to create one.
           </div>
         ) : (
           <div className="space-y-2">
@@ -651,7 +651,7 @@ export default function RoutinesBank() {
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><TaskIcon iconName={catInfo.icon} size={12} /> {catInfo.label}</span>
                       <span>•</span>
-                      <span>{stats.count} task{stats.count !== 1 ? 's' : ''}</span>
+                      <span>{stats.count} action{stats.count !== 1 ? 's' : ''}</span>
                     </div>
                   </div>
                   <button
@@ -709,9 +709,9 @@ export default function RoutinesBank() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-3xl max-h-[85vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>{editingRoutine ? 'Edit Routine' : 'New Routine'}</DialogTitle>
+            <DialogTitle>{editingRoutine ? 'Edit Ritual' : 'New Ritual'}</DialogTitle>
             <DialogDescription>
-              {editingRoutine ? 'Update routine details and sections' : 'Create a new routine template'}
+              {editingRoutine ? 'Update ritual details and sections' : 'Create a new ritual template'}
             </DialogDescription>
           </DialogHeader>
           
@@ -847,7 +847,7 @@ export default function RoutinesBank() {
                     </span>
                     <span className="flex items-center gap-1">
                       <Layers className="h-4 w-4" />
-                      {localTasks.length} task{localTasks.length !== 1 ? 's' : ''}
+                      {localTasks.length} action{localTasks.length !== 1 ? 's' : ''}
                     </span>
                   </div>
                 </div>
@@ -1156,7 +1156,7 @@ export default function RoutinesBank() {
                             className="w-full h-7 text-xs gap-1"
                           >
                             <Plus className="h-3 w-3" />
-                            Add Task
+                            Add Action
                           </Button>
                         )}
                       </div>
@@ -1169,7 +1169,7 @@ export default function RoutinesBank() {
           <DialogFooter className="pt-4 border-t">
             <Button variant="outline" onClick={closeDialog}>Cancel</Button>
             <Button onClick={handleSave} disabled={createRoutine.isPending || updateRoutine.isPending}>
-              {editingRoutine ? 'Save Changes' : 'Create Routine'}
+              {editingRoutine ? 'Save Changes' : 'Create Ritual'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1181,7 +1181,7 @@ export default function RoutinesBank() {
           <DialogHeader>
             <DialogTitle>{editingSection?.isNew ? 'New Section' : 'Edit Section'}</DialogTitle>
             <DialogDescription>
-              Add descriptive content to introduce this part of the routine
+              Add descriptive content to introduce this part of the ritual
             </DialogDescription>
           </DialogHeader>
           

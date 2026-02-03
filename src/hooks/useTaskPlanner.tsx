@@ -598,11 +598,11 @@ export const useCreateTask = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      toast({ title: 'Task created! ✨' });
+      toast({ title: 'Action created! ✨' });
     },
     onError: (error) => {
       console.error('Create task error:', error);
-      toast({ title: 'Failed to create task', variant: 'destructive' });
+      toast({ title: 'Failed to create action', variant: 'destructive' });
     },
   });
 };
@@ -656,11 +656,11 @@ export const useQuickAddPlaylistTask = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['playlist-task-exists'] });
-      toast({ title: 'Added to your routine! 🎧' });
+      toast({ title: 'Added to your rituals! 🎧' });
     },
     onError: (error) => {
       console.error('Quick add playlist task error:', error);
-      toast({ title: 'Failed to add to routine', variant: 'destructive' });
+      toast({ title: 'Failed to add to rituals', variant: 'destructive' });
     },
   });
 };
@@ -769,7 +769,7 @@ export const useUpdateTask = () => {
     },
     onError: (error) => {
       console.error('Update task error:', error);
-      toast({ title: 'Failed to update task', variant: 'destructive' });
+      toast({ title: 'Failed to update action', variant: 'destructive' });
     },
   });
 };
@@ -797,11 +797,11 @@ export const useDeleteTask = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      toast({ title: 'Task deleted' });
+      toast({ title: 'Action deleted' });
     },
     onError: (error) => {
       console.error('Delete task error:', error);
-      toast({ title: 'Failed to delete task', variant: 'destructive' });
+      toast({ title: 'Failed to delete action', variant: 'destructive' });
     },
   });
 };
@@ -1091,11 +1091,11 @@ export const useCreateTaskFromTemplate = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      toast({ title: 'Task added from template! ✨' });
+      toast({ title: 'Action added from template! ✨' });
     },
     onError: (error) => {
       console.error('Create from template error:', error);
-      toast({ title: 'Failed to add task', variant: 'destructive' });
+      toast({ title: 'Failed to add action', variant: 'destructive' });
     },
   });
 };
@@ -1228,7 +1228,7 @@ export const useReorderTasks = () => {
     },
     onError: (error) => {
       console.error('Reorder tasks error:', error);
-      toast({ title: 'Failed to reorder tasks', variant: 'destructive' });
+      toast({ title: 'Failed to reorder actions', variant: 'destructive' });
     },
   });
 };
@@ -1304,11 +1304,11 @@ export const useSkipTask = () => {
     onSuccess: (_, { date }) => {
       const dateStr = format(date, 'yyyy-MM-dd');
       queryClient.invalidateQueries({ queryKey: ['planner-skips', user?.id, dateStr] });
-      toast({ title: 'Task skipped for today' });
+      toast({ title: 'Action skipped for today' });
     },
     onError: (error) => {
       console.error('Skip task error:', error);
-      toast({ title: 'Failed to skip task', variant: 'destructive' });
+      toast({ title: 'Failed to skip action', variant: 'destructive' });
     },
   });
 };
@@ -1370,7 +1370,7 @@ export const useSnoozeTask = () => {
     },
     onError: (error) => {
       console.error('Snooze task error:', error);
-      toast({ title: 'Failed to reschedule task', variant: 'destructive' });
+      toast({ title: 'Failed to reschedule action', variant: 'destructive' });
     },
   });
 };
