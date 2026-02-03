@@ -210,6 +210,7 @@ export default function AppInspire() {
                       key={category.slug}
                       name={category.name}
                       icon={category.icon}
+                      emoji={category.emoji}
                       color={category.color}
                       isSelected={selectedCategory === category.slug}
                       onClick={() => setSelectedCategory(category.slug)}
@@ -219,6 +220,7 @@ export default function AppInspire() {
                     <CategoryCircle
                       name={categories.find(c => c.slug === 'pro')!.name}
                       icon={categories.find(c => c.slug === 'pro')!.icon}
+                      emoji={categories.find(c => c.slug === 'pro')!.emoji}
                       color={categories.find(c => c.slug === 'pro')!.color}
                       isSelected={selectedCategory === 'pro'}
                       onClick={() => setSelectedCategory('pro')}
