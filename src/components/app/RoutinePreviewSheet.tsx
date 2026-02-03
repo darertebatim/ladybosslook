@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Check, Pencil, Clock } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 // Color cycle for variety in planner (used when no specific color is set)
 export const ROUTINE_COLOR_CYCLE: TaskColor[] = [
@@ -75,6 +76,13 @@ export function RoutinePreviewSheet({
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingTaskIndex, setEditingTaskIndex] = useState<number>(0);
   const [showEditSheet, setShowEditSheet] = useState(false);
+
+  // Sync selectedTaskIds when tasks change (e.g., when data loads async)
+  useEffect(() => {
+    if (tasks.length > 0 && selectedTaskIds.size === 0) {
+      setSelectedTaskIds(new Set(tasks.map(t => t.id)));
+    }
+  }, [tasks]);
 
   const allSelected = selectedTaskIds.size === tasks.length;
 
@@ -247,7 +255,7 @@ export function RoutinePreviewSheet({
                       )}>
                         {/* Main content row */}
                         <div className="flex items-center gap-3 p-3">
-                          <span className="text-2xl shrink-0">{display.icon || '📝'}</span>
+                          <FluentEmoji emoji={display.icon || '📝'} size={28} className="shrink-0" />
                           
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-black truncate">{display.title}</p>
