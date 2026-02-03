@@ -59,7 +59,7 @@ export const TaskQuickStartSheet = ({
           {/* Header */}
           <div className="pt-2 pb-4 text-center">
             <div className="w-10 h-1 bg-muted-foreground/30 rounded-full mx-auto mb-4" />
-            <h2 className="text-lg font-semibold text-foreground">New Task</h2>
+            <h2 className="text-lg font-semibold text-foreground">New Action</h2>
           </div>
 
           {/* Name input */}
@@ -110,7 +110,7 @@ export const TaskQuickStartSheet = ({
           {suggestions.length > 0 && (
             <div className="px-4 pb-6">
               <p className="text-sm text-muted-foreground mb-3">
-                {taskName.trim() ? 'Similar tasks 💡' : 'Need some idea? 💡'}
+                {taskName.trim() ? 'Similar actions 💡' : 'Need some idea? 💡'}
               </p>
               <div className="space-y-2">
                 {suggestions.map((template) => {

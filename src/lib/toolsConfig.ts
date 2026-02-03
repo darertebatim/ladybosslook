@@ -58,12 +58,12 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'routines',
-    name: 'Routines',
+    name: 'Rituals',
     icon: 'Sparkles',
     bgColor: 'bg-[#D1FAE5]',
     iconColor: 'text-emerald-600',
     route: '/app/routines',
-    description: 'Daily habits',
+    description: 'Daily rituals',
   },
   {
     id: 'programs',

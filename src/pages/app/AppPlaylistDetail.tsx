@@ -404,10 +404,10 @@ export default function AppPlaylistDetail() {
         });
       }
       setShowRoutineSheet(false);
-      toast.success('Added to your routine!');
+      toast.success('Added to your rituals!');
     } catch (error) {
-      console.error('Failed to add routine:', error);
-      toast.error('Failed to add to routine');
+      console.error('Failed to add ritual:', error);
+      toast.error('Failed to add to rituals');
     }
   };
 

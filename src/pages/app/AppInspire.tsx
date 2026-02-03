@@ -123,12 +123,12 @@ export default function AppInspire() {
           pro_link_value: t.pro_link_value as string | null,
         })),
       });
-      toast.success('Task added to your routine! ✨');
+      toast.success('Action added to your rituals! ✨');
       setPreviewSheetOpen(false);
       setSelectedTemplate(null);
     } catch (error) {
-      console.error('Error adding task:', error);
-      toast.error('Failed to add task');
+      console.error('Error adding action:', error);
+      toast.error('Failed to add action');
     }
   };
 
@@ -142,7 +142,7 @@ export default function AppInspire() {
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
           <div className="flex items-center gap-2">
             <Sparkles className="w-6 h-6 text-primary" />
-            <h1 className="text-xl font-bold text-foreground">Routines</h1>
+            <h1 className="text-xl font-bold text-foreground">Rituals</h1>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -162,7 +162,7 @@ export default function AppInspire() {
           <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
             <Input
               type="search"
-              placeholder="Search routines..."
+              placeholder="Search rituals..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-muted/50"
@@ -192,14 +192,14 @@ export default function AppInspire() {
                     onClick={() => setSelectedCategory('popular')}
                   />
                   <CategoryCircle
-                    name="All Routines"
+                    name="All Rituals"
                     icon="Sparkles"
                     color="purple"
                     isSelected={selectedCategory === 'all-routines'}
                     onClick={() => setSelectedCategory('all-routines')}
                   />
                   <CategoryCircle
-                    name="All Tasks"
+                    name="All Actions"
                     icon="ListTodo"
                     color="blue"
                     isSelected={selectedCategory === 'all-tasks'}
@@ -237,12 +237,12 @@ export default function AppInspire() {
             <div className="mt-5 px-4 w-full max-w-full overflow-hidden">
               <h2 className="text-sm font-semibold text-muted-foreground mb-3">
                 {selectedCategory === 'popular'
-                  ? 'POPULAR ROUTINES'
+                  ? 'POPULAR RITUALS'
                   : selectedCategory === 'all-routines'
-                  ? 'ALL ROUTINES'
+                  ? 'ALL RITUALS'
                   : selectedCategory === 'all-tasks'
-                  ? 'ALL TASKS'
-                  : categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'ROUTINES'
+                  ? 'ALL ACTIONS'
+                  : categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'RITUALS'
                 }
               </h2>
 
@@ -271,10 +271,10 @@ export default function AppInspire() {
                 <ListTodo className="w-4 h-4 text-primary" />
                 <h2 className="text-sm font-semibold text-muted-foreground">
                   {selectedCategory === 'popular' 
-                    ? 'POPULAR TASKS'
+                    ? 'POPULAR ACTIONS'
                     : selectedCategory === 'all-tasks'
-                    ? 'ALL TASKS'
-                    : `${categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'CATEGORY'} TASKS`
+                    ? 'ALL ACTIONS'
+                    : `${categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'CATEGORY'} ACTIONS`
                   }
                 </h2>
               </div>
@@ -296,7 +296,7 @@ export default function AppInspire() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-muted-foreground">No tasks in this category</p>
+                  <p className="text-muted-foreground">No actions in this category</p>
                 </div>
               )}
             </div>
