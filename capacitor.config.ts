@@ -20,7 +20,7 @@ const useLiveReload = process.env.CAP_USE_LIVE_RELOAD === 'true';
 
 const config: CapacitorConfig = {
   appId: 'com.ladybosslook.academy',
-  appName: 'Simora',
+  appName: 'Simora Ladybosslook',
   webDir: 'dist',
   // DEV (optional): load from remote dev server instead of bundled dist/
   ...(useLiveReload
