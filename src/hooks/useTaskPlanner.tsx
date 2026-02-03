@@ -1231,3 +1231,180 @@ export const useReorderTasks = () => {
     },
   });
 };
+
+// ============================================
+// SKIP & SNOOZE FUNCTIONALITY
+// ============================================
+
+export interface TaskSkip {
+  id: string;
+  task_id: string;
+  user_id: string;
+  skipped_date: string;
+  snoozed_to_date: string | null;
+  created_at: string;
+}
+
+/**
+ * Get skipped task IDs for a specific date
+ */
+export const useSkipsForDate = (date: Date) => {
+  const { user } = useAuth();
+  const dateStr = format(date, 'yyyy-MM-dd');
+
+  return useQuery({
+    queryKey: ['planner-skips', user?.id, dateStr],
+    queryFn: async () => {
+      if (!user?.id) return new Set<string>();
+
+      const { data, error } = await supabase
+        .from('task_skips')
+        .select('task_id')
+        .eq('user_id', user.id)
+        .eq('skipped_date', dateStr);
+
+      if (error) throw error;
+      return new Set(data.map(s => s.task_id));
+    },
+    enabled: !!user?.id,
+    staleTime: 1000 * 30, // 30 seconds
+  });
+};
+
+/**
+ * Skip a task for a specific date
+ */
+export const useSkipTask = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ taskId, date }: { taskId: string; date: Date }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      const dateStr = format(date, 'yyyy-MM-dd');
+
+      const { data, error } = await supabase
+        .from('task_skips')
+        .upsert({
+          task_id: taskId,
+          user_id: user.id,
+          skipped_date: dateStr,
+          snoozed_to_date: null,
+        }, {
+          onConflict: 'task_id,skipped_date',
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as TaskSkip;
+    },
+    onSuccess: (_, { date }) => {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      queryClient.invalidateQueries({ queryKey: ['planner-skips', user?.id, dateStr] });
+      toast({ title: 'Task skipped for today' });
+    },
+    onError: (error) => {
+      console.error('Skip task error:', error);
+      toast({ title: 'Failed to skip task', variant: 'destructive' });
+    },
+  });
+};
+
+/**
+ * Snooze (reschedule) a non-repeating task to another date
+ */
+export const useSnoozeTask = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ taskId, fromDate, toDate }: { taskId: string; fromDate: Date; toDate: Date }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      const fromDateStr = format(fromDate, 'yyyy-MM-dd');
+      const toDateStr = format(toDate, 'yyyy-MM-dd');
+
+      // For non-repeating tasks, update the scheduled_date directly
+      const { data: task } = await supabase
+        .from('user_tasks')
+        .select('repeat_pattern')
+        .eq('id', taskId)
+        .single();
+
+      if (task?.repeat_pattern === 'none') {
+        // Update the task's scheduled_date to the new date
+        const { error } = await supabase
+          .from('user_tasks')
+          .update({ scheduled_date: toDateStr })
+          .eq('id', taskId);
+
+        if (error) throw error;
+      } else {
+        // For repeating tasks, record the skip with snooze-to date
+        const { error } = await supabase
+          .from('task_skips')
+          .upsert({
+            task_id: taskId,
+            user_id: user.id,
+            skipped_date: fromDateStr,
+            snoozed_to_date: toDateStr,
+          }, {
+            onConflict: 'task_id,skipped_date',
+          });
+
+        if (error) throw error;
+      }
+
+      return { taskId, fromDate, toDate };
+    },
+    onSuccess: (_, { fromDate, toDate }) => {
+      const fromDateStr = format(fromDate, 'yyyy-MM-dd');
+      queryClient.invalidateQueries({ queryKey: ['planner-skips', user?.id, fromDateStr] });
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+      
+      const toDateFormatted = format(toDate, 'MMM d');
+      toast({ title: `Rescheduled to ${toDateFormatted}` });
+    },
+    onError: (error) => {
+      console.error('Snooze task error:', error);
+      toast({ title: 'Failed to reschedule task', variant: 'destructive' });
+    },
+  });
+};
+
+/**
+ * Undo a skip/snooze
+ */
+export const useUndoSkip = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ taskId, date }: { taskId: string; date: Date }) => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      const dateStr = format(date, 'yyyy-MM-dd');
+
+      const { error } = await supabase
+        .from('task_skips')
+        .delete()
+        .eq('task_id', taskId)
+        .eq('user_id', user.id)
+        .eq('skipped_date', dateStr);
+
+      if (error) throw error;
+      return { taskId, date };
+    },
+    onSuccess: (_, { date }) => {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      queryClient.invalidateQueries({ queryKey: ['planner-skips', user?.id, dateStr] });
+      toast({ title: 'Skip undone' });
+    },
+    onError: (error) => {
+      console.error('Undo skip error:', error);
+      toast({ title: 'Failed to undo skip', variant: 'destructive' });
+    },
+  });
+};
