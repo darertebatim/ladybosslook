@@ -67,7 +67,7 @@ export default function AppInspireDetail() {
 
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
-      toast.error('No tasks in this routine');
+      toast.error('No actions in this ritual');
       return;
     }
     setShowPreviewSheet(true);
@@ -88,10 +88,10 @@ export default function AppInspireDetail() {
       });
       setShowPreviewSheet(false);
       setJustAdded(true);
-      toast.success(`${selectedTaskIds.length} tasks added!`);
+      toast.success(`${selectedTaskIds.length} actions added!`);
       // Don't navigate away - let user see the button change
     } catch (error) {
-      toast.error('Failed to add routine');
+      toast.error('Failed to add ritual');
     }
   };
 
@@ -211,7 +211,7 @@ export default function AppInspireDetail() {
             <div className="flex items-center gap-3 mt-3">
               {routine.tasks && routine.tasks.length > 0 && (
                 <div className="text-sm text-muted-foreground">
-                  {routine.tasks.length} tasks
+                  {routine.tasks.length} action{routine.tasks.length !== 1 ? 's' : ''}
                 </div>
               )}
             </div>
@@ -345,7 +345,7 @@ export default function AppInspireDetail() {
           isLoading={addRoutineFromBank.isPending}
           size="lg"
           variant="outline"
-          addText="Add to my routine"
+          addText="Add to my rituals"
         />
       </div>
 

@@ -213,15 +213,15 @@ export function RoutinePreviewSheet({
         >
           <div className="flex flex-col h-full">
             <SheetHeader className="text-left pb-2 flex-shrink-0">
-              <SheetTitle className="text-xl font-bold">Edit Routine</SheetTitle>
+              <SheetTitle className="text-xl font-bold">Edit Ritual</SheetTitle>
               <p className="text-sm text-muted-foreground">
-                Edit it to create your personalized routine.
+                Edit it to create your personalized ritual.
               </p>
             </SheetHeader>
 
             <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
               <p className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                Daily Tasks
+                Daily Actions
               </p>
               
               <div className="space-y-3">

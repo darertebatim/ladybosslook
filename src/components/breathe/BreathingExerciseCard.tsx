@@ -60,12 +60,12 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
         editedTasks,
         syntheticTasks: [syntheticTask], // Pass the synthetic task for on-the-fly creation
       });
-      toast.success(`${exercise.name} added to your routine!`);
+      toast.success(`${exercise.name} added to your rituals!`);
       setShowRoutineSheet(false);
       setJustAdded(true);
     } catch (error) {
-      console.error('Failed to add routine:', error);
-      toast.error('Failed to add to routine');
+      console.error('Failed to add ritual:', error);
+      toast.error('Failed to add ritual');
     }
   };
 
@@ -112,7 +112,7 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
                 ? "bg-success hover:bg-success/90" 
                 : "bg-foreground hover:bg-foreground/90"
             )}
-            aria-label={isAdded ? "Added to routine" : "Add to routine"}
+            aria-label={isAdded ? "Added to rituals" : "Add to rituals"}
           >
             {isAdded ? (
               <Check className="h-5 w-5 text-white" />

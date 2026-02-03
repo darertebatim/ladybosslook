@@ -321,7 +321,7 @@ const AppHome = () => {
     setSelectedTask(null);
     deleteTask.mutate(task.id, {
       onSuccess: () => {
-        toast.success('Task deleted');
+        toast.success('Action deleted');
         haptic.light();
       }
     });
@@ -538,32 +538,32 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Personal Tasks Section */}
+              {/* Personal Actions Section */}
               {filteredTasks.length === 0 && (selectedTag !== null || programEvents.length === 0) ? <div className="text-center py-12">
                   <div className="text-4xl mb-3">✨</div>
                   <p className="text-muted-foreground mb-4">
-                    {selectedTag ? `No ${selectedTag} tasks for this day` : 'No tasks for this day'}
+                    {selectedTag ? `No ${selectedTag} actions for this day` : 'No actions for this day'}
                   </p>
                   <button onClick={() => setShowQuickStart(true)} className="text-violet-600 font-medium">
-                    Add your first task
+                    Add your first action
                   </button>
                 </div> : filteredTasks.length > 0 && <div>
-                  {/* My Tasks header - always show */}
+                  {/* My Actions header - always show */}
                   <div className="flex items-center gap-2 mb-3">
                     <h2 className="text-sm font-semibold text-black uppercase tracking-wide">
-                      My Tasks
+                      My Actions
                     </h2>
                     <span className="text-xs text-foreground/40 ml-auto">Hold to reorder</span>
                   </div>
                   <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenWaterTracking={handleOpenWaterTracking} />
                 </div>}
 
-              {/* Popular Routines Suggestions - only show routines user hasn't added */}
+              {/* Popular Rituals Suggestions - only show rituals user hasn't added */}
               {suggestedRoutines.length > 0 && selectedTag === null && <div className="tour-suggestions mt-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="h-4 w-4 text-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
-                      Try a Routine
+                      Try a Ritual
                     </h2>
                   </div>
                   <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">

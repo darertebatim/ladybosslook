@@ -56,12 +56,12 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
         editedTasks,
         syntheticTasks: usingSynthetic ? [SYNTHETIC_JOURNAL_TASK] : undefined,
       });
-      toast.success('Journal routine added to your planner!');
+      toast.success('Journal ritual added to your planner!');
       setShowRoutineSheet(false);
       setJustAdded(true);
     } catch (error) {
       console.error('Failed to add routine:', error);
-      toast.error('Failed to add routine');
+      toast.error('Failed to add ritual');
     }
   };
 
@@ -71,7 +71,7 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
         isAdded={isAdded}
         onAddClick={() => setShowRoutineSheet(true)}
         isLoading={isLoading || addRoutinePlan.isPending}
-        addText="Add Journaling to My Routine"
+        addText="Add Journaling to My Rituals"
         size="sm"
         variant="outline"
       />
