@@ -224,11 +224,11 @@ export default function TasksBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
-      toast.success('Task created');
+      toast.success('Action created');
       closeSheet();
     },
     onError: (error) => {
-      toast.error('Failed to create task: ' + error.message);
+      toast.error('Failed to create action: ' + error.message);
     },
   });
 
@@ -278,11 +278,11 @@ export default function TasksBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
-      toast.success('Task updated');
+      toast.success('Action updated');
       closeSheet();
     },
     onError: (error) => {
-      toast.error('Failed to update task: ' + error.message);
+      toast.error('Failed to update action: ' + error.message);
     },
   });
 
@@ -295,7 +295,7 @@ export default function TasksBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
-      toast.success('Task deleted');
+      toast.success('Action deleted');
     },
   });
 
@@ -496,14 +496,14 @@ export default function TasksBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success('Routine created! Go to Routines Bank to edit it.');
+      toast.success('Ritual created! Go to Rituals Bank to edit it.');
       setCreateRoutineOpen(false);
       setNewRoutineName('');
       setNewRoutineCategory('general');
       clearSelection();
     },
     onError: (error) => {
-      toast.error('Failed to create routine: ' + error.message);
+      toast.error('Failed to create ritual: ' + error.message);
     },
   });
 
@@ -513,10 +513,10 @@ export default function TasksBank() {
         <div>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5" />
-            Tasks Bank
+            Actions Bank
           </CardTitle>
           <CardDescription>
-            Reusable task templates for routine planning
+            Reusable action templates for ritual planning
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
@@ -537,7 +537,7 @@ export default function TasksBank() {
           </Button>
           <Button onClick={openNewSheet} className="gap-2">
             <Plus className="h-4 w-4" />
-            Add Task
+            Add Action
           </Button>
         </div>
       </CardHeader>
@@ -556,7 +556,7 @@ export default function TasksBank() {
                 className="gap-2"
               >
                 <Layers className="h-4 w-4" />
-                Create Routine
+                Create Ritual
               </Button>
               <Button
                 size="sm"
@@ -598,7 +598,7 @@ export default function TasksBank() {
           <div className="text-center py-8 text-muted-foreground">Loading...</div>
         ) : filteredTasks.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            No tasks yet. Click "Add Task" to create one.
+            No actions yet. Click "Add Action" to create one.
           </div>
         ) : (
           <div className="space-y-2">
@@ -798,16 +798,16 @@ export default function TasksBank() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Layers className="h-4 w-4" />
-              Create Routine from Selection
+              Create Ritual from Selection
             </DialogTitle>
             <DialogDescription>
-              Create a new routine with {selectedTaskIds.size} selected task{selectedTaskIds.size !== 1 ? 's' : ''}
+              Create a new ritual with {selectedTaskIds.size} selected action{selectedTaskIds.size !== 1 ? 's' : ''}
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="routineName">Routine Name *</Label>
+              <Label htmlFor="routineName">Ritual Name *</Label>
               <Input
                 id="routineName"
                 value={newRoutineName}
@@ -836,9 +836,9 @@ export default function TasksBank() {
               </Select>
             </div>
 
-            {/* Preview selected tasks */}
+            {/* Preview selected actions */}
             <div className="space-y-2">
-              <Label>Selected Tasks</Label>
+              <Label>Selected Actions</Label>
               <div className="border rounded-lg p-2 max-h-40 overflow-y-auto space-y-1">
                 {selectedTasks.map((task, idx) => (
                   <div key={task.id} className="flex items-center gap-2 text-sm">
@@ -849,7 +849,7 @@ export default function TasksBank() {
                 ))}
               </div>
               <p className="text-xs text-muted-foreground">
-                {selectedTasks.length} tasks selected
+                {selectedTasks.length} actions selected
               </p>
             </div>
           </div>
@@ -862,7 +862,7 @@ export default function TasksBank() {
               onClick={() => createRoutineFromSelection.mutate()}
               disabled={!newRoutineName.trim() || createRoutineFromSelection.isPending}
             >
-              Create Routine
+              Create Ritual
             </Button>
           </DialogFooter>
         </DialogContent>

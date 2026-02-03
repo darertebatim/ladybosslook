@@ -332,7 +332,7 @@ export const TaskDetailModal = ({
               className="flex-1 gap-2 h-10 rounded-full border-2 border-black/30 bg-transparent hover:bg-white/30 text-black text-sm"
             >
               <Pencil className="h-4 w-4" />
-              Edit Task
+              Edit Action
             </Button>
             
             {/* Skip button - show if not completed */}

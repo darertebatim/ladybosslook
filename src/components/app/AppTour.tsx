@@ -5,23 +5,23 @@ import { useAppTour } from '@/hooks/useAppTour';
 export const tourSteps: Step[] = [
   {
     target: '.tour-header',
-    content: 'Welcome! 👋 This is your personal dashboard. Track your daily tasks and see your progress at a glance.',
+    content: 'Welcome! 👋 This is your personal dashboard. Track your daily actions and see your progress at a glance.',
     disableBeacon: true,
     placement: 'bottom',
   },
   {
     target: '.tour-calendar',
-    content: 'Swipe through days to see your tasks. Flame icons 🔥 show days you completed tasks!',
+    content: 'Swipe through days to see your actions. Flame icons 🔥 show days you honored actions!',
     placement: 'bottom',
   },
   {
     target: '.tour-streak',
-    content: 'Your streak! Complete tasks daily to keep it growing. Can you reach 30 days?',
+    content: 'Your momentum! Honor actions daily to keep it growing. Can you reach 30 days?',
     placement: 'bottom',
   },
   {
     target: '.tour-add-task',
-    content: 'Tap here to add new tasks or choose from popular suggestions ✨',
+    content: 'Tap here to add new actions or choose from popular suggestions ✨',
     placement: 'left',
   },
   {
@@ -31,7 +31,7 @@ export const tourSteps: Step[] = [
   },
   {
     target: '.tour-nav-routines',
-    content: 'Explore ready-made routines to build healthy habits. Morning, evening, focus time - we\'ve got you covered!',
+    content: 'Explore ready-made rituals to build healthy habits. Morning, evening, focus time - we\'ve got you covered!',
     placement: 'top',
   },
   {

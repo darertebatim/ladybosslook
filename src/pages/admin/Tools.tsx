@@ -18,15 +18,15 @@ export default function Tools() {
         <TabsList>
           <TabsTrigger value="routines" className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
-            Routines
+            Rituals
           </TabsTrigger>
           <TabsTrigger value="routines-bank" className="flex items-center gap-2">
             <Layers className="h-4 w-4" />
-            Routines Bank
+            Rituals Bank
           </TabsTrigger>
           <TabsTrigger value="tasks" className="flex items-center gap-2">
             <ListTodo className="h-4 w-4" />
-            Tasks Bank
+            Actions Bank
           </TabsTrigger>
           <TabsTrigger value="breathing" className="flex items-center gap-2">
             <Wind className="h-4 w-4" />

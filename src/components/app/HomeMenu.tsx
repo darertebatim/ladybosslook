@@ -29,7 +29,7 @@ const toolItems: NavItem[] = [
   { id: 'water', name: 'Water', icon: <Droplets className="h-4 w-4" />, route: '/app/water', color: 'text-blue-600 bg-blue-100' },
   { id: 'emotions', name: 'Emotions', icon: <HeartHandshake className="h-4 w-4" />, route: '/app/emotion', color: 'text-violet-600 bg-violet-100' },
   { id: 'period', name: 'Period', icon: <Heart className="h-4 w-4" />, route: '/app/period', color: 'text-pink-600 bg-pink-100' },
-  { id: 'routines', name: 'Routines', icon: <Sparkles className="h-4 w-4" />, route: '/app/routines', color: 'text-emerald-600 bg-emerald-100' },
+  { id: 'routines', name: 'Rituals', icon: <Sparkles className="h-4 w-4" />, route: '/app/routines', color: 'text-emerald-600 bg-emerald-100' },
 ];
 
 const accountItems: NavItem[] = [
