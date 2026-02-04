@@ -209,11 +209,14 @@ let isRegistering = false;
 let registrationListenersAttached = false;
 
 // Attach global listeners once only
-function attachRegistrationListeners() {
+async function attachRegistrationListeners() {
   if (registrationListenersAttached) {
     console.log('[Push] Listeners already attached, skipping');
     return;
   }
+
+  const PushNotifications = await getPushNotifications();
+  if (!PushNotifications) return;
   
   console.log('[Push] Attaching global registration listeners');
   registrationListenersAttached = true;
