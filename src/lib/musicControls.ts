@@ -2,16 +2,26 @@ import { Capacitor } from "@capacitor/core";
 
 // Dynamic import for the music controls plugin
 let CapacitorMusicControls: any = null;
+let pluginUnavailable = false; // Prevents repeated failed imports
 
 async function getMusicControls() {
-  if (!Capacitor.isNativePlatform()) return null;
+  // Skip on web or if plugin already known to be unavailable
+  if (!Capacitor.isNativePlatform() || pluginUnavailable) return null;
   
   if (!CapacitorMusicControls) {
     try {
+      // Check if plugin is registered with Capacitor before importing
+      if (!Capacitor.isPluginAvailable("CapacitorMusicControls")) {
+        console.warn("[MusicControls] Plugin not available on this platform");
+        pluginUnavailable = true;
+        return null;
+      }
+      
       const module = await import("capacitor-music-controls-plugin");
       CapacitorMusicControls = module.CapacitorMusicControls;
     } catch (error) {
-      console.warn("Music controls plugin not available:", error);
+      console.warn("[MusicControls] Plugin import failed:", error);
+      pluginUnavailable = true;
       return null;
     }
   }
