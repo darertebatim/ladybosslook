@@ -8,9 +8,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAppReview } from "@/hooks/useAppReview";
-import { AppReviewPrompt } from "@/components/app/AppReviewPrompt";
-import { FeedbackSheet } from "@/components/app/FeedbackSheet";
 
 interface TrackCompletionCelebrationProps {
   isOpen: boolean;
@@ -33,15 +30,6 @@ export function TrackCompletionCelebration({
   isPlaylistComplete,
 }: TrackCompletionCelebrationProps) {
   const [animateCheck, setAnimateCheck] = useState(false);
-  const {
-    isPromptOpen,
-    isFeedbackOpen,
-    checkAndPromptReview,
-    handleRating,
-    handleFeedbackSubmit,
-    handleDismiss,
-    closeFeedback,
-  } = useAppReview();
 
   useEffect(() => {
     if (isOpen) {
@@ -88,17 +76,6 @@ export function TrackCompletionCelebration({
       setAnimateCheck(false);
     }
   }, [isOpen, nextTrack, isPlaylistComplete, onClose, onPlayNext]);
-
-  // Trigger review prompt when playlist is complete
-  useEffect(() => {
-    if (isOpen && isPlaylistComplete) {
-      // Delay slightly to let celebration show first
-      const timer = setTimeout(() => {
-        checkAndPromptReview('playlist_complete');
-      }, 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen, isPlaylistComplete, checkAndPromptReview]);
 
   const handlePlayNext = () => {
     onClose();
@@ -175,20 +152,6 @@ export function TrackCompletionCelebration({
           )}
         </div>
       </DialogContent>
-
-      {/* App Review Prompt */}
-      <AppReviewPrompt
-        isOpen={isPromptOpen}
-        onRate={handleRating}
-        onDismiss={handleDismiss}
-      />
-
-      {/* Feedback Sheet for unhappy users */}
-      <FeedbackSheet
-        isOpen={isFeedbackOpen}
-        onSubmit={handleFeedbackSubmit}
-        onClose={closeFeedback}
-      />
     </Dialog>
   );
 }

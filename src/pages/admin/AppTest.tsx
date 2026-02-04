@@ -6,8 +6,6 @@ import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Bell, 
-  Star, 
-  MessageCircle, 
   Trophy, 
   Flame, 
   CheckCircle, 
@@ -19,8 +17,6 @@ import {
 } from 'lucide-react';
 
 // Import all testable components
-import { AppReviewPrompt } from '@/components/app/AppReviewPrompt';
-import { FeedbackSheet } from '@/components/app/FeedbackSheet';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { CompletionCelebration } from '@/components/app/CompletionCelebration';
 import { TrackCompletionCelebration } from '@/components/audio/TrackCompletionCelebration';
@@ -33,8 +29,6 @@ export default function AppTest() {
   const { toast: shadcnToast } = useToast();
   
   // Component visibility states
-  const [showReviewPrompt, setShowReviewPrompt] = useState(false);
-  const [showFeedbackSheet, setShowFeedbackSheet] = useState(false);
   const [showStreakCelebration, setShowStreakCelebration] = useState(false);
   const [showCompletionCelebration, setShowCompletionCelebration] = useState(false);
   const [showTrackCelebration, setShowTrackCelebration] = useState(false);
@@ -52,31 +46,6 @@ export default function AppTest() {
         </p>
       </div>
 
-      {/* Review System */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-amber-500" />
-            App Review System
-          </CardTitle>
-          <CardDescription>
-            Test the App Store review flow and feedback collection
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={() => setShowReviewPrompt(true)} variant="outline">
-              <Star className="h-4 w-4 mr-2" />
-              Review Prompt
-            </Button>
-            <Button onClick={() => setShowFeedbackSheet(true)} variant="outline">
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Feedback Sheet
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Celebrations */}
       <Card>
         <CardHeader>
@@ -85,14 +54,14 @@ export default function AppTest() {
             Celebrations
           </CardTitle>
           <CardDescription>
-            Test streak, course, and track completion celebrations
+            Test presence, course, and track completion celebrations
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => setShowStreakCelebration(true)} variant="outline">
-              <Flame className="h-4 w-4 mr-2" />
-              Streak Celebration
+              <Sparkles className="h-4 w-4 mr-2" />
+              Presence Celebration
             </Button>
             <Button onClick={() => setShowCompletionCelebration(true)} variant="outline">
               <Trophy className="h-4 w-4 mr-2" />
@@ -268,26 +237,6 @@ export default function AppTest() {
       </Card>
 
       {/* Render all modals/dialogs */}
-      <AppReviewPrompt
-        isOpen={showReviewPrompt}
-        onRate={(rating) => {
-          console.log('Rated:', rating);
-          toast.success(`Rated ${rating} stars!`);
-          setShowReviewPrompt(false);
-        }}
-        onDismiss={() => setShowReviewPrompt(false)}
-      />
-
-      <FeedbackSheet
-        isOpen={showFeedbackSheet}
-        onSubmit={(feedback) => {
-          console.log('Feedback:', feedback);
-          toast.success('Feedback submitted!');
-          setShowFeedbackSheet(false);
-        }}
-        onClose={() => setShowFeedbackSheet(false)}
-      />
-
       <StreakCelebration
         open={showStreakCelebration}
         onClose={() => setShowStreakCelebration(false)}

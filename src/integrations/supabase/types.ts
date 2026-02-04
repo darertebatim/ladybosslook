@@ -204,36 +204,6 @@ export type Database = {
         }
         Relationships: []
       }
-      app_review_events: {
-        Row: {
-          created_at: string
-          event_type: string
-          feedback: string | null
-          id: string
-          in_app_rating: number | null
-          trigger_source: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          event_type: string
-          feedback?: string | null
-          id?: string
-          in_app_rating?: number | null
-          trigger_source?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          event_type?: string
-          feedback?: string | null
-          id?: string
-          in_app_rating?: number | null
-          trigger_source?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       app_settings: {
         Row: {
           created_at: string

@@ -4,9 +4,6 @@ import { useUserPresence } from '@/hooks/useUserPresence';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
-import { useAppReview } from '@/hooks/useAppReview';
-import { AppReviewPrompt } from '@/components/app/AppReviewPrompt';
-import { FeedbackSheet } from '@/components/app/FeedbackSheet';
 import { Check, Sparkles } from 'lucide-react';
 
 interface ReturnCelebrationProps {
@@ -25,15 +22,6 @@ interface ReturnCelebrationProps {
 export const StreakCelebration = ({ open, onClose }: ReturnCelebrationProps) => {
   const { data: presence } = useUserPresence();
   const [isAnimating, setIsAnimating] = useState(false);
-  const {
-    isPromptOpen,
-    isFeedbackOpen,
-    checkAndPromptReview,
-    handleRating,
-    handleFeedbackSubmit,
-    handleDismiss,
-    closeFeedback,
-  } = useAppReview();
 
   const thisMonthDays = presence?.thisMonthActiveDays || 1;
   const isReturning = presence?.isReturning || false;
@@ -44,16 +32,6 @@ export const StreakCelebration = ({ open, onClose }: ReturnCelebrationProps) => 
       haptic.success();
     }
   }, [open]);
-
-  // Trigger review prompt on milestones (7, 14, 21 days this month)
-  useEffect(() => {
-    if (open && (thisMonthDays === 7 || thisMonthDays === 14 || thisMonthDays === 21)) {
-      const timer = setTimeout(() => {
-        checkAndPromptReview('streak_milestone');
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [open, thisMonthDays, checkAndPromptReview]);
 
   if (!open) return null;
 
@@ -164,20 +142,6 @@ export const StreakCelebration = ({ open, onClose }: ReturnCelebrationProps) => 
           I'm here
         </Button>
       </div>
-
-      {/* App Review Prompt */}
-      <AppReviewPrompt
-        isOpen={isPromptOpen}
-        onRate={handleRating}
-        onDismiss={handleDismiss}
-      />
-
-      {/* Feedback Sheet for unhappy users */}
-      <FeedbackSheet
-        isOpen={isFeedbackOpen}
-        onSubmit={handleFeedbackSubmit}
-        onClose={closeFeedback}
-      />
     </div>
   );
 };
