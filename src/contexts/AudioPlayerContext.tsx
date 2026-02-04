@@ -225,21 +225,9 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     audio.addEventListener("loadstart", handleLoadStart);
     audio.addEventListener("canplay", handleCanPlay);
     
-    // Setup native music control listeners
+    // Music controls removed - was causing iOS build issues with SPM
     if (Capacitor.isNativePlatform()) {
-      setupMusicControlsListeners({
-        onPlay: () => audio.play(),
-        onPause: () => audio.pause(),
-        onSeekForward: () => { audio.currentTime = Math.min(audio.currentTime + 15, audio.duration); },
-        onSeekBackward: () => { audio.currentTime = Math.max(audio.currentTime - 15, 0); },
-        onTap: () => {
-          // Navigate to the audio player when user taps Now Playing widget
-          const track = currentTrackRef.current;
-          if (track) {
-            navigate(`/app/player/${track.id}`);
-          }
-        },
-      });
+      // Native music controls disabled
     }
     
     return () => {
