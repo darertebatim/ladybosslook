@@ -68,7 +68,21 @@
     src="https://www.facebook.com/tr?id=755747250681175&ev=PageView&noscript=1"
     /></noscript>
     
-    <div id="root"></div>
+    <div id="root">
+      <!-- This shows if React fails to mount (black screen debug) -->
+      <div id="app-loading" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#fff;color:#333;font-family:system-ui,sans-serif;flex-direction:column;gap:8px;">
+        <div style="font-size:18px;">Loading...</div>
+        <div id="app-debug" style="font-size:12px;color:#999;"></div>
+      </div>
+    </div>
+    <script>
+      // Debug: log asset loading issues
+      window.addEventListener('error', function(e) {
+        var debug = document.getElementById('app-debug');
+        if (debug) debug.textContent = 'Error: ' + (e.message || 'Unknown');
+        console.error('[HTML] Load error:', e);
+      }, true);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
