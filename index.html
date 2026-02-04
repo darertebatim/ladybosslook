@@ -57,7 +57,7 @@
     </script>
   </head>
 
-  <body style="background:#fff;margin:0;">
+  <body style="background:#FF00FF;margin:0;">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MSMPQW2P"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -68,10 +68,12 @@
     src="https://www.facebook.com/tr?id=755747250681175&ev=PageView&noscript=1"
     /></noscript>
     
-    <div id="root">
+    <!-- DIAGNOSTIC: Bright magenta background to verify HTML is loading -->
+    <div id="root" style="min-height:100vh;background:#00FF00;">
       <!-- This shows if React fails to mount (black screen debug) -->
-      <div id="app-loading" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0B0B0E;color:#FFFFFF;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;flex-direction:column;gap:8px;font-size:12px;padding:16px;text-align:left;overflow:auto;">
-        <pre id="app-debug" style="white-space:pre-wrap;margin:0;">Simora Boot\nWaiting for JavaScript bundle...</pre>
+      <div id="app-loading" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#FFFF00;color:#000000;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;flex-direction:column;gap:8px;font-size:14px;padding:16px;text-align:left;overflow:auto;z-index:999999;">
+        <pre id="app-debug" style="white-space:pre-wrap;margin:0;color:#000;">SIMORA DEBUG v2
+Waiting for JS...</pre>
       </div>
     </div>
     <script>
