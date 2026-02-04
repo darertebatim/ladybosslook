@@ -35,30 +35,23 @@ interface ReviewEvent {
 
 /**
  * Check if we're running on native iOS
+ * TEMPORARILY DISABLED for debugging black screen issue
  */
 export const isNativeIOS = (): boolean => {
-  return Capacitor.getPlatform() === 'ios' && Capacitor.isNativePlatform();
+  // Disabled: always return false to prevent any native review calls
+  console.log('[AppReview] DISABLED - isNativeIOS returning false');
+  return false;
+  // Original: return Capacitor.getPlatform() === 'ios' && Capacitor.isNativePlatform();
 };
 
 /**
  * Request the native App Store review prompt
- * Note: Apple may choose not to display the prompt
+ * TEMPORARILY DISABLED for debugging black screen issue
  */
 export const requestNativeReview = async (): Promise<boolean> => {
-  if (!isNativeIOS()) {
-    console.log('[AppReview] Not on native iOS, skipping native review request');
-    return false;
-  }
-
-  try {
-    const { AppReview } = await import('@capawesome/capacitor-app-review');
-    await AppReview.requestReview();
-    console.log('[AppReview] Native review prompt requested');
-    return true;
-  } catch (error) {
-    console.error('[AppReview] Failed to request native review:', error);
-    return false;
-  }
+  // Completely disabled to rule out as crash source
+  console.log('[AppReview] DISABLED - requestNativeReview skipped');
+  return false;
 };
 
 /**
@@ -186,38 +179,13 @@ export const isUserEngaged = async (userId: string): Promise<boolean> => {
 
 /**
  * Main eligibility check - should we show the review prompt?
+ * TEMPORARILY DISABLED for debugging black screen issue
  */
 export const checkReviewEligibility = async (
   userId: string,
   triggerSource: ReviewTriggerSource
 ): Promise<boolean> => {
-  // Must be on native iOS
-  if (!isNativeIOS()) {
-    console.log('[AppReview] Not eligible: not on native iOS');
-    return false;
-  }
-
-  // Check if prompted recently
-  const recentlyPrompted = await wasPromptedRecently(userId);
-  if (recentlyPrompted) {
-    console.log('[AppReview] Not eligible: prompted recently');
-    return false;
-  }
-
-  // Check if native review already shown max times
-  const nativeMaxReached = await wasNativeReviewShown(userId);
-  if (nativeMaxReached) {
-    console.log('[AppReview] Not eligible: native review shown max times this year');
-    return false;
-  }
-
-  // Check if user is engaged enough
-  const engaged = await isUserEngaged(userId);
-  if (!engaged) {
-    console.log('[AppReview] Not eligible: user not engaged enough');
-    return false;
-  }
-
-  console.log('[AppReview] User is eligible for review prompt, trigger:', triggerSource);
-  return true;
+  // Completely disabled to rule out as crash source
+  console.log('[AppReview] DISABLED - checkReviewEligibility returning false');
+  return false;
 };
