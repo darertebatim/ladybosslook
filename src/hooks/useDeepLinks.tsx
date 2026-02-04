@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
+import type { URLOpenListenerEvent } from '@capacitor/app';
 
 /**
  * Hook to handle Universal Links (deep links) from iOS/Android
@@ -14,6 +14,11 @@ export function useDeepLinks() {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) {
       console.log('[DeepLinks] Not on native platform, skipping');
+      return;
+    }
+
+    if (!Capacitor.isPluginAvailable('App')) {
+      console.warn('[DeepLinks] App plugin not available, skipping');
       return;
     }
 
@@ -49,17 +54,15 @@ export function useDeepLinks() {
       }
     };
 
+    let listenerHandle: { remove: () => Promise<void> } | null = null;
+
     // Add listener for app URL open events
-    const addListener = async () => {
+    (async () => {
+      const { App } = await import('@capacitor/app');
       const listener = await App.addListener('appUrlOpen', handleAppUrlOpen);
       console.log('[DeepLinks] ✅ Listener registered');
-      return listener;
-    };
-
-    let listenerHandle: { remove: () => Promise<void> } | null = null;
-    addListener().then(handle => {
-      listenerHandle = handle;
-    });
+      listenerHandle = listener;
+    })().catch((e) => console.error('[DeepLinks] Listener init failed:', e));
 
     // Cleanup on unmount
     return () => {
@@ -80,7 +83,12 @@ export async function checkInitialDeepLink(): Promise<string | null> {
     return null;
   }
 
+  if (!Capacitor.isPluginAvailable('App')) {
+    return null;
+  }
+
   try {
+    const { App } = await import('@capacitor/app');
     const launchUrl = await App.getLaunchUrl();
     
     if (launchUrl?.url) {
