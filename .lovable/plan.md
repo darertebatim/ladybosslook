@@ -1,221 +1,79 @@
 
-# Strength-First Metrics: Replace Streaks with Depth of Return
 
-Based on my analysis of the codebase, I found streak-related code in **9 components** across the app. This plan transforms the metric system from "streak counting" to "depth of return" - measuring how often users come back, not how long they stay without breaking.
+# Fix: Black Screen After iOS Rebuild
 
----
+## Problem Identified
 
-## Philosophy Summary
+The app shows a black screen immediately after the splash screen disappears. Based on my analysis:
 
-**Current Model (Streak-Based)**:
-- Tracks consecutive days
-- Resets to 1 when broken
-- Creates anxiety about stopping
-- Punishes life interruptions
+**Root Cause**: `main.tsx` has **static imports** for `@capacitor/status-bar` and `@capacitor/splash-screen` at the top level. After rebuilding the iOS project, if these plugins aren't properly linked, the import throws a fatal JavaScript error before React can mount — leaving you with a blank screen and no visible error.
 
-**New Model (Depth of Return)**:
-- Tracks total days present this month
-- Celebrates each return
-- No "breaking" concept
-- Measures strength through return, not continuity
+The other Capacitor plugins (Push Notifications, Local Notifications, Music Controls) already use **dynamic imports** with error handling, which is why they don't cause crashes. StatusBar and SplashScreen were missed.
 
-**The Core Shift**: "Simora measures depth of return, not length of absence."
+## Solution
 
----
+Convert the static imports to dynamic imports with proper error handling, matching the pattern used for other Capacitor plugins.
 
-## Database Changes
+## Changes Required
 
-### 1. Add New Columns to `profiles` Table
+### 1. Update `src/main.tsx`
 
-| Column | Type | Purpose |
-|--------|------|---------|
-| `total_active_days` | integer | All-time count of days with activity |
-| `return_count` | integer | Number of times user returned after 2+ day gap |
-| `last_active_date` | date | Last date user showed up |
-| `this_month_active_days` | integer | Days active in current month (cached, recalculated monthly) |
+**Before (current code)**:
+```typescript
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { SplashScreen } from '@capacitor/splash-screen';
 
-### 2. Keep `user_streaks` Table (Internal Only)
-
-The table stays for internal analytics but values are no longer shown to users. This gives us historical data without displaying pressure-inducing numbers.
-
----
-
-## UI Changes Summary
-
-| Component | Current | New |
-|-----------|---------|-----|
-| StreakCelebration | "🔥 7" big number, streak counter | "You showed up today" with gentle checkmarks |
-| JournalHeaderStats | "day streak" label | "this month" (days active) |
-| JournalStats | "Day Streak" with flame | "Days This Month" with calendar |
-| CompactStatsPills | "🔥 7d streak" pill | "✓ 12 days" (this month) |
-| StatsCards | "🔥 7 days" | "Showed up 12 times this month" |
-| EmotionDashboard | "Streak" label | "This Month" label |
-
----
-
-## Component-by-Component Changes
-
-### 1. StreakCelebration.tsx → ReturnCelebration.tsx
-
-**Current**: Shows big streak number with fire emoji, week calendar highlighting consecutive days, "I'm committed 💪" button
-
-**New Design**:
-- Gentle illustration (leaf, sun, or heart) instead of fire
-- Message: "You showed up today" or "Welcome back" (after gap)
-- Show simple week view with checkmarks (not streak-based)
-- Button: "I'm here ✨" (present-focused, not commitment-focused)
-- For returning users (gap > 2 days): "Your strength is still here. Welcome back."
-
-### 2. JournalHeaderStats.tsx
-
-**Current**:
-```text
-📈 Total Entries | 🔥 Streak | 📅 This Month
+if (Capacitor.isNativePlatform()) {
+  StatusBar.setStyle({ style: Style.Dark }).catch(console.error);
+  SplashScreen.hide().catch(console.error);
+  // ...
+}
 ```
 
-**New**:
-```text
-📈 Total Entries | 📅 This Month | ✨ Returns
+**After (safe dynamic imports)**:
+```typescript
+// Remove static imports for StatusBar and SplashScreen
+
+if (Capacitor.isNativePlatform()) {
+  // Dynamically import StatusBar with error handling
+  import('@capacitor/status-bar')
+    .then(({ StatusBar, Style }) => {
+      StatusBar.setStyle({ style: Style.Dark }).catch(console.error);
+    })
+    .catch((e) => console.warn('[Main] StatusBar plugin not available:', e));
+  
+  // Dynamically import SplashScreen with error handling
+  import('@capacitor/splash-screen')
+    .then(({ SplashScreen }) => {
+      SplashScreen.hide().catch(console.error);
+    })
+    .catch((e) => console.warn('[Main] SplashScreen plugin not available:', e));
+  
+  // ... rest of initialization
+}
 ```
 
-Changes:
-- Replace "streak" with "this month" (days with entries)
-- Replace flame icon with calendar or sparkle
-- Remove "day streak" label, use "this month" instead
+This ensures:
+- The app always renders even if a native plugin fails
+- Errors are logged but non-fatal
+- Consistent pattern with the other hardened plugin imports
 
-### 3. JournalStats.tsx
+## Additional Verification Steps
 
-**Current**: Shows "Day Streak" with flame icon in stats grid
+After I make this fix, you should:
 
-**New**: 
-- Change "Day Streak" to "Days This Month"
-- Replace Flame icon with Calendar icon
-- calculateStreak() function repurposed to count unique days this month
+1. **Pull the changes**: `git pull`
+2. **Rebuild**: `npm run build`
+3. **Sync to iOS**: `npx cap sync ios`
+4. **Clean build in Xcode**: Shift+Cmd+K, then Cmd+R
 
-### 4. CompactStatsPills.tsx
+If the black screen persists, we can add more debug logging to pinpoint exactly where the crash occurs.
 
-**Current**: `{ icon: Flame, value: "7d", label: "streak" }`
+## Technical Details
 
-**New**: 
-- Icon: CheckCircle2 or Calendar (not Flame)
-- Value: "12 days" (this month count)
-- Label: "this month"
-- Remove "highlight: journalStreak >= 7" logic (no streak milestones)
+| File | Change |
+|------|--------|
+| `src/main.tsx` | Convert StatusBar and SplashScreen to dynamic imports with try/catch |
 
-### 5. StatsCards.tsx
+This is a minimal, targeted fix that matches the existing hardening pattern already used for Push Notifications, Local Notifications, and Music Controls in this codebase.
 
-**Current**: 
-```tsx
-{journalStreak > 0 ? `🔥 ${journalStreak} days` : 'Start today'}
-```
-
-**New**:
-```tsx
-{daysThisMonth > 0 ? `${daysThisMonth} days this month` : 'Start today'}
-```
-
-Remove fire emoji entirely.
-
-### 6. EmotionDashboard.tsx
-
-**Current**: Shows "Streak" label under flame icon
-
-**New**: 
-- Replace "Streak" with "This Month"
-- Replace Flame icon with Calendar or Sparkles icon
-- Keep the count but reframe it as presence, not continuity
-
----
-
-## Hook Changes
-
-### useTaskPlanner.tsx
-
-**Current `updateStreak` function** (lines 1107-1164):
-- Resets `current_streak` to 1 if gap > 1 day
-- Increments streak on consecutive days
-
-**New `updatePresence` function**:
-- Never "resets" anything
-- Increments `total_active_days` on each unique day
-- Updates `last_active_date`
-- If gap > 2 days: increment `return_count` (celebrate the return)
-- Updates `this_month_active_days` cache
-
-**useUserStreak hook** (lines 398-417):
-- Rename to `useUserPresence`
-- Return `{ totalDays, thisMonthDays, returnCount, lastActiveDate }` instead of streak
-
-### useJournal.tsx / JournalStats
-
-Replace `calculateStreak()` with `calculateMonthlyPresence()`:
-- Count unique days with entries in current month
-- No concept of "breaking"
-
-### useEmotionLogs.tsx
-
-Replace streak calculation with monthly presence count.
-
----
-
-## New Messages (StreakCelebration → ReturnCelebration)
-
-| Scenario | Current Message | New Message |
-|----------|----------------|-------------|
-| First activity | "Great start! Keep it going!" | "You showed up. That's strength." |
-| Same day return | (not triggered) | (no change) |
-| After 1 day | "Two days in a row!" | "You're here again. ✨" |
-| After 2+ day gap | Streak reset to 1 | "Welcome back. Your strength is still here." |
-| Weekly presence | "One full week!" | "7 days this month. You keep showing up." |
-| High presence | "30+ day streak!" | "You've shown up so many times. That's real strength." |
-
----
-
-## Files to Modify
-
-### Components (UI Changes)
-1. `src/components/app/StreakCelebration.tsx` - Complete redesign
-2. `src/components/app/JournalHeaderStats.tsx` - Replace streak with monthly
-3. `src/components/app/JournalStats.tsx` - Replace streak calculation
-4. `src/components/dashboard/CompactStatsPills.tsx` - Replace streak pill
-5. `src/components/dashboard/StatsCards.tsx` - Replace journal streak display
-6. `src/components/emotion/EmotionDashboard.tsx` - Replace streak label
-
-### Hooks (Logic Changes)
-7. `src/hooks/useTaskPlanner.tsx` - Replace updateStreak with updatePresence
-8. `src/hooks/useEmotionLogs.tsx` - Replace streak with monthly count
-
-### Database
-9. Create migration to add new columns to `profiles` table
-10. Update TypeScript types
-
----
-
-## Implementation Order
-
-**Phase 1: Database & Types**
-1. Create migration for new `profiles` columns
-2. Update Supabase types
-
-**Phase 2: Core Hook Changes**
-3. Modify `useTaskPlanner.tsx` - rename hook, change logic
-4. Modify `useEmotionLogs.tsx` - replace streak calculation
-
-**Phase 3: UI Updates**
-5. Transform `StreakCelebration.tsx` to `ReturnCelebration.tsx`
-6. Update `JournalHeaderStats.tsx`
-7. Update `JournalStats.tsx`
-8. Update `CompactStatsPills.tsx`
-9. Update `StatsCards.tsx`
-10. Update `EmotionDashboard.tsx`
-
----
-
-## Result
-
-After implementation:
-- No more "streak broken" anxiety
-- Returning after a gap is celebrated, not punished
-- Users see "You've shown up 15 days this month" instead of "🔥 3 day streak"
-- The celebration modal says "Your strength is still here" instead of counting consecutive days
-- Engagement comes from feeling welcomed, not from fear of loss
