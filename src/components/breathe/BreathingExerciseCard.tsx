@@ -47,9 +47,7 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
   const handleAddToRoutine = (e: React.MouseEvent) => {
     e.stopPropagation(); // Don't trigger card click
     haptic.light();
-    if (!isAdded) {
-      setShowRoutineSheet(true);
-    }
+    setShowRoutineSheet(true);
   };
 
   const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
