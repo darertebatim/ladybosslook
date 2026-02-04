@@ -2,7 +2,7 @@ import React, { createContext, useContext, useRef, useState, useEffect, useCallb
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { updateMusicControls, destroyMusicControls, setupMusicControlsListeners } from "@/lib/musicControls";
+// Music controls removed - was causing iOS build issues with SPM
 import { Capacitor } from "@capacitor/core";
 import { format } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
