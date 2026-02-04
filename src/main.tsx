@@ -3,23 +3,27 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { Capacitor } from '@capacitor/core';
-import { StatusBar, Style } from '@capacitor/status-bar';
-import { SplashScreen } from '@capacitor/splash-screen';
 import { initializePushNotificationHandlers, clearBadge } from './lib/pushNotifications';
 import { logBuildInfo } from './lib/buildInfo';
-
-// Log build info immediately on app start
-logBuildInfo();
-
-// Initialize Capacitor native features
 if (Capacitor.isNativePlatform()) {
   console.log('[Main] 📱 Native platform detected:', Capacitor.getPlatform());
   
   // Add native-app class to html for iOS scroll containment
   document.documentElement.classList.add('native-app');
   
-  StatusBar.setStyle({ style: Style.Dark }).catch(console.error);
-  SplashScreen.hide().catch(console.error);
+  // Dynamically import StatusBar with error handling (prevents crash if plugin unavailable)
+  import('@capacitor/status-bar')
+    .then(({ StatusBar, Style }) => {
+      StatusBar.setStyle({ style: Style.Dark }).catch(console.error);
+    })
+    .catch((e) => console.warn('[Main] StatusBar plugin not available:', e));
+  
+  // Dynamically import SplashScreen with error handling (prevents crash if plugin unavailable)
+  import('@capacitor/splash-screen')
+    .then(({ SplashScreen }) => {
+      SplashScreen.hide().catch(console.error);
+    })
+    .catch((e) => console.warn('[Main] SplashScreen plugin not available:', e));
   
   // Initialize push notification handlers (async, won't block app load)
   initializePushNotificationHandlers().catch(console.error);
