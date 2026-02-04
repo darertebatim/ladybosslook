@@ -1,79 +1,131 @@
 
 
-# Fix: Black Screen After iOS Rebuild
+# Plan: Remove All Capacitor Dependencies
 
-## Problem Identified
+## Overview
 
-The app shows a black screen immediately after the splash screen disappears. Based on my analysis:
+This plan completely removes all Capacitor-related code from the app to establish a clean baseline. The app will work as a pure web app. Tomorrow we can add Capacitor plugins back one by one to identify which one causes the black screen.
 
-**Root Cause**: `main.tsx` has **static imports** for `@capacitor/status-bar` and `@capacitor/splash-screen` at the top level. After rebuilding the iOS project, if these plugins aren't properly linked, the import throws a fatal JavaScript error before React can mount — leaving you with a blank screen and no visible error.
+## What Gets Removed
 
-The other Capacitor plugins (Push Notifications, Local Notifications, Music Controls) already use **dynamic imports** with error handling, which is why they don't cause crashes. StatusBar and SplashScreen were missed.
+### Package Dependencies (17 packages)
+- `@capacitor/core`, `@capacitor/cli`, `@capacitor/ios`, `@capacitor/android`
+- `@capacitor/action-sheet`, `@capacitor/app`, `@capacitor/browser`, `@capacitor/camera`
+- `@capacitor/device`, `@capacitor/filesystem`, `@capacitor/haptics`, `@capacitor/keyboard`
+- `@capacitor/local-notifications`, `@capacitor/push-notifications`, `@capacitor/share`
+- `@capacitor/splash-screen`, `@capacitor/status-bar`
+- `@capawesome/capacitor-app-review`, `@capawesome/capacitor-file-picker`
+- `@capgo/capacitor-social-login`, `@ebarooni/capacitor-calendar`
+- `capacitor-music-controls-plugin`, `capacitor-native-settings`
 
-## Solution
+### Files to Modify (~25 files)
 
-Convert the static imports to dynamic imports with proper error handling, matching the pattern used for other Capacitor plugins.
+**Core Entry Points:**
+1. `src/main.tsx` - Remove all Capacitor initialization, keep just React mount
+2. `capacitor.config.ts` - Keep file but simplify (needed for future reinstall)
 
-## Changes Required
+**Library Files (provide no-op stubs):**
+3. `src/lib/platform.ts` - Always return `false` for native checks
+4. `src/lib/haptics.ts` - No-op functions
+5. `src/lib/pushNotifications.ts` - No-op functions returning safe defaults
+6. `src/lib/localNotifications.ts` - No-op functions
+7. `src/lib/musicControls.ts` - Already stubbed
+8. `src/lib/appReview.ts` - Already disabled, ensure no imports
+9. `src/lib/nativeSocialAuth.ts` - Use browser OAuth only
+10. `src/lib/nativeFilePicker.ts` - Return "not supported" or use web APIs
+11. `src/lib/calendarIntegration.ts` - No-op functions
+12. `src/lib/taskAlarm.ts` - No-op functions
 
-### 1. Update `src/main.tsx`
+**Hooks:**
+13. `src/hooks/useKeyboard.tsx` - Return empty/default values
+14. `src/hooks/useDeepLinks.tsx` - No-op hook
+15. `src/hooks/useAppInstallTracking.tsx` - No-op hook
+16. `src/hooks/usePushNotificationFlow.tsx` - Return safe defaults
+17. `src/hooks/useAutoCompleteProTask.tsx` - Remove Capacitor imports
 
-**Before (current code)**:
+**Components:**
+18. `src/components/app/AppUpdateBanner.tsx` - Use window.open instead of Browser
+19. `src/components/app/PushNotificationOnboarding.tsx` - Hide on web or show web alternative
+20. `src/components/app/ProgramEventCard.tsx` - Use window.open instead of Browser
+21. `src/components/app/TaskQuickStartSheet.tsx` - Remove Keyboard imports
+22. `src/components/feed/FeedReplyInput.tsx` - Remove Keyboard imports
+
+**Pages:**
+23. `src/pages/Auth.tsx` - Remove Capacitor imports
+24. `src/pages/app/AppProfile.tsx` - Remove native settings, use web alternatives
+25. `src/pages/app/AppCourseDetail.tsx` - Remove Share/Filesystem, use web share API
+26. `src/pages/app/AppTaskCreate.tsx` - Remove Capacitor imports
+
+**Build Config:**
+27. `vite.config.ts` - Remove Capacitor chunk from manualChunks
+
+## Technical Approach
+
+For each file, we'll:
+1. Remove all `@capacitor/*` and `capacitor-*` imports
+2. Replace functionality with web equivalents or no-ops
+3. Keep function signatures intact so components don't break
+
+### Example Transformations
+
+**Platform detection:**
 ```typescript
-import { StatusBar, Style } from '@capacitor/status-bar';
-import { SplashScreen } from '@capacitor/splash-screen';
+// Before
+import { Capacitor } from '@capacitor/core';
+export const isNativeApp = () => Capacitor.isNativePlatform();
 
-if (Capacitor.isNativePlatform()) {
-  StatusBar.setStyle({ style: Style.Dark }).catch(console.error);
-  SplashScreen.hide().catch(console.error);
-  // ...
-}
+// After
+export const isNativeApp = () => false;
+export const isIOSApp = () => false;
 ```
 
-**After (safe dynamic imports)**:
+**Haptics:**
 ```typescript
-// Remove static imports for StatusBar and SplashScreen
+// Before
+import { Haptics } from '@capacitor/haptics';
+haptic.light = () => Haptics.impact({ style: ImpactStyle.Light });
 
-if (Capacitor.isNativePlatform()) {
-  // Dynamically import StatusBar with error handling
-  import('@capacitor/status-bar')
-    .then(({ StatusBar, Style }) => {
-      StatusBar.setStyle({ style: Style.Dark }).catch(console.error);
-    })
-    .catch((e) => console.warn('[Main] StatusBar plugin not available:', e));
-  
-  // Dynamically import SplashScreen with error handling
-  import('@capacitor/splash-screen')
-    .then(({ SplashScreen }) => {
-      SplashScreen.hide().catch(console.error);
-    })
-    .catch((e) => console.warn('[Main] SplashScreen plugin not available:', e));
-  
-  // ... rest of initialization
-}
+// After
+haptic.light = () => {}; // no-op
 ```
 
-This ensures:
-- The app always renders even if a native plugin fails
-- Errors are logged but non-fatal
-- Consistent pattern with the other hardened plugin imports
+**Browser plugin:**
+```typescript
+// Before
+import { Browser } from '@capacitor/browser';
+await Browser.open({ url });
 
-## Additional Verification Steps
+// After
+window.open(url, '_blank');
+```
 
-After I make this fix, you should:
+## Execution Order
 
-1. **Pull the changes**: `git pull`
-2. **Rebuild**: `npm run build`
-3. **Sync to iOS**: `npx cap sync ios`
-4. **Clean build in Xcode**: Shift+Cmd+K, then Cmd+R
+1. First: Update `src/lib/platform.ts` (everything else depends on this)
+2. Next: Update all other `src/lib/*.ts` utility files
+3. Then: Update hooks in `src/hooks/`
+4. Then: Update components and pages
+5. Finally: Update `vite.config.ts` and `package.json`
 
-If the black screen persists, we can add more debug logging to pinpoint exactly where the crash occurs.
+## After Implementation
 
-## Technical Details
+Run these commands locally:
+```bash
+git pull
+npm install
+npm run build
+npx cap sync ios
+```
 
-| File | Change |
-|------|--------|
-| `src/main.tsx` | Convert StatusBar and SplashScreen to dynamic imports with try/catch |
+In Xcode: Clean Build (⇧⌘K) → Run (⌘R)
 
-This is a minimal, targeted fix that matches the existing hardening pattern already used for Push Notifications, Local Notifications, and Music Controls in this codebase.
+**Expected Result:** The app should now show the yellow "SIMORA DEBUG v2" screen (proving HTML loads), then React should mount and display the app normally.
+
+## Tomorrow's Reinstall Strategy
+
+Once we confirm the app works:
+1. Add back `@capacitor/core` only → test
+2. Add `@capacitor/app` → test
+3. Add plugins one by one, testing each
+4. This will identify the exact plugin causing the black screen
 
