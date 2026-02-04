@@ -1,6 +1,11 @@
+/**
+ * Feed Reply Input - UPDATED (Capacitor Keyboard removed)
+ * 
+ * Keyboard handling removed.
+ * Capacitor will be added back incrementally to identify the black screen cause.
+ */
+
 import { useState, useRef, useEffect } from "react";
-import { Capacitor } from "@capacitor/core";
-import { Keyboard } from "@capacitor/keyboard";
 import { haptic } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +22,6 @@ export function FeedReplyInput({ onSend, disabled, placeholder = "Write a reply.
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-resize textarea based on content
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -28,7 +32,6 @@ export function FeedReplyInput({ onSend, disabled, placeholder = "Write a reply.
 
   const handleSend = () => {
     if (message.trim() && !disabled) {
-      // Haptic feedback on iOS/Android
       haptic.light();
       
       const textarea = textareaRef.current;
@@ -36,20 +39,11 @@ export function FeedReplyInput({ onSend, disabled, placeholder = "Write a reply.
       onSend(message.trim());
       setMessage("");
       
-      // Keep keyboard open
-      const keepKeyboardOpen = () => {
+      // Keep focus on textarea
+      requestAnimationFrame(() => {
         if (textarea) {
           textarea.focus();
         }
-        if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios') {
-          Keyboard.show().catch(() => {});
-        }
-      };
-      
-      requestAnimationFrame(() => {
-        keepKeyboardOpen();
-        setTimeout(keepKeyboardOpen, 50);
-        setTimeout(keepKeyboardOpen, 150);
       });
     }
   };

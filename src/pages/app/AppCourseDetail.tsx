@@ -12,8 +12,7 @@ import { downloadICSFile, generateICSFile } from '@/utils/calendar';
 import { addEventToCalendar, addMultipleEventsToCalendar, isCalendarAvailable, CalendarEvent, checkCalendarPermission } from '@/lib/calendarIntegration';
 import { format, addWeeks } from 'date-fns';
 import { toast } from "sonner";
-import { Share } from '@capacitor/share';
-import { Filesystem, Directory } from '@capacitor/filesystem';
+// Share and Filesystem imports removed (Capacitor removed)
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { isNativeApp } from '@/lib/platform';
 import { programImages } from '@/data/programs';
@@ -385,24 +384,9 @@ const AppCourseDetail = () => {
         } else if (result.error === 'Calendar permission denied') {
           toast.error('Please allow calendar access in Settings');
         } else {
-          // Fallback to share sheet if native calendar fails
-          const icsContent = generateICSFile(event);
-          const fileName = `${program.title.replace(/\s+/g, '-')}.ics`;
-          
-          const fileResult = await Filesystem.writeFile({
-            path: fileName,
-            data: icsContent,
-            directory: Directory.Cache,
-          });
-
-          await Share.share({
-            title: 'Add to Calendar',
-            text: `${event.title}`,
-            url: fileResult.uri,
-            dialogTitle: 'Add Event to Calendar'
-          });
-          
-          toast.success('Select Calendar app to add event');
+          // Fallback to web download if native calendar fails
+          downloadICSFile(event, `${program.title.replace(/\s+/g, '-')}.ics`);
+          toast.success('Calendar event downloaded!');
           markSessionSynced(nextSession.id);
         }
       } catch (error) {

@@ -1,3 +1,10 @@
+/**
+ * Program Event Card - UPDATED (Capacitor Browser removed)
+ * 
+ * Uses window.open instead of Browser plugin.
+ * Capacitor will be added back incrementally to identify the black screen cause.
+ */
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Video, BookOpen, Music, ExternalLink, Settings2 } from 'lucide-react';
@@ -8,8 +15,6 @@ import {
   useUncompleteProgramEvent 
 } from '@/hooks/usePlannerProgramEvents';
 import { haptic } from '@/lib/haptics';
-import { Capacitor } from '@capacitor/core';
-import { Browser } from '@capacitor/browser';
 import { isToday } from 'date-fns';
 import { SessionReminderSheet } from '@/components/app/SessionReminderSheet';
 import { useSessionReminderSettings } from '@/hooks/useSessionReminderSettings';
@@ -51,7 +56,6 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   const completeProgramEvent = useCompleteProgramEvent();
   const uncompleteProgramEvent = useUncompleteProgramEvent();
   
-  // Get reminder settings for this round
   const {
     sessionSettings,
     setSessionSettings,
@@ -62,7 +66,6 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   const style = EVENT_STYLES[event.type];
   const Icon = style.Icon;
   
-  // Determine which settings to use based on event type
   const isSession = event.type === 'session';
   const currentSettings = isSession ? sessionSettings : contentSettings;
   const saveSettings = isSession ? setSessionSettings : setContentSettings;
@@ -95,24 +98,17 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
 
     switch (event.type) {
       case 'session':
-        // If today and has meeting link, open it
         if (isToday(date) && event.meetingLink) {
-          if (Capacitor.isNativePlatform()) {
-            await Browser.open({ url: event.meetingLink });
-          } else {
-            window.open(event.meetingLink, '_blank');
-          }
+          // Use window.open instead of Browser plugin
+          window.open(event.meetingLink, '_blank');
         } else {
-          // Navigate to course detail
           navigate(`/app/course/${event.programSlug}`);
         }
         break;
       case 'module':
-        // Navigate to course detail (modules section)
         navigate(`/app/course/${event.programSlug}`);
         break;
       case 'track':
-        // Navigate to audio player
         if (event.playlistId) {
           navigate(`/app/player/playlist/${event.playlistId}`);
         }
@@ -136,9 +132,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
           event.isCompleted && 'opacity-60'
         )}
       >
-        {/* Main row */}
         <div className="flex items-center gap-3">
-          {/* Icon circle */}
           <div className={cn(
             'w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-sm text-white',
             style.iconBg
@@ -146,16 +140,12 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             <Icon className="h-5 w-5" />
           </div>
 
-          {/* Content */}
           <div className="flex-1 min-w-0">
-            {/* Top line: time/release + badge + settings + external link */}
             <div className="flex items-center gap-2 text-xs text-foreground/60 mb-0.5">
-              {/* Left: Time or "Anytime" */}
               <span className="font-semibold text-foreground/70">
                 {event.time || 'Anytime'}
               </span>
               
-              {/* Center: Badge */}
               <span className={cn(
                 'px-2 py-0.5 rounded-full text-white font-medium text-[10px]',
                 style.badgeColor
@@ -163,7 +153,6 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
                 {style.badge}
               </span>
               
-              {/* Settings icon - opens reminder sheet directly */}
               <button
                 onClick={handleSettingsClick}
                 className="p-1.5 rounded-full bg-foreground/5 hover:bg-foreground/10 active:bg-foreground/20 transition-colors"
@@ -171,13 +160,11 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
                 <Settings2 className="h-3.5 w-3.5 text-foreground/60" />
               </button>
               
-              {/* External link indicator for today's sessions */}
               {event.type === 'session' && isToday(date) && event.meetingLink && (
                 <ExternalLink className="h-3 w-3 text-foreground/50" />
               )}
             </div>
             
-            {/* Title */}
             <p className={cn(
               'font-semibold text-foreground truncate transition-all',
               event.isCompleted && 'line-through text-foreground/50'
@@ -185,13 +172,11 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
               {event.title}
             </p>
             
-            {/* Program name - subtle subtitle */}
             <p className="text-xs text-foreground/50 truncate">
               {event.programTitle}
             </p>
           </div>
 
-          {/* Checkbox */}
           <button
             onClick={handleToggleComplete}
             className={cn(
@@ -207,7 +192,6 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
         </div>
       </div>
 
-      {/* Reminder Settings Sheet */}
       <SessionReminderSheet
         open={showReminderSheet}
         onOpenChange={setShowReminderSheet}

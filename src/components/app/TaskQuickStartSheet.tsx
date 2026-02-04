@@ -1,12 +1,16 @@
+/**
+ * Task Quick Start Sheet - UPDATED (Capacitor Keyboard removed)
+ * 
+ * Keyboard handling removed.
+ * Capacitor will be added back incrementally to identify the black screen cause.
+ */
+
 import { useState } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useTaskTemplates, TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
-import { cn } from '@/lib/utils';
-import { Capacitor } from '@capacitor/core';
-import { Keyboard } from '@capacitor/keyboard';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface TaskQuickStartSheetProps {
@@ -42,7 +46,6 @@ export const TaskQuickStartSheet = ({
     onOpenChange(false);
   };
 
-  // Filter templates based on search or show popular
   const suggestions = taskName.trim()
     ? templates.filter(t => 
         t.title.toLowerCase().includes(taskName.toLowerCase())
@@ -56,13 +59,11 @@ export const TaskQuickStartSheet = ({
         className="h-auto max-h-[85vh] rounded-t-3xl pb-safe"
       >
         <div className="flex flex-col">
-          {/* Header */}
           <div className="pt-2 pb-4 text-center">
             <div className="w-10 h-1 bg-muted-foreground/30 rounded-full mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-foreground">New Action</h2>
           </div>
 
-          {/* Name input */}
           <div className="px-4 pb-4">
             <div className="relative bg-muted/50 rounded-2xl p-4">
               <Input
@@ -75,15 +76,10 @@ export const TaskQuickStartSheet = ({
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    // If there's text, continue; otherwise just dismiss keyboard to show suggestions
                     if (taskName.trim()) {
                       handleContinue();
                     } else {
-                      // Blur to dismiss keyboard and show suggestions
                       (e.target as HTMLInputElement).blur();
-                      if (Capacitor.isNativePlatform()) {
-                        Keyboard.hide();
-                      }
                     }
                   }
                 }}
@@ -94,7 +90,6 @@ export const TaskQuickStartSheet = ({
             </div>
           </div>
 
-          {/* Continue button - appears when name is entered */}
           {taskName.trim() && (
             <div className="px-4 pb-4">
               <Button
@@ -106,7 +101,6 @@ export const TaskQuickStartSheet = ({
             </div>
           )}
 
-          {/* Suggestions */}
           {suggestions.length > 0 && (
             <div className="px-4 pb-6">
               <p className="text-sm text-muted-foreground mb-3">
@@ -141,7 +135,6 @@ export const TaskQuickStartSheet = ({
             </div>
           )}
 
-          {/* Bottom padding */}
           <div className="h-4" />
         </div>
       </SheetContent>

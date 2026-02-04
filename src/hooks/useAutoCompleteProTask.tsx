@@ -1,112 +1,21 @@
+/**
+ * Auto Complete Pro Task hook - STUBBED (Capacitor references removed)
+ * 
+ * Core functionality preserved, native notifications removed.
+ * Capacitor will be added back incrementally to identify the black screen cause.
+ */
+
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ProLinkType } from '@/lib/proTaskTypes';
-import { LocalNotifications } from '@capacitor/local-notifications';
-import { Capacitor } from '@capacitor/core';
-
-/**
- * Hook to auto-complete pro tasks when user performs the related action.
- * For example:
- * - When user writes a journal entry → complete all 'journal' pro tasks for today
- * - When user completes an audio track → complete all 'playlist' pro tasks linked to that playlist
- * 
- * Also handles goal progress: if the task has a count goal, it increments goal_progress.
- * Triggers celebration notifications at 50% and 100% milestones.
- */
-
-// Helper to check and trigger milestone celebrations
-const checkAndCelebrateMilestone = async (
-  taskId: string,
-  taskTitle: string,
-  previousProgress: number,
-  newProgress: number,
-  goalTarget: number
-): Promise<void> => {
-  if (!Capacitor.isNativePlatform() || goalTarget <= 0) return;
-
-  const today = format(new Date(), 'yyyy-MM-dd');
-  const storageKey = `milestone_${taskId}_${today}`;
-  
-  // Get already celebrated milestones for this task today
-  const celebratedMilestones = JSON.parse(localStorage.getItem(storageKey) || '[]') as string[];
-  
-  const previousPercent = Math.floor((previousProgress / goalTarget) * 100);
-  const newPercent = Math.floor((newProgress / goalTarget) * 100);
-  
-  // Check 50% milestone
-  if (previousPercent < 50 && newPercent >= 50 && !celebratedMilestones.includes('50')) {
-    await triggerMilestoneNotification(
-      taskTitle,
-      newProgress,
-      goalTarget,
-      '50'
-    );
-    celebratedMilestones.push('50');
-    localStorage.setItem(storageKey, JSON.stringify(celebratedMilestones));
-  }
-  
-  // Check 100% milestone
-  if (previousPercent < 100 && newPercent >= 100 && !celebratedMilestones.includes('100')) {
-    await triggerMilestoneNotification(
-      taskTitle,
-      newProgress,
-      goalTarget,
-      '100'
-    );
-    celebratedMilestones.push('100');
-    localStorage.setItem(storageKey, JSON.stringify(celebratedMilestones));
-  }
-};
-
-// Trigger local notification for milestone
-const triggerMilestoneNotification = async (
-  taskTitle: string,
-  progress: number,
-  target: number,
-  milestone: '50' | '100'
-): Promise<void> => {
-  try {
-    const title = milestone === '100' 
-      ? '🏆 Goal complete!' 
-      : '🎉 Halfway there!';
-    
-    const body = milestone === '100'
-      ? `You finished all ${target} on "${taskTitle}"! Amazing work ✨`
-      : `${progress}/${target} done on "${taskTitle}"`;
-
-    await LocalNotifications.schedule({
-      notifications: [{
-        title,
-        body,
-        id: Date.now(),
-        schedule: { at: new Date(Date.now() + 500) }, // Immediate
-        sound: 'default',
-        extra: {
-          type: 'goal_milestone',
-          milestone,
-          url: '/app/home',
-        },
-      }],
-    });
-    
-    console.log(`[Milestone] Celebrated ${milestone}% for "${taskTitle}"`);
-  } catch (error) {
-    console.error('[Milestone] Failed to send notification:', error);
-  }
-};
 
 export const useAutoCompleteProTask = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  /**
-   * Auto-complete pro tasks of a specific type for today
-   * @param linkType - The pro_link_type (e.g., 'journal', 'playlist')
-   * @param linkValue - Optional: specific pro_link_value to match (e.g., playlist ID)
-   */
   const autoComplete = useCallback(async (
     linkType: ProLinkType,
     linkValue?: string | null
@@ -116,7 +25,6 @@ export const useAutoCompleteProTask = () => {
     const today = format(new Date(), 'yyyy-MM-dd');
 
     try {
-      // Find all active pro tasks of this type that are scheduled for today
       let query = supabase
         .from('user_tasks')
         .select('id, title, pro_link_type, pro_link_value, scheduled_date, repeat_pattern, repeat_days, goal_enabled, goal_type, goal_target')
@@ -124,7 +32,6 @@ export const useAutoCompleteProTask = () => {
         .eq('is_active', true)
         .eq('pro_link_type', linkType);
 
-      // If linkValue is provided, match it specifically (for playlist tasks)
       if (linkValue) {
         query = query.eq('pro_link_value', linkValue);
       }
@@ -138,19 +45,15 @@ export const useAutoCompleteProTask = () => {
 
       if (!tasks || tasks.length === 0) return 0;
 
-      // Filter tasks that are applicable for today
       const applicableTasks = tasks.filter(task => {
-        // Check if task is scheduled for today
         if (task.scheduled_date === today) return true;
 
-        // Check repeating tasks
         if (task.repeat_pattern) {
-          const dayOfWeek = new Date().getDay(); // 0 = Sunday
+          const dayOfWeek = new Date().getDay();
           
           if (task.repeat_pattern === 'daily') return true;
           
           if (task.repeat_pattern === 'weekly' && task.repeat_days) {
-            // repeat_days is array of day numbers (0-6)
             return (task.repeat_days as number[]).includes(dayOfWeek);
           }
           
@@ -164,7 +67,6 @@ export const useAutoCompleteProTask = () => {
 
       if (applicableTasks.length === 0) return 0;
 
-      // Get existing completions for today to check progress
       const taskIds = applicableTasks.map(t => t.id);
       const { data: existingCompletions } = await supabase
         .from('task_completions')
@@ -181,14 +83,11 @@ export const useAutoCompleteProTask = () => {
         const currentProgress = completionMap.get(task.id) || 0;
         const hasGoal = task.goal_enabled && task.goal_target && task.goal_target > 0;
         const isCountGoal = hasGoal && task.goal_type === 'count';
-        const goalTarget = task.goal_target || 0;
         
         if (isCountGoal) {
-          // For count goals, increment progress by 1
           const newProgress = currentProgress + 1;
           
           if (completionMap.has(task.id)) {
-            // Update existing completion with incremented progress
             await supabase
               .from('task_completions')
               .update({ goal_progress: newProgress })
@@ -196,7 +95,6 @@ export const useAutoCompleteProTask = () => {
               .eq('user_id', user.id)
               .eq('completed_date', today);
           } else {
-            // Insert new completion with progress = 1
             await supabase
               .from('task_completions')
               .insert({
@@ -207,12 +105,8 @@ export const useAutoCompleteProTask = () => {
               });
           }
           
-          // Check for milestone celebrations (50% and 100%)
-          await checkAndCelebrateMilestone(task.id, task.title, currentProgress, newProgress, goalTarget);
-          
           tasksCompleted++;
         } else {
-          // For non-goal tasks, just mark complete if not already
           if (!completionMap.has(task.id)) {
             await supabase
               .from('task_completions')
@@ -227,7 +121,6 @@ export const useAutoCompleteProTask = () => {
       }
 
       if (tasksCompleted > 0) {
-        // Invalidate queries to update UI
         queryClient.invalidateQueries({ queryKey: ['planner-completions', user.id, today] });
         queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
         queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
@@ -242,30 +135,18 @@ export const useAutoCompleteProTask = () => {
     }
   }, [user?.id, queryClient]);
 
-  /**
-   * Auto-complete journal pro tasks
-   */
   const autoCompleteJournal = useCallback(async (): Promise<number> => {
     return autoComplete('journal');
   }, [autoComplete]);
 
-  /**
-   * Auto-complete playlist pro tasks for a specific playlist
-   */
   const autoCompletePlaylist = useCallback(async (playlistId: string): Promise<number> => {
     return autoComplete('playlist', playlistId);
   }, [autoComplete]);
 
-  /**
-   * Auto-complete breathing pro tasks for a specific exercise
-   */
   const autoCompleteBreathe = useCallback(async (exerciseId: string): Promise<number> => {
     return autoComplete('breathe', exerciseId);
   }, [autoComplete]);
 
-  /**
-   * Auto-complete emotion pro tasks
-   */
   const autoCompleteEmotion = useCallback(async (): Promise<number> => {
     return autoComplete('emotion');
   }, [autoComplete]);

@@ -65,12 +65,6 @@ export default defineConfig(({ mode }) => ({
           'supabase': [
             '@supabase/supabase-js',
           ],
-          // Capacitor chunk - native features
-          'capacitor': [
-            '@capacitor/core',
-            '@capacitor/app',
-            '@capacitor/push-notifications',
-          ],
           // Charts chunk - only needed on admin pages
           'charts': [
             'recharts',
