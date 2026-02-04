@@ -238,7 +238,8 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleRoutineClick();
+                  haptic.light();
+                  setShowRoutineSheet(true);
                 }}
                 disabled={addRoutinePlan.isPending}
                 className="h-10 w-10 rounded-full bg-white text-violet-600 flex items-center justify-center shrink-0 active:scale-[0.95] transition-transform"
