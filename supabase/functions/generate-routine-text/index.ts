@@ -25,13 +25,29 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are a wellness content writer for a women's empowerment app. Write warm, encouraging, and action-oriented content. Be concise and inspiring. Avoid clichés. Write in a friendly, supportive tone.`;
+    const systemPrompt = `You are writing for Simora, a strength companion app for women. 
+
+PHILOSOPHY:
+- Simora helps users rebuild self-trust, not track habits
+- "Strength" means returning, not performing perfectly
+- Users are doing their best; breaks are natural
+- Tone is warm, steady, grounded — never urgent or pushy
+
+WRITING RULES:
+- Maximum 1-3 short sentences
+- Use simple words (A2/B1 English level)
+- No complex vocabulary or long words
+- No pressure words like "must", "should", "commit", "achieve"
+- Be gentle and kind, like a supportive friend
+- Focus on small moments of care, not big goals`;
 
     const userPrompt = `Context: "${context}"
 
 ${prompt}
 
-Return ONLY the generated text, no quotes, no explanations.`;
+IMPORTANT: Write 1-3 simple sentences only. Use easy words. Be warm and gentle.
+
+Return ONLY the text, nothing else.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -45,8 +61,8 @@ Return ONLY the generated text, no quotes, no explanations.`;
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        max_tokens: 200,
-        temperature: 0.7,
+        max_tokens: 100,
+        temperature: 0.6,
       }),
     });
 
