@@ -19,6 +19,10 @@ let PushNotificationsPlugin: typeof import('@capacitor/push-notifications').Push
 async function getPlugin() {
   if (!PushNotificationsPlugin && Capacitor.isNativePlatform()) {
     try {
+      if (!Capacitor.isPluginAvailable('PushNotifications')) {
+        console.warn('[Push] Native plugin not available (PushNotifications).');
+        return null;
+      }
       const module = await import('@capacitor/push-notifications');
       PushNotificationsPlugin = module.PushNotifications;
       console.log('[Push] Plugin loaded successfully');
@@ -58,75 +62,87 @@ export async function initializePushNotificationHandlers() {
     return;
   }
 
-  const plugin = await getPlugin();
-  if (!plugin) {
-    console.warn('[Push] Plugin not available, skipping handler initialization');
+  if (!Capacitor.isPluginAvailable('PushNotifications')) {
+    console.warn('[Push] PushNotifications plugin is not available on this build; skipping init.');
     return;
   }
 
-  console.log('[Push] 🚀 Initializing notification handlers for ALL states (foreground, background, closed)');
-
-  // Phase 5: Clear badge when app opens
-  clearBadge();
-
-  // ========================================
-  // FOREGROUND: When app is open and active
-  // ========================================
-  plugin.addListener('pushNotificationReceived', (notification) => {
-    console.log('[Push] 📱 FOREGROUND notification received:', {
-      title: notification.title,
-      body: notification.body,
-      data: notification.data,
-      id: notification.id,
-    });
-    
-    // Show in-app toast with action button if URL provided
-    toast(notification.title || 'New Notification', {
-      description: notification.body || '',
-      duration: 5000,
-      action: (notification.data?.url || notification.data?.destination_url) ? {
-        label: 'View',
-        onClick: () => {
-          const url = (notification.data?.url || notification.data?.destination_url) as string;
-          console.log('[Push] Toast action clicked, navigating to:', url);
-          handleDeepLink(url);
-          clearBadge();
-        },
-      } : undefined,
-    });
-  });
-
-  // ========================================
-  // BACKGROUND/CLOSED: When notification is tapped
-  // ========================================
-  plugin.addListener('pushNotificationActionPerformed', (action) => {
-    console.log('[Push] 🔔 Notification ACTION performed (background/closed):', {
-      actionId: action.actionId,
-      inputValue: action.inputValue,
-      notification: {
-        id: action.notification.id,
-        title: action.notification.title,
-        body: action.notification.body,
-        data: action.notification.data,
-      },
-    });
-    
-    // Phase 5: Clear badge when notification is tapped
-    clearBadge();
-    
-    const data = action.notification.data;
-    const destinationUrl = (data?.url || data?.destination_url) as string | undefined;
-    
-    if (destinationUrl) {
-      console.log('[Push] 🎯 Deep linking to:', destinationUrl);
-      setTimeout(() => handleDeepLink(destinationUrl), 500);
-    } else {
-      console.log('[Push] ℹ️ No deep link URL found, navigating to home');
-      setTimeout(() => handleDeepLink('/app/home'), 500);
+  try {
+    const plugin = await getPlugin();
+    if (!plugin) {
+      console.warn('[Push] Plugin not available, skipping handler initialization');
+      return;
     }
-  });
 
-  console.log('[Push] ✅ Notification handlers initialized successfully');
+    console.log('[Push] 🚀 Initializing notification handlers for ALL states (foreground, background, closed)');
+
+    // Phase 5: Clear badge when app opens
+    await clearBadge();
+
+    // ========================================
+    // FOREGROUND: When app is open and active
+    // ========================================
+    await plugin.addListener('pushNotificationReceived', (notification) => {
+      console.log('[Push] 📱 FOREGROUND notification received:', {
+        title: notification.title,
+        body: notification.body,
+        data: notification.data,
+        id: notification.id,
+      });
+
+      // Show in-app toast with action button if URL provided
+      toast(notification.title || 'New Notification', {
+        description: notification.body || '',
+        duration: 5000,
+        action: (notification.data?.url || notification.data?.destination_url)
+          ? {
+              label: 'View',
+              onClick: () => {
+                const url = (notification.data?.url || notification.data?.destination_url) as string;
+                console.log('[Push] Toast action clicked, navigating to:', url);
+                handleDeepLink(url);
+                clearBadge().catch((e) => console.error('[Push] clearBadge failed:', e));
+              },
+            }
+          : undefined,
+      });
+    });
+
+    // ========================================
+    // BACKGROUND/CLOSED: When notification is tapped
+    // ========================================
+    await plugin.addListener('pushNotificationActionPerformed', (action) => {
+      console.log('[Push] 🔔 Notification ACTION performed (background/closed):', {
+        actionId: action.actionId,
+        inputValue: action.inputValue,
+        notification: {
+          id: action.notification.id,
+          title: action.notification.title,
+          body: action.notification.body,
+          data: action.notification.data,
+        },
+      });
+
+      // Phase 5: Clear badge when notification is tapped
+      clearBadge().catch((e) => console.error('[Push] clearBadge failed:', e));
+
+      const data = action.notification.data;
+      const destinationUrl = (data?.url || data?.destination_url) as string | undefined;
+
+      if (destinationUrl) {
+        console.log('[Push] 🎯 Deep linking to:', destinationUrl);
+        setTimeout(() => handleDeepLink(destinationUrl), 500);
+      } else {
+        console.log('[Push] ℹ️ No deep link URL found, navigating to home');
+        setTimeout(() => handleDeepLink('/app/home'), 500);
+      }
+    });
+
+    console.log('[Push] ✅ Notification handlers initialized successfully');
+  } catch (error) {
+    // Critical: never allow plugin init to prevent app render.
+    console.error('[Push] ❌ Failed to initialize push handlers (non-fatal):', error);
+  }
 }
 
 // Phase 5: Clear badge count
@@ -304,7 +320,11 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
       });
 
       console.log('[Push] Calling PushNotifications.register()');
-      plugin.register();
+      try {
+        plugin.register();
+      } catch (e) {
+        console.error('[Push] ❌ register() threw (non-fatal):', e);
+      }
     });
   } catch (error: any) {
     isRegistering = false;
@@ -366,6 +386,11 @@ export async function getRegistrationStatus(): Promise<{
 export async function refreshDeviceToken(userId: string): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
 
+  if (!Capacitor.isPluginAvailable('PushNotifications')) {
+    console.warn('[Push] PushNotifications plugin not available; skipping token refresh.');
+    return;
+  }
+
   const plugin = await getPlugin();
   if (!plugin) return;
 
@@ -383,17 +408,26 @@ export async function refreshDeviceToken(userId: string): Promise<void> {
         resolve({ success: false });
       }, 10000);
 
-      plugin.addListener('registration', async (token) => {
-        clearTimeout(timeout);
-        resolve({ success: true, token: token.value });
-      });
+      // Wrap listener registration so a missing native bridge can't crash startup.
+      (async () => {
+        try {
+          await plugin.addListener('registration', async (token) => {
+            clearTimeout(timeout);
+            resolve({ success: true, token: token.value });
+          });
 
-      plugin.addListener('registrationError', () => {
-        clearTimeout(timeout);
-        resolve({ success: false });
-      });
+          await plugin.addListener('registrationError', () => {
+            clearTimeout(timeout);
+            resolve({ success: false });
+          });
 
-      plugin.register();
+          plugin.register();
+        } catch (e) {
+          clearTimeout(timeout);
+          console.error('[Push] ❌ Failed to register listeners/register() (non-fatal):', e);
+          resolve({ success: false });
+        }
+      })();
     });
 
     if (result.success && result.token) {

@@ -191,19 +191,23 @@ const NativeAppRedirect = () => {
       });
 
       // Initialize push notification handlers once
-      initializePushNotificationHandlers();
+      initializePushNotificationHandlers().catch((e) =>
+        console.error('[App] Push notification init failed (non-fatal):', e)
+      );
       
       // Initialize local notification handlers for task reminders
       initializeLocalNotificationHandlers((url: string) => {
         console.log('[App] Local notification deep link:', url);
         navigate(url);
-      });
+      }).catch((e) => console.error('[App] Local notification init failed (non-fatal):', e));
       
       // Initialize native social login (Google/Apple)
-      initializeSocialLogin();
+      initializeSocialLogin().catch((e) =>
+        console.error('[App] Social login init failed (non-fatal):', e)
+      );
       
       // Clear badge on app open
-      clearBadge();
+      clearBadge().catch((e) => console.error('[App] clearBadge failed (non-fatal):', e));
       
       // Refresh device token on app startup
       const refreshToken = async () => {
@@ -213,7 +217,7 @@ const NativeAppRedirect = () => {
           await refreshDeviceToken(user.id);
         }
       };
-      refreshToken();
+      refreshToken().catch((e) => console.error('[App] refreshToken failed (non-fatal):', e));
       
       // Check if app was launched with a deep link (cold start)
       const handleInitialDeepLink = async () => {
@@ -223,7 +227,9 @@ const NativeAppRedirect = () => {
           navigate(initialPath);
         }
       };
-      handleInitialDeepLink();
+      handleInitialDeepLink().catch((e) =>
+        console.error('[App] Initial deep link check failed (non-fatal):', e)
+      );
     }
   }, [navigate]);
   
