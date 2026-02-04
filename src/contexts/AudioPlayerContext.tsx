@@ -268,22 +268,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     };
   }, [currentTrack, user?.id, isPlaying, currentTime, duration]);
 
-  // Update music controls when state changes
-  useEffect(() => {
-    if (!currentTrack || !Capacitor.isNativePlatform()) return;
-    
-    updateMusicControls({
-      trackId: currentTrack.id,
-      track: currentTrack.title,
-      artist: currentTrack.playlistName || "LadyBoss Academy",
-      cover: currentTrack.coverImageUrl || "",
-      isPlaying,
-      duration: Math.floor(duration),
-      elapsed: Math.floor(currentTime),
-      hasPrev: false,
-      hasNext: hasNextTrack,
-    });
-  }, [currentTrack, isPlaying, duration, currentTime, hasNextTrack]);
+  // Music controls removed - was causing iOS build issues with SPM
 
   const playTrack = useCallback(async (track: TrackInfo, startPosition?: number) => {
     if (!audioRef.current) return;
