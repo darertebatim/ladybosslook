@@ -181,6 +181,8 @@ export type Database = {
           device_id: string
           id: string
           installed_at: string
+          last_seen_at: string | null
+          last_seen_version: string | null
           platform: string
           user_id: string | null
         }
@@ -190,6 +192,8 @@ export type Database = {
           device_id: string
           id?: string
           installed_at?: string
+          last_seen_at?: string | null
+          last_seen_version?: string | null
           platform?: string
           user_id?: string | null
         }
@@ -199,6 +203,8 @@ export type Database = {
           device_id?: string
           id?: string
           installed_at?: string
+          last_seen_at?: string | null
+          last_seen_version?: string | null
           platform?: string
           user_id?: string | null
         }
