@@ -1,31 +1,37 @@
-/**
- * Platform detection - STUBBED (Capacitor removed)
- * 
- * All functions return web-only values.
- * Capacitor will be added back incrementally to identify the black screen cause.
- */
+import { Capacitor } from '@capacitor/core';
 
+/**
+ * Simplified platform detection using Capacitor's built-in APIs
+ * Supports ?devNative=true URL parameter for previewing native layout in browser
+ */
 export const isNativeApp = (): boolean => {
-  // Check for dev preview flag only
+  // Check for dev preview flag
   if (typeof window !== 'undefined') {
     const devNative = new URLSearchParams(window.location.search).get('devNative') === 'true';
     if (devNative) return true;
   }
   
-  // Capacitor removed - always return false
-  return false;
+  return Capacitor.isNativePlatform();
 };
 
 export const isIOSApp = (): boolean => {
-  // Capacitor removed - always return false
-  return false;
+  return Capacitor.getPlatform() === 'ios';
 };
 
 export const isWebApp = (): boolean => {
-  return true;
+  return !isNativeApp();
 };
 
 export const isRealDevice = async (): Promise<boolean> => {
-  // Capacitor removed - always return false
-  return false;
+  if (!isIOSApp()) return false;
+  
+  try {
+    const { Device } = await import('@capacitor/device');
+    const info = await Device.getInfo();
+    // isVirtual is true for simulators
+    return !info.isVirtual;
+  } catch (error) {
+    console.error('[Platform] Failed to check device type:', error);
+    return false;
+  }
 };

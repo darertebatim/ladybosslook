@@ -1,28 +1,57 @@
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+
 /**
- * Haptic feedback utility - STUBBED (Capacitor removed)
- * 
- * All methods are no-ops.
- * Capacitor will be added back incrementally to identify the black screen cause.
+ * Centralized haptic feedback utility for native iOS/Android feel.
+ * All methods are safe to call on web - they simply no-op.
  */
 export const haptic = {
   /** Light tap - for selections, toggles, small interactions */
-  light: () => {},
+  light: () => {
+    if (Capacitor.isNativePlatform()) {
+      Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+    }
+  },
   
   /** Medium tap - for confirmations, drag start */
-  medium: () => {},
+  medium: () => {
+    if (Capacitor.isNativePlatform()) {
+      Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
+    }
+  },
   
   /** Heavy tap - for major actions */
-  heavy: () => {},
+  heavy: () => {
+    if (Capacitor.isNativePlatform()) {
+      Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => {});
+    }
+  },
   
   /** Success notification - task complete, achievement */
-  success: () => {},
+  success: () => {
+    if (Capacitor.isNativePlatform()) {
+      Haptics.notification({ type: NotificationType.Success }).catch(() => {});
+    }
+  },
   
   /** Warning notification - prevented action, alert */
-  warning: () => {},
+  warning: () => {
+    if (Capacitor.isNativePlatform()) {
+      Haptics.notification({ type: NotificationType.Warning }).catch(() => {});
+    }
+  },
   
   /** Error notification - failed action, destructive */
-  error: () => {},
+  error: () => {
+    if (Capacitor.isNativePlatform()) {
+      Haptics.notification({ type: NotificationType.Error }).catch(() => {});
+    }
+  },
   
   /** Selection change - picker wheels, star ratings */
-  selection: () => {},
+  selection: () => {
+    if (Capacitor.isNativePlatform()) {
+      Haptics.selectionChanged().catch(() => {});
+    }
+  },
 };

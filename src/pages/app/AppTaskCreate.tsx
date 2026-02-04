@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useKeyboard } from '@/hooks/useKeyboard';
-// Capacitor import removed
+import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -510,9 +510,9 @@ const AppTaskCreate = ({
     }
   };
 
-  // Store focused input ref for keyboard scroll fix
+  // Store focused input ref for iOS keyboard scroll fix
   const handleSubtaskInputFocus = (element: HTMLInputElement | null) => {
-    if (element) {
+    if (element && Capacitor.isNativePlatform()) {
       focusedInputRef.current = element;
       // The useEffect watching isKeyboardOpen will handle scrolling
     }
@@ -674,7 +674,9 @@ const AppTaskCreate = ({
             value={title}
             onChange={(e) => setTitle(e.target.value.slice(0, 50))}
             onFocus={(e) => {
-              focusedInputRef.current = e.target;
+              if (Capacitor.isNativePlatform()) {
+                focusedInputRef.current = e.target;
+              }
             }}
             placeholder="Task name"
             className="w-full text-lg font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0 pr-6"
@@ -715,7 +717,9 @@ const AppTaskCreate = ({
           value={description || ''}
           onChange={(e) => setDescription(e.target.value || null)}
           onFocus={(e) => {
-            focusedInputRef.current = e.target as unknown as HTMLInputElement;
+            if (Capacitor.isNativePlatform()) {
+              focusedInputRef.current = e.target as unknown as HTMLInputElement;
+            }
           }}
           placeholder="Add a description or notes..."
           className="w-full bg-white/60 dark:bg-slate-700/60 border-0 rounded-xl resize-none text-sm placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-foreground/20 min-h-0"

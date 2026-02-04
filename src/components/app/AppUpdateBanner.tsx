@@ -1,13 +1,7 @@
-/**
- * App Update Banner - STUBBED (Capacitor removed)
- * 
- * Uses window.open instead of Browser plugin.
- * Capacitor will be added back incrementally to identify the black screen cause.
- */
-
 import { Download, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppUpdateChecker } from '@/hooks/useAppUpdateChecker';
+import { Browser } from '@capacitor/browser';
 
 export function AppUpdateBanner() {
   const { updateAvailable, latestVersion, storeUrl, dismiss } = useAppUpdateChecker();
@@ -16,19 +10,27 @@ export function AppUpdateBanner() {
     return null;
   }
 
-  const handleUpdate = () => {
-    window.open(storeUrl, '_blank');
+  const handleUpdate = async () => {
+    try {
+      await Browser.open({ url: storeUrl });
+    } catch (error) {
+      console.error('[AppUpdateBanner] Error opening App Store:', error);
+      window.open(storeUrl, '_blank');
+    }
   };
 
   return (
     <div className="relative overflow-hidden rounded-xl border-2 border-primary bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 p-4">
+      {/* Animated background */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-pulse" />
       
       <div className="relative flex items-start gap-3">
+        {/* Icon */}
         <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary flex items-center justify-center">
           <Sparkles className="h-5 w-5 text-primary-foreground" />
         </div>
         
+        {/* Content */}
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-foreground">
             Update Available! 🎉
@@ -37,6 +39,7 @@ export function AppUpdateBanner() {
             Version {latestVersion} is now available with new features and improvements.
           </p>
           
+          {/* Action buttons */}
           <div className="flex items-center gap-2 mt-3">
             <Button
               size="sm"
@@ -57,6 +60,7 @@ export function AppUpdateBanner() {
           </div>
         </div>
         
+        {/* Dismiss button */}
         <Button
           size="icon"
           variant="ghost"

@@ -12,6 +12,7 @@ import { getDisplayBuildInfo } from '@/lib/buildInfo';
 import { ArrowLeft, Mail } from 'lucide-react';
 import appIcon from '@/assets/app-icon.png';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { Capacitor } from '@capacitor/core';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -274,7 +275,9 @@ export default function Auth() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     onFocus={(e) => {
-                      focusedInputRef.current = e.target;
+                      if (Capacitor.isNativePlatform()) {
+                        focusedInputRef.current = e.target;
+                      }
                     }}
                     required
                     className="h-12 rounded-xl"
@@ -290,7 +293,9 @@ export default function Auth() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       onFocus={(e) => {
-                        focusedInputRef.current = e.target;
+                        if (Capacitor.isNativePlatform()) {
+                          focusedInputRef.current = e.target;
+                        }
                       }}
                       required
                       className="h-12 rounded-xl"

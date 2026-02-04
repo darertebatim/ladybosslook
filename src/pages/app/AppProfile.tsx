@@ -15,7 +15,7 @@ import {
   LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell,
   BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, Trash2, AlertTriangle, Settings, PlayCircle
 } from 'lucide-react';
-// NativeSettings import removed (Capacitor removed)
+import { NativeSettings, IOSSettings, AndroidSettings } from 'capacitor-native-settings';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,7 +35,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { useState, useEffect, useMemo } from 'react';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications, unsubscribeFromPushNotifications } from '@/lib/pushNotifications';
 import { clearTourCompleted } from '@/hooks/useAppTour';
-import { isNativeApp } from '@/lib/platform';
+import { Capacitor } from '@capacitor/core';
 import { format, startOfMonth } from 'date-fns';
 import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
 
@@ -43,7 +43,7 @@ import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
 const useShowNativeSettings = () => {
   const [searchParams] = useSearchParams();
   const debugNative = searchParams.get('debugNative') === 'true';
-  return isNativeApp() || debugNative;
+  return Capacitor.isNativePlatform() || debugNative;
 };
 
 // Stats Pill Component
@@ -169,7 +169,7 @@ const AppProfile = () => {
   // Check notification permission and subscription status on mount
   useEffect(() => {
     const checkStatus = async () => {
-      if (isNativeApp() && user?.id) {
+      if (Capacitor.isNativePlatform() && user?.id) {
         const status = await checkPermissionStatus();
         setNotificationPermission(status);
 
@@ -609,13 +609,21 @@ const AppProfile = () => {
     }
   };
 
-  // Open native app settings (stubbed - Capacitor removed)
+  // Open native app settings
   const handleOpenAppSettings = async () => {
-    toast({
-      title: 'Not Available',
-      description: 'Native settings access requires the iOS app',
-      variant: 'destructive',
-    });
+    try {
+      await NativeSettings.open({
+        optionAndroid: AndroidSettings.ApplicationDetails,
+        optionIOS: IOSSettings.App,
+      });
+    } catch (error) {
+      console.error('Failed to open settings:', error);
+      toast({
+        title: 'Error',
+        description: 'Could not open settings',
+        variant: 'destructive',
+      });
+    }
   };
 
   const formatCurrency = (amount: number, currency: string = 'usd') => {
