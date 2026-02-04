@@ -68,21 +68,7 @@
     src="https://www.facebook.com/tr?id=755747250681175&ev=PageView&noscript=1"
     /></noscript>
     
-    <div id="root">
-      <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#000;color:#fff;">
-        Loading...
-      </div>
-    </div>
-    
-    <script>
-      window.onerror = function(msg, url, line) {
-        document.getElementById('root').innerHTML = 
-          '<div style="padding:20px;text-align:center;font-family:sans-serif;background:#000;color:#fff;height:100vh;">' +
-          '<h2 style="color:#ef4444;">App Error</h2><p>' + msg + '</p><p>Line: ' + line + '</p>' +
-          '<button onclick="location.reload()" style="padding:10px 20px;margin-top:20px;background:#8B5CF6;color:white;border:none;border-radius:8px;">Reload</button></div>';
-      };
-    </script>
-    
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

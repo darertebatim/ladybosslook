@@ -1,27 +1,10 @@
 import { supabase } from '@/integrations/supabase/client';
+import { PushNotifications, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
-import type { PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { toast } from 'sonner';
 
 export type NotificationPermission = 'granted' | 'denied' | 'default';
-
-let pushPlugin: typeof import('@capacitor/push-notifications').PushNotifications | null = null;
-
-async function getPushNotifications() {
-  if (!Capacitor.isNativePlatform()) return null;
-  if (!Capacitor.isPluginAvailable('PushNotifications')) {
-    console.warn('[Push] PushNotifications plugin not available');
-    return null;
-  }
-
-  if (!pushPlugin) {
-    const mod = await import('@capacitor/push-notifications');
-    pushPlugin = mod.PushNotifications;
-  }
-
-  return pushPlugin;
-}
 
 // Navigation callback for deep linking
 let navigationCallback: ((url: string) => void) | null = null;
@@ -53,155 +36,150 @@ export function initializePushNotificationHandlers() {
     return;
   }
 
-  (async () => {
-    const PushNotifications = await getPushNotifications();
-    if (!PushNotifications) return;
+  console.log('[Push] 🚀 Initializing notification handlers for ALL states (foreground, background, closed)');
 
-    console.log('[Push] 🚀 Initializing notification handlers for ALL states (foreground, background, closed)');
+  // Phase 5: Clear badge when app opens
+  clearBadge();
 
-    // Phase 5: Clear badge when app opens
-    await clearBadge();
-
-    // ========================================
-    // FOREGROUND: When app is open and active
-    // ========================================
-    PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
-      console.log('[Push] 📱 FOREGROUND notification received:', {
-        title: notification.title,
-        body: notification.body,
-        data: notification.data,
-        id: notification.id,
-      });
-
-      // Show in-app toast with action button if URL provided
-      toast(notification.title || 'New Notification', {
-        description: notification.body || '',
-        duration: 5000,
-        action: (notification.data?.url || notification.data?.destination_url) ? {
-          label: 'View',
-          onClick: () => {
-            const url = (notification.data?.url || notification.data?.destination_url) as string;
-            console.log('[Push] Toast action clicked, navigating to:', url);
-            handleDeepLink(url);
-            // Phase 5: Clear badge when user interacts with notification
-            clearBadge();
-          },
-        } : undefined,
-      });
+  // ========================================
+  // FOREGROUND: When app is open and active
+  // ========================================
+  PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
+    console.log('[Push] 📱 FOREGROUND notification received:', {
+      title: notification.title,
+      body: notification.body,
+      data: notification.data,
+      id: notification.id,
     });
-
-    // ========================================
-    // BACKGROUND/CLOSED: When notification is tapped
-    // ========================================
-    PushNotifications.addListener('pushNotificationActionPerformed', (action: ActionPerformed) => {
-      console.log('[Push] 🔔 Notification ACTION performed (background/closed):', {
-        actionId: action.actionId,
-        inputValue: action.inputValue,
-        notification: {
-          id: action.notification.id,
-          title: action.notification.title,
-          body: action.notification.body,
-          data: action.notification.data,
+    
+    // Phase 5: Badge count is managed by iOS automatically for foreground notifications
+    // iOS doesn't increment badge for foreground notifications, so no action needed
+    
+    // Show in-app toast with action button if URL provided
+    toast(notification.title || 'New Notification', {
+      description: notification.body || '',
+      duration: 5000,
+      action: (notification.data?.url || notification.data?.destination_url) ? {
+        label: 'View',
+        onClick: () => {
+          const url = (notification.data?.url || notification.data?.destination_url) as string;
+          console.log('[Push] Toast action clicked, navigating to:', url);
+          handleDeepLink(url);
+          // Phase 5: Clear badge when user interacts with notification
+          clearBadge();
         },
-      });
-
-      // Phase 5: Clear badge when notification is tapped
-      clearBadge();
-
-      const data = action.notification.data;
-
-      // Extract URL from data (check multiple possible keys)
-      const destinationUrl = (data?.url || data?.destination_url) as string | undefined;
-
-      if (destinationUrl) {
-        console.log('[Push] 🎯 Deep linking to:', destinationUrl);
-
-        // Small delay to ensure app is fully loaded
-        setTimeout(() => {
-          handleDeepLink(destinationUrl);
-        }, 500);
-      } else {
-        console.log('[Push] ℹ️ No deep link URL found in notification data, navigating to home');
-
-        // Navigate to home if no specific URL
-        setTimeout(() => {
-          handleDeepLink('/app/home');
-        }, 500);
-      }
+      } : undefined,
     });
+  });
 
-    console.log('[Push] ✅ Notification handlers initialized successfully');
-    console.log('[Push] ✓ Foreground handler: Shows toast with action button');
-    console.log('[Push] ✓ Background/Closed handler: Deep links to content');
-    console.log('[Push] ✓ Deep linking: Ready for navigation');
-    console.log('[Push] ✓ Badge management: Auto-clear on app open and notification tap');
-  })().catch((e) => console.error('[Push] Handler init failed:', e));
+  // ========================================
+  // BACKGROUND/CLOSED: When notification is tapped
+  // ========================================
+  PushNotifications.addListener('pushNotificationActionPerformed', (action: ActionPerformed) => {
+    console.log('[Push] 🔔 Notification ACTION performed (background/closed):', {
+      actionId: action.actionId,
+      inputValue: action.inputValue,
+      notification: {
+        id: action.notification.id,
+        title: action.notification.title,
+        body: action.notification.body,
+        data: action.notification.data,
+      },
+    });
+    
+    // Phase 5: Clear badge when notification is tapped
+    clearBadge();
+    
+    const data = action.notification.data;
+    
+    // Extract URL from data (check multiple possible keys)
+    const destinationUrl = (data?.url || data?.destination_url) as string | undefined;
+    
+    if (destinationUrl) {
+      console.log('[Push] 🎯 Deep linking to:', destinationUrl);
+      
+      // Small delay to ensure app is fully loaded
+      setTimeout(() => {
+        handleDeepLink(destinationUrl);
+      }, 500);
+    } else {
+      console.log('[Push] ℹ️ No deep link URL found in notification data, navigating to home');
+      
+      // Navigate to home if no specific URL
+      setTimeout(() => {
+        handleDeepLink('/app/home');
+      }, 500);
+    }
+  });
+
+  console.log('[Push] ✅ Notification handlers initialized successfully');
+  console.log('[Push] ✓ Foreground handler: Shows toast with action button');
+  console.log('[Push] ✓ Background/Closed handler: Deep links to content');
+  console.log('[Push] ✓ Deep linking: Ready for navigation');
+  console.log('[Push] ✓ Badge management: Auto-clear on app open and notification tap');
 }
 
 // Phase 5: Clear badge count
 export async function clearBadge(): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
-  const PushNotifications = await getPushNotifications();
-  if (!PushNotifications) return;
-
-  try {
-    // Remove all delivered notifications from notification center
-    // This also clears the badge count on iOS
-    await PushNotifications.removeAllDeliveredNotifications();
-    console.log('[Push] 🔔 Badge cleared and notification center cleared');
-  } catch (error) {
-    console.error('[Push] ❌ Error clearing badge:', error);
+  if (Capacitor.isNativePlatform()) {
+    try {
+      // Remove all delivered notifications from notification center
+      // This also clears the badge count on iOS
+      await PushNotifications.removeAllDeliveredNotifications();
+      console.log('[Push] 🔔 Badge cleared and notification center cleared');
+    } catch (error) {
+      console.error('[Push] ❌ Error clearing badge:', error);
+    }
   }
 }
 
 // Phase 5: Get current badge count (iOS only)
 export async function getBadgeCount(): Promise<number> {
-  if (!Capacitor.isNativePlatform()) return 0;
-  const PushNotifications = await getPushNotifications();
-  if (!PushNotifications) return 0;
-
-  try {
-    const result = await PushNotifications.getDeliveredNotifications();
-    const count = result.notifications.length;
-    console.log('[Push] 🔔 Current badge count:', count);
-    return count;
-  } catch (error) {
-    console.error('[Push] ❌ Error getting badge count:', error);
-    return 0;
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const result = await PushNotifications.getDeliveredNotifications();
+      const count = result.notifications.length;
+      console.log('[Push] 🔔 Current badge count:', count);
+      return count;
+    } catch (error) {
+      console.error('[Push] ❌ Error getting badge count:', error);
+      return 0;
+    }
   }
+  return 0;
 }
 
 export async function checkPermissionStatus(): Promise<NotificationPermission> {
-  if (!Capacitor.isNativePlatform()) return 'default';
-  const PushNotifications = await getPushNotifications();
-  if (!PushNotifications) return 'default';
-
-  const permStatus = await PushNotifications.checkPermissions();
-  if (permStatus.receive === 'granted') {
-    return 'granted';
-  } else if (permStatus.receive === 'denied') {
-    return 'denied';
-  }
-  return 'default';
-}
-
-export async function requestNotificationPermission(): Promise<NotificationPermission> {
-  if (!Capacitor.isNativePlatform()) return 'default';
-  const PushNotifications = await getPushNotifications();
-  if (!PushNotifications) return 'denied';
-
-  try {
-    const permStatus = await PushNotifications.requestPermissions();
+  if (Capacitor.isNativePlatform()) {
+    const permStatus = await PushNotifications.checkPermissions();
     if (permStatus.receive === 'granted') {
       return 'granted';
     } else if (permStatus.receive === 'denied') {
       return 'denied';
     }
     return 'default';
-  } catch (error) {
-    console.error('[Push] Error requesting permissions:', error);
-    return 'denied';
   }
+  
+  return 'default';
+}
+
+export async function requestNotificationPermission(): Promise<NotificationPermission> {
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const permStatus = await PushNotifications.requestPermissions();
+      if (permStatus.receive === 'granted') {
+        return 'granted';
+      } else if (permStatus.receive === 'denied') {
+        return 'denied';
+      }
+      return 'default';
+    } catch (error) {
+      console.error('[Push] Error requesting permissions:', error);
+      return 'denied';
+    }
+  }
+  
+  return 'default';
 }
 
 // Track if registration is in progress to prevent duplicate calls
@@ -209,14 +187,11 @@ let isRegistering = false;
 let registrationListenersAttached = false;
 
 // Attach global listeners once only
-async function attachRegistrationListeners() {
+function attachRegistrationListeners() {
   if (registrationListenersAttached) {
     console.log('[Push] Listeners already attached, skipping');
     return;
   }
-
-  const PushNotifications = await getPushNotifications();
-  if (!PushNotifications) return;
   
   console.log('[Push] Attaching global registration listeners');
   registrationListenersAttached = true;
@@ -234,11 +209,6 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
   if (!Capacitor.isNativePlatform()) {
     console.log('[Push] Not a native platform, skipping subscribe');
     return { success: false, error: 'Not supported on this platform' };
-  }
-
-  const PushNotifications = await getPushNotifications();
-  if (!PushNotifications) {
-    return { success: false, error: 'Push notifications plugin not available' };
   }
 
   if (!userId) {
@@ -401,9 +371,6 @@ export async function refreshDeviceToken(userId: string): Promise<void> {
   if (!Capacitor.isNativePlatform()) {
     return;
   }
-
-  const PushNotifications = await getPushNotifications();
-  if (!PushNotifications) return;
 
   const permission = await checkPermissionStatus();
   if (permission !== 'granted') {

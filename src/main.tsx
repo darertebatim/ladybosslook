@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { SplashScreen } from '@capacitor/splash-screen';
 import { initializePushNotificationHandlers, clearBadge } from './lib/pushNotifications';
 import { logBuildInfo } from './lib/buildInfo';
 
@@ -16,30 +18,14 @@ if (Capacitor.isNativePlatform()) {
   // Add native-app class to html for iOS scroll containment
   document.documentElement.classList.add('native-app');
   
-  // Safe async initialization with dynamic imports
-  (async () => {
-    try {
-      const { StatusBar, Style } = await import('@capacitor/status-bar');
-      await StatusBar.setStyle({ style: Style.Dark });
-      console.log('[Main] ✅ StatusBar initialized');
-    } catch (e) {
-      console.warn('[Main] ⚠️ StatusBar init failed:', e);
-    }
-    
-    try {
-      const { SplashScreen } = await import('@capacitor/splash-screen');
-      await SplashScreen.hide();
-      console.log('[Main] ✅ SplashScreen hidden');
-    } catch (e) {
-      console.warn('[Main] ⚠️ SplashScreen init failed:', e);
-    }
-    
-    // Initialize push notification handlers
-    initializePushNotificationHandlers();
-    
-    // Clear badge when app opens
-    clearBadge();
-  })();
+  StatusBar.setStyle({ style: Style.Dark }).catch(console.error);
+  SplashScreen.hide().catch(console.error);
+  
+  // Initialize push notification handlers
+  initializePushNotificationHandlers();
+  
+  // Clear badge when app opens
+  clearBadge();
 } else {
   console.log('[Main] 🌐 Web platform detected');
 }

@@ -1,22 +1,5 @@
+import { LocalNotifications, ScheduleOn } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
-import type { ScheduleOn } from '@capacitor/local-notifications';
-
-let localNotificationsPlugin: typeof import('@capacitor/local-notifications').LocalNotifications | null = null;
-
-async function getLocalNotifications() {
-  if (!Capacitor.isNativePlatform()) return null;
-  if (!Capacitor.isPluginAvailable('LocalNotifications')) {
-    console.warn('[LocalNotifications] LocalNotifications plugin not available');
-    return null;
-  }
-
-  if (!localNotificationsPlugin) {
-    const mod = await import('@capacitor/local-notifications');
-    localNotificationsPlugin = mod.LocalNotifications;
-  }
-
-  return localNotificationsPlugin;
-}
 
 /**
  * Local Notifications Service for Task Reminders
@@ -93,11 +76,6 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
     console.log('[LocalNotifications] Not on native platform, skipping');
     return { success: false, error: 'Not on native platform' };
   }
-
-  const LocalNotifications = await getLocalNotifications();
-  if (!LocalNotifications) {
-    return { success: false, error: 'Local notifications plugin not available' };
-  }
   
   try {
     const notificationTime = calculateNotificationTime(
@@ -170,9 +148,6 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
  */
 export async function cancelTaskReminder(taskId: string): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
-
-  const LocalNotifications = await getLocalNotifications();
-  if (!LocalNotifications) return;
   
   try {
     const notificationId = hashTaskId(taskId);
@@ -190,9 +165,6 @@ export async function cancelTaskReminder(taskId: string): Promise<void> {
  */
 export async function requestLocalNotificationPermission(): Promise<boolean> {
   if (!Capacitor.isNativePlatform()) return false;
-
-  const LocalNotifications = await getLocalNotifications();
-  if (!LocalNotifications) return false;
   
   try {
     const result = await LocalNotifications.requestPermissions();
@@ -216,23 +188,20 @@ export function isLocalNotificationsAvailable(): boolean {
  */
 export function initializeLocalNotificationHandlers(navigate: (url: string) => void): void {
   if (!Capacitor.isNativePlatform()) return;
-
-  (async () => {
-    const LocalNotifications = await getLocalNotifications();
-    if (!LocalNotifications) return;
-
-    // Handle notification tap (when app is in background or closed)
-    LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
-      console.log('[LocalNotifications] Notification tapped:', action.notification);
-      const url = action.notification.extra?.url || '/app/home';
-      navigate(url);
-    });
-
-    // Handle notification received while app is in foreground
-    LocalNotifications.addListener('localNotificationReceived', (notification) => {
-      console.log('[LocalNotifications] Notification received in foreground:', notification);
-    });
-
-    console.log('[LocalNotifications] Handlers initialized');
-  })().catch((e) => console.error('[LocalNotifications] Handler init failed:', e));
+  
+  // Handle notification tap (when app is in background or closed)
+  LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
+    console.log('[LocalNotifications] Notification tapped:', action.notification);
+    const url = action.notification.extra?.url || '/app/home';
+    navigate(url);
+  });
+  
+  // Handle notification received while app is in foreground
+  LocalNotifications.addListener('localNotificationReceived', (notification) => {
+    console.log('[LocalNotifications] Notification received in foreground:', notification);
+    // The notification will show as a banner on iOS
+    // We could optionally show a toast here for in-app notification
+  });
+  
+  console.log('[LocalNotifications] Handlers initialized');
 }
