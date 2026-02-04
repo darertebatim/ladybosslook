@@ -2,7 +2,7 @@ import React, { createContext, useContext, useRef, useState, useEffect, useCallb
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { updateMusicControls, destroyMusicControls, setupMusicControlsListeners } from "@/lib/musicControls";
+// Music controls removed - was causing iOS build issues with SPM
 import { Capacitor } from "@capacitor/core";
 import { format } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
@@ -225,21 +225,9 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     audio.addEventListener("loadstart", handleLoadStart);
     audio.addEventListener("canplay", handleCanPlay);
     
-    // Setup native music control listeners
+    // Music controls removed - was causing iOS build issues with SPM
     if (Capacitor.isNativePlatform()) {
-      setupMusicControlsListeners({
-        onPlay: () => audio.play(),
-        onPause: () => audio.pause(),
-        onSeekForward: () => { audio.currentTime = Math.min(audio.currentTime + 15, audio.duration); },
-        onSeekBackward: () => { audio.currentTime = Math.max(audio.currentTime - 15, 0); },
-        onTap: () => {
-          // Navigate to the audio player when user taps Now Playing widget
-          const track = currentTrackRef.current;
-          if (track) {
-            navigate(`/app/player/${track.id}`);
-          }
-        },
-      });
+      // Native music controls disabled
     }
     
     return () => {
@@ -280,22 +268,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     };
   }, [currentTrack, user?.id, isPlaying, currentTime, duration]);
 
-  // Update music controls when state changes
-  useEffect(() => {
-    if (!currentTrack || !Capacitor.isNativePlatform()) return;
-    
-    updateMusicControls({
-      trackId: currentTrack.id,
-      track: currentTrack.title,
-      artist: currentTrack.playlistName || "LadyBoss Academy",
-      cover: currentTrack.coverImageUrl || "",
-      isPlaying,
-      duration: Math.floor(duration),
-      elapsed: Math.floor(currentTime),
-      hasPrev: false,
-      hasNext: hasNextTrack,
-    });
-  }, [currentTrack, isPlaying, duration, currentTime, hasNextTrack]);
+  // Music controls removed - was causing iOS build issues with SPM
 
   const playTrack = useCallback(async (track: TrackInfo, startPosition?: number) => {
     if (!audioRef.current) return;
@@ -375,10 +348,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     setDuration(0);
     setIsPlaying(false);
     setPlaylistContextState(null);
-    
-    if (Capacitor.isNativePlatform()) {
-      destroyMusicControls();
-    }
+    // Music controls removed - was causing iOS build issues with SPM
   }, []);
 
   const setPlaylistContext = useCallback((context: PlaylistContext) => {
