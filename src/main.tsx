@@ -21,11 +21,11 @@ if (Capacitor.isNativePlatform()) {
   StatusBar.setStyle({ style: Style.Dark }).catch(console.error);
   SplashScreen.hide().catch(console.error);
   
-  // Initialize push notification handlers
-  initializePushNotificationHandlers();
+  // Initialize push notification handlers (async, won't block app load)
+  initializePushNotificationHandlers().catch(console.error);
   
-  // Clear badge when app opens
-  clearBadge();
+  // Clear badge when app opens (async, won't block app load)
+  clearBadge().catch(console.error);
 } else {
   console.log('[Main] 🌐 Web platform detected');
 }

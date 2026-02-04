@@ -1,4 +1,3 @@
-import { LocalNotifications, ScheduleOn } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 
 /**
@@ -6,7 +5,27 @@ import { Capacitor } from '@capacitor/core';
  * 
  * Uses device-side scheduling for exact timing and offline support.
  * More reliable than server-side push notifications for time-sensitive reminders.
+ * 
+ * IMPORTANT: LocalNotifications plugin is dynamically imported to prevent
+ * app crashes if native bridge is misconfigured.
  */
+
+// Lazy-loaded plugin reference
+let LocalNotificationsPlugin: typeof import('@capacitor/local-notifications').LocalNotifications | null = null;
+
+// Initialize plugin on demand
+async function getPlugin() {
+  if (!LocalNotificationsPlugin && Capacitor.isNativePlatform()) {
+    try {
+      const module = await import('@capacitor/local-notifications');
+      LocalNotificationsPlugin = module.LocalNotifications;
+      console.log('[LocalNotifications] Plugin loaded successfully');
+    } catch (error) {
+      console.error('[LocalNotifications] Failed to load plugin:', error);
+    }
+  }
+  return LocalNotificationsPlugin;
+}
 
 export interface TaskNotificationInput {
   taskId: string;
@@ -77,6 +96,11 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
     return { success: false, error: 'Not on native platform' };
   }
   
+  const plugin = await getPlugin();
+  if (!plugin) {
+    return { success: false, error: 'Plugin not available' };
+  }
+  
   try {
     const notificationTime = calculateNotificationTime(
       task.scheduledDate,
@@ -102,7 +126,7 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
         on: {
           hour: notificationTime.getHours(),
           minute: notificationTime.getMinutes(),
-        } as ScheduleOn,
+        },
         repeats: true,
       };
     } else if (task.repeatPattern === 'weekly' && task.scheduledDate) {
@@ -113,14 +137,14 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
           weekday: dayOfWeek + 1, // iOS uses 1-7, JS uses 0-6
           hour: notificationTime.getHours(),
           minute: notificationTime.getMinutes(),
-        } as ScheduleOn,
+        },
         repeats: true,
       };
     }
     // For other patterns (none, monthly, weekend, custom), use one-time scheduling
     // The server-side cron can handle the more complex patterns as a fallback
     
-    await LocalNotifications.schedule({
+    await plugin.schedule({
       notifications: [{
         id: notificationId,
         title: `${task.emoji} ${task.title}`,
@@ -149,9 +173,12 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
 export async function cancelTaskReminder(taskId: string): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   
+  const plugin = await getPlugin();
+  if (!plugin) return;
+  
   try {
     const notificationId = hashTaskId(taskId);
-    await LocalNotifications.cancel({
+    await plugin.cancel({
       notifications: [{ id: notificationId }],
     });
     console.log(`[LocalNotifications] Cancelled reminder for task ${taskId}`);
@@ -166,8 +193,11 @@ export async function cancelTaskReminder(taskId: string): Promise<void> {
 export async function requestLocalNotificationPermission(): Promise<boolean> {
   if (!Capacitor.isNativePlatform()) return false;
   
+  const plugin = await getPlugin();
+  if (!plugin) return false;
+  
   try {
-    const result = await LocalNotifications.requestPermissions();
+    const result = await plugin.requestPermissions();
     return result.display === 'granted';
   } catch (error) {
     console.error('[LocalNotifications] Failed to request permission:', error);
@@ -186,18 +216,21 @@ export function isLocalNotificationsAvailable(): boolean {
  * Initialize local notification handlers for deep linking
  * Call this once in App.tsx
  */
-export function initializeLocalNotificationHandlers(navigate: (url: string) => void): void {
+export async function initializeLocalNotificationHandlers(navigate: (url: string) => void): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   
+  const plugin = await getPlugin();
+  if (!plugin) return;
+  
   // Handle notification tap (when app is in background or closed)
-  LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
+  plugin.addListener('localNotificationActionPerformed', (action) => {
     console.log('[LocalNotifications] Notification tapped:', action.notification);
     const url = action.notification.extra?.url || '/app/home';
     navigate(url);
   });
   
   // Handle notification received while app is in foreground
-  LocalNotifications.addListener('localNotificationReceived', (notification) => {
+  plugin.addListener('localNotificationReceived', (notification) => {
     console.log('[LocalNotifications] Notification received in foreground:', notification);
     // The notification will show as a banner on iOS
     // We could optionally show a toast here for in-app notification
