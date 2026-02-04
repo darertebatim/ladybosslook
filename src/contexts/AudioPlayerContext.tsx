@@ -348,10 +348,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     setDuration(0);
     setIsPlaying(false);
     setPlaylistContextState(null);
-    
-    if (Capacitor.isNativePlatform()) {
-      destroyMusicControls();
-    }
+    // Music controls removed - was causing iOS build issues with SPM
   }, []);
 
   const setPlaylistContext = useCallback((context: PlaylistContext) => {
