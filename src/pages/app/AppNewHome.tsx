@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, User, MessageCircle, Mail, Send, ListChecks } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,9 @@ import { QuickActionsGrid } from '@/components/dashboard/QuickActionsGrid';
 import { SuggestedRoutineCard } from '@/components/dashboard/SuggestedRoutineCard';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
+import { WelcomeCard } from '@/components/app/WelcomeCard';
+import { FirstActionCelebration } from '@/components/app/FirstActionCelebration';
+import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { format } from 'date-fns';
 
 export default function AppNewHome() {
