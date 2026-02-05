@@ -33,6 +33,7 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
     e.stopPropagation();
     setDismissed(true);
     localStorage.removeItem('simora_force_new_user');
+    onDismiss?.();
   };
 
   const handleFlip = () => {
