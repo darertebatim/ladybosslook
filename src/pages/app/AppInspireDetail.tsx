@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Heart, Share2, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
