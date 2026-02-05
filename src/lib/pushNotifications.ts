@@ -427,6 +427,9 @@ export async function refreshDeviceToken(userId: string): Promise<void> {
     });
 
     if (result.success && result.token) {
+      // Get current app version to store with subscription
+      const appVersion = await getCurrentAppVersion();
+      
       // Upsert the token (will update if exists, insert if new)
       const { error } = await supabase
         .from('push_subscriptions')
@@ -436,6 +439,7 @@ export async function refreshDeviceToken(userId: string): Promise<void> {
             endpoint: `native:${result.token}`,
             p256dh_key: 'native-ios',
             auth_key: 'native-ios',
+            app_version: appVersion,
           },
           { onConflict: 'user_id,endpoint' }
         );

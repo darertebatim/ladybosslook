@@ -45,6 +45,9 @@ const NativeAppLayout = () => {
   // Auto-detect and sync user's timezone on app open
   useTimezoneSync(user?.id);
   
+  // Track app version on every app open
+  useAppInstallTracking(user?.id);
+  
   // Custom hooks after useState declarations
   const { unreadCount } = useUnreadChat();
   const { showUnreadPopup, unreadMessageCount, dismissPopup, goToChat } = useChatNotifications();
