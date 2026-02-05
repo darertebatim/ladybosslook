@@ -33,7 +33,26 @@ export default function AppNewHome() {
     nextSessionMap,
     suggestedRoutine,
     periodSettings,
+    isNewUser,
+    totalCompletions,
   } = useNewHomeData();
+
+  const [showQuickStart, setShowQuickStart] = useState(false);
+  const [showFirstCelebration, setShowFirstCelebration] = useState(false);
+  const prevCompletions = useRef(totalCompletions);
+
+  // Detect first-ever completion
+  useEffect(() => {
+    if (prevCompletions.current === 0 && totalCompletions === 1) {
+      // User just completed their first action ever
+      const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated');
+      if (!alreadyCelebrated) {
+        setShowFirstCelebration(true);
+        localStorage.setItem('simora_first_action_celebrated', 'true');
+      }
+    }
+    prevCompletions.current = totalCompletions;
+  }, [totalCompletions]);
 
   if (isLoading) {
     return <HomeSkeleton />;
