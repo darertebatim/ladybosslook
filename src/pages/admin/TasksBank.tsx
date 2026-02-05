@@ -385,6 +385,7 @@ export default function TasksBank() {
       color: 'mint',
       scheduledDate: new Date(),
       scheduledTime: null,
+      timePeriod: null,
       repeatEnabled: false,
       repeatPattern: 'daily',
       repeatInterval: 1,
