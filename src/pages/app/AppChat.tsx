@@ -511,8 +511,8 @@ export default function AppChat() {
             </Button>
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm">
-                  <MessageCircle className="h-5 w-5 text-primary" />
+                <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
+                  <MessageCircle className="h-5 w-5 text-foreground" />
                 </div>
                 {/* Online indicator */}
                 <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-background" />
