@@ -710,6 +710,13 @@ export default function AppAudioPlayer() {
             />
           </div>
 
+          {/* Promo Banner - Player Page */}
+          <PromoBanner 
+            location="player" 
+            currentPlaylistId={playlistInfo?.playlist_id || contextPlaylistId || undefined}
+            className="mt-3"
+          />
+
           {/* Up Next Preview */}
           {nextTrack && (
             <button

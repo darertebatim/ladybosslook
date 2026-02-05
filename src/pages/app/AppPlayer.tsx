@@ -311,6 +311,9 @@ export default function AppPlayer() {
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="p-4 pb-safe space-y-6">
+          {/* Promo Banner - Listen Page */}
+          <PromoBanner location="listen" className="-mt-2 mb-2" />
+
           {/* Continue Learning Section */}
           {progressFilter === "all" && selectedCategory === "all" && !searchQuery && continueListening.length > 0 && (
             <div className="space-y-3">

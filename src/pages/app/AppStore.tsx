@@ -203,6 +203,9 @@ const AppStore = () => {
           </div>
         ) : (
           <>
+            {/* Promo Banner - Explore Page */}
+            <PromoBanner location="explore" className="mb-2" />
+
             {/* Tools Section */}
             {(!searchQuery || filteredWellnessTools.length > 0) && (
               <section>
