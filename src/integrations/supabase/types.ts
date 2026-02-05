@@ -1939,6 +1939,7 @@ export type Database = {
       }
       promo_banners: {
         Row: {
+          aspect_ratio: string
           cover_image_url: string
           created_at: string
           custom_url: string | null
@@ -1953,6 +1954,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          aspect_ratio?: string
           cover_image_url: string
           created_at?: string
           custom_url?: string | null
@@ -1967,6 +1969,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          aspect_ratio?: string
           cover_image_url?: string
           created_at?: string
           custom_url?: string | null
