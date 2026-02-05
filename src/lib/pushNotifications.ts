@@ -9,6 +9,9 @@ export type NotificationPermission = 'granted' | 'denied' | 'default';
 // Navigation callback for deep linking
 let navigationCallback: ((url: string) => void) | null = null;
 
+// Track if handlers have been initialized to prevent duplicate listeners
+let handlersInitialized = false;
+
 // Register navigation callback from React Router
 export function registerNavigationCallback(callback: (url: string) => void) {
   navigationCallback = callback;
@@ -35,6 +38,13 @@ export function initializePushNotificationHandlers() {
     console.log('[Push] Not on native platform, skipping handler initialization');
     return;
   }
+
+  // Prevent duplicate listener registration
+  if (handlersInitialized) {
+    console.log('[Push] Handlers already initialized, skipping');
+    return;
+  }
+  handlersInitialized = true;
 
   console.log('[Push] 🚀 Initializing notification handlers for ALL states (foreground, background, closed)');
 
