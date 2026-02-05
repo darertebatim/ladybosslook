@@ -517,20 +517,25 @@ export function PromoBannerManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="routine">Routine Plan (specific)</SelectItem>
-                    <SelectItem value="playlist">Playlist (specific)</SelectItem>
-                    <SelectItem value="tasks">Task Template (specific)</SelectItem>
-                    <SelectItem value="routines_hub">Routine Bank (specific)</SelectItem>
-                    <SelectItem value="breathe_exercise">Breathing Exercise (specific)</SelectItem>
-                    <SelectItem value="tasks_bank">Tasks Bank Page</SelectItem>
-                    <SelectItem value="inspire">Inspire / Routines Hub</SelectItem>
-                    <SelectItem value="journal">Journal</SelectItem>
-                    <SelectItem value="programs">Programs / Store</SelectItem>
-                    <SelectItem value="breathe">Breathe Page</SelectItem>
-                    <SelectItem value="water">Water Tracking</SelectItem>
-                    <SelectItem value="channels">Feed / Channels</SelectItem>
-                    <SelectItem value="home">Home</SelectItem>
-                    <SelectItem value="custom_url">Custom URL (in-app)</SelectItem>
+                    <SelectItem value="home">🏠 Home</SelectItem>
+                    <SelectItem value="inspire">✨ Inspire / Routines Hub</SelectItem>
+                    <SelectItem value="routine">📋 Routine Plan (specific)</SelectItem>
+                    <SelectItem value="routines_hub">📚 Routine Bank (specific)</SelectItem>
+                    <SelectItem value="tasks_bank">📝 Tasks Bank Page</SelectItem>
+                    <SelectItem value="tasks">☑️ Task Template (specific)</SelectItem>
+                    <SelectItem value="planner">📅 Task Planner</SelectItem>
+                    <SelectItem value="playlist">🎧 Playlist (specific)</SelectItem>
+                    <SelectItem value="programs">🎓 Programs / Store</SelectItem>
+                    <SelectItem value="journal">📔 Journal</SelectItem>
+                    <SelectItem value="breathe">🫁 Breathe Page</SelectItem>
+                    <SelectItem value="breathe_exercise">💨 Breathing Exercise (specific)</SelectItem>
+                    <SelectItem value="water">💧 Water Tracking</SelectItem>
+                    <SelectItem value="emotion">😊 Emotion Tracker</SelectItem>
+                    <SelectItem value="period">🌸 Period Tracker</SelectItem>
+                    <SelectItem value="channels">💬 Feed / Channels</SelectItem>
+                    <SelectItem value="chat">🗨️ Chat / Support</SelectItem>
+                    <SelectItem value="profile">👤 Profile / Settings</SelectItem>
+                    <SelectItem value="custom_url">🔗 Custom URL (in-app)</SelectItem>
                     <SelectItem value="external_url">External URL (opens browser)</SelectItem>
                   </SelectContent>
                 </Select>
