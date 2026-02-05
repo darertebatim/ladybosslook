@@ -75,6 +75,11 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
       .select('task_id')
       .eq('user_id', userId)
       .eq('completed_date', dateStr),
+    // Total completions ever (for first-action detection)
+    supabase
+      .from('task_completions')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId),
     // Active enrollments with rounds
     supabase
       .from('course_enrollments')
