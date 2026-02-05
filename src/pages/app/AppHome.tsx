@@ -561,12 +561,6 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Welcome Ritual Card for New Users - covers the empty state */}
-              {isNewUser && filteredTasks.length === 0 && (
-                <div className="py-4">
-                  <WelcomeRitualCard />
-                </div>
-              )}
 
               {/* Personal Actions Section - hide empty state when welcome card is shown */}
               {!isNewUser && filteredTasks.length === 0 && (selectedTag !== null || programEvents.length === 0) ? (
