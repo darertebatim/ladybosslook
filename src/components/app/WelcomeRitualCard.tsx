@@ -4,8 +4,11 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useWelcomePopupRitual } from '@/hooks/useRoutinesBank';
-import { useTaskTemplates, TaskTemplate } from '@/hooks/useTaskPlanner';
+import { useTaskTemplates, TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { toast } from 'sonner';
+
+// Color cycle for visual variety
+const COLOR_CYCLE: TaskColor[] = ['peach', 'sky', 'pink', 'mint', 'lavender', 'lime', 'yellow'];
 
 interface WelcomeRitualCardProps {
   onActionAdded?: () => void;
