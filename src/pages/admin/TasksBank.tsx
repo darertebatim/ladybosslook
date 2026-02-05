@@ -848,11 +848,37 @@ export default function TasksBank() {
                   </div>
                   
                   {/* Description box - white background */}
-                  {task.description && (
-                    <div className="mx-3 mb-3 p-2.5 bg-white/80 rounded-xl text-sm text-muted-foreground">
-                      {task.description}
-                    </div>
-                  )}
+                  <div className="mx-3 mb-3 flex items-start gap-2">
+                    {task.description ? (
+                      <div className="flex-1 p-2.5 bg-white/80 rounded-xl text-sm text-muted-foreground">
+                        {task.description}
+                      </div>
+                    ) : (
+                      <div className="flex-1 p-2.5 bg-white/50 rounded-xl text-sm text-muted-foreground/50 italic">
+                        No description
+                      </div>
+                    )}
+                    {/* AI Generate button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        generateDescription(task);
+                      }}
+                      disabled={generatingDescriptionFor === task.id}
+                      className={cn(
+                        "p-2 rounded-lg transition-all shrink-0",
+                        "bg-violet-100 hover:bg-violet-200 text-violet-600",
+                        generatingDescriptionFor === task.id && "opacity-50 cursor-not-allowed"
+                      )}
+                      title="Generate description with AI"
+                    >
+                      {generatingDescriptionFor === task.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Wand2 className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               );
             })}
