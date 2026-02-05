@@ -214,6 +214,12 @@ const AppHome = () => {
     return result;
   }, [tasks, selectedTag, skippedTaskIds]);
 
+  // Show welcome popup for new users when a welcome ritual is configured
+  const showWelcomePopup = isNewUser && 
+    filteredTasks.length === 0 && 
+    welcomePopupRitual && 
+    !welcomePopupDismissed;
+
   // Get unique tags from tasks
   const taskTags = useMemo(() => {
     const tags = new Set<string>();
