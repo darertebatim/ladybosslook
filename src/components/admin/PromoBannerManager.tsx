@@ -376,6 +376,14 @@ export function PromoBannerManager() {
     setPriority(banner.priority);
     setStartsAt(banner.starts_at ? banner.starts_at.slice(0, 16) : '');
     setEndsAt(banner.ends_at ? banner.ends_at.slice(0, 16) : '');
+    // Load targeting
+    setTargetType(banner.target_type || 'all');
+    setIncludePrograms(banner.include_programs || []);
+    setExcludePrograms(banner.exclude_programs || []);
+    setIncludePlaylists(banner.include_playlists || []);
+    setExcludePlaylists(banner.exclude_playlists || []);
+    setIncludeTools(banner.include_tools || []);
+    setExcludeTools(banner.exclude_tools || []);
   };
 
   const getDestinationLabel = (banner: PromoBanner) => {
