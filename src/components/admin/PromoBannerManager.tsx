@@ -373,6 +373,9 @@ export function PromoBannerManager() {
     setExcludePlaylists([]);
     setIncludeTools([]);
     setExcludeTools([]);
+    // Reset location
+    setDisplayLocation('home');
+    setTargetPlaylistIds([]);
   };
 
   const startEditing = (banner: PromoBanner) => {
