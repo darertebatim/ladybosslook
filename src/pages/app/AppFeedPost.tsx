@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Loader2, Pin, Megaphone, Music, Calendar, FileText, MessageSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2, Pin, Megaphone, Music, Calendar, FileText, MessageSquare } from 'lucide-react';
+import { BackButton } from '@/components/app/BackButton';
 import { useFeedPost, usePostComments, useAddComment, useDeleteComment, useMarkPostRead } from '@/hooks/useFeed';
 import { useFeedRealtime, usePostCommentsRealtime } from '@/hooks/useFeedRealtime';
 import { useAuth } from '@/hooks/useAuth';
