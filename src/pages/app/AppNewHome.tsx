@@ -226,6 +226,28 @@ export default function AppNewHome() {
           </Card>
         </div>
       </div>
+
+      {/* Quick Start Sheet */}
+      <TaskQuickStartSheet
+        open={showQuickStart}
+        onOpenChange={setShowQuickStart}
+        onContinue={(taskName, template) => {
+          // Navigate to task create with pre-filled data
+          setShowQuickStart(false);
+          const params = new URLSearchParams();
+          params.set('name', taskName);
+          if (template) {
+            params.set('templateId', template.id);
+          }
+          window.location.href = `/app/task/new?${params.toString()}`;
+        }}
+      />
+
+      {/* First Action Celebration */}
+      <FirstActionCelebration
+        isOpen={showFirstCelebration}
+        onClose={() => setShowFirstCelebration(false)}
+      />
     </>
   );
 }
