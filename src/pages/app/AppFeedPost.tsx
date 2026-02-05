@@ -172,9 +172,7 @@ export default function AppFeedPost() {
     }
   };
 
-  const handleBack = () => {
-    navigate('/app/channels');
-  };
+  // handleBack is handled by BackButton component now
 
   // Simple scroll padding - input bar is ~80px, plus buffer
   const scrollPaddingBottom = 100;
