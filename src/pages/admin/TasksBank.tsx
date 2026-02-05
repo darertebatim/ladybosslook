@@ -165,6 +165,52 @@ export default function TasksBank() {
     },
   });
 
+  // AI description generation
+  const generateDescription = async (task: TaskBankItem) => {
+    setGeneratingDescriptionFor(task.id);
+    try {
+      const catInfo = getCategoryInfo(task.category);
+      const repeatLabel = task.repeat_pattern !== 'none' 
+        ? (task.repeat_pattern === 'daily' ? 'daily' :
+           task.repeat_pattern === 'weekly' ? 'weekly' : 'monthly')
+        : 'one-time';
+      const goalInfo = task.goal_enabled 
+        ? `with a goal of ${task.goal_target} ${task.goal_unit || 'times'}` 
+        : '';
+      
+      const context = `Action: "${task.title}" | Category: ${catInfo.label} | Frequency: ${repeatLabel} ${goalInfo}`.trim();
+      
+      const { data, error } = await supabase.functions.invoke('generate-routine-text', {
+        body: {
+          context,
+          fieldType: 'description',
+          prompt: `Write a brief 1-sentence description for this action. Make it warm, simple, and encouraging. Focus on the benefit or feeling, not instruction. No pressure words.`,
+        },
+      });
+      
+      if (error) throw error;
+      
+      const generatedText = data?.text;
+      if (generatedText) {
+        // Update the task with the generated description
+        const { error: updateError } = await supabase
+          .from('admin_task_bank')
+          .update({ description: generatedText })
+          .eq('id', task.id);
+        
+        if (updateError) throw updateError;
+        
+        queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
+        toast.success('Description generated');
+      }
+    } catch (err) {
+      console.error('Failed to generate description:', err);
+      toast.error('Failed to generate description');
+    } finally {
+      setGeneratingDescriptionFor(null);
+    }
+  };
+
   const updateAdminSettings = useMutation({
     mutationFn: async (payload: { id: string; settings: AdminSettings }) => {
       const { error } = await supabase
