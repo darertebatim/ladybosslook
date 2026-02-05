@@ -112,13 +112,8 @@ const AppEmotionHistory = () => {
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* Header */}
-      <header className="shrink-0 flex items-center gap-3 px-4 py-3 border-b">
-        <button
-          onClick={handleBack}
-          className="w-10 h-10 rounded-full bg-muted flex items-center justify-center active:scale-95 transition-transform"
-        >
-          <ChevronLeft className="h-5 w-5 text-foreground" />
-        </button>
+      <header className="shrink-0 flex items-center gap-1 px-4 py-3 border-b">
+        <BackButton to="/app/emotion" showLabel={false} />
         <h1 className="text-lg font-semibold">Emotion History</h1>
       </header>
 
