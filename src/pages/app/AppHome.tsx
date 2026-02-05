@@ -154,6 +154,17 @@ const AppHome = () => {
   const {
     data: addedRoutineIds = []
   } = useUserAddedBankRoutines();
+  
+  // Welcome popup ritual
+  const { data: welcomePopupRitual } = useWelcomePopupRitual();
+  const [welcomePopupDismissed, setWelcomePopupDismissed] = useState(false);
+  
+  // Show welcome popup for new users when a welcome ritual is configured
+  const showWelcomePopup = isNewUser && 
+    filteredTasks.length === 0 && 
+    welcomePopupRitual && 
+    !welcomePopupDismissed;
+  
   const addedRoutineIdsSet = useMemo(() => new Set(addedRoutineIds), [addedRoutineIds]);
   const suggestedRoutines = useMemo(() => 
     popularRoutines.filter(r => !addedRoutineIdsSet.has(r.id)).slice(0, 4), 
