@@ -78,14 +78,7 @@ export const EmotionContext = ({
     >
       {/* Header */}
       <header className="shrink-0 flex items-center px-4 py-3">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={onBack}
-          className="mr-2 -ml-2"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
+        <BackButton onClick={onBack} showLabel={false} />
       </header>
 
       {/* Content */}

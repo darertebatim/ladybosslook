@@ -224,12 +224,7 @@ export function BreathingExerciseScreen({
       <div className="absolute top-0 left-0 right-0" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3">
-          <button
-            onClick={handleClose}
-            className="p-2 rounded-full bg-muted text-foreground hover:bg-muted/80 transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <CloseButton variant="muted" onClick={handleClose} to="/app/breathe" />
           
           {isActive && (
             <span className="text-muted-foreground font-medium">

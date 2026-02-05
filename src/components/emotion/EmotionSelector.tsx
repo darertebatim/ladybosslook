@@ -111,15 +111,8 @@ export const EmotionSelector = ({ onComplete, onBack }: EmotionSelectorProps) =>
     >
       {/* Header */}
       <header className="shrink-0 flex items-center px-4 py-3">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={handleBack}
-          className="mr-2 -ml-2"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
-        <h1 className="text-base font-medium text-foreground">
+        <BackButton onClick={handleBack} showLabel={false} />
+        <h1 className="text-base font-medium text-foreground ml-2">
           Try to dig a little deeper
         </h1>
       </header>
