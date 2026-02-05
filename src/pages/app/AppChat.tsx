@@ -560,16 +560,51 @@ export default function AppChat() {
           
           <div className="p-4">
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-6">
-                <div className="h-20 w-20 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-5">
-                  <MessageCircle className="h-10 w-10 text-primary/60" />
+              <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-fade-in">
+                {/* Warm gradient card */}
+                <div className="w-full max-w-sm bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-3xl p-6 mb-6">
+                  {/* Avatar with gentle pulse */}
+                  <div className="relative mx-auto mb-5">
+                    <div className="h-20 w-20 mx-auto rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/10">
+                      <span className="text-4xl">💜</span>
+                    </div>
+                    {/* Online indicator */}
+                    <div className="absolute bottom-1 right-1/2 translate-x-8 h-4 w-4 rounded-full bg-emerald-500 border-2 border-background shadow-sm" />
+                  </div>
+                  
+                  {/* Time-based greeting */}
+                  <p className="text-muted-foreground text-[15px] mb-1">
+                    {getGreeting().text} {getGreeting().emoji}
+                  </p>
+                  <h2 className="font-semibold text-xl mb-3">I'm Sarah, and I'm here for you</h2>
+                  
+                  {/* Core message */}
+                  <p className="text-[15px] text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
+                    No rush. No judgment. Just a real person who cares.
+                  </p>
                 </div>
-                <h2 className="font-semibold text-xl mb-2">We're here for you 💜</h2>
-                <p className="text-[15px] text-muted-foreground max-w-[280px] leading-relaxed">
-                  Type a message or tap the mic to send a voice note — whatever feels easier for you.
-                </p>
-                <p className="text-[13px] text-muted-foreground/70 mt-3">
-                  We usually reply within a few hours
+                
+                {/* Conversation starters */}
+                <div className="w-full max-w-sm mb-6">
+                  <p className="text-[13px] text-muted-foreground/70 mb-3">Tap to start a conversation</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {conversationStarters.map((starter, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSendMessage(starter.text)}
+                        disabled={sending}
+                        className={`flex items-center gap-2.5 p-3 rounded-2xl bg-gradient-to-br ${starter.color} border border-border/30 text-left transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50`}
+                      >
+                        <starter.icon className="h-4 w-4 text-foreground/70 shrink-0" />
+                        <span className="text-[13px] font-medium text-foreground/90 leading-tight">{starter.text}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Warm footer */}
+                <p className="text-[13px] text-muted-foreground/60 max-w-[260px] leading-relaxed">
+                  Type, or tap the mic if that feels easier — we're listening. We check in throughout the day. 💜
                 </p>
               </div>
             ) : (
