@@ -131,11 +131,13 @@ const AppHome = () => {
   } = useProgramEventsForDate(selectedDate);
 
   // Home data for stats and rounds
+  const homeDataQuery = useNewHomeData();
   const {
     isNewUser: dataIsNewUser = false,
     totalCompletions = 0,
+    isLoading: homeDataLoading,
     ...homeData
-  } = useNewHomeData();
+  } = homeDataQuery;
   
   // Check for force new user flag (set by admin reset)
   const forceNewUser = localStorage.getItem('simora_force_new_user') === 'true';
