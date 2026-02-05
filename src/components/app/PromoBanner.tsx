@@ -393,7 +393,7 @@ export function PromoBanner({
   if (!activeBanner) return null;
 
   return (
-    <div className="px-4 py-2">
+    <div className={className || "px-4 py-2"}>
       <div
         className="relative w-full rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
         onClick={handleTap}
