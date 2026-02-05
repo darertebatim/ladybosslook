@@ -460,9 +460,13 @@ export function LeadsManager() {
 
       if (error) throw error;
 
+      // Set force new user flag for testing (clears on welcome card dismiss or first action)
+      localStorage.setItem('simora_force_new_user', 'true');
+      localStorage.removeItem('simora_first_action_celebrated');
+
       toast({
         title: "Data Reset Complete",
-        description: `All app data for ${searchResults.profile.email} has been reset`
+        description: `All app data for ${searchResults.profile.email} has been reset. Go to /app/home to see the new user experience.`
       });
 
       // Refresh search results

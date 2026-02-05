@@ -11,6 +11,12 @@ interface WelcomeCardProps {
 export function WelcomeCard({ onAddAction }: WelcomeCardProps) {
   const [dismissed, setDismissed] = useState(false);
 
+  const handleDismiss = () => {
+    setDismissed(true);
+    // Clear force new user flag when dismissed
+    localStorage.removeItem('simora_force_new_user');
+  };
+
   if (dismissed) return null;
 
   return (
@@ -25,7 +31,7 @@ export function WelcomeCard({ onAddAction }: WelcomeCardProps) {
         
         {/* Dismiss button */}
         <button
-          onClick={() => setDismissed(true)}
+          onClick={handleDismiss}
           className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center hover:bg-black/50 transition-colors"
         >
           <X className="w-4 h-4 text-white" />

@@ -124,10 +124,14 @@ const AppHome = () => {
 
   // Home data for stats and rounds
   const {
-    isNewUser = false,
+    isNewUser: dataIsNewUser = false,
     totalCompletions = 0,
     ...homeData
   } = useNewHomeData();
+  
+  // Check for force new user flag (set by admin reset)
+  const forceNewUser = localStorage.getItem('simora_force_new_user') === 'true';
+  const isNewUser = dataIsNewUser || forceNewUser;
   
   // Track first action celebration
   const prevCompletions = useRef(totalCompletions);
