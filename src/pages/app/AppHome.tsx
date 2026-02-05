@@ -141,6 +141,17 @@ const AppHome = () => {
   const forceNewUser = localStorage.getItem('simora_force_new_user') === 'true';
   const isNewUser = dataIsNewUser || forceNewUser;
   
+  // Track if user started this session as a new user (only set once when data loads)
+  useEffect(() => {
+    if (startedAsNewUser === null && !homeData?.isLoading) {
+      // Only set this once when home data first loads
+      setStartedAsNewUser(isNewUser);
+    }
+  }, [isNewUser, startedAsNewUser, homeData?.isLoading]);
+  
+  // Show welcome card if user started as new user this session (even after adding tasks)
+  const showWelcomeCard = (startedAsNewUser ?? isNewUser) && !welcomeCardDismissed;
+  
   // Track first action celebration
   const prevCompletions = useRef(totalCompletions);
   
