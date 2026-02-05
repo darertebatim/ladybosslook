@@ -342,7 +342,6 @@ export default function AppInspireDetail() {
           onAddClick={handleAddClick}
           isLoading={addRoutineFromBank.isPending}
           size="lg"
-          variant="outline"
           addText="Add to my rituals"
         />
       </div>
