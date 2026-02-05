@@ -581,10 +581,11 @@ const AppHome = () => {
               )}
 
               {/* Welcome Ritual Card for New Users - stays until dismissed */}
-              {isNewUser && !welcomeCardDismissed && (
+              {showWelcomeCard && (
                 <div className="py-4">
                   <WelcomeRitualCard onDismiss={() => {
                     setWelcomeCardDismissed(true);
+                    setStartedAsNewUser(false);
                     localStorage.setItem('simora_welcome_card_dismissed', 'true');
                   }} />
                 </div>
