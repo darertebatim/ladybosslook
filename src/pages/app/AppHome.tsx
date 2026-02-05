@@ -65,6 +65,11 @@ const AppHome = () => {
   
   // First action celebration state
   const [showFirstCelebration, setShowFirstCelebration] = useState(false);
+  
+  // Welcome card dismissed state - persisted in localStorage
+  const [welcomeCardDismissed, setWelcomeCardDismissed] = useState(() => 
+    localStorage.getItem('simora_welcome_card_dismissed') === 'true'
+  );
 
   const {
     run: runTour,
@@ -561,10 +566,13 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Welcome Ritual Card for New Users - covers the empty state */}
-              {isNewUser && filteredTasks.length === 0 && (
+              {/* Welcome Ritual Card for New Users - stays until dismissed */}
+              {isNewUser && !welcomeCardDismissed && (
                 <div className="py-4">
-                  <WelcomeRitualCard />
+                  <WelcomeRitualCard onDismiss={() => {
+                    setWelcomeCardDismissed(true);
+                    localStorage.setItem('simora_welcome_card_dismissed', 'true');
+                  }} />
                 </div>
               )}
 
