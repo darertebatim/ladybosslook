@@ -456,6 +456,8 @@ export default function TasksBank() {
 
   const filteredTasks = selectedCategory === 'all' 
     ? tasks 
+    : selectedCategory === 'populars'
+    ? tasks.filter(t => t.is_popular)
     : tasks.filter(t => t.category === selectedCategory);
 
   const usedCategories = [...new Set(tasks.map(t => t.category))];
@@ -648,6 +650,13 @@ export default function TasksBank() {
             <TabsTrigger value="all" className="flex items-center gap-1">
               <Sparkles className="h-3 w-3" />
               All
+            </TabsTrigger>
+            <TabsTrigger value="populars" className="flex items-center gap-1">
+              <Star className="h-3 w-3 text-yellow-500" />
+              Populars
+              <span className="text-xs text-muted-foreground">
+                ({tasks.filter(t => t.is_popular).length})
+              </span>
             </TabsTrigger>
             {routineCategories.map((cat) => (
               <TabsTrigger 
