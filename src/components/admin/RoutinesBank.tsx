@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles } from 'lucide-react';
+import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Gift } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
 import EmojiPicker from '@/components/app/EmojiPicker';
@@ -46,6 +46,7 @@ interface RoutineBankItem {
   emoji: string;
   is_active: boolean;
   is_popular: boolean;
+  is_welcome_popup: boolean;
   sort_order: number;
   created_at: string;
   updated_at: string;
@@ -353,6 +354,18 @@ export default function RoutinesBank() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['routines-bank'] }),
   });
 
+  // Toggle welcome popup (only one can be active at a time - handled by DB trigger)
+  const toggleWelcomePopup = useMutation({
+    mutationFn: async ({ id, is_welcome_popup }: { id: string; is_welcome_popup: boolean }) => {
+      const { error } = await supabase.from('routines_bank').update({ is_welcome_popup }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['welcome-popup-ritual'] });
+    },
+  });
+
   // Fetch sections and tasks for a routine when editing
   const fetchRoutineData = async (routineId: string) => {
     const [sectionsRes, tasksRes] = await Promise.all([
@@ -654,6 +667,19 @@ export default function RoutinesBank() {
                       <span>{stats.count} action{stats.count !== 1 ? 's' : ''}</span>
                     </div>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleWelcomePopup.mutate({ id: routine.id, is_welcome_popup: !routine.is_welcome_popup });
+                    }}
+                    className={cn(
+                      "p-2 transition-all",
+                      routine.is_welcome_popup ? "text-violet-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                    )}
+                    title={routine.is_welcome_popup ? "Remove as welcome popup" : "Set as welcome popup"}
+                  >
+                    <Gift className={cn("h-4 w-4", routine.is_welcome_popup && "fill-violet-200")} />
+                  </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

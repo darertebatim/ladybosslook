@@ -24,7 +24,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
-import { usePopularRoutinesBank, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
+import { usePopularRoutinesBank, useUserAddedBankRoutines, useWelcomePopupRitual } from '@/hooks/useRoutinesBank';
 import { RoutineBankCard } from '@/components/app/RoutineBankCard';
 import { haptic } from '@/lib/haptics';
 import { GoalInputSheet } from '@/components/app/GoalInputSheet';
@@ -33,7 +33,7 @@ import { WaterTrackingScreen } from '@/components/app/WaterTrackingScreen';
 import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
-import { WelcomeRitualCard } from '@/components/app/WelcomeRitualCard';
+import { WelcomeRitualPopup } from '@/components/app/WelcomeRitualPopup';
 import { FirstActionCelebration } from '@/components/app/FirstActionCelebration';
 import { toast } from 'sonner';
 const AppHome = () => {
@@ -154,6 +154,11 @@ const AppHome = () => {
   const {
     data: addedRoutineIds = []
   } = useUserAddedBankRoutines();
+  
+  // Welcome popup ritual
+  const { data: welcomePopupRitual } = useWelcomePopupRitual();
+  const [welcomePopupDismissed, setWelcomePopupDismissed] = useState(false);
+  
   const addedRoutineIdsSet = useMemo(() => new Set(addedRoutineIds), [addedRoutineIds]);
   const suggestedRoutines = useMemo(() => 
     popularRoutines.filter(r => !addedRoutineIdsSet.has(r.id)).slice(0, 4), 
@@ -208,6 +213,12 @@ const AppHome = () => {
     }
     return result;
   }, [tasks, selectedTag, skippedTaskIds]);
+
+  // Show welcome popup for new users when a welcome ritual is configured
+  const showWelcomePopup = isNewUser && 
+    filteredTasks.length === 0 && 
+    welcomePopupRitual && 
+    !welcomePopupDismissed;
 
   // Get unique tags from tasks
   const taskTags = useMemo(() => {
@@ -561,12 +572,6 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Welcome Ritual Card for New Users - covers the empty state */}
-              {isNewUser && filteredTasks.length === 0 && (
-                <div className="py-4">
-                  <WelcomeRitualCard />
-                </div>
-              )}
 
               {/* Personal Actions Section - hide empty state when welcome card is shown */}
               {!isNewUser && filteredTasks.length === 0 && (selectedTag !== null || programEvents.length === 0) ? (
@@ -712,6 +717,13 @@ const AppHome = () => {
           isOpen={showFirstCelebration}
           onClose={() => setShowFirstCelebration(false)}
         />
+
+        {/* Welcome Ritual Popup for New Users */}
+        {showWelcomePopup && (
+          <WelcomeRitualPopup
+            onDismiss={() => setWelcomePopupDismissed(true)}
+          />
+        )}
 
         {/* App Tour - Joyride guided walkthrough */}
         <AppTour run={runTour} stepIndex={stepIndex} onStepChange={setStepIndex} onComplete={completeTour} onSkip={skipTour} />

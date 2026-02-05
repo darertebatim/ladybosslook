@@ -2406,6 +2406,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_popular: boolean | null
+          is_welcome_popup: boolean
           sort_order: number | null
           subtitle: string | null
           title: string
@@ -2421,6 +2422,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_popular?: boolean | null
+          is_welcome_popup?: boolean
           sort_order?: number | null
           subtitle?: string | null
           title: string
@@ -2436,6 +2438,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_popular?: boolean | null
+          is_welcome_popup?: boolean
           sort_order?: number | null
           subtitle?: string | null
           title?: string

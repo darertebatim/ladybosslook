@@ -14,6 +14,7 @@ export interface RoutineBankItem {
   emoji: string | null;
   is_active: boolean | null;
   is_popular: boolean | null;
+  is_welcome_popup: boolean | null;
   sort_order: number | null;
   created_at: string | null;
   updated_at: string | null;
@@ -165,6 +166,26 @@ export function useFeaturedRoutinesBank() {
 
       if (error) throw error;
       return data as RoutineBankItem[];
+    },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+  });
+}
+
+// Fetch the welcome popup ritual (only one should be active)
+export function useWelcomePopupRitual() {
+  return useQuery({
+    queryKey: ['welcome-popup-ritual'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_welcome_popup', true)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as RoutineBankItem | null;
     },
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
