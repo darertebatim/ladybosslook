@@ -15,9 +15,12 @@ import {
   useAddRoutineFromBank,
   RoutineBankTask,
 } from '@/hooks/useRoutinesBank';
-import { useTaskTemplates, TaskTemplate, TaskColor } from '@/hooks/useTaskPlanner';
+import { useTaskTemplates, useCreateTask, TaskTemplate, TaskColor } from '@/hooks/useTaskPlanner';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function AppInspire() {
   const navigate = useNavigate();
@@ -37,6 +40,9 @@ export default function AppInspire() {
   );
   const { data: taskTemplates, isLoading: templatesLoading } = useTaskTemplates();
   const addRoutineFromBank = useAddRoutineFromBank();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false);
 
   // Determine which routines to display based on selected category
   const displayRoutines = useMemo(() => {
@@ -107,28 +113,71 @@ export default function AppInspire() {
 
   const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
     if (!selectedTemplate) return;
+    if (!user) {
+      toast.error('Please sign in to add rituals');
+      return;
+    }
 
     try {
-      // For individual task templates, we need to use the addRoutinePlan from useRoutinePlans
-      // since addRoutineFromBank expects a routine bank ID
-      const { useAddRoutinePlan } = await import('@/hooks/useRoutinePlans');
-      // This is a workaround - ideally we'd use a dedicated hook
-      // For now, use addRoutineFromBank with synthetic handling
-      await addRoutineFromBank.mutateAsync({
-        routineId: `synthetic-task-${selectedTemplate.id}`,
-        selectedTaskIds,
-        editedTasks: editedTasks.map(t => ({
-          ...t,
-          pro_link_type: t.pro_link_type as string | null,
-          pro_link_value: t.pro_link_value as string | null,
-        })),
-      });
+      setIsSavingTemplate(true);
+      
+      // Get the edited task data (there's only one for a single template)
+      const editedTask = editedTasks.find(t => t.id === selectedTemplate.id);
+      
+      // Determine pro_link fields
+      const proLinkType = editedTask?.pro_link_type ?? selectedTemplate.pro_link_type ?? 
+        (selectedTemplate.linked_playlist_id ? 'playlist' : null);
+      const proLinkValue = editedTask?.pro_link_value ?? selectedTemplate.pro_link_value ?? 
+        selectedTemplate.linked_playlist_id ?? null;
+      
+      // Get current max order_index
+      const { data: existingTasks } = await supabase
+        .from('user_tasks')
+        .select('order_index')
+        .eq('user_id', user.id)
+        .order('order_index', { ascending: false })
+        .limit(1);
+      
+      const startOrderIndex = (existingTasks?.[0]?.order_index ?? -1) + 1;
+      
+      // Create the user task directly
+      const { error } = await supabase
+        .from('user_tasks')
+        .insert({
+          user_id: user.id,
+          title: editedTask?.title || selectedTemplate.title,
+          emoji: editedTask?.icon || selectedTemplate.emoji || '✨',
+          color: editedTask?.color || selectedTemplate.color || 'mint',
+          repeat_pattern: editedTask?.repeatPattern || 'daily',
+          scheduled_time: editedTask?.scheduledTime || null,
+          tag: editedTask?.tag ?? selectedTemplate.category ?? null,
+          linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : null,
+          pro_link_type: proLinkType,
+          pro_link_value: proLinkValue,
+          is_active: true,
+          order_index: startOrderIndex,
+          // Copy goal settings from template
+          goal_enabled: selectedTemplate.goal_enabled ?? false,
+          goal_target: selectedTemplate.goal_target ?? null,
+          goal_type: selectedTemplate.goal_type ?? null,
+          goal_unit: selectedTemplate.goal_unit ?? null,
+        });
+      
+      if (error) throw error;
+      
+      // Invalidate queries to refresh planner
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
+      
       toast.success('Action added to your rituals! ✨');
       setPreviewSheetOpen(false);
       setSelectedTemplate(null);
     } catch (error) {
       console.error('Error adding action:', error);
       toast.error('Failed to add action');
+    } finally {
+      setIsSavingTemplate(false);
     }
   };
 
