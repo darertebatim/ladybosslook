@@ -75,7 +75,7 @@ function shouldShowBanner(banner: PromoBannerData): boolean {
 }
 
 export function PromoBanner({ 
-  location = 'home', 
+  location = 'home_top', 
   currentPlaylistId,
   className 
 }: PromoBannerProps) {

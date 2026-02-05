@@ -581,7 +581,8 @@ export function PromoBannerManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="home">🏠 Home Page</SelectItem>
+                    <SelectItem value="home_top">🏠 Home - Above Tasks</SelectItem>
+                    <SelectItem value="home_rituals">🏠 Home - After Rituals</SelectItem>
                     <SelectItem value="explore">🔍 Explore Page</SelectItem>
                     <SelectItem value="listen">🎧 Listen Page</SelectItem>
                     <SelectItem value="player">▶️ Audio Player</SelectItem>
