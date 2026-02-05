@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Trash2, Plus, ExternalLink, Sparkles, Loader2, Pencil, Users } from 'lucide-react';
+import { Trash2, Plus, ExternalLink, Sparkles, Loader2, Pencil, Users, Copy } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
@@ -879,13 +879,47 @@ export function PromoBannerManager() {
                     variant="ghost"
                     size="icon"
                     onClick={() => startEditing(banner)}
+                    title="Edit"
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
+                    onClick={() => {
+                      // Duplicate the banner by pre-filling the form
+                      setCoverImageUrl(banner.cover_image_url);
+                      setDestinationType(banner.destination_type);
+                      setDestinationId(banner.destination_id || '');
+                      setCustomUrl(banner.custom_url || '');
+                      setDisplayFrequency(banner.display_frequency);
+                      setAspectRatio(banner.aspect_ratio || '3:1');
+                      setIsActive(true);
+                      setPriority(banner.priority);
+                      setStartsAt('');
+                      setEndsAt('');
+                      setTargetType(banner.target_type || 'all');
+                      setIncludePrograms(banner.include_programs || []);
+                      setExcludePrograms(banner.exclude_programs || []);
+                      setIncludePlaylists(banner.include_playlists || []);
+                      setExcludePlaylists(banner.exclude_playlists || []);
+                      setIncludeTools(banner.include_tools || []);
+                      setExcludeTools(banner.exclude_tools || []);
+                      setDisplayLocation((banner.display_location as DisplayLocation) || 'home_top');
+                      setTargetPlaylistIds(banner.target_playlist_ids || []);
+                      setEditingBanner(null);
+                      setIsCreating(true);
+                      toast.success('Banner duplicated - modify and save as new');
+                    }}
+                    title="Duplicate"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => deleteMutation.mutate(banner.id)}
+                    title="Delete"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
