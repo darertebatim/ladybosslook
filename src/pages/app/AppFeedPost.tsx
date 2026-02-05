@@ -189,10 +189,8 @@ export default function AppFeedPost() {
           className="bg-background/80 backdrop-blur-xl border-b shrink-0 z-10"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="flex items-center gap-1 pt-3 pb-2 px-4">
-            <Button variant="ghost" size="icon" onClick={handleBack} className="h-9 w-9">
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
+          <div className="flex items-center gap-1 pt-1 pb-2 px-4">
+            <BackButton to="/app/channels" showLabel={false} />
             <h1 className="text-lg font-semibold">Post</h1>
           </div>
         </header>

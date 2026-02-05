@@ -16,7 +16,6 @@ interface PostGroup {
 }
 
 export default function AppFeed() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialChannel = searchParams.get('channel');
   
