@@ -55,7 +55,6 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
     
     try {
       if (!welcomeRitualInfo?.id) {
-        toast.error('No welcome ritual configured');
         return;
       }
       
@@ -68,11 +67,9 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
       setAddedActions(prev => new Set([...prev, actionId]));
       haptic.success();
       onActionAdded?.();
-      toast.success('Added to your day! ✨');
       // Don't dismiss - let user add more actions
     } catch (error) {
       console.error('Failed to add action:', error);
-      toast.error('Failed to add action');
     } finally {
       setAddingAction(null);
     }
