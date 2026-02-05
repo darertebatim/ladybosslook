@@ -36,6 +36,7 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     journalEntriesRes,
     tasksRes,
     completionsRes,
+    totalCompletionsRes,
     enrollmentsRes,
     routineRes,
     periodSettingsRes,
