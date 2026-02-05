@@ -69,6 +69,22 @@ const isLastInGroup = (msg: Message, nextMsg: Message | null): boolean => {
   return timeDiff > GROUP_TIME_THRESHOLD;
 };
 
+// Time-based greeting
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return { text: "Good morning", emoji: "🌅" };
+  if (hour < 17) return { text: "Good afternoon", emoji: "☀️" };
+  return { text: "Good evening", emoji: "🌙" };
+};
+
+// Conversation starters
+const conversationStarters = [
+  { icon: MessageCircle, text: "I have a question", color: "from-primary/20 to-primary/5" },
+  { icon: Mic, text: "I'd rather send a voice note", color: "from-emerald-500/20 to-emerald-500/5" },
+  { icon: Heart, text: "I just need someone to talk to", color: "from-rose-500/20 to-rose-500/5" },
+  { icon: HelpCircle, text: "Something isn't working", color: "from-amber-500/20 to-amber-500/5" },
+];
+
 /**
  * Full-screen Telegram-style chat page
  * - No tab bar (dedicated full-screen experience)
