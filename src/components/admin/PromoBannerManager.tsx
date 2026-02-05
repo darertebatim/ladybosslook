@@ -502,9 +502,9 @@ export function PromoBannerManager() {
                     <img
                       src={coverImageUrl}
                       alt="Preview"
-                      className="w-full aspect-[3/1] rounded-lg object-cover border"
+                      className={`w-full ${getAspectRatioClass(aspectRatio)} rounded-lg object-cover border max-w-md`}
                     />
-                    <p className="text-xs text-muted-foreground">Recommended: 1200×400 pixels (3:1 ratio)</p>
+                    <p className="text-xs text-muted-foreground">Recommended: {getAspectRatioDimensions(aspectRatio)} pixels ({aspectRatio} ratio)</p>
                   </div>
                 )}
               </div>
