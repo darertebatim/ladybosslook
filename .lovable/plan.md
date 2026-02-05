@@ -1,221 +1,258 @@
 
-# Strength-First Metrics: Replace Streaks with Depth of Return
 
-Based on my analysis of the codebase, I found streak-related code in **9 components** across the app. This plan transforms the metric system from "streak counting" to "depth of return" - measuring how often users come back, not how long they stay without breaking.
+## Back Button Audit & iOS-Style Redesign
 
----
-
-## Philosophy Summary
-
-**Current Model (Streak-Based)**:
-- Tracks consecutive days
-- Resets to 1 when broken
-- Creates anxiety about stopping
-- Punishes life interruptions
-
-**New Model (Depth of Return)**:
-- Tracks total days present this month
-- Celebrates each return
-- No "breaking" concept
-- Measures strength through return, not continuity
-
-**The Core Shift**: "Simora measures depth of return, not length of absence."
+### Executive Summary
+This plan addresses three major issues with back buttons across the app:
+1. Non-functional back buttons on certain pages
+2. Inconsistent navigation behavior (jumping to home instead of intelligent routing)
+3. Non-iOS-compliant back button design (too small, with hover effects)
 
 ---
 
-## Database Changes
+## Current State Analysis
 
-### 1. Add New Columns to `profiles` Table
+### Problem 1: Non-Functional Back Buttons
 
-| Column | Type | Purpose |
-|--------|------|---------|
-| `total_active_days` | integer | All-time count of days with activity |
-| `return_count` | integer | Number of times user returned after 2+ day gap |
-| `last_active_date` | date | Last date user showed up |
-| `this_month_active_days` | integer | Days active in current month (cached, recalculated monthly) |
+**Affected Pages:**
+- **AppInspireDetail** (Ritual Detail page) - The back button at lines 155-166 uses `navigate(-1)` with a history check fallback, but since the page may be entered from multiple sources (Home, Rituals page, direct link), the history approach can fail
 
-### 2. Keep `user_streaks` Table (Internal Only)
+### Problem 2: Inconsistent Navigation Logic
 
-The table stays for internal analytics but values are no longer shown to users. This gives us historical data without displaying pressure-inducing numbers.
+**Current Patterns Found:**
 
----
+| Page | Back Behavior | Issue |
+|------|---------------|-------|
+| AppChat | `navigate(-1)` swipe-back + button | Good iOS pattern |
+| AppEmotionHistory | Hard-coded `/app/emotion` | Correct - knows parent |
+| AppJournal | Hard-coded `/app/home` | Correct for top-level |
+| AppPlaylistDetail | Context-aware (`cameFromPlanner ? '/app/home' : '/app/player'`) | Best practice |
+| AppFeed | Hard-coded `/app/home` | Should be `/app/channels` |
+| AppCourseDetail | Hard-coded `/app/programs` | Correct |
+| AppBreathe | Uses AppHeader with `/app/home` | Correct for tool |
+| AppInspireDetail | `navigate(-1)` with fallback | Unreliable |
 
-## UI Changes Summary
+**Best Practice Pattern**: Pages like `AppPlaylistDetail` use query params or referrer tracking to provide intelligent back navigation based on where the user came from
 
-| Component | Current | New |
-|-----------|---------|-----|
-| StreakCelebration | "🔥 7" big number, streak counter | "You showed up today" with gentle checkmarks |
-| JournalHeaderStats | "day streak" label | "this month" (days active) |
-| JournalStats | "Day Streak" with flame | "Days This Month" with calendar |
-| CompactStatsPills | "🔥 7d streak" pill | "✓ 12 days" (this month) |
-| StatsCards | "🔥 7 days" | "Showed up 12 times this month" |
-| EmotionDashboard | "Streak" label | "This Month" label |
+### Problem 3: Non-iOS Back Button Design
 
----
+**Current BackButton Component Issues:**
+- Uses `<Button variant="ghost" size="icon">` - has hover effects, small tap target
+- Uses `ArrowLeft` icon instead of iOS-standard `ChevronLeft`
+- No text label (iOS typically shows "< Back" or parent page name)
+- Icon size is only 20px (h-5 w-5) - iOS uses larger icons
 
-## Component-by-Component Changes
-
-### 1. StreakCelebration.tsx → ReturnCelebration.tsx
-
-**Current**: Shows big streak number with fire emoji, week calendar highlighting consecutive days, "I'm committed 💪" button
-
-**New Design**:
-- Gentle illustration (leaf, sun, or heart) instead of fire
-- Message: "You showed up today" or "Welcome back" (after gap)
-- Show simple week view with checkmarks (not streak-based)
-- Button: "I'm here ✨" (present-focused, not commitment-focused)
-- For returning users (gap > 2 days): "Your strength is still here. Welcome back."
-
-### 2. JournalHeaderStats.tsx
-
-**Current**:
-```text
-📈 Total Entries | 🔥 Streak | 📅 This Month
-```
-
-**New**:
-```text
-📈 Total Entries | 📅 This Month | ✨ Returns
-```
-
-Changes:
-- Replace "streak" with "this month" (days with entries)
-- Replace flame icon with calendar or sparkle
-- Remove "day streak" label, use "this month" instead
-
-### 3. JournalStats.tsx
-
-**Current**: Shows "Day Streak" with flame icon in stats grid
-
-**New**: 
-- Change "Day Streak" to "Days This Month"
-- Replace Flame icon with Calendar icon
-- calculateStreak() function repurposed to count unique days this month
-
-### 4. CompactStatsPills.tsx
-
-**Current**: `{ icon: Flame, value: "7d", label: "streak" }`
-
-**New**: 
-- Icon: CheckCircle2 or Calendar (not Flame)
-- Value: "12 days" (this month count)
-- Label: "this month"
-- Remove "highlight: journalStreak >= 7" logic (no streak milestones)
-
-### 5. StatsCards.tsx
-
-**Current**: 
+**Good iOS Pattern Already in App** (AppChat):
 ```tsx
-{journalStreak > 0 ? `🔥 ${journalStreak} days` : 'Start today'}
+<Button 
+  variant="ghost" 
+  onClick={handleBack}
+  className="-ml-2 h-10 px-2 gap-0.5 text-primary hover:bg-transparent active:opacity-70"
+>
+  <ChevronLeft className="h-7 w-7" />
+  <span className="text-[17px]">Back</span>
+</Button>
 ```
 
-**New**:
+---
+
+## Proposed Solution
+
+### Phase 1: Create iOS-Style Back Button Component
+
+Replace the current `BackButton` component with an iOS-compliant design:
+
+**New BackButton Features:**
+- ChevronLeft icon (h-6 to h-7) instead of ArrowLeft
+- Optional text label (defaults to "Back")
+- No hover background - only opacity change on press
+- Primary color (blue/violet) for icon and text
+- Minimum 44px tap target (iOS HIG requirement)
+- Left-aligned with negative margin for edge alignment
+
+**New API:**
 ```tsx
-{daysThisMonth > 0 ? `${daysThisMonth} days this month` : 'Start today'}
+interface BackButtonProps {
+  to?: string;              // Explicit destination
+  label?: string;           // Text to show (default: "Back")
+  showLabel?: boolean;      // Whether to show label (default: true)
+  onClick?: () => void;     // Custom handler before navigation
+  className?: string;
+}
 ```
 
-Remove fire emoji entirely.
+### Phase 2: Fix Navigation Logic
 
-### 6. EmotionDashboard.tsx
+**Pattern to Implement:**
+1. For pages accessed from single parent: Use explicit `to` prop
+2. For pages accessed from multiple sources: Use URL query param or referrer tracking
 
-**Current**: Shows "Streak" label under flame icon
+**Specific Fixes:**
 
-**New**: 
-- Replace "Streak" with "This Month"
-- Replace Flame icon with Calendar or Sparkles icon
-- Keep the count but reframe it as presence, not continuity
+| Page | Current | Fix |
+|------|---------|-----|
+| AppInspireDetail | `navigate(-1)` | Add explicit `to="/app/routines"` or track referrer |
+| AppFeed | `/app/home` | Change to `/app/channels` |
+| AppFeedPost | `navigate(-1)` | Keep - nested page, history is reliable |
+| AppPlaylistDetail | Context-aware | Already good - keep pattern |
 
----
+### Phase 3: Update All Pages
 
-## Hook Changes
+Pages requiring updates:
 
-### useTaskPlanner.tsx
+1. **Pages using old BackButton component:**
+   - AppPlaylistDetail
+   - AppFeed  
+   - AppCourseDetail
+   - AppJournal
+   - AppJournalEntry
+   - AppBreathe (via AppHeader)
 
-**Current `updateStreak` function** (lines 1107-1164):
-- Resets `current_streak` to 1 if gap > 1 day
-- Increments streak on consecutive days
+2. **Pages with inline back buttons needing style update:**
+   - AppInspireDetail
+   - AppEmotionHistory
+   - AppFeedPost
+   - AppPeriod
+   - AppWater
+   - AppAudioPlayer
 
-**New `updatePresence` function**:
-- Never "resets" anything
-- Increments `total_active_days` on each unique day
-- Updates `last_active_date`
-- If gap > 2 days: increment `return_count` (celebrate the return)
-- Updates `this_month_active_days` cache
-
-**useUserStreak hook** (lines 398-417):
-- Rename to `useUserPresence`
-- Return `{ totalDays, thisMonthDays, returnCount, lastActiveDate }` instead of streak
-
-### useJournal.tsx / JournalStats
-
-Replace `calculateStreak()` with `calculateMonthlyPresence()`:
-- Count unique days with entries in current month
-- No concept of "breaking"
-
-### useEmotionLogs.tsx
-
-Replace streak calculation with monthly presence count.
+3. **Pages with correct iOS style (no change needed):**
+   - AppChat
 
 ---
 
-## New Messages (StreakCelebration → ReturnCelebration)
+## Technical Implementation Details
 
-| Scenario | Current Message | New Message |
-|----------|----------------|-------------|
-| First activity | "Great start! Keep it going!" | "You showed up. That's strength." |
-| Same day return | (not triggered) | (no change) |
-| After 1 day | "Two days in a row!" | "You're here again. ✨" |
-| After 2+ day gap | Streak reset to 1 | "Welcome back. Your strength is still here." |
-| Weekly presence | "One full week!" | "7 days this month. You keep showing up." |
-| High presence | "30+ day streak!" | "You've shown up so many times. That's real strength." |
+### Updated BackButton Component
+
+```tsx
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
+import { haptic } from '@/lib/haptics';
+import { cn } from '@/lib/utils';
+
+interface BackButtonProps {
+  to?: string;
+  label?: string;
+  showLabel?: boolean;
+  onClick?: () => void;
+  className?: string;
+}
+
+export function BackButton({ 
+  to, 
+  label = 'Back',
+  showLabel = true,
+  onClick, 
+  className 
+}: BackButtonProps) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    haptic.light();
+    onClick?.();
+    
+    if (to) {
+      navigate(to);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  return (
+    <button 
+      onClick={handleClick}
+      className={cn(
+        'flex items-center gap-0.5 h-10 px-1 -ml-1',
+        'text-primary hover:bg-transparent active:opacity-70',
+        'transition-opacity',
+        className
+      )}
+    >
+      <ChevronLeft className="h-7 w-7" />
+      {showLabel && (
+        <span className="text-[17px]">{label}</span>
+      )}
+    </button>
+  );
+}
+```
+
+### Circular Icon-Only Variant for Overlay Headers
+
+For pages like AppInspireDetail with image headers:
+
+```tsx
+export function BackButtonCircle({ 
+  to,
+  onClick,
+  className 
+}: Omit<BackButtonProps, 'label' | 'showLabel'>) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    haptic.light();
+    onClick?.();
+    to ? navigate(to) : navigate(-1);
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className={cn(
+        'w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm',
+        'flex items-center justify-center',
+        'text-white active:scale-95 transition-transform',
+        className
+      )}
+    >
+      <ChevronLeft className="h-5 w-5" />
+    </button>
+  );
+}
+```
+
+### AppHeader Update
+
+Update the AppHeader to use the new iOS-style back button:
+
+```tsx
+{showBack && (
+  <BackButton 
+    to={backTo} 
+    label={backLabel || 'Back'}
+    showLabel={showBackLabel ?? true}
+  />
+)}
+```
 
 ---
 
 ## Files to Modify
 
-### Components (UI Changes)
-1. `src/components/app/StreakCelebration.tsx` - Complete redesign
-2. `src/components/app/JournalHeaderStats.tsx` - Replace streak with monthly
-3. `src/components/app/JournalStats.tsx` - Replace streak calculation
-4. `src/components/dashboard/CompactStatsPills.tsx` - Replace streak pill
-5. `src/components/dashboard/StatsCards.tsx` - Replace journal streak display
-6. `src/components/emotion/EmotionDashboard.tsx` - Replace streak label
-
-### Hooks (Logic Changes)
-7. `src/hooks/useTaskPlanner.tsx` - Replace updateStreak with updatePresence
-8. `src/hooks/useEmotionLogs.tsx` - Replace streak with monthly count
-
-### Database
-9. Create migration to add new columns to `profiles` table
-10. Update TypeScript types
+1. `src/components/app/BackButton.tsx` - Complete rewrite with iOS style
+2. `src/components/app/AppHeader.tsx` - Update to use new BackButton props
+3. `src/pages/app/AppInspireDetail.tsx` - Use BackButtonCircle, fix destination
+4. `src/pages/app/AppEmotionHistory.tsx` - Use new BackButton component
+5. `src/pages/app/AppFeedPost.tsx` - Use new BackButton style
+6. `src/pages/app/AppPeriod.tsx` - Use new BackButton style
+7. `src/pages/app/AppWater.tsx` - Use new BackButton style
+8. `src/pages/app/AppAudioPlayer.tsx` - Update to iOS style
+9. `src/pages/app/AppFeed.tsx` - Fix destination from `/app/home` to `/app/channels`
+10. `src/pages/app/AppPlaylistDetail.tsx` - Update component style
+11. `src/pages/app/AppJournal.tsx` - Update component style
+12. `src/pages/app/AppJournalEntry.tsx` - Update component style
+13. `src/pages/app/AppCourseDetail.tsx` - Update component style
 
 ---
 
-## Implementation Order
-
-**Phase 1: Database & Types**
-1. Create migration for new `profiles` columns
-2. Update Supabase types
-
-**Phase 2: Core Hook Changes**
-3. Modify `useTaskPlanner.tsx` - rename hook, change logic
-4. Modify `useEmotionLogs.tsx` - replace streak calculation
-
-**Phase 3: UI Updates**
-5. Transform `StreakCelebration.tsx` to `ReturnCelebration.tsx`
-6. Update `JournalHeaderStats.tsx`
-7. Update `JournalStats.tsx`
-8. Update `CompactStatsPills.tsx`
-9. Update `StatsCards.tsx`
-10. Update `EmotionDashboard.tsx`
-
----
-
-## Result
+## Expected Outcome
 
 After implementation:
-- No more "streak broken" anxiety
-- Returning after a gap is celebrated, not punished
-- Users see "You've shown up 15 days this month" instead of "🔥 3 day streak"
-- The celebration modal says "Your strength is still here" instead of counting consecutive days
-- Engagement comes from feeling welcomed, not from fear of loss
+- All back buttons will have consistent iOS-style appearance
+- ChevronLeft icon with optional "Back" text label
+- Minimum 44px tap targets
+- No hover effects, only press opacity feedback
+- Intelligent navigation (knows where to go back to)
+- No broken/non-functional back buttons
+
