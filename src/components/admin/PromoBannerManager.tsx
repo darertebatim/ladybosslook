@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Trash2, Plus, Upload, ExternalLink, Sparkles, Loader2, Pencil } from 'lucide-react';
+import { Trash2, Plus, ExternalLink, Sparkles, Loader2, Pencil, Users } from 'lucide-react';
 import { format } from 'date-fns';
+import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
 type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
@@ -28,6 +29,13 @@ interface PromoBanner {
   starts_at: string | null;
   ends_at: string | null;
   created_at: string;
+  target_type: TargetType;
+  include_programs: string[];
+  exclude_programs: string[];
+  include_playlists: string[];
+  exclude_playlists: string[];
+  include_tools: string[];
+  exclude_tools: string[];
 }
 
 export function PromoBannerManager() {
