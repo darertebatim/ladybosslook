@@ -60,6 +60,15 @@ export function PromoBannerManager() {
   const [startsAt, setStartsAt] = useState('');
   const [endsAt, setEndsAt] = useState('');
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('3:1');
+  
+  // Audience targeting state
+  const [targetType, setTargetType] = useState<TargetType>('all');
+  const [includePrograms, setIncludePrograms] = useState<string[]>([]);
+  const [excludePrograms, setExcludePrograms] = useState<string[]>([]);
+  const [includePlaylists, setIncludePlaylists] = useState<string[]>([]);
+  const [excludePlaylists, setExcludePlaylists] = useState<string[]>([]);
+  const [includeTools, setIncludeTools] = useState<string[]>([]);
+  const [excludeTools, setExcludeTools] = useState<string[]>([]);
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({
