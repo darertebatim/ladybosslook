@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface PromoBanner {
   id: string;
@@ -12,6 +13,13 @@ interface PromoBanner {
   custom_url: string | null;
   display_frequency: 'once' | 'daily' | 'weekly';
   aspect_ratio: '3:1' | '16:9' | '1:1';
+  target_type: 'all' | 'enrolled' | 'custom';
+  include_programs: string[];
+  exclude_programs: string[];
+  include_playlists: string[];
+  exclude_playlists: string[];
+  include_tools: string[];
+  exclude_tools: string[];
 }
 
 const STORAGE_KEY = 'promo_banner_dismissals';
@@ -58,6 +66,7 @@ function shouldShowBanner(banner: PromoBanner): boolean {
 
 export function PromoBanner() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
 
   // Fetch active banners
@@ -75,10 +84,174 @@ export function PromoBanner() {
     },
   });
 
-  // Find the first banner that should be shown
-  const activeBanner = banners?.find(
-    (banner) => shouldShowBanner(banner) && !dismissedIds.has(banner.id)
-  );
+  // Fetch user's enrollments for targeting
+  const { data: userEnrollments } = useQuery({
+    queryKey: ['user-enrollments-for-promo', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .select('program_slug')
+        .eq('user_id', user.id)
+        .eq('status', 'active');
+      if (error) throw error;
+      return data.map(e => e.program_slug).filter(Boolean) as string[];
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fetch user's playlist access (based on audio progress)
+  const { data: userPlaylists } = useQuery({
+    queryKey: ['user-playlists-for-promo', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from('audio_progress')
+        .select('audio_id')
+        .eq('user_id', user.id);
+      if (error) throw error;
+      
+      // Get playlist IDs from audio progress
+      if (!data?.length) return [];
+      const audioIds = data.map(p => p.audio_id);
+      const { data: playlistItems } = await supabase
+        .from('audio_playlist_items')
+        .select('playlist_id')
+        .in('audio_id', audioIds);
+      
+      return [...new Set(playlistItems?.map(p => p.playlist_id) || [])];
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fetch user's tool usage
+  const { data: userTools } = useQuery({
+    queryKey: ['user-tools-for-promo', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const tools: string[] = [];
+      
+      // Check journal entries
+      const { count: journalCount } = await supabase
+        .from('journal_entries')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if (journalCount && journalCount > 0) tools.push('journal');
+      
+      // Check breathing sessions
+      const { count: breatheCount } = await supabase
+        .from('breathing_sessions')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if (breatheCount && breatheCount > 0) tools.push('breathe');
+      
+      // Check emotion logs
+      const { count: emotionCount } = await supabase
+        .from('emotion_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if (emotionCount && emotionCount > 0) tools.push('emotion');
+      
+      // Check period logs
+      const { count: periodCount } = await supabase
+        .from('period_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if (periodCount && periodCount > 0) tools.push('period');
+      
+      // Check tasks/planner
+      const { count: tasksCount } = await supabase
+        .from('user_tasks')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if (tasksCount && tasksCount > 0) tools.push('planner');
+      
+      return tools;
+    },
+    enabled: !!user?.id,
+  });
+
+  // Filter banners based on targeting
+  const eligibleBanners = useMemo(() => {
+    if (!banners) return [];
+    
+    return banners.filter(banner => {
+      // Always check dismiss status first
+      if (!shouldShowBanner(banner) || dismissedIds.has(banner.id)) {
+        return false;
+      }
+      
+      // Target type: all - show to everyone
+      if (banner.target_type === 'all') {
+        return true;
+      }
+      
+      // Target type: enrolled - show to anyone with any enrollment
+      if (banner.target_type === 'enrolled') {
+        return userEnrollments && userEnrollments.length > 0;
+      }
+      
+      // Target type: custom - apply include/exclude filters
+      if (banner.target_type === 'custom') {
+        let shouldShow = true;
+        
+        // Program includes (if specified, user must be in at least one)
+        if (banner.include_programs?.length > 0) {
+          const hasIncludedProgram = banner.include_programs.some(
+            slug => userEnrollments?.includes(slug)
+          );
+          if (!hasIncludedProgram) shouldShow = false;
+        }
+        
+        // Program excludes (if user is in any excluded program, hide)
+        if (banner.exclude_programs?.length > 0 && shouldShow) {
+          const hasExcludedProgram = banner.exclude_programs.some(
+            slug => userEnrollments?.includes(slug)
+          );
+          if (hasExcludedProgram) shouldShow = false;
+        }
+        
+        // Playlist includes
+        if (banner.include_playlists?.length > 0 && shouldShow) {
+          const hasIncludedPlaylist = banner.include_playlists.some(
+            id => userPlaylists?.includes(id)
+          );
+          if (!hasIncludedPlaylist) shouldShow = false;
+        }
+        
+        // Playlist excludes
+        if (banner.exclude_playlists?.length > 0 && shouldShow) {
+          const hasExcludedPlaylist = banner.exclude_playlists.some(
+            id => userPlaylists?.includes(id)
+          );
+          if (hasExcludedPlaylist) shouldShow = false;
+        }
+        
+        // Tool includes
+        if (banner.include_tools?.length > 0 && shouldShow) {
+          const hasIncludedTool = banner.include_tools.some(
+            tool => userTools?.includes(tool)
+          );
+          if (!hasIncludedTool) shouldShow = false;
+        }
+        
+        // Tool excludes
+        if (banner.exclude_tools?.length > 0 && shouldShow) {
+          const hasExcludedTool = banner.exclude_tools.some(
+            tool => userTools?.includes(tool)
+          );
+          if (hasExcludedTool) shouldShow = false;
+        }
+        
+        return shouldShow;
+      }
+      
+      return true;
+    });
+  }, [banners, dismissedIds, userEnrollments, userPlaylists, userTools]);
+
+  // Get first eligible banner
+  const activeBanner = eligibleBanners[0];
 
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation();

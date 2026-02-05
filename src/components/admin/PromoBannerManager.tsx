@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Trash2, Plus, Upload, ExternalLink, Sparkles, Loader2, Pencil } from 'lucide-react';
+import { Trash2, Plus, ExternalLink, Sparkles, Loader2, Pencil, Users } from 'lucide-react';
 import { format } from 'date-fns';
+import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
 type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
@@ -28,6 +29,13 @@ interface PromoBanner {
   starts_at: string | null;
   ends_at: string | null;
   created_at: string;
+  target_type: TargetType;
+  include_programs: string[];
+  exclude_programs: string[];
+  include_playlists: string[];
+  exclude_playlists: string[];
+  include_tools: string[];
+  exclude_tools: string[];
 }
 
 export function PromoBannerManager() {
@@ -52,6 +60,15 @@ export function PromoBannerManager() {
   const [startsAt, setStartsAt] = useState('');
   const [endsAt, setEndsAt] = useState('');
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('3:1');
+  
+  // Audience targeting state
+  const [targetType, setTargetType] = useState<TargetType>('all');
+  const [includePrograms, setIncludePrograms] = useState<string[]>([]);
+  const [excludePrograms, setExcludePrograms] = useState<string[]>([]);
+  const [includePlaylists, setIncludePlaylists] = useState<string[]>([]);
+  const [excludePlaylists, setExcludePlaylists] = useState<string[]>([]);
+  const [includeTools, setIncludeTools] = useState<string[]>([]);
+  const [excludeTools, setExcludeTools] = useState<string[]>([]);
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({
@@ -236,6 +253,13 @@ export function PromoBannerManager() {
         priority,
         starts_at: startsAt || null,
         ends_at: endsAt || null,
+        target_type: targetType,
+        include_programs: includePrograms,
+        exclude_programs: excludePrograms,
+        include_playlists: includePlaylists,
+        exclude_playlists: excludePlaylists,
+        include_tools: includeTools,
+        exclude_tools: excludeTools,
       });
       if (error) throw error;
     },
@@ -266,6 +290,13 @@ export function PromoBannerManager() {
         priority,
         starts_at: startsAt || null,
         ends_at: endsAt || null,
+        target_type: targetType,
+        include_programs: includePrograms,
+        exclude_programs: excludePrograms,
+        include_playlists: includePlaylists,
+        exclude_playlists: excludePlaylists,
+        include_tools: includeTools,
+        exclude_tools: excludeTools,
       }).eq('id', editingBanner.id);
       if (error) throw error;
     },
@@ -323,6 +354,14 @@ export function PromoBannerManager() {
     setEndsAt('');
     setBannerTitle('');
     setBannerSubtitle('');
+    // Reset targeting
+    setTargetType('all');
+    setIncludePrograms([]);
+    setExcludePrograms([]);
+    setIncludePlaylists([]);
+    setExcludePlaylists([]);
+    setIncludeTools([]);
+    setExcludeTools([]);
   };
 
   const startEditing = (banner: PromoBanner) => {
@@ -337,6 +376,14 @@ export function PromoBannerManager() {
     setPriority(banner.priority);
     setStartsAt(banner.starts_at ? banner.starts_at.slice(0, 16) : '');
     setEndsAt(banner.ends_at ? banner.ends_at.slice(0, 16) : '');
+    // Load targeting
+    setTargetType(banner.target_type || 'all');
+    setIncludePrograms(banner.include_programs || []);
+    setExcludePrograms(banner.exclude_programs || []);
+    setIncludePlaylists(banner.include_playlists || []);
+    setExcludePlaylists(banner.exclude_playlists || []);
+    setIncludeTools(banner.include_tools || []);
+    setExcludeTools(banner.exclude_tools || []);
   };
 
   const getDestinationLabel = (banner: PromoBanner) => {
@@ -648,6 +695,24 @@ export function PromoBannerManager() {
                 </div>
               </div>
 
+              {/* Audience Targeting */}
+              <PromoAudienceSelector
+                targetType={targetType}
+                setTargetType={setTargetType}
+                includePrograms={includePrograms}
+                setIncludePrograms={setIncludePrograms}
+                excludePrograms={excludePrograms}
+                setExcludePrograms={setExcludePrograms}
+                includePlaylists={includePlaylists}
+                setIncludePlaylists={setIncludePlaylists}
+                excludePlaylists={excludePlaylists}
+                setExcludePlaylists={setExcludePlaylists}
+                includeTools={includeTools}
+                setIncludeTools={setIncludeTools}
+                excludeTools={excludeTools}
+                setExcludeTools={setExcludeTools}
+              />
+
               {/* Active Toggle */}
               <div className="flex items-center gap-2">
                 <Switch checked={isActive} onCheckedChange={setIsActive} />
@@ -707,6 +772,12 @@ export function PromoBannerManager() {
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       {banner.display_frequency} • Priority: {banner.priority}
+                      {banner.target_type !== 'all' && (
+                        <span className="inline-flex items-center gap-1 ml-2">
+                          <Users className="h-3 w-3" />
+                          {banner.target_type === 'enrolled' ? 'Enrolled' : 'Custom'}
+                        </span>
+                      )}
                       {banner.starts_at && ` • From: ${format(new Date(banner.starts_at), 'MMM d')}`}
                       {banner.ends_at && ` • Until: ${format(new Date(banner.ends_at), 'MMM d')}`}
                     </div>

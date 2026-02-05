@@ -1947,10 +1947,17 @@ export type Database = {
           destination_type: string
           display_frequency: string
           ends_at: string | null
+          exclude_playlists: string[] | null
+          exclude_programs: string[] | null
+          exclude_tools: string[] | null
           id: string
+          include_playlists: string[] | null
+          include_programs: string[] | null
+          include_tools: string[] | null
           is_active: boolean
           priority: number
           starts_at: string | null
+          target_type: string
           updated_at: string
         }
         Insert: {
@@ -1962,10 +1969,17 @@ export type Database = {
           destination_type: string
           display_frequency?: string
           ends_at?: string | null
+          exclude_playlists?: string[] | null
+          exclude_programs?: string[] | null
+          exclude_tools?: string[] | null
           id?: string
+          include_playlists?: string[] | null
+          include_programs?: string[] | null
+          include_tools?: string[] | null
           is_active?: boolean
           priority?: number
           starts_at?: string | null
+          target_type?: string
           updated_at?: string
         }
         Update: {
@@ -1977,10 +1991,17 @@ export type Database = {
           destination_type?: string
           display_frequency?: string
           ends_at?: string | null
+          exclude_playlists?: string[] | null
+          exclude_programs?: string[] | null
+          exclude_tools?: string[] | null
           id?: string
+          include_playlists?: string[] | null
+          include_programs?: string[] | null
+          include_tools?: string[] | null
           is_active?: boolean
           priority?: number
           starts_at?: string | null
+          target_type?: string
           updated_at?: string
         }
         Relationships: []
