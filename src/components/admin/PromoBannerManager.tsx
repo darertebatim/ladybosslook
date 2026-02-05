@@ -267,6 +267,8 @@ export function PromoBannerManager() {
         exclude_playlists: excludePlaylists,
         include_tools: includeTools,
         exclude_tools: excludeTools,
+        display_location: displayLocation,
+        target_playlist_ids: targetPlaylistIds,
       });
       if (error) throw error;
     },
