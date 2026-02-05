@@ -332,6 +332,7 @@ export function PromoBannerManager() {
     setDestinationId(banner.destination_id || '');
     setCustomUrl(banner.custom_url || '');
     setDisplayFrequency(banner.display_frequency);
+    setAspectRatio(banner.aspect_ratio || '3:1');
     setIsActive(banner.is_active);
     setPriority(banner.priority);
     setStartsAt(banner.starts_at ? banner.starts_at.slice(0, 16) : '');
