@@ -27,6 +27,7 @@ export const TaskQuickStartSheet = ({
   const navigate = useNavigate();
   const [taskName, setTaskName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
+  const [isRolling, setIsRolling] = useState(false);
   const { data: templates = [] } = useTaskTemplates();
   const { data: categories = [] } = useRoutineBankCategories();
 
