@@ -497,7 +497,7 @@ export default function AppChat() {
       >
         {/* iOS-style Blur Header - fixed for proper scroll behavior */}
         <header 
-          className="fixed top-0 left-0 right-0 z-40 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-xl rounded-b-3xl shadow-sm"
+          className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border/30"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="flex items-center gap-1 pt-3 pb-2 px-4">
