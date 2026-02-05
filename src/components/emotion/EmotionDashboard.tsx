@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, History, Calendar, BarChart2, Heart } from 'lucide-react';
+import { History, Calendar, BarChart2, Heart } from 'lucide-react';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
+import { CloseButton } from '@/components/app/CloseButton';
 import { EmotionLogCard } from './EmotionLogCard';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
