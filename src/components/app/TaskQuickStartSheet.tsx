@@ -116,7 +116,7 @@ export const TaskQuickStartSheet = ({
               <Input
                 value={taskName}
                 onChange={(e) => setTaskName(e.target.value.slice(0, 50))}
-                placeholder="What would feel good right now?"
+                placeholder="Type a new action..."
                 className="text-base font-medium text-center border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1"
                 maxLength={50}
                 autoFocus
