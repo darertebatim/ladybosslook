@@ -57,6 +57,7 @@ interface TaskBankItem {
   is_active: boolean;
   tag: string | null;
   sort_order: number;
+  time_period: string | null;
 }
 
 // Admin settings for task bank items (visibility only - description is inline)
