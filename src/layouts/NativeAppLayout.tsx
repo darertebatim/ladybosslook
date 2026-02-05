@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { usePushNotificationFlow } from '@/hooks/usePushNotificationFlow';
 import { useTimezoneSync } from '@/hooks/useTimezoneSync';
+import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
