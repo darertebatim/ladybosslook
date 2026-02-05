@@ -980,7 +980,6 @@ const AppCourseDetail = () => {
               onClick={() => navigate('/app/browse')}
               className="mb-2"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
               Browse
             </Button>
 
