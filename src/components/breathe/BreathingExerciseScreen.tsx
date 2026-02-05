@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Pause, Play, HelpCircle } from 'lucide-react';
+import { Pause, Play, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BreathingCircle } from './BreathingCircle';
 import { BreathingInfoSheet } from './BreathingInfoSheet';
+import { CloseButton } from '@/components/app/CloseButton';
 import { BreathingExercise, useSaveBreathingSession } from '@/hooks/useBreathingExercises';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { haptic } from '@/lib/haptics';
