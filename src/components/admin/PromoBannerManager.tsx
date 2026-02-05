@@ -374,7 +374,7 @@ export function PromoBannerManager() {
     setIncludeTools([]);
     setExcludeTools([]);
     // Reset location
-    setDisplayLocation('home');
+    setDisplayLocation('home_top');
     setTargetPlaylistIds([]);
   };
 
