@@ -124,9 +124,24 @@ const AppHome = () => {
 
   // Home data for stats and rounds
   const {
-    data: homeData,
-    isLoading: homeLoading
+    isNewUser = false,
+    totalCompletions = 0,
+    ...homeData
   } = useNewHomeData();
+  
+  // Track first action celebration
+  const prevCompletions = useRef(totalCompletions);
+  
+  useEffect(() => {
+    if (prevCompletions.current === 0 && totalCompletions === 1) {
+      const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated');
+      if (!alreadyCelebrated) {
+        setShowFirstCelebration(true);
+        localStorage.setItem('simora_first_action_celebrated', 'true');
+      }
+    }
+    prevCompletions.current = totalCompletions;
+  }, [totalCompletions]);
 
   // Popular routines for suggestions (filter out already-added ones)
   const {
