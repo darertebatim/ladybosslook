@@ -718,6 +718,13 @@ const AppHome = () => {
           onClose={() => setShowFirstCelebration(false)}
         />
 
+        {/* Welcome Ritual Popup for New Users */}
+        {showWelcomePopup && (
+          <WelcomeRitualPopup
+            onDismiss={() => setWelcomePopupDismissed(true)}
+          />
+        )}
+
         {/* App Tour - Joyride guided walkthrough */}
         <AppTour run={runTour} stepIndex={stepIndex} onStepChange={setStepIndex} onComplete={completeTour} onSkip={skipTour} />
       </div>
