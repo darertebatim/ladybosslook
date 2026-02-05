@@ -42,6 +42,7 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
     linked_playlist_id: null,
     pro_link_type: 'breathe',
     pro_link_value: exercise.id, // Link to specific exercise
+    tag: 'pro', // Pro-linked tasks use 'pro' category
   };
 
   const handleAddToRoutine = (e: React.MouseEvent) => {

@@ -137,7 +137,7 @@ const AppWater = () => {
         color: editedWater?.color || 'sky',
         repeat_pattern: editedWater?.repeatPattern || 'daily',
         scheduled_time: editedWater?.scheduledTime || null,
-        tag: editedWater?.tag || 'Water',
+       tag: 'pro', // Pro-linked tasks should use 'pro' category for proper filtering
         reminder_enabled: editedWater?.reminderEnabled || false,
         // Pro task link to water tool
         pro_link_type: 'water',

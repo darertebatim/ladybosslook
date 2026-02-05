@@ -29,6 +29,7 @@ const SYNTHETIC_EMOTION_TASK: RoutinePlanTask = {
   pro_link_type: 'emotion',
   pro_link_value: null,
   linked_playlist: null,
+  tag: 'pro', // Pro-linked tasks use 'pro' category
 };
 
 export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {

@@ -85,5 +85,6 @@ export function createWaterRoutineTask(): RoutinePlanTask {
     // Pro Task link to water tracking tool
     pro_link_type: 'water',
     pro_link_value: null,
+    tag: 'pro', // Pro-linked tasks use 'pro' category
   };
 }
