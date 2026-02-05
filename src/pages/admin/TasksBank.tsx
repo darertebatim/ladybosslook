@@ -525,6 +525,52 @@ export default function TasksBank() {
     },
   });
 
+  // Add actions to existing routine
+  const addToExistingRoutine = useMutation({
+    mutationFn: async () => {
+      if (!selectedRoutineId) throw new Error('No ritual selected');
+      if (selectedTasks.length === 0) throw new Error('No actions selected');
+
+      // Get current max order for this routine
+      const { data: existingTasks } = await supabase
+        .from('routines_bank_tasks')
+        .select('task_order')
+        .eq('routine_id', selectedRoutineId)
+        .order('task_order', { ascending: false })
+        .limit(1);
+
+      const startOrder = existingTasks && existingTasks.length > 0 
+        ? (existingTasks[0].task_order || 0) + 1 
+        : 0;
+
+      // Add selected tasks to the routine
+      const taskRecords = selectedTasks.map((task, idx) => ({
+        routine_id: selectedRoutineId,
+        task_id: task.id,
+        title: task.title,
+        emoji: task.emoji,
+        section_title: null,
+        task_order: startOrder + idx,
+      }));
+
+      const { error } = await supabase.from('routines_bank_tasks').insert(taskRecords);
+      if (error) throw error;
+
+      return selectedRoutineId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
+      toast.success(`${selectedTasks.length} action(s) added to ritual!`);
+      setAddToRoutineOpen(false);
+      setSelectedRoutineId('');
+      clearSelection();
+    },
+    onError: (error) => {
+      toast.error('Failed to add actions: ' + error.message);
+    },
+  });
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
