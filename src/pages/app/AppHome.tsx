@@ -62,6 +62,9 @@ const AppHome = () => {
   
   // Skip task state
   const [skipTask, setSkipTask] = useState<UserTask | null>(null);
+  
+  // First action celebration state
+  const [showFirstCelebration, setShowFirstCelebration] = useState(false);
 
   const {
     run: runTour,
