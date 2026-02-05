@@ -64,6 +64,10 @@ export function PromoBannerManager() {
   const [endsAt, setEndsAt] = useState('');
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('3:1');
   
+  // Display location state
+  const [displayLocation, setDisplayLocation] = useState<DisplayLocation>('home');
+  const [targetPlaylistIds, setTargetPlaylistIds] = useState<string[]>([]);
+  
   // Audience targeting state
   const [targetType, setTargetType] = useState<TargetType>('all');
   const [includePrograms, setIncludePrograms] = useState<string[]>([]);
