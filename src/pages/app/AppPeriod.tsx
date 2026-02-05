@@ -151,15 +151,7 @@ const AppPeriod = () => {
           className="relative z-10 shrink-0 flex items-center justify-between px-4"
           style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)', paddingBottom: '12px' }}
         >
-          <button
-            onClick={() => {
-              haptic.light();
-              navigate('/app/home');
-            }}
-            className="w-10 h-10 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center shadow-sm active:scale-95 transition-transform"
-          >
-            <X className="h-5 w-5 text-pink-700" />
-          </button>
+          <BackButtonCircle to="/app/home" className="bg-white/60 text-pink-700" />
           
           <h1 className="text-lg font-semibold text-pink-800">Period Tracker</h1>
           

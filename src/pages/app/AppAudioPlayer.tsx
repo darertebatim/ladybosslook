@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Headphones, List, Lock, CheckCircle, Play } from "lucide-react";
+import { Headphones, List, Lock, CheckCircle, Play } from "lucide-react";
+import { BackButton } from "@/components/app/BackButton";
 import { AudioControls } from "@/components/audio/AudioControls";
 import { ProgressBar } from "@/components/audio/ProgressBar";
 import { BookmarkButton } from "@/components/audio/BookmarkButton";
