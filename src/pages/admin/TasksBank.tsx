@@ -91,6 +91,9 @@ export default function TasksBank() {
   const [addToRoutineOpen, setAddToRoutineOpen] = useState(false);
   const [selectedRoutineId, setSelectedRoutineId] = useState<string>('');
 
+  // AI description generation state
+  const [generatingDescriptionFor, setGeneratingDescriptionFor] = useState<string | null>(null);
+
   // Fetch routine categories from database
   const { data: routineCategories = [] } = useQuery({
     queryKey: ['routine-categories-for-tasks-bank'],
