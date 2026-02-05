@@ -26,6 +26,7 @@ const SYNTHETIC_JOURNAL_TASK: RoutinePlanTask = {
   pro_link_type: 'journal',
   pro_link_value: null,
   linked_playlist: null,
+  tag: 'pro', // Pro-linked tasks use 'pro' category
 };
 
 export const JournalReminderSettings = ({ className }: JournalReminderSettingsProps) => {
