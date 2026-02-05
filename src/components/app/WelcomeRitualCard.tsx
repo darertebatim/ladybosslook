@@ -4,8 +4,11 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useWelcomePopupRitual } from '@/hooks/useRoutinesBank';
-import { useTaskTemplates, TaskTemplate } from '@/hooks/useTaskPlanner';
+import { useTaskTemplates, TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { toast } from 'sonner';
+
+// Color cycle for visual variety
+const COLOR_CYCLE: TaskColor[] = ['peach', 'sky', 'pink', 'mint', 'lavender', 'lime', 'yellow'];
 
 interface WelcomeRitualCardProps {
   onActionAdded?: () => void;
@@ -143,7 +146,7 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
           </div>
         </div>
         
-        {/* Back of card */}
+        {/* Back of card - App-style with colorful action cards */}
         <div 
           className="absolute inset-0 w-full"
           style={{ 
@@ -151,41 +154,46 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
             transform: 'rotateY(180deg)',
           }}
         >
-          <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-md bg-card border border-border">
-            {/* Header */}
-            <div className="p-3 border-b border-border/50">
+          <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-md bg-gradient-to-br from-violet-50 to-purple-100 dark:from-violet-950/30 dark:to-purple-900/20">
+            {/* Header - softer, more app-like */}
+            <div className="px-4 pt-4 pb-2">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-sm text-foreground">
-                  Pick an action
-                </h3>
+                <div>
+                  <h3 className="font-bold text-base text-foreground">
+                    Pick an action
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    One is enough. Start small.
+                  </p>
+                </div>
                 <button
                   onClick={handleDismiss}
-                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+                  className="w-7 h-7 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center hover:bg-black/20 dark:hover:bg-white/20 transition-colors"
                 >
-                  <X className="w-3.5 h-3.5 text-muted-foreground" />
+                  <X className="w-4 h-4 text-foreground/70" />
                 </button>
               </div>
-              <p className="text-[11px] text-muted-foreground mt-0.5">
-                One is enough. Start small.
-              </p>
             </div>
             
-            {/* Actions list */}
-            <div className="p-2 space-y-1.5 overflow-y-auto max-h-[calc(100%-70px)]">
+            {/* Actions list - colorful app-style cards */}
+            <div className="px-3 pb-8 space-y-2 overflow-y-auto max-h-[calc(100%-80px)]">
               {ritualLoading ? (
-                <div className="flex items-center justify-center py-6">
-                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
                 </div>
               ) : displayActions.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground text-xs">
+                <div className="text-center py-8 text-muted-foreground text-sm">
                   No actions available yet
                 </div>
               ) : (
-                displayActions.map((action) => {
+                displayActions.map((action, index) => {
                   const isAdded = addedActions.has(action.id);
                   const isAdding = addingAction === action.id;
                   const emoji = action.emoji || '✨';
                   const actionTitle = action.title;
+                  // Use action's color or cycle through colors
+                  const actionColor = (action as RoutineBankTask).color as TaskColor || COLOR_CYCLE[index % COLOR_CYCLE.length];
+                  const bgColor = TASK_COLORS[actionColor] || TASK_COLORS.mint;
                   
                   return (
                     <button
@@ -193,31 +201,32 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
                       onClick={(e) => handleAddAction(action, e)}
                       disabled={isAdded || isAdding}
                       className={cn(
-                        "flex items-center gap-2.5 w-full p-2.5 rounded-xl border transition-all",
-                        isAdded 
-                          ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800" 
-                          : "bg-card border-border/50 hover:bg-muted/50 active:scale-[0.98]"
+                        "flex items-center gap-3 w-full p-3 rounded-xl transition-all active:scale-[0.98]",
+                        isAdded && "ring-2 ring-emerald-400 ring-offset-1"
                       )}
+                      style={{ backgroundColor: bgColor }}
                     >
-                      <FluentEmoji emoji={emoji} size={24} className="flex-shrink-0" />
+                      <span className="text-2xl shrink-0">
+                        {emoji.length <= 2 ? emoji : <FluentEmoji emoji={emoji} size={28} />}
+                      </span>
                       <span className={cn(
-                        "flex-1 text-left text-[13px] truncate",
-                        isAdded ? "text-emerald-700 dark:text-emerald-300" : "text-foreground"
+                        "flex-1 text-left font-medium text-[15px] text-black truncate",
+                        isAdded && "line-through opacity-70"
                       )}>
                         {actionTitle}
                       </span>
                       <div className={cn(
-                        "shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors",
+                        "shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-all",
                         isAdded 
                           ? "bg-emerald-500 text-white" 
-                          : "bg-muted text-muted-foreground"
+                          : "bg-white/60 text-black/50"
                       )}>
                         {isAdding ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin" />
                         ) : isAdded ? (
-                          <Check className="w-3.5 h-3.5" />
+                          <Check className="w-4 h-4" />
                         ) : (
-                          <Plus className="w-3.5 h-3.5" />
+                          <Plus className="w-4 h-4" />
                         )}
                       </div>
                     </button>
@@ -228,7 +237,7 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
             
             {/* Tap to flip back hint */}
             <div className="absolute bottom-2 inset-x-0 text-center">
-              <span className="text-[10px] text-muted-foreground/50">
+              <span className="text-[10px] text-foreground/40">
                 Tap to flip back
               </span>
             </div>
