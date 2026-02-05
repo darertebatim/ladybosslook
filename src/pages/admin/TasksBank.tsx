@@ -87,6 +87,10 @@ export default function TasksBank() {
   const [newRoutineName, setNewRoutineName] = useState('');
   const [newRoutineCategory, setNewRoutineCategory] = useState('general');
 
+  // Add to existing ritual state
+  const [addToRoutineOpen, setAddToRoutineOpen] = useState(false);
+  const [selectedRoutineId, setSelectedRoutineId] = useState<string>('');
+
   // Fetch routine categories from database
   const { data: routineCategories = [] } = useQuery({
     queryKey: ['routine-categories-for-tasks-bank'],
@@ -99,6 +103,20 @@ export default function TasksBank() {
       
       if (error) throw error;
       return data as RoutineCategory[];
+    },
+  });
+
+  // Fetch existing routines for "Add to Ritual" feature
+  const { data: existingRoutines = [] } = useQuery({
+    queryKey: ['routines-bank-for-adding'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('id, title, emoji, category')
+        .order('title', { ascending: true });
+      
+      if (error) throw error;
+      return data;
     },
   });
 
