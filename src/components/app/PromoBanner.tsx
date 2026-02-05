@@ -185,7 +185,7 @@ export function PromoBanner({
     enabled: !!user?.id,
   });
 
-  // Filter banners based on targeting
+  // Filter banners based on location and targeting
   const eligibleBanners = useMemo(() => {
     if (!banners) return [];
     
@@ -193,6 +193,19 @@ export function PromoBanner({
       // Always check dismiss status first
       if (!shouldShowBanner(banner) || dismissedIds.has(banner.id)) {
         return false;
+      }
+      
+      // Location filter - banner must be for this location or 'all'
+      const bannerLocation = banner.display_location || 'home';
+      if (bannerLocation !== 'all' && bannerLocation !== location) {
+        return false;
+      }
+      
+      // For player location: check playlist targeting
+      if (location === 'player' && banner.target_playlist_ids?.length > 0) {
+        if (!currentPlaylistId || !banner.target_playlist_ids.includes(currentPlaylistId)) {
+          return false;
+        }
       }
       
       // Target type: all - show to everyone
@@ -262,7 +275,7 @@ export function PromoBanner({
       
       return true;
     });
-  }, [banners, dismissedIds, userEnrollments, userPlaylists, userTools]);
+  }, [banners, dismissedIds, location, currentPlaylistId, userEnrollments, userPlaylists, userTools]);
 
   // Get first eligible banner
   const activeBanner = eligibleBanners[0];
