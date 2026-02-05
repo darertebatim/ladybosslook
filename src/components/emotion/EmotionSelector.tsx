@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ChevronRight } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { BackButton } from '@/components/app/BackButton';
 import { 
   VALENCE_OPTIONS, 
   EMOTION_CATEGORIES,
