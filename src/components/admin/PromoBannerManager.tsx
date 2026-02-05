@@ -361,23 +361,49 @@ export function PromoBannerManager() {
       case 'journal':
         return 'Journal';
       case 'programs':
-        return 'Programs Page';
+        return 'Programs / Store';
       case 'breathe':
         return 'Breathe Page';
       case 'water':
         return 'Water Tracking';
       case 'channels':
-        return 'Feed/Channels';
+        return 'Feed / Channels';
       case 'home':
         return 'Home Page';
       case 'inspire':
-        return 'Inspire/Routines';
+        return 'Inspire / Routines';
+      case 'emotion':
+        return 'Emotion Tracker';
+      case 'period':
+        return 'Period Tracker';
+      case 'chat':
+        return 'Chat / Support';
+      case 'profile':
+        return 'Profile / Settings';
+      case 'planner':
+        return 'Task Planner';
       case 'custom_url':
         return banner.custom_url || 'Custom URL';
       case 'external_url':
         return banner.custom_url || 'External URL';
       default:
         return 'Unknown';
+    }
+  };
+  
+  const getAspectRatioClass = (ratio: AspectRatio) => {
+    switch (ratio) {
+      case '16:9': return 'aspect-video';
+      case '1:1': return 'aspect-square';
+      default: return 'aspect-[3/1]';
+    }
+  };
+  
+  const getAspectRatioDimensions = (ratio: AspectRatio) => {
+    switch (ratio) {
+      case '16:9': return '1920×1080';
+      case '1:1': return '1080×1080';
+      default: return '1200×400';
     }
   };
 
