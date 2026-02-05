@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Trash2, Heart } from 'lucide-react';
+import { Trash2, Heart } from 'lucide-react';
 import { format, isToday, isYesterday, startOfDay, isSameDay } from 'date-fns';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { EmotionLogCard } from '@/components/emotion/EmotionLogCard';
+import { BackButton } from '@/components/app/BackButton';
 import { haptic } from '@/lib/haptics';
 import {
   AlertDialog,
