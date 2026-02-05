@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
 import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart } from 'lucide-react';
@@ -33,6 +33,8 @@ import { WaterTrackingScreen } from '@/components/app/WaterTrackingScreen';
 import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
+import { WelcomeCard } from '@/components/app/WelcomeCard';
+import { FirstActionCelebration } from '@/components/app/FirstActionCelebration';
 import { toast } from 'sonner';
 const AppHome = () => {
   const navigate = useNavigate();
@@ -60,6 +62,9 @@ const AppHome = () => {
   
   // Skip task state
   const [skipTask, setSkipTask] = useState<UserTask | null>(null);
+  
+  // First action celebration state
+  const [showFirstCelebration, setShowFirstCelebration] = useState(false);
 
   const {
     run: runTour,
@@ -119,9 +124,24 @@ const AppHome = () => {
 
   // Home data for stats and rounds
   const {
-    data: homeData,
-    isLoading: homeLoading
+    isNewUser = false,
+    totalCompletions = 0,
+    ...homeData
   } = useNewHomeData();
+  
+  // Track first action celebration
+  const prevCompletions = useRef(totalCompletions);
+  
+  useEffect(() => {
+    if (prevCompletions.current === 0 && totalCompletions === 1) {
+      const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated');
+      if (!alreadyCelebrated) {
+        setShowFirstCelebration(true);
+        localStorage.setItem('simora_first_action_celebrated', 'true');
+      }
+    }
+    prevCompletions.current = totalCompletions;
+  }, [totalCompletions]);
 
   // Popular routines for suggestions (filter out already-added ones)
   const {
@@ -537,11 +557,21 @@ const AppHome = () => {
                 </div>
               )}
 
+              {/* Welcome Card for New Users - show above empty state */}
+              {isNewUser && filteredTasks.length === 0 && (
+                <div className="mb-4">
+                  <WelcomeCard onAddAction={() => setShowQuickStart(true)} />
+                </div>
+              )}
+
               {/* Personal Actions Section */}
               {filteredTasks.length === 0 && (selectedTag !== null || programEvents.length === 0) ? <div className="text-center py-12">
                   <div className="text-4xl mb-3">✨</div>
-                  <p className="text-muted-foreground mb-4">
-                    {selectedTag ? `No ${selectedTag} actions for this day` : 'No actions for this day'}
+                  <p className="text-muted-foreground mb-2">
+                    {selectedTag ? `No ${selectedTag} actions for this day` : 'Your day is open'}
+                  </p>
+                  <p className="text-xs text-muted-foreground/70 mb-4">
+                    One small action is enough
                   </p>
                   <button onClick={() => setShowQuickStart(true)} className="text-violet-600 font-medium">
                     Add your first action
@@ -668,6 +698,12 @@ const AppHome = () => {
         )}
 
         {user && showNotificationFlow && <PushNotificationOnboarding userId={user.id} onComplete={() => setShowNotificationFlow(false)} onSkip={() => setShowNotificationFlow(false)} />}
+
+        {/* First Action Celebration */}
+        <FirstActionCelebration
+          isOpen={showFirstCelebration}
+          onClose={() => setShowFirstCelebration(false)}
+        />
 
         {/* App Tour - Joyride guided walkthrough */}
         <AppTour run={runTour} stepIndex={stepIndex} onStepChange={setStepIndex} onComplete={completeTour} onSkip={skipTour} />
