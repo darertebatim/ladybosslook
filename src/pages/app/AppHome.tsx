@@ -557,11 +557,21 @@ const AppHome = () => {
                 </div>
               )}
 
+              {/* Welcome Card for New Users - show above empty state */}
+              {isNewUser && filteredTasks.length === 0 && (
+                <div className="mb-4">
+                  <WelcomeCard onAddAction={() => setShowQuickStart(true)} />
+                </div>
+              )}
+
               {/* Personal Actions Section */}
               {filteredTasks.length === 0 && (selectedTag !== null || programEvents.length === 0) ? <div className="text-center py-12">
                   <div className="text-4xl mb-3">✨</div>
-                  <p className="text-muted-foreground mb-4">
-                    {selectedTag ? `No ${selectedTag} actions for this day` : 'No actions for this day'}
+                  <p className="text-muted-foreground mb-2">
+                    {selectedTag ? `No ${selectedTag} actions for this day` : 'Your day is open'}
+                  </p>
+                  <p className="text-xs text-muted-foreground/70 mb-4">
+                    One small action is enough
                   </p>
                   <button onClick={() => setShowQuickStart(true)} className="text-violet-600 font-medium">
                     Add your first action
