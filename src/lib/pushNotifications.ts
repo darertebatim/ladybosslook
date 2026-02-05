@@ -1,10 +1,22 @@
 import { supabase } from '@/integrations/supabase/client';
 import { PushNotifications, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { toast } from 'sonner';
 
 export type NotificationPermission = 'granted' | 'denied' | 'default';
+
+// Helper to get current app version
+async function getCurrentAppVersion(): Promise<string | null> {
+  if (!Capacitor.isNativePlatform()) return null;
+  try {
+    const info = await App.getInfo();
+    return info.version;
+  } catch {
+    return null;
+  }
+}
 
 // Navigation callback for deep linking
 let navigationCallback: ((url: string) => void) | null = null;
