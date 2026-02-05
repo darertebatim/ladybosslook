@@ -565,10 +565,14 @@ const AppHome = () => {
                       Try a Ritual
                     </h2>
                   </div>
-                  <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-                    {suggestedRoutines.map(routine => <div key={routine.id} className="w-32 shrink-0">
-                        <RoutineBankCard routine={routine} onClick={() => navigate(`/app/routines/${routine.id}`)} />
-                      </div>)}
+                  <div className="grid grid-cols-2 gap-3">
+                    {suggestedRoutines.slice(0, 4).map(routine => (
+                      <RoutineBankCard 
+                        key={routine.id} 
+                        routine={routine} 
+                        onClick={() => navigate(`/app/routines/${routine.id}`)} 
+                      />
+                    ))}
                   </div>
                 </div>}
 
