@@ -67,11 +67,6 @@ const AppEmotionHistory = () => {
     return groups;
   }, [filteredLogs]);
 
-  const handleBack = () => {
-    haptic.light();
-    navigate('/app/emotion');
-  };
-
   const handleDeleteClick = (id: string) => {
     haptic.light();
     setDeleteId(id);

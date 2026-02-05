@@ -154,18 +154,7 @@ export default function AppInspireDetail() {
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
-        <button
-          onClick={() => {
-            if (window.history.length > 1) {
-              navigate(-1);
-            } else {
-              navigate('/app/routines');
-            }
-          }}
-          className="p-2 rounded-full bg-black/30 backdrop-blur-sm text-white"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
+        <BackButtonCircle to="/app/routines" />
         <div className="flex items-center gap-2">
           <button className="p-2 rounded-full bg-black/30 backdrop-blur-sm text-white">
             <Heart className="w-5 h-5" />
