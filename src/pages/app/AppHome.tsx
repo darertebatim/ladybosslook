@@ -561,15 +561,16 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Welcome Ritual Card for New Users - flipping card with actions */}
+              {/* Welcome Ritual Card for New Users - covers the empty state */}
               {isNewUser && filteredTasks.length === 0 && (
-                <div className="mb-4">
+                <div className="py-4">
                   <WelcomeRitualCard />
                 </div>
               )}
 
-              {/* Personal Actions Section */}
-              {filteredTasks.length === 0 && (selectedTag !== null || programEvents.length === 0) ? <div className="text-center py-12">
+              {/* Personal Actions Section - hide empty state when welcome card is shown */}
+              {!isNewUser && filteredTasks.length === 0 && (selectedTag !== null || programEvents.length === 0) ? (
+                <div className="text-center py-12">
                   <div className="text-4xl mb-3">✨</div>
                   <p className="text-muted-foreground mb-2">
                     {selectedTag ? `No ${selectedTag} actions for this day` : 'Your day is open'}
@@ -580,16 +581,19 @@ const AppHome = () => {
                   <button onClick={() => setShowQuickStart(true)} className="text-violet-600 font-medium">
                     Add your first action
                   </button>
-                </div> : filteredTasks.length > 0 && <div>
+                </div>
+              ) : filteredTasks.length > 0 ? (
+                <div>
                   {/* My Actions header - always show */}
                   <div className="flex items-center gap-2 mb-3">
-                    <h2 className="text-sm font-semibold text-black uppercase tracking-wide">
+                    <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">
                       My Actions
                     </h2>
                     <span className="text-xs text-foreground/40 ml-auto">Hold to reorder</span>
                   </div>
                   <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenWaterTracking={handleOpenWaterTracking} />
-                </div>}
+                </div>
+              ) : null}
 
               {/* Popular Rituals Suggestions - only show rituals user hasn't added */}
               {suggestedRoutines.length > 0 && selectedTag === null && <div className="tour-suggestions mt-6">
