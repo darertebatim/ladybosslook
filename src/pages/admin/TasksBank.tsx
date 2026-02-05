@@ -57,6 +57,7 @@ interface TaskBankItem {
   is_active: boolean;
   tag: string | null;
   sort_order: number;
+  time_period: string | null;
 }
 
 // Admin settings for task bank items (visibility only - description is inline)
@@ -690,11 +691,17 @@ export default function TasksBank() {
             {filteredTasks.map((task) => {
               const catInfo = getCategoryInfo(task.category);
               const isSelected = selectedTaskIds.has(task.id);
+              const repeatLabel = task.repeat_pattern !== 'none' 
+                ? (task.repeat_pattern === 'daily' ? 'Daily' :
+                   task.repeat_pattern === 'weekly' ? 'Weekly' :
+                   task.repeat_pattern === 'monthly' ? 'Monthly' : 'Once')
+                : 'Once';
+              const timeLabel = task.time_period || 'Anytime';
               return (
                 <div
                   key={task.id}
                   className={cn(
-                    'flex items-center gap-3 p-3 rounded-xl border cursor-pointer hover:shadow-sm transition-shadow group',
+                    'rounded-2xl border cursor-pointer hover:shadow-sm transition-shadow group overflow-hidden',
                     !task.is_active && 'opacity-50',
                     isSelected && 'ring-2 ring-primary'
                   )}
@@ -707,86 +714,96 @@ export default function TasksBank() {
                     }
                   }}
                 >
-                  {/* Checkbox for selection mode */}
-                  {selectionMode && (
-                    <div onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={isSelected}
-                        onCheckedChange={() => toggleTaskSelection(task.id)}
-                      />
+                  {/* Main content row */}
+                  <div className="flex items-center gap-3 p-3">
+                    {/* Checkbox for selection mode */}
+                    {selectionMode && (
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => toggleTaskSelection(task.id)}
+                        />
+                      </div>
+                    )}
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === task.color)?.hex }}>
+                      <TaskIcon iconName={task.emoji} size={20} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      {/* Title */}
+                      <p className={cn("font-semibold text-[15px] text-foreground truncate", !task.is_active && "line-through")}>
+                        {task.title}
+                      </p>
+                      {/* Category • Repeat • Time */}
+                      <p className="text-xs text-muted-foreground">
+                        {catInfo.label} • {repeatLabel} • {timeLabel}
+                      </p>
+                    </div>
+                    {/* Quick toggle: Popular */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        togglePopular.mutate({ id: task.id, is_popular: !task.is_popular });
+                      }}
+                      className={cn(
+                        "p-2 transition-all shrink-0",
+                        task.is_popular 
+                          ? "text-amber-500" 
+                          : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                      )}
+                      title={task.is_popular ? "Remove from popular" : "Mark as popular"}
+                    >
+                      <Star className={cn("h-4 w-4", task.is_popular && "fill-amber-500")} />
+                    </button>
+                    {/* Quick toggle: Active */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleActive.mutate({ id: task.id, is_active: !task.is_active });
+                      }}
+                      className={cn(
+                        "p-2 transition-all shrink-0",
+                        !task.is_active 
+                          ? "text-muted-foreground" 
+                          : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                      )}
+                      title={task.is_active ? "Deactivate task" : "Activate task"}
+                    >
+                      {task.is_active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </button>
+
+                    {/* Admin settings */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openAdminSettingsForTask(task);
+                      }}
+                      className={cn(
+                        "p-2 transition-all shrink-0",
+                        "text-muted-foreground opacity-0 group-hover:opacity-100"
+                      )}
+                      title="Admin settings"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteTask(task.id);
+                      }}
+                      className="p-2 text-destructive opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                  </div>
+                  
+                  {/* Description box - white background */}
+                  {task.description && (
+                    <div className="mx-3 mb-3 p-2.5 bg-white/80 rounded-xl text-sm text-muted-foreground">
+                      {task.description}
                     </div>
                   )}
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === task.color)?.hex }}>
-                    <TaskIcon iconName={task.emoji} size={20} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className={cn("font-medium truncate", !task.is_active && "line-through")}>{task.title}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><TaskIcon iconName={catInfo.icon} size={12} /> {catInfo.label}</span>
-                      {task.goal_enabled && <span>• Goal</span>}
-                      {task.pro_link_type && <span>• Pro</span>}
-                    </div>
-                  </div>
-                  {/* Quick toggle: Popular */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      togglePopular.mutate({ id: task.id, is_popular: !task.is_popular });
-                    }}
-                    className={cn(
-                      "p-2 transition-all",
-                      task.is_popular 
-                        ? "text-amber-500" 
-                        : "text-muted-foreground opacity-0 group-hover:opacity-100"
-                    )}
-                    title={task.is_popular ? "Remove from popular" : "Mark as popular"}
-                  >
-                    <Star className={cn("h-4 w-4", task.is_popular && "fill-amber-500")} />
-                  </button>
-                  {/* Quick toggle: Active */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleActive.mutate({ id: task.id, is_active: !task.is_active });
-                    }}
-                    className={cn(
-                      "p-2 transition-all",
-                      !task.is_active 
-                        ? "text-muted-foreground" 
-                        : "text-muted-foreground opacity-0 group-hover:opacity-100"
-                    )}
-                    title={task.is_active ? "Deactivate task" : "Activate task"}
-                  >
-                    {task.is_active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                  </button>
-
-                  {/* Admin settings */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openAdminSettingsForTask(task);
-                    }}
-                    className={cn(
-                      "p-2 transition-all",
-                      "text-muted-foreground opacity-0 group-hover:opacity-100"
-                    )}
-                    title="Admin settings"
-                  >
-                    <Sparkles className="h-4 w-4" />
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteTask(task.id);
-                    }}
-                    className="p-2 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                 </div>
               );
             })}
