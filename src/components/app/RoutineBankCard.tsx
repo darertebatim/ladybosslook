@@ -83,23 +83,23 @@ export function RoutineBankCard({
   }
 
   return (
-    <Card 
-      className="overflow-hidden rounded-2xl border-border/50 cursor-pointer hover:shadow-lg hover:border-border transition-all hover:scale-[1.02] active:scale-[0.98]"
+    <button 
+      className="overflow-hidden rounded-2xl cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] w-full text-left shadow-md"
       onClick={handleClick}
     >
-      {/* Image Section - aspect-square */}
-      <div className="relative aspect-square">
+      {/* Square Image Container */}
+      <div className="relative aspect-square w-full">
         {routine.cover_image_url ? (
           <img
             src={routine.cover_image_url}
             alt={routine.title}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover rounded-2xl"
           />
         ) : (
           <div className={cn(
-            'w-full h-full bg-gradient-to-br flex items-center justify-center',
+            'w-full h-full bg-gradient-to-br flex items-center justify-center rounded-2xl',
             gradient
           )}>
             <FluentEmoji emoji={routineEmoji} size={72} className="opacity-40" />
@@ -107,27 +107,23 @@ export function RoutineBankCard({
         )}
         
         {/* Bottom Gradient for Title Overlay */}
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 via-black/30 to-transparent rounded-b-2xl" />
         
         {/* Category badge - top left */}
         {routine.category && routine.category !== 'general' && (
-          <Badge variant="secondary" className="absolute top-2 left-2 rounded-full capitalize">
+          <Badge 
+            variant="secondary" 
+            className="absolute top-2.5 left-2.5 rounded-full capitalize text-[11px] px-2 py-0.5 bg-white/90 text-foreground backdrop-blur-sm"
+          >
             {routine.category}
           </Badge>
         )}
         
-        {/* Title Overlay */}
-        <h3 className="absolute bottom-2 left-2 right-2 font-semibold text-sm text-white line-clamp-2 drop-shadow-md z-10">
+        {/* Title Overlay - Bottom */}
+        <h3 className="absolute bottom-2.5 left-2.5 right-2.5 font-semibold text-sm text-white line-clamp-2 drop-shadow-lg">
           {routine.title}
         </h3>
       </div>
-      
-      {/* Content Section */}
-      <div className="p-3">
-        {routine.subtitle && (
-          <p className="text-xs text-muted-foreground line-clamp-2">{routine.subtitle}</p>
-        )}
-      </div>
-    </Card>
+    </button>
   );
 }
