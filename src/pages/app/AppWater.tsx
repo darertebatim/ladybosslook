@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Plus, Settings, Droplets, CalendarPlus, Check } from 'lucide-react';
+import { Plus, Settings, Droplets, CalendarPlus, Check } from 'lucide-react';
+import { BackButtonCircle } from '@/components/app/BackButton';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useTasksForDate, useCompletionsForDate, useAddGoalProgress, useCreateTask, UserTask } from '@/hooks/useTaskPlanner';
