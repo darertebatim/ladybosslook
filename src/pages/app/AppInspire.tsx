@@ -365,7 +365,7 @@ export default function AppInspire() {
           routineTitle={selectedTemplate.title}
           defaultTag={categories?.find(c => c.slug === selectedTemplate.category)?.name || null}
           onSave={handleSaveRoutine}
-          isSaving={addRoutineFromBank.isPending}
+          isSaving={isSavingTemplate}
         />
       )}
     </div>
