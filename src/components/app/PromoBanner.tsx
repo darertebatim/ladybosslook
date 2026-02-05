@@ -53,7 +53,7 @@ function setDismissal(bannerId: string) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(dismissals));
 }
 
-function shouldShowBanner(banner: PromoBanner): boolean {
+function shouldShowBanner(banner: PromoBannerData): boolean {
   const dismissals = getDismissals();
   const dismissedAt = dismissals[banner.id];
   
