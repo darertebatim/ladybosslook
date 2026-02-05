@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Loader2, Pin, Megaphone, Music, Calendar, FileText, MessageSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2, Pin, Megaphone, Music, Calendar, FileText, MessageSquare } from 'lucide-react';
+import { BackButton } from '@/components/app/BackButton';
 import { useFeedPost, usePostComments, useAddComment, useDeleteComment, useMarkPostRead } from '@/hooks/useFeed';
 import { useFeedRealtime, usePostCommentsRealtime } from '@/hooks/useFeedRealtime';
 import { useAuth } from '@/hooks/useAuth';
@@ -172,9 +172,7 @@ export default function AppFeedPost() {
     }
   };
 
-  const handleBack = () => {
-    navigate('/app/channels');
-  };
+  // handleBack is handled by BackButton component now
 
   // Simple scroll padding - input bar is ~80px, plus buffer
   const scrollPaddingBottom = 100;
@@ -191,10 +189,8 @@ export default function AppFeedPost() {
           className="bg-background/80 backdrop-blur-xl border-b shrink-0 z-10"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="flex items-center gap-1 pt-3 pb-2 px-4">
-            <Button variant="ghost" size="icon" onClick={handleBack} className="h-9 w-9">
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
+          <div className="flex items-center gap-1 pt-1 pb-2 px-4">
+            <BackButton to="/app/channels" showLabel={false} />
             <h1 className="text-lg font-semibold">Post</h1>
           </div>
         </header>
@@ -215,10 +211,8 @@ export default function AppFeedPost() {
           className="bg-background/80 backdrop-blur-xl border-b shrink-0 z-10"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="flex items-center gap-1 pt-3 pb-2 px-4">
-            <Button variant="ghost" size="icon" onClick={handleBack} className="h-9 w-9">
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
+          <div className="flex items-center gap-1 pt-1 pb-2 px-4">
+            <BackButton to="/app/channels" showLabel={false} />
             <h1 className="text-lg font-semibold">Post not found</h1>
           </div>
         </header>
@@ -273,10 +267,8 @@ export default function AppFeedPost() {
         className="bg-background/80 backdrop-blur-xl border-b shrink-0 z-10"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="flex items-center gap-1 pt-3 pb-2 px-4">
-          <Button variant="ghost" size="icon" onClick={handleBack} className="h-9 w-9">
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
+        <div className="flex items-center gap-1 pt-1 pb-2 px-4">
+          <BackButton to="/app/channels" showLabel={false} />
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-semibold truncate">
               {post.channel?.name || 'Post'}

@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, CalendarPlus, Loader2, Bell, Clock, Lock, FileText, Play, ArrowLeft, Settings2, BellRing } from 'lucide-react';
+import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, CalendarPlus, Loader2, Bell, Clock, Lock, FileText, Play, Settings2, BellRing } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { BackButton } from '@/components/app/BackButton';
 import { downloadICSFile, generateICSFile } from '@/utils/calendar';
@@ -939,8 +939,8 @@ const AppCourseDetail = () => {
         className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-6 pb-3 px-4 flex items-center gap-3">
-          <BackButton to="/app/programs" className="shrink-0" />
+        <div className="pt-1 pb-2 px-4 flex items-center gap-1">
+          <BackButton to="/app/programs" showLabel={false} />
           <div className="min-w-0">
             <h1 className="font-semibold text-lg truncate">{program?.title || 'Program Details'}</h1>
             {round && (
@@ -980,7 +980,6 @@ const AppCourseDetail = () => {
               onClick={() => navigate('/app/browse')}
               className="mb-2"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
               Browse
             </Button>
 

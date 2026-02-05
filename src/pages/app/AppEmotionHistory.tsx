@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Trash2, Heart } from 'lucide-react';
+import { Trash2, Heart } from 'lucide-react';
 import { format, isToday, isYesterday, startOfDay, isSameDay } from 'date-fns';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { EmotionLogCard } from '@/components/emotion/EmotionLogCard';
+import { BackButton } from '@/components/app/BackButton';
 import { haptic } from '@/lib/haptics';
 import {
   AlertDialog,
@@ -20,7 +20,6 @@ import { cn } from '@/lib/utils';
 type FilterTab = 'all' | 'week' | 'month';
 
 const AppEmotionHistory = () => {
-  const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterTab>('all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   
@@ -68,11 +67,6 @@ const AppEmotionHistory = () => {
     return groups;
   }, [filteredLogs]);
 
-  const handleBack = () => {
-    haptic.light();
-    navigate('/app/emotion');
-  };
-
   const handleDeleteClick = (id: string) => {
     haptic.light();
     setDeleteId(id);
@@ -112,13 +106,8 @@ const AppEmotionHistory = () => {
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* Header */}
-      <header className="shrink-0 flex items-center gap-3 px-4 py-3 border-b">
-        <button
-          onClick={handleBack}
-          className="w-10 h-10 rounded-full bg-muted flex items-center justify-center active:scale-95 transition-transform"
-        >
-          <ChevronLeft className="h-5 w-5 text-foreground" />
-        </button>
+      <header className="shrink-0 flex items-center gap-1 px-4 py-3 border-b">
+        <BackButton to="/app/emotion" showLabel={false} />
         <h1 className="text-lg font-semibold">Emotion History</h1>
       </header>
 

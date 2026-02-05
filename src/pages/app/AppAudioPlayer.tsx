@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Headphones, List, Lock, CheckCircle, Play } from "lucide-react";
+import { ChevronLeft, Headphones, List, Lock, CheckCircle, Play } from "lucide-react";
+import { BackButton } from "@/components/app/BackButton";
 import { AudioControls } from "@/components/audio/AudioControls";
 import { ProgressBar } from "@/components/audio/ProgressBar";
 import { BookmarkButton } from "@/components/audio/BookmarkButton";
@@ -440,11 +441,8 @@ export default function AppAudioPlayer() {
           className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-xl rounded-b-3xl shadow-sm"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="pt-3 pb-2 px-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/app/player')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Library
-            </Button>
+          <div className="pt-1 pb-2 px-4">
+            <BackButton to="/app/player" label="Library" />
           </div>
         </div>
         
@@ -497,10 +495,8 @@ export default function AppAudioPlayer() {
         className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-xl rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-3 pb-2 px-4 flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
+        <div className="pt-1 pb-2 px-4 flex items-center gap-1">
+          <button
             onClick={() => {
               const backPlaylistId = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
               if (backPlaylistId) {
@@ -509,10 +505,10 @@ export default function AppAudioPlayer() {
                 navigate('/app/player');
               }
             }}
-            className="rounded-full shrink-0"
+            className="flex items-center gap-0.5 min-h-[44px] min-w-[44px] px-1 -ml-1 text-primary hover:bg-transparent active:opacity-70 transition-opacity"
           >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+            <ChevronLeft className="h-7 w-7 shrink-0" />
+          </button>
           
           <div className="flex-1 min-w-0 flex items-center gap-2">
             {(isModuleMode ? modulePlaylistInfo : playlistInfo) ? (

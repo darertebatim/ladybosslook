@@ -6,6 +6,8 @@ interface AppHeaderProps {
   subtitle?: string;
   showBack?: boolean;
   backTo?: string;
+  backLabel?: string;
+  showBackLabel?: boolean;
   rightAction?: ReactNode;
   transparent?: boolean;
 }
@@ -15,6 +17,8 @@ export function AppHeader({
   subtitle, 
   showBack = false,
   backTo,
+  backLabel = 'Back',
+  showBackLabel = true,
   rightAction, 
   transparent = false 
 }: AppHeaderProps) {
@@ -27,10 +31,14 @@ export function AppHeader({
       }`}
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <div className="flex items-center justify-between pt-3 pb-2 px-4">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="flex items-center justify-between pt-1 pb-2 px-4">
+        <div className="flex items-center gap-1 flex-1 min-w-0">
           {showBack && (
-            <BackButton to={backTo} className="shrink-0" />
+            <BackButton 
+              to={backTo} 
+              label={backLabel}
+              showLabel={showBackLabel}
+            />
           )}
           <div className="min-w-0">
             <h1 className="font-semibold text-lg truncate">{title}</h1>
@@ -49,12 +57,12 @@ export function AppHeader({
   );
 }
 
-// Spacer to offset content below fixed header (~48px header + safe area)
+// Spacer to offset content below fixed header (~56px header + safe area)
 export function AppHeaderSpacer() {
   return (
     <div 
       style={{ 
-        height: 'calc(48px + env(safe-area-inset-top, 0px))' 
+        height: 'calc(56px + env(safe-area-inset-top, 0px))' 
       }} 
     />
   );

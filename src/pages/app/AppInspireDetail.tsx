@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, Loader2 } from 'lucide-react';
+import { Heart, Share2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { BackButtonCircle } from '@/components/app/BackButton';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
@@ -9,6 +10,7 @@ import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
+
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
   pink: 'from-pink-400 to-pink-600',
@@ -152,18 +154,7 @@ export default function AppInspireDetail() {
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
-        <button
-          onClick={() => {
-            if (window.history.length > 1) {
-              navigate(-1);
-            } else {
-              navigate('/app/routines');
-            }
-          }}
-          className="p-2 rounded-full bg-black/30 backdrop-blur-sm text-white"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
+        <BackButtonCircle to="/app/routines" />
         <div className="flex items-center gap-2">
           <button className="p-2 rounded-full bg-black/30 backdrop-blur-sm text-white">
             <Heart className="w-5 h-5" />

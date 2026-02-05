@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { BackButton } from '@/components/app/BackButton';
@@ -16,7 +16,6 @@ interface PostGroup {
 }
 
 export default function AppFeed() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialChannel = searchParams.get('channel');
   
@@ -126,8 +125,8 @@ export default function AppFeed() {
         className="fixed top-0 left-0 right-0 z-10 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="flex items-center gap-3 px-4 pt-3 pb-2">
-          <BackButton to="/app/home" />
+        <div className="flex items-center gap-1 px-4 pt-1 pb-2">
+          <BackButton to="/app/channels" showLabel={false} />
           <h1 className="text-lg font-semibold">Community</h1>
         </div>
 

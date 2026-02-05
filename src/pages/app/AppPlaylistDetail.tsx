@@ -543,9 +543,8 @@ export default function AppPlaylistDetail() {
           className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="pt-3 pb-2 px-4 flex items-center gap-2">
-            <BackButton to="/app/player" />
-            <span className="text-sm text-muted-foreground">Library</span>
+          <div className="pt-1 pb-2 px-4 flex items-center gap-1">
+            <BackButton to="/app/player" label="Library" />
           </div>
         </div>
         <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
@@ -569,9 +568,8 @@ export default function AppPlaylistDetail() {
         className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-3 pb-2 px-4 flex items-center gap-2">
-          <BackButton to={cameFromPlanner ? '/app/home' : '/app/player'} />
-          <span className="text-sm text-muted-foreground">{cameFromPlanner ? 'Home' : 'Library'}</span>
+        <div className="pt-1 pb-2 px-4 flex items-center gap-1">
+          <BackButton to={cameFromPlanner ? '/app/home' : '/app/player'} label={cameFromPlanner ? 'Home' : 'Library'} />
         </div>
       </div>
 
