@@ -51,6 +51,7 @@ export function PromoBannerManager() {
   const [bannerSubtitle, setBannerSubtitle] = useState('');
   const [startsAt, setStartsAt] = useState('');
   const [endsAt, setEndsAt] = useState('');
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('3:1');
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({
