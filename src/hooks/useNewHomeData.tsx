@@ -226,8 +226,16 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     ? availableRoutines[Math.floor(Math.random() * availableRoutines.length)] 
     : null;
 
+  // New user detection: no tasks and account less than 24 hours old
+  const profile = profileRes.data;
+  const accountAgeHours = profile?.created_at 
+    ? (Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60)
+    : 999;
+  const totalCompletions = totalCompletionsRes.count || 0;
+  const isNewUser = allTasks.length === 0 && accountAgeHours < 24;
+
   return {
-    profile: profileRes.data,
+    profile,
     listeningMinutes: Math.floor(listeningSeconds / 60),
     completedTracks,
     unreadPosts,
@@ -239,6 +247,8 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     nextSessionMap,
     suggestedRoutine,
     periodSettings: periodSettingsRes.data,
+    isNewUser,
+    totalCompletions,
   };
 }
 
