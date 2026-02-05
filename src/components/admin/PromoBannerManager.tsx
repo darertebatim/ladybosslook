@@ -772,6 +772,12 @@ export function PromoBannerManager() {
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       {banner.display_frequency} • Priority: {banner.priority}
+                      {banner.target_type !== 'all' && (
+                        <span className="inline-flex items-center gap-1 ml-2">
+                          <Users className="h-3 w-3" />
+                          {banner.target_type === 'enrolled' ? 'Enrolled' : 'Custom'}
+                        </span>
+                      )}
                       {banner.starts_at && ` • From: ${format(new Date(banner.starts_at), 'MMM d')}`}
                       {banner.ends_at && ` • Until: ${format(new Date(banner.ends_at), 'MMM d')}`}
                     </div>
