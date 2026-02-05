@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, CalendarPlus, Loader2, Bell, Clock, Lock, FileText, Play, ArrowLeft, Settings2, BellRing } from 'lucide-react';
+import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, CalendarPlus, Loader2, Bell, Clock, Lock, FileText, Play, Settings2, BellRing } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { BackButton } from '@/components/app/BackButton';
 import { downloadICSFile, generateICSFile } from '@/utils/calendar';
