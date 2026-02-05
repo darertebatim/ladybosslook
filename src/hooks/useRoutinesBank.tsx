@@ -145,7 +145,6 @@ export function useWelcomePopupRitual() {
     gcTime: 1000 * 60 * 30,
   });
 }
-}
 
 // Fetch popular routines
 export function usePopularRoutinesBank() {
