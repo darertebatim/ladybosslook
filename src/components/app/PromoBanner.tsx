@@ -74,7 +74,11 @@ function shouldShowBanner(banner: PromoBannerData): boolean {
   }
 }
 
-export function PromoBanner() {
+export function PromoBanner({ 
+  location = 'home', 
+  currentPlaylistId,
+  className 
+}: PromoBannerProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
@@ -90,7 +94,7 @@ export function PromoBanner() {
         .order('priority', { ascending: false });
       
       if (error) throw error;
-      return data as PromoBanner[];
+      return data as PromoBannerData[];
     },
   });
 
