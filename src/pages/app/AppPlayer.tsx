@@ -9,6 +9,7 @@ import { usePlayerData } from "@/hooks/useAppData";
 import { PlayerSkeleton } from "@/components/app/skeletons";
 import { CategoryCircle } from "@/components/app/CategoryCircle";
 import { cn } from "@/lib/utils";
+import { PromoBanner } from "@/components/app/PromoBanner";
 
 // Category configuration with icons and colors
 const categoryConfig: Record<string, { name: string; icon: string; color: string }> = {
