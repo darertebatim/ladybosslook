@@ -292,6 +292,9 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
         console.log('[Push] ✅ Token received from APNs:', token.value.substring(0, 20) + '...');
         console.log('[Push] Saving token to database...');
 
+        // Get current app version to store with subscription
+        const appVersion = await getCurrentAppVersion();
+        
         const { error } = await supabase
           .from('push_subscriptions')
           .upsert(
@@ -300,6 +303,7 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
               endpoint: `native:${token.value}`,
               p256dh_key: 'native-ios',
               auth_key: 'native-ios',
+              app_version: appVersion,
             },
             {
               onConflict: 'user_id,endpoint',
