@@ -1,10 +1,22 @@
 import { supabase } from '@/integrations/supabase/client';
 import { PushNotifications, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { toast } from 'sonner';
 
 export type NotificationPermission = 'granted' | 'denied' | 'default';
+
+// Helper to get current app version
+async function getCurrentAppVersion(): Promise<string | null> {
+  if (!Capacitor.isNativePlatform()) return null;
+  try {
+    const info = await App.getInfo();
+    return info.version;
+  } catch {
+    return null;
+  }
+}
 
 // Navigation callback for deep linking
 let navigationCallback: ((url: string) => void) | null = null;
@@ -280,6 +292,9 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
         console.log('[Push] ✅ Token received from APNs:', token.value.substring(0, 20) + '...');
         console.log('[Push] Saving token to database...');
 
+        // Get current app version to store with subscription
+        const appVersion = await getCurrentAppVersion();
+        
         const { error } = await supabase
           .from('push_subscriptions')
           .upsert(
@@ -288,6 +303,7 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
               endpoint: `native:${token.value}`,
               p256dh_key: 'native-ios',
               auth_key: 'native-ios',
+              app_version: appVersion,
             },
             {
               onConflict: 'user_id,endpoint',
@@ -411,6 +427,9 @@ export async function refreshDeviceToken(userId: string): Promise<void> {
     });
 
     if (result.success && result.token) {
+      // Get current app version to store with subscription
+      const appVersion = await getCurrentAppVersion();
+      
       // Upsert the token (will update if exists, insert if new)
       const { error } = await supabase
         .from('push_subscriptions')
@@ -420,6 +439,7 @@ export async function refreshDeviceToken(userId: string): Promise<void> {
             endpoint: `native:${result.token}`,
             p256dh_key: 'native-ios',
             auth_key: 'native-ios',
+            app_version: appVersion,
           },
           { onConflict: 'user_id,endpoint' }
         );

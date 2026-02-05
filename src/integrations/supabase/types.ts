@@ -2076,6 +2076,7 @@ export type Database = {
       }
       push_subscriptions: {
         Row: {
+          app_version: string | null
           auth_key: string
           created_at: string | null
           endpoint: string
@@ -2084,6 +2085,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          app_version?: string | null
           auth_key: string
           created_at?: string | null
           endpoint: string
@@ -2092,6 +2094,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          app_version?: string | null
           auth_key?: string
           created_at?: string | null
           endpoint?: string

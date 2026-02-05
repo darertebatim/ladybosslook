@@ -8,6 +8,7 @@ import { HomeBannerManager } from '@/components/admin/HomeBannerManager';
 import { MailchimpTagManager } from '@/components/admin/MailchimpTagManager';
 import { EmailGenerator } from '@/components/admin/EmailGenerator';
 import { PromoBannerManager } from '@/components/admin/PromoBannerManager';
+import { UpdateNotificationSender } from '@/components/admin/UpdateNotificationSender';
 
 export default function Communications() {
   return (
@@ -18,8 +19,9 @@ export default function Communications() {
       </div>
 
       <Tabs defaultValue="pn-center">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="pn-center">PN Center</TabsTrigger>
+          <TabsTrigger value="updates">Updates</TabsTrigger>
           <TabsTrigger value="broadcasts">Broadcasts</TabsTrigger>
           <TabsTrigger value="push">Push Only</TabsTrigger>
           <TabsTrigger value="promo">Promo</TabsTrigger>
@@ -30,6 +32,10 @@ export default function Communications() {
 
         <TabsContent value="pn-center" className="space-y-6">
           <PushNotificationCenter />
+        </TabsContent>
+
+        <TabsContent value="updates" className="space-y-6">
+          <UpdateNotificationSender />
         </TabsContent>
 
         <TabsContent value="broadcasts" className="space-y-6">
