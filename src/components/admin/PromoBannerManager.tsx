@@ -179,6 +179,7 @@ export function PromoBannerManager() {
         body: {
           title: bannerTitle.trim(),
           subtitle: bannerSubtitle.trim() || undefined,
+          aspectRatio,
         },
       });
 
