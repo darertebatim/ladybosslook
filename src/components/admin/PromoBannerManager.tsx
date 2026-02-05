@@ -11,8 +11,9 @@ import { toast } from 'sonner';
 import { Trash2, Plus, Upload, ExternalLink, Sparkles, Loader2, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 
-type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url';
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
+type AspectRatio = '3:1' | '16:9' | '1:1';
 
 interface PromoBanner {
   id: string;
@@ -21,6 +22,7 @@ interface PromoBanner {
   destination_id: string | null;
   custom_url: string | null;
   display_frequency: DisplayFrequency;
+  aspect_ratio: AspectRatio;
   is_active: boolean;
   priority: number;
   starts_at: string | null;
@@ -49,6 +51,7 @@ export function PromoBannerManager() {
   const [bannerSubtitle, setBannerSubtitle] = useState('');
   const [startsAt, setStartsAt] = useState('');
   const [endsAt, setEndsAt] = useState('');
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('3:1');
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({
@@ -176,6 +179,7 @@ export function PromoBannerManager() {
         body: {
           title: bannerTitle.trim(),
           subtitle: bannerSubtitle.trim() || undefined,
+          aspectRatio,
         },
       });
 
@@ -227,6 +231,7 @@ export function PromoBannerManager() {
         destination_id: needsDestinationId ? destinationId || null : null,
         custom_url: needsCustomUrl ? customUrl : null,
         display_frequency: displayFrequency,
+        aspect_ratio: aspectRatio,
         is_active: isActive,
         priority,
         starts_at: startsAt || null,
@@ -256,6 +261,7 @@ export function PromoBannerManager() {
         destination_id: needsDestinationId ? destinationId || null : null,
         custom_url: needsCustomUrl ? customUrl : null,
         display_frequency: displayFrequency,
+        aspect_ratio: aspectRatio,
         is_active: isActive,
         priority,
         starts_at: startsAt || null,
@@ -310,6 +316,7 @@ export function PromoBannerManager() {
     setDestinationId('');
     setCustomUrl('');
     setDisplayFrequency('once');
+    setAspectRatio('3:1');
     setIsActive(true);
     setPriority(0);
     setStartsAt('');
@@ -325,6 +332,7 @@ export function PromoBannerManager() {
     setDestinationId(banner.destination_id || '');
     setCustomUrl(banner.custom_url || '');
     setDisplayFrequency(banner.display_frequency);
+    setAspectRatio(banner.aspect_ratio || '3:1');
     setIsActive(banner.is_active);
     setPriority(banner.priority);
     setStartsAt(banner.starts_at ? banner.starts_at.slice(0, 16) : '');
@@ -353,23 +361,49 @@ export function PromoBannerManager() {
       case 'journal':
         return 'Journal';
       case 'programs':
-        return 'Programs Page';
+        return 'Programs / Store';
       case 'breathe':
         return 'Breathe Page';
       case 'water':
         return 'Water Tracking';
       case 'channels':
-        return 'Feed/Channels';
+        return 'Feed / Channels';
       case 'home':
         return 'Home Page';
       case 'inspire':
-        return 'Inspire/Routines';
+        return 'Inspire / Routines';
+      case 'emotion':
+        return 'Emotion Tracker';
+      case 'period':
+        return 'Period Tracker';
+      case 'chat':
+        return 'Chat / Support';
+      case 'profile':
+        return 'Profile / Settings';
+      case 'planner':
+        return 'Task Planner';
       case 'custom_url':
         return banner.custom_url || 'Custom URL';
       case 'external_url':
         return banner.custom_url || 'External URL';
       default:
         return 'Unknown';
+    }
+  };
+  
+  const getAspectRatioClass = (ratio: AspectRatio) => {
+    switch (ratio) {
+      case '16:9': return 'aspect-video';
+      case '1:1': return 'aspect-square';
+      default: return 'aspect-[3/1]';
+    }
+  };
+  
+  const getAspectRatioDimensions = (ratio: AspectRatio) => {
+    switch (ratio) {
+      case '16:9': return '1920×1080';
+      case '1:1': return '1080×1080';
+      default: return '1200×400';
     }
   };
 
@@ -392,6 +426,21 @@ export function PromoBannerManager() {
             <div className="space-y-4 mb-6 p-4 border rounded-lg bg-muted/50">
               <h3 className="font-semibold">{editingBanner ? 'Edit Banner' : 'Create New Banner'}</h3>
               
+              {/* Aspect Ratio Selection */}
+              <div className="space-y-2">
+                <Label>Banner Size / Aspect Ratio</Label>
+                <Select value={aspectRatio} onValueChange={(v) => setAspectRatio(v as AspectRatio)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="3:1">3:1 Wide Banner (1200×400)</SelectItem>
+                    <SelectItem value="16:9">16:9 Video Banner (1920×1080)</SelectItem>
+                    <SelectItem value="1:1">1:1 Square Banner (1080×1080)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* AI Generation Section */}
               <div className="space-y-3 p-4 bg-gradient-to-br from-violet-50 to-pink-50 dark:from-violet-950/30 dark:to-pink-950/30 rounded-lg border border-violet-200 dark:border-violet-800">
                 <div className="flex items-center gap-2">
@@ -399,7 +448,7 @@ export function PromoBannerManager() {
                   <Label className="text-sm font-medium">Generate with AI</Label>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Enter a title and optional subtitle to generate a 1200×400 banner image
+                  Enter a title and optional subtitle to generate a {getAspectRatioDimensions(aspectRatio)} banner image
                 </p>
                 <div className="grid gap-2">
                   <Input
@@ -453,9 +502,9 @@ export function PromoBannerManager() {
                     <img
                       src={coverImageUrl}
                       alt="Preview"
-                      className="w-full aspect-[3/1] rounded-lg object-cover border"
+                      className={`w-full ${getAspectRatioClass(aspectRatio)} rounded-lg object-cover border max-w-md`}
                     />
-                    <p className="text-xs text-muted-foreground">Recommended: 1200×400 pixels (3:1 ratio)</p>
+                    <p className="text-xs text-muted-foreground">Recommended: {getAspectRatioDimensions(aspectRatio)} pixels ({aspectRatio} ratio)</p>
                   </div>
                 )}
               </div>
@@ -468,21 +517,26 @@ export function PromoBannerManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="routine">Routine Plan (specific)</SelectItem>
-                    <SelectItem value="playlist">Playlist (specific)</SelectItem>
-                    <SelectItem value="tasks">Task Template (specific)</SelectItem>
-                    <SelectItem value="routines_hub">Routine Bank (specific)</SelectItem>
-                    <SelectItem value="breathe_exercise">Breathing Exercise (specific)</SelectItem>
-                    <SelectItem value="tasks_bank">Tasks Bank Page</SelectItem>
-                    <SelectItem value="inspire">Inspire / Routines Hub</SelectItem>
-                    <SelectItem value="journal">Journal</SelectItem>
-                    <SelectItem value="programs">Programs / Store</SelectItem>
-                    <SelectItem value="breathe">Breathe Page</SelectItem>
-                    <SelectItem value="water">Water Tracking</SelectItem>
-                    <SelectItem value="channels">Feed / Channels</SelectItem>
-                    <SelectItem value="home">Home</SelectItem>
-                    <SelectItem value="custom_url">Custom URL (in-app)</SelectItem>
-                    <SelectItem value="external_url">External URL (opens browser)</SelectItem>
+                    <SelectItem value="home">🏠 Home</SelectItem>
+                    <SelectItem value="inspire">✨ Inspire / Routines Hub</SelectItem>
+                    <SelectItem value="routine">📋 Routine Plan (specific)</SelectItem>
+                    <SelectItem value="routines_hub">📚 Routine Bank (specific)</SelectItem>
+                    <SelectItem value="tasks_bank">📝 Tasks Bank Page</SelectItem>
+                    <SelectItem value="tasks">☑️ Task Template (specific)</SelectItem>
+                    <SelectItem value="planner">📅 Task Planner</SelectItem>
+                    <SelectItem value="playlist">🎧 Playlist (specific)</SelectItem>
+                    <SelectItem value="programs">🎓 Programs / Store</SelectItem>
+                    <SelectItem value="journal">📔 Journal</SelectItem>
+                    <SelectItem value="breathe">🫁 Breathe Page</SelectItem>
+                    <SelectItem value="breathe_exercise">💨 Breathing Exercise (specific)</SelectItem>
+                    <SelectItem value="water">💧 Water Tracking</SelectItem>
+                    <SelectItem value="emotion">😊 Emotion Tracker</SelectItem>
+                    <SelectItem value="period">🌸 Period Tracker</SelectItem>
+                    <SelectItem value="channels">💬 Feed / Channels</SelectItem>
+                    <SelectItem value="chat">🗨️ Chat / Support</SelectItem>
+                    <SelectItem value="profile">👤 Profile / Settings</SelectItem>
+                    <SelectItem value="custom_url">🔗 Custom URL (in-app)</SelectItem>
+                    <SelectItem value="external_url">🌐 External URL (opens browser)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
