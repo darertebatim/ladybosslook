@@ -52,17 +52,21 @@ export function TodayFocusCard({
             <div>
               <p className="font-medium text-foreground">
                 {todayTasksCount === 0 
-                  ? "No actions scheduled"
+                  ? "Your day is open ✨"
                   : allDone 
                     ? "You've honored all your actions!"
                     : `${pendingTasks} action${pendingTasks !== 1 ? 's' : ''} remaining`
                 }
               </p>
-              {todayTasksCount > 0 && !allDone && (
+              {todayTasksCount === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  One small action is enough
+                </p>
+              ) : todayTasksCount > 0 && !allDone ? (
                 <p className="text-sm text-muted-foreground">
                   {todayCompletedCount} of {todayTasksCount} honored
                 </p>
-              )}
+              ) : null}
             </div>
           </div>
 
