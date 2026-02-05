@@ -124,7 +124,8 @@ export function useRoutinesBank(categorySlug?: string) {
     },
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
-});
+  });
+}
 
 // Fetch the welcome popup ritual (the one marked as is_welcome_popup)
 export function useWelcomePopupRitual() {
