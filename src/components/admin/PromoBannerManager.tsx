@@ -399,7 +399,7 @@ export function PromoBannerManager() {
     setIncludeTools(banner.include_tools || []);
     setExcludeTools(banner.exclude_tools || []);
     // Load location
-    setDisplayLocation(banner.display_location || 'home');
+    setDisplayLocation((banner.display_location as DisplayLocation) || 'home_top');
     setTargetPlaylistIds(banner.target_playlist_ids || []);
   };
 
