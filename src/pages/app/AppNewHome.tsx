@@ -148,9 +148,9 @@ export default function AppNewHome() {
           {/* App Update Banner */}
           <AppUpdateBanner />
 
-          {/* Welcome Card for New Users */}
+          {/* Welcome Ritual Card for New Users */}
           {isNewUser && (
-            <WelcomeCard onAddAction={() => setShowQuickStart(true)} />
+            <WelcomeRitualCard />
           )}
 
           {/* Today's Focus */}
