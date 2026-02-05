@@ -311,9 +311,6 @@ export default function AppPlayer() {
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="p-4 pb-safe space-y-6">
-          {/* Promo Banner - Listen Page */}
-          <PromoBanner location="listen" className="mb-4" />
-
           {/* Continue Learning Section */}
           {progressFilter === "all" && selectedCategory === "all" && !searchQuery && continueListening.length > 0 && (
             <div className="space-y-3">
@@ -350,6 +347,10 @@ export default function AppPlayer() {
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               {selectedCategory === 'all' ? 'All Playlists' : categoryConfig[selectedCategory]?.name || selectedCategory}
             </h2>
+            
+            {/* Promo Banner - Listen Page (under heading) */}
+            <PromoBanner location="listen" className="mb-2" />
+            
             {renderPlaylistGrid(filteredPlaylists)}
           </div>
         </div>
