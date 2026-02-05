@@ -1182,6 +1182,9 @@ export const useResetPlannerData = () => {
       return data;
     },
     onSuccess: () => {
+      // Clear localStorage flags for new user experience
+      localStorage.removeItem('simora_first_action_celebrated');
+      
       // Clear ALL cached queries and reload to guarantee a true "day one" UI.
       queryClient.clear();
       toast({ title: 'Complete Reset', description: 'Fresh start like day one.' });
