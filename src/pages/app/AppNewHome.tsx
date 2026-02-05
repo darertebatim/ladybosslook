@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, User, MessageCircle, Mail, Send, ListChecks } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,9 @@ import { QuickActionsGrid } from '@/components/dashboard/QuickActionsGrid';
 import { SuggestedRoutineCard } from '@/components/dashboard/SuggestedRoutineCard';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
+import { WelcomeCard } from '@/components/app/WelcomeCard';
+import { FirstActionCelebration } from '@/components/app/FirstActionCelebration';
+import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { format } from 'date-fns';
 
 export default function AppNewHome() {
@@ -29,7 +33,26 @@ export default function AppNewHome() {
     nextSessionMap,
     suggestedRoutine,
     periodSettings,
+    isNewUser,
+    totalCompletions,
   } = useNewHomeData();
+
+  const [showQuickStart, setShowQuickStart] = useState(false);
+  const [showFirstCelebration, setShowFirstCelebration] = useState(false);
+  const prevCompletions = useRef(totalCompletions);
+
+  // Detect first-ever completion
+  useEffect(() => {
+    if (prevCompletions.current === 0 && totalCompletions === 1) {
+      // User just completed their first action ever
+      const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated');
+      if (!alreadyCelebrated) {
+        setShowFirstCelebration(true);
+        localStorage.setItem('simora_first_action_celebrated', 'true');
+      }
+    }
+    prevCompletions.current = totalCompletions;
+  }, [totalCompletions]);
 
   if (isLoading) {
     return <HomeSkeleton />;
@@ -125,6 +148,11 @@ export default function AppNewHome() {
           {/* App Update Banner */}
           <AppUpdateBanner />
 
+          {/* Welcome Card for New Users */}
+          {isNewUser && (
+            <WelcomeCard onAddAction={() => setShowQuickStart(true)} />
+          )}
+
           {/* Today's Focus */}
           <TodayFocusCard
             todayTasksCount={todayTasksCount}
@@ -198,6 +226,28 @@ export default function AppNewHome() {
           </Card>
         </div>
       </div>
+
+      {/* Quick Start Sheet */}
+      <TaskQuickStartSheet
+        open={showQuickStart}
+        onOpenChange={setShowQuickStart}
+        onContinue={(taskName, template) => {
+          // Navigate to task create with pre-filled data
+          setShowQuickStart(false);
+          const params = new URLSearchParams();
+          params.set('name', taskName);
+          if (template) {
+            params.set('templateId', template.id);
+          }
+          window.location.href = `/app/task/new?${params.toString()}`;
+        }}
+      />
+
+      {/* First Action Celebration */}
+      <FirstActionCelebration
+        isOpen={showFirstCelebration}
+        onClose={() => setShowFirstCelebration(false)}
+      />
     </>
   );
 }

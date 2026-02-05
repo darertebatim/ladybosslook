@@ -19,6 +19,8 @@ interface NewHomeData {
   nextSessionMap: Map<string, string>;
   suggestedRoutine: any | null;
   periodSettings: any | null;
+  isNewUser: boolean; // First 24 hours or no tasks ever added
+  totalCompletions: number; // Total completions ever
 }
 
 async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
@@ -34,6 +36,7 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     journalEntriesRes,
     tasksRes,
     completionsRes,
+    totalCompletionsRes,
     enrollmentsRes,
     routineRes,
     periodSettingsRes,
@@ -73,6 +76,11 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
       .select('task_id')
       .eq('user_id', userId)
       .eq('completed_date', dateStr),
+    // Total completions ever (for first-action detection)
+    supabase
+      .from('task_completions')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId),
     // Active enrollments with rounds
     supabase
       .from('course_enrollments')
@@ -218,8 +226,16 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     ? availableRoutines[Math.floor(Math.random() * availableRoutines.length)] 
     : null;
 
+  // New user detection: no tasks and account less than 24 hours old
+  const profile = profileRes.data;
+  const accountAgeHours = profile?.created_at 
+    ? (Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60)
+    : 999;
+  const totalCompletions = totalCompletionsRes.count || 0;
+  const isNewUser = allTasks.length === 0 && accountAgeHours < 24;
+
   return {
-    profile: profileRes.data,
+    profile,
     listeningMinutes: Math.floor(listeningSeconds / 60),
     completedTracks,
     unreadPosts,
@@ -231,6 +247,8 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     nextSessionMap,
     suggestedRoutine,
     periodSettings: periodSettingsRes.data,
+    isNewUser,
+    totalCompletions,
   };
 }
 
@@ -259,5 +277,7 @@ export function useNewHomeData() {
     nextSessionMap: query.data?.nextSessionMap || new Map<string, string>(),
     suggestedRoutine: query.data?.suggestedRoutine || null,
     periodSettings: query.data?.periodSettings || null,
+    isNewUser: query.data?.isNewUser || false,
+    totalCompletions: query.data?.totalCompletions || 0,
   };
 }
