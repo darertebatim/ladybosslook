@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Sparkles, Star, ChevronRight, Trash2, Eye, EyeOff, CheckSquare, Square, Layers, X, FolderPlus } from 'lucide-react';
+import { Plus, Sparkles, Star, ChevronRight, Trash2, Eye, EyeOff, CheckSquare, Square, Layers, X, FolderPlus, Wand2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
@@ -91,6 +91,9 @@ export default function TasksBank() {
   const [addToRoutineOpen, setAddToRoutineOpen] = useState(false);
   const [selectedRoutineId, setSelectedRoutineId] = useState<string>('');
 
+  // AI description generation state
+  const [generatingDescriptionFor, setGeneratingDescriptionFor] = useState<string | null>(null);
+
   // Fetch routine categories from database
   const { data: routineCategories = [] } = useQuery({
     queryKey: ['routine-categories-for-tasks-bank'],
@@ -161,6 +164,52 @@ export default function TasksBank() {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
     },
   });
+
+  // AI description generation
+  const generateDescription = async (task: TaskBankItem) => {
+    setGeneratingDescriptionFor(task.id);
+    try {
+      const catInfo = getCategoryInfo(task.category);
+      const repeatLabel = task.repeat_pattern !== 'none' 
+        ? (task.repeat_pattern === 'daily' ? 'daily' :
+           task.repeat_pattern === 'weekly' ? 'weekly' : 'monthly')
+        : 'one-time';
+      const goalInfo = task.goal_enabled 
+        ? `with a goal of ${task.goal_target} ${task.goal_unit || 'times'}` 
+        : '';
+      
+      const context = `Action: "${task.title}" | Category: ${catInfo.label} | Frequency: ${repeatLabel} ${goalInfo}`.trim();
+      
+      const { data, error } = await supabase.functions.invoke('generate-routine-text', {
+        body: {
+          context,
+          fieldType: 'description',
+          prompt: `Write a brief 1-sentence description for this action. Make it warm, simple, and encouraging. Focus on the benefit or feeling, not instruction. No pressure words.`,
+        },
+      });
+      
+      if (error) throw error;
+      
+      const generatedText = data?.text;
+      if (generatedText) {
+        // Update the task with the generated description
+        const { error: updateError } = await supabase
+          .from('admin_task_bank')
+          .update({ description: generatedText })
+          .eq('id', task.id);
+        
+        if (updateError) throw updateError;
+        
+        queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
+        toast.success('Description generated');
+      }
+    } catch (err) {
+      console.error('Failed to generate description:', err);
+      toast.error('Failed to generate description');
+    } finally {
+      setGeneratingDescriptionFor(null);
+    }
+  };
 
   const updateAdminSettings = useMutation({
     mutationFn: async (payload: { id: string; settings: AdminSettings }) => {
@@ -799,11 +848,37 @@ export default function TasksBank() {
                   </div>
                   
                   {/* Description box - white background */}
-                  {task.description && (
-                    <div className="mx-3 mb-3 p-2.5 bg-white/80 rounded-xl text-sm text-muted-foreground">
-                      {task.description}
-                    </div>
-                  )}
+                  <div className="mx-3 mb-3 flex items-start gap-2">
+                    {task.description ? (
+                      <div className="flex-1 p-2.5 bg-white/80 rounded-xl text-sm text-muted-foreground">
+                        {task.description}
+                      </div>
+                    ) : (
+                      <div className="flex-1 p-2.5 bg-white/50 rounded-xl text-sm text-muted-foreground/50 italic">
+                        No description
+                      </div>
+                    )}
+                    {/* AI Generate button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        generateDescription(task);
+                      }}
+                      disabled={generatingDescriptionFor === task.id}
+                      className={cn(
+                        "p-2 rounded-lg transition-all shrink-0",
+                        "bg-violet-100 hover:bg-violet-200 text-violet-600",
+                        generatingDescriptionFor === task.id && "opacity-50 cursor-not-allowed"
+                      )}
+                      title="Generate description with AI"
+                    >
+                      {generatingDescriptionFor === task.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Wand2 className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               );
             })}
