@@ -166,18 +166,32 @@ const AppHome = () => {
   const showWelcomeCard = (startedAsNewUser ?? isNewUser) && !welcomeCardDismissed;
   
   // Track first action celebration
-  const prevCompletions = useRef(totalCompletions);
-  
+  const hasAnyCompletionToday = (completions?.tasks?.length ?? 0) > 0;
+
+  const triggerFirstCelebration = useCallback(() => {
+    const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
+    if (alreadyCelebrated) return;
+
+    setShowFirstCelebration(true);
+    localStorage.setItem('simora_first_action_celebrated', 'true');
+  }, []);
+
+  // Fast path: show immediately after the first completion is recorded (before home stats refetch)
+  const prevTotalCompletions = useRef(totalCompletions);
+
   useEffect(() => {
-    if (prevCompletions.current === 0 && totalCompletions === 1) {
-      const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated');
-      if (!alreadyCelebrated) {
-        setShowFirstCelebration(true);
-        localStorage.setItem('simora_first_action_celebrated', 'true');
-      }
+    if (!homeDataLoading && totalCompletions === 0 && hasAnyCompletionToday) {
+      triggerFirstCelebration();
     }
-    prevCompletions.current = totalCompletions;
-  }, [totalCompletions]);
+  }, [homeDataLoading, totalCompletions, hasAnyCompletionToday, triggerFirstCelebration]);
+
+  // Fallback: when total completions count updates from 0 → 1
+  useEffect(() => {
+    if (prevTotalCompletions.current === 0 && totalCompletions === 1) {
+      triggerFirstCelebration();
+    }
+    prevTotalCompletions.current = totalCompletions;
+  }, [totalCompletions, triggerFirstCelebration]);
 
   // Popular routines for suggestions (filter out already-added ones)
   const {
