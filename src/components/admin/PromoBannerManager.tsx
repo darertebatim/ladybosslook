@@ -37,6 +37,8 @@ interface PromoBanner {
   exclude_playlists: string[];
   include_tools: string[];
   exclude_tools: string[];
+  display_location: DisplayLocation;
+  target_playlist_ids: string[];
 }
 
 export function PromoBannerManager() {
