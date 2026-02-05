@@ -22,6 +22,7 @@ interface PromoBanner {
   destination_id: string | null;
   custom_url: string | null;
   display_frequency: DisplayFrequency;
+  aspect_ratio: AspectRatio;
   is_active: boolean;
   priority: number;
   starts_at: string | null;
