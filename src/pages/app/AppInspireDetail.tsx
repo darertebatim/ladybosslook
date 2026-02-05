@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, Loader2 } from 'lucide-react';
+import { Heart, Share2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { BackButtonCircle } from '@/components/app/BackButton';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
@@ -9,6 +10,7 @@ import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
+
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
   pink: 'from-pink-400 to-pink-600',
