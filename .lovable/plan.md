@@ -1,118 +1,96 @@
 
+# Support Chat Welcome Experience Redesign
 
-## Ritual Detail Page Enhancement Plan
-
-### Overview
-Redesign the ritual detail page (`AppInspireDetail.tsx`) to create a more polished, modern iOS-style experience that matches the app's design language and improves visual hierarchy.
-
----
-
-## Current Issues
-
-1. **Header Icons**: Heart and Share buttons use custom inline styles - need to use a consistent circular button component
-2. **Hero Image**: Works well but gradient overlay could be refined
-3. **Title Section**: Basic styling - needs more visual polish
-4. **Action Cards**: Good styling with pastel colors, but can be refined for better consistency
-5. **Bottom CTA**: Uses outline variant which appears too muted
+## Philosophy Alignment
+Following Simora's core values: **welcomed, not evaluated** — **companion, not coach** — **presence, not instruction**.
 
 ---
 
-## Proposed Enhancements
+## Current State
+A simple centered icon with generic text. Functional but not emotionally engaging.
 
-### 1. Refine Header Icon Buttons
+---
 
-Replace inline icon buttons with consistent circular styling matching BackButtonCircle:
+## The New Experience
 
-**Current:**
-```tsx
-<button className="p-2 rounded-full bg-black/30 backdrop-blur-sm text-white">
-  <Heart className="w-5 h-5" />
-</button>
-```
+### Visual Redesign
 
-**New:**
-- Same styling as BackButtonCircle (40x40px, 44px touch target)
-- Active scale feedback
-- Consistent with CloseButton patterns
+**1. Warm Welcome Header**
+- Friendly greeting that changes based on time of day:
+  - Morning: "Good morning 🌅"
+  - Afternoon: "Good afternoon ☀️"  
+  - Evening: "Good evening 🌙"
+- A gentle, personal message: *"I'm Sarah, and I'm here whenever you need."*
 
-### 2. Improve Hero Image Section
+**2. Visual Warmth**
+- Soft avatar with a real human feel (or a warm illustration)
+- Gentle lavender gradient background card instead of stark emptiness
+- Subtle animation on load (fade-in, not bouncy)
 
-- Add subtle gradient fade at bottom for better title readability
-- Ensure proper aspect ratio for cover images
-- Better fallback for routines without covers (larger emoji, nicer gradient)
+**3. Conversation Starters**
+Instead of leaving users to figure out what to say, offer gentle prompts they can tap:
+- 💬 "I have a question about my rituals"
+- 🎙️ "I'd rather send a voice note"
+- 💜 "I just need someone to talk to"
+- ✨ "Something isn't working right"
 
-### 3. Polish Title & Metadata Section
+These aren't buttons — they're soft, tappable cards that send the message automatically.
 
-**Current:** Simple title, subtitle, action count
+**4. The Core Message**
+Warm, Simora-aligned copy:
+> *"No rush. No judgment. Just a real person who cares.*
+> *Type, or tap the mic if that feels easier — we're listening."*
 
-**Enhanced:**
-- Title with slightly larger font (text-2xl → text-[26px])
-- Action count as subtle gray badge-style text
-- Category badge below title (consistent with card styling)
-- Visual separator before description
-
-### 4. Enhance Action Cards Design
-
-Match the reference screenshot style:
-- Softer, more pastel backgrounds (using TASK_COLORS)
-- Cleaner metadata line: "category • repeat"
-- Description box with white background and rounded corners (already present, just ensure consistency)
-- Slightly larger emoji icons
-- Better spacing
-
-### 5. Upgrade Bottom CTA Button
-
-**Current:** Uses `variant="outline"` which appears muted in lavender
-
-**Enhanced:**
-- Change to solid lavender fill: `bg-[#F4ECFE]` 
-- Darker text for better contrast
-- Match the styling shown in reference screenshot
+**5. Response Time — Human & Honest**
+Instead of "usually replies within hours", something warmer:
+> *"We check in throughout the day. You'll hear back soon."*
 
 ---
 
 ## Technical Implementation
 
-### File to Modify
-`src/pages/app/AppInspireDetail.tsx`
+### Files to Modify
+- `src/pages/app/AppChat.tsx` — Replace the empty state with the new welcome component
 
-### Changes Summary
+### New Components (inline)
+- Time-based greeting helper function
+- Conversation starter cards that auto-send messages
+- Gentle fade-in animation
 
-1. **Header buttons** (lines 158-167):
-   - Extract to use consistent styling with 44px touch targets
-   - Add `active:scale-95` feedback
+### Key Code Changes
 
-2. **Hero section** (lines 176-192):
-   - Keep current implementation, minor gradient refinement
-   - Maintain safe-area padding
+```tsx
+// Time-based greeting
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return { text: "Good morning", emoji: "🌅" };
+  if (hour < 17) return { text: "Good afternoon", emoji: "☀️" };
+  return { text: "Good evening", emoji: "🌙" };
+};
 
-3. **Title section** (lines 195-209):
-   - Slightly larger title
-   - Improve spacing
-   - Add category badge if available
+// Conversation starters
+const starters = [
+  { icon: MessageCircle, text: "I have a question" },
+  { icon: Mic, text: "I'd rather send a voice note" },
+  { icon: Heart, text: "I just need someone to talk to" },
+  { icon: HelpCircle, text: "Something isn't working" },
+];
+```
 
-4. **Task cards** (lines 240-276 and 286-320):
-   - Keep current TASK_COLORS approach
-   - Ensure consistent styling in both section and non-section views
-   - Slightly increase emoji size for better visibility
-
-5. **Bottom CTA** (lines 328-341):
-   - Keep AddedToRoutineButton but ensure styling consistency
-   - The `variant="outline"` already uses the lavender style for not-added state
-
-### Optional Enhancements
-
-- Add subtle animation when scrolling past hero (optional, low priority)
-- Show estimated total time for all actions (sum of durations)
+### Empty State Redesign
+- Full-width soft lavender card with rounded corners
+- Avatar/icon area with gentle pulse animation
+- Greeting + personal message
+- Tappable conversation starters in a 2x2 grid
+- Warm footer text
 
 ---
 
 ## Expected Result
+When users open chat for the first time, they feel:
+- **Welcome** — not like they're bothering anyone
+- **Seen** — the greeting feels personal
+- **Safe** — multiple ways to reach out, no wrong answer
+- **Cared for** — the tone is human, not corporate
 
-After implementation:
-- More polished, professional ritual detail page
-- Consistent iOS-style interactions and feedback
-- Better visual hierarchy and readability
-- Matches the high-quality styling shown in reference screenshot
-- Consistent with other parts of the app (cards, buttons, colors)
-
+This aligns perfectly with Simora's core: *"welcomed, not evaluated"*.
