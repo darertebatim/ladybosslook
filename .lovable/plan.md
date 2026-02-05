@@ -1,258 +1,239 @@
 
 
-## Back Button Audit & iOS-Style Redesign
+## X Button Audit & Standardization Plan
 
 ### Executive Summary
-This plan addresses three major issues with back buttons across the app:
-1. Non-functional back buttons on certain pages
-2. Inconsistent navigation behavior (jumping to home instead of intelligent routing)
-3. Non-iOS-compliant back button design (too small, with hover effects)
+
+This plan addresses issues with X (close) buttons across the app:
+1. **Inconsistent behavior** - Some jump to home, some close overlays/modals, some do nothing
+2. **Non-iOS styling** - Small tap targets, hover effects, inconsistent placement
+3. **Missing context awareness** - X buttons should return users to where they came from, not always home
 
 ---
 
 ## Current State Analysis
 
-### Problem 1: Non-Functional Back Buttons
+### X Button Categories Found
 
-**Affected Pages:**
-- **AppInspireDetail** (Ritual Detail page) - The back button at lines 155-166 uses `navigate(-1)` with a history check fallback, but since the page may be entered from multiple sources (Home, Rituals page, direct link), the history approach can fail
+| Type | Current Behavior | Expected Behavior |
+|------|------------------|-------------------|
+| **Tool Dashboard Close** (Emotion, Period, Water) | Hard-coded `/app/home` | Should go to referrer (home or browse) |
+| **Modal/Sheet Close** | Closes overlay | Correct (keep as-is) |
+| **Search Clear** | Clears search | Correct (keep as-is) |
+| **Exercise/Timer Close** | Calls `onClose()` | Correct (keep as-is) |
 
-### Problem 2: Inconsistent Navigation Logic
+### Specific Issues Found
 
-**Current Patterns Found:**
+**1. EmotionDashboard (X button jumps to home)**
+- Location: `src/components/emotion/EmotionDashboard.tsx` line 46-49
+- Current: `navigate('/app/home')` 
+- Issue: User might have come from `/app/browse` - should return there instead
 
-| Page | Back Behavior | Issue |
-|------|---------------|-------|
-| AppChat | `navigate(-1)` swipe-back + button | Good iOS pattern |
-| AppEmotionHistory | Hard-coded `/app/emotion` | Correct - knows parent |
-| AppJournal | Hard-coded `/app/home` | Correct for top-level |
-| AppPlaylistDetail | Context-aware (`cameFromPlanner ? '/app/home' : '/app/player'`) | Best practice |
-| AppFeed | Hard-coded `/app/home` | Should be `/app/channels` |
-| AppCourseDetail | Hard-coded `/app/programs` | Correct |
-| AppBreathe | Uses AppHeader with `/app/home` | Correct for tool |
-| AppInspireDetail | `navigate(-1)` with fallback | Unreliable |
+**2. AppPeriod (X button = BackButtonCircle)**
+- Location: `src/pages/app/AppPeriod.tsx` line 154
+- Current: Already updated to `BackButtonCircle to="/app/home"` (fixed in previous plan)
+- Minor Issue: Should detect referrer (browse vs home)
 
-**Best Practice Pattern**: Pages like `AppPlaylistDetail` use query params or referrer tracking to provide intelligent back navigation based on where the user came from
+**3. AppWater (X button = BackButtonCircle)**  
+- Location: `src/pages/app/AppWater.tsx` line 4
+- Current: Uses BackButtonCircle properly
+- Minor Issue: Should detect referrer
 
-### Problem 3: Non-iOS Back Button Design
+**4. BreathingExerciseScreen (X button)**
+- Location: `src/components/breathe/BreathingExerciseScreen.tsx` lines 226-231
+- Current: Button with muted background calls `handleClose()`
+- Issue: Non-iOS styling (muted background, hover effect)
 
-**Current BackButton Component Issues:**
-- Uses `<Button variant="ghost" size="icon">` - has hover effects, small tap target
-- Uses `ArrowLeft` icon instead of iOS-standard `ChevronLeft`
-- No text label (iOS typically shows "< Back" or parent page name)
-- Icon size is only 20px (h-5 w-5) - iOS uses larger icons
-
-**Good iOS Pattern Already in App** (AppChat):
-```tsx
-<Button 
-  variant="ghost" 
-  onClick={handleBack}
-  className="-ml-2 h-10 px-2 gap-0.5 text-primary hover:bg-transparent active:opacity-70"
->
-  <ChevronLeft className="h-7 w-7" />
-  <span className="text-[17px]">Back</span>
-</Button>
-```
+**5. EmotionSelector and EmotionContext (ChevronLeft back buttons)**
+- These use ChevronLeft but with old `<Button variant="ghost" size="icon">` pattern
+- Issue: Should use the new `BackButton` component for consistency
 
 ---
 
 ## Proposed Solution
 
-### Phase 1: Create iOS-Style Back Button Component
+### Phase 1: Create CloseButton Component
 
-Replace the current `BackButton` component with an iOS-compliant design:
+Create a standardized iOS-style close button component for tool dashboards:
 
-**New BackButton Features:**
-- ChevronLeft icon (h-6 to h-7) instead of ArrowLeft
-- Optional text label (defaults to "Back")
-- No hover background - only opacity change on press
-- Primary color (blue/violet) for icon and text
-- Minimum 44px tap target (iOS HIG requirement)
-- Left-aligned with negative margin for edge alignment
+**Features:**
+- 44px minimum tap target
+- Semi-transparent circular background
+- No hover effects, only press feedback
+- Supports light and dark variants
 
-**New API:**
+**Proposed API:**
 ```tsx
-interface BackButtonProps {
-  to?: string;              // Explicit destination
-  label?: string;           // Text to show (default: "Back")
-  showLabel?: boolean;      // Whether to show label (default: true)
-  onClick?: () => void;     // Custom handler before navigation
+interface CloseButtonProps {
+  to?: string;           // Explicit destination (default: previous page or home)
+  onClick?: () => void;  // Custom handler before navigation
+  variant?: 'dark' | 'light' | 'muted'; // Visual style
   className?: string;
 }
 ```
 
-### Phase 2: Fix Navigation Logic
+### Phase 2: Add Referrer Tracking
 
-**Pattern to Implement:**
-1. For pages accessed from single parent: Use explicit `to` prop
-2. For pages accessed from multiple sources: Use URL query param or referrer tracking
+For tool pages accessed from multiple locations (home or browse), track the referrer:
 
-**Specific Fixes:**
+**Pattern:**
+```tsx
+// In navigation
+navigate('/app/emotion', { state: { from: '/app/browse' } });
 
-| Page | Current | Fix |
-|------|---------|-----|
-| AppInspireDetail | `navigate(-1)` | Add explicit `to="/app/routines"` or track referrer |
-| AppFeed | `/app/home` | Change to `/app/channels` |
-| AppFeedPost | `navigate(-1)` | Keep - nested page, history is reliable |
-| AppPlaylistDetail | Context-aware | Already good - keep pattern |
+// In tool page
+const location = useLocation();
+const backTo = location.state?.from || '/app/home';
+```
 
-### Phase 3: Update All Pages
+### Phase 3: Update All Tool X Buttons
 
-Pages requiring updates:
+**Files requiring updates:**
 
-1. **Pages using old BackButton component:**
-   - AppPlaylistDetail
-   - AppFeed  
-   - AppCourseDetail
-   - AppJournal
-   - AppJournalEntry
-   - AppBreathe (via AppHeader)
+1. **EmotionDashboard** - Replace custom X button with CloseButton, add referrer detection
+2. **BreathingExerciseScreen** - Replace with CloseButton, update styling
+3. **EmotionSelector** - Replace Button variant="ghost" with BackButton component
+4. **EmotionContext** - Replace Button variant="ghost" with BackButton component
 
-2. **Pages with inline back buttons needing style update:**
-   - AppInspireDetail
-   - AppEmotionHistory
-   - AppFeedPost
-   - AppPeriod
-   - AppWater
-   - AppAudioPlayer
+### Phase 4: Update Navigation Sources
 
-3. **Pages with correct iOS style (no change needed):**
-   - AppChat
+Pages that link to tools should pass referrer state:
+
+- `src/pages/app/AppHome.tsx` - Already correct (no change needed)
+- `src/pages/app/AppStore.tsx` - Add state to tool links
+- Any other navigation to tool pages
 
 ---
 
 ## Technical Implementation Details
 
-### Updated BackButton Component
+### New CloseButton Component
 
 ```tsx
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+// src/components/app/CloseButton.tsx
+import { useNavigate, useLocation } from 'react-router-dom';
+import { X } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 
-interface BackButtonProps {
+interface CloseButtonProps {
   to?: string;
-  label?: string;
-  showLabel?: boolean;
   onClick?: () => void;
+  variant?: 'dark' | 'light' | 'muted';
   className?: string;
 }
 
-export function BackButton({ 
+export function CloseButton({ 
   to, 
-  label = 'Back',
-  showLabel = true,
   onClick, 
+  variant = 'dark',
   className 
-}: BackButtonProps) {
+}: CloseButtonProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Determine destination: explicit to > referrer state > fallback home
+  const destination = to || (location.state as any)?.from || '/app/home';
 
   const handleClick = () => {
     haptic.light();
     onClick?.();
-    
-    if (to) {
-      navigate(to);
-    } else {
-      navigate(-1);
-    }
+    navigate(destination);
   };
 
-  return (
-    <button 
-      onClick={handleClick}
-      className={cn(
-        'flex items-center gap-0.5 h-10 px-1 -ml-1',
-        'text-primary hover:bg-transparent active:opacity-70',
-        'transition-opacity',
-        className
-      )}
-    >
-      <ChevronLeft className="h-7 w-7" />
-      {showLabel && (
-        <span className="text-[17px]">{label}</span>
-      )}
-    </button>
-  );
-}
-```
-
-### Circular Icon-Only Variant for Overlay Headers
-
-For pages like AppInspireDetail with image headers:
-
-```tsx
-export function BackButtonCircle({ 
-  to,
-  onClick,
-  className 
-}: Omit<BackButtonProps, 'label' | 'showLabel'>) {
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    haptic.light();
-    onClick?.();
-    to ? navigate(to) : navigate(-1);
+  const variantStyles = {
+    dark: 'bg-black/20 text-white',
+    light: 'bg-white/60 text-gray-700',
+    muted: 'bg-muted text-foreground',
   };
 
   return (
     <button
       onClick={handleClick}
       className={cn(
-        'w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm',
+        'w-10 h-10 min-w-[44px] min-h-[44px] rounded-full',
         'flex items-center justify-center',
-        'text-white active:scale-95 transition-transform',
+        'active:scale-95 transition-transform',
+        variantStyles[variant],
         className
       )}
     >
-      <ChevronLeft className="h-5 w-5" />
+      <X className="h-5 w-5" />
     </button>
   );
 }
 ```
 
-### AppHeader Update
-
-Update the AppHeader to use the new iOS-style back button:
+### EmotionDashboard Update
 
 ```tsx
-{showBack && (
-  <BackButton 
-    to={backTo} 
-    label={backLabel || 'Back'}
-    showLabel={showBackLabel ?? true}
-  />
-)}
+// Before (lines 46-49, 118-123)
+const handleClose = () => {
+  haptic.light();
+  navigate('/app/home');
+};
+
+<button onClick={handleClose} className="w-10 h-10 rounded-full bg-black/20...">
+  <X className="h-5 w-5 text-white" />
+</button>
+
+// After
+import { CloseButton } from '@/components/app/CloseButton';
+
+// In header:
+<CloseButton variant="dark" />
+```
+
+### EmotionSelector Update
+
+```tsx
+// Before (lines 114-121)
+<Button variant="ghost" size="icon" onClick={handleBack} className="mr-2 -ml-2">
+  <ChevronLeft className="w-5 h-5" />
+</Button>
+
+// After
+import { BackButton } from '@/components/app/BackButton';
+
+<BackButton onClick={handleBack} showLabel={false} />
+```
+
+### BreathingExerciseScreen Update
+
+```tsx
+// Before (lines 226-231)
+<button onClick={handleClose} className="p-2 rounded-full bg-muted...">
+  <X className="h-5 w-5" />
+</button>
+
+// After
+import { CloseButton } from '@/components/app/CloseButton';
+
+<CloseButton variant="muted" onClick={handleClose} to="/app/breathe" />
 ```
 
 ---
 
-## Files to Modify
+## Files to Create/Modify
 
-1. `src/components/app/BackButton.tsx` - Complete rewrite with iOS style
-2. `src/components/app/AppHeader.tsx` - Update to use new BackButton props
-3. `src/pages/app/AppInspireDetail.tsx` - Use BackButtonCircle, fix destination
-4. `src/pages/app/AppEmotionHistory.tsx` - Use new BackButton component
-5. `src/pages/app/AppFeedPost.tsx` - Use new BackButton style
-6. `src/pages/app/AppPeriod.tsx` - Use new BackButton style
-7. `src/pages/app/AppWater.tsx` - Use new BackButton style
-8. `src/pages/app/AppAudioPlayer.tsx` - Update to iOS style
-9. `src/pages/app/AppFeed.tsx` - Fix destination from `/app/home` to `/app/channels`
-10. `src/pages/app/AppPlaylistDetail.tsx` - Update component style
-11. `src/pages/app/AppJournal.tsx` - Update component style
-12. `src/pages/app/AppJournalEntry.tsx` - Update component style
-13. `src/pages/app/AppCourseDetail.tsx` - Update component style
+### New File
+1. `src/components/app/CloseButton.tsx` - New standardized close button component
+
+### Files to Modify
+2. `src/components/emotion/EmotionDashboard.tsx` - Use CloseButton
+3. `src/components/emotion/EmotionSelector.tsx` - Use BackButton component
+4. `src/components/emotion/EmotionContext.tsx` - Use BackButton component  
+5. `src/components/breathe/BreathingExerciseScreen.tsx` - Use CloseButton
+6. `src/pages/app/AppStore.tsx` - Pass referrer state when navigating to tools
 
 ---
 
 ## Expected Outcome
 
 After implementation:
-- All back buttons will have consistent iOS-style appearance
-- ChevronLeft icon with optional "Back" text label
-- Minimum 44px tap targets
-- No hover effects, only press opacity feedback
-- Intelligent navigation (knows where to go back to)
-- No broken/non-functional back buttons
+- All X/close buttons have consistent iOS-style appearance
+- 44px minimum tap targets for accessibility
+- No hover effects - only press feedback
+- Smart navigation: returns to where user came from (home or browse)
+- Clean component abstraction for future tool pages
 
