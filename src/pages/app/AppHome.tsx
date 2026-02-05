@@ -558,8 +558,8 @@ const AppHome = () => {
             {/* Home Banners (announcements with videos/CTAs) */}
             <HomeBanner />
 
-            {/* Tag filter chips */}
-            {taskTags.length > 0 && <div className="py-2 -mx-4 px-4 bg-background overflow-x-auto">
+            {/* Tag filter chips - temporarily hidden */}
+            {/* {taskTags.length > 0 && <div className="py-2 -mx-4 px-4 bg-background overflow-x-auto">
                 <div className="flex gap-2">
                   <button onClick={() => setSelectedTag(null)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all font-medium', selectedTag === null ? 'bg-chip-lavender text-foreground' : 'bg-transparent border border-foreground/20 text-foreground/60')}>
                     All
@@ -568,7 +568,7 @@ const AppHome = () => {
                       {tag}
                     </button>)}
                 </div>
-              </div>}
+              </div>} */}
 
           {isLoading ? <div className="space-y-3">
               {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 rounded-2xl" />)}
