@@ -567,7 +567,7 @@ const AppHome = () => {
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
             {/* Promo Banner */}
-            <PromoBanner location="home_top" />
+            <PromoBanner location="home_top" className="py-2" />
 
             {/* Home Banners (announcements with videos/CTAs) */}
             <HomeBanner />
