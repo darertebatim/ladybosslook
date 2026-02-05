@@ -441,7 +441,10 @@ export function useAddRoutineFromBank() {
             color: edited?.color || bankTask?.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
             repeat_pattern: edited?.repeatPattern || 'daily',
             scheduled_time: edited?.scheduledTime || null,
-            tag: edited?.tag ?? routine.category,
+            // Use category from admin_task_bank (the source of truth), fallback to routine.category
+            tag: edited?.tag ?? bankTask?.category ?? routine.category,
+            // Copy time_period from admin_task_bank
+            time_period: bankTask?.time_period ?? null,
             linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : null,
             pro_link_type: proLinkType,
             pro_link_value: proLinkValue,
