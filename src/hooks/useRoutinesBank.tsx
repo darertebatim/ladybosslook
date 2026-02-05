@@ -14,6 +14,7 @@ export interface RoutineBankItem {
   emoji: string | null;
   is_active: boolean | null;
   is_popular: boolean | null;
+  is_welcome_popup: boolean | null;
   sort_order: number | null;
   created_at: string | null;
   updated_at: string | null;
