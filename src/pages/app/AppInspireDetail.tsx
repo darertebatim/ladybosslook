@@ -97,20 +97,6 @@ export default function AppInspireDetail() {
     }
   };
 
-  const handleShare = async () => {
-    if (!routine) return;
-    
-    try {
-      await navigator.share({
-        title: routine.title,
-        text: routine.subtitle || routine.description || '',
-        url: window.location.href,
-      });
-    } catch {
-      // User cancelled or share not supported
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
