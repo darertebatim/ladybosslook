@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { BackButton } from '@/components/app/BackButton';
 import { CONTEXT_OPTIONS, getEmotionLabel, type Valence } from '@/lib/emotionData';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
@@ -77,14 +78,7 @@ export const EmotionContext = ({
     >
       {/* Header */}
       <header className="shrink-0 flex items-center px-4 py-3">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={onBack}
-          className="mr-2 -ml-2"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
+        <BackButton onClick={onBack} showLabel={false} />
       </header>
 
       {/* Content */}

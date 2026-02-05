@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, History, Calendar, BarChart2, Heart } from 'lucide-react';
+import { History, Calendar, BarChart2, Heart } from 'lucide-react';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
+import { CloseButton } from '@/components/app/CloseButton';
 import { EmotionLogCard } from './EmotionLogCard';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
@@ -43,10 +44,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
 
   const isAdded = existingTask || justAdded;
 
-  const handleClose = () => {
-    haptic.light();
-    navigate('/app/home');
-  };
+  // handleClose removed - using CloseButton with referrer detection
 
   const handleViewHistory = () => {
     haptic.light();
@@ -115,12 +113,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
           className="relative z-10 shrink-0 flex items-center justify-between px-4"
           style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)', paddingBottom: '12px' }}
         >
-          <button
-            onClick={handleClose}
-            className="w-10 h-10 rounded-full bg-black/20 flex items-center justify-center active:scale-95 transition-transform"
-          >
-            <X className="h-5 w-5 text-white" />
-          </button>
+          <CloseButton variant="dark" />
           
           <h1 className="text-lg font-semibold text-white">Emotions</h1>
           
