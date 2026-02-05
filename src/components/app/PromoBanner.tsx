@@ -145,13 +145,6 @@ export function PromoBanner() {
         .eq('user_id', user.id);
       if (breatheCount && breatheCount > 0) tools.push('breathe');
       
-      // Check water tracking
-      const { count: waterCount } = await supabase
-        .from('water_intake_logs')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id);
-      if (waterCount && waterCount > 0) tools.push('water');
-      
       // Check emotion logs
       const { count: emotionCount } = await supabase
         .from('emotion_logs')
