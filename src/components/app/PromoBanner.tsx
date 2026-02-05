@@ -202,7 +202,7 @@ export function PromoBanner() {
         <img
           src={activeBanner.cover_image_url}
           alt="Promo"
-          className="w-full aspect-[3/1] object-cover"
+          className={`w-full ${getAspectRatioClass()} object-cover`}
         />
         
         {/* Close Button */}

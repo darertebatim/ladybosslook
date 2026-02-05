@@ -536,7 +536,7 @@ export function PromoBannerManager() {
                     <SelectItem value="chat">🗨️ Chat / Support</SelectItem>
                     <SelectItem value="profile">👤 Profile / Settings</SelectItem>
                     <SelectItem value="custom_url">🔗 Custom URL (in-app)</SelectItem>
-                    <SelectItem value="external_url">External URL (opens browser)</SelectItem>
+                    <SelectItem value="external_url">🌐 External URL (opens browser)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

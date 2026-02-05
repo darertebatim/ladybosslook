@@ -5,13 +5,26 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+type AspectRatio = '3:1' | '16:9' | '1:1';
+
+function getAspectRatioConfig(aspectRatio: AspectRatio) {
+  switch (aspectRatio) {
+    case '16:9':
+      return { width: 1920, height: 1080, label: '16:9 aspect ratio (1920x1080 pixels)' };
+    case '1:1':
+      return { width: 1080, height: 1080, label: '1:1 aspect ratio (1080x1080 pixels)' };
+    default:
+      return { width: 1200, height: 400, label: '3:1 aspect ratio (1200x400 pixels)' };
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { title, subtitle } = await req.json();
+    const { title, subtitle, aspectRatio = '3:1' } = await req.json();
 
     if (!title) {
       return new Response(
@@ -25,8 +38,10 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    // Build the prompt for a 1200x400 (3:1) promotional banner
-    const prompt = `Create a beautiful promotional banner image with a 3:1 aspect ratio (1200x400 pixels).
+    const config = getAspectRatioConfig(aspectRatio as AspectRatio);
+
+    // Build the prompt based on aspect ratio
+    const prompt = `Create a beautiful promotional banner image with a ${config.label}.
 
 The banner should feature:
 - Title text: "${title}"
@@ -40,7 +55,7 @@ ${subtitle ? `- Subtitle text: "${subtitle}"` : ''}
 Style: Luxury feminine branding, elegant gradient, modern minimalist.
 Important: Make the text readable and prominent on the banner.`;
 
-    console.log('Generating promo banner with prompt:', prompt);
+    console.log('Generating promo banner with aspect ratio:', aspectRatio, 'prompt:', prompt);
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
