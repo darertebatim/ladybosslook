@@ -177,7 +177,7 @@ function AppUpdateLogsCard() {
                     v{log.device_version}
                   </Badge>
                   <span className="text-muted-foreground truncate">
-                    {(log.profiles as any)?.full_name || (log.profiles as any)?.email?.split('@')[0] || 'Unknown'}
+                    {log.profile?.full_name || log.profile?.email?.split('@')[0] || 'Unknown'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
