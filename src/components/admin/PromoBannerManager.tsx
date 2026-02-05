@@ -15,7 +15,7 @@ import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
 type AspectRatio = '3:1' | '16:9' | '1:1';
-type DisplayLocation = 'home' | 'explore' | 'listen' | 'player' | 'all';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'all';
 
 interface PromoBanner {
   id: string;
@@ -65,7 +65,7 @@ export function PromoBannerManager() {
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('3:1');
   
   // Display location state
-  const [displayLocation, setDisplayLocation] = useState<DisplayLocation>('home');
+  const [displayLocation, setDisplayLocation] = useState<DisplayLocation>('home_top');
   const [targetPlaylistIds, setTargetPlaylistIds] = useState<string[]>([]);
   
   // Audience targeting state
@@ -374,7 +374,7 @@ export function PromoBannerManager() {
     setIncludeTools([]);
     setExcludeTools([]);
     // Reset location
-    setDisplayLocation('home');
+    setDisplayLocation('home_top');
     setTargetPlaylistIds([]);
   };
 
@@ -399,7 +399,7 @@ export function PromoBannerManager() {
     setIncludeTools(banner.include_tools || []);
     setExcludeTools(banner.exclude_tools || []);
     // Load location
-    setDisplayLocation(banner.display_location || 'home');
+    setDisplayLocation((banner.display_location as DisplayLocation) || 'home_top');
     setTargetPlaylistIds(banner.target_playlist_ids || []);
   };
 
@@ -581,7 +581,8 @@ export function PromoBannerManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="home">🏠 Home Page</SelectItem>
+                    <SelectItem value="home_top">🏠 Home - Above Tasks</SelectItem>
+                    <SelectItem value="home_rituals">🏠 Home - After Rituals</SelectItem>
                     <SelectItem value="explore">🔍 Explore Page</SelectItem>
                     <SelectItem value="listen">🎧 Listen Page</SelectItem>
                     <SelectItem value="player">▶️ Audio Player</SelectItem>

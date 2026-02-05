@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-type DisplayLocation = 'home' | 'explore' | 'listen' | 'player' | 'all';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'all';
 
 interface PromoBannerData {
   id: string;
@@ -75,7 +75,7 @@ function shouldShowBanner(banner: PromoBannerData): boolean {
 }
 
 export function PromoBanner({ 
-  location = 'home', 
+  location = 'home_top', 
   currentPlaylistId,
   className 
 }: PromoBannerProps) {
