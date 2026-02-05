@@ -504,7 +504,7 @@ export default function AppChat() {
             <Button 
               variant="ghost" 
               onClick={handleBack}
-              className="-ml-2 h-10 px-2 gap-0.5 text-primary hover:bg-transparent active:opacity-70"
+              className="-ml-2 h-10 px-2 gap-0.5 text-foreground hover:bg-transparent active:opacity-70"
             >
               <ChevronLeft className="h-7 w-7" />
               <span className="text-[17px]">Back</span>
