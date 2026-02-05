@@ -33,7 +33,7 @@ import { WaterTrackingScreen } from '@/components/app/WaterTrackingScreen';
 import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
-import { WelcomeCard } from '@/components/app/WelcomeCard';
+import { WelcomeRitualCard } from '@/components/app/WelcomeRitualCard';
 import { FirstActionCelebration } from '@/components/app/FirstActionCelebration';
 import { toast } from 'sonner';
 const AppHome = () => {
@@ -561,10 +561,10 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Welcome Card for New Users - show above empty state */}
+              {/* Welcome Ritual Card for New Users - flipping card with actions */}
               {isNewUser && filteredTasks.length === 0 && (
                 <div className="mb-4">
-                  <WelcomeCard onAddAction={() => setShowQuickStart(true)} />
+                  <WelcomeRitualCard />
                 </div>
               )}
 
