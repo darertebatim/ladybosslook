@@ -670,6 +670,19 @@ export default function RoutinesBank() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      toggleWelcomePopup.mutate({ id: routine.id, is_welcome_popup: !routine.is_welcome_popup });
+                    }}
+                    className={cn(
+                      "p-2 transition-all",
+                      routine.is_welcome_popup ? "text-violet-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                    )}
+                    title={routine.is_welcome_popup ? "Remove as welcome popup" : "Set as welcome popup"}
+                  >
+                    <Gift className={cn("h-4 w-4", routine.is_welcome_popup && "fill-violet-200")} />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
                       togglePopular.mutate({ id: routine.id, is_popular: !routine.is_popular });
                     }}
                     className={cn(

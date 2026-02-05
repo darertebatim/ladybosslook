@@ -33,7 +33,7 @@ import { WaterTrackingScreen } from '@/components/app/WaterTrackingScreen';
 import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
-import { WelcomeRitualCard } from '@/components/app/WelcomeRitualCard';
+import { WelcomeRitualPopup } from '@/components/app/WelcomeRitualPopup';
 import { FirstActionCelebration } from '@/components/app/FirstActionCelebration';
 import { toast } from 'sonner';
 const AppHome = () => {
