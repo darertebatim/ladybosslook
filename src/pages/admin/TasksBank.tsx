@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Sparkles, Star, ChevronRight, Trash2, Eye, EyeOff, CheckSquare, Square, Layers, X } from 'lucide-react';
 import { Plus, Sparkles, Star, ChevronRight, Trash2, Eye, EyeOff, CheckSquare, Square, Layers, X, FolderPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
