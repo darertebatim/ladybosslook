@@ -545,6 +545,7 @@ export default function AppPlaylistDetail() {
         >
           <div className="pt-1 pb-2 px-4 flex items-center gap-1">
             <BackButton to="/app/player" label="Library" />
+          </div>
         </div>
         <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
         <div className="flex-1 flex items-center justify-center">
