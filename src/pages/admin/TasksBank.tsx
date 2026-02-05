@@ -326,6 +326,8 @@ export default function TasksBank() {
         description: data.formData.description || null,
         is_active: data.adminSettings.is_active,
         is_popular: data.adminSettings.is_popular,
+        // Time of day setting
+        time_period: data.formData.timePeriod || null,
       };
 
       const { error } = await supabase
