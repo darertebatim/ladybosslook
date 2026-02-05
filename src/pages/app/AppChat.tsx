@@ -79,10 +79,10 @@ const getGreeting = () => {
 
 // Conversation starters
 const conversationStarters = [
-  { icon: MessageCircle, text: "I have a question", color: "from-primary/20 to-primary/5" },
-  { icon: Mic, text: "I'd rather send a voice note", color: "from-emerald-500/20 to-emerald-500/5" },
-  { icon: Heart, text: "I just need someone to talk to", color: "from-rose-500/20 to-rose-500/5" },
-  { icon: HelpCircle, text: "Something isn't working", color: "from-amber-500/20 to-amber-500/5" },
+  { icon: MessageCircle, text: "I have a question" },
+  { icon: Mic, text: "I'd rather send a voice note" },
+  { icon: Heart, text: "I just need someone to talk to" },
+  { icon: HelpCircle, text: "Something isn't working" },
 ];
 
 /**
