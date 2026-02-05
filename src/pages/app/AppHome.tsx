@@ -65,6 +65,11 @@ const AppHome = () => {
   
   // First action celebration state
   const [showFirstCelebration, setShowFirstCelebration] = useState(false);
+  
+  // Welcome card dismissed state - persisted in localStorage
+  const [welcomeCardDismissed, setWelcomeCardDismissed] = useState(() => 
+    localStorage.getItem('simora_welcome_card_dismissed') === 'true'
+  );
 
   const {
     run: runTour,
