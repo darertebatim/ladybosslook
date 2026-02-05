@@ -275,6 +275,10 @@ export default function AppFeedPost() {
             </h1>
           </div>
         </div>
+      </header>
+
+      {/* Scrollable Content */}
+      <div 
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto overscroll-contain"
         style={{ paddingBottom: scrollPaddingBottom }}
