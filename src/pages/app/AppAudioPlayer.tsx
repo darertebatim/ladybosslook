@@ -714,7 +714,7 @@ export default function AppAudioPlayer() {
           <PromoBanner 
             location="player" 
             currentPlaylistId={playlistInfo?.playlist_id || contextPlaylistId || undefined}
-            className="mt-3"
+            className="mt-4 mb-2"
           />
 
           {/* Up Next Preview */}
