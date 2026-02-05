@@ -425,19 +425,22 @@ export default function TasksBank() {
   };
 
   const handleSaveSheet = (formData: TaskFormData) => {
+    // Use tag as category - the form's "Category" picker sets the tag field
+    const categoryToSave = formData.tag || editCategory;
+    
     if (editingTask) {
       updateTask.mutate({
         id: editingTask.id,
         formData,
         subtasks: formData.subtasks,
-        category: editCategory,
+        category: categoryToSave,
         adminSettings,
       });
     } else {
       createTask.mutate({
         formData,
         subtasks: formData.subtasks,
-        category: editCategory,
+        category: categoryToSave,
         adminSettings,
       });
     }
