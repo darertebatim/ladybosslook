@@ -70,6 +70,9 @@ const AppHome = () => {
   const [welcomeCardDismissed, setWelcomeCardDismissed] = useState(() => 
     localStorage.getItem('simora_welcome_card_dismissed') === 'true'
   );
+  
+  // Track if user started this session as a new user (so card stays visible after adding tasks)
+  const [startedAsNewUser, setStartedAsNewUser] = useState<boolean | null>(null);
 
   const {
     run: runTour,
