@@ -462,8 +462,8 @@ export default function AppChat() {
                 <span className="text-[17px]">Back</span>
               </Button>
               <div className="flex items-center gap-3">
-                <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5 text-primary" />
+              <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
+                  <MessageCircle className="h-5 w-5 text-foreground" />
                 </div>
                 <div>
                   <h1 className="font-semibold text-[17px]">Support</h1>
