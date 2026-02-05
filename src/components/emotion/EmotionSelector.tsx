@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BackButton } from '@/components/app/BackButton';
 import { 
