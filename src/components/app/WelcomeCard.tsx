@@ -11,6 +11,12 @@ interface WelcomeCardProps {
 export function WelcomeCard({ onAddAction }: WelcomeCardProps) {
   const [dismissed, setDismissed] = useState(false);
 
+  const handleDismiss = () => {
+    setDismissed(true);
+    // Clear force new user flag when dismissed
+    localStorage.removeItem('simora_force_new_user');
+  };
+
   if (dismissed) return null;
 
   return (
