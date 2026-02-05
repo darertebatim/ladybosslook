@@ -232,7 +232,8 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     ? (Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60)
     : 999;
   const totalCompletions = totalCompletionsRes.count || 0;
-  const isNewUser = allTasks.length === 0 && accountAgeHours < 24;
+  // Show as "new user" if they have zero tasks - allows welcome card to show for reset accounts
+  const isNewUser = allTasks.length === 0;
 
   return {
     profile,
