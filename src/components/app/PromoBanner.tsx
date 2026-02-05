@@ -127,6 +127,44 @@ export function PromoBanner() {
       case 'inspire':
         navigate('/app/routines');
         break;
+      case 'tasks':
+        if (activeBanner.destination_id) {
+          // Navigate to task creation with pre-selected template
+          navigate(`/app/tasks/create?template=${activeBanner.destination_id}`);
+        }
+        break;
+      case 'routines_hub':
+        if (activeBanner.destination_id) {
+          navigate(`/app/routines/bank/${activeBanner.destination_id}`);
+        } else {
+          navigate('/app/routines');
+        }
+        break;
+      case 'tasks_bank':
+        navigate('/app/tasks/bank');
+        break;
+      case 'breathe_exercise':
+        if (activeBanner.destination_id) {
+          navigate(`/app/breathe/${activeBanner.destination_id}`);
+        } else {
+          navigate('/app/breathe');
+        }
+        break;
+      case 'emotion':
+        navigate('/app/emotion');
+        break;
+      case 'period':
+        navigate('/app/period');
+        break;
+      case 'chat':
+        navigate('/app/chat');
+        break;
+      case 'profile':
+        navigate('/app/profile');
+        break;
+      case 'planner':
+        navigate('/app/home'); // Planner is on home
+        break;
       case 'custom_url':
         if (activeBanner.custom_url) {
           if (activeBanner.custom_url.startsWith('http')) {
@@ -136,6 +174,19 @@ export function PromoBanner() {
           }
         }
         break;
+      case 'external_url':
+        if (activeBanner.custom_url) {
+          window.open(activeBanner.custom_url, '_blank');
+        }
+        break;
+    }
+  };
+  
+  const getAspectRatioClass = () => {
+    switch (activeBanner?.aspect_ratio) {
+      case '16:9': return 'aspect-video';
+      case '1:1': return 'aspect-square';
+      default: return 'aspect-[3/1]';
     }
   };
 
