@@ -398,6 +398,9 @@ export function PromoBannerManager() {
     setExcludePlaylists(banner.exclude_playlists || []);
     setIncludeTools(banner.include_tools || []);
     setExcludeTools(banner.exclude_tools || []);
+    // Load location
+    setDisplayLocation(banner.display_location || 'home');
+    setTargetPlaylistIds(banner.target_playlist_ids || []);
   };
 
   const getDestinationLabel = (banner: PromoBanner) => {
