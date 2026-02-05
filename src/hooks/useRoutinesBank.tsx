@@ -124,7 +124,27 @@ export function useRoutinesBank(categorySlug?: string) {
     },
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
+});
+
+// Fetch the welcome popup ritual (the one marked as is_welcome_popup)
+export function useWelcomePopupRitual() {
+  return useQuery({
+    queryKey: ['welcome-popup-ritual'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_welcome_popup', true)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as RoutineBankItem | null;
+    },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
+}
 }
 
 // Fetch popular routines

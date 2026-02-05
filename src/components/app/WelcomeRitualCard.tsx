@@ -3,12 +3,9 @@ import { X, Plus, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask } from '@/hooks/useRoutinesBank';
+import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useWelcomePopupRitual } from '@/hooks/useRoutinesBank';
 import { useTaskTemplates, TaskTemplate } from '@/hooks/useTaskPlanner';
 import { toast } from 'sonner';
-
-// The welcome ritual ID in the database
-const WELCOME_RITUAL_ID = 'b8f4019f-dd9a-4c7d-a901-69b37cc78b7d';
 
 interface WelcomeRitualCardProps {
   onActionAdded?: () => void;
@@ -20,8 +17,11 @@ export function WelcomeRitualCard({ onActionAdded }: WelcomeRitualCardProps) {
   const [addedActions, setAddedActions] = useState<Set<string>>(new Set());
   const [addingAction, setAddingAction] = useState<string | null>(null);
   
-  // Fetch welcome ritual details
-  const { data: welcomeRitual, isLoading: ritualLoading } = useRoutineBankDetail(WELCOME_RITUAL_ID);
+  // Fetch the welcome popup ritual dynamically
+  const { data: welcomeRitualInfo, isLoading: welcomeLoading } = useWelcomePopupRitual();
+  
+  // Fetch full ritual details including tasks
+  const { data: welcomeRitual, isLoading: ritualLoading } = useRoutineBankDetail(welcomeRitualInfo?.id);
   const addRoutine = useAddRoutineFromBank();
   
   // Fallback: fetch popular templates if ritual has no tasks
@@ -49,9 +49,14 @@ export function WelcomeRitualCard({ onActionAdded }: WelcomeRitualCardProps) {
     haptic.light();
     
     try {
+      if (!welcomeRitualInfo?.id) {
+        toast.error('No welcome ritual configured');
+        return;
+      }
+      
       // Add the single task from the routine
       await addRoutine.mutateAsync({
-        routineId: WELCOME_RITUAL_ID,
+        routineId: welcomeRitualInfo.id,
         selectedTaskIds: [actionId],
       });
       
@@ -59,6 +64,7 @@ export function WelcomeRitualCard({ onActionAdded }: WelcomeRitualCardProps) {
       haptic.success();
       onActionAdded?.();
       toast.success('Added to your day! ✨');
+      // Don't dismiss - let user add more actions
     } catch (error) {
       console.error('Failed to add action:', error);
       toast.error('Failed to add action');
@@ -68,10 +74,17 @@ export function WelcomeRitualCard({ onActionAdded }: WelcomeRitualCardProps) {
   };
 
   if (dismissed) return null;
+  
+  // Don't show if no welcome ritual is configured or still loading
+  if (welcomeLoading || !welcomeRitualInfo) return null;
 
   // Get actions to display (from ritual tasks or fallback to popular templates)
   const actions = welcomeRitual?.tasks?.length ? welcomeRitual.tasks : [];
   const displayActions = actions.length > 0 ? actions : popularTemplates;
+  
+  // Use ritual's title and subtitle dynamically
+  const title = welcomeRitualInfo.title || 'Your day is open';
+  const subtitle = welcomeRitualInfo.subtitle || 'Tap to pick your first actions';
 
   return (
     <div 
@@ -96,17 +109,17 @@ export function WelcomeRitualCard({ onActionAdded }: WelcomeRitualCardProps) {
             {welcomeRitual?.cover_image_url ? (
               <img 
                 src={welcomeRitual.cover_image_url} 
-                alt="Welcome to Simora" 
+                alt={title} 
                 className="w-full h-full object-cover"
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center">
-                <FluentEmoji emoji="✨" size={96} className="opacity-40" />
+                <FluentEmoji emoji={welcomeRitualInfo.emoji || '✨'} size={96} className="opacity-40" />
               </div>
             )}
             
             {/* Bottom Gradient for Title Overlay - same as RoutineBankCard */}
-            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
             
             {/* Dismiss button */}
             <button
@@ -116,13 +129,13 @@ export function WelcomeRitualCard({ onActionAdded }: WelcomeRitualCardProps) {
               <X className="w-4 h-4 text-white" />
             </button>
             
-            {/* Title Overlay - Bottom, same style as RoutineBankCard */}
-            <div className="absolute bottom-2.5 left-2.5 right-2.5">
-              <h3 className="font-semibold text-sm text-white drop-shadow-lg">
-                Your day is open ✨
+            {/* Title Overlay - Bottom, matching RoutineBankCard sizing */}
+            <div className="absolute bottom-3 left-3 right-3">
+              <h3 className="font-bold text-lg text-white drop-shadow-lg leading-tight">
+                {title}
               </h3>
-              <p className="text-white/80 text-xs mt-0.5">
-                Tap to pick your first actions
+              <p className="text-white/90 text-sm mt-1 drop-shadow">
+                {subtitle}
               </p>
             </div>
           </div>
@@ -170,7 +183,7 @@ export function WelcomeRitualCard({ onActionAdded }: WelcomeRitualCardProps) {
                   const isAdded = addedActions.has(action.id);
                   const isAdding = addingAction === action.id;
                   const emoji = action.emoji || '✨';
-                  const title = action.title;
+                  const actionTitle = action.title;
                   
                   return (
                     <button
@@ -189,7 +202,7 @@ export function WelcomeRitualCard({ onActionAdded }: WelcomeRitualCardProps) {
                         "flex-1 text-left text-[13px] truncate",
                         isAdded ? "text-emerald-700 dark:text-emerald-300" : "text-foreground"
                       )}>
-                        {title}
+                        {actionTitle}
                       </span>
                       <div className={cn(
                         "shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors",

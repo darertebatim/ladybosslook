@@ -351,7 +351,22 @@ export default function RoutinesBank() {
       const { error } = await supabase.from('routines_bank').update({ is_active }).eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['routines-bank'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['welcome-popup-ritual'] });
+    },
+  });
+
+  // Toggle welcome popup
+  const toggleWelcomePopup = useMutation({
+    mutationFn: async ({ id, is_welcome_popup }: { id: string; is_welcome_popup: boolean }) => {
+      const { error } = await supabase.from('routines_bank').update({ is_welcome_popup }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['welcome-popup-ritual'] });
+    },
   });
 
   // Fetch sections and tasks for a routine when editing
