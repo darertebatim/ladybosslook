@@ -47,13 +47,30 @@ export const TaskQuickStartSheet = ({
   };
 
   const handleRandomAction = () => {
-    if (templates.length === 0) return;
-    const randomIndex = Math.floor(Math.random() * templates.length);
-    const randomTemplate = templates[randomIndex];
-    if (randomTemplate) {
-      haptic.success();
-      handleTemplateSelect(randomTemplate);
-    }
+    if (templates.length === 0 || isRolling) return;
+    
+    setIsRolling(true);
+    haptic.light();
+    
+    // Dice roll delay with haptic pulses
+    let pulseCount = 0;
+    const pulseInterval = setInterval(() => {
+      haptic.light();
+      pulseCount++;
+      if (pulseCount >= 3) clearInterval(pulseInterval);
+    }, 200);
+    
+    // After ~1 second, select and add the action
+    setTimeout(() => {
+      clearInterval(pulseInterval);
+      const randomIndex = Math.floor(Math.random() * templates.length);
+      const randomTemplate = templates[randomIndex];
+      setIsRolling(false);
+      if (randomTemplate) {
+        haptic.success();
+        handleTemplateSelect(randomTemplate);
+      }
+    }, 1000);
   };
 
   const handleBrowseAll = () => {
