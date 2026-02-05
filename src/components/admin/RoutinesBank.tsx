@@ -46,6 +46,7 @@ interface RoutineBankItem {
   emoji: string;
   is_active: boolean;
   is_popular: boolean;
+  is_welcome_popup: boolean;
   sort_order: number;
   created_at: string;
   updated_at: string;
