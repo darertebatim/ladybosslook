@@ -593,10 +593,10 @@ export default function AppChat() {
                         key={index}
                         onClick={() => handleSendMessage(starter.text)}
                         disabled={sending}
-                        className={`flex items-center gap-2.5 p-3 rounded-2xl bg-gradient-to-br ${starter.color} border border-border/30 text-left transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50`}
+                        className="flex items-center gap-2.5 p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border/30 text-left transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                       >
-                        <starter.icon className="h-4 w-4 text-foreground/70 shrink-0" />
-                        <span className="text-[13px] font-medium text-foreground/90 leading-tight">{starter.text}</span>
+                        <starter.icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-[13px] font-medium text-foreground leading-tight">{starter.text}</span>
                       </button>
                     ))}
                   </div>
