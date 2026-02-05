@@ -121,6 +121,7 @@ Deno.serve(async (req) => {
 
     // -------- Routines / planner extras --------
     await mustDelete(supabaseAdmin, 'user_routine_plans', 'user_id', targetUserId);
+    await mustDelete(supabaseAdmin, 'user_routines_bank', 'user_id', targetUserId);
     await mustDelete(supabaseAdmin, 'planner_program_completions', 'user_id', targetUserId);
     await mustDelete(supabaseAdmin, 'routine_plan_ratings', 'user_id', targetUserId);
 
