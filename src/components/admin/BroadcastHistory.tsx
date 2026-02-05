@@ -1,9 +1,22 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Megaphone, Users, Bell, Mail, Loader2, Link as LinkIcon } from 'lucide-react';
+import { Megaphone, Users, Bell, Mail, Loader2, Link as LinkIcon, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface Broadcast {
   id: string;
@@ -20,6 +33,8 @@ interface Broadcast {
 }
 
 export function BroadcastHistory() {
+  const queryClient = useQueryClient();
+  
   const { data: broadcasts, isLoading } = useQuery({
     queryKey: ['broadcast-history'],
     queryFn: async () => {
@@ -31,6 +46,33 @@ export function BroadcastHistory() {
       
       if (error) throw error;
       return data as Broadcast[];
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (broadcastId: string) => {
+      // First delete all chat messages that reference this broadcast
+      const { error: messagesError } = await supabase
+        .from('chat_messages')
+        .delete()
+        .eq('broadcast_id', broadcastId);
+      
+      if (messagesError) throw messagesError;
+      
+      // Then delete the broadcast itself
+      const { error: broadcastError } = await supabase
+        .from('broadcast_messages')
+        .delete()
+        .eq('id', broadcastId);
+      
+      if (broadcastError) throw broadcastError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['broadcast-history'] });
+      toast.success('Broadcast deleted from all chats');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to delete broadcast');
     }
   });
 
@@ -117,6 +159,34 @@ export function BroadcastHistory() {
                   <span className="text-xs text-muted-foreground whitespace-nowrap">
                     {format(new Date(broadcast.created_at), 'MMM d, h:mm a')}
                   </span>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Broadcast</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete this broadcast and remove it from all {broadcast.sent_count} user chats. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => deleteMutation.mutate(broadcast.id)}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             ))}
