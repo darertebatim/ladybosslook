@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Trash2, Plus, ExternalLink, Sparkles, Loader2, Pencil, Users } from 'lucide-react';
+import { Trash2, Plus, ExternalLink, Sparkles, Loader2, Pencil, Users, Copy } from 'lucide-react';
 import { format } from 'date-fns';
 import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
