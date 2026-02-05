@@ -662,6 +662,9 @@ const AppHome = () => {
                       />
                     ))}
                   </div>
+                  
+                  {/* Promo Banner - Home Page */}
+                  <PromoBanner location="home" className="mt-4" />
                 </div>}
 
             </>}

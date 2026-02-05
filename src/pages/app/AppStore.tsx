@@ -12,6 +12,7 @@ import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
 import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
+import { PromoBanner } from '@/components/app/PromoBanner';
 
 // Category configuration for filtering programs
 const categoryConfig = [
@@ -202,6 +203,9 @@ const AppStore = () => {
           </div>
         ) : (
           <>
+            {/* Promo Banner - Explore Page */}
+            <PromoBanner location="explore" className="mb-2" />
+
             {/* Tools Section */}
             {(!searchQuery || filteredWellnessTools.length > 0) && (
               <section>

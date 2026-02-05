@@ -15,6 +15,7 @@ import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
 type AspectRatio = '3:1' | '16:9' | '1:1';
+type DisplayLocation = 'home' | 'explore' | 'listen' | 'player' | 'all';
 
 interface PromoBanner {
   id: string;
@@ -36,6 +37,8 @@ interface PromoBanner {
   exclude_playlists: string[];
   include_tools: string[];
   exclude_tools: string[];
+  display_location: DisplayLocation;
+  target_playlist_ids: string[];
 }
 
 export function PromoBannerManager() {
@@ -60,6 +63,10 @@ export function PromoBannerManager() {
   const [startsAt, setStartsAt] = useState('');
   const [endsAt, setEndsAt] = useState('');
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('3:1');
+  
+  // Display location state
+  const [displayLocation, setDisplayLocation] = useState<DisplayLocation>('home');
+  const [targetPlaylistIds, setTargetPlaylistIds] = useState<string[]>([]);
   
   // Audience targeting state
   const [targetType, setTargetType] = useState<TargetType>('all');
@@ -260,6 +267,8 @@ export function PromoBannerManager() {
         exclude_playlists: excludePlaylists,
         include_tools: includeTools,
         exclude_tools: excludeTools,
+        display_location: displayLocation,
+        target_playlist_ids: targetPlaylistIds,
       });
       if (error) throw error;
     },
@@ -297,6 +306,8 @@ export function PromoBannerManager() {
         exclude_playlists: excludePlaylists,
         include_tools: includeTools,
         exclude_tools: excludeTools,
+        display_location: displayLocation,
+        target_playlist_ids: targetPlaylistIds,
       }).eq('id', editingBanner.id);
       if (error) throw error;
     },
@@ -362,6 +373,9 @@ export function PromoBannerManager() {
     setExcludePlaylists([]);
     setIncludeTools([]);
     setExcludeTools([]);
+    // Reset location
+    setDisplayLocation('home');
+    setTargetPlaylistIds([]);
   };
 
   const startEditing = (banner: PromoBanner) => {
@@ -384,6 +398,9 @@ export function PromoBannerManager() {
     setExcludePlaylists(banner.exclude_playlists || []);
     setIncludeTools(banner.include_tools || []);
     setExcludeTools(banner.exclude_tools || []);
+    // Load location
+    setDisplayLocation(banner.display_location || 'home');
+    setTargetPlaylistIds(banner.target_playlist_ids || []);
   };
 
   const getDestinationLabel = (banner: PromoBanner) => {
@@ -555,6 +572,75 @@ export function PromoBannerManager() {
                   </div>
                 )}
               </div>
+
+              {/* Display Location */}
+              <div className="space-y-2">
+                <Label>Display Location</Label>
+                <Select value={displayLocation} onValueChange={(v) => setDisplayLocation(v as DisplayLocation)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="home">🏠 Home Page</SelectItem>
+                    <SelectItem value="explore">🔍 Explore Page</SelectItem>
+                    <SelectItem value="listen">🎧 Listen Page</SelectItem>
+                    <SelectItem value="player">▶️ Audio Player</SelectItem>
+                    <SelectItem value="all">📍 All Locations</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Where in the app this banner should appear
+                </p>
+              </div>
+
+              {/* Target Playlists - only show when location is 'player' */}
+              {displayLocation === 'player' && (
+                <div className="space-y-2">
+                  <Label>Target Playlists (optional)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty to show on all audio players, or select specific playlists
+                  </p>
+                  <Select 
+                    value={targetPlaylistIds[0] || ''} 
+                    onValueChange={(v) => {
+                      if (v && !targetPlaylistIds.includes(v)) {
+                        setTargetPlaylistIds([...targetPlaylistIds, v]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Add a playlist..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {playlists?.filter(p => !targetPlaylistIds.includes(p.id)).map(p => (
+                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {targetPlaylistIds.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {targetPlaylistIds.map(id => {
+                        const playlist = playlists?.find(p => p.id === id);
+                        return (
+                          <span 
+                            key={id} 
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                          >
+                            {playlist?.name || id}
+                            <button 
+                              type="button"
+                              onClick={() => setTargetPlaylistIds(targetPlaylistIds.filter(pid => pid !== id))}
+                              className="hover:text-destructive"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Destination Type */}
               <div className="space-y-2">

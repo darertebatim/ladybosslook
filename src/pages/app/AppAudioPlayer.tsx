@@ -8,6 +8,7 @@ import { ProgressBar } from "@/components/audio/ProgressBar";
 import { BookmarkButton } from "@/components/audio/BookmarkButton";
 import { BookmarksList } from "@/components/audio/BookmarksList";
 import { TrackCompletionCelebration } from "@/components/audio/TrackCompletionCelebration";
+import { PromoBanner } from "@/components/app/PromoBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -708,6 +709,13 @@ export default function AppAudioPlayer() {
               variant="default"
             />
           </div>
+
+          {/* Promo Banner - Player Page */}
+          <PromoBanner 
+            location="player" 
+            currentPlaylistId={playlistInfo?.playlist_id || contextPlaylistId || undefined}
+            className="mt-3"
+          />
 
           {/* Up Next Preview */}
           {nextTrack && (

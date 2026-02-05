@@ -5,7 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-interface PromoBanner {
+type DisplayLocation = 'home' | 'explore' | 'listen' | 'player' | 'all';
+
+interface PromoBannerData {
   id: string;
   cover_image_url: string;
   destination_type: 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner';
@@ -20,6 +22,14 @@ interface PromoBanner {
   exclude_playlists: string[];
   include_tools: string[];
   exclude_tools: string[];
+  display_location: DisplayLocation;
+  target_playlist_ids: string[];
+}
+
+interface PromoBannerProps {
+  location?: DisplayLocation;
+  currentPlaylistId?: string;
+  className?: string;
 }
 
 const STORAGE_KEY = 'promo_banner_dismissals';
@@ -43,7 +53,7 @@ function setDismissal(bannerId: string) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(dismissals));
 }
 
-function shouldShowBanner(banner: PromoBanner): boolean {
+function shouldShowBanner(banner: PromoBannerData): boolean {
   const dismissals = getDismissals();
   const dismissedAt = dismissals[banner.id];
   
@@ -64,7 +74,11 @@ function shouldShowBanner(banner: PromoBanner): boolean {
   }
 }
 
-export function PromoBanner() {
+export function PromoBanner({ 
+  location = 'home', 
+  currentPlaylistId,
+  className 
+}: PromoBannerProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
@@ -80,7 +94,7 @@ export function PromoBanner() {
         .order('priority', { ascending: false });
       
       if (error) throw error;
-      return data as PromoBanner[];
+      return data as PromoBannerData[];
     },
   });
 
@@ -171,7 +185,7 @@ export function PromoBanner() {
     enabled: !!user?.id,
   });
 
-  // Filter banners based on targeting
+  // Filter banners based on location and targeting
   const eligibleBanners = useMemo(() => {
     if (!banners) return [];
     
@@ -179,6 +193,19 @@ export function PromoBanner() {
       // Always check dismiss status first
       if (!shouldShowBanner(banner) || dismissedIds.has(banner.id)) {
         return false;
+      }
+      
+      // Location filter - banner must be for this location or 'all'
+      const bannerLocation = banner.display_location || 'home';
+      if (bannerLocation !== 'all' && bannerLocation !== location) {
+        return false;
+      }
+      
+      // For player location: check playlist targeting
+      if (location === 'player' && banner.target_playlist_ids?.length > 0) {
+        if (!currentPlaylistId || !banner.target_playlist_ids.includes(currentPlaylistId)) {
+          return false;
+        }
       }
       
       // Target type: all - show to everyone
@@ -248,7 +275,7 @@ export function PromoBanner() {
       
       return true;
     });
-  }, [banners, dismissedIds, userEnrollments, userPlaylists, userTools]);
+  }, [banners, dismissedIds, location, currentPlaylistId, userEnrollments, userPlaylists, userTools]);
 
   // Get first eligible banner
   const activeBanner = eligibleBanners[0];
@@ -366,7 +393,7 @@ export function PromoBanner() {
   if (!activeBanner) return null;
 
   return (
-    <div className="px-4 py-2">
+    <div className={className || "px-4 py-2"}>
       <div
         className="relative w-full rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
         onClick={handleTap}

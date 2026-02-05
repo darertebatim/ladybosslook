@@ -9,6 +9,7 @@ import { usePlayerData } from "@/hooks/useAppData";
 import { PlayerSkeleton } from "@/components/app/skeletons";
 import { CategoryCircle } from "@/components/app/CategoryCircle";
 import { cn } from "@/lib/utils";
+import { PromoBanner } from "@/components/app/PromoBanner";
 
 // Category configuration with icons and colors
 const categoryConfig: Record<string, { name: string; icon: string; color: string }> = {
@@ -310,6 +311,9 @@ export default function AppPlayer() {
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="p-4 pb-safe space-y-6">
+          {/* Promo Banner - Listen Page */}
+          <PromoBanner location="listen" className="-mt-2 mb-2" />
+
           {/* Continue Learning Section */}
           {progressFilter === "all" && selectedCategory === "all" && !searchQuery && continueListening.length > 0 && (
             <div className="space-y-3">
