@@ -20,7 +20,6 @@ import { cn } from '@/lib/utils';
 type FilterTab = 'all' | 'week' | 'month';
 
 const AppEmotionHistory = () => {
-  const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterTab>('all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   
