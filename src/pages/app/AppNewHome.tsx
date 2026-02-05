@@ -14,7 +14,7 @@ import { QuickActionsGrid } from '@/components/dashboard/QuickActionsGrid';
 import { SuggestedRoutineCard } from '@/components/dashboard/SuggestedRoutineCard';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
-import { WelcomeCard } from '@/components/app/WelcomeCard';
+import { WelcomeRitualCard } from '@/components/app/WelcomeRitualCard';
 import { FirstActionCelebration } from '@/components/app/FirstActionCelebration';
 import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { format } from 'date-fns';
