@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { BackButton } from '@/components/app/BackButton';
