@@ -156,12 +156,14 @@ export default function AppInspireDetail() {
       >
         <BackButtonCircle to="/app/routines" />
         <div className="flex items-center gap-2">
-          <button className="p-2 rounded-full bg-black/30 backdrop-blur-sm text-white">
+          <button 
+            className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
+          >
             <Heart className="w-5 h-5" />
           </button>
           <button 
             onClick={handleShare}
-            className="p-2 rounded-full bg-black/30 backdrop-blur-sm text-white"
+            className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
           >
             <Share2 className="w-5 h-5" />
           </button>
@@ -193,24 +195,29 @@ export default function AppInspireDetail() {
 
         <div className="px-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 160px)' }}>
           {/* Title & Badges */}
-          <div className="pt-4">
-            <h1 className="text-2xl font-bold text-foreground">{routine.title}</h1>
+          <div className="pt-5">
+            <h1 className="text-[26px] font-bold text-foreground leading-tight">{routine.title}</h1>
             {routine.subtitle && (
-              <p className="text-muted-foreground mt-1">{routine.subtitle}</p>
+              <p className="text-muted-foreground mt-1.5">{routine.subtitle}</p>
             )}
             
-            <div className="flex items-center gap-3 mt-3">
+            <div className="flex items-center gap-2 mt-3">
+              {routine.category && (
+                <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-muted text-muted-foreground">
+                  {routine.category}
+                </span>
+              )}
               {routine.tasks && routine.tasks.length > 0 && (
-                <div className="text-sm text-muted-foreground">
+                <span className="text-sm text-muted-foreground">
                   {routine.tasks.length} action{routine.tasks.length !== 1 ? 's' : ''}
-                </div>
+                </span>
               )}
             </div>
           </div>
 
           {/* Description */}
           {routine.description && (
-            <div className="mt-6">
+            <div className="mt-5">
               <p className="text-muted-foreground leading-relaxed">{routine.description}</p>
             </div>
           )}
@@ -335,7 +342,6 @@ export default function AppInspireDetail() {
           onAddClick={handleAddClick}
           isLoading={addRoutineFromBank.isPending}
           size="lg"
-          variant="outline"
           addText="Add to my rituals"
         />
       </div>
