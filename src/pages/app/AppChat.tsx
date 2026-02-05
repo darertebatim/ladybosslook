@@ -576,7 +576,7 @@ export default function AppChat() {
                   <p className="text-muted-foreground text-[15px] mb-1">
                     {getGreeting().text} {getGreeting().emoji}
                   </p>
-                  <h2 className="font-semibold text-xl mb-3">I'm Sarah, and I'm here for you</h2>
+                  <h2 className="font-semibold text-xl mb-3">I'm Mary, and I'm here for you</h2>
                   
                   {/* Core message */}
                   <p className="text-[15px] text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
