@@ -23,6 +23,7 @@ const FALLBACK_BREATHING_TASKS: RoutinePlanTask[] = [
     linked_playlist_id: null,
     pro_link_type: 'breathe',
     pro_link_value: null, // Opens breathe page
+    tag: 'pro', // Pro-linked tasks use 'pro' category
   },
 ];
 
