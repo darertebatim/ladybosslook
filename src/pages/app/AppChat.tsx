@@ -79,10 +79,10 @@ const getGreeting = () => {
 
 // Conversation starters
 const conversationStarters = [
-  { icon: MessageCircle, text: "I have a question", color: "from-primary/20 to-primary/5" },
-  { icon: Mic, text: "I'd rather send a voice note", color: "from-emerald-500/20 to-emerald-500/5" },
-  { icon: Heart, text: "I just need someone to talk to", color: "from-rose-500/20 to-rose-500/5" },
-  { icon: HelpCircle, text: "Something isn't working", color: "from-amber-500/20 to-amber-500/5" },
+  { icon: MessageCircle, text: "I have a question" },
+  { icon: Mic, text: "I'd rather send a voice note" },
+  { icon: Heart, text: "I just need someone to talk to" },
+  { icon: HelpCircle, text: "Something isn't working" },
 ];
 
 /**
@@ -447,23 +447,23 @@ export default function AppChat() {
           description="Chat with our support team"
         />
         <div className="flex flex-col bg-background h-full">
-          {/* Header */}
+        {/* Header */}
           <header 
-            className="fixed top-0 left-0 right-0 z-40 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-xl rounded-b-3xl shadow-sm"
+            className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border/30"
             style={{ paddingTop: 'env(safe-area-inset-top)' }}
           >
           <div className="flex items-center gap-1 pt-3 pb-2 px-4">
             <Button 
               variant="ghost" 
               onClick={handleBack}
-              className="-ml-2 h-10 px-2 gap-0.5 text-primary hover:bg-transparent active:opacity-70"
+              className="-ml-2 h-10 px-2 gap-0.5 text-foreground hover:bg-transparent active:opacity-70"
             >
                 <ChevronLeft className="h-7 w-7" />
                 <span className="text-[17px]">Back</span>
               </Button>
               <div className="flex items-center gap-3">
-                <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5 text-primary" />
+              <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
+                  <MessageCircle className="h-5 w-5 text-foreground" />
                 </div>
                 <div>
                   <h1 className="font-semibold text-[17px]">Support</h1>
@@ -497,22 +497,22 @@ export default function AppChat() {
       >
         {/* iOS-style Blur Header - fixed for proper scroll behavior */}
         <header 
-          className="fixed top-0 left-0 right-0 z-40 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-xl rounded-b-3xl shadow-sm"
+          className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border/30"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="flex items-center gap-1 pt-3 pb-2 px-4">
             <Button 
               variant="ghost" 
               onClick={handleBack}
-              className="-ml-2 h-10 px-2 gap-0.5 text-primary hover:bg-transparent active:opacity-70"
+              className="-ml-2 h-10 px-2 gap-0.5 text-foreground hover:bg-transparent active:opacity-70"
             >
               <ChevronLeft className="h-7 w-7" />
               <span className="text-[17px]">Back</span>
             </Button>
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm">
-                  <MessageCircle className="h-5 w-5 text-primary" />
+                <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
+                  <MessageCircle className="h-5 w-5 text-foreground" />
                 </div>
                 {/* Online indicator */}
                 <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-background" />
@@ -561,15 +561,15 @@ export default function AppChat() {
           <div className="p-4">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-fade-in">
-                {/* Warm gradient card */}
-                <div className="w-full max-w-sm bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-3xl p-6 mb-6">
-                  {/* Avatar with gentle pulse */}
+                {/* Welcome card - clean white */}
+                <div className="w-full max-w-sm bg-card rounded-3xl p-6 mb-6 border border-border/50">
+                  {/* Avatar - clean */}
                   <div className="relative mx-auto mb-5">
-                    <div className="h-20 w-20 mx-auto rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center shadow-lg shadow-primary/10">
+                    <div className="h-20 w-20 mx-auto rounded-full bg-muted border border-border flex items-center justify-center">
                       <span className="text-4xl">💜</span>
                     </div>
                     {/* Online indicator */}
-                    <div className="absolute bottom-1 right-1/2 translate-x-8 h-4 w-4 rounded-full bg-emerald-500 border-2 border-background shadow-sm" />
+                    <div className="absolute bottom-1 right-1/2 translate-x-8 h-4 w-4 rounded-full bg-emerald-500 border-2 border-background" />
                   </div>
                   
                   {/* Time-based greeting */}
@@ -593,10 +593,10 @@ export default function AppChat() {
                         key={index}
                         onClick={() => handleSendMessage(starter.text)}
                         disabled={sending}
-                        className={`flex items-center gap-2.5 p-3 rounded-2xl bg-gradient-to-br ${starter.color} border border-border/30 text-left transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50`}
+                        className="flex items-center gap-2.5 p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border/30 text-left transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                       >
-                        <starter.icon className="h-4 w-4 text-foreground/70 shrink-0" />
-                        <span className="text-[13px] font-medium text-foreground/90 leading-tight">{starter.text}</span>
+                        <starter.icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-[13px] font-medium text-foreground leading-tight">{starter.text}</span>
                       </button>
                     ))}
                   </div>
