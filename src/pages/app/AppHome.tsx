@@ -145,11 +145,11 @@ const AppHome = () => {
   
   // Track if user started this session as a new user (only set once when data loads)
   useEffect(() => {
-    if (startedAsNewUser === null && !homeData?.isLoading) {
+    if (startedAsNewUser === null && !homeDataLoading) {
       // Only set this once when home data first loads
       setStartedAsNewUser(isNewUser);
     }
-  }, [isNewUser, startedAsNewUser, homeData?.isLoading]);
+  }, [isNewUser, startedAsNewUser, homeDataLoading]);
   
   // Show welcome card if user started as new user this session (even after adding tasks)
   const showWelcomeCard = (startedAsNewUser ?? isNewUser) && !welcomeCardDismissed;
