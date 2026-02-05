@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Settings, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Settings, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { BackButtonCircle } from '@/components/app/BackButton';
 import { format, addMonths, subMonths } from 'date-fns';
 import { 
   usePeriodSettings, 
