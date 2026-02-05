@@ -445,7 +445,8 @@ export function useAddRoutinePlan() {
             color: edited?.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
             repeat_pattern: edited?.repeatPattern || 'daily',
             scheduled_time: edited?.scheduledTime || null,
-            tag: edited?.tag ?? planCategoryName ?? planTitle,
+         // For pro-linked tasks, use 'pro' as category; otherwise use the category name or plan title
+         tag: proLinkType ? 'pro' : (edited?.tag ?? planCategoryName ?? planTitle),
             linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : null,
             pro_link_type: proLinkType,
             pro_link_value: proLinkValue,

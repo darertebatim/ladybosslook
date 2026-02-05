@@ -321,7 +321,6 @@ const AppHome = () => {
     setSelectedTask(null);
     deleteTask.mutate(task.id, {
       onSuccess: () => {
-        toast.success('Action deleted');
         haptic.light();
       }
     });

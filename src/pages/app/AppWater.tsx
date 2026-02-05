@@ -138,10 +138,14 @@ const AppWater = () => {
         repeat_pattern: editedWater?.repeatPattern || 'daily',
         scheduled_time: editedWater?.scheduledTime || null,
         tag: editedWater?.tag || 'Water',
+       // IMPORTANT: Set category to 'pro' for pro-linked tasks  
+       // The tag can be 'Water' but the filtering category should be 'pro'
         reminder_enabled: editedWater?.reminderEnabled || false,
         // Pro task link to water tool
         pro_link_type: 'water',
         pro_link_value: null,
+       // Category field for proper categorization
+       category: 'pro',
         // Goal settings for water tracking
         goal_enabled: true,
         goal_type: 'count',
