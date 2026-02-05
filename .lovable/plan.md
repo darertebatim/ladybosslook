@@ -1,117 +1,267 @@
 
-# App Version Tracking & Targeted Update Notifications
+# Add Promo Banners to Multiple App Locations
 
-## Problem Summary
-Currently, no user versions are being tracked because:
-1. The `useAppInstallTracking` hook is created but **never used** in the app
-2. Push notifications cannot filter by app version
-3. The in-app update banner only works for users already on v1.1.07+
+## Overview
 
-## Solution Overview
-Create a reliable version tracking system that:
-1. Tracks every user's current app version on every login/open
-2. Allows admin to send push notifications ONLY to outdated users
-3. Shows the update banner ONLY to outdated users
-4. Provides admin visibility into version adoption
+Currently, the `PromoBanner` component exists but needs to be placed in strategic locations throughout the app. This plan adds promo banners to four new locations:
 
----
+1. **Home Page** - Under the "Try a Ritual" section (suggested rituals)
+2. **Explore Page** - Under header, above the Tools section
+3. **Listen Page** - Under header, above playlists
+4. **Audio Player Page** - Under play controls (targeting specific playlists)
 
-## Implementation Steps
-
-### Step 1: Fix Version Tracking Hook
-**File:** `src/hooks/useAppInstallTracking.tsx`
-- Use `App.getInfo().version` for reliable native version detection
-- Track by `user_id` primarily (not device_id) for consistency
-- Update `last_seen_version` column on every app open
-- Remove localStorage caching that prevents updates
-
-### Step 2: Add Hook to NativeAppLayout  
-**File:** `src/layouts/NativeAppLayout.tsx`
-- Call `useAppInstallTracking()` in the layout so it runs for all logged-in users
-- This ensures version is tracked on every app open
-
-### Step 3: Add Version Field to Push Subscriptions Table
-**Database migration:**
-- Add `app_version` column to `push_subscriptions` table
-- This links each push token directly to a version
-
-### Step 4: Update Push Registration to Include Version
-**File:** `src/lib/pushNotifications.ts`
-- When saving push token, also save current app version
-- Update version whenever token is refreshed
-
-### Step 5: Create Edge Function for Targeted Version Push
-**File:** `supabase/functions/send-update-push-notification/index.ts`
-- Accept `targetVersion` parameter (e.g., "< 1.1.08")
-- Filter push tokens to only those with outdated versions
-- Send push notification to prompt update
-
-### Step 6: Admin UI for Version-Based Push
-**File:** `src/pages/admin/Communications.tsx` or new component
-- Add "Send Update Notification" feature
-- Show current version distribution
-- Select target versions (all below X)
-- Preview affected user count before sending
-
-### Step 7: Improve Update Banner Logic
-**File:** `src/hooks/useAppUpdateChecker.tsx`
-- Instead of calling edge function, compare against `app_settings.latest_ios_version`
-- Show banner immediately on app open if version < latest
-- No need for 24-hour cache on first check
-
----
-
-## Technical Details
+## Technical Approach
 
 ### Database Changes
-```sql
--- Add version tracking to push_subscriptions
-ALTER TABLE push_subscriptions 
-ADD COLUMN app_version text;
 
--- Index for fast version filtering
-CREATE INDEX idx_push_subscriptions_version 
-ON push_subscriptions(app_version);
+Add a new `display_location` column to the `promo_banners` table to control where each banner appears:
+
+```sql
+ALTER TABLE promo_banners 
+ADD COLUMN display_location text NOT NULL DEFAULT 'home';
 ```
 
-### Version Tracking Flow
-1. User opens app → `useAppInstallTracking` runs
-2. Gets version via `App.getInfo().version`
-3. Updates `app_installations.last_seen_version` 
-4. Updates `push_subscriptions.app_version`
+Supported values:
+- `home` - Shows on Home page (existing + under rituals)
+- `explore` - Shows on Explore/Browse page
+- `listen` - Shows on Listen page
+- `player` - Shows on Audio Player page
+- `all` - Shows in all locations
 
-### Push Notification Flow (for updates)
-1. Admin opens Communications → "Update Notification" tab
-2. Sees: "45 users on < 1.1.08"
-3. Clicks "Send Update Push"
-4. Edge function queries `push_subscriptions WHERE app_version < '1.1.08'`
-5. Sends push to those users only
+### Component Enhancement
 
-### In-App Banner Flow
-1. On app open, compare `App.getInfo().version` with `app_settings.latest_ios_version`
-2. If outdated → show banner immediately
-3. User clicks "Update" → opens App Store
-4. User clicks "Later" → dismiss for 24 hours
+Create a reusable `LocationPromoBanner` component that:
+- Accepts a `location` prop to filter which banners to show
+- Optionally accepts `playlistId` for player-specific targeting
+- Reuses the existing filtering logic (audience targeting, display frequency, dismissals)
 
----
+### File Changes
 
-## Files to Create/Modify
-
-| File | Action | Purpose |
-|------|--------|---------|
-| `src/hooks/useAppInstallTracking.tsx` | Modify | Fix version tracking logic |
-| `src/layouts/NativeAppLayout.tsx` | Modify | Call tracking hook |
-| `src/lib/pushNotifications.ts` | Modify | Save version with push token |
-| `supabase/functions/send-update-push-notification/index.ts` | Create | Version-targeted push |
-| `src/components/admin/UpdateNotificationSender.tsx` | Create | Admin UI for sending |
-| `src/pages/admin/Communications.tsx` | Modify | Add "Updates" tab |
-| Database | Migrate | Add `app_version` to `push_subscriptions` |
+| File | Action | Description |
+|------|--------|-------------|
+| `supabase/migrations/...` | Create | Add `display_location` column |
+| `src/components/app/PromoBanner.tsx` | Modify | Add `location` and `playlistId` props for filtering |
+| `src/pages/app/AppHome.tsx` | Modify | Add PromoBanner after suggested rituals section |
+| `src/pages/app/AppStore.tsx` | Modify | Add PromoBanner below header, above Tools |
+| `src/pages/app/AppPlayer.tsx` | Modify | Add PromoBanner below header, above playlists |
+| `src/pages/app/AppAudioPlayer.tsx` | Modify | Add PromoBanner below play controls |
+| `src/components/admin/PromoBannerManager.tsx` | Modify | Add location selector in admin UI |
 
 ---
 
-## Result
-After implementation:
-- Every app open updates the user's version in database
-- Admin can send push to "all users on version < X"  
-- Banner shows automatically to outdated users
-- You can see exactly who has updated in admin dashboard
+## Implementation Details
+
+### 1. Database Migration
+
+```sql
+ALTER TABLE promo_banners 
+ADD COLUMN display_location text NOT NULL DEFAULT 'home';
+
+-- Add location for player-specific banners (filter by playlist)
+ALTER TABLE promo_banners 
+ADD COLUMN target_playlist_ids uuid[] DEFAULT '{}';
+
+-- Index for efficient location filtering
+CREATE INDEX idx_promo_banners_location ON promo_banners(display_location);
+```
+
+### 2. Update PromoBanner Component
+
+Add props to the component:
+
+```tsx
+interface PromoBannerProps {
+  location?: 'home' | 'explore' | 'listen' | 'player' | 'all';
+  currentPlaylistId?: string; // For player page targeting
+  className?: string;
+}
+
+export function PromoBanner({ 
+  location = 'home', 
+  currentPlaylistId,
+  className 
+}: PromoBannerProps) {
+  // Filter banners by location
+  const eligibleBanners = useMemo(() => {
+    if (!banners) return [];
+    
+    return banners.filter(banner => {
+      // Location filter
+      if (banner.display_location !== 'all' && banner.display_location !== location) {
+        return false;
+      }
+      
+      // For player location: check if current playlist matches target
+      if (location === 'player' && banner.target_playlist_ids?.length > 0) {
+        if (!currentPlaylistId || !banner.target_playlist_ids.includes(currentPlaylistId)) {
+          return false;
+        }
+      }
+      
+      // ... existing targeting logic ...
+    });
+  }, [...]);
+}
+```
+
+### 3. Page Integrations
+
+**AppHome.tsx** - After "Try a Ritual" section (line ~665):
+```tsx
+{/* Promo Banner - After Rituals */}
+<PromoBanner location="home" className="mt-4" />
+```
+
+**AppStore.tsx (Explore)** - After header, before Tools section (line ~205):
+```tsx
+{/* Promo Banner - Explore Page */}
+<PromoBanner location="explore" className="mb-4" />
+
+{/* Tools Section */}
+<section>
+  <h2>Tools</h2>
+  ...
+</section>
+```
+
+**AppPlayer.tsx (Listen)** - After header spacer, before content (line ~311):
+```tsx
+{/* Promo Banner - Listen Page */}
+<PromoBanner location="listen" className="px-4 pt-2" />
+
+{/* Continue Learning Section */}
+...
+```
+
+**AppAudioPlayer.tsx** - After AudioControls, before "Up Next" (line ~710):
+```tsx
+{/* Controls */}
+<AudioControls ... />
+
+{/* Promo Banner - Player specific */}
+<PromoBanner 
+  location="player" 
+  currentPlaylistId={playlistInfo?.playlist_id || contextPlaylistId}
+  className="mt-3"
+/>
+
+{/* Up Next Preview */}
+{nextTrack && ...}
+```
+
+### 4. Admin UI Updates
+
+Add a location selector in `PromoBannerManager.tsx`:
+
+```tsx
+<Label>Display Location</Label>
+<Select value={displayLocation} onValueChange={setDisplayLocation}>
+  <SelectItem value="home">Home Page</SelectItem>
+  <SelectItem value="explore">Explore Page</SelectItem>
+  <SelectItem value="listen">Listen Page</SelectItem>
+  <SelectItem value="player">Audio Player</SelectItem>
+  <SelectItem value="all">All Locations</SelectItem>
+</Select>
+
+{/* Show playlist selector when player is selected */}
+{displayLocation === 'player' && (
+  <div>
+    <Label>Target Playlists (optional)</Label>
+    <p className="text-xs text-muted-foreground">
+      Leave empty to show on all audio player pages
+    </p>
+    <MultiSelect 
+      options={playlists}
+      value={targetPlaylistIds}
+      onChange={setTargetPlaylistIds}
+    />
+  </div>
+)}
+```
+
+---
+
+## Visual Placement Summary
+
+```
+HOME PAGE
++-----------------------------------------+
+| Header                                  |
+| Week Strip                              |
++-----------------------------------------+
+| My Actions                              |
+| [Task Cards...]                         |
++-----------------------------------------+
+| Try a Ritual                            |
+| [Routine Cards...]                      |
++-----------------------------------------+
+| >>> PROMO BANNER HERE <<<               |
++-----------------------------------------+
+| Active Rounds Carousel                  |
++-----------------------------------------+
+
+EXPLORE PAGE
++-----------------------------------------+
+| Header (Explore Simora)                 |
++-----------------------------------------+
+| >>> PROMO BANNER HERE <<<               |
++-----------------------------------------+
+| Tools                                   |
+| [Tool Cards...]                         |
++-----------------------------------------+
+| Programs                                |
++-----------------------------------------+
+
+LISTEN PAGE
++-----------------------------------------+
+| Header (Listen)                         |
+| Category Circles                        |
+| Filter Pills                            |
++-----------------------------------------+
+| >>> PROMO BANNER HERE <<<               |
++-----------------------------------------+
+| Continue Learning                       |
+| All Playlists                           |
++-----------------------------------------+
+
+AUDIO PLAYER
++-----------------------------------------+
+| Header                                  |
++-----------------------------------------+
+| Cover Art                               |
+| Title                                   |
+| Progress Bar                            |
+| Play Controls                           |
++-----------------------------------------+
+| >>> PROMO BANNER HERE <<<               |
++-----------------------------------------+
+| Up Next Preview                         |
++-----------------------------------------+
+```
+
+---
+
+## Player Page Targeting Logic
+
+The player page banner is the trickiest because it allows:
+
+1. **Show to all audio players** - Banner with no target playlists
+2. **Show only for specific playlists** - Banner with `target_playlist_ids` set
+
+Example use cases:
+- Promote a meditation course only when user is listening to meditation content
+- Cross-promote related playlists
+- Upsell premium content while user listens to free tracks
+
+---
+
+## Testing Considerations
+
+After implementation, verify:
+1. Banners appear in each location correctly
+2. Location filtering works (banner set to "explore" doesn't show on "home")
+3. Player targeting works with specific playlist IDs
+4. Existing audience targeting (programs, tools, playlists) still works
+5. Dismiss functionality persists across all locations
+6. Admin can create banners for each location
+
