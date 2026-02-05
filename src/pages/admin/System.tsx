@@ -93,23 +93,31 @@ function AppUpdateLogsCard() {
   const { data: logs, isLoading, refetch } = useQuery({
     queryKey: ['app-update-logs'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First, get the update logs
+      const { data: logsData, error: logsError } = await supabase
         .from('app_update_logs')
-        .select(`
-          id,
-          device_version,
-          latest_version,
-          update_available,
-          platform,
-          checked_at,
-          user_id,
-          profiles:user_id (full_name, email)
-        `)
+        .select('id, device_version, latest_version, update_available, platform, checked_at, user_id')
         .order('checked_at', { ascending: false })
         .limit(50);
       
-      if (error) throw error;
-      return data;
+      if (logsError) throw logsError;
+      if (!logsData || logsData.length === 0) return [];
+
+      // Then, fetch profiles for the user_ids
+      const userIds = [...new Set(logsData.map(l => l.user_id).filter(Boolean))];
+      if (userIds.length === 0) return logsData.map(l => ({ ...l, profile: null }));
+
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', userIds);
+
+      const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+      
+      return logsData.map(l => ({
+        ...l,
+        profile: l.user_id ? profileMap.get(l.user_id) || null : null,
+      }));
     },
   });
 
