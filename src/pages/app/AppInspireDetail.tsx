@@ -156,12 +156,14 @@ export default function AppInspireDetail() {
       >
         <BackButtonCircle to="/app/routines" />
         <div className="flex items-center gap-2">
-          <button className="p-2 rounded-full bg-black/30 backdrop-blur-sm text-white">
+          <button 
+            className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
+          >
             <Heart className="w-5 h-5" />
           </button>
           <button 
             onClick={handleShare}
-            className="p-2 rounded-full bg-black/30 backdrop-blur-sm text-white"
+            className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
           >
             <Share2 className="w-5 h-5" />
           </button>
