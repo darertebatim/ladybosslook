@@ -277,5 +277,7 @@ export function useNewHomeData() {
     nextSessionMap: query.data?.nextSessionMap || new Map<string, string>(),
     suggestedRoutine: query.data?.suggestedRoutine || null,
     periodSettings: query.data?.periodSettings || null,
+    isNewUser: query.data?.isNewUser || false,
+    totalCompletions: query.data?.totalCompletions || 0,
   };
 }
