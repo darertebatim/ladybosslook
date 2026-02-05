@@ -9,9 +9,10 @@ import { toast } from 'sonner';
 
 interface WelcomeRitualCardProps {
   onActionAdded?: () => void;
+  onDismiss?: () => void;
 }
 
-export function WelcomeRitualCard({ onActionAdded }: WelcomeRitualCardProps) {
+export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCardProps) {
   const [dismissed, setDismissed] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [addedActions, setAddedActions] = useState<Set<string>>(new Set());
