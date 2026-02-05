@@ -84,22 +84,22 @@ export function RoutineBankCard({
 
   return (
     <button 
-      className="overflow-hidden rounded-2xl cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] w-full text-left shadow-md"
+      className="overflow-hidden cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] w-full text-left"
       onClick={handleClick}
     >
       {/* Square Image Container */}
-      <div className="relative aspect-square w-full">
+      <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-md">
         {routine.cover_image_url ? (
           <img
             src={routine.cover_image_url}
             alt={routine.title}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-cover rounded-2xl"
+            className="w-full h-full object-cover"
           />
         ) : (
           <div className={cn(
-            'w-full h-full bg-gradient-to-br flex items-center justify-center rounded-2xl',
+            'w-full h-full bg-gradient-to-br flex items-center justify-center',
             gradient
           )}>
             <FluentEmoji emoji={routineEmoji} size={72} className="opacity-40" />
@@ -107,23 +107,25 @@ export function RoutineBankCard({
         )}
         
         {/* Bottom Gradient for Title Overlay */}
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 via-black/30 to-transparent rounded-b-2xl" />
-        
-        {/* Category badge - top left */}
-        {routine.category && routine.category !== 'general' && (
-          <Badge 
-            variant="secondary" 
-            className="absolute top-2.5 left-2.5 rounded-full capitalize text-[11px] px-2 py-0.5 bg-white/90 text-foreground backdrop-blur-sm"
-          >
-            {routine.category}
-          </Badge>
-        )}
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         
         {/* Title Overlay - Bottom */}
         <h3 className="absolute bottom-2.5 left-2.5 right-2.5 font-semibold text-sm text-white line-clamp-2 drop-shadow-lg">
           {routine.title}
         </h3>
       </div>
+      
+      {/* Category badge - Below image */}
+      {routine.category && routine.category !== 'general' && (
+        <div className="mt-2 px-0.5">
+          <Badge 
+            variant="secondary" 
+            className="rounded-full capitalize text-[11px] px-2 py-0.5 bg-muted/80 text-muted-foreground"
+          >
+            {routine.category}
+          </Badge>
+        </div>
+      )}
     </button>
   );
 }
