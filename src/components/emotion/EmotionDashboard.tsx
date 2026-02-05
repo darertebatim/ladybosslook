@@ -44,10 +44,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
 
   const isAdded = existingTask || justAdded;
 
-  const handleClose = () => {
-    haptic.light();
-    navigate('/app/home');
-  };
+  // handleClose removed - using CloseButton with referrer detection
 
   const handleViewHistory = () => {
     haptic.light();
