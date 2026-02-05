@@ -842,6 +842,8 @@ export const useCompleteTask = () => {
       queryClient.invalidateQueries({ queryKey: ['planner-completions', user?.id, dateStr] });
       queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
       queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
+      // Ensure Home stats (including totalCompletions) update immediately
+      queryClient.invalidateQueries({ queryKey: ['new-home-data', user?.id] });
     },
     onError: (error) => {
       console.error('Complete task error:', error);

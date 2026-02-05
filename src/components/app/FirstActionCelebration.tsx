@@ -10,6 +10,13 @@ interface FirstActionCelebrationProps {
   onClose: () => void;
 }
 
+const CONFETTI_COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--accent))',
+  'hsl(var(--secondary))',
+  'hsl(var(--ring))',
+];
+
 export function FirstActionCelebration({ isOpen, onClose }: FirstActionCelebrationProps) {
   const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
 
@@ -17,69 +24,76 @@ export function FirstActionCelebration({ isOpen, onClose }: FirstActionCelebrati
     if (isOpen && !hasTriggeredConfetti) {
       setHasTriggeredConfetti(true);
       haptic.success();
-      
-      // Gentle celebration confetti
+
       confetti({
-        particleCount: 80,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#A78BFA', '#F9A8D4', '#FDE68A', '#93C5FD', '#C4B5FD']
+        particleCount: 70,
+        spread: 65,
+        origin: { y: 0.62 },
+        colors: CONFETTI_COLORS,
+        scalar: 0.9,
+        ticks: 220,
       });
 
-      // Delayed heart-shaped burst
       setTimeout(() => {
         confetti({
-          particleCount: 40,
-          spread: 45,
-          origin: { y: 0.5 },
-          colors: ['#F472B6', '#A78BFA', '#FCD34D']
+          particleCount: 35,
+          spread: 48,
+          origin: { y: 0.55 },
+          colors: CONFETTI_COLORS,
+          scalar: 0.95,
+          ticks: 200,
         });
-      }, 400);
+      }, 350);
     }
   }, [isOpen, hasTriggeredConfetti]);
 
   useEffect(() => {
-    if (!isOpen) {
-      setHasTriggeredConfetti(false);
-    }
+    if (!isOpen) setHasTriggeredConfetti(false);
   }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-sm text-center border-none bg-gradient-to-b from-violet-50 to-background dark:from-violet-950/30 dark:to-background overflow-hidden">
-        {/* Decorative sparkles */}
-        <div className="absolute top-6 left-6 text-violet-400 animate-pulse">
-          <Sparkles className="h-5 w-5" />
-        </div>
-        <div className="absolute top-6 right-6 text-pink-400 animate-pulse" style={{ animationDelay: '0.3s' }}>
-          <Sparkles className="h-5 w-5" />
-        </div>
+      <DialogContent className="sm:max-w-sm p-0 overflow-hidden border border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="relative p-6 text-center">
+          {/* Ambient background */}
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/15 via-background to-background" />
 
-        <div className="py-8 px-4 relative z-10">
-          {/* Heart Icon */}
-          <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-violet-400 to-pink-400 flex items-center justify-center mb-6 shadow-lg animate-scale-in">
-            <Heart className="h-10 w-10 text-white fill-white" />
+          {/* Decorative sparkles */}
+          <div className="absolute top-5 left-5 text-primary/60 animate-pulse">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div
+            className="absolute top-6 right-6 text-primary/40 animate-pulse"
+            style={{ animationDelay: '0.25s' }}
+          >
+            <Sparkles className="h-4 w-4" />
           </div>
 
-          {/* Main Message */}
-          <h2 className="text-2xl font-bold mb-3 text-foreground">
-            You showed up 💜
-          </h2>
-          
-          <p className="text-muted-foreground mb-6 leading-relaxed">
-            This was your first action.
-            <br />
-            <span className="text-sm">Showing up for yourself matters.</span>
-          </p>
+          <div className="relative">
+            {/* Icon */}
+            <div className="mx-auto mb-5 grid place-items-center size-20 rounded-2xl bg-primary text-primary-foreground shadow-lg">
+              <Heart className="h-9 w-9 fill-current" />
+            </div>
 
-          <Button 
-            onClick={onClose}
-            className="w-full bg-violet-600 hover:bg-violet-700 text-white"
-          >
-            Continue
-          </Button>
+            {/* Copy */}
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+              You showed up for yourself
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              Your first action is in.
+              <br />
+              Keep it small. Keep it kind.
+            </p>
+
+            <div className="mt-6">
+              <Button onClick={onClose} className="w-full h-11 rounded-xl">
+                Continue
+              </Button>
+            </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
   );
 }
+
