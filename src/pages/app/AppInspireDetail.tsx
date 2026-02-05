@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Heart, Share2, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
@@ -97,20 +97,6 @@ export default function AppInspireDetail() {
     }
   };
 
-  const handleShare = async () => {
-    if (!routine) return;
-    
-    try {
-      await navigator.share({
-        title: routine.title,
-        text: routine.subtitle || routine.description || '',
-        url: window.location.href,
-      });
-    } catch {
-      // User cancelled or share not supported
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -149,25 +135,12 @@ export default function AppInspireDetail() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
-      {/* Fixed Header */}
+      {/* Fixed Header - Back button only */}
       <header 
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4"
+        className="fixed top-0 left-0 right-0 z-50 flex items-center px-4"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
         <BackButtonCircle to="/app/routines" />
-        <div className="flex items-center gap-2">
-          <button 
-            className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
-          >
-            <Heart className="w-5 h-5" />
-          </button>
-          <button 
-            onClick={handleShare}
-            className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
-          >
-            <Share2 className="w-5 h-5" />
-          </button>
-        </div>
       </header>
 
       {/* Scroll Container */}
@@ -175,30 +148,40 @@ export default function AppInspireDetail() {
         className="flex-1 overflow-y-auto overscroll-contain"
         style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
       >
-        {/* Hero Image/Gradient */}
-        <div className={cn(
-          'relative w-full bg-gradient-to-br',
-          gradient
-        )} style={{ height: 'calc(224px + env(safe-area-inset-top, 0px))' }}>
-          {routine.cover_image_url ? (
-            <img
-              src={routine.cover_image_url}
-              alt={routine.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center pt-12">
-              <span className="text-8xl opacity-30">{routineIcon}</span>
+        {/* Hero Image - Square with title overlay */}
+        <div 
+          className="relative w-full"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        >
+          <div className={cn(
+            'relative w-full aspect-square bg-gradient-to-br overflow-hidden',
+            gradient
+          )}>
+            {routine.cover_image_url ? (
+              <img
+                src={routine.cover_image_url}
+                alt={routine.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-8xl opacity-30">{routineIcon}</span>
+              </div>
+            )}
+            {/* Title overlay at bottom */}
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent pt-16 pb-4 px-4">
+              <h1 className="text-2xl font-bold text-white leading-tight drop-shadow-lg">
+                {routine.title}
+              </h1>
             </div>
-          )}
+          </div>
         </div>
 
         <div className="px-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 160px)' }}>
-          {/* Title & Badges */}
-          <div className="pt-5">
-            <h1 className="text-[26px] font-bold text-foreground leading-tight">{routine.title}</h1>
+          {/* Subtitle & Badges */}
+          <div className="pt-4">
             {routine.subtitle && (
-              <p className="text-muted-foreground mt-1.5">{routine.subtitle}</p>
+              <p className="text-muted-foreground">{routine.subtitle}</p>
             )}
             
             <div className="flex items-center gap-2 mt-3">
