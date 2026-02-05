@@ -1,138 +1,117 @@
 
-# Welcome Popup Ritual Feature
+# App Version Tracking & Targeted Update Notifications
 
-## Summary
-Transform the current WelcomeRitualCard from an inline banner into a true popup/overlay that appears on top of the home screen content. Also make the ritual selection dynamic via admin panel instead of hardcoded.
+## Problem Summary
+Currently, no user versions are being tracked because:
+1. The `useAppInstallTracking` hook is created but **never used** in the app
+2. Push notifications cannot filter by app version
+3. The in-app update banner only works for users already on v1.1.07+
 
-## Current Issues
-1. The card appears inline with page content, not as an overlay on top
-2. Title/subtitle are hardcoded ("Your day is open", "Tap to pick your first actions")
-3. The welcome ritual ID is hardcoded in the component
-4. No admin UI to select which ritual appears as the welcome popup
+## Solution Overview
+Create a reliable version tracking system that:
+1. Tracks every user's current app version on every login/open
+2. Allows admin to send push notifications ONLY to outdated users
+3. Shows the update banner ONLY to outdated users
+4. Provides admin visibility into version adoption
 
-## Implementation Plan
+---
 
-### 1. Database Change: Add Welcome Ritual Flag
-Add a new column `is_welcome_popup` to the `routines_bank` table to mark which ritual should be used as the welcome popup (only one can be active at a time).
+## Implementation Steps
 
-```sql
-ALTER TABLE routines_bank 
-ADD COLUMN is_welcome_popup boolean DEFAULT false;
+### Step 1: Fix Version Tracking Hook
+**File:** `src/hooks/useAppInstallTracking.tsx`
+- Use `App.getInfo().version` for reliable native version detection
+- Track by `user_id` primarily (not device_id) for consistency
+- Update `last_seen_version` column on every app open
+- Remove localStorage caching that prevents updates
 
--- Add trigger to ensure only one welcome popup at a time
-CREATE OR REPLACE FUNCTION ensure_single_welcome_popup()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.is_welcome_popup = true THEN
-    UPDATE routines_bank 
-    SET is_welcome_popup = false 
-    WHERE id != NEW.id AND is_welcome_popup = true;
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+### Step 2: Add Hook to NativeAppLayout  
+**File:** `src/layouts/NativeAppLayout.tsx`
+- Call `useAppInstallTracking()` in the layout so it runs for all logged-in users
+- This ensures version is tracked on every app open
 
-CREATE TRIGGER single_welcome_popup_trigger
-BEFORE INSERT OR UPDATE ON routines_bank
-FOR EACH ROW
-EXECUTE FUNCTION ensure_single_welcome_popup();
-```
+### Step 3: Add Version Field to Push Subscriptions Table
+**Database migration:**
+- Add `app_version` column to `push_subscriptions` table
+- This links each push token directly to a version
 
-### 2. Update useRoutinesBank Hook
-Add a new hook `useWelcomePopupRitual` that fetches the ritual marked as welcome popup:
+### Step 4: Update Push Registration to Include Version
+**File:** `src/lib/pushNotifications.ts`
+- When saving push token, also save current app version
+- Update version whenever token is refreshed
 
-```typescript
-export function useWelcomePopupRitual() {
-  return useQuery({
-    queryKey: ['welcome-popup-ritual'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('routines_bank')
-        .select('*')
-        .eq('is_active', true)
-        .eq('is_welcome_popup', true)
-        .single();
-      
-      if (error && error.code !== 'PGRST116') throw error;
-      return data as RoutineBankItem | null;
-    },
-  });
-}
-```
+### Step 5: Create Edge Function for Targeted Version Push
+**File:** `supabase/functions/send-update-push-notification/index.ts`
+- Accept `targetVersion` parameter (e.g., "< 1.1.08")
+- Filter push tokens to only those with outdated versions
+- Send push notification to prompt update
 
-### 3. Redesign WelcomeRitualCard Component
-Transform it into a true popup overlay:
+### Step 6: Admin UI for Version-Based Push
+**File:** `src/pages/admin/Communications.tsx` or new component
+- Add "Send Update Notification" feature
+- Show current version distribution
+- Select target versions (all below X)
+- Preview affected user count before sending
 
-**Key changes:**
-- Fixed position with `z-50` to overlay on top of content
-- Semi-transparent background (light blur/dim based on your preference)
-- Centered modal-like appearance
-- Uses ritual's actual `title` and `subtitle` instead of hardcoded text
-- Larger size (popup style, not banner)
-- Keep the flip interaction for showing actions on the back
+### Step 7: Improve Update Banner Logic
+**File:** `src/hooks/useAppUpdateChecker.tsx`
+- Instead of calling edge function, compare against `app_settings.latest_ios_version`
+- Show banner immediately on app open if version < latest
+- No need for 24-hour cache on first check
 
-**Structure:**
-```text
-+----------------------------------------+
-|  Fixed Overlay (z-50)                  |
-|  +----------------------------------+  |
-|  |  [X] Dismiss                     |  |
-|  |                                  |  |
-|  |  [Cover Image]                   |  |
-|  |                                  |  |
-|  |  Title: {ritual.title}           |  |
-|  |  Subtitle: {ritual.subtitle}     |  |
-|  |                                  |  |
-|  |  "Tap to pick your first actions"|  |
-|  +----------------------------------+  |
-+----------------------------------------+
-```
-
-**Back of card (after flip):**
-```text
-+----------------------------------+
-|  Pick an action            [X]  |
-|  One is enough. Start small.    |
-|----------------------------------|
-|  [emoji] Action 1          [+]  |
-|  [emoji] Action 2          [+]  |
-|  [emoji] Action 3          [✓]  |
-|----------------------------------|
-|  Tap to flip back               |
-+----------------------------------+
-```
-
-### 4. Update Admin Rituals Bank UI
-Add a "Welcome Popup" toggle button next to the existing Popular/Active toggles in `RoutinesBank.tsx`:
-
-- Add Crown or Gift icon for the welcome popup toggle
-- Only one ritual can be marked as welcome popup (radio-style)
-- Show visual indicator for the currently selected welcome ritual
-
-### 5. Update AppHome Integration
-- Import the new `useWelcomePopupRitual` hook
-- Render `WelcomeRitualCard` as an overlay (fixed position) instead of inline
-- Show only when `isNewUser` is true and no tasks exist and a welcome ritual is configured
-- Hide the regular empty state content underneath (dimmed by overlay)
+---
 
 ## Technical Details
 
-### Files to Modify
-1. **Database migration**: Add `is_welcome_popup` column and trigger
-2. **src/hooks/useRoutinesBank.tsx**: Add `useWelcomePopupRitual` hook
-3. **src/components/app/WelcomeRitualCard.tsx**: Complete redesign as overlay popup
-4. **src/components/admin/RoutinesBank.tsx**: Add welcome popup toggle UI
-5. **src/pages/app/AppHome.tsx**: Update rendering logic for overlay positioning
+### Database Changes
+```sql
+-- Add version tracking to push_subscriptions
+ALTER TABLE push_subscriptions 
+ADD COLUMN app_version text;
 
-### Styling Approach
-- Use `fixed inset-0 z-50` for the overlay container
-- Light backdrop blur (`backdrop-blur-sm`) with subtle dim (`bg-black/20`)
-- Card centered using `flex items-center justify-center`
-- Card size: `max-w-sm` (similar to modal size from screenshot)
-- Keep the 3D flip animation for interactivity
+-- Index for fast version filtering
+CREATE INDEX idx_push_subscriptions_version 
+ON push_subscriptions(app_version);
+```
 
-### Behavior
-- Popup appears for new users with no tasks
-- Stays visible until user clicks X (even after adding actions)
-- Clears `simora_force_new_user` localStorage flag on dismiss
-- If no ritual is marked as welcome popup, the card doesn't appear
+### Version Tracking Flow
+1. User opens app → `useAppInstallTracking` runs
+2. Gets version via `App.getInfo().version`
+3. Updates `app_installations.last_seen_version` 
+4. Updates `push_subscriptions.app_version`
+
+### Push Notification Flow (for updates)
+1. Admin opens Communications → "Update Notification" tab
+2. Sees: "45 users on < 1.1.08"
+3. Clicks "Send Update Push"
+4. Edge function queries `push_subscriptions WHERE app_version < '1.1.08'`
+5. Sends push to those users only
+
+### In-App Banner Flow
+1. On app open, compare `App.getInfo().version` with `app_settings.latest_ios_version`
+2. If outdated → show banner immediately
+3. User clicks "Update" → opens App Store
+4. User clicks "Later" → dismiss for 24 hours
+
+---
+
+## Files to Create/Modify
+
+| File | Action | Purpose |
+|------|--------|---------|
+| `src/hooks/useAppInstallTracking.tsx` | Modify | Fix version tracking logic |
+| `src/layouts/NativeAppLayout.tsx` | Modify | Call tracking hook |
+| `src/lib/pushNotifications.ts` | Modify | Save version with push token |
+| `supabase/functions/send-update-push-notification/index.ts` | Create | Version-targeted push |
+| `src/components/admin/UpdateNotificationSender.tsx` | Create | Admin UI for sending |
+| `src/pages/admin/Communications.tsx` | Modify | Add "Updates" tab |
+| Database | Migrate | Add `app_version` to `push_subscriptions` |
+
+---
+
+## Result
+After implementation:
+- Every app open updates the user's version in database
+- Admin can send push to "all users on version < X"  
+- Banner shows automatically to outdated users
+- You can see exactly who has updated in admin dashboard
