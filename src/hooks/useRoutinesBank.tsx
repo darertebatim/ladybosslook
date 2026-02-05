@@ -370,13 +370,15 @@ export function useAddRoutineFromBank() {
 
       if (tasksError) throw tasksError;
 
-      // Get pro_link info and goal info from admin_task_bank
+      // Get pro_link info, goal info, AND category from admin_task_bank
       const taskIds = allTasks?.filter(t => t.task_id).map(t => t.task_id) || [];
       let taskDetails: Record<string, { 
         pro_link_type: string | null; 
         pro_link_value: string | null; 
         linked_playlist_id: string | null; 
         color: string | null;
+        category: string | null;
+        time_period: string | null;
         goal_enabled: boolean;
         goal_target: number | null;
         goal_type: string | null;
@@ -386,7 +388,7 @@ export function useAddRoutineFromBank() {
       if (taskIds.length > 0) {
         const { data: bankTasks } = await supabase
           .from('admin_task_bank')
-          .select('id, pro_link_type, pro_link_value, linked_playlist_id, color, goal_enabled, goal_target, goal_type, goal_unit')
+          .select('id, pro_link_type, pro_link_value, linked_playlist_id, color, category, time_period, goal_enabled, goal_target, goal_type, goal_unit')
           .in('id', taskIds);
 
         bankTasks?.forEach(bt => {
@@ -395,6 +397,8 @@ export function useAddRoutineFromBank() {
             pro_link_value: bt.pro_link_value,
             linked_playlist_id: bt.linked_playlist_id,
             color: bt.color,
+            category: bt.category,
+            time_period: bt.time_period,
             goal_enabled: bt.goal_enabled ?? false,
             goal_target: bt.goal_target,
             goal_type: bt.goal_type,
@@ -437,7 +441,10 @@ export function useAddRoutineFromBank() {
             color: edited?.color || bankTask?.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
             repeat_pattern: edited?.repeatPattern || 'daily',
             scheduled_time: edited?.scheduledTime || null,
-            tag: edited?.tag ?? routine.category,
+            // Use category from admin_task_bank (the source of truth), fallback to routine.category
+            tag: edited?.tag ?? bankTask?.category ?? routine.category,
+            // Copy time_period from admin_task_bank
+            time_period: bankTask?.time_period ?? null,
             linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : null,
             pro_link_type: proLinkType,
             pro_link_value: proLinkValue,

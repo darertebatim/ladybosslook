@@ -268,6 +268,8 @@ export default function TasksBank() {
         description: data.formData.description || null,
         is_active: data.adminSettings.is_active,
         is_popular: data.adminSettings.is_popular,
+        // Time of day setting
+        time_period: data.formData.timePeriod || null,
       };
 
       const { data: newTask, error } = await supabase
@@ -324,6 +326,8 @@ export default function TasksBank() {
         description: data.formData.description || null,
         is_active: data.adminSettings.is_active,
         is_popular: data.adminSettings.is_popular,
+        // Time of day setting
+        time_period: data.formData.timePeriod || null,
       };
 
       const { error } = await supabase
@@ -381,6 +385,7 @@ export default function TasksBank() {
       color: 'mint',
       scheduledDate: new Date(),
       scheduledTime: null,
+      timePeriod: null,
       repeatEnabled: false,
       repeatPattern: 'daily',
       repeatInterval: 1,
@@ -416,9 +421,8 @@ export default function TasksBank() {
     setEditSubtasks(subtasks);
     setEditCategory(task.category);
     
-    // Find category name from slug to use as tag if no tag is set
-    const categoryInfo = routineCategories.find(c => c.slug === task.category);
-    const tagValue = task.tag || categoryInfo?.name || null;
+    // Use category slug for tag (which maps to category in save)
+    const tagValue = task.category;
     
     setSheetInitialData({
       title: task.title,
@@ -427,6 +431,8 @@ export default function TasksBank() {
       color: task.color as any,
       scheduledDate: new Date(),
       scheduledTime: null,
+      // Load time_period from task
+      timePeriod: task.time_period as any || null,
       repeatEnabled: task.repeat_pattern !== 'none',
       repeatPattern: ['daily', 'weekly', 'monthly'].includes(task.repeat_pattern) 
         ? task.repeat_pattern as 'daily' | 'weekly' | 'monthly' 

@@ -70,6 +70,9 @@ const AppHome = () => {
   const [welcomeCardDismissed, setWelcomeCardDismissed] = useState(() => 
     localStorage.getItem('simora_welcome_card_dismissed') === 'true'
   );
+  
+  // Track if user started this session as a new user (so card stays visible after adding tasks)
+  const [startedAsNewUser, setStartedAsNewUser] = useState<boolean | null>(null);
 
   const {
     run: runTour,
@@ -128,15 +131,28 @@ const AppHome = () => {
   } = useProgramEventsForDate(selectedDate);
 
   // Home data for stats and rounds
+  const homeDataQuery = useNewHomeData();
   const {
     isNewUser: dataIsNewUser = false,
     totalCompletions = 0,
+    isLoading: homeDataLoading,
     ...homeData
-  } = useNewHomeData();
+  } = homeDataQuery;
   
   // Check for force new user flag (set by admin reset)
   const forceNewUser = localStorage.getItem('simora_force_new_user') === 'true';
   const isNewUser = dataIsNewUser || forceNewUser;
+  
+  // Track if user started this session as a new user (only set once when data loads)
+  useEffect(() => {
+    if (startedAsNewUser === null && !homeDataLoading) {
+      // Only set this once when home data first loads
+      setStartedAsNewUser(isNewUser);
+    }
+  }, [isNewUser, startedAsNewUser, homeDataLoading]);
+  
+  // Show welcome card if user started as new user this session (even after adding tasks)
+  const showWelcomeCard = (startedAsNewUser ?? isNewUser) && !welcomeCardDismissed;
   
   // Track first action celebration
   const prevCompletions = useRef(totalCompletions);
@@ -567,10 +583,11 @@ const AppHome = () => {
               )}
 
               {/* Welcome Ritual Card for New Users - stays until dismissed */}
-              {isNewUser && !welcomeCardDismissed && (
+              {showWelcomeCard && (
                 <div className="py-4">
                   <WelcomeRitualCard onDismiss={() => {
                     setWelcomeCardDismissed(true);
+                    setStartedAsNewUser(false);
                     localStorage.setItem('simora_welcome_card_dismissed', 'true');
                   }} />
                 </div>
