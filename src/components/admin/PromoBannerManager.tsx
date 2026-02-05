@@ -231,6 +231,7 @@ export function PromoBannerManager() {
         destination_id: needsDestinationId ? destinationId || null : null,
         custom_url: needsCustomUrl ? customUrl : null,
         display_frequency: displayFrequency,
+        aspect_ratio: aspectRatio,
         is_active: isActive,
         priority,
         starts_at: startsAt || null,
