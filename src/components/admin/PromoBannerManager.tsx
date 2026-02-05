@@ -290,6 +290,13 @@ export function PromoBannerManager() {
         priority,
         starts_at: startsAt || null,
         ends_at: endsAt || null,
+        target_type: targetType,
+        include_programs: includePrograms,
+        exclude_programs: excludePrograms,
+        include_playlists: includePlaylists,
+        exclude_playlists: excludePlaylists,
+        include_tools: includeTools,
+        exclude_tools: excludeTools,
       }).eq('id', editingBanner.id);
       if (error) throw error;
     },
