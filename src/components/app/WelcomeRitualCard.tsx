@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { X, Plus, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useWelcomePopupRitual } from '@/hooks/useRoutinesBank';
-import { useTaskTemplates, TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
+import { useTaskTemplates, TaskTemplate, TASK_COLORS, TaskColor, useAllActiveTasks } from '@/hooks/useTaskPlanner';
 
 
 // Color cycle for visual variety
@@ -18,7 +18,7 @@ interface WelcomeRitualCardProps {
 export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCardProps) {
   const [dismissed, setDismissed] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [addedActions, setAddedActions] = useState<Set<string>>(new Set());
+  const [justAddedActions, setJustAddedActions] = useState<Set<string>>(new Set());
   const [addingAction, setAddingAction] = useState<string | null>(null);
   
   // Fetch the welcome popup ritual dynamically
@@ -28,14 +28,51 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
   const { data: welcomeRitual, isLoading: ritualLoading } = useRoutineBankDetail(welcomeRitualInfo?.id);
   const addRoutine = useAddRoutineFromBank();
   
+  // Fetch user's existing tasks to check which are already added
+  const { data: userTasks = [] } = useAllActiveTasks();
+  
   // Fallback: fetch popular templates if ritual has no tasks
   const { data: templates = [] } = useTaskTemplates();
   const popularTemplates = templates.filter(t => t.is_popular).slice(0, 6);
 
+  // Get actions to display (from ritual tasks or fallback to popular templates)
+  const actions = welcomeRitual?.tasks?.length ? welcomeRitual.tasks : [];
+  const displayActions = actions.length > 0 ? actions : popularTemplates;
+
+  // Check which actions user already has (by matching title)
+  const existingTaskTitles = useMemo(() => 
+    new Set(userTasks.map(t => t.title.toLowerCase().trim())),
+    [userTasks]
+  );
+
+  // Combined set of added actions (both already existing and just added this session)
+  const addedActions = useMemo(() => {
+    const set = new Set<string>();
+    displayActions.forEach(action => {
+      if (existingTaskTitles.has(action.title.toLowerCase().trim()) || justAddedActions.has(action.id)) {
+        set.add(action.id);
+      }
+    });
+    return set;
+  }, [displayActions, existingTaskTitles, justAddedActions]);
+
+  // Auto-dismiss when all actions are added
+  useEffect(() => {
+    if (displayActions.length > 0 && addedActions.size === displayActions.length) {
+      // Small delay for better UX - let user see the last checkmark
+      const timer = setTimeout(() => {
+        setDismissed(true);
+        localStorage.setItem('simora_welcome_card_dismissed', 'true');
+        onDismiss?.();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [addedActions.size, displayActions.length, onDismiss]);
+
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation();
     setDismissed(true);
-    localStorage.removeItem('simora_force_new_user');
+    localStorage.setItem('simora_welcome_card_dismissed', 'true');
     onDismiss?.();
   };
 
@@ -64,10 +101,10 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
         selectedTaskIds: [actionId],
       });
       
-      setAddedActions(prev => new Set([...prev, actionId]));
+      setJustAddedActions(prev => new Set([...prev, actionId]));
       haptic.success();
       onActionAdded?.();
-      // Don't dismiss - let user add more actions
+      // Don't dismiss - let user add more actions (auto-dismiss will happen when all are added)
     } catch (error) {
       console.error('Failed to add action:', error);
     } finally {
@@ -79,10 +116,6 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
   
   // Don't show if no welcome ritual is configured or still loading
   if (welcomeLoading || !welcomeRitualInfo) return null;
-
-  // Get actions to display (from ritual tasks or fallback to popular templates)
-  const actions = welcomeRitual?.tasks?.length ? welcomeRitual.tasks : [];
-  const displayActions = actions.length > 0 ? actions : popularTemplates;
   
   // Use ritual's title and subtitle dynamically
   const title = welcomeRitualInfo.title || 'Your day is open';
