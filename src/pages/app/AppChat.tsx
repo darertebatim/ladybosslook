@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, MessageCircle, RefreshCw, ChevronDown } from "lucide-react";
+import { ChevronLeft, MessageCircle, RefreshCw, ChevronDown, Mic, Heart, HelpCircle } from "lucide-react";
 import { ChatSkeleton } from "@/components/app/skeletons";
 import { SEOHead } from "@/components/SEOHead";
 import { format, isToday, isYesterday, isSameDay } from "date-fns";
