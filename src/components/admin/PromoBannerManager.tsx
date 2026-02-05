@@ -426,6 +426,21 @@ export function PromoBannerManager() {
             <div className="space-y-4 mb-6 p-4 border rounded-lg bg-muted/50">
               <h3 className="font-semibold">{editingBanner ? 'Edit Banner' : 'Create New Banner'}</h3>
               
+              {/* Aspect Ratio Selection */}
+              <div className="space-y-2">
+                <Label>Banner Size / Aspect Ratio</Label>
+                <Select value={aspectRatio} onValueChange={(v) => setAspectRatio(v as AspectRatio)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="3:1">3:1 Wide Banner (1200×400)</SelectItem>
+                    <SelectItem value="16:9">16:9 Video Banner (1920×1080)</SelectItem>
+                    <SelectItem value="1:1">1:1 Square Banner (1080×1080)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* AI Generation Section */}
               <div className="space-y-3 p-4 bg-gradient-to-br from-violet-50 to-pink-50 dark:from-violet-950/30 dark:to-pink-950/30 rounded-lg border border-violet-200 dark:border-violet-800">
                 <div className="flex items-center gap-2">
@@ -433,7 +448,7 @@ export function PromoBannerManager() {
                   <Label className="text-sm font-medium">Generate with AI</Label>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Enter a title and optional subtitle to generate a 1200×400 banner image
+                  Enter a title and optional subtitle to generate a {getAspectRatioDimensions(aspectRatio)} banner image
                 </p>
                 <div className="grid gap-2">
                   <Input
