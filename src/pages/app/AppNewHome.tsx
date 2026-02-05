@@ -148,6 +148,11 @@ export default function AppNewHome() {
           {/* App Update Banner */}
           <AppUpdateBanner />
 
+          {/* Welcome Card for New Users */}
+          {isNewUser && (
+            <WelcomeCard onAddAction={() => setShowQuickStart(true)} />
+          )}
+
           {/* Today's Focus */}
           <TodayFocusCard
             todayTasksCount={todayTasksCount}
