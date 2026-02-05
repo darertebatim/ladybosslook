@@ -19,6 +19,8 @@ interface NewHomeData {
   nextSessionMap: Map<string, string>;
   suggestedRoutine: any | null;
   periodSettings: any | null;
+  isNewUser: boolean; // First 24 hours or no tasks ever added
+  totalCompletions: number; // Total completions ever
 }
 
 async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
