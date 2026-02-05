@@ -186,7 +186,7 @@ html.native-app [data-scroll-container="true"] {
     /* Typography Scale */
     --font-display: 'Playfair Display', serif;
     --font-body: 'Inter', sans-serif;
-    --font-app: 'Nunito', sans-serif;
+    --font-app: 'Inter', sans-serif;
     --font-farsi: 'Vazirmatn', sans-serif;
 
     /* Animation */
