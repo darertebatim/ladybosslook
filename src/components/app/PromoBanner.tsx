@@ -5,7 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-interface PromoBanner {
+type DisplayLocation = 'home' | 'explore' | 'listen' | 'player' | 'all';
+
+interface PromoBannerData {
   id: string;
   cover_image_url: string;
   destination_type: 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner';
@@ -20,6 +22,14 @@ interface PromoBanner {
   exclude_playlists: string[];
   include_tools: string[];
   exclude_tools: string[];
+  display_location: DisplayLocation;
+  target_playlist_ids: string[];
+}
+
+interface PromoBannerProps {
+  location?: DisplayLocation;
+  currentPlaylistId?: string;
+  className?: string;
 }
 
 const STORAGE_KEY = 'promo_banner_dismissals';
