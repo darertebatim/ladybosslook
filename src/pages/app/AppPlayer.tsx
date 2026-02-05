@@ -306,7 +306,7 @@ export default function AppPlayer() {
       </div>
 
       {/* Header Spacer - accounts for header + categories + filter pills */}
-      <div style={{ height: 'calc(160px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
+      <div style={{ height: 'calc(180px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
