@@ -11,8 +11,9 @@ import { toast } from 'sonner';
 import { Trash2, Plus, Upload, ExternalLink, Sparkles, Loader2, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 
-type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url';
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
+type AspectRatio = '3:1' | '16:9' | '1:1';
 
 interface PromoBanner {
   id: string;
