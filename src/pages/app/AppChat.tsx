@@ -544,13 +544,16 @@ export default function AppChat() {
           
           <div className="p-4">
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
-                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-4">
-                  <MessageCircle className="h-8 w-8 text-primary/60" />
+              <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-6">
+                <div className="h-20 w-20 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-5">
+                  <MessageCircle className="h-10 w-10 text-primary/60" />
                 </div>
-                <h2 className="font-semibold text-lg mb-1">Start a conversation</h2>
-                <p className="text-sm text-muted-foreground max-w-xs">
-                  Send us a message and we'll get back to you as soon as possible
+                <h2 className="font-semibold text-xl mb-2">We're here for you 💜</h2>
+                <p className="text-[15px] text-muted-foreground max-w-[280px] leading-relaxed">
+                  Type a message or tap the mic to send a voice note — whatever feels easier for you.
+                </p>
+                <p className="text-[13px] text-muted-foreground/70 mt-3">
+                  We usually reply within a few hours
                 </p>
               </div>
             ) : (
