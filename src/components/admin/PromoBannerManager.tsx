@@ -695,6 +695,24 @@ export function PromoBannerManager() {
                 </div>
               </div>
 
+              {/* Audience Targeting */}
+              <PromoAudienceSelector
+                targetType={targetType}
+                setTargetType={setTargetType}
+                includePrograms={includePrograms}
+                setIncludePrograms={setIncludePrograms}
+                excludePrograms={excludePrograms}
+                setExcludePrograms={setExcludePrograms}
+                includePlaylists={includePlaylists}
+                setIncludePlaylists={setIncludePlaylists}
+                excludePlaylists={excludePlaylists}
+                setExcludePlaylists={setExcludePlaylists}
+                includeTools={includeTools}
+                setIncludeTools={setIncludeTools}
+                excludeTools={excludeTools}
+                setExcludeTools={setExcludeTools}
+              />
+
               {/* Active Toggle */}
               <div className="flex items-center gap-2">
                 <Switch checked={isActive} onCheckedChange={setIsActive} />
