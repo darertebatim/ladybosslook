@@ -316,6 +316,7 @@ export function PromoBannerManager() {
     setDestinationId('');
     setCustomUrl('');
     setDisplayFrequency('once');
+    setAspectRatio('3:1');
     setIsActive(true);
     setPriority(0);
     setStartsAt('');
