@@ -354,6 +354,14 @@ export function PromoBannerManager() {
     setEndsAt('');
     setBannerTitle('');
     setBannerSubtitle('');
+    // Reset targeting
+    setTargetType('all');
+    setIncludePrograms([]);
+    setExcludePrograms([]);
+    setIncludePlaylists([]);
+    setExcludePlaylists([]);
+    setIncludeTools([]);
+    setExcludeTools([]);
   };
 
   const startEditing = (banner: PromoBanner) => {
