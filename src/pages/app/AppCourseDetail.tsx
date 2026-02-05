@@ -939,8 +939,8 @@ const AppCourseDetail = () => {
         className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-6 pb-3 px-4 flex items-center gap-3">
-          <BackButton to="/app/programs" className="shrink-0" />
+        <div className="pt-1 pb-2 px-4 flex items-center gap-1">
+          <BackButton to="/app/programs" showLabel={false} />
           <div className="min-w-0">
             <h1 className="font-semibold text-lg truncate">{program?.title || 'Program Details'}</h1>
             {round && (
