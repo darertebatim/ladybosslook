@@ -573,6 +573,75 @@ export function PromoBannerManager() {
                 )}
               </div>
 
+              {/* Display Location */}
+              <div className="space-y-2">
+                <Label>Display Location</Label>
+                <Select value={displayLocation} onValueChange={(v) => setDisplayLocation(v as DisplayLocation)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="home">🏠 Home Page</SelectItem>
+                    <SelectItem value="explore">🔍 Explore Page</SelectItem>
+                    <SelectItem value="listen">🎧 Listen Page</SelectItem>
+                    <SelectItem value="player">▶️ Audio Player</SelectItem>
+                    <SelectItem value="all">📍 All Locations</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Where in the app this banner should appear
+                </p>
+              </div>
+
+              {/* Target Playlists - only show when location is 'player' */}
+              {displayLocation === 'player' && (
+                <div className="space-y-2">
+                  <Label>Target Playlists (optional)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty to show on all audio players, or select specific playlists
+                  </p>
+                  <Select 
+                    value={targetPlaylistIds[0] || ''} 
+                    onValueChange={(v) => {
+                      if (v && !targetPlaylistIds.includes(v)) {
+                        setTargetPlaylistIds([...targetPlaylistIds, v]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Add a playlist..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {playlists?.filter(p => !targetPlaylistIds.includes(p.id)).map(p => (
+                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {targetPlaylistIds.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {targetPlaylistIds.map(id => {
+                        const playlist = playlists?.find(p => p.id === id);
+                        return (
+                          <span 
+                            key={id} 
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                          >
+                            {playlist?.name || id}
+                            <button 
+                              type="button"
+                              onClick={() => setTargetPlaylistIds(targetPlaylistIds.filter(pid => pid !== id))}
+                              className="hover:text-destructive"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Destination Type */}
               <div className="space-y-2">
                 <Label>Destination Type</Label>
