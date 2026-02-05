@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { BackButton } from '@/components/app/BackButton';
 import { CONTEXT_OPTIONS, getEmotionLabel, type Valence } from '@/lib/emotionData';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
