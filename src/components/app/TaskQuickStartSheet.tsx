@@ -94,30 +94,30 @@ export const TaskQuickStartSheet = ({
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent 
         side="bottom" 
-        className="h-auto max-h-[85vh] rounded-t-[28px] p-0 pb-safe bg-background/95 backdrop-blur-xl"
+        className="h-auto max-h-[85vh] rounded-t-3xl p-0 pb-safe"
         hideCloseButton
       >
         <div className="flex flex-col">
-          {/* iOS-style Header with drag handle */}
-          <div className="pt-2 pb-3 px-5 flex items-center justify-between">
-            <div className="w-8" />
-            <div className="w-9 h-[5px] bg-muted-foreground/25 rounded-full" />
+          {/* Compact Header */}
+          <div className="pt-3 pb-2 px-4 flex items-center justify-between">
+            <div className="w-8" /> {/* Spacer */}
+            <div className="w-10 h-1 bg-muted-foreground/30 rounded-full" />
             <button 
               onClick={handleClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-muted/60 active:scale-95 transition-transform"
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
             >
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
 
-          {/* Title input - iOS style */}
-          <div className="px-5 pb-4">
-            <div className="bg-secondary/60 rounded-2xl px-4 py-3">
+          {/* Title input */}
+          <div className="px-4 pb-3">
+            <div className="bg-muted/50 rounded-xl p-3">
               <Input
                 value={taskName}
                 onChange={(e) => setTaskName(e.target.value.slice(0, 50))}
                 placeholder="Type a new action..."
-                className="text-[17px] font-medium text-center border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/40 h-auto py-0"
+                className="text-base font-medium text-center border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1"
                 maxLength={50}
                 autoFocus
                 onKeyDown={(e) => {
@@ -134,72 +134,66 @@ export const TaskQuickStartSheet = ({
                   }
                 }}
               />
-              {taskName.length > 0 && (
-                <div className="text-[11px] text-muted-foreground/50 text-center mt-2">
-                  {taskName.length}/50
-                </div>
-              )}
+              <div className="text-[10px] text-muted-foreground/60 text-center mt-1">
+                {taskName.length}/50
+              </div>
             </div>
           </div>
 
           {/* Continue button - appears when name is entered */}
           {taskName.trim() && (
-            <div className="px-5 pb-4">
+            <div className="px-4 pb-3">
               <Button
                 onClick={handleContinue}
-                className="w-full h-[50px] rounded-2xl bg-foreground text-background font-semibold text-[17px] active:scale-[0.98] transition-transform"
+                className="w-full h-11 rounded-full bg-foreground text-background font-semibold text-sm hover:bg-foreground/90"
               >
                 Continue
               </Button>
             </div>
           )}
 
-          {/* Quick Action Buttons - iOS pill style */}
-          <div className="px-5 pb-4 flex gap-3">
+          {/* Quick Action Buttons */}
+          <div className="px-4 pb-3 flex gap-2">
             <button
               onClick={handleRandomAction}
-              className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-secondary/60 active:bg-secondary transition-colors active:scale-[0.98]"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-muted/50 hover:bg-muted border border-border/30 transition-all active:scale-[0.98]"
             >
-              <Dices className="w-[18px] h-[18px] text-foreground/70" />
-              <span className="text-[15px] font-medium text-foreground">Random</span>
+              <Dices className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-foreground">Random</span>
             </button>
             <button
               onClick={handleBrowseAll}
-              className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-secondary/60 active:bg-secondary transition-colors active:scale-[0.98]"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-muted/50 hover:bg-muted border border-border/30 transition-all active:scale-[0.98]"
             >
-              <BookOpen className="w-[18px] h-[18px] text-foreground/70" />
-              <span className="text-[15px] font-medium text-foreground">Browse All</span>
+              <BookOpen className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-foreground">Browse All</span>
             </button>
           </div>
 
-          {/* Suggestions - iOS list style */}
+          {/* Suggestions */}
           {filteredSuggestions.length > 0 && (
-            <div className="px-5 pb-4">
-              <p className="text-[13px] font-medium text-muted-foreground/70 uppercase tracking-wide mb-2 px-1">
-                {taskName.trim() ? 'Matching' : 'Suggestions'}
+            <div className="px-4 pb-3">
+              <p className="text-xs text-muted-foreground mb-2">
+                {taskName.trim() ? 'Matching actions' : 'Suggestions'}
               </p>
-              <div className="bg-secondary/40 rounded-2xl overflow-hidden divide-y divide-border/30">
-                {filteredSuggestions.map((template, index) => (
+              <div className="space-y-1.5">
+                {filteredSuggestions.map((template) => (
                   <button
                     key={template.id}
                     onClick={() => handleTemplateSelect(template)}
-                    className={cn(
-                      "flex items-center gap-3 w-full px-4 py-3.5 bg-transparent active:bg-secondary/60 transition-colors",
-                      index === 0 && "rounded-t-2xl",
-                      index === filteredSuggestions.length - 1 && "rounded-b-2xl"
-                    )}
+                    className="flex items-center gap-3 w-full p-3 rounded-xl bg-card border border-border/50 hover:bg-muted/50 transition-all active:scale-[0.99]"
                   >
-                    <FluentEmoji emoji={template.emoji || '📝'} size={28} className="flex-shrink-0" />
+                    <FluentEmoji emoji={template.emoji || '📝'} size={24} className="flex-shrink-0" />
                     <div className="flex-1 min-w-0 text-left">
-                      <p className="text-[16px] font-normal text-foreground truncate">
+                      <p className="text-[15px] text-foreground truncate">
                         {template.title}
                       </p>
                     </div>
-                    <span className="text-[13px] text-muted-foreground/60 shrink-0 mr-1">
+                    <span className="text-xs text-muted-foreground shrink-0">
                       {template.category}
                     </span>
-                    <div className="shrink-0 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Plus className="w-4 h-4 text-primary" />
+                    <div className="shrink-0 w-6 h-6 rounded-full bg-muted flex items-center justify-center">
+                      <Plus className="w-3.5 h-3.5 text-muted-foreground" />
                     </div>
                   </button>
                 ))}
@@ -207,24 +201,26 @@ export const TaskQuickStartSheet = ({
             </div>
           )}
 
-          {/* Category Pills - iOS segmented style */}
-          <div className="pb-5">
+          {/* Category Pills */}
+          <div className="pb-4">
             <ScrollArea className="w-full">
-              <div className="flex gap-2 px-5">
+              <div className="flex gap-2 px-4">
+                {/* Popular pill */}
                 <button
                   onClick={() => {
                     haptic.light();
                     setSelectedCategory('popular');
                   }}
                   className={cn(
-                    "px-4 py-2 rounded-full text-[14px] font-medium whitespace-nowrap transition-all shrink-0 active:scale-95",
+                    "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0",
                     selectedCategory === 'popular'
                       ? "bg-foreground text-background"
-                      : "bg-secondary/60 text-foreground/80"
+                      : "bg-muted text-foreground hover:bg-muted/80"
                   )}
                 >
                   ⭐ Popular
                 </button>
+                {/* Category pills from database */}
                 {categories.map((cat) => (
                   <button
                     key={cat.slug}
@@ -233,10 +229,10 @@ export const TaskQuickStartSheet = ({
                       setSelectedCategory(cat.slug);
                     }}
                     className={cn(
-                      "px-4 py-2 rounded-full text-[14px] font-medium whitespace-nowrap transition-all shrink-0 active:scale-95",
+                      "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0",
                       selectedCategory === cat.slug
                         ? "bg-foreground text-background"
-                        : "bg-secondary/60 text-foreground/80"
+                        : "bg-muted text-foreground hover:bg-muted/80"
                     )}
                   >
                     {cat.emoji && <span className="mr-1">{cat.emoji}</span>}
@@ -249,7 +245,7 @@ export const TaskQuickStartSheet = ({
           </div>
 
           {/* Bottom safe area padding */}
-          <div className="h-1" />
+          <div className="h-2" />
         </div>
       </SheetContent>
     </Sheet>
