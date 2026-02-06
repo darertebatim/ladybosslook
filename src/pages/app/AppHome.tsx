@@ -357,7 +357,7 @@ const AppHome = () => {
             description: `Progress: ${mins}/${goalMins} min`,
             duration: 2000,
           });
-          if (result.streakIncreased && !isFirstActionEver) {
+          if (result.streakIncreased) {
             setShowStreakModal(true);
           }
         },
