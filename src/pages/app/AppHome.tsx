@@ -171,7 +171,8 @@ const AppHome = () => {
     const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
     if (alreadyCelebrated) return;
 
-    setShowFirstCelebration(true);
+    setIsFirstActionCelebration(true);
+    setShowStreakModal(true);
     localStorage.setItem('simora_first_action_celebrated', 'true');
   }, []);
 
