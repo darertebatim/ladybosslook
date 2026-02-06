@@ -12,6 +12,7 @@ import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
+import { ActionSheetTour } from '@/components/app/tour/ActionSheetTour';
 
 // Map time_period values to display labels
 const TIME_PERIOD_LABELS: Record<string, string> = {
@@ -314,6 +315,9 @@ export const TaskQuickStartSheet = ({
           {/* Bottom safe area padding */}
           <div className="h-2" />
         </div>
+
+        {/* Action Sheet Tour */}
+        <ActionSheetTour isOpen={open} />
       </SheetContent>
     </Sheet>
   );

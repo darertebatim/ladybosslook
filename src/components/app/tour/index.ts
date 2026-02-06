@@ -11,6 +11,7 @@ export { ProgramsTour } from './ProgramsTour';
 export { RoundTour } from './RoundTour';
 export { ExploreTour } from './ExploreTour';
 export { PlaylistTour } from './PlaylistTour';
+export { ActionSheetTour } from './ActionSheetTour';
 
 // Hook and utilities
 export { 
