@@ -5,7 +5,8 @@ import { Sparkles } from 'lucide-react';
 import tourWelcomeImage from '@/assets/tour-welcome.png';
 
 const TOUR_PROMPT_KEY = 'simora_tour_prompt_shown';
-
+const TOUR_PROMPT_DISMISSED_KEY = 'simora_tour_prompt_dismissed_at';
+const TOUR_RE_PROMPT_DAYS = 3; // Re-prompt after 3 days
 interface TourWelcomePopupProps {
   isFirstOpen: boolean;
   onStartTour: () => void;
@@ -40,31 +41,38 @@ export function TourWelcomePopup({
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    // Only show if it's first open and we haven't shown the prompt before
-    if (isFirstOpen) {
-      const hasShown = localStorage.getItem(TOUR_PROMPT_KEY);
-      if (!hasShown) {
-        // Wait for PN popup to resolve first (3s delay to ensure PN shows first at 2s)
-        const delay = isPNOnboardingPending() ? 3500 : 500;
-        const timer = setTimeout(() => {
-          // Double-check PN isn't showing right now
-          const pnPopupActive = document.querySelector('[data-pn-onboarding="true"]');
-          if (pnPopupActive) {
-            // PN popup is active, wait for it to close
-            const observer = new MutationObserver(() => {
-              if (!document.querySelector('[data-pn-onboarding="true"]')) {
-                observer.disconnect();
-                setTimeout(() => setIsOpen(true), 500);
-              }
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
-            return;
-          }
-          setIsOpen(true);
-        }, delay);
-        return () => clearTimeout(timer);
-      }
+    if (!isFirstOpen) return;
+    
+    // Check if tour was completed (started and finished)
+    const hasCompleted = localStorage.getItem(TOUR_PROMPT_KEY) === 'true';
+    if (hasCompleted) return;
+    
+    // Check if dismissed - if so, only re-prompt after X days
+    const dismissedAt = localStorage.getItem(TOUR_PROMPT_DISMISSED_KEY);
+    if (dismissedAt) {
+      const daysSinceDismissed = (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60 * 24);
+      if (daysSinceDismissed < TOUR_RE_PROMPT_DAYS) return;
     }
+    
+    // Wait for PN popup to resolve first (3.5s delay to ensure PN shows first at 2s)
+    const delay = isPNOnboardingPending() ? 3500 : 500;
+    const timer = setTimeout(() => {
+      // Double-check PN isn't showing right now
+      const pnPopupActive = document.querySelector('[data-pn-onboarding="true"]');
+      if (pnPopupActive) {
+        // PN popup is active, wait for it to close
+        const observer = new MutationObserver(() => {
+          if (!document.querySelector('[data-pn-onboarding="true"]')) {
+            observer.disconnect();
+            setTimeout(() => setIsOpen(true), 500);
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        return;
+      }
+      setIsOpen(true);
+    }, delay);
+    return () => clearTimeout(timer);
   }, [isFirstOpen]);
 
   const handleStartTour = () => {
@@ -77,7 +85,8 @@ export function TourWelcomePopup({
   };
 
   const handleLater = () => {
-    localStorage.setItem(TOUR_PROMPT_KEY, 'true');
+    // Store dismissal timestamp - will re-prompt after TOUR_RE_PROMPT_DAYS
+    localStorage.setItem(TOUR_PROMPT_DISMISSED_KEY, Date.now().toString());
     setIsOpen(false);
     onSkipTour();
   };
@@ -125,4 +134,5 @@ export function TourWelcomePopup({
 // Helper to reset the tour prompt (for testing)
 export const resetTourPrompt = () => {
   localStorage.removeItem(TOUR_PROMPT_KEY);
+  localStorage.removeItem(TOUR_PROMPT_DISMISSED_KEY);
 };
