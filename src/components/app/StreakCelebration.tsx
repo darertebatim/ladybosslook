@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
 import { useUserPresence } from '@/hooks/useUserPresence';
+import { useAppReview } from '@/hooks/useAppReview';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
@@ -31,11 +32,22 @@ const CONFETTI_COLORS = [
  */
 export const StreakCelebration = ({ open, onClose, isFirstAction = false }: StreakCelebrationProps) => {
   const { data: presence } = useUserPresence();
+  const { maybeRequestReview, shouldShowForStreak } = useAppReview();
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
 
   const thisMonthDays = presence?.thisMonthActiveDays || 1;
   const isReturning = presence?.isReturning || false;
+
+  // Handle close with potential review prompt
+  const handleClose = async () => {
+    onClose();
+    
+    // Check if we should show review after closing
+    if (shouldShowForStreak(thisMonthDays)) {
+      await maybeRequestReview();
+    }
+  };
 
   useEffect(() => {
     if (open) {
@@ -143,7 +155,7 @@ export const StreakCelebration = ({ open, onClose, isFirstAction = false }: Stre
   return (
     <div 
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-      onClick={onClose}
+      onClick={handleClose}
     >
       {/* Gentle overlay */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
@@ -217,7 +229,7 @@ export const StreakCelebration = ({ open, onClose, isFirstAction = false }: Stre
 
         {/* Button */}
         <Button
-          onClick={onClose}
+          onClick={handleClose}
           className="w-full bg-white hover:bg-white/90 text-violet-900 font-medium py-3 rounded-xl"
         >
           {isFirstAction ? (

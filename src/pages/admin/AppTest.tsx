@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
+import { forceRequestReview } from '@/lib/appReview';
 import { 
   Bell, 
   Trophy, 
@@ -13,7 +14,8 @@ import {
   AlertCircle,
   Info,
   CheckCircle2,
-  Download
+  Download,
+  Star
 } from 'lucide-react';
 
 // Import all testable components
@@ -126,6 +128,39 @@ export default function AppTest() {
           <p className="text-xs text-muted-foreground mt-3">
             Note: This banner only appears on native iOS when a newer version is available in the App Store. 
             The check runs every 24 hours and can be dismissed for 24 hours.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* App Store Review */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Star className="h-5 w-5 text-yellow-500" />
+            App Store Review
+          </CardTitle>
+          <CardDescription>
+            Test the native App Store review prompt (iOS only)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button 
+            onClick={async () => {
+              const success = await forceRequestReview();
+              if (success) {
+                toast.success('Review prompt triggered');
+              } else {
+                toast.error('Review prompt failed - requires native iOS');
+              }
+            }} 
+            variant="outline"
+          >
+            <Star className="h-4 w-4 mr-2" />
+            Request App Review
+          </Button>
+          <p className="text-xs text-muted-foreground mt-3">
+            Note: Only works on native iOS. In development, the dialog shows but reviews can't be submitted.
+            iOS limits to 3 prompts per year per user.
           </p>
         </CardContent>
       </Card>
