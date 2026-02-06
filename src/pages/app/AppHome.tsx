@@ -319,7 +319,7 @@ const AppHome = () => {
             description: `Progress: ${result.newProgress}/${waterTask.goal_target}`,
             duration: 2000,
           });
-          if (result.streakIncreased) {
+          if (result.streakIncreased && !isFirstActionEver) {
             setShowStreakModal(true);
           }
         },
