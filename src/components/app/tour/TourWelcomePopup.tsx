@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Clock } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import tourWelcomeImage from '@/assets/tour-welcome.png';
 
 const TOUR_PROMPT_KEY = 'simora_tour_prompt_shown';
@@ -54,49 +54,34 @@ export function TourWelcomePopup({
         hideCloseButton
         className="w-[min(420px,calc(100vw-24px))] max-w-none border-0 bg-gradient-to-b from-accent/30 to-background p-0 overflow-hidden rounded-3xl shadow-2xl max-h-[92vh] sm:max-w-md"
       >
-        {/* Image Section */}
-        <div className="relative w-full aspect-[4/3] sm:aspect-square overflow-hidden bg-gradient-to-br from-accent/40 via-accent/20 to-accent/10">
+        {/* Image Section - Square */}
+        <div className="relative w-full aspect-square overflow-hidden">
           <img 
             src={tourWelcomeImage} 
-            alt="Welcome to Simora" 
+            alt="Take a Tour" 
             className="w-full h-full object-cover"
             loading="eager"
             decoding="async"
           />
-          {/* Subtle overlay for better text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />
         </div>
 
-        {/* Content Section */}
-        <div className="px-5 sm:px-6 pt-3 sm:pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-center space-y-4">
-          <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-bold text-foreground">
-              Welcome to Simora! ✨
-            </h2>
-            <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-              We're so glad you're here. Ready for a quick tour?
-            </p>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex flex-col gap-3 pt-1">
-            <Button 
-              onClick={handleStartTour}
-              className="w-full h-11 sm:h-12 rounded-2xl bg-foreground hover:bg-foreground/90 text-background font-semibold text-base gap-2"
-            >
-              <Sparkles className="h-5 w-5" />
-              Show Me Around
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              onClick={handleLater}
-              className="w-full h-11 rounded-2xl bg-accent/20 text-foreground/80 hover:text-foreground hover:bg-accent/30 font-medium gap-2"
-            >
-              <Clock className="h-4 w-4" />
-              Maybe Later
-            </Button>
-          </div>
+        {/* Buttons Only */}
+        <div className="px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 flex flex-col gap-3">
+          <Button 
+            onClick={handleStartTour}
+            className="w-full h-12 rounded-2xl bg-foreground hover:bg-foreground/90 text-background font-semibold text-base gap-2"
+          >
+            <Sparkles className="h-5 w-5" />
+            Let's Go
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            onClick={handleLater}
+            className="w-full h-11 rounded-2xl bg-accent/20 text-foreground/80 hover:text-foreground hover:bg-accent/30 font-medium"
+          >
+            Maybe Later
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
