@@ -460,13 +460,14 @@ export function LeadsManager() {
 
       if (error) throw error;
 
-      // Set force new user flag for testing (clears on welcome card dismiss or first action)
-      localStorage.setItem('simora_force_new_user', 'true');
-      localStorage.removeItem('simora_first_action_celebrated');
+      // Full client-side reset - clears all tours, onboarding flags, etc.
+      // This is centralized so new features automatically get included
+      const { fullClientReset } = await import('@/lib/clientReset');
+      fullClientReset();
 
       toast({
-        title: "Data Reset Complete",
-        description: `All app data for ${searchResults.profile.email} has been reset. Go to /app/home to see the new user experience.`
+        title: "Ultimate Reset Complete",
+        description: `All app data + client flags for ${searchResults.profile.email} have been reset. Go to /app/home for full "Day 1" experience.`
       });
 
       // Refresh search results
