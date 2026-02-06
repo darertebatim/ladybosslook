@@ -4,14 +4,22 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Plus, Dices, BookOpen, X } from 'lucide-react';
-import { useTaskTemplates, TaskTemplate } from '@/hooks/useTaskPlanner';
+import { Dices, BookOpen, X, CalendarPlus } from 'lucide-react';
+import { useTaskTemplates, TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { cn } from '@/lib/utils';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
+
+// Map time_period values to display labels
+const TIME_PERIOD_LABELS: Record<string, string> = {
+  morning: 'Morning',
+  afternoon: 'Afternoon',
+  evening: 'Evening',
+  night: 'Bedtime',
+};
 
 interface TaskQuickStartSheetProps {
   open: boolean;
@@ -193,33 +201,69 @@ export const TaskQuickStartSheet = ({
             </button>
           </div>
 
-          {/* Suggestions */}
+          {/* Suggestions - TaskTemplateCard style */}
           {filteredSuggestions.length > 0 && (
             <div className="px-4 pb-3">
               <p className="text-xs text-muted-foreground mb-2">
                 {taskName.trim() ? 'Matching actions' : 'Suggestions'}
               </p>
-              <div className="space-y-1.5">
-                {filteredSuggestions.map((template) => (
-                  <button
-                    key={template.id}
-                    onClick={() => handleTemplateSelect(template)}
-                    className="flex items-center gap-3 w-full p-3 rounded-xl bg-card border border-border/50 hover:bg-muted/50 transition-all active:scale-[0.99]"
-                  >
-                    <FluentEmoji emoji={template.emoji || '📝'} size={24} className="flex-shrink-0" />
-                    <div className="flex-1 min-w-0 text-left">
-                      <p className="text-[15px] text-foreground truncate">
-                        {template.title}
-                      </p>
+              <div className="space-y-2">
+                {filteredSuggestions.map((template) => {
+                  const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
+                  const timePeriodLabel = template.time_period 
+                    ? TIME_PERIOD_LABELS[template.time_period] || template.time_period
+                    : 'Anytime';
+
+                  return (
+                    <div 
+                      key={template.id}
+                      className="rounded-xl border border-border/50 overflow-hidden"
+                      style={{ backgroundColor: bgColor }}
+                    >
+                      {/* Main content row */}
+                      <div className="flex items-center gap-3 p-3">
+                        <FluentEmoji emoji={template.emoji || '📝'} size={32} className="shrink-0" />
+                        
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-black truncate">{template.title}</p>
+                          <p className="text-xs text-black/70 truncate">
+                            {template.category}
+                            {template.repeat_pattern && template.repeat_pattern !== 'none' && (
+                              <span>
+                                {' • '}
+                                {template.repeat_pattern === 'daily' ? 'Daily' : 
+                                 template.repeat_pattern === 'weekly' ? 'Weekly' : 
+                                 template.repeat_pattern === 'monthly' ? 'Monthly' :
+                                 template.repeat_pattern === 'weekend' ? 'Weekends' : ''}
+                              </span>
+                            )}
+                            {(!template.repeat_pattern || template.repeat_pattern === 'none') && (
+                              <span>{' • '}Once</span>
+                            )}
+                            <span>{' • '}{timePeriodLabel}</span>
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={() => handleTemplateSelect(template)}
+                          className="shrink-0 p-2.5 rounded-full bg-foreground hover:bg-foreground/90 transition-colors"
+                          aria-label="Add action"
+                        >
+                          <CalendarPlus className="h-5 w-5 text-background" />
+                        </button>
+                      </div>
+
+                      {/* Description box */}
+                      {template.description && (
+                        <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
+                          <p className="text-xs text-black/80 leading-relaxed line-clamp-2">
+                            {template.description}
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    <span className="text-xs text-muted-foreground shrink-0">
-                      {template.category}
-                    </span>
-                    <div className="shrink-0 w-6 h-6 rounded-full bg-muted flex items-center justify-center">
-                      <Plus className="w-3.5 h-3.5 text-muted-foreground" />
-                    </div>
-                  </button>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
