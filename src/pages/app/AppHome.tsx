@@ -208,6 +208,9 @@ const AppHome = () => {
     [popularRoutines, addedRoutineIdsSet]
   );
 
+  // Popular actions for suggestions
+  const { data: popularActions = [] } = usePopularActions();
+
   // Generate week days
   const weekDays = useMemo(() => {
     const weekStart = startOfWeek(selectedDate, {
