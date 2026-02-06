@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
 import { useUserPresence } from '@/hooks/useUserPresence';
+import { useAppReview } from '@/hooks/useAppReview';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
