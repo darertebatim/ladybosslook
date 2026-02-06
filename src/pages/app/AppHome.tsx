@@ -62,8 +62,8 @@ const AppHome = () => {
   // Skip task state
   const [skipTask, setSkipTask] = useState<UserTask | null>(null);
   
-  // First action celebration state
-  const [showFirstCelebration, setShowFirstCelebration] = useState(false);
+  // First action celebration - tracks if this is user's first ever completion (uses unified StreakCelebration)
+  const [isFirstActionCelebration, setIsFirstActionCelebration] = useState(false);
   
   // Welcome card dismissed state - persisted in localStorage
   const [welcomeCardDismissed, setWelcomeCardDismissed] = useState(() => 
