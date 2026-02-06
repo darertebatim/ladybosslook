@@ -8,6 +8,7 @@ export { BreatheTour } from './BreatheTour';
 export { PeriodTour } from './PeriodTour';
 export { ProgramsTour } from './ProgramsTour';
 export { RoundTour } from './RoundTour';
+export { ExploreTour } from './ExploreTour';
 
 // Hook and utilities
 export { 

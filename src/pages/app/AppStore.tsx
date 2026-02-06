@@ -13,6 +13,7 @@ import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
 import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
 import { PromoBanner } from '@/components/app/PromoBanner';
+import { ExploreTour } from '@/components/app/tour';
 
 // Category configuration for filtering programs
 const categoryConfig = [
@@ -183,7 +184,7 @@ const AppStore = () => {
               <h1 className="text-xl font-bold text-foreground">Explore Simora</h1>
               <button 
                 onClick={() => setShowSearch(true)}
-                className="p-2 rounded-full transition-transform active:scale-95"
+                className="tour-search-button p-2 rounded-full transition-transform active:scale-95"
               >
                 <Search className="h-5 w-5 text-muted-foreground" />
               </button>
@@ -191,6 +192,9 @@ const AppStore = () => {
           )}
         </div>
       </header>
+
+      {/* Explore Tour */}
+      <ExploreTour isFirstVisit={true} />
 
       {/* Scrollable Content */}
       <div 
@@ -208,7 +212,7 @@ const AppStore = () => {
 
             {/* Tools Section */}
             {(!searchQuery || filteredWellnessTools.length > 0 || filteredAudioTools.length > 0) && (
-              <section>
+              <section className="tour-tools-section">
                 <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
                   Tools
                 </h2>
@@ -229,7 +233,7 @@ const AppStore = () => {
 
             {/* Programs Section */}
             {(!searchQuery || hasProgramMatches) && freePrograms.length > 0 && (
-              <section>
+              <section className="tour-programs-section">
                 <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
                   Browse Programs
                 </h2>
