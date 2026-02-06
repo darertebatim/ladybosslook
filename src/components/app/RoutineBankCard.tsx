@@ -10,6 +10,7 @@ interface RoutineBankCardProps {
   routine: RoutineBankItem;
   onClick?: () => void;
   variant?: 'default' | 'compact';
+  className?: string;
 }
 
 const colorGradients: Record<string, string> = {
@@ -45,7 +46,8 @@ const colorBackgrounds: Record<string, string> = {
 export function RoutineBankCard({ 
   routine, 
   onClick, 
-  variant = 'default' 
+  variant = 'default',
+  className,
 }: RoutineBankCardProps) {
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
@@ -84,7 +86,10 @@ export function RoutineBankCard({
 
   return (
     <button 
-      className="overflow-hidden cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] w-full text-left"
+      className={cn(
+        "overflow-hidden cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] w-full text-left",
+        className
+      )}
       onClick={handleClick}
     >
       {/* Square Image Container */}

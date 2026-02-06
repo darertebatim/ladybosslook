@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { RitualsTour } from '@/components/app/tour';
 
 export default function AppInspire() {
   const navigate = useNavigate();
@@ -231,7 +232,7 @@ export default function AppInspire() {
               <h2 className="text-sm font-semibold text-muted-foreground px-4 mb-3">
                 BROWSE CATEGORIES
               </h2>
-              <ScrollArea className="w-full">
+              <ScrollArea className="w-full tour-ritual-categories">
                 <div className="flex gap-2 px-4 pb-2">
                   <CategoryCircle
                     name="Popular"
@@ -301,11 +302,12 @@ export default function AppInspire() {
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-3 w-full max-w-full">
-                  {searchedRoutines.map((routine) => (
+                  {searchedRoutines.map((routine, index) => (
                     <RoutineBankCard
                       key={routine.id}
                       routine={routine}
                       onClick={() => navigate(`/app/routines/${routine.id}`)}
+                      className={index === 0 ? 'tour-ritual-card' : undefined}
                     />
                   ))}
                 </div>
@@ -368,6 +370,9 @@ export default function AppInspire() {
           isSaving={isSavingTemplate}
         />
       )}
+
+      {/* Feature Tour */}
+      <RitualsTour isFirstVisit={true} />
     </div>
   );
 }

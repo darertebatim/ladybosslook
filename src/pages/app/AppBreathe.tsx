@@ -12,6 +12,7 @@ import {
 import { BreathingExerciseCard } from '@/components/breathe/BreathingExerciseCard';
 import { BreathingExerciseScreen } from '@/components/breathe/BreathingExerciseScreen';
 import { Skeleton } from '@/components/ui/skeleton';
+import { BreatheTour } from '@/components/app/tour';
 import { haptic } from '@/lib/haptics';
 
 export default function AppBreathe() {
@@ -117,16 +118,20 @@ export default function AppBreathe() {
               <p className="text-muted-foreground">No exercises in this category yet</p>
             </div>
           ) : (
-            filteredExercises.map((exercise) => (
+            filteredExercises.map((exercise, index) => (
               <BreathingExerciseCard
                 key={exercise.id}
                 exercise={exercise}
                 onClick={() => handleExerciseClick(exercise)}
+                className={index === 0 ? 'tour-exercise-card' : undefined}
               />
             ))
           )}
         </div>
       </div>
+      
+      {/* Feature Tour */}
+      <BreatheTour isFirstVisit={true} />
     </>
   );
 }

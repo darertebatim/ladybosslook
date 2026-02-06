@@ -9,6 +9,7 @@ import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { CoursesSkeleton } from '@/components/app/skeletons';
 import { usePrograms } from '@/hooks/usePrograms';
 import { EnrolledProgramCard } from '@/components/app/EnrolledProgramCard';
+import { ProgramsTour } from '@/components/app/tour';
 import {
   Carousel,
   CarouselContent,
@@ -293,6 +294,8 @@ const AppCourses = () => {
         </div>
       )}
 
+      {/* Feature Tour */}
+      <ProgramsTour isFirstVisit={true} hasPrograms={enrollments && enrollments.length > 0} />
     </div>
   );
 };
