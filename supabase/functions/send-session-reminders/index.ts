@@ -163,10 +163,26 @@ Deno.serve(async (req) => {
       if (enrollments && enrollments.length > 0) {
         const userIds = enrollments.map(e => e.user_id);
         
+        // Fetch notification preferences
+        const { data: preferences } = await supabase
+          .from('user_notification_preferences')
+          .select('user_id, session_reminders')
+          .in('user_id', userIds);
+        
+        const prefsMap = new Map(preferences?.map(p => [p.user_id, p.session_reminders]) || []);
+        
+        // Filter users who want session reminders (default true)
+        const filteredUserIds = userIds.filter(uid => prefsMap.get(uid) !== false);
+        
+        if (filteredUserIds.length === 0) {
+          console.log('All enrolled users have disabled session reminders');
+          continue;
+        }
+        
         const { data: subscriptions } = await supabase
           .from('push_subscriptions')
           .select('*')
-          .in('user_id', userIds);
+          .in('user_id', filteredUserIds);
 
         for (const sub of subscriptions || []) {
           try {

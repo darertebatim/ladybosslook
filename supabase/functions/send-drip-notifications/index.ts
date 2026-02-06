@@ -154,11 +154,27 @@ Deno.serve(async (req) => {
       const userIds = enrollments.map(e => e.user_id);
       console.log(`Found ${userIds.length} enrolled users`);
 
+      // Fetch notification preferences
+      const { data: preferences } = await supabase
+        .from('user_notification_preferences')
+        .select('user_id, content_drip')
+        .in('user_id', userIds);
+      
+      const prefsMap = new Map(preferences?.map(p => [p.user_id, p.content_drip]) || []);
+      
+      // Filter users who want content drip notifications (default true)
+      const filteredUserIds = userIds.filter(uid => prefsMap.get(uid) !== false);
+      
+      if (filteredUserIds.length === 0) {
+        console.log('All users have disabled content drip notifications');
+        continue;
+      }
+
       // Get push subscriptions for these users
       const { data: subscriptions, error: subError } = await supabase
         .from('push_subscriptions')
         .select('*')
-        .in('user_id', userIds);
+        .in('user_id', filteredUserIds);
 
       if (subError) {
         console.error('Error fetching subscriptions:', subError);

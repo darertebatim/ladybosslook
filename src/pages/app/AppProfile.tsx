@@ -28,6 +28,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { JournalStats } from '@/components/app/JournalStats';
+import { NotificationPreferencesCard } from '@/components/app/NotificationPreferencesCard';
 import { checkCalendarPermission, requestCalendarPermission, isCalendarAvailable } from '@/lib/calendarIntegration';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -1284,6 +1285,14 @@ const AppProfile = () => {
                 )}
               </CardContent>
             </Card>
+          )}
+
+          {/* Notification Preferences Card - Native Only (when notifications enabled) */}
+          {showNativeSettings && (
+            <NotificationPreferencesCard 
+              userId={user?.id}
+              notificationsEnabled={notificationPermission === 'granted' && subscriptionStatus === 'active'}
+            />
           )}
 
           {/* Calendar Sync Card - Native Only */}
