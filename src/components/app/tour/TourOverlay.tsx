@@ -189,25 +189,35 @@ export function TourOverlay({
       setTooltipStyle(calculateTooltipPosition(rect, position, tooltipRef.current));
     };
 
-    // Initial update with small delay for tooltip to render
-    const initialTimer = setTimeout(updatePosition, 50);
-    updatePosition();
-    
-    // Recalculate on scroll/resize
-    window.addEventListener('scroll', updatePosition, true);
-    window.addEventListener('resize', updatePosition);
-    
-    return () => {
-      clearTimeout(initialTimer);
-      window.removeEventListener('scroll', updatePosition, true);
-      window.removeEventListener('resize', updatePosition);
+    // Scroll element into view first, then update position
+    const element = document.querySelector(currentStep.target!);
+    if (element) {
+      // Scroll the element into view with padding
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       
-      // Restore original z-index when step changes or tour ends
-      if (targetElement instanceof HTMLElement && originalZIndex !== null) {
-        targetElement.style.zIndex = originalZIndex;
-        if (originalPosition) targetElement.style.position = originalPosition;
-      }
-    };
+      // Wait for scroll to complete before calculating positions
+      const scrollTimer = setTimeout(updatePosition, 400);
+      
+      // Recalculate on scroll/resize
+      window.addEventListener('scroll', updatePosition, true);
+      window.addEventListener('resize', updatePosition);
+      
+      return () => {
+        clearTimeout(scrollTimer);
+        window.removeEventListener('scroll', updatePosition, true);
+        window.removeEventListener('resize', updatePosition);
+        
+        // Restore original z-index when step changes or tour ends
+        if (targetElement instanceof HTMLElement && originalZIndex !== null) {
+          targetElement.style.zIndex = originalZIndex;
+          if (originalPosition) targetElement.style.position = originalPosition;
+        }
+      };
+    } else {
+      // Element not found, show centered
+      setSpotlightRect(null);
+      setTooltipStyle(calculateTooltipPosition(null, 'center', tooltipRef.current));
+    }
   }, [isActive, currentStep, calculateTooltipPosition]);
 
   // Handle keyboard navigation

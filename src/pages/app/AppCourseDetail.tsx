@@ -1178,7 +1178,7 @@ const AppCourseDetail = () => {
 
             {/* New Sessions Available Banner */}
             {hasNewSessions && round && (
-              <Alert className="border-amber-500/50 bg-amber-50 dark:bg-amber-950/30">
+              <Alert className="border-amber-500/50 bg-amber-50 dark:bg-amber-950/30 tour-sync-banner">
                 <CalendarPlus className="h-4 w-4 text-amber-600" />
                 <AlertDescription className="flex items-center justify-between gap-4">
                   <span className="text-sm text-amber-800 dark:text-amber-200">
@@ -1231,7 +1231,7 @@ const AppCourseDetail = () => {
 
             {/* Quick Actions - Only show if enrollment has a round */}
             {round && (
-              <Card>
+              <Card className="tour-quick-actions">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calendar className="h-5 w-5" />
@@ -1317,7 +1317,7 @@ const AppCourseDetail = () => {
                       variant={areAllSessionsSynced(sessionIds) ? "outline" : "secondary"}
                       size="lg" 
                       className={cn(
-                        "w-full",
+                        "w-full tour-sync-all-btn",
                         areAllSessionsSynced(sessionIds) && "border-green-500 text-green-700 dark:text-green-400"
                       )}
                       onClick={handleSyncAllSessions}
@@ -1352,7 +1352,7 @@ const AppCourseDetail = () => {
                     <Button 
                       variant="outline" 
                       size="lg" 
-                      className="w-full"
+                      className="w-full tour-drive-btn"
                       onClick={() => window.open(round.google_drive_link!, '_blank')}
                     >
                       <FolderOpen className="h-5 w-5 mr-2" />
@@ -1365,7 +1365,7 @@ const AppCourseDetail = () => {
                     <Button 
                       variant="outline" 
                       size="lg" 
-                      className="w-full"
+                      className="w-full tour-support-btn"
                       onClick={handleContactSupport}
                     >
                       <MessageCircle className="h-5 w-5 mr-2" />
@@ -1392,14 +1392,14 @@ const AppCourseDetail = () => {
                   {/* Reminder Settings Button */}
                   <Button
                     variant="outline"
-                    className="w-full mb-4 bg-[#F4ECFE] hover:bg-[#E8DEF8] border-[#F4ECFE]"
+                    className="w-full mb-4 bg-[#F4ECFE] hover:bg-[#E8DEF8] border-[#F4ECFE] tour-session-reminder-btn"
                     onClick={() => setShowSessionReminderSheet(true)}
                   >
                     <Bell className="h-4 w-4 mr-2" />
                     {sessionSettings.enabled ? 'Reminder Settings' : 'Enable Reminders'}
                   </Button>
                   <div className="space-y-3">
-                    {dbSessions.map((session) => {
+                    {dbSessions.map((session, index) => {
                       const sessionDate = new Date(session.session_date);
                       const isPast = isSessionPast(session.session_date);
                       const isToday = isSessionToday(session.session_date);
@@ -1454,7 +1454,9 @@ const AppCourseDetail = () => {
                               size="icon"
                               className={cn(
                                 "shrink-0",
-                                isSessionSynced(session.id) && "text-green-600 dark:text-green-400"
+                                isSessionSynced(session.id) && "text-green-600 dark:text-green-400",
+                                // Add tour class only to the first non-past session
+                                index === dbSessions.findIndex(s => !isSessionPast(s.session_date)) && "tour-session-calendar-icon"
                               )}
                               onClick={() => handleAddSingleSession(session)}
                               disabled={addingSessionId === session.id}
@@ -1495,7 +1497,7 @@ const AppCourseDetail = () => {
                   {/* Reminder Settings Button */}
                   <Button
                     variant="outline"
-                    className="w-full mb-4 bg-[#F4ECFE] hover:bg-[#E8DEF8] border-[#F4ECFE]"
+                    className="w-full mb-4 bg-[#F4ECFE] hover:bg-[#E8DEF8] border-[#F4ECFE] tour-content-reminder-btn"
                     onClick={() => setShowContentReminderSheet(true)}
                   >
                     <Bell className="h-4 w-4 mr-2" />
@@ -1503,7 +1505,7 @@ const AppCourseDetail = () => {
                   </Button>
                   <div className="space-y-3">
                     {/* Render modules if available */}
-                    {hasDripModules && playlistModules?.map((module) => {
+                    {hasDripModules && playlistModules?.map((module, moduleIndex) => {
                       const unlockDate = getModuleUnlockDate(module.drip_delay_days);
                       const isAvailable = unlockDate ? new Date() >= unlockDate : true;
                       const isToday = unlockDate && isDateToday(unlockDate);
@@ -1559,7 +1561,12 @@ const AppCourseDetail = () => {
                               size="icon"
                               className={cn(
                                 "shrink-0",
-                                hasContentReminder(module.id) && "text-primary"
+                                hasContentReminder(module.id) && "text-primary",
+                                // Add tour class to first locked module
+                                moduleIndex === playlistModules?.findIndex(m => {
+                                  const ud = getModuleUnlockDate(m.drip_delay_days);
+                                  return ud && new Date() < ud;
+                                }) && "tour-content-bell-icon"
                               )}
                               onClick={() => handleContentReminder(module, unlockDate)}
                             >
@@ -1658,7 +1665,7 @@ const AppCourseDetail = () => {
               </Card>
             )}
 
-            <Card>
+            <Card className="tour-program-info">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Program Information</CardTitle>
