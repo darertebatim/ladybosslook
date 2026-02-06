@@ -1,121 +1,235 @@
 
 
-## Plan: Add App Store Review Prompt + Remove Debugging Leftovers
+# Interactive Tour System - Comprehensive Improvements
 
-### Overview
-This plan addresses two requests:
-1. **Add App Store Review functionality** - Implement an in-app review prompt using a Capacitor plugin that triggers the native iOS App Store rating dialog
-2. **Remove debugging leftovers** - Clean up fallback loading/error displays in `index.html` that were added during v1.1.07 blackness debugging
+## Overview
+This plan addresses multiple issues with the current tour system: missing tour steps, copy quality, UI accessibility, and missing tours for key features.
 
 ---
 
-### Part 1: App Store Review Implementation
+## 1. TourOverlay UI Improvements
 
-**Approach**: Use `@capacitor-community/in-app-review` plugin - this is the community-maintained standard for Capacitor 5+ and works seamlessly on iOS.
+### Close Button Size (Critical - Screenshot Shows Issue)
+The close button is too small for mobile touch targets. Apple recommends 44x44pt minimum.
 
-#### Files to Create/Modify:
-
-**1. Install the plugin** (dependency)
-- Add `@capacitor-community/in-app-review` to package.json
-
-**2. Create `src/lib/appReview.ts`** (new file)
-```text
-- Helper functions to trigger the review prompt
-- Safety checks for native platform
-- Rate limiting (only prompt once per 30 days)
-- Error handling with try-catch
-```
-
-**3. Create a custom hook `src/hooks/useAppReview.tsx`** (new file)
-```text
-- Determines when to show review prompt
-- Triggers after meaningful user actions (e.g., 5th streak celebration, course completion)
-- Tracks last review prompt date in localStorage
-```
-
-**4. Update `src/components/app/StreakCelebration.tsx`**
-```text
-- Add review trigger after user reaches certain milestones (e.g., 5-day streak)
-- Call the review prompt after celebration modal closes
-```
-
-**5. Update `src/components/app/CompletionCelebration.tsx`**
-```text
-- Optionally trigger review after course completion
-```
-
-**6. Add test button to `src/pages/admin/AppTest.tsx`**
-```text
-- Add "Request App Review" button for testing
-```
-
-#### Review Trigger Strategy:
-- Trigger after 5th streak (first meaningful engagement)
-- Trigger after completing a program/course
-- Maximum once per 30 days (iOS limits to 3 per year anyway)
-- Only on native iOS platform
+**File: `src/components/app/tour/TourOverlay.tsx`**
+- Increase close button from `p-1.5` to `p-2.5`
+- Increase icon from `h-4 w-4` to `h-5 w-5`
+- Add better touch target with `min-h-[44px] min-w-[44px]`
 
 ---
 
-### Part 2: Remove Debugging Leftovers
+## 2. Home Tour Enhancements
 
-**File: `index.html`**
+### A. Welcome Card Integration
+Add conditional step for the Welcome Ritual Card when user has no actions.
 
-Remove these debugging elements (lines 71-103):
-- `#loading-fallback` div with "Loading Simora..." message
-- `#error-display` div for native error display  
-- `#debug-info` element
-- The script that hides the loading fallback
+### B. Dynamic Ending
+- If Welcome Card is visible: End tour encouraging user to "flip the card"
+- If Welcome Card is not visible: End tour encouraging user to add their first action
 
-These were added during v1.1.07 debugging but are no longer needed since:
-- The app loads correctly now
-- React has its own loading states via Suspense/PageLoader
-- The `window.onerror` handler in `main.tsx` already captures errors
+**File: `src/components/app/tour/HomeTour.tsx`**
+- Add `hasWelcomeCard` prop
+- Add Welcome Card step targeting `.tour-welcome-card`
+- Modify final step based on Welcome Card availability
 
-**File: `src/main.tsx`**
-
-Remove or simplify:
-- The `window.onerror` handler that writes to `#error-display` (which will be removed)
+**File: `src/pages/app/AppHome.tsx`**
+- Add `tour-welcome-card` class to `WelcomeRitualCard` component
+- Pass `hasWelcomeCard={showWelcomeCard}` to HomeTour
 
 ---
 
-### Technical Details
+## 3. Rituals Tour - Show Actions List
 
-**In-App Review Plugin Usage:**
-```typescript
-import { InAppReview } from '@capacitor-community/in-app-review';
+Add step explaining the "Actions" section (task templates) shown under rituals.
 
-export async function requestAppReview(): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
-  
-  try {
-    await InAppReview.requestReview();
-    console.log('[Review] Review requested successfully');
-  } catch (error) {
-    console.error('[Review] Error requesting review:', error);
-  }
-}
+**File: `src/components/app/tour/RitualsTour.tsx`**
+- Add new step targeting `.tour-actions-section`
+- Position after ritual cards, before final step
+
+**File: `src/pages/app/AppInspire.tsx`**
+- Add `tour-actions-section` class to the Actions section container
+
+---
+
+## 4. Explore Tour - Explain Specific Tools
+
+Expand Explore tour to highlight individual tools by purpose.
+
+**File: `src/components/app/tour/ExploreTour.tsx`**
+Add steps for:
+- Journal (reflection)
+- Breathe (calm)
+- Water (hydration)
+- Emotions (name feelings)
+
+---
+
+## 5. New Playlist Tour (Add to Routine Feature)
+
+Create new tour for playlist detail pages that shows the "Add to My Rituals" button.
+
+**New File: `src/components/app/tour/PlaylistTour.tsx`**
+Steps:
+1. Welcome - This is your audio content
+2. Track list - See all tracks, tap to play
+3. Add to Routine button - Add this to your daily rituals
+4. Done - Enjoy your listening
+
+**Files to Update:**
+- `src/hooks/useFeatureTour.tsx` - Add 'playlist' to TourFeature type
+- `src/components/app/tour/index.ts` - Export PlaylistTour
+- `src/pages/app/AppPlaylistDetail.tsx` - Integrate tour, add class markers
+- `src/lib/clientReset.ts` - Add playlist tour key
+
+---
+
+## 6. Breathe Tour - Show Add to Routine
+
+Expand Breathe tour to show the "Add to Routine" button on exercise detail.
+
+**File: `src/components/app/tour/BreatheTour.tsx`**
+- Add step for add-to-routine functionality
+- Target `.tour-add-to-routine`
+
+**File: `src/components/breathe/BreathingExerciseScreen.tsx`** (or relevant component)
+- Add `tour-add-to-routine` class to the add button
+
+---
+
+## 7. Rewrite All Tour Copy
+
+Rewrite all tour text to be warmer, more direct, and aligned with Simora's "strength companion" philosophy. Use simple A2/B1 English, avoid pressure words.
+
+### Home Tour Copy Refresh
+```
+Welcome: "Hi there! This is your home. Everything starts here."
+Menu: "Tap the menu to see all your tools."
+Calendar: "Swipe to pick a day. The flame shows days you showed up."
+Add Action: "Tap + to add something small to your day."
+Explore: "Find new tools and content here."
+Listen: "Audio for calm, focus, or movement."
+Channels: "See updates from your community."
+Support: "We're here if you need anything."
+Final (with Welcome Card): "Ready? Flip the card below to pick your first action."
+Final (without Welcome Card): "Ready? Tap + to add your first action."
 ```
 
-**iOS Limitations to Note:**
-- iOS limits to 3 review prompts per 365 days per user
-- iOS decides whether to actually show the dialog (not guaranteed)
-- Cannot be triggered in response to button tap (must feel natural)
-- In development, dialog always shows but reviews can't be submitted
+### Rituals Tour Copy Refresh
+```
+Welcome: "These are ready-made rituals. Pick what feels right."
+Categories: "Filter by type: morning, evening, focus, and more."
+Ritual Card: "Tap any ritual to see what's inside."
+Actions Section: "Individual actions live here. Add one at a time."
+Done: "Start small. One action is enough."
+```
+
+### Player Tour Copy Refresh
+```
+Welcome: "Your audio library. Listen anytime, anywhere."
+Playlists: "Browse by category. Free content is always here."
+Continue: "Pick up where you left off."
+Done: "Every listen is a step forward."
+```
+
+### Breathe Tour Copy Refresh
+```
+Welcome: "Breathing exercises to calm your mind."
+Exercise: "Each one has a different purpose. Try one."
+Add to Routine: "Add this to your daily plan."
+Done: "Even one minute helps."
+```
+
+### Journal Tour Copy Refresh
+```
+Welcome: "Your private space to reflect."
+New Entry: "Tap + to start writing."
+Mood: "Track how you feel over time."
+Done: "A few words each day make a difference."
+```
+
+### Explore Tour Copy Refresh
+```
+Welcome: "Everything Simora offers is here."
+Tools: "Journal, Breathe, Water, Emotions. Tap any to start."
+Programs: "Courses and audio content. Browse freely."
+Search: "Find what you need quickly."
+Done: "Take your time. Explore what calls to you."
+```
+
+### Period Tour Copy Refresh
+```
+Welcome: "Track your cycle privately."
+Log: "Tap a day to log."
+Insights: "See patterns and predictions."
+Done: "Understanding your body is strength."
+```
+
+### Programs Tour Copy Refresh
+```
+Welcome: "Your enrolled programs live here."
+Card: "Tap to open lessons and materials."
+Progress: "See how far you've come."
+Done: "One lesson at a time."
+```
+
+### Playlist Tour Copy (New)
+```
+Welcome: "This is your playlist. Listen at your pace."
+Tracks: "Tap any track to play."
+Add: "Want to remember this? Add it to your rituals."
+Done: "Enjoy. Every listen counts."
+```
 
 ---
 
-### Summary of Changes
+## 8. Files Summary
 
-| File | Action |
-|------|--------|
-| `package.json` | Add `@capacitor-community/in-app-review` |
-| `src/lib/appReview.ts` | Create - review helper functions |
-| `src/hooks/useAppReview.tsx` | Create - review trigger logic |
-| `src/components/app/StreakCelebration.tsx` | Modify - add review trigger |
-| `src/pages/admin/AppTest.tsx` | Modify - add test button |
-| `index.html` | Remove debugging fallback elements |
-| `src/main.tsx` | Simplify error handler |
+### Files to Modify:
+1. `src/components/app/tour/TourOverlay.tsx` - Bigger close button
+2. `src/components/app/tour/HomeTour.tsx` - Welcome card + dynamic ending + copy
+3. `src/components/app/tour/RitualsTour.tsx` - Actions section step + copy
+4. `src/components/app/tour/ExploreTour.tsx` - Tool explanations + copy
+5. `src/components/app/tour/BreatheTour.tsx` - Add to routine + copy
+6. `src/components/app/tour/PlayerTour.tsx` - Copy refresh
+7. `src/components/app/tour/JournalTour.tsx` - Copy refresh
+8. `src/components/app/tour/PeriodTour.tsx` - Copy refresh
+9. `src/components/app/tour/ProgramsTour.tsx` - Copy refresh
+10. `src/components/app/tour/RoundTour.tsx` - Copy refresh
+11. `src/components/app/tour/index.ts` - Export PlaylistTour
+12. `src/hooks/useFeatureTour.tsx` - Add 'playlist' type
+13. `src/lib/clientReset.ts` - Add playlist reset key
+14. `src/pages/app/AppHome.tsx` - Welcome card class + tour prop
+15. `src/pages/app/AppInspire.tsx` - Actions section class
+16. `src/pages/app/AppPlaylistDetail.tsx` - Tour integration + classes
 
-After implementation, run `npx cap sync` to sync the new plugin with the native iOS project.
+### New Files:
+1. `src/components/app/tour/PlaylistTour.tsx` - Playlist detail tour
+
+---
+
+## 9. Testing Checklist
+
+After implementation, verify:
+
+1. **Home Tour** - Menu, Calendar, Add, Banner (if exists), Rituals (if exists), Programs (if exists), all 4 nav items, Welcome Card / Add Action ending
+2. **Rituals Tour** - Categories, Ritual cards, Actions section
+3. **Player Tour** - Playlists, Continue listening
+4. **Playlist Tour (New)** - Tracks, Add to Routine button
+5. **Breathe Tour** - Exercise cards, Add to routine
+6. **Journal Tour** - New entry button
+7. **Explore Tour** - Tools section, Programs section, Search
+8. **Period Tour** - Log days, Insights
+9. **Programs Tour** - Program cards, Progress
+10. **Round Tour** - Audio, Live sessions, Materials, Feed
+11. **UI** - Close button is easy to tap on mobile
+
+---
+
+## Technical Notes
+
+- All tours use `isFirstVisit={true}` for automatic trigger
+- Tours persist completion in localStorage: `simora_tour_[feature]_done`
+- "Restart All Tours" in Profile clears all these flags
+- Admin "Ultimate Reset" also clears tour flags via `fullClientReset()`
 
