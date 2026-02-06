@@ -60,7 +60,7 @@ export function TaskTemplateCard({ template, onAdd }: TaskTemplateCardProps) {
 
         <button
           onClick={handleAdd}
-          className="shrink-0 p-2.5 rounded-full bg-foreground hover:bg-foreground/90 transition-colors"
+          className="tour-action-add-btn shrink-0 p-2.5 rounded-full bg-foreground hover:bg-foreground/90 transition-colors"
           aria-label="Add to my rituals"
         >
           <CalendarPlus className="h-5 w-5 text-background" />

@@ -211,7 +211,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
           </button>
 
           {/* Add to Routine button - custom styling for emotion page */}
-          <div className="flex items-center gap-2">
+          <div className="tour-emotion-add-routine flex items-center gap-2">
             <button
               onClick={() => isAdded ? navigate('/app/home') : handleRoutineClick()}
               className="flex-1 h-12 rounded-full flex items-center justify-center gap-2 font-medium transition-all active:scale-[0.98] bg-success/30 text-white"
