@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SectionNav } from '@/components/app/profile/SectionNav';
 import { 
   LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell,
   BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, Trash2, AlertTriangle, Settings, PlayCircle
@@ -33,7 +34,7 @@ import { checkCalendarPermission, requestCalendarPermission, isCalendarAvailable
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications, unsubscribeFromPushNotifications } from '@/lib/pushNotifications';
 import { resetAllTours } from '@/lib/clientReset';
 import { Capacitor } from '@capacitor/core';
@@ -112,6 +113,62 @@ const AppProfile = () => {
   // Journal entries for monthly presence calculation
   const { data: journalEntries } = useJournalEntries();
   const daysThisMonth = useMemo(() => calculateMonthlyPresence(journalEntries || []), [journalEntries]);
+
+  // Section refs for scroll navigation - Account tab
+  const personalInfoRef = useRef<HTMLDivElement>(null);
+  const passwordRef = useRef<HTMLDivElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
+
+  // Section refs for scroll navigation - Settings tab
+  const supportRef = useRef<HTMLDivElement>(null);
+  const pushNotificationsRef = useRef<HTMLDivElement>(null);
+  const notificationPrefsRef = useRef<HTMLDivElement>(null);
+  const calendarSyncRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to section helper
+  const scrollToSection = useCallback((ref: React.RefObject<HTMLDivElement>) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
+  // Section nav items for Account tab
+  const accountSections = useMemo(() => [
+    { id: 'personal', label: 'Info', icon: <User className="h-4 w-4" /> },
+    { id: 'password', label: 'Password', icon: <Lock className="h-4 w-4" /> },
+    { id: 'actions', label: 'Actions', icon: <LogOut className="h-4 w-4" /> },
+  ], []);
+
+  // Section nav items for Settings tab
+  const settingsSections = useMemo(() => {
+    const sections = [
+      { id: 'support', label: 'Support', icon: <MessageCircle className="h-4 w-4" /> },
+    ];
+    if (showNativeSettings) {
+      sections.push({ id: 'push', label: 'Push', icon: <Bell className="h-4 w-4" /> });
+    }
+    sections.push({ id: 'prefs', label: 'Preferences', icon: <Settings className="h-4 w-4" /> });
+    if (showNativeSettings) {
+      sections.push({ id: 'calendar', label: 'Calendar', icon: <Calendar className="h-4 w-4" /> });
+    }
+    return sections;
+  }, [showNativeSettings]);
+
+  // Handle section navigation
+  const handleAccountNav = useCallback((id: string) => {
+    switch (id) {
+      case 'personal': scrollToSection(personalInfoRef); break;
+      case 'password': scrollToSection(passwordRef); break;
+      case 'actions': scrollToSection(actionsRef); break;
+    }
+  }, [scrollToSection]);
+
+  const handleSettingsNav = useCallback((id: string) => {
+    switch (id) {
+      case 'support': scrollToSection(supportRef); break;
+      case 'push': scrollToSection(pushNotificationsRef); break;
+      case 'prefs': scrollToSection(notificationPrefsRef); break;
+      case 'calendar': scrollToSection(calendarSyncRef); break;
+    }
+  }, [scrollToSection]);
 
   // Test push notification
   const handleTestNotification = async () => {
@@ -712,8 +769,11 @@ const AppProfile = () => {
         
         {/* Account Tab */}
         <TabsContent value="account" className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe mt-0 space-y-4">
+          {/* Quick Navigation */}
+          <SectionNav items={accountSections} onNavigate={handleAccountNav} />
+          
           {/* Profile Info Card */}
-          <Card className="rounded-2xl shadow-sm border-0 bg-card">
+          <Card ref={personalInfoRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <User className="h-4 w-4" />
@@ -811,7 +871,7 @@ const AppProfile = () => {
           </Card>
 
           {/* Password Card */}
-          <Card className="rounded-2xl shadow-sm border-0 bg-card">
+          <Card ref={passwordRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Lock className="h-4 w-4" />
@@ -853,7 +913,7 @@ const AppProfile = () => {
           </Card>
 
           {/* Actions Card */}
-          <Card className="rounded-2xl shadow-sm border-0 bg-card">
+          <Card ref={actionsRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Actions</CardTitle>
             </CardHeader>
@@ -1081,8 +1141,11 @@ const AppProfile = () => {
 
         {/* Settings Tab */}
         <TabsContent value="settings" className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe mt-0 space-y-4">
+          {/* Quick Navigation */}
+          <SectionNav items={settingsSections} onNavigate={handleSettingsNav} />
+
           {/* Support Card */}
-          <Card className="rounded-2xl shadow-sm border-0 bg-card">
+          <Card ref={supportRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <MessageCircle className="h-4 w-4" />
@@ -1166,7 +1229,7 @@ const AppProfile = () => {
 
           {/* Push Notifications Card - Native Only */}
           {showNativeSettings && (
-            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <Card ref={pushNotificationsRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Bell className="h-4 w-4" />
@@ -1288,17 +1351,19 @@ const AppProfile = () => {
           )}
 
           {/* Notification Preferences Card - Always shown (server-side notifications work on all platforms) */}
-          <NotificationPreferencesCard 
-            userId={user?.id}
-            notificationsEnabled={showNativeSettings 
-              ? (notificationPermission === 'granted' && subscriptionStatus === 'active')
-              : true // On web, show preferences (server notifications still work)
-            }
-          />
+          <div ref={notificationPrefsRef} className="scroll-mt-4">
+            <NotificationPreferencesCard 
+              userId={user?.id}
+              notificationsEnabled={showNativeSettings 
+                ? (notificationPermission === 'granted' && subscriptionStatus === 'active')
+                : true // On web, show preferences (server notifications still work)
+              }
+            />
+          </div>
 
           {/* Calendar Sync Card - Native Only */}
           {showNativeSettings && (
-            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <Card ref={calendarSyncRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
