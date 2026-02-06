@@ -769,7 +769,6 @@ const AppHome = () => {
           hasEnrolledPrograms={activeRounds.length > 0}
           hasSuggestedRituals={suggestedRoutines.length > 0}
           hasWelcomeCard={showWelcomeCard}
-          onOpenActionSheet={() => setShowQuickStart(true)}
         />
       </div>
     </>;

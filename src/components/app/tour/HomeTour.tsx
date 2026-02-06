@@ -8,7 +8,6 @@ interface HomeTourProps {
   hasSuggestedRituals?: boolean;
   hasWelcomeCard?: boolean;
   isFirstOpen?: boolean;
-  onOpenActionSheet?: () => void;
 }
 
 export function HomeTour({
@@ -16,7 +15,6 @@ export function HomeTour({
   hasSuggestedRituals = false,
   hasWelcomeCard = false,
   isFirstOpen = false,
-  onOpenActionSheet,
 }: HomeTourProps) {
   const [userWantsTour, setUserWantsTour] = useState(false);
 
@@ -54,21 +52,6 @@ export function HomeTour({
         description: 'Tap + to add something small to your day.',
         position: 'left',
         action: 'tap',
-        // After this step, open the sheet for the next step
-        onComplete: () => {
-          if (onOpenActionSheet) {
-            onOpenActionSheet();
-          }
-        },
-      },
-      {
-        id: 'action-sheet',
-        title: 'Pick an Action ✨',
-        target: '.tour-action-suggestions',
-        description: 'Browse suggestions or try "Random" for a surprise. Tap the + to add any action.',
-        position: 'top',
-        action: 'tap',
-        condition: () => !!document.querySelector('.tour-action-suggestions'),
       },
     ];
 
