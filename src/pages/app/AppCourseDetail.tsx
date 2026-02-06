@@ -34,6 +34,7 @@ import { scheduleUrgentAlarm } from '@/lib/taskAlarm';
 import { scheduleTaskReminder, cancelTaskReminder, isLocalNotificationsAvailable } from '@/lib/localNotifications';
 import DOMPurify from 'dompurify';
 import { cn } from '@/lib/utils';
+import { RoundTour } from '@/components/app/tour';
 
 const AppCourseDetail = () => {
   const { slug, roundId } = useParams();
@@ -1243,7 +1244,7 @@ const AppCourseDetail = () => {
                     <Button 
                       variant="default" 
                       size="lg" 
-                      className="w-full relative"
+                      className="w-full relative tour-community-btn"
                       onClick={() => navigate(`/app/channels?channel=${roundChannel.id}`)}
                     >
                       <MessageCircle className="h-5 w-5 mr-2" />
@@ -1264,7 +1265,7 @@ const AppCourseDetail = () => {
                     <Button 
                       variant="default" 
                       size="lg" 
-                      className="w-full"
+                      className="w-full tour-playlist-btn"
                       onClick={() => navigate(`/app/player/playlist/${round.audio_playlist_id}`)}
                     >
                       <Music className="h-5 w-5 mr-2" />
@@ -1277,7 +1278,7 @@ const AppCourseDetail = () => {
                     <Button 
                       variant="default" 
                       size="lg" 
-                      className="w-full"
+                      className="w-full tour-meet-btn"
                       onClick={() => window.open(round.google_meet_link!, '_blank')}
                     >
                       <Video className="h-5 w-5 mr-2" />
@@ -1291,7 +1292,7 @@ const AppCourseDetail = () => {
                       variant={isSessionSynced(nextSession.id) ? "outline" : "secondary"}
                       size="lg" 
                       className={cn(
-                        "w-full",
+                        "w-full tour-calendar-btn",
                         isSessionSynced(nextSession.id) && "border-green-500 text-green-700 dark:text-green-400"
                       )}
                       onClick={handleAddToCalendar}
@@ -1377,7 +1378,7 @@ const AppCourseDetail = () => {
 
             {/* Upcoming Sessions Card */}
             {dbSessions && dbSessions.length > 0 && (
-              <Card>
+              <Card className="tour-sessions-list">
                 <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Clock className="h-5 w-5" />
@@ -1477,7 +1478,7 @@ const AppCourseDetail = () => {
 
             {/* Content Schedule Card - shows drip unlock timeline for modules or audio tracks */}
             {showContentSchedule && (
-              <Card>
+              <Card className="tour-content-schedule">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5" />
@@ -1821,6 +1822,11 @@ const AppCourseDetail = () => {
         currentSettings={contentSettings}
         onSave={handleSaveContentSettings}
       />
+
+      {/* Round Tour */}
+      {enrollment && round && (
+        <RoundTour isFirstVisit={true} />
+      )}
     </>
   );
 };

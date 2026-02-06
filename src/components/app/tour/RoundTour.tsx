@@ -4,84 +4,79 @@ import { TourOverlay } from './TourOverlay';
 
 interface RoundTourProps {
   isFirstVisit?: boolean;
-  hasAudioContent?: boolean;
-  hasLiveSessions?: boolean;
-  hasSupplements?: boolean;
 }
 
-export function RoundTour({ 
-  isFirstVisit = false,
-  hasAudioContent = false,
-  hasLiveSessions = false,
-  hasSupplements = false,
-}: RoundTourProps) {
-  const steps = useMemo((): TourStep[] => {
-    const baseSteps: TourStep[] = [
-      {
-        id: 'welcome',
-        title: 'Your Course 📚',
-        description: 'Everything you need for this program is here.',
-        position: 'center',
-        action: 'look',
-      },
-    ];
-
-    if (hasAudioContent) {
-      baseSteps.push({
-        id: 'audio',
-        target: '.tour-audio-content',
-        title: 'Audio Lessons',
-        description: 'Listen at your own pace. New content unlocks as you go.',
-        position: 'bottom',
-        action: 'tap',
-        condition: () => !!document.querySelector('.tour-audio-content'),
-      });
-    }
-
-    if (hasLiveSessions) {
-      baseSteps.push({
-        id: 'sessions',
-        target: '.tour-live-sessions',
-        title: 'Live Sessions',
-        description: 'Join scheduled sessions with your coach.',
-        position: 'bottom',
-        action: 'tap',
-        condition: () => !!document.querySelector('.tour-live-sessions'),
-      });
-    }
-
-    if (hasSupplements) {
-      baseSteps.push({
-        id: 'materials',
-        target: '.tour-supplements',
-        title: 'Course Materials',
-        description: 'Worksheets, guides, and resources to support you.',
-        position: 'bottom',
-        action: 'tap',
-        condition: () => !!document.querySelector('.tour-supplements'),
-      });
-    }
-
-    baseSteps.push({
-      id: 'feed',
-      target: '.tour-course-feed',
-      title: 'Course Community',
-      description: 'Connect with fellow students and share progress.',
-      position: 'top',
-      action: 'tap',
-      condition: () => !!document.querySelector('.tour-course-feed'),
-    });
-
-    baseSteps.push({
-      id: 'done',
-      title: "You've Got This! 🌟",
-      description: 'One step at a time. Progress, not perfection.',
+export function RoundTour({ isFirstVisit = false }: RoundTourProps) {
+  const steps = useMemo((): TourStep[] => [
+    {
+      id: 'welcome',
+      title: 'Your Course Hub 📚',
+      description: 'Everything for this program is on this page. Let me show you around.',
       position: 'center',
       action: 'look',
-    });
-
-    return baseSteps;
-  }, [hasAudioContent, hasLiveSessions, hasSupplements]);
+    },
+    {
+      id: 'community',
+      target: '.tour-community-btn',
+      title: 'Join the Community',
+      description: 'Tap to chat with fellow students. Ask questions, share wins, get support.',
+      position: 'bottom',
+      action: 'tap',
+      condition: () => !!document.querySelector('.tour-community-btn'),
+    },
+    {
+      id: 'playlist',
+      target: '.tour-playlist-btn',
+      title: 'Audio Lessons',
+      description: 'Tap to access all audio content. New lessons unlock as you progress.',
+      position: 'bottom',
+      action: 'tap',
+      condition: () => !!document.querySelector('.tour-playlist-btn'),
+    },
+    {
+      id: 'meet',
+      target: '.tour-meet-btn',
+      title: 'Live Sessions',
+      description: 'Join live video sessions with your coach. Check the schedule for times.',
+      position: 'bottom',
+      action: 'tap',
+      condition: () => !!document.querySelector('.tour-meet-btn'),
+    },
+    {
+      id: 'calendar',
+      target: '.tour-calendar-btn',
+      title: 'Sync to Calendar',
+      description: 'Tap to add sessions to your phone calendar. Never miss a live session.',
+      position: 'bottom',
+      action: 'tap',
+      condition: () => !!document.querySelector('.tour-calendar-btn'),
+    },
+    {
+      id: 'sessions',
+      target: '.tour-sessions-list',
+      title: 'Session Schedule',
+      description: "See all scheduled sessions. Today's session is highlighted. Tap calendar icon to add each one.",
+      position: 'top',
+      action: 'look',
+      condition: () => !!document.querySelector('.tour-sessions-list'),
+    },
+    {
+      id: 'content-schedule',
+      target: '.tour-content-schedule',
+      title: 'Content Unlocks',
+      description: 'Track when new lessons become available. Set reminders so you never miss new content.',
+      position: 'top',
+      action: 'look',
+      condition: () => !!document.querySelector('.tour-content-schedule'),
+    },
+    {
+      id: 'done',
+      title: "You're Ready! 🌟",
+      description: 'Start by visiting the Community to introduce yourself. One step at a time.',
+      position: 'center',
+      action: 'look',
+    },
+  ], []);
 
   const tour = useFeatureTour({
     feature: 'round',

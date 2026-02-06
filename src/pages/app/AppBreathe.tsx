@@ -81,7 +81,7 @@ export default function AppBreathe() {
         <AppHeaderSpacer />
 
         {/* Category circles */}
-        <div className="px-4 py-4">
+        <div className="px-4 py-4 tour-categories">
           <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-hide">
             {BREATHING_CATEGORIES.map((category) => (
               <CategoryCircle
