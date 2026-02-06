@@ -1287,13 +1287,14 @@ const AppProfile = () => {
             </Card>
           )}
 
-          {/* Notification Preferences Card - Native Only (when notifications enabled) */}
-          {showNativeSettings && (
-            <NotificationPreferencesCard 
-              userId={user?.id}
-              notificationsEnabled={notificationPermission === 'granted' && subscriptionStatus === 'active'}
-            />
-          )}
+          {/* Notification Preferences Card - Always shown (server-side notifications work on all platforms) */}
+          <NotificationPreferencesCard 
+            userId={user?.id}
+            notificationsEnabled={showNativeSettings 
+              ? (notificationPermission === 'granted' && subscriptionStatus === 'active')
+              : true // On web, show preferences (server notifications still work)
+            }
+          />
 
           {/* Calendar Sync Card - Native Only */}
           {showNativeSettings && (
