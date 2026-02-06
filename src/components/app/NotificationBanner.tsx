@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Bell, X, ChevronRight } from 'lucide-react';
 import { checkPermissionStatus } from '@/lib/pushNotifications';
 import { shouldShowPushUI } from '@/hooks/usePushNotificationFlow';
@@ -15,51 +15,74 @@ export function NotificationBanner({ onEnableClick }: NotificationBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isPreEnrolled, setIsPreEnrolled] = useState(false);
 
+  const checkVisibility = useCallback(async () => {
+    // Only show on native OR debug mode
+    if (!shouldShowPushUI()) {
+      setIsVisible(false);
+      return;
+    }
+
+    // In debug mode, skip permission check
+    const isDebug = new URLSearchParams(window.location.search).get('debugPush') === 'true';
+    if (!isDebug) {
+      const permission = await checkPermissionStatus();
+      if (permission === 'granted') {
+        setIsVisible(false);
+        return;
+      }
+    }
+
+    // Check if pre-enrolled (special tracking)
+    const preEnrolled = localStorage.getItem('preEnrolledNeedsPush') === 'true';
+    setIsPreEnrolled(preEnrolled);
+
+    // Check dismissal timing
+    const dismissedAt = localStorage.getItem('notificationBannerDismissed');
+    if (dismissedAt) {
+      const hoursSince = (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60);
+      // Pre-enrolled users: show after 12 hours, regular users: 24 hours
+      const threshold = preEnrolled ? 12 : 24;
+      if (hoursSince < threshold) {
+        setIsVisible(false);
+        return;
+      }
+    }
+
+    // Check if completed onboarding successfully
+    const completed = localStorage.getItem('pushOnboardingCompleted') === 'true';
+    if (completed) {
+      setIsVisible(false);
+      return;
+    }
+
+    setIsVisible(true);
+  }, []);
+
+  // Check on mount
   useEffect(() => {
-    const checkVisibility = async () => {
-      // Only show on native OR debug mode
-      if (!shouldShowPushUI()) {
-        setIsVisible(false);
-        return;
+    checkVisibility();
+  }, [checkVisibility]);
+
+  // Re-check when tab becomes visible (user might have enabled PN in another flow)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkVisibility();
       }
-
-      // In debug mode, skip permission check
-      const isDebug = new URLSearchParams(window.location.search).get('debugPush') === 'true';
-      if (!isDebug) {
-        const permission = await checkPermissionStatus();
-        if (permission === 'granted') {
-          setIsVisible(false);
-          return;
-        }
-      }
-
-      // Check if pre-enrolled (special tracking)
-      const preEnrolled = localStorage.getItem('preEnrolledNeedsPush') === 'true';
-      setIsPreEnrolled(preEnrolled);
-
-      // Check dismissal timing
-      const dismissedAt = localStorage.getItem('notificationBannerDismissed');
-      if (dismissedAt) {
-        const hoursSince = (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60);
-        // Pre-enrolled users: show after 12 hours, regular users: 24 hours
-        const threshold = preEnrolled ? 12 : 24;
-        if (hoursSince < threshold) {
-          setIsVisible(false);
-          return;
-        }
-      }
-
-      // Check if completed onboarding successfully
-      const completed = localStorage.getItem('pushOnboardingCompleted') === 'true';
-      if (completed) {
-        setIsVisible(false);
-        return;
-      }
-
-      setIsVisible(true);
     };
 
-    checkVisibility();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [checkVisibility]);
+
+  // Listen for custom event when PN is enabled (fired from onboarding)
+  useEffect(() => {
+    const handlePNEnabled = () => {
+      setIsVisible(false);
+    };
+
+    window.addEventListener('pushNotificationsEnabled', handlePNEnabled);
+    return () => window.removeEventListener('pushNotificationsEnabled', handlePNEnabled);
   }, []);
 
   const handleDismiss = () => {

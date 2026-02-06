@@ -40,6 +40,8 @@ export function PushNotificationOnboarding({
           // Mark as completed
           localStorage.setItem('pushOnboardingCompleted', 'true');
           localStorage.setItem('notificationsEnabled', 'true');
+          // Dispatch event to notify banner to hide
+          window.dispatchEvent(new CustomEvent('pushNotificationsEnabled'));
           onComplete();
         } else {
           setShowFallback(true);
