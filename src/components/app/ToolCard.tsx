@@ -17,9 +17,10 @@ const iconMap: Record<string, LucideIcon> = {
 interface ToolCardProps {
   tool: ToolConfig;
   size?: 'default' | 'compact' | 'teaser';
+  className?: string;
 }
 
-export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
+export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
   const navigate = useNavigate();
   const IconComponent = iconMap[tool.icon] || Circle;
 
@@ -99,7 +100,8 @@ export function ToolCard({ tool, size = 'default' }: ToolCardProps) {
         'shadow-sm border border-black/5',
         'transition-transform active:scale-[0.97]',
         tool.bgColor,
-        tool.comingSoon && 'opacity-60'
+        tool.comingSoon && 'opacity-60',
+        className
       )}
     >
       <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-white/60">

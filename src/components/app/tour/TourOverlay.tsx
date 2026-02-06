@@ -297,7 +297,7 @@ export function TourOverlay({
         </h3>
 
         {/* Description */}
-        <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+        <p className="text-foreground text-sm leading-relaxed mb-4">
           {currentStep.description}
         </p>
 

@@ -218,13 +218,21 @@ const AppStore = () => {
                 </h2>
                 <div className="grid grid-cols-2 gap-2">
                   {filteredWellnessTools.map((tool) => (
-                    <ToolCard key={tool.id} tool={tool} />
+                    <ToolCard 
+                      key={tool.id} 
+                      tool={tool} 
+                      className={`tour-tool-${tool.id}`}
+                    />
                   ))}
                   {/* Audio tools - Meditate & Sounds */}
                   {filteredAudioTools
                     .filter(t => t.id === 'meditate' || t.id === 'soundscape')
                     .map((tool) => (
-                      <ToolCard key={tool.id} tool={tool} />
+                      <ToolCard 
+                        key={tool.id} 
+                        tool={tool} 
+                        className={`tour-tool-${tool.id}`}
+                      />
                     ))}
                 </div>
               </section>

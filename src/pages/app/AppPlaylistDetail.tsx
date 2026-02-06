@@ -627,7 +627,7 @@ export default function AppPlaylistDetail() {
         {/* Continue Button */}
         {hasAccess && totalItems > 0 && (
           <div className="flex flex-col gap-2 w-full">
-            <Button onClick={handleContinue} size="lg" className="w-full">
+            <Button onClick={handleContinue} size="lg" className="w-full tour-continue-btn">
               <Play className="h-5 w-5 mr-1" />
               {getNextPlayableItem() ? 'Continue' : 'Play'}
             </Button>
