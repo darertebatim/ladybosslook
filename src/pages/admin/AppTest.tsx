@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
+import { forceRequestReview } from '@/lib/appReview';
 import { 
   Bell, 
   Trophy, 
@@ -13,7 +14,8 @@ import {
   AlertCircle,
   Info,
   CheckCircle2,
-  Download
+  Download,
+  Star
 } from 'lucide-react';
 
 // Import all testable components
