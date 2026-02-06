@@ -178,7 +178,7 @@ export const TaskQuickStartSheet = ({
             </div>
           )}
 
-          <div className="px-4 pb-3 flex gap-2">
+          <div className="px-4 pb-3 flex gap-2 tour-action-buttons">
             <button
               onClick={handleRandomAction}
               disabled={isRolling}
@@ -246,11 +246,11 @@ export const TaskQuickStartSheet = ({
 
           {/* Suggestions - TaskTemplateCard style */}
           {filteredSuggestions.length > 0 && (
-            <div className="px-4 pb-4">
+            <div className="px-4 pb-4 tour-action-suggestions">
               <p className="text-xs text-muted-foreground mb-2">
                 {taskName.trim() ? 'Matching actions' : 'Suggestions'}
               </p>
-              <div className="space-y-2">
+              <div className="space-y-2 tour-action-list">
                 {filteredSuggestions.map((template) => {
                   const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
                   const timePeriodLabel = template.time_period 
