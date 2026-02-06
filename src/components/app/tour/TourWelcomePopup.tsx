@@ -41,6 +41,15 @@ export function TourWelcomePopup({
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
+    // Check if tours were just reset - force show popup
+    const justReset = localStorage.getItem('simora_tours_just_reset') === 'true';
+    if (justReset) {
+      localStorage.removeItem('simora_tours_just_reset');
+      // Small delay to let page settle
+      const timer = setTimeout(() => setIsOpen(true), 500);
+      return () => clearTimeout(timer);
+    }
+    
     if (!isFirstOpen) return;
     
     // Check if tour was completed (started and finished)

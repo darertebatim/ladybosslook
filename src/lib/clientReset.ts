@@ -36,6 +36,13 @@ export function resetAllTours(): void {
     localStorage.removeItem(`simora_tour_${feature}_done`);
   });
   
+  // Tour welcome popup flags - so it re-appears
+  localStorage.removeItem('simora_tour_prompt_shown');
+  localStorage.removeItem('simora_tour_prompt_dismissed_at');
+  
+  // Set a flag to force tour popup to show immediately
+  localStorage.setItem('simora_tours_just_reset', 'true');
+  
   console.log('[clientReset] All tours reset');
 }
 
