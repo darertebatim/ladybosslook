@@ -1,12 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Headphones, List, Lock, CheckCircle, Play } from "lucide-react";
+import { ChevronLeft, Headphones, List, Lock, CheckCircle, Play, CalendarPlus, Check } from "lucide-react";
 import { BackButton } from "@/components/app/BackButton";
 import { AudioControls } from "@/components/audio/AudioControls";
 import { ProgressBar } from "@/components/audio/ProgressBar";
-import { BookmarkButton } from "@/components/audio/BookmarkButton";
-import { BookmarksList } from "@/components/audio/BookmarksList";
 import { TrackCompletionCelebration } from "@/components/audio/TrackCompletionCelebration";
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,8 +21,9 @@ import {
 } from "@/components/ui/sheet";
 import { getTrackAvailabilityWithCountdown } from "@/lib/dripContent";
 import { useAudioPlayer, TrackInfo } from "@/contexts/AudioPlayerContext";
-import { useBookmarks } from "@/hooks/useBookmarks";
+import { useExistingAudioTask, useQuickAddAudioTask } from "@/hooks/useAudioRoutine";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
 
 export default function AppAudioPlayer() {
   const { audioId } = useParams();
@@ -59,14 +58,9 @@ export default function AppAudioPlayer() {
     playNextTrack,
   } = useAudioPlayer();
 
-  // Bookmarks
-  const { 
-    bookmarks, 
-    addBookmark, 
-    deleteBookmark, 
-    isAdding: isAddingBookmark,
-    isDeleting: isDeletingBookmark 
-  } = useBookmarks(audioId);
+  // Audio routine hook (replaces bookmarks)
+  const { data: existingTask, isLoading: isCheckingTask } = useExistingAudioTask(audioId);
+  const addAudioTaskMutation = useQuickAddAudioTask();
 
   // Fetch audio content
   const { data: audio, isLoading } = useQuery({
@@ -532,12 +526,37 @@ export default function AppAudioPlayer() {
             )}
           </div>
 
-          {/* Bookmark Button */}
-          <BookmarkButton
-            currentTime={currentTime}
-            onAddBookmark={addBookmark}
-            isAdding={isAddingBookmark}
-          />
+          {/* Add to Routine Button */}
+          {audio && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10"
+              onClick={() => {
+                if (existingTask) {
+                  // Already added - navigate to planner
+                  haptic.light();
+                  navigate('/app/home');
+                } else {
+                  // Add to routine
+                  haptic.medium();
+                  addAudioTaskMutation.mutate({
+                    id: audio.id,
+                    title: audio.title,
+                    cover_image_url: audio.cover_image_url,
+                  });
+                }
+              }}
+              disabled={addAudioTaskMutation.isPending || isCheckingTask}
+              title={existingTask ? "Go to planner" : "Add to my rituals"}
+            >
+              {existingTask ? (
+                <Check className="h-5 w-5 text-emerald-600" />
+              ) : (
+                <CalendarPlus className="h-5 w-5" />
+              )}
+            </Button>
+          )}
 
           {/* Track List Sheet - supports both module mode and track mode */}
           {((isModuleMode && modulePlaylist && modulePlaylist.length > 1) || 
