@@ -165,8 +165,8 @@ export function TourOverlay({
         if (element instanceof HTMLElement) {
           originalZIndex = element.style.zIndex;
           originalPosition = element.style.position;
-          // Elevate element above the overlay backdrop (z-9990) but allow tooltip (z-10002) on top
-          element.style.zIndex = '9995';
+          // Elevate element above the overlay backdrop (z-99999) but below tooltip (z-100001)
+          element.style.zIndex = '99998';
           // Ensure it has a position context for z-index to work
           const computedPosition = window.getComputedStyle(element).position;
           if (computedPosition === 'static') {
@@ -262,9 +262,9 @@ export function TourOverlay({
   const isCenter = currentStep.position === 'center' || !currentStep.target;
 
   return (
-    <div className="fixed inset-0 z-[9990] pointer-events-auto">
-      {/* Backdrop with spotlight cutout - lower z-index */}
-      <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 9990 }}>
+    <div className="fixed inset-0 z-[99999] pointer-events-auto">
+      {/* Backdrop with spotlight cutout */}
+      <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 99999 }}>
         <defs>
           <mask id="spotlight-mask">
             <rect x="0" y="0" width="100%" height="100%" fill="white" />
@@ -299,7 +299,7 @@ export function TourOverlay({
             left: spotlightRect.left,
             width: spotlightRect.width,
             height: spotlightRect.height,
-            zIndex: 10001,
+            zIndex: 100000,
           }}
         />
       )}
@@ -313,7 +313,7 @@ export function TourOverlay({
           // Mobile-first padding
           "p-4 sm:p-5"
         )}
-        style={{ ...tooltipStyle, zIndex: 10002 }}
+        style={{ ...tooltipStyle, zIndex: 100001 }}
       >
         {/* Skip button - larger touch target for mobile */}
         <button
