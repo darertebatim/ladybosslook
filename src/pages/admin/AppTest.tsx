@@ -132,6 +132,39 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
+      {/* App Store Review */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Star className="h-5 w-5 text-yellow-500" />
+            App Store Review
+          </CardTitle>
+          <CardDescription>
+            Test the native App Store review prompt (iOS only)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button 
+            onClick={async () => {
+              const success = await forceRequestReview();
+              if (success) {
+                toast.success('Review prompt triggered');
+              } else {
+                toast.error('Review prompt failed - requires native iOS');
+              }
+            }} 
+            variant="outline"
+          >
+            <Star className="h-4 w-4 mr-2" />
+            Request App Review
+          </Button>
+          <p className="text-xs text-muted-foreground mt-3">
+            Note: Only works on native iOS. In development, the dialog shows but reviews can't be submitted.
+            iOS limits to 3 prompts per year per user.
+          </p>
+        </CardContent>
+      </Card>
+
       {/* Toasts */}
       <Card>
         <CardHeader>

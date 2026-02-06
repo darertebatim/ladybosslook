@@ -229,7 +229,7 @@ export const StreakCelebration = ({ open, onClose, isFirstAction = false }: Stre
 
         {/* Button */}
         <Button
-          onClick={onClose}
+          onClick={handleClose}
           className="w-full bg-white hover:bg-white/90 text-violet-900 font-medium py-3 rounded-xl"
         >
           {isFirstAction ? (
