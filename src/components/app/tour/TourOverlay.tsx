@@ -348,32 +348,28 @@ export function TourOverlay({
         </p>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-2">
-          {/* Progress dots */}
-          <div className="flex gap-1.5 flex-shrink-0">
-            {Array.from({ length: totalSteps }).map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-colors",
-                  i === currentStepIndex ? "bg-primary" : "bg-muted"
-                )}
-              />
-            ))}
+        <div className="flex flex-col gap-3">
+          {/* Progress indicator - compact for many steps */}
+          <div className="flex items-center justify-center gap-1">
+            <span className="text-xs text-muted-foreground font-medium">
+              {currentStepIndex + 1} / {totalSteps}
+            </span>
           </div>
 
           {/* Navigation buttons */}
-          <div className="flex gap-2 flex-shrink-0">
-            {currentStepIndex > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handlePrev}
-                className="h-9 w-9 p-0 active:scale-95"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-            )}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex-1">
+              {currentStepIndex > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handlePrev}
+                  className="h-9 w-9 p-0 active:scale-95"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
             <Button
               size="sm"
               onClick={handleNext}
