@@ -26,6 +26,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
 import { usePopularRoutinesBank, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
 import { RoutineBankCard } from '@/components/app/RoutineBankCard';
+import { usePopularActions } from '@/hooks/usePopularActions';
+import { ActionBankCard } from '@/components/app/ActionBankCard';
 import { haptic } from '@/lib/haptics';
 import { GoalInputSheet } from '@/components/app/GoalInputSheet';
 import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
@@ -205,6 +207,9 @@ const AppHome = () => {
     popularRoutines.filter(r => !addedRoutineIdsSet.has(r.id)).slice(0, 4), 
     [popularRoutines, addedRoutineIdsSet]
   );
+
+  // Popular actions for suggestions
+  const { data: popularActions = [] } = usePopularActions();
 
   // Generate week days
   const weekDays = useMemo(() => {
@@ -644,6 +649,27 @@ const AppHome = () => {
                   <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenWaterTracking={handleOpenWaterTracking} />
                 </div>
               ) : null}
+
+              {/* Popular Actions Suggestions */}
+              {popularActions.length > 0 && selectedTag === null && (
+                <div className="mt-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Star className="h-4 w-4 text-amber-500" />
+                    <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
+                      Try an Action
+                    </h2>
+                  </div>
+                  <div className="space-y-1.5">
+                    {popularActions.slice(0, 6).map(action => (
+                      <ActionBankCard 
+                        key={action.id} 
+                        action={action} 
+                        onClick={() => handleQuickStartContinue(action.title, action)} 
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Popular Rituals Suggestions - only show rituals user hasn't added */}
               {suggestedRoutines.length > 0 && selectedTag === null && <div className="tour-suggestions mt-6">
