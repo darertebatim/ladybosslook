@@ -108,7 +108,7 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
           <button
             onClick={handleAddToRoutine}
             className={cn(
-              "flex-shrink-0 p-2.5 rounded-full transition-colors",
+              "tour-add-to-routine flex-shrink-0 p-2.5 rounded-full transition-colors",
               isAdded 
                 ? "bg-success hover:bg-success/90" 
                 : "bg-foreground hover:bg-foreground/90"
