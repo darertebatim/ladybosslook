@@ -238,6 +238,14 @@ Deno.serve(async (req) => {
     
     const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
     
+    // Fetch notification preferences
+    const { data: preferences } = await supabase
+      .from('user_notification_preferences')
+      .select('user_id, morning_summary, evening_checkin')
+      .in('user_id', userIds);
+    
+    const prefsMap = new Map(preferences?.map(p => [p.user_id, p]) || []);
+    
     // Build user -> subscriptions map
     const userSubscriptions = new Map<string, typeof usersWithSubs>();
     for (const sub of usersWithSubs) {
@@ -247,6 +255,7 @@ Deno.serve(async (req) => {
     }
     
     // Filter users by local hour (7 AM for morning, 6 PM for evening)
+    // AND by their notification preferences
     const morningUsers: string[] = [];
     const eveningUsers: string[] = [];
     
@@ -254,10 +263,15 @@ Deno.serve(async (req) => {
       const profile = profileMap.get(userId);
       const timezone = profile?.timezone || 'America/Los_Angeles';
       const localHour = getUserLocalHour(timezone);
+      const prefs = prefsMap.get(userId);
       
-      if (localHour === MORNING_HOUR) {
+      // Check preferences (default to true if not set)
+      const wantsMorning = prefs?.morning_summary !== false;
+      const wantsEvening = prefs?.evening_checkin !== false;
+      
+      if (localHour === MORNING_HOUR && wantsMorning) {
         morningUsers.push(userId);
-      } else if (localHour === EVENING_HOUR) {
+      } else if (localHour === EVENING_HOUR && wantsEvening) {
         eveningUsers.push(userId);
       }
     }

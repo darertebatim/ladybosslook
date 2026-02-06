@@ -1550,9 +1550,13 @@ export type Database = {
           failed_count: number | null
           function_name: string
           id: string
+          notification_type: string | null
           schedule_id: string | null
+          scheduled_for: string | null
+          sent_at: string | null
           sent_count: number | null
           status: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -1560,9 +1564,13 @@ export type Database = {
           failed_count?: number | null
           function_name: string
           id?: string
+          notification_type?: string | null
           schedule_id?: string | null
+          scheduled_for?: string | null
+          sent_at?: string | null
           sent_count?: number | null
           status: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -1570,9 +1578,13 @@ export type Database = {
           failed_count?: number | null
           function_name?: string
           id?: string
+          notification_type?: string | null
           schedule_id?: string | null
+          scheduled_for?: string | null
+          sent_at?: string | null
           sent_count?: number | null
           status?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -2814,6 +2826,66 @@ export type Database = {
           id?: string
           last_viewed_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_notification_preferences: {
+        Row: {
+          action_reminders: boolean
+          announcements: boolean
+          content_drip: boolean
+          created_at: string
+          daily_completion: boolean
+          evening_checkin: boolean
+          feed_posts: boolean
+          goal_milestones: boolean
+          goal_nudges: boolean
+          id: string
+          momentum_celebration: boolean
+          morning_summary: boolean
+          session_reminders: boolean
+          time_period_reminders: boolean
+          updated_at: string
+          user_id: string
+          weekly_summary: boolean
+        }
+        Insert: {
+          action_reminders?: boolean
+          announcements?: boolean
+          content_drip?: boolean
+          created_at?: string
+          daily_completion?: boolean
+          evening_checkin?: boolean
+          feed_posts?: boolean
+          goal_milestones?: boolean
+          goal_nudges?: boolean
+          id?: string
+          momentum_celebration?: boolean
+          morning_summary?: boolean
+          session_reminders?: boolean
+          time_period_reminders?: boolean
+          updated_at?: string
+          user_id: string
+          weekly_summary?: boolean
+        }
+        Update: {
+          action_reminders?: boolean
+          announcements?: boolean
+          content_drip?: boolean
+          created_at?: string
+          daily_completion?: boolean
+          evening_checkin?: boolean
+          feed_posts?: boolean
+          goal_milestones?: boolean
+          goal_nudges?: boolean
+          id?: string
+          momentum_celebration?: boolean
+          morning_summary?: boolean
+          session_reminders?: boolean
+          time_period_reminders?: boolean
+          updated_at?: string
+          user_id?: string
+          weekly_summary?: boolean
         }
         Relationships: []
       }
