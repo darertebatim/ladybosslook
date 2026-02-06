@@ -18,8 +18,7 @@ import { PromoBanner } from '@/components/app/PromoBanner';
 import { HomeBanner } from '@/components/app/HomeBanner';
 import { NotificationBanner } from '@/components/app/NotificationBanner';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
-import { AppTour } from '@/components/app/AppTour';
-import { useAppTour } from '@/hooks/useAppTour';
+import { HomeTour } from '@/components/app/tour';
 import { useAuth } from '@/hooks/useAuth';
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -72,14 +71,6 @@ const AppHome = () => {
   
   // Track if user started this session as a new user (so card stays visible after adding tasks)
   const [startedAsNewUser, setStartedAsNewUser] = useState<boolean | null>(null);
-
-  const {
-    run: runTour,
-    stepIndex,
-    setStepIndex,
-    completeTour,
-    skipTour
-  } = useAppTour();
 
   // Handle quick start continue
   const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
@@ -141,6 +132,9 @@ const AppHome = () => {
   // Check for force new user flag (set by admin reset)
   const forceNewUser = localStorage.getItem('simora_force_new_user') === 'true';
   const isNewUser = dataIsNewUser || forceNewUser;
+  
+  // Track if this is truly a first-time user for tour (no prior completions ever)
+  const isFirstOpen = !homeDataLoading && totalCompletions === 0 && !localStorage.getItem('simora_tour_home_done');
   
   // Track if user started this session as a new user (only set once when data loads)
   useEffect(() => {
@@ -446,7 +440,7 @@ const AppHome = () => {
           {/* Title bar - three column layout for balanced centering */}
           <div className="grid grid-cols-[auto_1fr_auto] items-center px-4 h-12">
             {/* Left: Menu button */}
-            <div className="justify-self-start">
+            <div className="justify-self-start tour-menu-button">
               <HomeMenu />
             </div>
 
@@ -570,7 +564,9 @@ const AppHome = () => {
             <PromoBanner location="home_top" className="py-2" />
 
             {/* Home Banners (announcements with videos/CTAs) */}
-            <HomeBanner />
+            <div className="tour-banner">
+              <HomeBanner />
+            </div>
 
             {/* Tag filter chips - temporarily hidden */}
             {/* {taskTags.length > 0 && <div className="py-2 -mx-4 px-4 bg-background overflow-x-auto">
@@ -646,7 +642,7 @@ const AppHome = () => {
               ) : null}
 
               {/* Popular Rituals Suggestions - only show rituals user hasn't added */}
-              {suggestedRoutines.length > 0 && selectedTag === null && <div className="tour-suggestions mt-6">
+              {suggestedRoutines.length > 0 && selectedTag === null && <div className="tour-suggested-ritual mt-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="h-4 w-4 text-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
@@ -676,7 +672,7 @@ const AppHome = () => {
 
         {/* Fixed Bottom Dashboard - only show if user has active programs */}
         {activeRounds.length > 0 && (
-          <div className="fixed bottom-0 left-0 right-0 z-40 rounded-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)] bg-primary-foreground rounded-none" style={{
+          <div className="tour-programs-carousel fixed bottom-0 left-0 right-0 z-40 rounded-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)] bg-primary-foreground rounded-none" style={{
             paddingBottom: 'max(64px, calc(52px + env(safe-area-inset-bottom)))'
           }}>
             <div className="px-1 py-1 bg-primary-foreground">
@@ -767,9 +763,13 @@ const AppHome = () => {
 
         {user && showNotificationFlow && <PushNotificationOnboarding userId={user.id} onComplete={() => setShowNotificationFlow(false)} onSkip={() => setShowNotificationFlow(false)} />}
 
-
-        {/* App Tour - Joyride guided walkthrough */}
-        <AppTour run={runTour} stepIndex={stepIndex} onStepChange={setStepIndex} onComplete={completeTour} onSkip={skipTour} />
+        {/* New Interactive Home Tour */}
+        <HomeTour 
+          isFirstOpen={isFirstOpen}
+          hasEnrolledPrograms={activeRounds.length > 0}
+          hasBanner={true}
+          hasSuggestedRituals={suggestedRoutines.length > 0}
+        />
       </div>
     </>;
 };
