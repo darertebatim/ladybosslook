@@ -285,14 +285,9 @@ const AppHome = () => {
     return map;
   }, [completions]);
 
-  // Check if this is the user's first action ever (suppress streak modal if so)
-  const isFirstActionEver = totalCompletions === 0 && localStorage.getItem('simora_first_action_celebrated') !== 'true';
-
   const handleStreakIncrease = useCallback(() => {
-    // Don't show streak modal if FirstActionCelebration will show
-    if (isFirstActionEver) return;
     setShowStreakModal(true);
-  }, [isFirstActionEver]);
+  }, []);
 
   const handleOpenGoalInput = useCallback((task: UserTask) => {
     setGoalInputTask(task);
