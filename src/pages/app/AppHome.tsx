@@ -335,7 +335,7 @@ const AppHome = () => {
             description: `Progress: ${result.newProgress}/${goalInputTask.goal_target}`,
             duration: 2000,
           });
-          if (result.streakIncreased && !isFirstActionEver) {
+          if (result.streakIncreased) {
             setShowStreakModal(true);
           }
         },
