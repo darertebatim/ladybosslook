@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
+import { TourWelcomePopup } from './TourWelcomePopup';
 
 interface HomeTourProps {
   hasEnrolledPrograms?: boolean;
@@ -15,6 +16,8 @@ export function HomeTour({
   hasWelcomeCard = false,
   isFirstOpen = false,
 }: HomeTourProps) {
+  const [userWantsTour, setUserWantsTour] = useState(false);
+
   // Build steps dynamically based on available content
   const steps = useMemo((): TourStep[] => {
     const baseSteps: TourStep[] = [
@@ -143,21 +146,46 @@ export function HomeTour({
   const tour = useFeatureTour({
     feature: 'home',
     steps,
-    triggerOnMount: isFirstOpen,
+    // Don't auto-trigger - wait for user to accept via popup
+    triggerOnMount: false,
   });
 
+  // Handle user accepting tour from popup
+  const handleStartTour = useCallback(() => {
+    setUserWantsTour(true);
+    // Small delay to ensure popup is closed
+    setTimeout(() => {
+      tour.forceStartTour();
+    }, 100);
+  }, [tour]);
+
+  // Handle user declining tour
+  const handleSkipTour = useCallback(() => {
+    tour.completeTour();
+  }, [tour]);
+
   return (
-    <TourOverlay
-      isActive={tour.isActive}
-      currentStep={tour.currentStep}
-      currentStepIndex={tour.currentStepIndex}
-      totalSteps={tour.totalSteps}
-      isLastStep={tour.isLastStep}
-      onNext={tour.nextStep}
-      onPrev={tour.prevStep}
-      onSkip={tour.completeTour}
-      onComplete={tour.completeTour}
-    />
+    <>
+      {/* Welcome popup - shows before tour */}
+      <TourWelcomePopup
+        isFirstOpen={isFirstOpen}
+        onStartTour={handleStartTour}
+        onSkipTour={handleSkipTour}
+      />
+
+      {/* Actual tour overlay */}
+      <TourOverlay
+        isActive={tour.isActive}
+        currentStep={tour.currentStep}
+        currentStepIndex={tour.currentStepIndex}
+        totalSteps={tour.totalSteps}
+        isLastStep={tour.isLastStep}
+        onNext={tour.nextStep}
+        onPrev={tour.prevStep}
+        onSkip={tour.completeTour}
+        onComplete={tour.completeTour}
+      />
+    </>
   );
 }
 

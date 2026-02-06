@@ -1,5 +1,6 @@
 // Tour components
 export { TourOverlay } from './TourOverlay';
+export { TourWelcomePopup, resetTourPrompt } from './TourWelcomePopup';
 export { HomeTour } from './HomeTour';
 export { RitualsTour } from './RitualsTour';
 export { PlayerTour } from './PlayerTour';
