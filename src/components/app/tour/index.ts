@@ -9,6 +9,7 @@ export { PeriodTour } from './PeriodTour';
 export { ProgramsTour } from './ProgramsTour';
 export { RoundTour } from './RoundTour';
 export { ExploreTour } from './ExploreTour';
+export { PlaylistTour } from './PlaylistTour';
 
 // Hook and utilities
 export { 

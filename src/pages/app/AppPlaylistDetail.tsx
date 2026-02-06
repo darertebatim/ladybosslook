@@ -18,6 +18,7 @@ import { useRoutinePlan, useAddRoutinePlan } from "@/hooks/useRoutinePlans";
 import { useQuickAddPlaylistTask } from "@/hooks/useTaskPlanner";
 import { RoutinePreviewSheet } from "@/components/app/RoutinePreviewSheet";
 import { AddedToRoutineButton } from "@/components/app/AddedToRoutineButton";
+import { PlaylistTour } from "@/components/app/tour";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 export default function AppPlaylistDetail() {
@@ -630,13 +631,15 @@ export default function AppPlaylistDetail() {
               <Play className="h-5 w-5 mr-1" />
               {getNextPlayableItem() ? 'Continue' : 'Play'}
             </Button>
-            <AddedToRoutineButton
-              isAdded={!!existingTask}
-              onAddClick={handleAddToRoutine}
-              isLoading={quickAddTask.isPending}
-              size="lg"
-              variant="outline"
-            />
+            <div className="tour-add-to-routine">
+              <AddedToRoutineButton
+                isAdded={!!existingTask}
+                onAddClick={handleAddToRoutine}
+                isLoading={quickAddTask.isPending}
+                size="lg"
+                variant="outline"
+              />
+            </div>
           </div>
         )}
 
@@ -733,7 +736,7 @@ export default function AppPlaylistDetail() {
 
       {/* Track List */}
       {showTracks && tracks && tracks.length > 0 && (
-        <div className="px-4 pb-4 space-y-2">
+        <div className="px-4 pb-4 space-y-2 tour-track-list">
           <h2 className="text-lg font-semibold mb-3">Tracks</h2>
           {tracks.map((item, index) => {
             const track = item.audio_content;
@@ -856,6 +859,9 @@ export default function AppPlaylistDetail() {
             isSaving={addRoutinePlan.isPending || quickAddTask.isPending}
           />
         )}
+
+        {/* Playlist Tour */}
+        <PlaylistTour isFirstVisit={true} />
         
         {/* Bottom safe area padding */}
         <div className="pb-safe" />

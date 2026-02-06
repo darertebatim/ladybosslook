@@ -19,8 +19,8 @@ export function RoundTour({
     const baseSteps: TourStep[] = [
       {
         id: 'welcome',
-        title: 'Your Course Dashboard 📚',
-        description: 'Everything you need for this program is here: lessons, sessions, and materials.',
+        title: 'Your Course 📚',
+        description: 'Everything you need for this program is here.',
         position: 'center',
         action: 'look',
       },
@@ -31,7 +31,7 @@ export function RoundTour({
         id: 'audio',
         target: '.tour-audio-content',
         title: 'Audio Lessons',
-        description: 'Listen to lessons at your own pace. New content unlocks as you progress.',
+        description: 'Listen at your own pace. New content unlocks as you go.',
         position: 'bottom',
         action: 'tap',
         condition: () => !!document.querySelector('.tour-audio-content'),
@@ -43,7 +43,7 @@ export function RoundTour({
         id: 'sessions',
         target: '.tour-live-sessions',
         title: 'Live Sessions',
-        description: 'Join scheduled live sessions with your coach. Add them to your calendar so you don\'t miss them!',
+        description: 'Join scheduled sessions with your coach.',
         position: 'bottom',
         action: 'tap',
         condition: () => !!document.querySelector('.tour-live-sessions'),
@@ -55,7 +55,7 @@ export function RoundTour({
         id: 'materials',
         target: '.tour-supplements',
         title: 'Course Materials',
-        description: 'Access worksheets, guides, and downloadable resources to support your learning.',
+        description: 'Worksheets, guides, and resources to support you.',
         position: 'bottom',
         action: 'tap',
         condition: () => !!document.querySelector('.tour-supplements'),
@@ -66,7 +66,7 @@ export function RoundTour({
       id: 'feed',
       target: '.tour-course-feed',
       title: 'Course Community',
-      description: 'Connect with fellow students, ask questions, and share your progress.',
+      description: 'Connect with fellow students and share progress.',
       position: 'top',
       action: 'tap',
       condition: () => !!document.querySelector('.tour-course-feed'),
@@ -74,8 +74,8 @@ export function RoundTour({
 
     baseSteps.push({
       id: 'done',
-      title: 'You\'ve Got This! 🌟',
-      description: 'Take it one step at a time. Progress, not perfection.',
+      title: "You've Got This! 🌟",
+      description: 'One step at a time. Progress, not perfection.',
       position: 'center',
       action: 'look',
     });

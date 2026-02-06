@@ -605,7 +605,7 @@ const AppHome = () => {
 
               {/* Welcome Ritual Card for New Users - stays until dismissed */}
               {showWelcomeCard && (
-                <div className="py-4">
+                <div className="py-4 tour-welcome-card">
                   <WelcomeRitualCard onDismiss={() => {
                     setWelcomeCardDismissed(true);
                     setStartedAsNewUser(false);
@@ -769,6 +769,7 @@ const AppHome = () => {
           hasEnrolledPrograms={activeRounds.length > 0}
           hasBanner={true}
           hasSuggestedRituals={suggestedRoutines.length > 0}
+          hasWelcomeCard={showWelcomeCard}
         />
       </div>
     </>;

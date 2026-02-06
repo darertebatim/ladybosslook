@@ -317,7 +317,7 @@ export default function AppInspire() {
 
           {/* Task Ideas Section - hide for all-routines since they focus on routines only */}
           {taskTemplates && taskTemplates.length > 0 && selectedCategory !== 'all-routines' && (
-            <div className="mt-8 px-4 w-full max-w-full overflow-hidden pb-8">
+            <div className="mt-8 px-4 w-full max-w-full overflow-hidden pb-8 tour-actions-section">
               <div className="flex items-center gap-2 mb-3">
                 <ListTodo className="w-4 h-4 text-primary" />
                 <h2 className="text-sm font-semibold text-muted-foreground">

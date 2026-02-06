@@ -6,6 +6,7 @@ interface HomeTourProps {
   hasEnrolledPrograms?: boolean;
   hasBanner?: boolean;
   hasSuggestedRituals?: boolean;
+  hasWelcomeCard?: boolean;
   isFirstOpen?: boolean;
 }
 
@@ -13,6 +14,7 @@ export function HomeTour({
   hasEnrolledPrograms = false,
   hasBanner = false,
   hasSuggestedRituals = false,
+  hasWelcomeCard = false,
   isFirstOpen = false,
 }: HomeTourProps) {
   // Build steps dynamically based on available content
@@ -20,8 +22,8 @@ export function HomeTour({
     const baseSteps: TourStep[] = [
       {
         id: 'welcome',
-        title: 'Welcome to Simora! ✨',
-        description: 'Let me show you around. This is your personal dashboard where everything happens.',
+        title: 'Welcome to Simora ✨',
+        description: 'Hi there! This is your home. Everything starts here.',
         position: 'center',
         action: 'look',
       },
@@ -29,7 +31,7 @@ export function HomeTour({
         id: 'menu',
         title: 'Your Menu',
         target: '.tour-menu-button',
-        description: 'Tap here to access all app features: Listen, Journal, Breathe, Rituals, and more.',
+        description: 'Tap the menu to see all your tools.',
         position: 'bottom',
         action: 'tap',
       },
@@ -37,7 +39,7 @@ export function HomeTour({
         id: 'calendar',
         title: 'Your Week',
         target: '.tour-calendar',
-        description: 'Swipe to see different days. Flame icons 🔥 show when you honored your actions!',
+        description: 'Swipe to pick a day. The flame shows days you showed up.',
         position: 'bottom',
         action: 'swipe',
       },
@@ -45,7 +47,7 @@ export function HomeTour({
         id: 'add-action',
         title: 'Add Actions',
         target: '.tour-add-task',
-        description: 'Tap + to add daily actions. Start with just one small step!',
+        description: 'Tap + to add something small to your day.',
         position: 'left',
         action: 'tap',
       },
@@ -57,7 +59,7 @@ export function HomeTour({
         id: 'banner',
         title: 'Announcements',
         target: '.tour-banner',
-        description: 'Important updates and messages from your coach will appear here.',
+        description: 'Important updates and messages will appear here.',
         position: 'bottom',
         action: 'look',
         condition: () => !!document.querySelector('.tour-banner'),
@@ -70,7 +72,7 @@ export function HomeTour({
         id: 'rituals',
         title: 'Suggested Rituals',
         target: '.tour-suggested-ritual',
-        description: 'Quick rituals designed for you. Tap to preview and add actions to your day.',
+        description: 'Quick rituals designed for you. Tap to preview and add.',
         position: 'top',
         action: 'tap',
         condition: () => !!document.querySelector('.tour-suggested-ritual'),
@@ -83,7 +85,7 @@ export function HomeTour({
         id: 'programs',
         title: 'Your Programs',
         target: '.tour-programs-carousel',
-        description: 'Your enrolled courses are here. Tap to access lessons, materials, and live sessions.',
+        description: 'Your enrolled courses are here. Tap to access lessons.',
         position: 'top',
         action: 'tap',
         condition: () => !!document.querySelector('.tour-programs-carousel'),
@@ -95,7 +97,7 @@ export function HomeTour({
       id: 'nav-explore',
       title: 'Explore 🧭',
       target: '.tour-nav-explore',
-      description: 'Discover programs, courses, and content. Browse everything Simora has to offer.',
+      description: 'Find new tools and content here.',
       position: 'top',
       action: 'tap',
     });
@@ -104,7 +106,7 @@ export function HomeTour({
       id: 'nav-listen',
       title: 'Listen 🎵',
       target: '.tour-nav-listen',
-      description: 'Meditations, affirmations, and audio content. Listen while you relax or on the go.',
+      description: 'Audio for calm, focus, or movement.',
       position: 'top',
       action: 'tap',
     });
@@ -113,7 +115,7 @@ export function HomeTour({
       id: 'nav-channels',
       title: 'Channels 👥',
       target: '.tour-nav-channels',
-      description: 'Community feed and announcements. Connect with others on the same journey.',
+      description: 'See updates from your community.',
       position: 'top',
       action: 'tap',
     });
@@ -122,22 +124,34 @@ export function HomeTour({
       id: 'nav-support',
       title: 'Support 💬',
       target: '.tour-nav-support',
-      description: 'Need help? Chat directly with our support team anytime. We\'re here for you!',
+      description: "We're here if you need anything.",
       position: 'top',
       action: 'tap',
     });
 
-    // ===== FINAL STEP - ENCOURAGE SUPPORT MESSAGE =====
-    baseSteps.push({
-      id: 'done',
-      title: "Say Hello! 👋",
-      description: 'You\'re all set! Why not start by sending us a quick hello in Support? Introduce yourself — we\'d love to know what brought you here.',
-      position: 'center',
-      action: 'look',
-    });
+    // ===== FINAL STEP - Dynamic based on Welcome Card =====
+    if (hasWelcomeCard) {
+      baseSteps.push({
+        id: 'welcome-card',
+        title: 'Your First Action 🎯',
+        target: '.tour-welcome-card',
+        description: 'Ready? Flip the card below to pick your first action.',
+        position: 'top',
+        action: 'tap',
+        condition: () => !!document.querySelector('.tour-welcome-card'),
+      });
+    } else {
+      baseSteps.push({
+        id: 'done',
+        title: 'Ready to Start! 👋',
+        description: "Ready? Tap + to add your first action.",
+        position: 'center',
+        action: 'look',
+      });
+    }
 
     return baseSteps;
-  }, [hasEnrolledPrograms, hasBanner, hasSuggestedRituals]);
+  }, [hasEnrolledPrograms, hasBanner, hasSuggestedRituals, hasWelcomeCard]);
 
   const tour = useFeatureTour({
     feature: 'home',

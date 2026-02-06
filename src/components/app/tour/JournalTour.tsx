@@ -10,8 +10,8 @@ export function JournalTour({ isFirstVisit = false }: JournalTourProps) {
   const steps = useMemo((): TourStep[] => [
     {
       id: 'welcome',
-      title: 'Your Private Journal 📝',
-      description: 'A safe space to reflect, process emotions, and track your growth. Everything here is private.',
+      title: 'Your Journal 📝',
+      description: 'Your private space to reflect.',
       position: 'center',
       action: 'look',
     },
@@ -19,7 +19,7 @@ export function JournalTour({ isFirstVisit = false }: JournalTourProps) {
       id: 'new-entry',
       target: '.tour-new-entry',
       title: 'Start Writing',
-      description: 'Tap the + button to create a new entry. Use prompts for inspiration or write freely.',
+      description: 'Tap + to start writing.',
       position: 'left',
       action: 'tap',
       condition: () => !!document.querySelector('.tour-new-entry'),
@@ -28,7 +28,7 @@ export function JournalTour({ isFirstVisit = false }: JournalTourProps) {
       id: 'mood',
       target: '.tour-mood-selector',
       title: 'Track Your Mood',
-      description: 'Add a mood to each entry. Over time, you\'ll see patterns in how you feel.',
+      description: 'Track how you feel over time.',
       position: 'bottom',
       action: 'tap',
       condition: () => !!document.querySelector('.tour-mood-selector'),
@@ -36,7 +36,7 @@ export function JournalTour({ isFirstVisit = false }: JournalTourProps) {
     {
       id: 'done',
       title: 'Your Story Matters 💜',
-      description: 'Just a few sentences each day can transform your self-awareness.',
+      description: 'A few words each day make a difference.',
       position: 'center',
       action: 'look',
     },

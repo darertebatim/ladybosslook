@@ -2,48 +2,48 @@ import { useMemo } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
 
-interface PeriodTourProps {
+interface PlaylistTourProps {
   isFirstVisit?: boolean;
 }
 
-export function PeriodTour({ isFirstVisit = false }: PeriodTourProps) {
+export function PlaylistTour({ isFirstVisit = false }: PlaylistTourProps) {
   const steps = useMemo((): TourStep[] => [
     {
       id: 'welcome',
-      title: 'Period Tracker 🌸',
-      description: 'Track your cycle privately.',
+      title: 'Your Playlist 🎧',
+      description: 'This is your playlist. Listen at your pace.',
       position: 'center',
       action: 'look',
     },
     {
-      id: 'log',
-      target: '.tour-period-log',
-      title: 'Log Your Days',
-      description: 'Tap a day to log.',
+      id: 'tracks',
+      target: '.tour-track-list',
+      title: 'Tracks',
+      description: 'Tap any track to play.',
       position: 'bottom',
       action: 'tap',
-      condition: () => !!document.querySelector('.tour-period-log'),
+      condition: () => !!document.querySelector('.tour-track-list'),
     },
     {
-      id: 'insights',
-      target: '.tour-period-insights',
-      title: 'Cycle Insights',
-      description: 'See patterns and predictions.',
+      id: 'add-to-routine',
+      target: '.tour-add-to-routine',
+      title: 'Add to Your Rituals',
+      description: 'Want to remember this? Add it to your rituals.',
       position: 'top',
-      action: 'look',
-      condition: () => !!document.querySelector('.tour-period-insights'),
+      action: 'tap',
+      condition: () => !!document.querySelector('.tour-add-to-routine'),
     },
     {
       id: 'done',
-      title: 'Know Your Body 💪',
-      description: 'Understanding your body is strength.',
+      title: 'Enjoy Listening 🎵',
+      description: 'Enjoy. Every listen counts.',
       position: 'center',
       action: 'look',
     },
   ], []);
 
   const tour = useFeatureTour({
-    feature: 'period',
+    feature: 'playlist',
     steps,
     triggerOnMount: isFirstVisit,
   });
