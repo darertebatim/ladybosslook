@@ -9,7 +9,8 @@ export type TourFeature =
   | 'period' 
   | 'programs' 
   | 'round'
-  | 'explore';
+  | 'explore'
+  | 'playlist';
 
 const getTourKey = (feature: TourFeature) => `simora_tour_${feature}_done`;
 
@@ -159,6 +160,6 @@ export const resetTour = (feature: TourFeature) => {
 
 // Helper to reset all tours
 export const resetAllTours = () => {
-  const features: TourFeature[] = ['home', 'rituals', 'breathe', 'journal', 'player', 'period', 'programs', 'round', 'explore'];
+  const features: TourFeature[] = ['home', 'rituals', 'breathe', 'journal', 'player', 'period', 'programs', 'round', 'explore', 'playlist'];
   features.forEach(f => localStorage.removeItem(getTourKey(f)));
 };

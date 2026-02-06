@@ -4,7 +4,7 @@
  */
 
 // Tour feature keys
-const TOUR_FEATURES = ['home', 'rituals', 'breathe', 'journal', 'player', 'period', 'programs', 'round', 'explore'] as const;
+const TOUR_FEATURES = ['home', 'rituals', 'breathe', 'journal', 'player', 'period', 'programs', 'round', 'explore', 'playlist'] as const;
 
 // All localStorage keys that should be cleared on reset
 const CLIENT_RESET_KEYS = [
