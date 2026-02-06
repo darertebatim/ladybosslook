@@ -24,8 +24,9 @@ export function HomeTour({
       {
         id: 'welcome',
         title: 'Welcome to Simora ✨',
-        description: 'Hi there! This is your home. Everything starts here.',
-        position: 'center',
+        description: 'Hi there! This is your Home. Everything starts here.',
+        target: '.tour-nav-home',
+        position: 'top',
         action: 'look',
       },
       {
