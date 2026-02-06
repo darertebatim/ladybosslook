@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
 
@@ -45,13 +45,13 @@ export function HomeTour({
         id: 'add-action',
         title: 'Add Actions',
         target: '.tour-add-task',
-        description: 'Tap the + button to add daily actions. Start with just one small action!',
+        description: 'Tap + to add daily actions. Start with just one small step!',
         position: 'left',
         action: 'tap',
       },
     ];
 
-    // Conditionally add banner step
+    // Conditionally add banner step ONLY if banner actually exists
     if (hasBanner) {
       baseSteps.push({
         id: 'banner',
@@ -90,21 +90,48 @@ export function HomeTour({
       });
     }
 
-    // Quick actions grid
+    // ===== BOTTOM NAV EXPLANATIONS =====
     baseSteps.push({
-      id: 'quick-actions',
-      title: 'Quick Access',
-      target: '.tour-quick-actions',
-      description: 'Fast access to Listen, Journal, Channels, and Rituals. Everything you need, one tap away.',
+      id: 'nav-explore',
+      title: 'Explore 🧭',
+      target: '.tour-nav-explore',
+      description: 'Discover programs, courses, and content. Browse everything Simora has to offer.',
       position: 'top',
       action: 'tap',
     });
 
-    // Final encouragement
+    baseSteps.push({
+      id: 'nav-listen',
+      title: 'Listen 🎵',
+      target: '.tour-nav-listen',
+      description: 'Meditations, affirmations, and audio content. Listen while you relax or on the go.',
+      position: 'top',
+      action: 'tap',
+    });
+
+    baseSteps.push({
+      id: 'nav-channels',
+      title: 'Channels 👥',
+      target: '.tour-nav-channels',
+      description: 'Community feed and announcements. Connect with others on the same journey.',
+      position: 'top',
+      action: 'tap',
+    });
+
+    baseSteps.push({
+      id: 'nav-support',
+      title: 'Support 💬',
+      target: '.tour-nav-support',
+      description: 'Need help? Chat directly with our support team anytime. We\'re here for you!',
+      position: 'top',
+      action: 'tap',
+    });
+
+    // ===== FINAL STEP - ENCOURAGE SUPPORT MESSAGE =====
     baseSteps.push({
       id: 'done',
-      title: "You're All Set! 🎉",
-      description: 'Start with one small action today. Remember: showing up is the goal, not perfection.',
+      title: "Say Hello! 👋",
+      description: 'You\'re all set! Why not start by sending us a quick hello in Support? Introduce yourself — we\'d love to know what brought you here.',
       position: 'center',
       action: 'look',
     });
