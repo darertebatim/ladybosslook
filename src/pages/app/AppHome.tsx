@@ -765,11 +765,6 @@ const AppHome = () => {
 
         {user && showNotificationFlow && <PushNotificationOnboarding userId={user.id} onComplete={() => setShowNotificationFlow(false)} onSkip={() => setShowNotificationFlow(false)} />}
 
-        {/* First Action Celebration */}
-        <FirstActionCelebration
-          isOpen={showFirstCelebration}
-          onClose={() => setShowFirstCelebration(false)}
-        />
 
         {/* App Tour - Joyride guided walkthrough */}
         <AppTour run={runTour} stepIndex={stepIndex} onStepChange={setStepIndex} onComplete={completeTour} onSkip={skipTour} />
