@@ -34,7 +34,6 @@ import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
 import { WelcomeRitualCard } from '@/components/app/WelcomeRitualCard';
-import { FirstActionCelebration } from '@/components/app/FirstActionCelebration';
 import { toast } from 'sonner';
 const AppHome = () => {
   const navigate = useNavigate();
@@ -63,8 +62,8 @@ const AppHome = () => {
   // Skip task state
   const [skipTask, setSkipTask] = useState<UserTask | null>(null);
   
-  // First action celebration state
-  const [showFirstCelebration, setShowFirstCelebration] = useState(false);
+  // First action celebration - tracks if this is user's first ever completion (uses unified StreakCelebration)
+  const [isFirstActionCelebration, setIsFirstActionCelebration] = useState(false);
   
   // Welcome card dismissed state - persisted in localStorage
   const [welcomeCardDismissed, setWelcomeCardDismissed] = useState(() => 
@@ -172,7 +171,8 @@ const AppHome = () => {
     const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
     if (alreadyCelebrated) return;
 
-    setShowFirstCelebration(true);
+    setIsFirstActionCelebration(true);
+    setShowStreakModal(true);
     localStorage.setItem('simora_first_action_celebrated', 'true');
   }, []);
 
@@ -285,14 +285,9 @@ const AppHome = () => {
     return map;
   }, [completions]);
 
-  // Check if this is the user's first action ever (suppress streak modal if so)
-  const isFirstActionEver = totalCompletions === 0 && localStorage.getItem('simora_first_action_celebrated') !== 'true';
-
   const handleStreakIncrease = useCallback(() => {
-    // Don't show streak modal if FirstActionCelebration will show
-    if (isFirstActionEver) return;
     setShowStreakModal(true);
-  }, [isFirstActionEver]);
+  }, []);
 
   const handleOpenGoalInput = useCallback((task: UserTask) => {
     setGoalInputTask(task);
@@ -319,7 +314,7 @@ const AppHome = () => {
             description: `Progress: ${result.newProgress}/${waterTask.goal_target}`,
             duration: 2000,
           });
-          if (result.streakIncreased && !isFirstActionEver) {
+          if (result.streakIncreased) {
             setShowStreakModal(true);
           }
         },
@@ -340,7 +335,7 @@ const AppHome = () => {
             description: `Progress: ${result.newProgress}/${goalInputTask.goal_target}`,
             duration: 2000,
           });
-          if (result.streakIncreased && !isFirstActionEver) {
+          if (result.streakIncreased) {
             setShowStreakModal(true);
           }
         },
@@ -362,7 +357,7 @@ const AppHome = () => {
             description: `Progress: ${mins}/${goalMins} min`,
             duration: 2000,
           });
-          if (result.streakIncreased && !isFirstActionEver) {
+          if (result.streakIncreased) {
             setShowStreakModal(true);
           }
         },
@@ -718,8 +713,15 @@ const AppHome = () => {
           onSkip={handleSkipTask}
         />
 
-        {/* Streak celebration modal */}
-        <StreakCelebration open={showStreakModal} onClose={() => setShowStreakModal(false)} />
+        {/* Streak celebration modal (also handles first action celebration) */}
+        <StreakCelebration 
+          open={showStreakModal} 
+          onClose={() => {
+            setShowStreakModal(false);
+            setIsFirstActionCelebration(false);
+          }}
+          isFirstAction={isFirstActionCelebration}
+        />
 
         {/* Task Skip Sheet */}
         <TaskSkipSheet
@@ -765,11 +767,6 @@ const AppHome = () => {
 
         {user && showNotificationFlow && <PushNotificationOnboarding userId={user.id} onComplete={() => setShowNotificationFlow(false)} onSkip={() => setShowNotificationFlow(false)} />}
 
-        {/* First Action Celebration */}
-        <FirstActionCelebration
-          isOpen={showFirstCelebration}
-          onClose={() => setShowFirstCelebration(false)}
-        />
 
         {/* App Tour - Joyride guided walkthrough */}
         <AppTour run={runTour} stepIndex={stepIndex} onStepChange={setStepIndex} onComplete={completeTour} onSkip={skipTour} />
