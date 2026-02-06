@@ -9,11 +9,6 @@ import { logBuildInfo } from './lib/buildInfo';
 // Global error handler to catch any uncaught errors
 window.onerror = (message, source, lineno, colno, error) => {
   console.error('[FATAL]', message, source, lineno, colno, error);
-  const errorDiv = document.getElementById('error-display');
-  if (errorDiv) {
-    errorDiv.style.display = 'block';
-    errorDiv.textContent = `Error: ${message}`;
-  }
 };
 
 // Log build info immediately on app start

@@ -68,39 +68,7 @@
     src="https://www.facebook.com/tr?id=755747250681175&ev=PageView&noscript=1"
     /></noscript>
     
-    <!-- Fallback loading state for native app debugging - WHITE background to see errors -->
-    <div id="loading-fallback" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#FFFFFF;color:#000;font-family:system-ui;z-index:9999;">
-      <div style="font-size:24px;margin-bottom:10px;">🚀</div>
-      <div>Loading Simora...</div>
-      <div id="debug-info" style="margin-top:20px;font-size:12px;color:#666;"></div>
-      <script>document.getElementById('debug-info').textContent = 'v' + Date.now();</script>
-    </div>
-    
-    <!-- Error display for native debugging -->
-    <div id="error-display" style="display:none;position:fixed;bottom:20px;left:20px;right:20px;background:#f00;color:#fff;padding:16px;border-radius:8px;font-family:monospace;font-size:12px;z-index:10000;max-height:200px;overflow:auto;"></div>
-    
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Hide loading fallback once React renders -->
-    <script>
-      (function() {
-        var checkRoot = setInterval(function() {
-          var root = document.getElementById('root');
-          if (root && root.children.length > 0) {
-            document.getElementById('loading-fallback').style.display = 'none';
-            clearInterval(checkRoot);
-          }
-        }, 100);
-        // Timeout after 10 seconds
-        setTimeout(function() {
-          clearInterval(checkRoot);
-          var loading = document.getElementById('loading-fallback');
-          if (loading && loading.style.display !== 'none') {
-            loading.textContent = 'App failed to load. Check console for errors.';
-          }
-        }, 10000);
-      })();
-    </script>
   </body>
 </html>
