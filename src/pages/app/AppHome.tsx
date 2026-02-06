@@ -650,6 +650,27 @@ const AppHome = () => {
                 </div>
               ) : null}
 
+              {/* Popular Actions Suggestions */}
+              {popularActions.length > 0 && selectedTag === null && (
+                <div className="mt-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Star className="h-4 w-4 text-amber-500" />
+                    <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
+                      Try an Action
+                    </h2>
+                  </div>
+                  <div className="space-y-1.5">
+                    {popularActions.slice(0, 6).map(action => (
+                      <ActionBankCard 
+                        key={action.id} 
+                        action={action} 
+                        onClick={() => handleQuickStartContinue(action.title, action)} 
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Popular Rituals Suggestions - only show rituals user hasn't added */}
               {suggestedRoutines.length > 0 && selectedTag === null && <div className="tour-suggestions mt-6">
                   <div className="flex items-center gap-2 mb-3">
