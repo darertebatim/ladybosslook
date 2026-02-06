@@ -360,7 +360,7 @@ export function useAddRoutinePlan() {
         scheduledTime?: string | null;
         tag?: string | null;
         linked_playlist_id?: string | null;
-        pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | null;
+        pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | null;
         pro_link_value?: string | null;
       }[];
       syntheticTasks?: RoutinePlanTask[];

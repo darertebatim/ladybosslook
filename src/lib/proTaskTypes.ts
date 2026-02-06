@@ -9,11 +9,12 @@ import {
   Wind,
   Droplets,
   Heart,
-  HeartHandshake
+  HeartHandshake,
+  Headphones
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -173,6 +174,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open the emotion naming tool',
     requiresValue: false,
   },
+  audio: {
+    value: 'audio',
+    label: 'Audio Track',
+    icon: Headphones,
+    badgeText: 'Listen',
+    color: 'emerald',
+    gradientClass: 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40',
+    iconColorClass: 'text-emerald-600 dark:text-emerald-400',
+    badgeColorClass: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Link to a specific audio track',
+    requiresValue: true,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
@@ -182,6 +196,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
   switch (linkType) {
     case 'playlist':
       return `/app/player/playlist/${linkValue}`;
+    case 'audio':
+      return `/app/player/${linkValue}`;
     case 'journal':
       return '/app/journal/new';
     case 'breathe':
