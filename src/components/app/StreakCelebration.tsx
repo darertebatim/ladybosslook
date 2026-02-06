@@ -155,7 +155,7 @@ export const StreakCelebration = ({ open, onClose, isFirstAction = false }: Stre
   return (
     <div 
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-      onClick={onClose}
+      onClick={handleClose}
     >
       {/* Gentle overlay */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
