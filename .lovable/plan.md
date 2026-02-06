@@ -1,267 +1,121 @@
 
-# Add Promo Banners to Multiple App Locations
 
-## Overview
+## Plan: Add App Store Review Prompt + Remove Debugging Leftovers
 
-Currently, the `PromoBanner` component exists but needs to be placed in strategic locations throughout the app. This plan adds promo banners to four new locations:
-
-1. **Home Page** - Under the "Try a Ritual" section (suggested rituals)
-2. **Explore Page** - Under header, above the Tools section
-3. **Listen Page** - Under header, above playlists
-4. **Audio Player Page** - Under play controls (targeting specific playlists)
-
-## Technical Approach
-
-### Database Changes
-
-Add a new `display_location` column to the `promo_banners` table to control where each banner appears:
-
-```sql
-ALTER TABLE promo_banners 
-ADD COLUMN display_location text NOT NULL DEFAULT 'home';
-```
-
-Supported values:
-- `home` - Shows on Home page (existing + under rituals)
-- `explore` - Shows on Explore/Browse page
-- `listen` - Shows on Listen page
-- `player` - Shows on Audio Player page
-- `all` - Shows in all locations
-
-### Component Enhancement
-
-Create a reusable `LocationPromoBanner` component that:
-- Accepts a `location` prop to filter which banners to show
-- Optionally accepts `playlistId` for player-specific targeting
-- Reuses the existing filtering logic (audience targeting, display frequency, dismissals)
-
-### File Changes
-
-| File | Action | Description |
-|------|--------|-------------|
-| `supabase/migrations/...` | Create | Add `display_location` column |
-| `src/components/app/PromoBanner.tsx` | Modify | Add `location` and `playlistId` props for filtering |
-| `src/pages/app/AppHome.tsx` | Modify | Add PromoBanner after suggested rituals section |
-| `src/pages/app/AppStore.tsx` | Modify | Add PromoBanner below header, above Tools |
-| `src/pages/app/AppPlayer.tsx` | Modify | Add PromoBanner below header, above playlists |
-| `src/pages/app/AppAudioPlayer.tsx` | Modify | Add PromoBanner below play controls |
-| `src/components/admin/PromoBannerManager.tsx` | Modify | Add location selector in admin UI |
+### Overview
+This plan addresses two requests:
+1. **Add App Store Review functionality** - Implement an in-app review prompt using a Capacitor plugin that triggers the native iOS App Store rating dialog
+2. **Remove debugging leftovers** - Clean up fallback loading/error displays in `index.html` that were added during v1.1.07 blackness debugging
 
 ---
 
-## Implementation Details
+### Part 1: App Store Review Implementation
 
-### 1. Database Migration
+**Approach**: Use `@capacitor-community/in-app-review` plugin - this is the community-maintained standard for Capacitor 5+ and works seamlessly on iOS.
 
-```sql
-ALTER TABLE promo_banners 
-ADD COLUMN display_location text NOT NULL DEFAULT 'home';
+#### Files to Create/Modify:
 
--- Add location for player-specific banners (filter by playlist)
-ALTER TABLE promo_banners 
-ADD COLUMN target_playlist_ids uuid[] DEFAULT '{}';
+**1. Install the plugin** (dependency)
+- Add `@capacitor-community/in-app-review` to package.json
 
--- Index for efficient location filtering
-CREATE INDEX idx_promo_banners_location ON promo_banners(display_location);
+**2. Create `src/lib/appReview.ts`** (new file)
+```text
+- Helper functions to trigger the review prompt
+- Safety checks for native platform
+- Rate limiting (only prompt once per 30 days)
+- Error handling with try-catch
 ```
 
-### 2. Update PromoBanner Component
+**3. Create a custom hook `src/hooks/useAppReview.tsx`** (new file)
+```text
+- Determines when to show review prompt
+- Triggers after meaningful user actions (e.g., 5th streak celebration, course completion)
+- Tracks last review prompt date in localStorage
+```
 
-Add props to the component:
+**4. Update `src/components/app/StreakCelebration.tsx`**
+```text
+- Add review trigger after user reaches certain milestones (e.g., 5-day streak)
+- Call the review prompt after celebration modal closes
+```
 
-```tsx
-interface PromoBannerProps {
-  location?: 'home' | 'explore' | 'listen' | 'player' | 'all';
-  currentPlaylistId?: string; // For player page targeting
-  className?: string;
-}
+**5. Update `src/components/app/CompletionCelebration.tsx`**
+```text
+- Optionally trigger review after course completion
+```
 
-export function PromoBanner({ 
-  location = 'home', 
-  currentPlaylistId,
-  className 
-}: PromoBannerProps) {
-  // Filter banners by location
-  const eligibleBanners = useMemo(() => {
-    if (!banners) return [];
-    
-    return banners.filter(banner => {
-      // Location filter
-      if (banner.display_location !== 'all' && banner.display_location !== location) {
-        return false;
-      }
-      
-      // For player location: check if current playlist matches target
-      if (location === 'player' && banner.target_playlist_ids?.length > 0) {
-        if (!currentPlaylistId || !banner.target_playlist_ids.includes(currentPlaylistId)) {
-          return false;
-        }
-      }
-      
-      // ... existing targeting logic ...
-    });
-  }, [...]);
+**6. Add test button to `src/pages/admin/AppTest.tsx`**
+```text
+- Add "Request App Review" button for testing
+```
+
+#### Review Trigger Strategy:
+- Trigger after 5th streak (first meaningful engagement)
+- Trigger after completing a program/course
+- Maximum once per 30 days (iOS limits to 3 per year anyway)
+- Only on native iOS platform
+
+---
+
+### Part 2: Remove Debugging Leftovers
+
+**File: `index.html`**
+
+Remove these debugging elements (lines 71-103):
+- `#loading-fallback` div with "Loading Simora..." message
+- `#error-display` div for native error display  
+- `#debug-info` element
+- The script that hides the loading fallback
+
+These were added during v1.1.07 debugging but are no longer needed since:
+- The app loads correctly now
+- React has its own loading states via Suspense/PageLoader
+- The `window.onerror` handler in `main.tsx` already captures errors
+
+**File: `src/main.tsx`**
+
+Remove or simplify:
+- The `window.onerror` handler that writes to `#error-display` (which will be removed)
+
+---
+
+### Technical Details
+
+**In-App Review Plugin Usage:**
+```typescript
+import { InAppReview } from '@capacitor-community/in-app-review';
+
+export async function requestAppReview(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+  
+  try {
+    await InAppReview.requestReview();
+    console.log('[Review] Review requested successfully');
+  } catch (error) {
+    console.error('[Review] Error requesting review:', error);
+  }
 }
 ```
 
-### 3. Page Integrations
-
-**AppHome.tsx** - After "Try a Ritual" section (line ~665):
-```tsx
-{/* Promo Banner - After Rituals */}
-<PromoBanner location="home" className="mt-4" />
-```
-
-**AppStore.tsx (Explore)** - After header, before Tools section (line ~205):
-```tsx
-{/* Promo Banner - Explore Page */}
-<PromoBanner location="explore" className="mb-4" />
-
-{/* Tools Section */}
-<section>
-  <h2>Tools</h2>
-  ...
-</section>
-```
-
-**AppPlayer.tsx (Listen)** - After header spacer, before content (line ~311):
-```tsx
-{/* Promo Banner - Listen Page */}
-<PromoBanner location="listen" className="px-4 pt-2" />
-
-{/* Continue Learning Section */}
-...
-```
-
-**AppAudioPlayer.tsx** - After AudioControls, before "Up Next" (line ~710):
-```tsx
-{/* Controls */}
-<AudioControls ... />
-
-{/* Promo Banner - Player specific */}
-<PromoBanner 
-  location="player" 
-  currentPlaylistId={playlistInfo?.playlist_id || contextPlaylistId}
-  className="mt-3"
-/>
-
-{/* Up Next Preview */}
-{nextTrack && ...}
-```
-
-### 4. Admin UI Updates
-
-Add a location selector in `PromoBannerManager.tsx`:
-
-```tsx
-<Label>Display Location</Label>
-<Select value={displayLocation} onValueChange={setDisplayLocation}>
-  <SelectItem value="home">Home Page</SelectItem>
-  <SelectItem value="explore">Explore Page</SelectItem>
-  <SelectItem value="listen">Listen Page</SelectItem>
-  <SelectItem value="player">Audio Player</SelectItem>
-  <SelectItem value="all">All Locations</SelectItem>
-</Select>
-
-{/* Show playlist selector when player is selected */}
-{displayLocation === 'player' && (
-  <div>
-    <Label>Target Playlists (optional)</Label>
-    <p className="text-xs text-muted-foreground">
-      Leave empty to show on all audio player pages
-    </p>
-    <MultiSelect 
-      options={playlists}
-      value={targetPlaylistIds}
-      onChange={setTargetPlaylistIds}
-    />
-  </div>
-)}
-```
+**iOS Limitations to Note:**
+- iOS limits to 3 review prompts per 365 days per user
+- iOS decides whether to actually show the dialog (not guaranteed)
+- Cannot be triggered in response to button tap (must feel natural)
+- In development, dialog always shows but reviews can't be submitted
 
 ---
 
-## Visual Placement Summary
+### Summary of Changes
 
-```
-HOME PAGE
-+-----------------------------------------+
-| Header                                  |
-| Week Strip                              |
-+-----------------------------------------+
-| My Actions                              |
-| [Task Cards...]                         |
-+-----------------------------------------+
-| Try a Ritual                            |
-| [Routine Cards...]                      |
-+-----------------------------------------+
-| >>> PROMO BANNER HERE <<<               |
-+-----------------------------------------+
-| Active Rounds Carousel                  |
-+-----------------------------------------+
+| File | Action |
+|------|--------|
+| `package.json` | Add `@capacitor-community/in-app-review` |
+| `src/lib/appReview.ts` | Create - review helper functions |
+| `src/hooks/useAppReview.tsx` | Create - review trigger logic |
+| `src/components/app/StreakCelebration.tsx` | Modify - add review trigger |
+| `src/pages/admin/AppTest.tsx` | Modify - add test button |
+| `index.html` | Remove debugging fallback elements |
+| `src/main.tsx` | Simplify error handler |
 
-EXPLORE PAGE
-+-----------------------------------------+
-| Header (Explore Simora)                 |
-+-----------------------------------------+
-| >>> PROMO BANNER HERE <<<               |
-+-----------------------------------------+
-| Tools                                   |
-| [Tool Cards...]                         |
-+-----------------------------------------+
-| Programs                                |
-+-----------------------------------------+
-
-LISTEN PAGE
-+-----------------------------------------+
-| Header (Listen)                         |
-| Category Circles                        |
-| Filter Pills                            |
-+-----------------------------------------+
-| >>> PROMO BANNER HERE <<<               |
-+-----------------------------------------+
-| Continue Learning                       |
-| All Playlists                           |
-+-----------------------------------------+
-
-AUDIO PLAYER
-+-----------------------------------------+
-| Header                                  |
-+-----------------------------------------+
-| Cover Art                               |
-| Title                                   |
-| Progress Bar                            |
-| Play Controls                           |
-+-----------------------------------------+
-| >>> PROMO BANNER HERE <<<               |
-+-----------------------------------------+
-| Up Next Preview                         |
-+-----------------------------------------+
-```
-
----
-
-## Player Page Targeting Logic
-
-The player page banner is the trickiest because it allows:
-
-1. **Show to all audio players** - Banner with no target playlists
-2. **Show only for specific playlists** - Banner with `target_playlist_ids` set
-
-Example use cases:
-- Promote a meditation course only when user is listening to meditation content
-- Cross-promote related playlists
-- Upsell premium content while user listens to free tracks
-
----
-
-## Testing Considerations
-
-After implementation, verify:
-1. Banners appear in each location correctly
-2. Location filtering works (banner set to "explore" doesn't show on "home")
-3. Player targeting works with specific playlist IDs
-4. Existing audience targeting (programs, tools, playlists) still works
-5. Dismiss functionality persists across all locations
-6. Admin can create banners for each location
+After implementation, run `npx cap sync` to sync the new plugin with the native iOS project.
 
