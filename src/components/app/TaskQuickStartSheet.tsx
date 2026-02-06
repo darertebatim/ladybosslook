@@ -201,9 +201,52 @@ export const TaskQuickStartSheet = ({
             </button>
           </div>
 
+          {/* Category Pills */}
+          <div className="pb-3">
+            <ScrollArea className="w-full">
+              <div className="flex gap-2 px-4">
+                {/* Popular pill */}
+                <button
+                  onClick={() => {
+                    haptic.light();
+                    setSelectedCategory('popular');
+                  }}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0",
+                    selectedCategory === 'popular'
+                      ? "bg-foreground text-background"
+                      : "bg-muted text-foreground hover:bg-muted/80"
+                  )}
+                >
+                  ⭐ Popular
+                </button>
+                {/* Category pills from database */}
+                {categories.map((cat) => (
+                  <button
+                    key={cat.slug}
+                    onClick={() => {
+                      haptic.light();
+                      setSelectedCategory(cat.slug);
+                    }}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0",
+                      selectedCategory === cat.slug
+                        ? "bg-foreground text-background"
+                        : "bg-muted text-foreground hover:bg-muted/80"
+                    )}
+                  >
+                    {cat.emoji && <span className="mr-1">{cat.emoji}</span>}
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" className="invisible" />
+            </ScrollArea>
+          </div>
+
           {/* Suggestions - TaskTemplateCard style */}
           {filteredSuggestions.length > 0 && (
-            <div className="px-4 pb-3">
+            <div className="px-4 pb-4">
               <p className="text-xs text-muted-foreground mb-2">
                 {taskName.trim() ? 'Matching actions' : 'Suggestions'}
               </p>
@@ -267,49 +310,6 @@ export const TaskQuickStartSheet = ({
               </div>
             </div>
           )}
-
-          {/* Category Pills */}
-          <div className="pb-4">
-            <ScrollArea className="w-full">
-              <div className="flex gap-2 px-4">
-                {/* Popular pill */}
-                <button
-                  onClick={() => {
-                    haptic.light();
-                    setSelectedCategory('popular');
-                  }}
-                  className={cn(
-                    "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0",
-                    selectedCategory === 'popular'
-                      ? "bg-foreground text-background"
-                      : "bg-muted text-foreground hover:bg-muted/80"
-                  )}
-                >
-                  ⭐ Popular
-                </button>
-                {/* Category pills from database */}
-                {categories.map((cat) => (
-                  <button
-                    key={cat.slug}
-                    onClick={() => {
-                      haptic.light();
-                      setSelectedCategory(cat.slug);
-                    }}
-                    className={cn(
-                      "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0",
-                      selectedCategory === cat.slug
-                        ? "bg-foreground text-background"
-                        : "bg-muted text-foreground hover:bg-muted/80"
-                    )}
-                  >
-                    {cat.emoji && <span className="mr-1">{cat.emoji}</span>}
-                    {cat.name}
-                  </button>
-                ))}
-              </div>
-              <ScrollBar orientation="horizontal" className="invisible" />
-            </ScrollArea>
-          </div>
 
           {/* Bottom safe area padding */}
           <div className="h-2" />
