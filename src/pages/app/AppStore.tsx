@@ -207,7 +207,7 @@ const AppStore = () => {
             <PromoBanner location="explore" className="mb-2" />
 
             {/* Tools Section */}
-            {(!searchQuery || filteredWellnessTools.length > 0) && (
+            {(!searchQuery || filteredWellnessTools.length > 0 || filteredAudioTools.length > 0) && (
               <section>
                 <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
                   Tools
@@ -216,6 +216,12 @@ const AppStore = () => {
                   {filteredWellnessTools.map((tool) => (
                     <ToolCard key={tool.id} tool={tool} />
                   ))}
+                  {/* Audio tools - Meditate & Sounds */}
+                  {filteredAudioTools
+                    .filter(t => t.id === 'meditate' || t.id === 'soundscape')
+                    .map((tool) => (
+                      <ToolCard key={tool.id} tool={tool} />
+                    ))}
                 </div>
               </section>
             )}
