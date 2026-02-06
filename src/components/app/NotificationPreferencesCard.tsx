@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
 import { Bell, Sparkles, Target, Clock, Calendar, Megaphone, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { PreferenceItem } from './notifications/PreferenceItem';
+import { WakeSleepTimeSettings } from './notifications/WakeSleepTimeSettings';
+import { useLocalNotificationScheduler } from '@/hooks/useLocalNotificationScheduler';
 
 interface NotificationPreferences {
   id: string;
@@ -24,6 +26,8 @@ interface NotificationPreferences {
   feed_posts: boolean;
   announcements: boolean;
   weekly_summary: boolean;
+  wake_time: string;
+  sleep_time: string;
 }
 
 const DEFAULT_PREFERENCES: Omit<NotificationPreferences, 'id' | 'user_id'> = {
@@ -40,33 +44,9 @@ const DEFAULT_PREFERENCES: Omit<NotificationPreferences, 'id' | 'user_id'> = {
   feed_posts: true,
   announcements: true,
   weekly_summary: true,
+  wake_time: '07:00',
+  sleep_time: '22:00',
 };
-
-interface PreferenceItemProps {
-  icon: React.ReactNode;
-  label: string;
-  description: string;
-  checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
-  disabled?: boolean;
-}
-
-const PreferenceItem = ({ icon, label, description, checked, onCheckedChange, disabled }: PreferenceItemProps) => (
-  <div className="flex items-center justify-between py-3 border-b border-border/30 last:border-0">
-    <div className="flex items-start gap-3 flex-1">
-      <div className="text-muted-foreground mt-0.5">{icon}</div>
-      <div className="space-y-0.5">
-        <p className="text-sm font-medium">{label}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
-      </div>
-    </div>
-    <Switch 
-      checked={checked} 
-      onCheckedChange={onCheckedChange}
-      disabled={disabled}
-    />
-  </div>
-);
 
 interface NotificationPreferencesCardProps {
   userId: string | undefined;
@@ -76,6 +56,7 @@ interface NotificationPreferencesCardProps {
 export function NotificationPreferencesCard({ userId, notificationsEnabled }: NotificationPreferencesCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { scheduleNotifications } = useLocalNotificationScheduler(userId);
 
   // Fetch user preferences
   const { data: preferences, isLoading } = useQuery({
@@ -97,7 +78,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
 
   // Upsert preferences mutation
   const updatePreference = useMutation({
-    mutationFn: async ({ key, value }: { key: keyof typeof DEFAULT_PREFERENCES; value: boolean }) => {
+    mutationFn: async ({ key, value }: { key: keyof typeof DEFAULT_PREFERENCES; value: boolean | string }) => {
       if (!userId) throw new Error('No user');
       
       // If no existing preferences, create with defaults
@@ -118,8 +99,21 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
         if (error) throw error;
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notification-preferences', userId] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['notification-preferences', userId] });
+      
+      // Re-schedule local notifications when preferences change
+      const newPrefs = queryClient.getQueryData(['notification-preferences', userId]) as NotificationPreferences | null;
+      if (newPrefs) {
+        scheduleNotifications({
+          morning_summary: newPrefs.morning_summary,
+          evening_checkin: newPrefs.evening_checkin,
+          time_period_reminders: newPrefs.time_period_reminders,
+          goal_nudges: newPrefs.goal_nudges,
+          wake_time: newPrefs.wake_time || '07:00',
+          sleep_time: newPrefs.sleep_time || '22:00',
+        });
+      }
     },
     onError: (error) => {
       console.error('Failed to update preference:', error);
@@ -131,9 +125,21 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
     updatePreference.mutate({ key, value: checked });
   };
 
+  const handleTimeChange = (key: 'wake_time' | 'sleep_time') => (time: string) => {
+    updatePreference.mutate({ key, value: time });
+  };
+
   const getPreference = (key: keyof typeof DEFAULT_PREFERENCES): boolean => {
-    if (preferences) {
-      return preferences[key];
+    if (preferences && key in preferences) {
+      return preferences[key as keyof NotificationPreferences] as boolean;
+    }
+    return DEFAULT_PREFERENCES[key] as boolean;
+  };
+
+  const getTimePreference = (key: 'wake_time' | 'sleep_time'): string => {
+    if (preferences && preferences[key]) {
+      // Handle time format from DB (could be "07:00:00" or "07:00")
+      return preferences[key].substring(0, 5);
     }
     return DEFAULT_PREFERENCES[key];
   };
@@ -170,6 +176,15 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
               </div>
             ) : (
               <>
+                {/* Quiet Hours Section */}
+                <WakeSleepTimeSettings
+                  wakeTime={getTimePreference('wake_time')}
+                  sleepTime={getTimePreference('sleep_time')}
+                  onWakeTimeChange={handleTimeChange('wake_time')}
+                  onSleepTimeChange={handleTimeChange('sleep_time')}
+                  disabled={updatePreference.isPending}
+                />
+
                 {/* Daily Actions Section */}
                 <div className="space-y-1">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
@@ -179,7 +194,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
                   <PreferenceItem
                     icon={<Clock className="h-4 w-4" />}
                     label="Morning Summary"
-                    description="Daily overview of your actions at 7 AM"
+                    description="Daily overview of your actions at wake time"
                     checked={getPreference('morning_summary')}
                     onCheckedChange={handleToggle('morning_summary')}
                     disabled={updatePreference.isPending}
