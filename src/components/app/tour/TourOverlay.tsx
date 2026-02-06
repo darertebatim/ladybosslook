@@ -127,7 +127,7 @@ export function TourOverlay({
     };
   }, []);
 
-  // Calculate spotlight position
+  // Calculate spotlight position and elevate target element
   useEffect(() => {
     if (!isActive || !currentStep) {
       setSpotlightRect(null);
@@ -141,12 +141,38 @@ export function TourOverlay({
       return;
     }
 
+    let targetElement: Element | null = null;
+    let originalZIndex: string | null = null;
+    let originalPosition: string | null = null;
+
     const updatePosition = () => {
       const element = document.querySelector(currentStep.target!);
       if (!element) {
         setSpotlightRect(null);
         setTooltipStyle(calculateTooltipPosition(null, 'center', tooltipRef.current));
         return;
+      }
+
+      // Store reference and elevate z-index to bring element above overlay backdrop
+      if (element !== targetElement) {
+        // Restore previous element if different
+        if (targetElement instanceof HTMLElement && originalZIndex !== null) {
+          targetElement.style.zIndex = originalZIndex;
+          if (originalPosition) targetElement.style.position = originalPosition;
+        }
+        
+        targetElement = element;
+        if (element instanceof HTMLElement) {
+          originalZIndex = element.style.zIndex;
+          originalPosition = element.style.position;
+          // Elevate element to be visible above the overlay backdrop (but below tooltip)
+          element.style.zIndex = '10000';
+          // Ensure it has a position context for z-index to work
+          const computedPosition = window.getComputedStyle(element).position;
+          if (computedPosition === 'static') {
+            element.style.position = 'relative';
+          }
+        }
       }
 
       const rect = element.getBoundingClientRect();
@@ -175,6 +201,12 @@ export function TourOverlay({
       clearTimeout(initialTimer);
       window.removeEventListener('scroll', updatePosition, true);
       window.removeEventListener('resize', updatePosition);
+      
+      // Restore original z-index when step changes or tour ends
+      if (targetElement instanceof HTMLElement && originalZIndex !== null) {
+        targetElement.style.zIndex = originalZIndex;
+        if (originalPosition) targetElement.style.position = originalPosition;
+      }
     };
   }, [isActive, currentStep, calculateTooltipPosition]);
 
@@ -248,17 +280,31 @@ export function TourOverlay({
         />
       </svg>
 
-      {/* Spotlight ring */}
+      {/* Spotlight ring - also brings the element visually forward */}
       {spotlightRect && (
-        <div
-          className="absolute rounded-xl ring-4 ring-primary/50 ring-offset-2 ring-offset-transparent animate-pulse pointer-events-none"
-          style={{
-            top: spotlightRect.top,
-            left: spotlightRect.left,
-            width: spotlightRect.width,
-            height: spotlightRect.height,
-          }}
-        />
+        <>
+          {/* Visual highlight ring */}
+          <div
+            className="absolute rounded-xl ring-4 ring-primary/50 ring-offset-2 ring-offset-transparent animate-pulse pointer-events-none"
+            style={{
+              top: spotlightRect.top,
+              left: spotlightRect.left,
+              width: spotlightRect.width,
+              height: spotlightRect.height,
+              zIndex: 10000,
+            }}
+          />
+          {/* Clickable pass-through area over spotlight */}
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              top: spotlightRect.top,
+              left: spotlightRect.left,
+              width: spotlightRect.width,
+              height: spotlightRect.height,
+            }}
+          />
+        </>
       )}
 
       {/* Tooltip - Mobile optimized */}
