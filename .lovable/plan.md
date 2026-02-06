@@ -1,235 +1,182 @@
 
-
-# Interactive Tour System - Comprehensive Improvements
+# Tour System Overhaul: Educational Button-by-Button Guidance
 
 ## Overview
-This plan addresses multiple issues with the current tour system: missing tour steps, copy quality, UI accessibility, and missing tours for key features.
+Complete overhaul of all tours to provide specific, educational guidance for every button and feature. The current tours show sections but don't teach users what each button does. This plan fixes that by making every tour step highlight a specific actionable button with clear instructions.
 
 ---
 
-## 1. TourOverlay UI Improvements
-
-### Close Button Size (Critical - Screenshot Shows Issue)
-The close button is too small for mobile touch targets. Apple recommends 44x44pt minimum.
+## 1. TourOverlay - Text Color Fix
 
 **File: `src/components/app/tour/TourOverlay.tsx`**
-- Increase close button from `p-1.5` to `p-2.5`
-- Increase icon from `h-4 w-4` to `h-5 w-5`
-- Add better touch target with `min-h-[44px] min-w-[44px]`
+
+Change the description text from grey to black for better readability:
+- Line 300: Change `text-muted-foreground` to `text-foreground`
 
 ---
 
-## 2. Home Tour Enhancements
+## 2. Breathe Tour - Fix "Add to Routine" Step
 
-### A. Welcome Card Integration
-Add conditional step for the Welcome Ritual Card when user has no actions.
+**Problem**: The `.tour-add-to-routine` class doesn't exist in the Breathe exercise screen. The screen auto-saves sessions but doesn't have an explicit "Add to Routine" button.
 
-### B. Dynamic Ending
-- If Welcome Card is visible: End tour encouraging user to "flip the card"
-- If Welcome Card is not visible: End tour encouraging user to add their first action
-
-**File: `src/components/app/tour/HomeTour.tsx`**
-- Add `hasWelcomeCard` prop
-- Add Welcome Card step targeting `.tour-welcome-card`
-- Modify final step based on Welcome Card availability
-
-**File: `src/pages/app/AppHome.tsx`**
-- Add `tour-welcome-card` class to `WelcomeRitualCard` component
-- Pass `hasWelcomeCard={showWelcomeCard}` to HomeTour
-
----
-
-## 3. Rituals Tour - Show Actions List
-
-Add step explaining the "Actions" section (task templates) shown under rituals.
-
-**File: `src/components/app/tour/RitualsTour.tsx`**
-- Add new step targeting `.tour-actions-section`
-- Position after ritual cards, before final step
-
-**File: `src/pages/app/AppInspire.tsx`**
-- Add `tour-actions-section` class to the Actions section container
-
----
-
-## 4. Explore Tour - Explain Specific Tools
-
-Expand Explore tour to highlight individual tools by purpose.
-
-**File: `src/components/app/tour/ExploreTour.tsx`**
-Add steps for:
-- Journal (reflection)
-- Breathe (calm)
-- Water (hydration)
-- Emotions (name feelings)
-
----
-
-## 5. New Playlist Tour (Add to Routine Feature)
-
-Create new tour for playlist detail pages that shows the "Add to My Rituals" button.
-
-**New File: `src/components/app/tour/PlaylistTour.tsx`**
-Steps:
-1. Welcome - This is your audio content
-2. Track list - See all tracks, tap to play
-3. Add to Routine button - Add this to your daily rituals
-4. Done - Enjoy your listening
-
-**Files to Update:**
-- `src/hooks/useFeatureTour.tsx` - Add 'playlist' to TourFeature type
-- `src/components/app/tour/index.ts` - Export PlaylistTour
-- `src/pages/app/AppPlaylistDetail.tsx` - Integrate tour, add class markers
-- `src/lib/clientReset.ts` - Add playlist tour key
-
----
-
-## 6. Breathe Tour - Show Add to Routine
-
-Expand Breathe tour to show the "Add to Routine" button on exercise detail.
+**Solution**: Remove the non-existent step and instead explain the exercise cards and duration options clearly.
 
 **File: `src/components/app/tour/BreatheTour.tsx`**
-- Add step for add-to-routine functionality
-- Target `.tour-add-to-routine`
 
-**File: `src/components/breathe/BreathingExerciseScreen.tsx`** (or relevant component)
-- Add `tour-add-to-routine` class to the add button
+New steps:
+1. Welcome: "Take a moment to breathe. These exercises help calm your mind."
+2. Categories: Target `.tour-categories` - "Filter by what you need: Calm, Focus, Energy, or Sleep."
+3. Exercise Card: Target `.tour-exercise-card` - "Tap any card to start. Each exercise has a different rhythm."
+4. Done: "Complete a session to track your progress. Just one minute helps."
 
----
-
-## 7. Rewrite All Tour Copy
-
-Rewrite all tour text to be warmer, more direct, and aligned with Simora's "strength companion" philosophy. Use simple A2/B1 English, avoid pressure words.
-
-### Home Tour Copy Refresh
-```
-Welcome: "Hi there! This is your home. Everything starts here."
-Menu: "Tap the menu to see all your tools."
-Calendar: "Swipe to pick a day. The flame shows days you showed up."
-Add Action: "Tap + to add something small to your day."
-Explore: "Find new tools and content here."
-Listen: "Audio for calm, focus, or movement."
-Channels: "See updates from your community."
-Support: "We're here if you need anything."
-Final (with Welcome Card): "Ready? Flip the card below to pick your first action."
-Final (without Welcome Card): "Ready? Tap + to add your first action."
-```
-
-### Rituals Tour Copy Refresh
-```
-Welcome: "These are ready-made rituals. Pick what feels right."
-Categories: "Filter by type: morning, evening, focus, and more."
-Ritual Card: "Tap any ritual to see what's inside."
-Actions Section: "Individual actions live here. Add one at a time."
-Done: "Start small. One action is enough."
-```
-
-### Player Tour Copy Refresh
-```
-Welcome: "Your audio library. Listen anytime, anywhere."
-Playlists: "Browse by category. Free content is always here."
-Continue: "Pick up where you left off."
-Done: "Every listen is a step forward."
-```
-
-### Breathe Tour Copy Refresh
-```
-Welcome: "Breathing exercises to calm your mind."
-Exercise: "Each one has a different purpose. Try one."
-Add to Routine: "Add this to your daily plan."
-Done: "Even one minute helps."
-```
-
-### Journal Tour Copy Refresh
-```
-Welcome: "Your private space to reflect."
-New Entry: "Tap + to start writing."
-Mood: "Track how you feel over time."
-Done: "A few words each day make a difference."
-```
-
-### Explore Tour Copy Refresh
-```
-Welcome: "Everything Simora offers is here."
-Tools: "Journal, Breathe, Water, Emotions. Tap any to start."
-Programs: "Courses and audio content. Browse freely."
-Search: "Find what you need quickly."
-Done: "Take your time. Explore what calls to you."
-```
-
-### Period Tour Copy Refresh
-```
-Welcome: "Track your cycle privately."
-Log: "Tap a day to log."
-Insights: "See patterns and predictions."
-Done: "Understanding your body is strength."
-```
-
-### Programs Tour Copy Refresh
-```
-Welcome: "Your enrolled programs live here."
-Card: "Tap to open lessons and materials."
-Progress: "See how far you've come."
-Done: "One lesson at a time."
-```
-
-### Playlist Tour Copy (New)
-```
-Welcome: "This is your playlist. Listen at your pace."
-Tracks: "Tap any track to play."
-Add: "Want to remember this? Add it to your rituals."
-Done: "Enjoy. Every listen counts."
-```
+**File: `src/pages/app/AppBreathe.tsx`**
+- Add `tour-categories` class to the category filter container
 
 ---
 
-## 8. Files Summary
+## 3. Round Tour - Complete Course Detail Integration
+
+**Problem**: RoundTour exists but is never used in AppCourseDetail. The course page has many important buttons that users need to understand.
+
+**File: `src/pages/app/AppCourseDetail.tsx`**
+- Import and add `RoundTour` component
+- Add tour class markers to all key buttons
+
+**File: `src/components/app/tour/RoundTour.tsx`**
+
+Complete rewrite with steps for each button:
+
+1. Welcome: "Welcome to your course! Everything you need is on this page."
+2. Community Button: Target `.tour-community-btn` - "Tap to join your course community. Ask questions, share progress."
+3. Playlist Button: Target `.tour-playlist-btn` - "Tap to access all audio lessons. New content unlocks as you progress."
+4. Google Meet: Target `.tour-meet-btn` (conditional) - "Join live sessions with your coach. Check the schedule for times."
+5. Calendar Sync: Target `.tour-calendar-btn` - "Sync all sessions to your phone calendar so you never miss one."
+6. Sessions List: Target `.tour-sessions-list` - "See all scheduled sessions. Today's session is highlighted."
+7. Content Schedule: Target `.tour-content-schedule` (conditional) - "Track when new lessons unlock. Set reminders to stay on track."
+8. Done: "You're all set! Tap 'Community' to introduce yourself."
+
+---
+
+## 4. Explore Tour - Explain Each Tool
+
+**File: `src/components/app/tour/ExploreTour.tsx`**
+
+New steps explaining each tool individually:
+
+1. Welcome: "This is your wellness toolkit. Each tool helps a different part of your day."
+2. Journal: Target `.tour-tool-journal` - "Write daily reflections. Just a few words make a difference."
+3. Breathe: Target `.tour-tool-breathe` - "Breathing exercises to calm your mind. Try one when stressed."
+4. Water: Target `.tour-tool-water` - "Track your water intake. Hydration helps everything."
+5. Emotions: Target `.tour-tool-emotions` - "Name how you feel. It helps you understand yourself."
+6. Period: Target `.tour-tool-period` - "Track your cycle privately. See patterns and predictions."
+7. Meditate: Target `.tour-tool-meditate` - "Guided meditations for any moment."
+8. Sounds: Target `.tour-tool-soundscape` - "Ambient sounds for focus, sleep, or relaxation."
+9. Programs: Target `.tour-programs-section` - "Browse courses and audio content. Tap to preview."
+10. Search: Target `.tour-search-button` - "Can't find something? Search here."
+11. Done: "Explore at your pace. Start with what feels right today."
+
+**File: `src/pages/app/AppStore.tsx`**
+- Add unique tour classes to each ToolCard (e.g., `tour-tool-journal`, `tour-tool-breathe`, etc.)
+
+**File: `src/components/app/ToolCard.tsx`**
+- Accept a `className` prop to enable tour markers
+
+---
+
+## 5. Playlist Tour - Clear Button Guidance
+
+**File: `src/components/app/tour/PlaylistTour.tsx`**
+
+New steps with specific button guidance:
+
+1. Welcome: "This is your playlist. Each track is ready to play."
+2. Track List: Target `.tour-track-list` - "Tap any track to start listening. Your progress is saved automatically."
+3. Continue Button: Target `.tour-continue-btn` - "Tap 'Continue' to pick up where you left off."
+4. Add to Rituals: Target `.tour-add-to-routine` - "Add this playlist to your daily rituals. Get reminders to listen."
+5. Done: "Enjoy listening. Every minute counts toward your progress."
+
+**File: `src/pages/app/AppPlaylistDetail.tsx`**
+- Add `tour-continue-btn` class to the Continue/Play button
+
+---
+
+## 6. Home Tour - Verify Existing Steps
+
+The Home Tour already covers nav items and welcome card. Verify it's working correctly.
+
+**Check:**
+- `.tour-welcome-card` class is on the WelcomeRitualCard
+- `hasWelcomeCard` prop is correctly passed to HomeTour
+
+---
+
+## 7. Rituals Tour - Verify Actions Section
+
+Already has `.tour-actions-section` targeting. Verify it's working.
+
+**Check:**
+- The class exists in AppInspire.tsx (confirmed: line 320)
+- The step should work if elements exist
+
+---
+
+## Files Summary
 
 ### Files to Modify:
-1. `src/components/app/tour/TourOverlay.tsx` - Bigger close button
-2. `src/components/app/tour/HomeTour.tsx` - Welcome card + dynamic ending + copy
-3. `src/components/app/tour/RitualsTour.tsx` - Actions section step + copy
-4. `src/components/app/tour/ExploreTour.tsx` - Tool explanations + copy
-5. `src/components/app/tour/BreatheTour.tsx` - Add to routine + copy
-6. `src/components/app/tour/PlayerTour.tsx` - Copy refresh
-7. `src/components/app/tour/JournalTour.tsx` - Copy refresh
-8. `src/components/app/tour/PeriodTour.tsx` - Copy refresh
-9. `src/components/app/tour/ProgramsTour.tsx` - Copy refresh
-10. `src/components/app/tour/RoundTour.tsx` - Copy refresh
-11. `src/components/app/tour/index.ts` - Export PlaylistTour
-12. `src/hooks/useFeatureTour.tsx` - Add 'playlist' type
-13. `src/lib/clientReset.ts` - Add playlist reset key
-14. `src/pages/app/AppHome.tsx` - Welcome card class + tour prop
-15. `src/pages/app/AppInspire.tsx` - Actions section class
-16. `src/pages/app/AppPlaylistDetail.tsx` - Tour integration + classes
 
-### New Files:
-1. `src/components/app/tour/PlaylistTour.tsx` - Playlist detail tour
+1. **`src/components/app/tour/TourOverlay.tsx`**
+   - Change description text color from grey to black
+
+2. **`src/components/app/tour/BreatheTour.tsx`**
+   - Remove non-existent "add-to-routine" step
+   - Add categories step
+
+3. **`src/pages/app/AppBreathe.tsx`**
+   - Add `tour-categories` class to category container
+
+4. **`src/components/app/tour/RoundTour.tsx`**
+   - Complete rewrite with 8 button-specific steps
+
+5. **`src/pages/app/AppCourseDetail.tsx`**
+   - Import and add RoundTour component
+   - Add tour class markers to all buttons
+
+6. **`src/components/app/tour/ExploreTour.tsx`**
+   - Expand to 11 steps covering each tool individually
+
+7. **`src/pages/app/AppStore.tsx`**
+   - Add unique tour classes to each ToolCard
+
+8. **`src/components/app/ToolCard.tsx`**
+   - Accept className prop for tour markers
+
+9. **`src/components/app/tour/PlaylistTour.tsx`**
+   - Expand with Continue button step
+
+10. **`src/pages/app/AppPlaylistDetail.tsx`**
+    - Add `tour-continue-btn` class to Continue/Play button
 
 ---
 
-## 9. Testing Checklist
+## Testing Checklist
 
-After implementation, verify:
+After implementation, verify each tour:
 
-1. **Home Tour** - Menu, Calendar, Add, Banner (if exists), Rituals (if exists), Programs (if exists), all 4 nav items, Welcome Card / Add Action ending
-2. **Rituals Tour** - Categories, Ritual cards, Actions section
-3. **Player Tour** - Playlists, Continue listening
-4. **Playlist Tour (New)** - Tracks, Add to Routine button
-5. **Breathe Tour** - Exercise cards, Add to routine
-6. **Journal Tour** - New entry button
-7. **Explore Tour** - Tools section, Programs section, Search
-8. **Period Tour** - Log days, Insights
-9. **Programs Tour** - Program cards, Progress
-10. **Round Tour** - Audio, Live sessions, Materials, Feed
-11. **UI** - Close button is easy to tap on mobile
+| Tour | Check |
+|------|-------|
+| **All Tours** | Text is black (not grey) |
+| **Breathe** | Categories step highlights filter, exercise card works |
+| **Course (Round)** | Each button is highlighted: Community, Playlist, Meet, Calendar, Sessions |
+| **Explore** | Each tool is highlighted individually: Journal, Breathe, Water, Emotions, Period, Meditate, Sounds |
+| **Playlist** | Continue button and Add to Rituals are explained |
+| **Home** | Welcome card or Add Action ending works |
+| **Rituals** | Actions section is highlighted |
 
 ---
 
 ## Technical Notes
 
-- All tours use `isFirstVisit={true}` for automatic trigger
-- Tours persist completion in localStorage: `simora_tour_[feature]_done`
-- "Restart All Tours" in Profile clears all these flags
-- Admin "Ultimate Reset" also clears tour flags via `fullClientReset()`
-
+- All tours use CSS class markers (e.g., `.tour-tool-journal`)
+- Steps with `condition` functions skip if element doesn't exist
+- Tours persist completion in localStorage
+- "Restart All Tours" in Profile resets all flags
