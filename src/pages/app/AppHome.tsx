@@ -718,8 +718,15 @@ const AppHome = () => {
           onSkip={handleSkipTask}
         />
 
-        {/* Streak celebration modal */}
-        <StreakCelebration open={showStreakModal} onClose={() => setShowStreakModal(false)} />
+        {/* Streak celebration modal (also handles first action celebration) */}
+        <StreakCelebration 
+          open={showStreakModal} 
+          onClose={() => {
+            setShowStreakModal(false);
+            setIsFirstActionCelebration(false);
+          }}
+          isFirstAction={isFirstActionCelebration}
+        />
 
         {/* Task Skip Sheet */}
         <TaskSkipSheet
