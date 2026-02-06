@@ -32,11 +32,22 @@ const CONFETTI_COLORS = [
  */
 export const StreakCelebration = ({ open, onClose, isFirstAction = false }: StreakCelebrationProps) => {
   const { data: presence } = useUserPresence();
+  const { maybeRequestReview, shouldShowForStreak } = useAppReview();
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
 
   const thisMonthDays = presence?.thisMonthActiveDays || 1;
   const isReturning = presence?.isReturning || false;
+
+  // Handle close with potential review prompt
+  const handleClose = async () => {
+    onClose();
+    
+    // Check if we should show review after closing
+    if (shouldShowForStreak(thisMonthDays)) {
+      await maybeRequestReview();
+    }
+  };
 
   useEffect(() => {
     if (open) {
