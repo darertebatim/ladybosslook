@@ -12,9 +12,10 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 interface BreathingExerciseCardProps {
   exercise: BreathingExercise;
   onClick: () => void;
+  className?: string;
 }
 
-export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCardProps) {
+export function BreathingExerciseCard({ exercise, onClick, className }: BreathingExerciseCardProps) {
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const addRoutinePlan = useAddRoutinePlan();
@@ -75,7 +76,8 @@ export function BreathingExerciseCard({ exercise, onClick }: BreathingExerciseCa
         className={cn(
           'w-full text-left p-4 rounded-2xl transition-all',
           'bg-card border border-border shadow-sm',
-          'hover:shadow-md active:scale-[0.98]'
+          'hover:shadow-md active:scale-[0.98]',
+          className
         )}
       >
         <div className="flex items-start gap-3">

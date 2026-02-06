@@ -10,6 +10,7 @@ import { PlayerSkeleton } from "@/components/app/skeletons";
 import { CategoryCircle } from "@/components/app/CategoryCircle";
 import { cn } from "@/lib/utils";
 import { PromoBanner } from "@/components/app/PromoBanner";
+import { PlayerTour } from "@/components/app/tour";
 
 // Category configuration with icons and colors
 const categoryConfig: Record<string, { name: string; icon: string; color: string }> = {
@@ -313,7 +314,7 @@ export default function AppPlayer() {
         <div className="p-4 pb-safe space-y-6">
           {/* Continue Learning Section */}
           {progressFilter === "all" && selectedCategory === "all" && !searchQuery && continueListening.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-3 tour-continue-listening">
               <div className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-primary" />
                 <h2 className="text-lg font-semibold">Continue Learning</h2>
@@ -343,7 +344,7 @@ export default function AppPlayer() {
           )}
 
           {/* All Playlists Section */}
-          <div className="space-y-3">
+          <div className="space-y-3 tour-playlists">
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               {selectedCategory === 'all' ? 'All Playlists' : categoryConfig[selectedCategory]?.name || selectedCategory}
             </h2>
@@ -355,6 +356,9 @@ export default function AppPlayer() {
           </div>
         </div>
       </div>
+      
+      {/* Feature Tour */}
+      <PlayerTour isFirstVisit={true} />
     </div>
   );
 }

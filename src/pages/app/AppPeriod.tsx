@@ -16,6 +16,7 @@ import { PeriodDaySheet } from '@/components/app/PeriodDaySheet';
 import { PeriodSettingsSheet } from '@/components/app/PeriodSettingsSheet';
 import { PeriodCalendar } from '@/components/app/PeriodCalendar';
 import { PeriodCycleInsights } from '@/components/app/PeriodCycleInsights';
+import { PeriodTour } from '@/components/app/tour';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
@@ -279,6 +280,9 @@ const AppPeriod = () => {
         open={showSettingsSheet}
         onOpenChange={setShowSettingsSheet}
       />
+
+      {/* Feature Tour */}
+      <PeriodTour isFirstVisit={true} />
     </>
   );
 };

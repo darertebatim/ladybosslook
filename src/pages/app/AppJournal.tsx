@@ -11,6 +11,7 @@ import { JournalReminderSettings } from '@/components/app/JournalReminderSetting
 import { JournalHeaderStats } from '@/components/app/JournalHeaderStats';
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
+import { JournalTour } from '@/components/app/tour';
 import { format, startOfDay, startOfMonth, subDays, isAfter } from 'date-fns';
 
 // Calculate monthly presence - unique days with entries this month
@@ -120,6 +121,7 @@ const AppJournal = () => {
             <Button 
               variant="ghost" 
               size="icon"
+              className="tour-new-entry"
               onClick={() => navigate('/app/journal/new')}
             >
               <Plus className="h-5 w-5" />
@@ -211,6 +213,8 @@ const AppJournal = () => {
         )}
         </div>
       </div>
+      {/* Feature Tour */}
+      <JournalTour isFirstVisit={true} />
     </div>
   );
 };
