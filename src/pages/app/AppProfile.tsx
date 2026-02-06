@@ -34,7 +34,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
 import { useState, useEffect, useMemo } from 'react';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications, unsubscribeFromPushNotifications } from '@/lib/pushNotifications';
-import { clearTourCompleted } from '@/hooks/useAppTour';
+import { resetAllTours } from '@/lib/clientReset';
 import { Capacitor } from '@capacitor/core';
 import { format, startOfMonth } from 'date-fns';
 import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
@@ -861,13 +861,13 @@ const AppProfile = () => {
                 variant="ghost"
                 className="w-full justify-start h-12 rounded-xl bg-muted/30"
                 onClick={() => {
-                  clearTourCompleted();
+                  resetAllTours();
                   navigate('/app/home');
-                  toast({ title: 'Tour will restart', description: 'Navigate to the home page to start the app tour.' });
+                  toast({ title: 'Tours Reset', description: 'All feature tours will restart when you visit each section.' });
                 }}
               >
                 <PlayCircle className="mr-3 h-4 w-4" />
-                Replay App Tour
+                Restart All Tours
               </Button>
               
               <Button
