@@ -4,7 +4,6 @@ import { TourOverlay } from './TourOverlay';
 
 interface HomeTourProps {
   hasEnrolledPrograms?: boolean;
-  hasBanner?: boolean;
   hasSuggestedRituals?: boolean;
   hasWelcomeCard?: boolean;
   isFirstOpen?: boolean;
@@ -12,7 +11,6 @@ interface HomeTourProps {
 
 export function HomeTour({
   hasEnrolledPrograms = false,
-  hasBanner = false,
   hasSuggestedRituals = false,
   hasWelcomeCard = false,
   isFirstOpen = false,
@@ -53,18 +51,7 @@ export function HomeTour({
       },
     ];
 
-    // Conditionally add banner step ONLY if banner actually exists
-    if (hasBanner) {
-      baseSteps.push({
-        id: 'banner',
-        title: 'Announcements',
-        target: '.tour-banner',
-        description: 'Important updates and messages will appear here.',
-        position: 'bottom',
-        action: 'look',
-        condition: () => !!document.querySelector('.tour-banner'),
-      });
-    }
+    // Banner step removed - announcements no longer part of tour
 
     // Conditionally add suggested rituals step
     if (hasSuggestedRituals) {
@@ -151,7 +138,7 @@ export function HomeTour({
     }
 
     return baseSteps;
-  }, [hasEnrolledPrograms, hasBanner, hasSuggestedRituals, hasWelcomeCard]);
+  }, [hasEnrolledPrograms, hasSuggestedRituals, hasWelcomeCard]);
 
   const tour = useFeatureTour({
     feature: 'home',
