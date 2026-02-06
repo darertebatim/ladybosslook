@@ -2844,9 +2844,11 @@ export type Database = {
           momentum_celebration: boolean
           morning_summary: boolean
           session_reminders: boolean
+          sleep_time: string | null
           time_period_reminders: boolean
           updated_at: string
           user_id: string
+          wake_time: string | null
           weekly_summary: boolean
         }
         Insert: {
@@ -2863,9 +2865,11 @@ export type Database = {
           momentum_celebration?: boolean
           morning_summary?: boolean
           session_reminders?: boolean
+          sleep_time?: string | null
           time_period_reminders?: boolean
           updated_at?: string
           user_id: string
+          wake_time?: string | null
           weekly_summary?: boolean
         }
         Update: {
@@ -2882,9 +2886,11 @@ export type Database = {
           momentum_celebration?: boolean
           morning_summary?: boolean
           session_reminders?: boolean
+          sleep_time?: string | null
           time_period_reminders?: boolean
           updated_at?: string
           user_id?: string
+          wake_time?: string | null
           weekly_summary?: boolean
         }
         Relationships: []
