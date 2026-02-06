@@ -26,6 +26,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
 import { usePopularRoutinesBank, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
 import { RoutineBankCard } from '@/components/app/RoutineBankCard';
+import { usePopularActions } from '@/hooks/usePopularActions';
+import { ActionBankCard } from '@/components/app/ActionBankCard';
 import { haptic } from '@/lib/haptics';
 import { GoalInputSheet } from '@/components/app/GoalInputSheet';
 import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
