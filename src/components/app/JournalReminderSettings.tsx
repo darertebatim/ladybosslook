@@ -67,7 +67,7 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
   };
 
   return (
-    <div className={className}>
+    <div className={`${className || ''} tour-journal-add-routine`}>
       <AddedToRoutineButton
         isAdded={isAdded}
         onAddClick={() => setShowRoutineSheet(true)}

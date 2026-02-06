@@ -209,7 +209,7 @@ export const WaterTrackingScreen = ({
               haptic.light();
               onOpenRoutineSheet();
             }}
-            className="w-14 h-14 rounded-full bg-white/80 backdrop-blur-sm shadow-lg flex items-center justify-center"
+            className="tour-water-add-routine w-14 h-14 rounded-full bg-white/80 backdrop-blur-sm shadow-lg flex items-center justify-center"
           >
             <CalendarPlus className="h-6 w-6 text-sky-700" />
           </button>

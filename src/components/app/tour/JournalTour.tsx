@@ -34,6 +34,15 @@ export function JournalTour({ isFirstVisit = false }: JournalTourProps) {
       condition: () => !!document.querySelector('.tour-mood-selector'),
     },
     {
+      id: 'add-to-routine',
+      target: '.tour-journal-add-routine',
+      title: 'Add to My Rituals',
+      description: 'Tap to add daily journaling to your planner. Get reminders to write each day.',
+      position: 'top',
+      action: 'tap',
+      condition: () => !!document.querySelector('.tour-journal-add-routine'),
+    },
+    {
       id: 'done',
       title: 'Your Story Matters 💜',
       description: 'A few words each day make a difference.',
