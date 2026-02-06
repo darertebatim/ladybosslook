@@ -165,8 +165,8 @@ export function TourOverlay({
         if (element instanceof HTMLElement) {
           originalZIndex = element.style.zIndex;
           originalPosition = element.style.position;
-          // Elevate element to be visible above the overlay backdrop (but below tooltip)
-          element.style.zIndex = '10000';
+          // Elevate element above the overlay backdrop (z-9990) but allow tooltip (z-10002) on top
+          element.style.zIndex = '9995';
           // Ensure it has a position context for z-index to work
           const computedPosition = window.getComputedStyle(element).position;
           if (computedPosition === 'static') {
@@ -262,9 +262,9 @@ export function TourOverlay({
   const isCenter = currentStep.position === 'center' || !currentStep.target;
 
   return (
-    <div className="fixed inset-0 z-[9999] pointer-events-auto">
-      {/* Backdrop with spotlight cutout */}
-      <svg className="absolute inset-0 w-full h-full">
+    <div className="fixed inset-0 z-[9990] pointer-events-auto">
+      {/* Backdrop with spotlight cutout - lower z-index */}
+      <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 9990 }}>
         <defs>
           <mask id="spotlight-mask">
             <rect x="0" y="0" width="100%" height="100%" fill="white" />
@@ -290,34 +290,21 @@ export function TourOverlay({
         />
       </svg>
 
-      {/* Spotlight ring - also brings the element visually forward */}
+      {/* Spotlight ring - visual highlight */}
       {spotlightRect && (
-        <>
-          {/* Visual highlight ring */}
-          <div
-            className="absolute rounded-xl ring-4 ring-primary/50 ring-offset-2 ring-offset-transparent animate-pulse pointer-events-none"
-            style={{
-              top: spotlightRect.top,
-              left: spotlightRect.left,
-              width: spotlightRect.width,
-              height: spotlightRect.height,
-              zIndex: 10000,
-            }}
-          />
-          {/* Clickable pass-through area over spotlight */}
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              top: spotlightRect.top,
-              left: spotlightRect.left,
-              width: spotlightRect.width,
-              height: spotlightRect.height,
-            }}
-          />
-        </>
+        <div
+          className="absolute rounded-xl ring-4 ring-primary/50 ring-offset-2 ring-offset-transparent animate-pulse pointer-events-none"
+          style={{
+            top: spotlightRect.top,
+            left: spotlightRect.left,
+            width: spotlightRect.width,
+            height: spotlightRect.height,
+            zIndex: 10001,
+          }}
+        />
       )}
 
-      {/* Tooltip - Mobile optimized */}
+      {/* Tooltip - Mobile optimized - highest z-index */}
       <div
         ref={tooltipRef}
         className={cn(
@@ -326,7 +313,7 @@ export function TourOverlay({
           // Mobile-first padding
           "p-4 sm:p-5"
         )}
-        style={tooltipStyle}
+        style={{ ...tooltipStyle, zIndex: 10002 }}
       >
         {/* Skip button - larger touch target for mobile */}
         <button
