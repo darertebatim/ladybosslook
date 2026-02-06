@@ -12,6 +12,26 @@ interface TourWelcomePopupProps {
   onSkipTour: () => void;
 }
 
+/**
+ * Check if PN onboarding is currently active or about to show
+ * Tour popup should wait until PN flow is resolved
+ */
+const isPNOnboardingPending = (): boolean => {
+  // If PN onboarding already completed, we're clear
+  if (localStorage.getItem('pushOnboardingCompleted') === 'true') return false;
+  
+  // If PN onboarding was dismissed, check if enough time has passed for re-show
+  const dismissedAt = localStorage.getItem('pushOnboardingDismissed');
+  if (dismissedAt) {
+    const daysSinceDismissed = (Date.now() - parseInt(dismissedAt)) / (1000 * 60 * 60 * 24);
+    // If dismissed less than 3 days ago, PN popup won't show, so we're clear
+    if (daysSinceDismissed < 3) return false;
+  }
+  
+  // Otherwise, PN popup might be pending (will show after 2s)
+  return true;
+};
+
 export function TourWelcomePopup({ 
   isFirstOpen, 
   onStartTour, 
@@ -24,10 +44,24 @@ export function TourWelcomePopup({
     if (isFirstOpen) {
       const hasShown = localStorage.getItem(TOUR_PROMPT_KEY);
       if (!hasShown) {
-        // Small delay to let the page render first
+        // Wait for PN popup to resolve first (3s delay to ensure PN shows first at 2s)
+        const delay = isPNOnboardingPending() ? 3500 : 500;
         const timer = setTimeout(() => {
+          // Double-check PN isn't showing right now
+          const pnPopupActive = document.querySelector('[data-pn-onboarding="true"]');
+          if (pnPopupActive) {
+            // PN popup is active, wait for it to close
+            const observer = new MutationObserver(() => {
+              if (!document.querySelector('[data-pn-onboarding="true"]')) {
+                observer.disconnect();
+                setTimeout(() => setIsOpen(true), 500);
+              }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+            return;
+          }
           setIsOpen(true);
-        }, 500);
+        }, delay);
         return () => clearTimeout(timer);
       }
     }
