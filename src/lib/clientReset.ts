@@ -18,6 +18,7 @@ const CLIENT_RESET_KEYS = [
   'simora_force_new_user',
   'simora_first_action_celebrated',
   'simora_welcome_card_dismissed',
+  'simora_welcome_card_action_added',
   
   // Any other onboarding/first-time flags
   'simora_onboarding_complete',

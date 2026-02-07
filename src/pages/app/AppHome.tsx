@@ -99,8 +99,10 @@ const AppHome = () => {
   const updateGoldStreak = useUpdateGoldStreak();
   
   // Welcome card dismissed state - persisted in localStorage
+  // Also hide if user has ever added an action from the welcome card
   const [welcomeCardDismissed, setWelcomeCardDismissed] = useState(() => 
-    localStorage.getItem('simora_welcome_card_dismissed') === 'true'
+    localStorage.getItem('simora_welcome_card_dismissed') === 'true' ||
+    localStorage.getItem('simora_welcome_card_action_added') === 'true'
   );
   
   // Track if user started this session as a new user (so card stays visible after adding tasks)
@@ -189,6 +191,7 @@ const AppHome = () => {
       // Clear the dismissal so the card shows again
       setWelcomeCardDismissed(false);
       localStorage.removeItem('simora_welcome_card_dismissed');
+      localStorage.removeItem('simora_welcome_card_action_added');
     }
   }, [dataIsNewUser, welcomeCardDismissed]);
   
