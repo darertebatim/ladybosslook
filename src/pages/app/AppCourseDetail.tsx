@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, CalendarPlus, Loader2, Bell, Clock, Lock, FileText, Play, Settings2, BellRing } from 'lucide-react';
+import { BookOpen, Video, FolderOpen, Calendar, ExternalLink, Info, MessageCircle, Music, Send, CheckCircle2, CalendarPlus, Loader2, Bell, Clock, Lock, FileText, Play, Settings2, BellRing, HelpCircle } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { BackButton } from '@/components/app/BackButton';
 import { downloadICSFile, generateICSFile } from '@/utils/calendar';
@@ -34,7 +34,7 @@ import { scheduleUrgentAlarm } from '@/lib/taskAlarm';
 import { scheduleTaskReminder, cancelTaskReminder, isLocalNotificationsAvailable } from '@/lib/localNotifications';
 import DOMPurify from 'dompurify';
 import { cn } from '@/lib/utils';
-import { RoundTour } from '@/components/app/tour';
+import { RoundTour, TourHelpButton } from '@/components/app/tour';
 
 const AppCourseDetail = () => {
   const { slug, roundId } = useParams();
@@ -50,6 +50,11 @@ const AppCourseDetail = () => {
   const [showCourseNotificationPrompt, setShowCourseNotificationPrompt] = useState(false);
   const [showSessionReminderSheet, setShowSessionReminderSheet] = useState(false);
   const [showContentReminderSheet, setShowContentReminderSheet] = useState(false);
+  const [startTour, setStartTour] = useState<(() => void) | null>(null);
+  
+  const handleTourReady = useCallback((tourStart: () => void) => {
+    setStartTour(() => tourStart);
+  }, []);
   
   // Get unseen content functions for view tracking
   let markEnrollmentViewed: ((id: string) => Promise<void>) | null = null;
@@ -942,7 +947,7 @@ const AppCourseDetail = () => {
       >
         <div className="pt-1 pb-2 px-4 flex items-center gap-1">
           <BackButton to="/app/programs" showLabel={false} />
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h1 className="font-semibold text-lg truncate">{program?.title || 'Program Details'}</h1>
             {round && (
               <p className="text-xs text-muted-foreground truncate">
@@ -950,6 +955,7 @@ const AppCourseDetail = () => {
               </p>
             )}
           </div>
+          {startTour && <TourHelpButton onClick={startTour} />}
         </div>
       </div>
 
@@ -1832,7 +1838,7 @@ const AppCourseDetail = () => {
 
       {/* Round Tour */}
       {enrollment && round && (
-        <RoundTour isFirstVisit={true} />
+        <RoundTour isFirstVisit={true} onTourReady={handleTourReady} />
       )}
     </>
   );
