@@ -97,7 +97,7 @@ export const MonthCalendar = ({
                     <img 
                       src={BADGE_IMAGES[badgeLevel]} 
                       alt={`${badgeLevel} badge`}
-                      className="w-full h-full object-contain"
+                      className="w-[115%] h-[115%] object-cover"
                     />
                   ) : (
                     <>

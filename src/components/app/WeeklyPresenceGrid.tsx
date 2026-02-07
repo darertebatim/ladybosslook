@@ -81,7 +81,7 @@ export function WeeklyPresenceGrid({
               <img 
                 src={BADGE_IMAGES[day.badgeLevel]} 
                 alt={`${day.badgeLevel} badge`}
-                className="w-full h-full object-contain"
+                className="w-[115%] h-[115%] object-cover"
               />
             ) : (
               <span>{format(day.date, 'd')}</span>
