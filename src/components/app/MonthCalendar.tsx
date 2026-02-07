@@ -1,7 +1,24 @@
 import { useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isToday } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Flame, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
+import type { BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
+
+import badgeBronze from '@/assets/badge-bronze.png';
+import badgeSilver from '@/assets/badge-silver.png';
+import badgeGold from '@/assets/badge-gold.png';
+
+const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
+  bronze: badgeBronze,
+  silver: badgeSilver,
+  gold: badgeGold,
+};
+
+interface DayStats {
+  badgeLevel: BadgeLevel;
+  completedTasks: number;
+  totalTasks: number;
+}
 
 interface MonthCalendarProps {
   selectedDate: Date;
@@ -9,9 +26,18 @@ interface MonthCalendarProps {
   onDateSelect: (date: Date) => void;
   completedDates?: Set<string>;
   programEventDates?: Set<string>;
+  /** Badge data keyed by date string (yyyy-MM-dd) */
+  badgeData?: Record<string, DayStats>;
 }
 
-export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect, completedDates, programEventDates }: MonthCalendarProps) => {
+export const MonthCalendar = ({ 
+  selectedDate, 
+  currentMonth, 
+  onDateSelect, 
+  completedDates, 
+  programEventDates,
+  badgeData,
+}: MonthCalendarProps) => {
   // Generate all days for the month grid
   const weeks = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
@@ -44,8 +70,12 @@ export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect, comple
             const isSelected = isSameDay(dateItem, selectedDate);
             const isTodayDate = isToday(dateItem);
             const dateStr = format(dateItem, 'yyyy-MM-dd');
-            const hasCompletions = completedDates?.has(dateStr);
             const hasProgramEvents = programEventDates?.has(dateStr);
+            
+            // Get badge level for this day
+            const dayStats = badgeData?.[dateStr];
+            const badgeLevel = dayStats?.badgeLevel || 'none';
+            const hasBadge = badgeLevel !== 'none';
 
             return (
               <button
@@ -55,26 +85,31 @@ export const MonthCalendar = ({ selectedDate, currentMonth, onDateSelect, comple
               >
                 <div
                   className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
+                    'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative overflow-hidden',
                     !isCurrentMonth && 'text-muted-foreground/30',
-                    isCurrentMonth && !isSelected && !isTodayDate && 'hover:bg-muted/50',
-                    isSelected && 'bg-violet-600 text-white shadow-md',
-                    !isSelected && isTodayDate && isCurrentMonth && 'bg-violet-100 text-violet-700'
+                    isCurrentMonth && !isSelected && !isTodayDate && !hasBadge && 'hover:bg-muted/50',
+                    isSelected && !hasBadge && 'bg-violet-600 text-white shadow-md',
+                    !isSelected && isTodayDate && isCurrentMonth && !hasBadge && 'bg-violet-100 text-violet-700',
+                    hasBadge && isSelected && 'ring-2 ring-violet-600 ring-offset-1'
                   )}
                 >
-                  {hasCompletions && isCurrentMonth && (
-                    <Flame className={cn(
-                      "absolute h-7 w-7",
-                      isSelected ? "text-orange-300 opacity-70" : "text-orange-400 opacity-50"
-                    )} />
+                  {hasBadge && isCurrentMonth ? (
+                    <img 
+                      src={BADGE_IMAGES[badgeLevel]} 
+                      alt={`${badgeLevel} badge`}
+                      className="w-[140%] h-[140%] object-cover"
+                    />
+                  ) : (
+                    <>
+                      {hasProgramEvents && isCurrentMonth && (
+                        <Star className={cn(
+                          "absolute -top-0.5 -right-0.5 h-3 w-3",
+                          isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-500 fill-indigo-500"
+                        )} />
+                      )}
+                      <span className="relative z-10">{format(dateItem, 'd')}</span>
+                    </>
                   )}
-                  {hasProgramEvents && isCurrentMonth && (
-                    <Star className={cn(
-                      "absolute -top-0.5 -right-0.5 h-3 w-3",
-                      isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-500 fill-indigo-500"
-                    )} />
-                  )}
-                  <span className="relative z-10">{format(dateItem, 'd')}</span>
                 </div>
               </button>
             );
