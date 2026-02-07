@@ -77,11 +77,11 @@ export function WeeklyPresenceGrid({
               !day.isActive && !isDark && 'bg-orange-100 text-orange-400'
             )}
           >
-            {day.isActive && day.badgeLevel !== 'none' ? (
+          {day.isActive && day.badgeLevel !== 'none' ? (
               <img 
                 src={BADGE_IMAGES[day.badgeLevel]} 
                 alt={`${day.badgeLevel} badge`}
-                className="w-full h-full object-cover"
+                className="w-[140%] h-[140%] object-cover"
               />
             ) : (
               <span>{format(day.date, 'd')}</span>

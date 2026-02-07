@@ -7,6 +7,7 @@ import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { Check, Sparkles, Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { SoftReviewPrompt } from './SoftReviewPrompt';
 
 interface StreakCelebrationProps {
   open: boolean;
@@ -44,6 +45,7 @@ export const StreakCelebration = ({
   const { maybeRequestReview, shouldShowForStreak } = useAppReview();
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
+  const [showReviewPrompt, setShowReviewPrompt] = useState(false);
 
   const thisMonthDays = presence?.thisMonthActiveDays || 1;
   const isReturning = presence?.isReturning || false;
@@ -61,10 +63,23 @@ export const StreakCelebration = ({
       return;
     }
     
-    // Check if we should show review after closing
+    // Check if we should show review after closing - show soft prompt first
     if (shouldShowForStreak(thisMonthDays)) {
-      await maybeRequestReview();
+      setTimeout(() => {
+        setShowReviewPrompt(true);
+      }, 300);
     }
+  };
+
+  // Handle accepting the soft review prompt
+  const handleAcceptReview = async () => {
+    setShowReviewPrompt(false);
+    await maybeRequestReview();
+  };
+
+  // Handle declining the soft review prompt
+  const handleDeclineReview = () => {
+    setShowReviewPrompt(false);
   };
 
   useEffect(() => {
@@ -260,6 +275,13 @@ export const StreakCelebration = ({
           )}
         </Button>
       </div>
+
+      {/* Soft Review Prompt - shown after streak celebration closes */}
+      <SoftReviewPrompt
+        isOpen={showReviewPrompt}
+        onClose={handleDeclineReview}
+        onAccept={handleAcceptReview}
+      />
     </div>
   );
 };

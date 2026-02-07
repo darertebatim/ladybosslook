@@ -20,20 +20,31 @@ function calculateBadgeLevel(completed: number, total: number): BadgeLevel {
 }
 
 // Helper to check if a task applies to a given date (same logic as useTasksForDate)
+// Also checks if the task existed on or before that date to prevent retroactive badge changes
 function taskAppliesToDate(task: {
   scheduled_date: string | null;
   repeat_pattern: string;
   repeat_days: number[] | null;
+  created_at?: string;
 }, dateStr: string): boolean {
   const date = parseISO(dateStr);
   const dayOfWeek = date.getDay();
+
+  // Check if task existed on or before this date
+  // This prevents newly added tasks from retroactively affecting past badges
+  if (task.created_at) {
+    const taskCreatedDate = parseISO(task.created_at.split('T')[0]);
+    if (taskCreatedDate > date) {
+      return false; // Task didn't exist on this day
+    }
+  }
 
   // Non-repeating tasks - only show on scheduled date
   if (task.repeat_pattern === 'none') {
     return task.scheduled_date === dateStr;
   }
 
-  // Daily tasks - always show
+  // Daily tasks - always show (if task existed)
   if (task.repeat_pattern === 'daily') return true;
 
   // Weekend tasks - only Sat/Sun
@@ -75,10 +86,10 @@ export function useWeeklyTaskCompletion() {
         format(addDays(weekStart, i), 'yyyy-MM-dd')
       );
 
-      // Fetch ALL active user tasks (including repeating ones)
+      // Fetch ALL active user tasks (including repeating ones and their creation date)
       const { data: tasks, error: tasksError } = await supabase
         .from('user_tasks')
-        .select('id, scheduled_date, repeat_pattern, repeat_days')
+        .select('id, scheduled_date, repeat_pattern, repeat_days, created_at')
         .eq('user_id', user.id)
         .eq('is_active', true);
 
@@ -153,10 +164,10 @@ export function useDateRangeTaskCompletion(startDate: Date, endDate: Date) {
         current = addDays(current, 1);
       }
 
-      // Fetch ALL active user tasks (including repeating ones)
+      // Fetch ALL active user tasks (including repeating ones and their creation date)
       const { data: tasks, error: tasksError } = await supabase
         .from('user_tasks')
-        .select('id, scheduled_date, repeat_pattern, repeat_days')
+        .select('id, scheduled_date, repeat_pattern, repeat_days, created_at')
         .eq('user_id', user.id)
         .eq('is_active', true);
 

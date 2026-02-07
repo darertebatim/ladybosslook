@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
@@ -171,11 +171,15 @@ export function HomeTour({
     setTimeout(() => {
       tour.forceStartTour();
     }, 100);
-  }, [tour]);
+  }, [tour.forceStartTour]);
 
-  // Expose tour trigger to parent
+  // Track if we've already called onTourReady to prevent infinite loops
+  const hasCalledTourReady = useRef(false);
+
+  // Expose tour trigger to parent - only call once
   useEffect(() => {
-    if (onTourReady) {
+    if (onTourReady && !hasCalledTourReady.current) {
+      hasCalledTourReady.current = true;
       onTourReady(handleStartTour);
     }
   }, [onTourReady, handleStartTour]);
