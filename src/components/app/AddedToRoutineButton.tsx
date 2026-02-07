@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Check, CalendarPlus, Sparkles } from 'lucide-react';
+import { Check, CalendarPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -109,7 +109,7 @@ export const AddedToRoutineButton = ({
         className
       )}
     >
-      <Sparkles className="h-4 w-4" />
+      <CalendarPlus className="h-4 w-4" />
       <span className="text-sm">{addText}</span>
     </Button>
   );
