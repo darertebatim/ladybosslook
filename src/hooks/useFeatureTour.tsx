@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export type TourFeature = 
   | 'home' 
@@ -54,24 +54,7 @@ export function useFeatureTour({
   });
 
   // Filter steps based on conditions
-  const activeSteps = useMemo(() => {
-    return steps.filter(step => !step.condition || step.condition());
-  }, [steps, ...dependencies]);
-
-  // Keep index in-bounds if conditional steps appear/disappear
-  useEffect(() => {
-    if (!isActive) return;
-
-    if (activeSteps.length === 0) {
-      setCurrentStepIndex(0);
-      return;
-    }
-
-    if (currentStepIndex >= activeSteps.length) {
-      setCurrentStepIndex(activeSteps.length - 1);
-    }
-  }, [isActive, currentStepIndex, activeSteps.length]);
-
+  const activeSteps = steps.filter(step => !step.condition || step.condition());
   const currentStep = activeSteps[currentStepIndex];
   const totalSteps = activeSteps.length;
   const isLastStep = currentStepIndex === totalSteps - 1;
@@ -91,29 +74,18 @@ export function useFeatureTour({
     setIsActive(true);
   }, [feature]);
 
-  // Skip/complete tour
-  const completeTour = useCallback(() => {
-    localStorage.setItem(getTourKey(feature), 'true');
-    setHasCompleted(true);
-    setIsActive(false);
-    setCurrentStepIndex(0);
-  }, [feature]);
-
-  // Next step (functional update avoids stale state / race issues)
+  // Next step
   const nextStep = useCallback(() => {
-    setCurrentStepIndex(prev => {
-      const step = activeSteps[prev];
-      step?.onComplete?.();
-
-      if (prev >= activeSteps.length - 1) {
-        // Avoid side effects inside the state updater
-        setTimeout(() => completeTour(), 0);
-        return 0;
-      }
-
-      return prev + 1;
-    });
-  }, [activeSteps, completeTour]);
+    if (currentStep?.onComplete) {
+      currentStep.onComplete();
+    }
+    
+    if (isLastStep) {
+      completeTour();
+    } else {
+      setCurrentStepIndex(prev => prev + 1);
+    }
+  }, [currentStep, isLastStep]);
 
   // Previous step
   const prevStep = useCallback(() => {
@@ -121,6 +93,14 @@ export function useFeatureTour({
       setCurrentStepIndex(prev => prev - 1);
     }
   }, [currentStepIndex]);
+
+  // Skip/complete tour
+  const completeTour = useCallback(() => {
+    localStorage.setItem(getTourKey(feature), 'true');
+    setHasCompleted(true);
+    setIsActive(false);
+    setCurrentStepIndex(0);
+  }, [feature]);
 
   // Skip without marking complete (temporary dismiss)
   const dismissTour = useCallback(() => {
