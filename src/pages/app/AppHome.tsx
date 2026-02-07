@@ -35,6 +35,8 @@ import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
 import { WelcomeRitualCard } from '@/components/app/WelcomeRitualCard';
 import { toast } from 'sonner';
 import { useWeeklyTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
+import { BadgeCelebration } from '@/components/app/BadgeCelebration';
+import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
 
 import badgeBronze from '@/assets/badge-bronze.png';
 import badgeSilver from '@/assets/badge-silver.png';
@@ -298,6 +300,21 @@ const AppHome = () => {
     });
     return map;
   }, [completions]);
+
+  // Badge celebration tracking
+  const todayDateStr = format(selectedDate, 'yyyy-MM-dd');
+  const todayStats = weeklyCompletion?.[todayDateStr];
+  const {
+    celebrationType: badgeCelebrationType,
+    closeCelebration: closeBadgeCelebration,
+    completedCount: badgeCompletedCount,
+    totalCount: badgeTotalCount,
+  } = useBadgeCelebration({
+    currentBadgeLevel: todayStats?.badgeLevel || 'none',
+    completedCount: todayStats?.completedTasks || 0,
+    totalCount: todayStats?.totalTasks || 0,
+    dateKey: todayDateStr,
+  });
 
   const handleStreakIncrease = useCallback(() => {
     setShowStreakModal(true);
@@ -761,6 +778,15 @@ const AppHome = () => {
             setIsFirstActionCelebration(false);
           }}
           isFirstAction={isFirstActionCelebration}
+        />
+
+        {/* Badge celebration (silver/almost-there toasts + gold modal) */}
+        <BadgeCelebration
+          type={badgeCelebrationType}
+          onClose={closeBadgeCelebration}
+          onCollectGold={closeBadgeCelebration}
+          completedCount={badgeCompletedCount}
+          totalCount={badgeTotalCount}
         />
 
         {/* Task Skip Sheet */}
