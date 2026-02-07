@@ -126,10 +126,10 @@ export const PlaylistCard = memo(function PlaylistCard({
       <div className="p-3 space-y-2">
         
         {description && (
-          <p className="text-xs text-muted-foreground line-clamp-2">{description}</p>
+          <p className="text-xs text-black line-clamp-2">{description}</p>
         )}
         
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs text-black">
           <div className="flex items-center gap-1">
             <Music className="h-3 w-3" />
             <span>{trackCount} tracks</span>
