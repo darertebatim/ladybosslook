@@ -1,10 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Dices, BookOpen, X, CalendarPlus } from 'lucide-react';
+import { Dices, BookOpen, X, CalendarPlus, HelpCircle } from 'lucide-react';
 import { useTaskTemplates, TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { cn } from '@/lib/utils';
@@ -37,8 +37,13 @@ export const TaskQuickStartSheet = ({
   const [taskName, setTaskName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
   const [isRolling, setIsRolling] = useState(false);
+  const [startTour, setStartTour] = useState<(() => void) | null>(null);
   const { data: templates = [] } = useTaskTemplates();
   const { data: categories = [] } = useRoutineBankCategories();
+
+  const handleTourReady = useCallback((tourStart: () => void) => {
+    setStartTour(() => tourStart);
+  }, []);
 
   const handleContinue = () => {
     if (taskName.trim()) {
@@ -125,9 +130,19 @@ export const TaskQuickStartSheet = ({
         hideCloseButton
       >
         <div className="flex flex-col">
-          {/* Compact Header */}
+          {/* Compact Header with help button */}
           <div className="pt-3 pb-2 px-4 flex items-center justify-between">
-            <div className="w-8" /> {/* Spacer */}
+            {startTour ? (
+              <button 
+                onClick={startTour}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
+                aria-label="Start tour"
+              >
+                <HelpCircle className="w-4 h-4 text-muted-foreground" />
+              </button>
+            ) : (
+              <div className="w-8" />
+            )}
             <div className="w-10 h-1 bg-muted-foreground/30 rounded-full" />
             <button 
               onClick={handleClose}
@@ -317,7 +332,7 @@ export const TaskQuickStartSheet = ({
         </div>
 
         {/* Action Sheet Tour */}
-        <ActionSheetTour isOpen={open} />
+        <ActionSheetTour isOpen={open} onTourReady={handleTourReady} />
       </SheetContent>
     </Sheet>
   );

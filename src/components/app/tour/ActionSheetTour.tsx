@@ -4,9 +4,10 @@ import { TourOverlay } from './TourOverlay';
 
 interface ActionSheetTourProps {
   isOpen: boolean;
+  onTourReady?: (startTour: () => void) => void;
 }
 
-export function ActionSheetTour({ isOpen }: ActionSheetTourProps) {
+export function ActionSheetTour({ isOpen, onTourReady }: ActionSheetTourProps) {
   const steps = useMemo((): TourStep[] => [
     {
       id: 'suggestions',
@@ -32,16 +33,12 @@ export function ActionSheetTour({ isOpen }: ActionSheetTourProps) {
     triggerOnMount: false,
   });
 
-  // Trigger tour when sheet opens (only if not completed)
+  // Expose forceStartTour to parent via callback
   useEffect(() => {
-    if (isOpen && !tour.hasCompleted) {
-      // Small delay to ensure sheet is fully rendered
-      const timer = setTimeout(() => {
-        tour.startTour();
-      }, 400);
-      return () => clearTimeout(timer);
+    if (isOpen && onTourReady) {
+      onTourReady(tour.forceStartTour);
     }
-  }, [isOpen, tour.hasCompleted, tour.startTour]);
+  }, [isOpen, onTourReady, tour.forceStartTour]);
 
   // Dismiss tour when sheet closes
   useEffect(() => {
