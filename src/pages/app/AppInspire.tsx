@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Heart, Loader2, Sparkles, ListTodo } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -21,7 +21,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
-import { RitualsTour } from '@/components/app/tour';
+import { RitualsTour, TourHelpButton } from '@/components/app/tour';
 
 export default function AppInspire() {
   const navigate = useNavigate();
@@ -30,6 +30,11 @@ export default function AppInspire() {
   const [showSearch, setShowSearch] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null);
   const [previewSheetOpen, setPreviewSheetOpen] = useState(false);
+  const [startTour, setStartTour] = useState<(() => void) | null>(null);
+
+  const handleTourReady = useCallback((tourStart: () => void) => {
+    setStartTour(() => tourStart);
+  }, []);
 
   const { data: categories, isLoading: categoriesLoading } = useRoutineBankCategories();
   const { data: featuredRoutines } = useFeaturedRoutinesBank();
@@ -194,7 +199,10 @@ export default function AppInspire() {
             <Sparkles className="w-6 h-6 text-primary" />
             <h1 className="text-xl font-bold text-foreground">Rituals</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {startTour && (
+              <TourHelpButton onClick={startTour} />
+            )}
             <button
               onClick={() => setShowSearch(!showSearch)}
               className="p-2 rounded-full hover:bg-muted/50 transition-colors"
@@ -372,7 +380,7 @@ export default function AppInspire() {
       )}
 
       {/* Feature Tour */}
-      <RitualsTour isFirstVisit={true} />
+      <RitualsTour isFirstVisit={true} onTourReady={handleTourReady} />
     </div>
   );
 }

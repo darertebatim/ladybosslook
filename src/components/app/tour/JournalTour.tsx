@@ -1,12 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
 
 interface JournalTourProps {
   isFirstVisit?: boolean;
+  onTourReady?: (startTour: () => void) => void;
 }
 
-export function JournalTour({ isFirstVisit = false }: JournalTourProps) {
+export function JournalTour({ isFirstVisit = false, onTourReady }: JournalTourProps) {
   const steps = useMemo((): TourStep[] => [
     {
       id: 'welcome',
@@ -56,6 +57,13 @@ export function JournalTour({ isFirstVisit = false }: JournalTourProps) {
     steps,
     triggerOnMount: isFirstVisit,
   });
+
+  // Expose forceStartTour to parent
+  useEffect(() => {
+    if (onTourReady) {
+      onTourReady(tour.forceStartTour);
+    }
+  }, [onTourReady, tour.forceStartTour]);
 
   return (
     <TourOverlay

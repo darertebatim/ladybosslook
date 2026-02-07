@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Wind } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
@@ -12,7 +12,7 @@ import {
 import { BreathingExerciseCard } from '@/components/breathe/BreathingExerciseCard';
 import { BreathingExerciseScreen } from '@/components/breathe/BreathingExerciseScreen';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BreatheTour } from '@/components/app/tour';
+import { BreatheTour, TourHelpButton } from '@/components/app/tour';
 import { haptic } from '@/lib/haptics';
 
 export default function AppBreathe() {
@@ -21,6 +21,11 @@ export default function AppBreathe() {
   
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedExercise, setSelectedExercise] = useState<BreathingExercise | null>(null);
+  const [startTour, setStartTour] = useState<(() => void) | null>(null);
+
+  const handleTourReady = useCallback((tourStart: () => void) => {
+    setStartTour(() => tourStart);
+  }, []);
 
   // Handle deep link to specific exercise from pro task
   const exerciseId = searchParams.get('exercise');
@@ -77,6 +82,7 @@ export default function AppBreathe() {
           title="Breathe"
           showBack
           backTo="/app/home"
+          rightAction={startTour ? <TourHelpButton onClick={startTour} /> : undefined}
         />
         <AppHeaderSpacer />
 
@@ -131,7 +137,7 @@ export default function AppBreathe() {
       </div>
       
       {/* Feature Tour */}
-      <BreatheTour isFirstVisit={true} />
+      <BreatheTour isFirstVisit={true} onTourReady={handleTourReady} />
     </>
   );
 }

@@ -1,12 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
 
 interface RitualsTourProps {
   isFirstVisit?: boolean;
+  onTourReady?: (startTour: () => void) => void;
 }
 
-export function RitualsTour({ isFirstVisit = false }: RitualsTourProps) {
+export function RitualsTour({ isFirstVisit = false, onTourReady }: RitualsTourProps) {
   const steps = useMemo((): TourStep[] => [
     {
       id: 'welcome',
@@ -65,6 +66,13 @@ export function RitualsTour({ isFirstVisit = false }: RitualsTourProps) {
     steps,
     triggerOnMount: isFirstVisit,
   });
+
+  // Expose forceStartTour to parent
+  useEffect(() => {
+    if (onTourReady) {
+      onTourReady(tour.forceStartTour);
+    }
+  }, [onTourReady, tour.forceStartTour]);
 
   return (
     <TourOverlay

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink } from "lucide-react";
+import { Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink, HelpCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { SupplementViewer } from "@/components/app/SupplementViewer";
 import { BackButton } from "@/components/app/BackButton";
@@ -36,6 +36,11 @@ export default function AppPlaylistDetail() {
   } | null>(null);
   const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const [startTour, setStartTour] = useState<(() => void) | null>(null);
+
+  const handleTourReady = useCallback((tourStart: () => void) => {
+    setStartTour(() => tourStart);
+  }, []);
 
   // Routine-related hooks
   const { data: linkedRoutine } = usePlaylistRoutine(playlistId);
@@ -569,8 +574,17 @@ export default function AppPlaylistDetail() {
         className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-1 pb-2 px-4 flex items-center gap-1">
+        <div className="pt-1 pb-2 px-4 flex items-center justify-between">
           <BackButton to={cameFromPlanner ? '/app/home' : '/app/player'} label={cameFromPlanner ? 'Home' : 'Library'} />
+          {startTour && (
+            <button
+              onClick={startTour}
+              className="h-9 w-9 flex items-center justify-center rounded-full"
+              aria-label="Start page tour"
+            >
+              <HelpCircle className="h-5 w-5 text-muted-foreground" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -861,7 +875,7 @@ export default function AppPlaylistDetail() {
         )}
 
         {/* Playlist Tour */}
-        <PlaylistTour isFirstVisit={true} />
+        <PlaylistTour isFirstVisit={true} onTourReady={handleTourReady} />
         
         {/* Bottom safe area padding */}
         <div className="pb-safe" />

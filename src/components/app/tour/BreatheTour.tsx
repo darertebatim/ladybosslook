@@ -1,12 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
 
 interface BreatheTourProps {
   isFirstVisit?: boolean;
+  onTourReady?: (startTour: () => void) => void;
 }
 
-export function BreatheTour({ isFirstVisit = false }: BreatheTourProps) {
+export function BreatheTour({ isFirstVisit = false, onTourReady }: BreatheTourProps) {
   const steps = useMemo((): TourStep[] => [
     {
       id: 'welcome',
@@ -56,6 +57,13 @@ export function BreatheTour({ isFirstVisit = false }: BreatheTourProps) {
     steps,
     triggerOnMount: isFirstVisit,
   });
+
+  // Expose forceStartTour to parent
+  useEffect(() => {
+    if (onTourReady) {
+      onTourReady(tour.forceStartTour);
+    }
+  }, [onTourReady, tour.forceStartTour]);
 
   return (
     <TourOverlay
