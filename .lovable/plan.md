@@ -1,115 +1,138 @@
 
-# Add Individual Audio to Routine
+
+# Presence & Achievements Page
 
 ## Overview
-Replace the bookmark functionality in the audio player with an "Add to My Rituals" feature. This allows users to add individual audio tracks (not just playlists) to their daily routine/planner.
+Create a new full-screen page called "My Presence" (or similar - aligns with strength-first philosophy) that opens when tapping the orange streak badge. This page will consolidate all presence metrics, achievements, and future gamification elements in one beautiful, motivating space.
 
-## Changes
+## Page Sections
 
-### 1. Add New Pro Link Type for Audio
-**File: `src/lib/proTaskTypes.ts`**
-- Add `'audio'` to the `ProLinkType` union type
-- Add configuration entry in `PRO_LINK_CONFIGS` for audio type with:
-  - Icon: Headphones
-  - Badge text: "Listen"
-  - Color: emerald (same family as playlist)
-  - requiresValue: true (needs audio ID)
-- Update `getProTaskNavigationPath()` to handle `'audio'` type → `/app/player/{audioId}`
+### 1. Hero Stats Card
+- Large central display showing **Days This Month** prominently
+- Current streak number with flame icon
+- Longest streak milestone
+- Return count with special "Welcome Back" acknowledgment (strength-first: returning is celebrated, not punished)
 
-### 2. Create Hooks for Audio Task Management
-**New file: `src/hooks/useAudioRoutine.tsx`**
-- `useExistingAudioTask(audioId)`: Check if user already has a routine task for this specific audio track
-- `useQuickAddAudioTask()`: Mutation hook to add an audio track directly to user's routine
+### 2. Weekly Presence Visual  
+- 7-day week grid (like the one in StreakCelebration modal)
+- Checkmarks for active days
+- Today highlighted
+- Soft, non-judgmental design for missed days
 
-### 3. Replace Bookmark Button with Add to Routine
-**File: `src/pages/app/AppAudioPlayer.tsx`**
-- Remove `BookmarkButton` import and usage
-- Remove `useBookmarks` hook and related state
-- Add new "Add to Routine" button in the header (CalendarPlus icon)
-- Implement simple tap-to-add behavior:
-  - Shows CalendarPlus icon by default
-  - On tap: adds audio to routine with default settings (daily, pro link to audio)
-  - Shows success toast "Added to your rituals! 🎧"
-  - After added: button becomes Check icon, tapping navigates to planner
+### 3. All-Time Stats
+- **Total Active Days** - lifetime count
+- **Returns** - number of times came back after 2+ day gap (celebrated!)
+- **Listening Minutes** - audio content consumed
+- **Completed Tracks** - audio completions
+- **Journal Entries** - total entries written
+- **Breathing Sessions** - mindfulness sessions completed
 
-### 4. Update TypeScript Types
-**File: `src/hooks/useTaskPlanner.tsx`**
-- Add `'audio'` to the `pro_link_type` union type in `UserTask`, `CreateTaskInput`, and `UpdateTaskInput` interfaces
+### 4. Achievements Section (Unlockable)
+Achievement cards that unlock based on milestones:
+- **"First Step"** - Completed first task ever
+- **"Week Warrior"** - 7 days active in a month
+- **"Steady Presence"** - 14 days active in a month
+- **"Return Strength"** - Came back after a break (celebrates return count milestones)
+- **"Listener"** - 60+ minutes of audio content
+- **"Reflective Soul"** - 10+ journal entries
+- **"Breath Master"** - 10+ breathing sessions
+- **"Full Month"** - Active 30+ days total
 
-### 5. Cleanup Bookmark Code (Optional but Recommended)
-The following files can be removed or deprecated since bookmarks are no longer used:
-- `src/components/audio/BookmarkButton.tsx` (remove)
-- `src/components/audio/BookmarksList.tsx` (remove)
-- `src/hooks/useBookmarks.tsx` (remove)
-- Database table `audio_bookmarks` remains (can be cleaned later)
+### 5. Monthly Progress
+- Visual calendar heatmap showing active days this month
+- Soft colors (violet/purple gradient to match app theme)
+- No shame for gaps - just gentle visualization
+
+## Technical Implementation
+
+### Files to Create
+1. **`src/pages/app/AppPresence.tsx`** - Main page component
+2. **`src/hooks/usePresenceStats.tsx`** - Hook to fetch all presence/achievement data
+3. **`src/components/app/AchievementCard.tsx`** - Reusable achievement display component
+4. **`src/components/app/WeeklyPresenceGrid.tsx`** - Week visualization (extracted from StreakCelebration)
+5. **`src/lib/achievements.ts`** - Achievement definitions and unlock logic
+
+### Files to Modify
+1. **`src/App.tsx`** - Add route `/app/presence` (full-screen, outside AppLayout)
+2. **`src/pages/app/AppHome.tsx`** - Change orange badge to navigate to `/app/presence` instead of showing modal
+
+### Data Sources
+The hook will aggregate from existing tables:
+- `profiles` - total_active_days, return_count, this_month_active_days
+- `user_streaks` - current_streak, longest_streak
+- `task_completions` - count for "first action" achievement
+- `audio_progress` - listening stats
+- `journal_entries` - entry count
+- `breathing_sessions` - session count
+- `emotion_logs` - emotion check-in count
+
+### Achievement System
+Achievements will be **calculated client-side** based on existing data (no new database tables needed initially). The logic will check thresholds and return which achievements are unlocked.
+
+Future enhancement: Store unlocked achievements in database for push notification celebrations.
+
+---
+
+## Visual Design Notes
+- Gradient purple/violet header matching app theme
+- Cards with soft shadows and rounded corners
+- Achievements show as locked (grayed) or unlocked (colorful with icon)
+- Confetti burst animation when viewing newly unlocked achievements
+- Back button to return to Home
+- No "shame" language - all copy is encouraging
 
 ---
 
 ## Technical Details
 
-### New ProLinkConfig for Audio
-```text
-audio: {
-  value: 'audio',
-  label: 'Audio Track',
-  icon: Headphones,
-  badgeText: 'Listen',
-  color: 'emerald',
-  gradientClass: 'bg-gradient-to-br from-emerald-100 to-teal-100',
-  iconColorClass: 'text-emerald-600',
-  badgeColorClass: 'bg-emerald-500/20 text-emerald-700',
-  buttonClass: 'bg-white hover:bg-white/90 text-foreground',
-  description: 'Link to a specific audio track',
-  requiresValue: true,
+### Route Configuration
+```typescript
+// Full-screen page (outside AppLayout for immersive experience)
+<Route path="/app/presence" element={<ProtectedRoute><AppPresence /></ProtectedRoute>} />
+```
+
+### Navigation Change
+```typescript
+// AppHome.tsx - Change from modal to navigation
+<button onClick={() => navigate('/app/presence')} className="tour-streak ...">
+  <Flame className="h-4 w-4 fill-current" />
+  <span className="text-sm font-semibold">{streak?.current_streak || 0}</span>
+</button>
+```
+
+### Achievement Definition Structure
+```typescript
+interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  icon: string; // emoji or lucide icon name
+  color: string; // bg color when unlocked
+  unlockCondition: (stats: PresenceStats) => boolean;
 }
 ```
 
-### Navigation Path Update
-```text
-case 'audio':
-  return `/app/player/${linkValue}`;
-```
-
-### Audio Player Header Button Logic
-- Fetch current audio info (title, cover, duration)
-- Check if task exists via `useExistingAudioTask(audioId)`
-- If not added: show CalendarPlus icon → tap adds task
-- If added: show Check icon → tap navigates to /app/home
-
-### Task Creation Data
-When adding an audio to routine:
-```text
-{
-  title: audio.title,
-  emoji: '🎧',
-  color: 'sky',
-  repeat_pattern: 'daily',
-  pro_link_type: 'audio',
-  pro_link_value: audioId,
-  is_active: true,
+### Data Hook Interface
+```typescript
+interface PresenceStats {
+  // Presence metrics
+  totalActiveDays: number;
+  thisMonthActiveDays: number;
+  returnCount: number;
+  currentStreak: number;
+  longestStreak: number;
+  
+  // Activity stats
+  listeningMinutes: number;
+  completedTracks: number;
+  journalEntries: number;
+  breathingSessions: number;
+  emotionLogs: number;
+  totalTaskCompletions: number;
+  
+  // Computed
+  unlockedAchievements: Achievement[];
+  lockedAchievements: Achievement[];
 }
 ```
 
----
-
-## Files to Modify
-1. `src/lib/proTaskTypes.ts` - Add 'audio' type and config
-2. `src/hooks/useTaskPlanner.tsx` - Add 'audio' to type unions
-3. `src/pages/app/AppAudioPlayer.tsx` - Replace bookmark with add-to-routine
-4. **New:** `src/hooks/useAudioRoutine.tsx` - Hooks for audio task management
-
-## Files to Remove
-1. `src/components/audio/BookmarkButton.tsx`
-2. `src/components/audio/BookmarksList.tsx`
-3. `src/hooks/useBookmarks.tsx`
-
----
-
-## User Experience
-1. User opens audio player
-2. In header, sees CalendarPlus icon instead of Bookmark icon
-3. Taps icon → audio is added to their daily rituals
-4. Toast appears: "Added to your rituals! 🎧"
-5. Icon changes to Check mark
-6. Tapping again navigates to Home/Planner
-7. In planner, tapping the audio task opens the audio player directly
