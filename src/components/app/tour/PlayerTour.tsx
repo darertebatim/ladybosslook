@@ -1,12 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useImperativeHandle, forwardRef } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
 
-interface PlayerTourProps {
-  isFirstVisit?: boolean;
+export interface PlayerTourRef {
+  startTour: () => void;
 }
 
-export function PlayerTour({ isFirstVisit = false }: PlayerTourProps) {
+export const PlayerTour = forwardRef<PlayerTourRef>(function PlayerTour(_, ref) {
   const steps = useMemo((): TourStep[] => [
     {
       id: 'welcome',
@@ -90,8 +90,13 @@ export function PlayerTour({ isFirstVisit = false }: PlayerTourProps) {
   const tour = useFeatureTour({
     feature: 'player',
     steps,
-    triggerOnMount: isFirstVisit,
+    triggerOnMount: false, // On-demand only
   });
+
+  // Expose startTour to parent via ref
+  useImperativeHandle(ref, () => ({
+    startTour: () => tour.forceStartTour(),
+  }), [tour]);
 
   return (
     <TourOverlay
@@ -106,4 +111,4 @@ export function PlayerTour({ isFirstVisit = false }: PlayerTourProps) {
       onComplete={tour.completeTour}
     />
   );
-}
+});

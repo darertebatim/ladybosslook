@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast } from "lucide-react";
@@ -10,7 +10,7 @@ import { PlayerSkeleton } from "@/components/app/skeletons";
 import { CategoryCircle } from "@/components/app/CategoryCircle";
 import { cn } from "@/lib/utils";
 import { PromoBanner } from "@/components/app/PromoBanner";
-import { PlayerTour } from "@/components/app/tour";
+import { PlayerTour, PlayerTourRef, TourHelpButton } from "@/components/app/tour";
 
 // Category configuration with icons and colors
 const categoryConfig: Record<string, { name: string; icon: string; color: string }> = {
@@ -30,6 +30,7 @@ export default function AppPlayer() {
   const [showSearch, setShowSearch] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [progressFilter, setProgressFilter] = useState<"all" | "in_progress" | "completed">("all");
+  const tourRef = useRef<PlayerTourRef>(null);
 
   // Read initial category from URL query param
   useEffect(() => {
@@ -261,9 +262,12 @@ export default function AppPlayer() {
           ) : (
             <>
               <h1 className="text-xl font-bold">Listen</h1>
-              <button onClick={() => setShowSearch(true)} className="tour-player-search p-2 -mr-2">
-                <Search className="h-5 w-5 text-muted-foreground" />
-              </button>
+              <div className="flex items-center">
+                <TourHelpButton onClick={() => tourRef.current?.startTour()} />
+                <button onClick={() => setShowSearch(true)} className="tour-player-search p-2 -mr-2">
+                  <Search className="h-5 w-5 text-muted-foreground" />
+                </button>
+              </div>
             </>
           )}
         </div>
@@ -358,7 +362,7 @@ export default function AppPlayer() {
       </div>
       
       {/* Feature Tour */}
-      <PlayerTour isFirstVisit={true} />
+      <PlayerTour ref={tourRef} />
     </div>
   );
 }

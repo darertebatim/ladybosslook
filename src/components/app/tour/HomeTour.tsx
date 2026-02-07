@@ -131,29 +131,17 @@ export function HomeTour({
       action: 'tap',
     });
 
-    // ===== FINAL STEP - Dynamic based on Welcome Card =====
-    if (hasWelcomeCard) {
-      baseSteps.push({
-        id: 'welcome-card',
-        title: 'Your First Action 🎯',
-        target: '.tour-welcome-card',
-        description: 'Ready? Flip the card below to pick your first action.',
-        position: 'top',
-        action: 'tap',
-        condition: () => !!document.querySelector('.tour-welcome-card'),
-      });
-    } else {
-      baseSteps.push({
-        id: 'done',
-        title: 'Ready to Start! 👋',
-        description: "Ready? Tap + to add your first action.",
-        position: 'center',
-        action: 'look',
-      });
-    }
+    // ===== FINAL STEP =====
+    baseSteps.push({
+      id: 'done',
+      title: 'Ready to Start! 👋',
+      description: "Ready? Tap + to add your first action.",
+      position: 'center',
+      action: 'look',
+    });
 
     return baseSteps;
-  }, [hasEnrolledPrograms, hasSuggestedRituals, hasWelcomeCard]);
+  }, [hasEnrolledPrograms, hasSuggestedRituals]);
 
   const tour = useFeatureTour({
     feature: 'home',
