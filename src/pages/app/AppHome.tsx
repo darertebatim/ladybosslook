@@ -472,9 +472,9 @@ const AppHome = () => {
               )}
             </div>
 
-            {/* Right: Streak badge only */}
+            {/* Right: Streak badge - navigates to presence page */}
             <div className="flex items-center justify-end justify-self-end">
-              <button onClick={() => setShowStreakModal(true)} className="tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-sm">
+              <button onClick={() => navigate('/app/presence')} className="tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-sm active:scale-95 transition-transform">
                 <Flame className="h-4 w-4 fill-current" />
                 <span className="text-sm font-semibold">{streak?.current_streak || 0}</span>
               </button>
