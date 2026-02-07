@@ -152,8 +152,12 @@ export function BadgeCelebration({
                 />
               </div>
             ) : (
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                <span className="text-3xl">🐥</span>
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center overflow-hidden">
+                <img 
+                  src={BADGE_IMAGES.gold} 
+                  alt="Gold badge" 
+                  className="w-[120%] h-[120%] object-cover"
+                />
               </div>
             )}
             {/* Sparkle decorations */}
