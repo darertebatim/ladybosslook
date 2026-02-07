@@ -1,242 +1,139 @@
 
-# Plan: Streak Goal Challenge Feature
+# iOS Celebrations & Rating Issues Fix Plan
 
-## Overview
-Implement a "Streak Goal" feature inspired by the me+ app that:
-1. Prompts users to set a streak goal (7, 14, 30, or 50 days) after their first streak day
-2. Displays a "Streak Challenge" progress card on the Presence page
-3. Shows progress with an animated striped orange progress bar
+## Summary of Issues
 
----
+Based on the screenshots and code analysis, there are **6 distinct issues** to address:
 
-## User Flow
-
-```text
-User completes first task → Celebration modal appears → User taps "I'm committed"
-                                                              ↓
-                                          Streak Goal Selection page slides up
-                                                              ↓
-                                          User picks goal (7, 14, 30, 50)
-                                                              ↓
-                                          "Commit to my goal" → Saves to DB
-                                                              ↓
-                                          Presence page shows Streak Challenge card
-```
-
----
-
-## Components to Create
-
-### 1. StreakGoalSelection (Full-screen modal/page)
-
-Design matching me+ screenshots:
-- Purple/violet gradient background (as shown in reference images)
-- Large orange flame badge with selected number inside
-- "Days" label below flame
-- Title: "Pick Your **Streak Goal** and Stay on Track!"
-- Four rounded selection buttons: 7, 14, 30, 50
-  - Selected: Orange background with white ring
-  - Unselected: Semi-transparent purple/gray
-- Motivational text with multiplier (2x, 5x, 7x, 9x based on goal)
-- Black "Commit to my goal" button at bottom
-- Decorative dots/sparkles in background
-
-### 2. StreakChallengeCard (for Presence page)
-
-Design matching me+ screenshot:
-- White rounded card
-- "Streak Challenge" header
-- "Day X" in orange (current streak)
-- "of the Y-day challenge" subtitle
-- Striped orange progress bar with flame icon
-- Goal number badge at end of progress bar
-
-### 3. StreakProgressBar (reusable component)
-
-Custom progress bar with:
-- Gray/light background track
-- Orange striped fill (diagonal lines like candy cane)
-- Small flame icon at current progress position
-- Goal number circle at end
-
----
-
-## Database Changes
-
-### Add to `user_streaks` table:
-```sql
-ALTER TABLE user_streaks 
-ADD COLUMN streak_goal integer DEFAULT NULL,
-ADD COLUMN streak_goal_set_at timestamp with time zone DEFAULT NULL;
-```
-
-This stores:
-- `streak_goal`: The target (7, 14, 30, or 50)
-- `streak_goal_set_at`: When the goal was set (to track challenge start)
-
----
-
-## Files to Create
-
-### New Components:
-1. `src/components/app/StreakGoalSelection.tsx` - Full-screen goal picker
-2. `src/components/app/StreakChallengeCard.tsx` - Progress card for Presence page
-3. `src/components/app/StreakProgressBar.tsx` - Striped progress bar with flame
-
----
-
-## Files to Modify
-
-### 1. `src/components/app/StreakCelebration.tsx`
-- Add state to track if we should show goal selection after close
-- On first streak day, trigger goal selection flow after modal closes
-- Pass callback to parent to open goal selection
-
-### 2. `src/pages/app/AppHome.tsx`
-- Add state for streak goal selection modal
-- Handle the flow: celebration closes → goal selection opens (if first day and no goal set)
-- Add mutation to save streak goal
-
-### 3. `src/pages/app/AppPresence.tsx`
-- Import and display StreakChallengeCard
-- Show only when user has a streak goal set
-- Fetch streak goal from user_streaks
-
-### 4. `src/hooks/useTaskPlanner.tsx`
-- Extend `UserStreak` interface to include `streak_goal` and `streak_goal_set_at`
-- Add mutation hook for setting streak goal
-- Update query to fetch these new fields
-
-### 5. `src/integrations/supabase/types.ts`
-- Will be auto-updated when database migration runs
-
----
-
-## Design Specifications
-
-### StreakGoalSelection Colors:
-- Background: `from-violet-400 via-violet-500 to-violet-600`
-- Decorative curves: Semi-transparent white wavy lines
-- Sparkle dots: White with varying opacity
-- Flame badge: Orange gradient with white stroke
-- Selected button: `bg-orange-400` with `ring-4 ring-white`
-- Unselected button: `bg-violet-400/50`
-- CTA button: `bg-gray-900 text-white`
-
-### Multiplier Messages:
-| Goal | Message |
-|------|---------|
-| 7 days | "You'll be **2x** as likely to achieve a healthier lifestyle!" |
-| 14 days | "You'll be **5x** as likely to achieve a healthier lifestyle!" |
-| 30 days | "You'll be **7x** as likely to achieve a healthier lifestyle!" |
-| 50 days | "You'll be **9x** as likely to achieve a healthier lifestyle!" |
-
-### StreakProgressBar:
-```css
-/* Striped pattern */
-background: repeating-linear-gradient(
-  45deg,
-  #fb923c,
-  #fb923c 8px,
-  #fdba74 8px,
-  #fdba74 16px
-);
-```
-
-### StreakChallengeCard Layout:
-- Container: `bg-white rounded-2xl p-4 shadow-sm`
-- Header: `text-sm font-semibold text-gray-900`
-- Day number: `text-3xl font-bold text-orange-500`
-- Subtitle: `text-sm text-gray-500`
-- Progress bar height: `h-3`
-- Goal badge: Small gray circle with number
-
----
-
-## Flow Logic
-
-### When to Show Goal Selection:
-```typescript
-const shouldShowGoalSelection = (streak: UserStreak | null) => {
-  // Show if:
-  // 1. User just got their first streak (current_streak === 1)
-  // 2. User doesn't have a goal set yet
-  // 3. Today is the first streak day (last_completion_date === today)
-  return streak?.current_streak === 1 && 
-         !streak?.streak_goal && 
-         streak?.last_completion_date === format(new Date(), 'yyyy-MM-dd');
-};
-```
-
-### Celebration to Goal Selection Flow:
-1. User completes task
-2. Streak increases to 1 (first day)
-3. StreakCelebration modal shows
-4. User taps "I'm committed"
-5. Modal closes
-6. Parent component detects goal selection should show
-7. StreakGoalSelection slides up
-8. User picks goal and confirms
-9. Goal saved to database
-10. Selection closes, toast confirms
+1. **Toast notifications covering the menu** - Currently positioned at `bottom-center` with `120px` offset, but still overlapping the iOS tab bar in some cases
+2. **Review rating prompt "Not Now" button freezing** - The custom rating prompt dialog needs proper event handling 
+3. **Gold coins becoming silver when adding new actions** - Badge level calculation uses current task count, so adding a new task retroactively changes completion percentages
+4. **Coin sizes in WeeklyPresenceGrid on Presence page** - Need 140% scaling like other places
+5. **Badge celebrations shape/appearance issues** - The toast celebrations need iOS-safe positioning adjustments
+6. **HomeTour causing "Maximum update depth" errors** - Infinite loop in useEffect callback
 
 ---
 
 ## Technical Details
 
-### New Hook: useStreakGoal
-```typescript
-export const useSetStreakGoal = () => {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
+### Issue 1: Toast Notifications Covering Menu
 
-  return useMutation({
-    mutationFn: async (goal: 7 | 14 | 30 | 50) => {
-      await supabase
-        .from('user_streaks')
-        .update({ 
-          streak_goal: goal,
-          streak_goal_set_at: new Date().toISOString()
-        })
-        .eq('user_id', user.id);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
-      toast.success('Challenge accepted! Let's do this!');
-    }
-  });
-};
-```
+**Current State:**
+- `src/components/ui/sonner.tsx` sets `offset="120px"` and `position="bottom-center"`
+- On iOS, the safe area + tab bar height can exceed 120px
 
-### Challenge Progress Calculation:
-```typescript
-const getChallengeProgress = (currentStreak: number, goal: number) => {
-  return Math.min((currentStreak / goal) * 100, 100);
-};
-```
+**Fix:**
+- Increase the offset to `140px` to ensure toasts appear well above the bottom navigation
 
 ---
 
-## Summary of Changes
+### Issue 2: Review Rating Prompt Freezing
 
-| File | Action | Description |
-|------|--------|-------------|
-| `StreakGoalSelection.tsx` | Create | Full-screen goal picker with purple gradient |
-| `StreakChallengeCard.tsx` | Create | Progress card for Presence page |
-| `StreakProgressBar.tsx` | Create | Striped orange progress bar with flame |
-| `StreakCelebration.tsx` | Modify | Add callback for goal selection trigger |
-| `AppHome.tsx` | Modify | Handle goal selection flow after celebration |
-| `AppPresence.tsx` | Modify | Display Streak Challenge card |
-| `useTaskPlanner.tsx` | Modify | Add streak goal mutation and types |
-| Database | Migration | Add streak_goal and streak_goal_set_at columns |
+**Analysis:**
+The screenshot shows a custom "Enjoying Simora?" dialog with stars and "Not Now" button. This appears to be a native iOS App Store review overlay or a custom component that was deleted. Since the InAppReview plugin is used directly (which triggers the system's native review dialog), there's no custom dialog code in the current codebase.
+
+**Fix:**
+- The native InAppReview plugin dialog is controlled by iOS - the "Not Now" button behavior is managed by the OS
+- Need to create a custom "soft prompt" dialog that appears BEFORE the native review, allowing users to decline without triggering the native flow
+- Add proper `e.stopPropagation()` on the Not Now button
 
 ---
 
-## Visual Outcome
+### Issue 3: Gold Coins Becoming Silver When Adding New Actions
 
-After implementation:
-1. First-time streak users see a beautiful purple goal selection screen
-2. The flame badge dynamically shows the selected goal number
-3. Presence page displays challenge progress with an engaging striped progress bar
-4. Users feel motivated by the "Xx more likely" messaging
-5. The entire flow matches the polished me+ aesthetic
+**Root Cause:**
+The `useWeeklyTaskCompletion` hook calculates badge levels based on the **current** active task list. When a new task is added:
+- Previous days' completion percentages are recalculated
+- A day that was 100% (gold) becomes less than 100% because a new task now exists
+
+**Example:**
+- Day had 3/3 tasks completed = Gold (100%)
+- User adds a new daily task
+- Day now has 3/4 tasks completed = Silver (75%)
+
+**Fix:**
+- Store the snapshot of total tasks per day when tasks are completed
+- OR calculate badges based only on tasks that existed on that specific day (using task `created_at`)
+- Modify `taskAppliesToDate` to also check if the task existed before or on that date
+
+---
+
+### Issue 4: Coin Sizes in WeeklyPresenceGrid on Presence Page
+
+**Current State:**
+- `src/components/app/WeeklyPresenceGrid.tsx` uses `w-full h-full object-cover`
+- This doesn't scale up the image to fill the container edge-to-edge
+
+**Fix:**
+- Change to `w-[140%] h-[140%] object-cover` to match AppHome styling
+
+---
+
+### Issue 5: Badge Celebrations iOS Positioning
+
+**Current State:**
+- `BadgeCelebration.tsx` uses `bottom-24` for toasts
+- Gold celebration uses `items-end` and safe area padding
+
+**Fix:**
+- Increase bottom offset for toasts to `bottom-32` (128px) to clear iOS tab bar + safe area
+- Ensure modals respect safe areas consistently
+
+---
+
+### Issue 6: HomeTour Maximum Update Depth Error
+
+**Root Cause:**
+Console shows infinite loop in `HomeTour.tsx` related to `setState` in `useEffect`
+
+**Fix:**
+- Add proper dependency array to prevent re-running
+- Wrap the tour start callback in `useCallback` with stable dependencies
+
+---
+
+## Implementation Steps
+
+### Step 1: Fix Toast Positioning (sonner.tsx)
+- Increase offset from `120px` to `140px`
+
+### Step 2: Fix Badge Celebration Toast Positioning (BadgeCelebration.tsx)
+- Change `bottom-24` to `bottom-32` for silver/almostGold toasts
+- Ensure proper iOS safe area handling
+
+### Step 3: Create Custom Pre-Review Prompt
+- Create `SoftReviewPrompt.tsx` component
+- Show before triggering native InAppReview
+- Include proper button event handling with `stopPropagation`
+
+### Step 4: Fix WeeklyPresenceGrid Coin Sizing
+- Update image classes from `w-full h-full` to `w-[140%] h-[140%]`
+
+### Step 5: Fix Gold-to-Silver Badge Regression
+- Modify `useWeeklyTaskCompletion.tsx` to filter tasks by creation date
+- Only count tasks that existed on or before the day being calculated
+
+### Step 6: Fix HomeTour Infinite Loop
+- Stabilize the callback with proper memoization
+- Add missing dependencies to useEffect
+
+---
+
+## Files to Modify
+
+1. `src/components/ui/sonner.tsx` - Toast offset
+2. `src/components/app/BadgeCelebration.tsx` - Toast bottom positioning
+3. `src/components/app/WeeklyPresenceGrid.tsx` - Coin image sizing
+4. `src/hooks/useWeeklyTaskCompletion.tsx` - Badge calculation logic
+5. `src/components/app/tour/HomeTour.tsx` - Fix infinite loop
+6. **New File:** `src/components/app/SoftReviewPrompt.tsx` - Custom review pre-prompt
+
+---
+
+## Expected Outcomes
+
+- Toasts appear above the iOS tab bar consistently
+- Review prompt allows dismissal without freezing
+- Gold badges remain gold even after adding new tasks
+- Coins on Presence page display at correct size (edge-to-edge in circles)
+- No console errors from HomeTour component
