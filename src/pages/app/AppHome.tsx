@@ -555,7 +555,6 @@ const AppHome = () => {
                                 src={BADGE_IMAGES[badgeLevel]} 
                                 alt={`${badgeLevel} badge`}
                                 className="w-full h-full object-cover"
-                                style={{ transform: 'scale(4)' }}
                               />
                             ) : (
                               <>
