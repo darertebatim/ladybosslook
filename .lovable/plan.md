@@ -1,138 +1,104 @@
 
-
-# Presence & Achievements Page
+# Plan: Redesign Celebrations with Orange Theme
 
 ## Overview
-Create a new full-screen page called "My Presence" (or similar - aligns with strength-first philosophy) that opens when tapping the orange streak badge. This page will consolidate all presence metrics, achievements, and future gamification elements in one beautiful, motivating space.
-
-## Page Sections
-
-### 1. Hero Stats Card
-- Large central display showing **Days This Month** prominently
-- Current streak number with flame icon
-- Longest streak milestone
-- Return count with special "Welcome Back" acknowledgment (strength-first: returning is celebrated, not punished)
-
-### 2. Weekly Presence Visual  
-- 7-day week grid (like the one in StreakCelebration modal)
-- Checkmarks for active days
-- Today highlighted
-- Soft, non-judgmental design for missed days
-
-### 3. All-Time Stats
-- **Total Active Days** - lifetime count
-- **Returns** - number of times came back after 2+ day gap (celebrated!)
-- **Listening Minutes** - audio content consumed
-- **Completed Tracks** - audio completions
-- **Journal Entries** - total entries written
-- **Breathing Sessions** - mindfulness sessions completed
-
-### 4. Achievements Section (Unlockable)
-Achievement cards that unlock based on milestones:
-- **"First Step"** - Completed first task ever
-- **"Week Warrior"** - 7 days active in a month
-- **"Steady Presence"** - 14 days active in a month
-- **"Return Strength"** - Came back after a break (celebrates return count milestones)
-- **"Listener"** - 60+ minutes of audio content
-- **"Reflective Soul"** - 10+ journal entries
-- **"Breath Master"** - 10+ breathing sessions
-- **"Full Month"** - Active 30+ days total
-
-### 5. Monthly Progress
-- Visual calendar heatmap showing active days this month
-- Soft colors (violet/purple gradient to match app theme)
-- No shame for gaps - just gentle visualization
-
-## Technical Implementation
-
-### Files to Create
-1. **`src/pages/app/AppPresence.tsx`** - Main page component
-2. **`src/hooks/usePresenceStats.tsx`** - Hook to fetch all presence/achievement data
-3. **`src/components/app/AchievementCard.tsx`** - Reusable achievement display component
-4. **`src/components/app/WeeklyPresenceGrid.tsx`** - Week visualization (extracted from StreakCelebration)
-5. **`src/lib/achievements.ts`** - Achievement definitions and unlock logic
-
-### Files to Modify
-1. **`src/App.tsx`** - Add route `/app/presence` (full-screen, outside AppLayout)
-2. **`src/pages/app/AppHome.tsx`** - Change orange badge to navigate to `/app/presence` instead of showing modal
-
-### Data Sources
-The hook will aggregate from existing tables:
-- `profiles` - total_active_days, return_count, this_month_active_days
-- `user_streaks` - current_streak, longest_streak
-- `task_completions` - count for "first action" achievement
-- `audio_progress` - listening stats
-- `journal_entries` - entry count
-- `breathing_sessions` - session count
-- `emotion_logs` - emotion check-in count
-
-### Achievement System
-Achievements will be **calculated client-side** based on existing data (no new database tables needed initially). The logic will check thresholds and return which achievements are unlocked.
-
-Future enhancement: Store unlocked achievements in database for push notification celebrations.
+Replace the current dark purple/violet theme in all celebration components with a warm orange theme to match the streak button in the app header and align with the me+ design language.
 
 ---
 
-## Visual Design Notes
-- Gradient purple/violet header matching app theme
-- Cards with soft shadows and rounded corners
-- Achievements show as locked (grayed) or unlocked (colorful with icon)
-- Confetti burst animation when viewing newly unlocked achievements
-- Back button to return to Home
-- No "shame" language - all copy is encouraging
+## Design Reference (from me+ screenshots)
+
+- **Streak button**: `bg-gradient-to-r from-orange-400 to-orange-500` with white text/icon
+- **Streak page header**: Gradient from orange-400 at top to cream/warm white at bottom
+- **Celebration modal**: Dark overlay with orange flame icon, streak count, week progress bar with orange striped pattern, and orange CTA button
+
+---
+
+## Changes Required
+
+### 1. BadgeCelebration Component (`src/components/app/BadgeCelebration.tsx`)
+
+**Toast Celebrations (Silver & Almost-There):**
+- Change background from `from-violet-600 to-purple-700` to `from-orange-400 to-orange-500`
+- Update sparkle colors from pink to warm white/amber tones
+- Keep white text for contrast
+
+**Gold Modal:**
+- Change modal background from violet to orange gradient: `from-orange-400 via-orange-500 to-orange-600`
+- Update rays background from purple to orange tones
+- Update confetti colors to more orange-focused palette
+- Change "Collect" button to dark/slate for contrast (already correct)
+
+### 2. StreakCelebration Component (`src/components/app/StreakCelebration.tsx`)
+
+- Change modal gradient from `from-violet-900 to-indigo-900` to `from-orange-500 to-orange-600`
+- Update confetti colors from violet/pink to orange/amber tones
+- Update week presence indicator circles from violet to orange theme
+- Change button from white/violet-900 to appropriate contrast styling
+- Update icon backgrounds from violet-500 to orange-500
+
+### 3. AppPresence Page (`src/pages/app/AppPresence.tsx`)
+
+- Change hero header gradient from `from-violet-600 via-violet-700 to-indigo-800` to `from-orange-400 via-orange-500 to-orange-600`
+- Update text accent colors from violet-200/300 to orange-100/200 for better contrast
+- Update WeeklyPresenceGrid to use orange theme when `variant="dark"`
+
+### 4. WeeklyPresenceGrid Component (if applicable)
+- Update active day indicators from violet to orange theme
+
+---
+
+## Color Palette for Orange Theme
+
+| Element | Current | New |
+|---------|---------|-----|
+| Toast BG | `from-violet-600 to-purple-700` | `from-orange-400 to-orange-500` |
+| Gold Modal BG | `from-violet-500 via-violet-500 to-violet-600` | `from-orange-400 via-orange-500 to-orange-600` |
+| Streak Modal BG | `from-violet-900 to-indigo-900` | `from-orange-500 to-orange-600` |
+| Presence Hero | `from-violet-600 via-violet-700 to-indigo-800` | `from-orange-400 via-orange-500 to-orange-600` |
+| Rays/Glow | `rgba(139, 92, 246, 0.3)` (violet) | `rgba(251, 146, 60, 0.3)` (orange-400) |
+| Confetti | Violet/Pink | Orange/Amber/Gold |
+| Active Indicators | `bg-violet-500` | `bg-orange-500` |
 
 ---
 
 ## Technical Details
 
-### Route Configuration
-```typescript
-// Full-screen page (outside AppLayout for immersive experience)
-<Route path="/app/presence" element={<ProtectedRoute><AppPresence /></ProtectedRoute>} />
+### Confetti Color Update
+```javascript
+// New orange-focused confetti palette
+const CONFETTI_COLORS = [
+  '#fb923c', // orange-400
+  '#f97316', // orange-500
+  '#ea580c', // orange-600
+  '#fbbf24', // amber-400
+  '#fcd34d', // amber-300
+];
 ```
 
-### Navigation Change
-```typescript
-// AppHome.tsx - Change from modal to navigation
-<button onClick={() => navigate('/app/presence')} className="tour-streak ...">
-  <Flame className="h-4 w-4 fill-current" />
-  <span className="text-sm font-semibold">{streak?.current_streak || 0}</span>
-</button>
+### Rays Background Update
+```javascript
+// Gold modal rays
+style={{
+  background: 'repeating-conic-gradient(from 0deg, rgba(251, 146, 60, 0.3) 0deg 10deg, transparent 10deg 20deg)',
+}}
 ```
 
-### Achievement Definition Structure
-```typescript
-interface Achievement {
-  id: string;
-  name: string;
-  description: string;
-  icon: string; // emoji or lucide icon name
-  color: string; // bg color when unlocked
-  unlockCondition: (stats: PresenceStats) => boolean;
-}
-```
+---
 
-### Data Hook Interface
-```typescript
-interface PresenceStats {
-  // Presence metrics
-  totalActiveDays: number;
-  thisMonthActiveDays: number;
-  returnCount: number;
-  currentStreak: number;
-  longestStreak: number;
-  
-  // Activity stats
-  listeningMinutes: number;
-  completedTracks: number;
-  journalEntries: number;
-  breathingSessions: number;
-  emotionLogs: number;
-  totalTaskCompletions: number;
-  
-  // Computed
-  unlockedAchievements: Achievement[];
-  lockedAchievements: Achievement[];
-}
-```
+## Files to Modify
 
+1. `src/components/app/BadgeCelebration.tsx` - Update toast and modal colors
+2. `src/components/app/StreakCelebration.tsx` - Update modal and indicators
+3. `src/pages/app/AppPresence.tsx` - Update hero header gradient
+4. `src/components/app/WeeklyPresenceGrid.tsx` - Update active day colors (if needed)
+
+---
+
+## Visual Outcome
+
+All celebration moments will have a consistent warm orange theme that:
+- Matches the streak button in the header
+- Aligns with the me+ design inspiration
+- Creates visual cohesion across the gamification features
+- Maintains good contrast with white text and icons
