@@ -72,9 +72,7 @@ export const PlaylistCard = memo(function PlaylistCard({
 
   return (
     <Card 
-      className={`overflow-hidden rounded-2xl border-border/50 cursor-pointer hover:shadow-lg hover:border-border transition-all hover:scale-[1.02] active:scale-[0.98] ${
-        isLocked ? 'opacity-80' : ''
-      } ${tourClass}`}
+      className={`overflow-hidden rounded-2xl border-border/50 cursor-pointer hover:shadow-lg hover:border-border transition-all hover:scale-[1.02] active:scale-[0.98] ${tourClass}`}
       onClick={handleClick}
     >
       <div className="relative aspect-square">
@@ -126,10 +124,10 @@ export const PlaylistCard = memo(function PlaylistCard({
       <div className="p-3 space-y-2">
         
         {description && (
-          <p className={`text-xs line-clamp-2 ${isLocked ? 'text-muted-foreground' : 'text-foreground/80'}`}>{description}</p>
+          <p className={`text-xs line-clamp-2 ${isLocked ? 'text-muted-foreground' : 'text-foreground'}`}>{description}</p>
         )}
         
-        <div className={`flex items-center gap-2 text-xs ${isLocked ? 'text-muted-foreground' : 'text-foreground/70'}`}>
+        <div className={`flex items-center gap-2 text-xs ${isLocked ? 'text-muted-foreground' : 'text-foreground'}`}>
           <div className="flex items-center gap-1">
             <Music className="h-3 w-3" />
             <span>{trackCount} tracks</span>
@@ -151,7 +149,7 @@ export const PlaylistCard = memo(function PlaylistCard({
         )}
         
         {isLocked && programSlug && (
-          <div className="flex items-center justify-center gap-1.5 py-2 px-3 bg-zinc-900 text-white rounded-lg text-xs font-medium">
+          <div className="flex items-center justify-center gap-1.5 py-2 px-3 bg-foreground text-background rounded-lg text-xs font-medium">
             <span>Tap to enroll</span>
             <ChevronRight className="h-3.5 w-3.5" />
           </div>

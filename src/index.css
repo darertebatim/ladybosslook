@@ -271,27 +271,27 @@ html.native-app [data-scroll-container="true"] {
   /* Applied only to /app/* pages via .app-theme class */
   .app-theme {
     --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
+    --foreground: 0 0% 0%;
     font-family: var(--font-app), sans-serif;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card-foreground: 0 0% 0%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
+    --popover-foreground: 0 0% 0%;
 
-    --primary: 0 0% 9%;
+    --primary: 0 0% 0%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 0 0% 20%;
 
     --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 9%;
+    --secondary-foreground: 0 0% 0%;
 
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
     --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 9%;
+    --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -301,7 +301,7 @@ html.native-app [data-scroll-container="true"] {
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 0 0% 9%;
+    --ring: 0 0% 0%;
 
     /* UI chips / selection pills (matches the task tag “All” chip lavender) */
     --chip-lavender: 268 68% 85%;
