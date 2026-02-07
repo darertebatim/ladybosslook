@@ -844,6 +844,8 @@ export const useCompleteTask = () => {
       queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
       // Ensure Home stats (including totalCompletions) update immediately
       queryClient.invalidateQueries({ queryKey: ['new-home-data', user?.id] });
+      // Update weekly task completion badges
+      queryClient.invalidateQueries({ queryKey: ['weekly-task-completion'] });
     },
     onError: (error) => {
       console.error('Complete task error:', error);
@@ -877,6 +879,8 @@ export const useUncompleteTask = () => {
       const dateStr = format(variables.date, 'yyyy-MM-dd');
       queryClient.invalidateQueries({ queryKey: ['planner-completions', user?.id, dateStr] });
       queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
+      // Update weekly task completion badges
+      queryClient.invalidateQueries({ queryKey: ['weekly-task-completion'] });
     },
     onError: (error) => {
       console.error('Uncomplete task error:', error);
