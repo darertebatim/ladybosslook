@@ -154,6 +154,20 @@ export default {
 					'50%': { transform: 'translateX(0) translateY(2px)' },
 					'75%': { transform: 'translateX(-2px) translateY(1px)' },
 					'100%': { transform: 'translateX(0) translateY(0)' }
+				},
+				'fly-to-header': {
+					'0%': { 
+						transform: 'translate(0, 0) scale(1)',
+						opacity: '1'
+					},
+					'50%': {
+						transform: 'translate(var(--fly-x, 0), calc(var(--fly-y, 0) / 2)) scale(0.6)',
+						opacity: '1'
+					},
+					'100%': { 
+						transform: 'translate(var(--fly-x, 0), var(--fly-y, 0)) scale(0.25)',
+						opacity: '0'
+					}
 				}
 			},
 			animation: {
@@ -170,7 +184,8 @@ export default {
 				'shake': 'shake 0.4s ease-in-out',
 				'wave': 'wave 1.5s ease-in-out infinite',
 				'heartbeat': 'heartbeat 0.8s ease-in-out infinite',
-				'write': 'write 0.6s ease-in-out'
+				'write': 'write 0.6s ease-in-out',
+				'fly-to-header': 'fly-to-header 0.6s ease-in-out forwards'
 			},
 			backgroundImage: {
 				'gradient-hero': 'var(--gradient-hero)',
