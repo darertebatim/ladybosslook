@@ -18,13 +18,18 @@ async function requireAuthUser(req: Request) {
   const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
   const authHeader = req.headers.get('Authorization');
-  if (!authHeader) return { error: 'Missing authorization header' } as const;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { error: 'Missing authorization header' } as const;
+  }
+
+  const token = authHeader.replace('Bearer ', '');
 
   const supabaseUser = createClient(supabaseUrl, supabaseAnonKey, {
     global: { headers: { Authorization: authHeader } },
   });
 
-  const { data, error } = await supabaseUser.auth.getUser();
+  // Explicitly pass token to getUser for proper validation
+  const { data, error } = await supabaseUser.auth.getUser(token);
   if (error || !data?.user) return { error: 'Unauthorized' } as const;
 
   return { user: data.user } as const;
