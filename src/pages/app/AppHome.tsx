@@ -542,7 +542,7 @@ const AppHome = () => {
                           
                           {/* Badge or Number */}
                           <div className={cn(
-                            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5',
+                            'w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5',
                             !hasBadge && (isSelected 
                               ? 'bg-white text-foreground dark:bg-white dark:text-foreground'
                               : isTodayDate 
@@ -554,7 +554,7 @@ const AppHome = () => {
                                 src={BADGE_IMAGES[badgeLevel]} 
                                 alt={`${badgeLevel} badge`}
                                 className={cn(
-                                  "w-8 h-8 object-contain",
+                                  "w-10 h-10 object-contain",
                                   isSelected && "ring-2 ring-white ring-offset-1 ring-offset-chip-lavender rounded-full"
                                 )}
                               />
