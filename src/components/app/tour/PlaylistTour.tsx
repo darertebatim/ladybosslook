@@ -1,12 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
 
 interface PlaylistTourProps {
   isFirstVisit?: boolean;
+  onTourReady?: (startTour: () => void) => void;
 }
 
-export function PlaylistTour({ isFirstVisit = false }: PlaylistTourProps) {
+export function PlaylistTour({ isFirstVisit = false, onTourReady }: PlaylistTourProps) {
   const steps = useMemo((): TourStep[] => [
     {
       id: 'welcome',
@@ -56,6 +57,13 @@ export function PlaylistTour({ isFirstVisit = false }: PlaylistTourProps) {
     steps,
     triggerOnMount: isFirstVisit,
   });
+
+  // Expose forceStartTour to parent
+  useEffect(() => {
+    if (onTourReady) {
+      onTourReady(tour.forceStartTour);
+    }
+  }, [onTourReady, tour.forceStartTour]);
 
   return (
     <TourOverlay

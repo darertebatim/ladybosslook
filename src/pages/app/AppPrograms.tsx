@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react';
 import { useCoursesData } from '@/hooks/useAppData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { CoursesSkeleton } from '@/components/app/skeletons';
 import { usePrograms } from '@/hooks/usePrograms';
 import { EnrolledProgramCard } from '@/components/app/EnrolledProgramCard';
-import { ProgramsTour } from '@/components/app/tour';
+import { ProgramsTour, TourHelpButton } from '@/components/app/tour';
 import {
   Carousel,
   CarouselContent,
@@ -20,6 +21,11 @@ const AppCourses = () => {
   // Use centralized data hook
   const { enrollments, nextSessionMap, nextContentMap, isLoading } = useCoursesData();
   const { programs, isLoading: programsLoading } = usePrograms();
+  const [startTour, setStartTour] = useState<(() => void) | null>(null);
+
+  const handleTourReady = useCallback((tourStart: () => void) => {
+    setStartTour(() => tourStart);
+  }, []);
   
   // Get unseen content - wrap in try/catch in case provider is missing
   let unseenEnrollments = new Set<string>();
@@ -137,6 +143,7 @@ const AppCourses = () => {
       <AppHeader 
         title="Programs" 
         subtitle={totalPrograms > 0 ? `${totalPrograms} enrolled` : undefined}
+        rightAction={startTour ? <TourHelpButton onClick={startTour} /> : undefined}
       />
       <AppHeaderSpacer />
       
@@ -295,7 +302,7 @@ const AppCourses = () => {
       )}
 
       {/* Feature Tour */}
-      <ProgramsTour isFirstVisit={true} hasPrograms={enrollments && enrollments.length > 0} />
+      <ProgramsTour isFirstVisit={true} hasPrograms={enrollments && enrollments.length > 0} onTourReady={handleTourReady} />
     </div>
   );
 };

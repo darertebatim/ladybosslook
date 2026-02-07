@@ -1,13 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
 
 interface ProgramsTourProps {
   isFirstVisit?: boolean;
   hasPrograms?: boolean;
+  onTourReady?: (startTour: () => void) => void;
 }
 
-export function ProgramsTour({ isFirstVisit = false, hasPrograms = false }: ProgramsTourProps) {
+export function ProgramsTour({ isFirstVisit = false, hasPrograms = false, onTourReady }: ProgramsTourProps) {
   const steps = useMemo((): TourStep[] => {
     const baseSteps: TourStep[] = [
       {
@@ -67,6 +68,13 @@ export function ProgramsTour({ isFirstVisit = false, hasPrograms = false }: Prog
     steps,
     triggerOnMount: isFirstVisit,
   });
+
+  // Expose forceStartTour to parent
+  useEffect(() => {
+    if (onTourReady) {
+      onTourReady(tour.forceStartTour);
+    }
+  }, [onTourReady, tour.forceStartTour]);
 
   return (
     <TourOverlay

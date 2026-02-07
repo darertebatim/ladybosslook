@@ -2,6 +2,7 @@
 export { TourOverlay } from './TourOverlay';
 export { TourWelcomePopup } from './TourWelcomePopup';
 export { TourBanner, resetTourPrompt } from './TourBanner';
+export { TourHelpButton } from './TourHelpButton';
 export { HomeTour } from './HomeTour';
 export { RitualsTour } from './RitualsTour';
 export { PlayerTour } from './PlayerTour';

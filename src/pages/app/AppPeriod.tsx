@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Settings, Heart, ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react';
 import { BackButtonCircle } from '@/components/app/BackButton';
 import { format, addMonths, subMonths } from 'date-fns';
 import { 
@@ -27,6 +27,11 @@ const AppPeriod = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDaySheet, setShowDaySheet] = useState(false);
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
+  const [startTour, setStartTour] = useState<(() => void) | null>(null);
+  
+  const handleTourReady = useCallback((tourStart: () => void) => {
+    setStartTour(() => tourStart);
+  }, []);
   
   const { status, settings, isLoading, hasCompletedOnboarding } = useCycleStatusWithLoading();
   const { data: monthLogs = [] } = usePeriodLogsForMonth(currentMonth);
@@ -156,8 +161,18 @@ const AppPeriod = () => {
           
           <h1 className="text-lg font-semibold text-pink-800">Period Tracker</h1>
           
-          {/* Empty placeholder for layout balance */}
-          <div className="w-10 h-10" />
+          {/* Help button for tour */}
+          {startTour ? (
+            <button
+              onClick={startTour}
+              className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
+              aria-label="Start page tour"
+            >
+              <HelpCircle className="h-5 w-5 text-pink-700" />
+            </button>
+          ) : (
+            <div className="w-10 h-10" />
+          )}
         </header>
 
         {/* Content - no scroll needed */}
@@ -282,7 +297,7 @@ const AppPeriod = () => {
       />
 
       {/* Feature Tour */}
-      <PeriodTour isFirstVisit={true} />
+      <PeriodTour isFirstVisit={true} onTourReady={handleTourReady} />
     </>
   );
 };

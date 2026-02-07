@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, BookOpen, NotebookPen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { JournalReminderSettings } from '@/components/app/JournalReminderSetting
 import { JournalHeaderStats } from '@/components/app/JournalHeaderStats';
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
-import { JournalTour } from '@/components/app/tour';
+import { JournalTour, TourHelpButton } from '@/components/app/tour';
 import { format, startOfDay, startOfMonth, subDays, isAfter } from 'date-fns';
 
 // Calculate monthly presence - unique days with entries this month
@@ -37,6 +37,11 @@ const AppJournal = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [startTour, setStartTour] = useState<(() => void) | null>(null);
+  
+  const handleTourReady = useCallback((tourStart: () => void) => {
+    setStartTour(() => tourStart);
+  }, []);
   
   const { data: entries, isLoading } = useJournalEntries(searchQuery);
 
@@ -111,6 +116,9 @@ const AppJournal = () => {
             <h1 className="text-xl font-semibold">My Journal</h1>
           </div>
           <div className="flex items-center gap-1">
+            {startTour && (
+              <TourHelpButton onClick={startTour} />
+            )}
             <Button 
               variant="ghost" 
               size="icon"
@@ -214,7 +222,7 @@ const AppJournal = () => {
         </div>
       </div>
       {/* Feature Tour */}
-      <JournalTour isFirstVisit={true} />
+      <JournalTour isFirstVisit={true} onTourReady={handleTourReady} />
     </div>
   );
 };
