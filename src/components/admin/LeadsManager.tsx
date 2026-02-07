@@ -31,7 +31,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { usePrograms } from '@/hooks/usePrograms';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface PushSubscription {
   id: string;
@@ -106,6 +106,7 @@ export function LeadsManager() {
   const [deletingSubscription, setDeletingSubscription] = useState<string | null>(null);
   const { toast } = useToast();
   const { programs, isLoading: programsLoading } = usePrograms();
+  const queryClient = useQueryClient();
 
   // Fetch available rounds for selected course
   const { data: enrollRounds } = useQuery({
@@ -446,31 +447,51 @@ export function LeadsManager() {
   };
 
   const handleResetUserData = async () => {
-    if (!searchResults?.profile?.id) return;
+    const targetUserId = searchResults?.profile?.id;
+    const targetEmail = searchResults?.profile?.email;
+    if (!targetUserId) return;
 
     setIsResetting(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const { error } = await supabase.functions.invoke('reset-user-data', {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError) throw sessionError;
+      if (!session?.access_token || !session?.user?.id) {
+        throw new Error('Your session expired. Please refresh and sign in again, then retry.');
+      }
+
+      const { data, error } = await supabase.functions.invoke('reset-user-data', {
         body: {
-          targetUserId: searchResults.profile.id
+          targetUserId,
         },
         headers: {
-          Authorization: `Bearer ${session?.access_token}`
-        }
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
 
       if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      if ((data as any)?.success !== true) {
+        throw new Error('Reset did not complete. Please check Edge Function logs.');
+      }
 
-      // Full client-side reset - clears all tours, onboarding flags, etc.
-      // This is centralized so new features automatically get included
-      const { fullClientReset } = await import('@/lib/clientReset');
-      fullClientReset();
+      const isResettingSelf = session.user.id === targetUserId;
+
+      // Only clear *this device's* local flags/cache when you're resetting *your own* account.
+      if (isResettingSelf) {
+        const { fullClientReset } = await import('@/lib/clientReset');
+        fullClientReset();
+        queryClient.clear();
+        window.location.href = '/app/home';
+        return;
+      }
 
       toast({
-        title: "Ultimate Reset Complete",
-        description: `All app data + client flags for ${searchResults.profile.email} have been reset. Go to /app/home for full "Day 1" experience.`
+        title: 'Reset Complete',
+        description: `All app data for ${targetEmail ?? 'this user'} has been reset.`,
       });
 
       // Refresh search results
@@ -478,9 +499,9 @@ export function LeadsManager() {
     } catch (error: any) {
       console.error('Reset user data error:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to reset user data",
-        variant: "destructive"
+        title: 'Error',
+        description: error.message || 'Failed to reset user data',
+        variant: 'destructive',
       });
     } finally {
       setIsResetting(false);
