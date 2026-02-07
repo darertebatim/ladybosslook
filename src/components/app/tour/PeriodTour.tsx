@@ -46,7 +46,7 @@ export function PeriodTour({ isFirstVisit = false, onTourReady }: PeriodTourProp
   const tour = useFeatureTour({
     feature: 'period',
     steps,
-    triggerOnMount: isFirstVisit,
+    triggerOnMount: false,
   });
 
   // Expose forceStartTour to parent

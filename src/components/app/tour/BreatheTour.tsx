@@ -55,7 +55,7 @@ export function BreatheTour({ isFirstVisit = false, onTourReady }: BreatheTourPr
   const tour = useFeatureTour({
     feature: 'breathe',
     steps,
-    triggerOnMount: isFirstVisit,
+    triggerOnMount: false,
   });
 
   // Expose forceStartTour to parent

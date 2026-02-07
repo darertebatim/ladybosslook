@@ -64,7 +64,7 @@ export function RitualsTour({ isFirstVisit = false, onTourReady }: RitualsTourPr
   const tour = useFeatureTour({
     feature: 'rituals',
     steps,
-    triggerOnMount: isFirstVisit,
+    triggerOnMount: false,
   });
 
   // Expose forceStartTour to parent

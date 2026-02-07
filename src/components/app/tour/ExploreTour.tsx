@@ -140,7 +140,7 @@ export function ExploreTour({ isFirstVisit = false, onTourReady }: ExploreTourPr
   const tour = useFeatureTour({
     feature: 'explore',
     steps,
-    triggerOnMount: isFirstVisit,
+    triggerOnMount: false,
   });
 
   // Expose forceStartTour to parent
