@@ -101,12 +101,12 @@ export function RoundTour({ isFirstVisit = false }: RoundTourProps) {
     // Sessions Section
     {
       id: 'sessions',
-      target: '.tour-sessions-list',
+      target: '.tour-sessions-header',
       title: 'Session Schedule',
       description: "All your scheduled live sessions. Today's session is highlighted. Past sessions are dimmed.",
       position: 'top',
       action: 'look',
-      condition: () => !!document.querySelector('.tour-sessions-list'),
+      condition: () => !!document.querySelector('.tour-sessions-header'),
     },
     {
       id: 'session-reminder-settings',

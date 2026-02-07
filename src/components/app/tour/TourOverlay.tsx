@@ -177,16 +177,27 @@ export function TourOverlay({
 
       const rect = element.getBoundingClientRect();
       const spotlightPadding = 8;
-      
+
+      // If the target is very tall (like a long list/card), highlight only the header/top area
+      // to avoid an oversized spotlight that can feel “stuck”.
+      const viewportHeight = window.innerHeight || 0;
+      const isVeryTall = viewportHeight > 0 && rect.height > viewportHeight * 0.75;
+      const headerHeight = Math.min(rect.height, 140);
+      const spotlightHeight = isVeryTall ? headerHeight : rect.height;
+
+      const anchorRect = isVeryTall
+        ? DOMRect.fromRect({ x: rect.x, y: rect.y, width: rect.width, height: spotlightHeight })
+        : rect;
+
       setSpotlightRect({
-        top: rect.top - spotlightPadding,
-        left: rect.left - spotlightPadding,
-        width: rect.width + spotlightPadding * 2,
-        height: rect.height + spotlightPadding * 2,
+        top: anchorRect.top - spotlightPadding,
+        left: anchorRect.left - spotlightPadding,
+        width: anchorRect.width + spotlightPadding * 2,
+        height: anchorRect.height + spotlightPadding * 2,
       });
 
       const position = currentStep.position || 'bottom';
-      setTooltipStyle(calculateTooltipPosition(rect, position, tooltipRef.current));
+      setTooltipStyle(calculateTooltipPosition(anchorRect, position, tooltipRef.current));
     };
 
     // Scroll element into view first, then update position

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 export type TourFeature = 
   | 'home' 
@@ -53,11 +53,31 @@ export function useFeatureTour({
     return localStorage.getItem(getTourKey(feature)) === 'true';
   });
 
-  // Filter steps based on conditions
-  const activeSteps = steps.filter(step => !step.condition || step.condition());
-  const currentStep = activeSteps[currentStepIndex];
+  // Filter steps based on conditions.
+  // Some conditions query the DOM, so memoize the filtered list to reduce churn.
+  const activeSteps = useMemo(
+    () => steps.filter(step => !step.condition || step.condition()),
+    [steps, dependencies]
+  );
+
   const totalSteps = activeSteps.length;
-  const isLastStep = currentStepIndex === totalSteps - 1;
+  const safeStepIndex = totalSteps === 0 ? 0 : Math.min(currentStepIndex, totalSteps - 1);
+  const currentStep = activeSteps[safeStepIndex];
+  const isLastStep = safeStepIndex === totalSteps - 1;
+
+  // Skip/complete tour
+  const completeTour = useCallback(() => {
+    localStorage.setItem(getTourKey(feature), 'true');
+    setHasCompleted(true);
+    setIsActive(false);
+    setCurrentStepIndex(0);
+  }, [feature]);
+
+  // Skip without marking complete (temporary dismiss)
+  const dismissTour = useCallback(() => {
+    setIsActive(false);
+    setCurrentStepIndex(0);
+  }, []);
 
   // Start tour
   const startTour = useCallback(() => {
@@ -79,34 +99,34 @@ export function useFeatureTour({
     if (currentStep?.onComplete) {
       currentStep.onComplete();
     }
-    
+
     if (isLastStep) {
       completeTour();
     } else {
       setCurrentStepIndex(prev => prev + 1);
     }
-  }, [currentStep, isLastStep]);
+  }, [currentStep, isLastStep, completeTour]);
 
   // Previous step
   const prevStep = useCallback(() => {
-    if (currentStepIndex > 0) {
-      setCurrentStepIndex(prev => prev - 1);
+    if (safeStepIndex > 0) {
+      setCurrentStepIndex(prev => Math.max(0, prev - 1));
     }
-  }, [currentStepIndex]);
+  }, [safeStepIndex]);
 
-  // Skip/complete tour
-  const completeTour = useCallback(() => {
-    localStorage.setItem(getTourKey(feature), 'true');
-    setHasCompleted(true);
-    setIsActive(false);
-    setCurrentStepIndex(0);
-  }, [feature]);
+  // Keep step index in bounds when step visibility changes (async data / conditional UI)
+  useEffect(() => {
+    if (!isActive) return;
 
-  // Skip without marking complete (temporary dismiss)
-  const dismissTour = useCallback(() => {
-    setIsActive(false);
-    setCurrentStepIndex(0);
-  }, []);
+    if (totalSteps === 0) {
+      dismissTour();
+      return;
+    }
+
+    if (currentStepIndex !== safeStepIndex) {
+      setCurrentStepIndex(safeStepIndex);
+    }
+  }, [isActive, totalSteps, currentStepIndex, safeStepIndex, dismissTour]);
 
   // Trigger on mount if enabled
   useEffect(() => {
@@ -132,7 +152,7 @@ export function useFeatureTour({
   return {
     isActive,
     currentStep,
-    currentStepIndex,
+    currentStepIndex: safeStepIndex,
     totalSteps,
     isLastStep,
     hasCompleted,
