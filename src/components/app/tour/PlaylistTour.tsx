@@ -17,12 +17,12 @@ export function PlaylistTour({ isFirstVisit = false }: PlaylistTourProps) {
     },
     {
       id: 'tracks',
-      target: '.tour-track-list',
+      target: '.tour-track-list-header',
       title: 'Track List',
       description: 'Tap any track to start listening. Your progress is saved automatically.',
       position: 'bottom',
       action: 'tap',
-      condition: () => !!document.querySelector('.tour-track-list'),
+      condition: () => !!document.querySelector('.tour-track-list-header'),
     },
     {
       id: 'continue',

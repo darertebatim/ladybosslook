@@ -120,12 +120,12 @@ export function ExploreTour({ isFirstVisit = false }: ExploreTourProps) {
     // Programs section overview
     {
       id: 'programs-section',
-      target: '.tour-programs-section',
+      target: '.tour-programs-section-header',
       title: 'Browse Programs 📚',
       description: 'Explore courses, audiobooks, and coaching. Tap any to preview.',
       position: 'top',
       action: 'tap',
-      condition: () => !!document.querySelector('.tour-programs-section'),
+      condition: () => !!document.querySelector('.tour-programs-section-header'),
     },
     // Bottom nav explanations
     {

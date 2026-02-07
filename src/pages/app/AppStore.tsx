@@ -242,7 +242,7 @@ const AppStore = () => {
             {/* Programs Section */}
             {(!searchQuery || hasProgramMatches) && freePrograms.length > 0 && (
               <section className="tour-programs-section">
-                <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
+                <h2 className="tour-programs-section-header text-sm font-semibold text-foreground mb-2 px-1">
                   Browse Programs
                 </h2>
 

@@ -35,12 +35,12 @@ export function RitualsTour({ isFirstVisit = false }: RitualsTourProps) {
     },
     {
       id: 'actions-section',
-      target: '.tour-actions-section',
+      target: '.tour-actions-section-header',
       title: 'Individual Actions',
       description: 'Individual actions live here. Each one can be added to your planner separately.',
       position: 'top',
       action: 'look',
-      condition: () => !!document.querySelector('.tour-actions-section'),
+      condition: () => !!document.querySelector('.tour-actions-section-header'),
     },
     {
       id: 'add-action-btn',
