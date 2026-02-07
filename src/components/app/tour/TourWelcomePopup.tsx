@@ -39,17 +39,41 @@ export function TourWelcomePopup({
   onSkipTour 
 }: TourWelcomePopupProps) {
   const [isOpen, setIsOpen] = useState(false);
-
+  
+  // Check for reset flag on every render - this catches when user navigates back
   useEffect(() => {
-    // Check if tours were just reset - force show popup immediately
-    const justReset = localStorage.getItem('simora_tours_just_reset') === 'true';
-    if (justReset) {
-      localStorage.removeItem('simora_tours_just_reset');
-      // Small delay to let page settle after navigation
-      const timer = setTimeout(() => setIsOpen(true), 600);
-      return () => clearTimeout(timer);
-    }
+    const checkForReset = () => {
+      const justReset = localStorage.getItem('simora_tours_just_reset') === 'true';
+      if (justReset) {
+        localStorage.removeItem('simora_tours_just_reset');
+        // Show popup after small delay
+        setTimeout(() => setIsOpen(true), 600);
+        return true;
+      }
+      return false;
+    };
     
+    // Check immediately
+    if (checkForReset()) return;
+    
+    // Also poll briefly in case the flag is set after mount (e.g., navigation timing)
+    const pollInterval = setInterval(() => {
+      if (checkForReset()) {
+        clearInterval(pollInterval);
+      }
+    }, 200);
+    
+    // Stop polling after 2 seconds
+    const stopPolling = setTimeout(() => clearInterval(pollInterval), 2000);
+    
+    return () => {
+      clearInterval(pollInterval);
+      clearTimeout(stopPolling);
+    };
+  }, []);
+
+  // Normal first-open flow
+  useEffect(() => {
     // For normal flow, require isFirstOpen
     if (!isFirstOpen) return;
     
