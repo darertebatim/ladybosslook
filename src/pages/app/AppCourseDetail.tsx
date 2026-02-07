@@ -1379,8 +1379,8 @@ const AppCourseDetail = () => {
             {/* Upcoming Sessions Card */}
             {dbSessions && dbSessions.length > 0 && (
               <Card className="tour-sessions-list">
-                <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardHeader className="tour-sessions-header">
+                  <CardTitle className="tour-sessions-title flex items-center gap-2">
                     <Clock className="h-5 w-5" />
                     Sessions
                     <Badge variant="secondary" className="ml-auto">
