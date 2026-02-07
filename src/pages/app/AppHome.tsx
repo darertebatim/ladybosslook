@@ -90,7 +90,9 @@ const AppHome = () => {
   const [showGoalSelection, setShowGoalSelection] = useState(false);
   const setStreakGoal = useSetStreakGoal();
   
-  // Gold streak celebration state
+  // Gold streak celebration state - use localStorage to prevent re-showing on navigation
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const goldCelebrationShownKey = `simora_gold_celebration_shown_${todayStr}`;
   const [showGoldStreakCelebration, setShowGoldStreakCelebration] = useState(false);
   const { data: goldStreakData } = useGoldStreak();
   const { data: goldDatesThisWeek = [] } = useGoldDatesThisWeek();
@@ -822,6 +824,12 @@ const AppHome = () => {
           onClose={closeBadgeCelebration}
           onCollectGold={closeBadgeCelebration}
           onGoldCollected={() => {
+            // Check if already shown today to prevent re-showing on navigation
+            if (localStorage.getItem(goldCelebrationShownKey) === 'true') {
+              return;
+            }
+            // Mark as shown for today
+            localStorage.setItem(goldCelebrationShownKey, 'true');
             // Update gold streak and show celebration
             updateGoldStreak.mutate(undefined, {
               onSuccess: () => {
