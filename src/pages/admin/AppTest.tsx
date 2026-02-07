@@ -31,6 +31,9 @@ import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnb
 import { PushNotificationPrompt } from '@/components/app/PushNotificationPrompt';
 import { CourseNotificationPrompt } from '@/components/app/CourseNotificationPrompt';
 import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
+import { BadgeCelebration, BadgeCelebrationLevel } from '@/components/app/BadgeCelebration';
+import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
+import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -53,6 +56,11 @@ export default function AppTest() {
   const [showPushOnboarding, setShowPushOnboarding] = useState(false);
   const [showPushPrompt, setShowPushPrompt] = useState(false);
   const [showCourseNotificationPrompt, setShowCourseNotificationPrompt] = useState(false);
+  
+  // Badge celebration states
+  const [badgeCelebrationType, setBadgeCelebrationType] = useState<BadgeCelebrationLevel | null>(null);
+  const [showGoldStreakCelebration, setShowGoldStreakCelebration] = useState(false);
+  const [showStreakGoalSelection, setShowStreakGoalSelection] = useState(false);
 
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
@@ -104,6 +112,31 @@ export default function AppTest() {
                 <Button onClick={() => setShowTrackCelebrationPlaylistComplete(true)} className="w-full justify-start" variant="outline">
                   <Sparkles className="h-4 w-4 mr-2" />
                   Playlist Complete
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">🏅 Badge Celebrations</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button onClick={() => setBadgeCelebrationType('silver')} className="w-full justify-start" variant="outline">
+                  🥈 Silver Badge Toast (50%)
+                </Button>
+                <Button onClick={() => setBadgeCelebrationType('almostGold')} className="w-full justify-start" variant="outline">
+                  ⭐ Almost Gold Toast
+                </Button>
+                <Button onClick={() => setBadgeCelebrationType('gold')} className="w-full justify-start" variant="outline">
+                  🥇 Gold Badge Modal (100%)
+                </Button>
+                <Button onClick={() => setShowGoldStreakCelebration(true)} className="w-full justify-start" variant="outline">
+                  <Flame className="h-4 w-4 mr-2" />
+                  Gold Streak Celebration
+                </Button>
+                <Button onClick={() => setShowStreakGoalSelection(true)} className="w-full justify-start" variant="outline">
+                  <Flame className="h-4 w-4 mr-2" />
+                  Streak Goal Selection
                 </Button>
               </CardContent>
             </Card>
@@ -283,6 +316,28 @@ export default function AppTest() {
           open={showCourseNotificationPrompt}
           onClose={() => setShowCourseNotificationPrompt(false)}
         />
+        <BadgeCelebration
+          type={badgeCelebrationType}
+          onClose={() => setBadgeCelebrationType(null)}
+          onCollectGold={() => toast.success('Gold badge collected!')}
+          onGoldCollected={() => setShowGoldStreakCelebration(true)}
+          completedCount={5}
+          totalCount={6}
+        />
+        <GoldStreakCelebration
+          open={showGoldStreakCelebration}
+          onClose={() => setShowGoldStreakCelebration(false)}
+          currentGoldStreak={3}
+          goldDatesThisWeek={[new Date(), new Date(Date.now() - 86400000), new Date(Date.now() - 172800000)]}
+        />
+        <StreakGoalSelection
+          open={showStreakGoalSelection}
+          onClose={() => setShowStreakGoalSelection(false)}
+          onSelectGoal={(goal) => {
+            toast.success(`Streak goal set to ${goal} days!`);
+            setShowStreakGoalSelection(false);
+          }}
+        />
       </div>
     );
   }
@@ -329,6 +384,40 @@ export default function AppTest() {
             <Button onClick={() => setShowTrackCelebrationPlaylistComplete(true)} variant="outline">
               <Sparkles className="h-4 w-4 mr-2" />
               Playlist Complete
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Badge Celebrations */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Flame className="h-5 w-5 text-orange-500" />
+            Badge & Streak Celebrations
+          </CardTitle>
+          <CardDescription>
+            Test daily badge progress toasts and gold streak celebrations
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setBadgeCelebrationType('silver')} variant="outline">
+              🥈 Silver Badge Toast (50%)
+            </Button>
+            <Button onClick={() => setBadgeCelebrationType('almostGold')} variant="outline">
+              ⭐ Almost Gold Toast
+            </Button>
+            <Button onClick={() => setBadgeCelebrationType('gold')} variant="outline">
+              🥇 Gold Badge Modal (100%)
+            </Button>
+            <Button onClick={() => setShowGoldStreakCelebration(true)} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Gold Streak Celebration
+            </Button>
+            <Button onClick={() => setShowStreakGoalSelection(true)} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Streak Goal Selection
             </Button>
           </div>
         </CardContent>
@@ -582,6 +671,31 @@ export default function AppTest() {
         programTitle="Assertiveness Training"
         open={showCourseNotificationPrompt}
         onClose={() => setShowCourseNotificationPrompt(false)}
+      />
+
+      <BadgeCelebration
+        type={badgeCelebrationType}
+        onClose={() => setBadgeCelebrationType(null)}
+        onCollectGold={() => toast.success('Gold badge collected!')}
+        onGoldCollected={() => setShowGoldStreakCelebration(true)}
+        completedCount={5}
+        totalCount={6}
+      />
+
+      <GoldStreakCelebration
+        open={showGoldStreakCelebration}
+        onClose={() => setShowGoldStreakCelebration(false)}
+        currentGoldStreak={3}
+        goldDatesThisWeek={[new Date(), new Date(Date.now() - 86400000), new Date(Date.now() - 172800000)]}
+      />
+
+      <StreakGoalSelection
+        open={showStreakGoalSelection}
+        onClose={() => setShowStreakGoalSelection(false)}
+        onSelectGoal={(goal) => {
+          toast.success(`Streak goal set to ${goal} days!`);
+          setShowStreakGoalSelection(false);
+        }}
       />
     </div>
   );
