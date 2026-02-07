@@ -129,12 +129,12 @@ export function RoundTour({ isFirstVisit = false }: RoundTourProps) {
     // Content Schedule Section
     {
       id: 'content-schedule',
-      target: '.tour-content-schedule',
+      target: '.tour-content-schedule-header',
       title: 'Content Unlocks',
       description: 'See when new lessons and materials become available. Locked content shows the unlock date.',
       position: 'top',
       action: 'look',
-      condition: () => !!document.querySelector('.tour-content-schedule'),
+      condition: () => !!document.querySelector('.tour-content-schedule-header'),
     },
     {
       id: 'content-reminder-settings',

@@ -1481,8 +1481,8 @@ const AppCourseDetail = () => {
             {/* Content Schedule Card - shows drip unlock timeline for modules or audio tracks */}
             {showContentSchedule && (
               <Card className="tour-content-schedule">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                <CardHeader className="tour-content-schedule-header">
+                  <CardTitle className="tour-content-schedule-title flex items-center gap-2">
                     <BookOpen className="h-5 w-5" />
                     {hasDripTracks ? 'Audiobook Schedule' : 'Content Schedule'}
                     <Badge variant="secondary" className="ml-auto">
