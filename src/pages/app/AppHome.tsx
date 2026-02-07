@@ -643,6 +643,9 @@ const AppHome = () => {
 
               {/* Popular Rituals Suggestions - only show rituals user hasn't added */}
               {suggestedRoutines.length > 0 && selectedTag === null && <div className="tour-suggested-ritual mt-6">
+                  {/* Tour Banner - placed above rituals */}
+                  <div id="tour-banner-slot" />
+                  
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="h-4 w-4 text-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
