@@ -737,7 +737,7 @@ export default function AppPlaylistDetail() {
       {/* Track List */}
       {showTracks && tracks && tracks.length > 0 && (
         <div className="px-4 pb-4 space-y-2 tour-track-list">
-          <h2 className="text-lg font-semibold mb-3">Tracks</h2>
+          <h2 className="tour-track-list-header text-lg font-semibold mb-3">Tracks</h2>
           {tracks.map((item, index) => {
             const track = item.audio_content;
             const progress = getTrackProgress(track.id);
