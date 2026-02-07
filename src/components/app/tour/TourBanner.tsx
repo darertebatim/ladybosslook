@@ -9,9 +9,10 @@ const TOUR_RE_PROMPT_DAYS = 3;
 interface TourBannerProps {
   isFirstOpen: boolean;
   onStartTour: () => void;
+  forceShow?: boolean; // Server indicates new user (totalCompletions === 0)
 }
 
-export function TourBanner({ isFirstOpen, onStartTour }: TourBannerProps) {
+export function TourBanner({ isFirstOpen, onStartTour, forceShow = false }: TourBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   // Check for reset flag on every render
@@ -47,6 +48,13 @@ export function TourBanner({ isFirstOpen, onStartTour }: TourBannerProps) {
   useEffect(() => {
     if (!isFirstOpen) return;
 
+    // When server says totalCompletions === 0 (forceShow), ignore localStorage flags
+    // This handles remote admin reset where the user's localStorage wasn't cleared
+    if (forceShow) {
+      const timer = setTimeout(() => setIsVisible(true), 500);
+      return () => clearTimeout(timer);
+    }
+
     // Check if tour was completed
     const hasCompleted = localStorage.getItem(TOUR_PROMPT_KEY) === 'true';
     if (hasCompleted) return;
@@ -64,7 +72,7 @@ export function TourBanner({ isFirstOpen, onStartTour }: TourBannerProps) {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [isFirstOpen]);
+  }, [isFirstOpen, forceShow]);
 
   const handleStartTour = () => {
     localStorage.setItem(TOUR_PROMPT_KEY, 'true');

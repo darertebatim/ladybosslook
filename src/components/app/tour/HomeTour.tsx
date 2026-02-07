@@ -9,6 +9,8 @@ interface HomeTourProps {
   hasSuggestedRituals?: boolean;
   hasWelcomeCard?: boolean;
   isFirstOpen?: boolean;
+  /** Server indicates 0 completions - bypass localStorage flags */
+  forceShow?: boolean;
   // Portal target ID for banner placement
   bannerPortalId?: string;
   // Callback to expose the tour trigger function
@@ -20,6 +22,7 @@ export function HomeTour({
   hasSuggestedRituals = false,
   hasWelcomeCard = false,
   isFirstOpen = false,
+  forceShow = false,
   bannerPortalId = 'tour-banner-slot',
   onTourReady,
 }: HomeTourProps) {
@@ -188,6 +191,7 @@ export function HomeTour({
   const bannerElement = (
     <TourBanner
       isFirstOpen={isFirstOpen}
+      forceShow={forceShow}
       onStartTour={handleStartTour}
     />
   );
