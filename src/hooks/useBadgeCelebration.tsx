@@ -45,7 +45,22 @@ export function useBadgeCelebration({
     const prevLevel = prevBadgeLevelRef.current;
     const celebrationKey = `${dateKey}-${currentBadgeLevel}`;
     
-    // Skip if already celebrated this level today
+    // Check for "almost gold" first (1 task away) - this is independent of badge level changes
+    // Must check before the badge level transitions
+    if (
+      currentBadgeLevel === 'silver' && 
+      totalCount > 0 && 
+      completedCount === totalCount - 1 &&
+      !celebratedLevelsRef.current.has(`${dateKey}-almostGold`) &&
+      !celebratedLevelsRef.current.has(`${dateKey}-gold`)
+    ) {
+      setCelebrationType('almostGold');
+      celebratedLevelsRef.current.add(`${dateKey}-almostGold`);
+      prevBadgeLevelRef.current = currentBadgeLevel;
+      return;
+    }
+    
+    // Skip if already celebrated this badge level today
     if (celebratedLevelsRef.current.has(celebrationKey)) {
       prevBadgeLevelRef.current = currentBadgeLevel;
       return;
@@ -60,17 +75,6 @@ export function useBadgeCelebration({
     else if (currentBadgeLevel === 'gold' && prevLevel !== 'gold') {
       setCelebrationType('gold');
       celebratedLevelsRef.current.add(celebrationKey);
-    }
-    // Check for "almost gold" (1 task away) - only if we haven't shown gold yet
-    else if (
-      currentBadgeLevel === 'silver' && 
-      totalCount > 0 && 
-      completedCount === totalCount - 1 &&
-      !celebratedLevelsRef.current.has(`${dateKey}-almostGold`) &&
-      !celebratedLevelsRef.current.has(`${dateKey}-gold`)
-    ) {
-      setCelebrationType('almostGold');
-      celebratedLevelsRef.current.add(`${dateKey}-almostGold`);
     }
 
     prevBadgeLevelRef.current = currentBadgeLevel;
