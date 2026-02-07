@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key, Edit2, Trash2, UserPlus, Smartphone, Send, RotateCcw } from 'lucide-react';
+import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key, Edit2, Trash2, UserPlus, Smartphone, Send, RotateCcw, GitMerge } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -99,6 +99,9 @@ export function LeadsManager() {
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [isMerging, setIsMerging] = useState(false);
+  const [isMergeDialogOpen, setIsMergeDialogOpen] = useState(false);
+  const [mergeEmail, setMergeEmail] = useState('');
   const [sendingTestTo, setSendingTestTo] = useState<string | null>(null);
   const [deletingSubscription, setDeletingSubscription] = useState<string | null>(null);
   const { toast } = useToast();
@@ -484,6 +487,54 @@ export function LeadsManager() {
     }
   };
 
+  const handleMergeAccounts = async () => {
+    if (!searchResults?.profile?.id || !mergeEmail.trim()) {
+      toast({
+        title: 'Missing Information',
+        description: 'Please enter the secondary email to merge',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsMerging(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { data, error } = await supabase.functions.invoke('admin-merge-accounts', {
+        body: {
+          primaryUserId: searchResults.profile.id,
+          secondaryEmail: mergeEmail.trim(),
+        },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Merge Complete!',
+        description: `Transferred ${data.mergedOrders} orders and ${data.mergedEnrollments} enrollments from ${mergeEmail}`,
+      });
+
+      setIsMergeDialogOpen(false);
+      setMergeEmail('');
+      
+      // Refresh search results
+      handleSearch();
+    } catch (error: any) {
+      console.error('Merge accounts error:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to merge accounts',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsMerging(false);
+    }
+  };
+
   const handleSendTestNotification = async (email: string, subscriptionId: string) => {
     setSendingTestTo(subscriptionId);
     try {
@@ -749,6 +800,58 @@ export function LeadsManager() {
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
+
+                      <Dialog open={isMergeDialogOpen} onOpenChange={setIsMergeDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <GitMerge className="h-4 w-4 mr-2" />
+                            Merge Accounts
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Merge Account Data</DialogTitle>
+                            <DialogDescription>
+                              Transfer orders and enrollments from another email to <strong>{searchResults.profile.email}</strong>.
+                              This is useful when a user purchased with a different email.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="merge-email">Secondary Email</Label>
+                              <Input
+                                id="merge-email"
+                                type="email"
+                                placeholder="Enter the email with orders to merge..."
+                                value={mergeEmail}
+                                onChange={(e) => setMergeEmail(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleMergeAccounts()}
+                              />
+                              <p className="text-xs text-muted-foreground">
+                                All orders and enrollments from this email will be transferred to the current user.
+                              </p>
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setIsMergeDialogOpen(false);
+                                setMergeEmail('');
+                              }}
+                              disabled={isMerging}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={handleMergeAccounts}
+                              disabled={isMerging || !mergeEmail.trim()}
+                            >
+                              {isMerging ? 'Merging...' : 'Merge Data'}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
 
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
