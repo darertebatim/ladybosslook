@@ -134,7 +134,7 @@ export function BadgeCelebration({
         className="fixed bottom-24 left-4 right-4 z-[100] animate-in slide-in-from-bottom-4 duration-300"
         onClick={onClose}
       >
-        <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl p-4 shadow-xl flex items-center gap-3">
+        <div className="bg-gradient-to-r from-orange-500 to-orange-400 rounded-2xl p-4 shadow-xl flex items-center gap-3">
           {/* Left icon/badge */}
           <div className="relative shrink-0">
             {type === 'silver' ? (

@@ -164,7 +164,7 @@ export const StreakCelebration = ({ open, onClose, isFirstAction = false }: Stre
       {/* Modal content */}
       <div 
         className={cn(
-          'relative bg-gradient-to-b from-orange-500 to-orange-600 rounded-3xl p-8 w-full max-w-[300px] text-center transition-all duration-500',
+          'relative bg-gradient-to-b from-orange-400 to-orange-500 rounded-3xl p-8 w-full max-w-[300px] text-center transition-all duration-500',
           isAnimating ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
         )}
         onClick={(e) => e.stopPropagation()}
