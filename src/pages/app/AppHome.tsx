@@ -173,7 +173,10 @@ const AppHome = () => {
   const isNewUser = dataIsNewUser || forceNewUser;
   
   // Track if this is truly a first-time user for tour (no prior completions ever)
-  const isFirstOpen = !homeDataLoading && totalCompletions === 0 && !localStorage.getItem('simora_tour_home_done');
+  // If server shows 0 completions, treat as first open regardless of localStorage
+  // (handles remote admin reset where localStorage wasn't cleared on this device)
+  const serverIndicatesNewUser = totalCompletions === 0;
+  const isFirstOpen = !homeDataLoading && serverIndicatesNewUser;
   
   // Track if user started this session as a new user (only set once when data loads)
   useEffect(() => {
