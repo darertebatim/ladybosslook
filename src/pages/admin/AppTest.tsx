@@ -15,7 +15,12 @@ import {
   Info,
   CheckCircle2,
   Download,
-  Star
+  Star,
+  Home,
+  Compass,
+  Music,
+  Users,
+  Headset
 } from 'lucide-react';
 
 // Import all testable components
@@ -27,8 +32,18 @@ import { PushNotificationPrompt } from '@/components/app/PushNotificationPrompt'
 import { CourseNotificationPrompt } from '@/components/app/CourseNotificationPrompt';
 import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
 
+// Mock bottom nav items for testing
+const mockNavItems = [
+  { label: 'Home', icon: Home, active: true },
+  { label: 'Explore', icon: Compass, active: false },
+  { label: 'Listen', icon: Music, active: false },
+  { label: 'Channels', icon: Users, active: false, badge: 3 },
+  { label: 'Support', icon: Headset, active: false, badge: 1 },
+];
+
 export default function AppTest() {
   const { toast: shadcnToast } = useToast();
+  const [showIOSPreview, setShowIOSPreview] = useState(false);
   
   // Component visibility states
   const [showStreakCelebration, setShowStreakCelebration] = useState(false);
@@ -39,13 +54,251 @@ export default function AppTest() {
   const [showPushPrompt, setShowPushPrompt] = useState(false);
   const [showCourseNotificationPrompt, setShowCourseNotificationPrompt] = useState(false);
 
+  // iOS Preview Mode renders the test content in a simulated iOS environment
+  if (showIOSPreview) {
+    return (
+      <div 
+        className="fixed inset-0 bg-background flex flex-col"
+        style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        {/* iOS Status Bar Placeholder */}
+        <div 
+          className="bg-background border-b border-border flex items-center justify-between px-4"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 8px)', paddingBottom: '12px' }}
+        >
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setShowIOSPreview(false)}
+            className="text-primary"
+          >
+            ← Exit Preview
+          </Button>
+          <span className="text-sm font-semibold">iOS Preview Mode</span>
+          <div className="w-20" />
+        </div>
+
+        {/* Scrollable Content Area */}
+        <main 
+          className="flex-1 overflow-y-auto overscroll-contain"
+          style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}
+        >
+          <div className="p-4 space-y-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">🎉 Celebrations</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button onClick={() => setShowStreakCelebration(true)} className="w-full justify-start" variant="outline">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Presence Celebration
+                </Button>
+                <Button onClick={() => setShowCompletionCelebration(true)} className="w-full justify-start" variant="outline">
+                  <Trophy className="h-4 w-4 mr-2" />
+                  Course Completion
+                </Button>
+                <Button onClick={() => setShowTrackCelebration(true)} className="w-full justify-start" variant="outline">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Track Complete
+                </Button>
+                <Button onClick={() => setShowTrackCelebrationPlaylistComplete(true)} className="w-full justify-start" variant="outline">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Playlist Complete
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">🔔 Push Notifications</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button onClick={() => setShowPushOnboarding(true)} className="w-full justify-start" variant="outline">
+                  <Bell className="h-4 w-4 mr-2" />
+                  Full Onboarding
+                </Button>
+                <Button onClick={() => setShowPushPrompt(true)} className="w-full justify-start" variant="outline">
+                  <Bell className="h-4 w-4 mr-2" />
+                  Quick Prompt
+                </Button>
+                <Button onClick={() => setShowCourseNotificationPrompt(true)} className="w-full justify-start" variant="outline">
+                  <Bell className="h-4 w-4 mr-2" />
+                  Course Prompt
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">🍞 Toast Notifications</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-2">
+                <Button onClick={() => toast.success('Success!')} variant="outline" size="sm">
+                  ✅ Success
+                </Button>
+                <Button onClick={() => toast.error('Error!')} variant="outline" size="sm">
+                  ❌ Error
+                </Button>
+                <Button onClick={() => toast.info('Info message')} variant="outline" size="sm">
+                  ℹ️ Info
+                </Button>
+                <Button onClick={() => toast.warning('Warning!')} variant="outline" size="sm">
+                  ⚠️ Warning
+                </Button>
+                <Button 
+                  onClick={() => {
+                    const id = toast.loading('Loading...');
+                    setTimeout(() => toast.dismiss(id), 2000);
+                  }} 
+                  variant="outline" 
+                  size="sm"
+                >
+                  ⏳ Loading
+                </Button>
+                <Button 
+                  onClick={() => shadcnToast({ title: 'Legacy Toast', description: 'Via useToast hook' })} 
+                  variant="outline" 
+                  size="sm"
+                >
+                  📦 Legacy
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">⭐ App Review</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  onClick={async () => {
+                    const success = await forceRequestReview();
+                    toast(success ? 'Review prompted!' : 'Requires native iOS');
+                  }} 
+                  className="w-full"
+                  variant="outline"
+                >
+                  <Star className="h-4 w-4 mr-2" />
+                  Request App Review
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">📲 Update Banner</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AppUpdateBanner />
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+
+        {/* iOS Bottom Navigation */}
+        <nav 
+          className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
+          <div className="flex items-center justify-around h-16">
+            {mockNavItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.label}
+                  className="flex flex-col items-center justify-center flex-1 h-full relative"
+                  onClick={() => toast(`${item.label} tapped`)}
+                >
+                  <div className="relative">
+                    <Icon 
+                      className="h-6 w-6" 
+                      strokeWidth={item.active ? 2.5 : 1.5}
+                    />
+                    {item.badge && (
+                      <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                        {item.badge}
+                      </span>
+                    )}
+                  </div>
+                  <span className={`text-[10px] mt-1 ${item.active ? 'font-semibold' : 'font-medium text-muted-foreground'}`}>
+                    {item.label}
+                  </span>
+                  {item.active && (
+                    <div className="absolute bottom-1 w-1 h-1 rounded-full bg-primary" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+
+        {/* Render all modals/dialogs */}
+        <StreakCelebration
+          open={showStreakCelebration}
+          onClose={() => setShowStreakCelebration(false)}
+        />
+        <CompletionCelebration
+          isOpen={showCompletionCelebration}
+          onClose={() => setShowCompletionCelebration(false)}
+          courseName="Courageous Character Course"
+          roundName="Round 5 - January 2026"
+        />
+        <TrackCompletionCelebration
+          isOpen={showTrackCelebration}
+          onClose={() => setShowTrackCelebration(false)}
+          trackTitle="Day 1: Introduction to Assertiveness"
+          nextTrack={{ title: "Day 2: Setting Boundaries", coverImageUrl: undefined }}
+          onPlayNext={() => {
+            toast.info('Playing next track...');
+            setShowTrackCelebration(false);
+          }}
+          isPlaylistComplete={false}
+        />
+        <TrackCompletionCelebration
+          isOpen={showTrackCelebrationPlaylistComplete}
+          onClose={() => setShowTrackCelebrationPlaylistComplete(false)}
+          trackTitle="Day 30: Final Reflection"
+          isPlaylistComplete={true}
+        />
+        {showPushOnboarding && (
+          <div className="fixed inset-0 z-50 bg-background">
+            <PushNotificationOnboarding
+              userId="test-user-id"
+              onComplete={() => {
+                toast.success('Push notifications enabled!');
+                setShowPushOnboarding(false);
+              }}
+              onSkip={() => setShowPushOnboarding(false)}
+            />
+          </div>
+        )}
+        <PushNotificationPrompt
+          userId="test-user-id"
+          open={showPushPrompt}
+          onClose={() => setShowPushPrompt(false)}
+        />
+        <CourseNotificationPrompt
+          userId="test-user-id"
+          programTitle="Assertiveness Training"
+          open={showCourseNotificationPrompt}
+          onClose={() => setShowCourseNotificationPrompt(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">App Component Tester</h1>
-        <p className="text-muted-foreground">
-          Preview and test all popups, modals, toasts, and celebrations
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">App Component Tester</h1>
+          <p className="text-muted-foreground">
+            Preview and test all popups, modals, toasts, and celebrations
+          </p>
+        </div>
+        <Button onClick={() => setShowIOSPreview(true)} className="gap-2">
+          📱 iOS Preview Mode
+        </Button>
       </div>
 
       {/* Celebrations */}
@@ -173,7 +426,7 @@ export default function AppTest() {
             Toast Notifications
           </CardTitle>
           <CardDescription>
-            Test different toast styles (Sonner and Shadcn)
+            Test different toast styles (all now use Sonner)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -215,7 +468,6 @@ export default function AppTest() {
               <Button 
                 onClick={() => {
                   const toastId = toast.loading('Loading...');
-                  // Auto-dismiss after 2 seconds for demo, but user can close anytime
                   setTimeout(() => toast.dismiss(toastId), 2000);
                 }} 
                 variant="outline"
@@ -242,12 +494,12 @@ export default function AppTest() {
           <Separator />
 
           <div>
-            <p className="text-sm font-medium mb-2">Shadcn Toasts</p>
+            <p className="text-sm font-medium mb-2">Legacy useToast Hook (now uses Sonner)</p>
             <div className="flex flex-wrap gap-2">
               <Button 
                 onClick={() => shadcnToast({
                   title: 'Default Toast',
-                  description: 'This is a default shadcn toast message.',
+                  description: 'This uses the useToast hook but renders via Sonner.',
                 })} 
                 variant="outline"
                 size="sm"
@@ -257,7 +509,7 @@ export default function AppTest() {
               <Button 
                 onClick={() => shadcnToast({
                   title: 'Destructive Toast',
-                  description: 'Something went wrong!',
+                  description: 'Shows as error toast in Sonner!',
                   variant: 'destructive',
                 })} 
                 variant="outline"
@@ -306,7 +558,6 @@ export default function AppTest() {
         isPlaylistComplete={true}
       />
 
-      {/* Note: Push notification components require userId prop - showing info message instead */}
       {showPushOnboarding && (
         <div className="fixed inset-0 z-50 bg-background">
           <PushNotificationOnboarding
