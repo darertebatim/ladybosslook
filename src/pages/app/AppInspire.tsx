@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Heart, Loader2, Sparkles, ListTodo } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -21,7 +21,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
-import { RitualsTour, RitualsTourRef, TourHelpButton } from '@/components/app/tour';
+import { RitualsTour } from '@/components/app/tour';
 
 export default function AppInspire() {
   const navigate = useNavigate();
@@ -30,7 +30,6 @@ export default function AppInspire() {
   const [showSearch, setShowSearch] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null);
   const [previewSheetOpen, setPreviewSheetOpen] = useState(false);
-  const tourRef = useRef<RitualsTourRef>(null);
 
   const { data: categories, isLoading: categoriesLoading } = useRoutineBankCategories();
   const { data: featuredRoutines } = useFeaturedRoutinesBank();
@@ -195,13 +194,15 @@ export default function AppInspire() {
             <Sparkles className="w-6 h-6 text-primary" />
             <h1 className="text-xl font-bold text-foreground">Rituals</h1>
           </div>
-          <div className="flex items-center gap-1">
-            <TourHelpButton onClick={() => tourRef.current?.startTour()} />
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setShowSearch(!showSearch)}
               className="p-2 rounded-full hover:bg-muted/50 transition-colors"
             >
               <Search className="w-5 h-5 text-muted-foreground" />
+            </button>
+            <button className="p-2 rounded-full hover:bg-muted/50 transition-colors">
+              <Heart className="w-5 h-5 text-muted-foreground" />
             </button>
           </div>
         </div>
@@ -371,7 +372,7 @@ export default function AppInspire() {
       )}
 
       {/* Feature Tour */}
-      <RitualsTour ref={tourRef} />
+      <RitualsTour isFirstVisit={true} />
     </div>
   );
 }

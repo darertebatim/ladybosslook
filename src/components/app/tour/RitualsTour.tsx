@@ -1,12 +1,12 @@
-import { useMemo, useImperativeHandle, forwardRef } from 'react';
+import { useMemo } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
 
-export interface RitualsTourRef {
-  startTour: () => void;
+interface RitualsTourProps {
+  isFirstVisit?: boolean;
 }
 
-export const RitualsTour = forwardRef<RitualsTourRef>(function RitualsTour(_, ref) {
+export function RitualsTour({ isFirstVisit = false }: RitualsTourProps) {
   const steps = useMemo((): TourStep[] => [
     {
       id: 'welcome',
@@ -63,13 +63,8 @@ export const RitualsTour = forwardRef<RitualsTourRef>(function RitualsTour(_, re
   const tour = useFeatureTour({
     feature: 'rituals',
     steps,
-    triggerOnMount: false, // On-demand only
+    triggerOnMount: isFirstVisit,
   });
-
-  // Expose startTour to parent via ref
-  useImperativeHandle(ref, () => ({
-    startTour: () => tour.forceStartTour(),
-  }), [tour]);
 
   return (
     <TourOverlay
@@ -84,4 +79,4 @@ export const RitualsTour = forwardRef<RitualsTourRef>(function RitualsTour(_, re
       onComplete={tour.completeTour}
     />
   );
-});
+}

@@ -5,7 +5,7 @@ import { Search, X, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { useEnrollments, useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import { ProgramCard } from '@/components/app/ProgramCard';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
@@ -13,7 +13,7 @@ import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
 import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
 import { PromoBanner } from '@/components/app/PromoBanner';
-import { ExploreTour, ExploreTourRef, TourHelpButton } from '@/components/app/tour';
+import { ExploreTour } from '@/components/app/tour';
 
 // Category configuration for filtering programs
 const categoryConfig = [
@@ -37,7 +37,6 @@ const AppStore = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const tourRef = useRef<ExploreTourRef>(null);
 
   const { data: enrollments = [] } = useEnrollments();
   const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
@@ -183,22 +182,19 @@ const AppStore = () => {
           ) : (
             <>
               <h1 className="text-xl font-bold text-foreground">Explore Simora</h1>
-              <div className="flex items-center">
-                <TourHelpButton onClick={() => tourRef.current?.startTour()} />
-                <button 
-                  onClick={() => setShowSearch(true)}
-                  className="tour-search-button p-2 rounded-full transition-transform active:scale-95"
-                >
-                  <Search className="h-5 w-5 text-muted-foreground" />
-                </button>
-              </div>
+              <button 
+                onClick={() => setShowSearch(true)}
+                className="tour-search-button p-2 rounded-full transition-transform active:scale-95"
+              >
+                <Search className="h-5 w-5 text-muted-foreground" />
+              </button>
             </>
           )}
         </div>
       </header>
 
       {/* Explore Tour */}
-      <ExploreTour ref={tourRef} />
+      <ExploreTour isFirstVisit={true} />
 
       {/* Scrollable Content */}
       <div 

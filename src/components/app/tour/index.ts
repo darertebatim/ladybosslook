@@ -2,16 +2,15 @@
 export { TourOverlay } from './TourOverlay';
 export { TourWelcomePopup } from './TourWelcomePopup';
 export { TourBanner, resetTourPrompt } from './TourBanner';
-export { TourHelpButton } from './TourHelpButton';
 export { HomeTour } from './HomeTour';
-export { RitualsTour, type RitualsTourRef } from './RitualsTour';
-export { PlayerTour, type PlayerTourRef } from './PlayerTour';
+export { RitualsTour } from './RitualsTour';
+export { PlayerTour } from './PlayerTour';
 export { JournalTour } from './JournalTour';
 export { BreatheTour } from './BreatheTour';
 export { PeriodTour } from './PeriodTour';
 export { ProgramsTour } from './ProgramsTour';
 export { RoundTour } from './RoundTour';
-export { ExploreTour, type ExploreTourRef } from './ExploreTour';
+export { ExploreTour } from './ExploreTour';
 export { PlaylistTour } from './PlaylistTour';
 export { ActionSheetTour } from './ActionSheetTour';
 
