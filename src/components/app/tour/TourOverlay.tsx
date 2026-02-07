@@ -54,6 +54,9 @@ export function TourOverlay({
     const padding = 16;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
+    // Account for bottom nav bar and safe area (typically ~80-100px on mobile)
+    const bottomSafeZone = 100;
+    const effectiveViewportHeight = viewportHeight - bottomSafeZone;
     
     // For center position or no target
     if (position === 'center' || !targetRect) {
@@ -61,11 +64,15 @@ export function TourOverlay({
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
+        maxHeight: `${effectiveViewportHeight - 40}px`,
       };
     }
 
     const tooltipWidth = Math.min(viewportWidth - padding * 2, 320);
-    const tooltipHeight = tooltipEl?.offsetHeight || 200;
+    // Use measured height if available, but cap it to prevent overflow
+    const measuredHeight = tooltipEl?.offsetHeight || 0;
+    const maxTooltipHeight = effectiveViewportHeight - 40;
+    const tooltipHeight = measuredHeight > 0 ? Math.min(measuredHeight, maxTooltipHeight) : 200;
     
     let top: number;
     let left: number;
@@ -102,21 +109,35 @@ export function TourOverlay({
       left = viewportWidth - tooltipWidth - safeMargin;
     }
 
-    // Vertical bounds - if tooltip goes off screen, flip position
+    // Vertical bounds - ensure tooltip is never cut off at top or bottom
+    // First, check if bottom edge goes beyond the safe zone
+    if (top + tooltipHeight > effectiveViewportHeight) {
+      // Try flipping to top position
+      if ((position === 'bottom' || position === 'left' || position === 'right') && targetRect) {
+        const flippedTop = targetRect.top - tooltipHeight - padding;
+        if (flippedTop >= safeMargin) {
+          top = flippedTop;
+        } else {
+          // Can't flip, just clamp to viewport
+          top = Math.max(safeMargin, effectiveViewportHeight - tooltipHeight);
+        }
+      } else {
+        top = Math.max(safeMargin, effectiveViewportHeight - tooltipHeight);
+      }
+    }
+    
+    // Check top edge
     if (top < safeMargin) {
-      // If top position doesn't fit, try bottom
+      // Try flipping to bottom
       if (position === 'top' && targetRect) {
-        top = targetRect.bottom + padding;
+        const flippedTop = targetRect.bottom + padding;
+        if (flippedTop + tooltipHeight <= effectiveViewportHeight) {
+          top = flippedTop;
+        } else {
+          top = safeMargin;
+        }
       } else {
         top = safeMargin;
-      }
-    } else if (top + tooltipHeight > viewportHeight - safeMargin) {
-      // If bottom doesn't fit, try top
-      if (position === 'bottom' && targetRect) {
-        top = targetRect.top - tooltipHeight - padding;
-        if (top < safeMargin) top = safeMargin;
-      } else {
-        top = viewportHeight - tooltipHeight - safeMargin;
       }
     }
 
@@ -124,6 +145,7 @@ export function TourOverlay({
       top: `${top}px`,
       left: `${left}px`,
       width: `${tooltipWidth}px`,
+      maxHeight: `${maxTooltipHeight}px`,
     };
   }, []);
 
