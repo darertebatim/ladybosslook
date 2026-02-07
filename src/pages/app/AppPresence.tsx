@@ -29,7 +29,7 @@ const AppPresence = () => {
       <div className="min-h-screen bg-background">
         {/* Hero Header */}
         <div 
-          className="relative bg-gradient-to-b from-violet-600 via-violet-700 to-indigo-800 text-white"
+          className="relative bg-gradient-to-b from-orange-400 via-orange-500 to-orange-600 text-white"
           style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}
         >
           {/* Back button */}
@@ -46,8 +46,8 @@ const AppPresence = () => {
           {/* Hero Stats */}
           <div className="px-6 pb-8 pt-2 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Sparkles className="h-5 w-5 text-violet-300" />
-              <span className="text-violet-200 text-sm font-medium">Your Presence</span>
+              <Sparkles className="h-5 w-5 text-orange-100" />
+              <span className="text-orange-100 text-sm font-medium">Your Presence</span>
             </div>
             
             {/* Main stat: Days This Month */}
@@ -59,7 +59,7 @@ const AppPresence = () => {
                 <span className="text-xl text-violet-200 ml-2">days</span>
               </div>
             )}
-            <p className="text-violet-200 text-sm mb-6">this month</p>
+            <p className="text-orange-100 text-sm mb-6">this month</p>
             
             {/* Week presence grid */}
             <WeeklyPresenceGrid 

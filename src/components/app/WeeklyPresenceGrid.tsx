@@ -70,7 +70,7 @@ export function WeeklyPresenceGrid({
           <div 
             className={cn(
               'w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium transition-all',
-              day.isToday && isDark && 'ring-2 ring-violet-300',
+              day.isToday && isDark && 'ring-2 ring-orange-300',
               day.isToday && !isDark && 'ring-2 ring-primary/30',
               !day.isActive && (
                 isDark
