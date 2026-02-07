@@ -190,79 +190,67 @@ export function BadgeCelebration({
       className="fixed inset-0 z-[100] flex items-end justify-center"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      {/* Dark overlay with subtle rays */}
-      <div className="absolute inset-0 bg-black/70">
+      {/* Dark overlay with rays effect */}
+      <div className="absolute inset-0 bg-black/80">
         {/* Radial rays background */}
         <div 
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-30"
           style={{
-            background: 'repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.15) 0deg 5deg, transparent 5deg 10deg)',
-            transformOrigin: 'center 70%',
+            background: 'repeating-conic-gradient(from 0deg, rgba(251, 146, 60, 0.3) 0deg 10deg, transparent 10deg 20deg)',
+            transformOrigin: 'center 60%',
           }}
         />
       </div>
 
-      {/* Badge floating above the modal */}
+      {/* Celebration content */}
       <div 
         className={cn(
-          'absolute left-1/2 -translate-x-1/2 bottom-[320px] z-20 transition-all duration-500',
-          isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-        )}
-      >
-        {/* Sparkle decorations around badge */}
-        <Sparkles className="absolute -left-10 top-1/4 h-6 w-6 text-white/80 animate-pulse" />
-        <Sparkles className="absolute -right-10 top-1/4 h-6 w-6 text-white/80 animate-pulse delay-100" />
-        <Sparkles className="absolute -left-6 bottom-4 h-5 w-5 text-white/60 animate-pulse delay-200" />
-        <Sparkles className="absolute -right-6 bottom-4 h-5 w-5 text-white/60 animate-pulse delay-300" />
-        
-        {/* Glow effect */}
-        <div className="absolute inset-0 bg-amber-400/30 blur-3xl rounded-full scale-150" />
-        
-        {/* Badge image */}
-        <img 
-          ref={badgeRef}
-          src={BADGE_IMAGES.gold} 
-          alt="Gold badge" 
-          className={cn(
-            'w-32 h-32 object-contain relative z-10 drop-shadow-2xl transition-all',
-            flyingBadge && 'animate-fly-to-header'
-          )}
-          style={{
-            filter: 'drop-shadow(0 0 30px rgba(255, 215, 0, 0.5))',
-          }}
-        />
-      </div>
-
-      {/* Celebration content - bottom sheet style */}
-      <div 
-        className={cn(
-          'relative w-full max-w-md mx-4 rounded-t-[40px] pt-10 pb-8 px-6 transition-all duration-500',
+          'relative w-full max-w-md mx-4 bg-gradient-to-t from-orange-400 via-orange-500 to-orange-600 rounded-t-[40px] pt-8 pb-8 px-6 transition-all duration-500',
           isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
         )}
-        style={{
-          background: 'linear-gradient(0deg, #fffbeb 0%, #fef3c7 30%, #fdba74 70%, #fb923c 100%)',
-        }}
       >
-        {/* Decorative sparkle dots */}
-        <div className="absolute top-6 left-6 w-2 h-2 rounded-full bg-white/60" />
-        <div className="absolute top-12 right-10 w-1.5 h-1.5 rounded-full bg-white/50" />
-        <div className="absolute top-20 left-12 w-1 h-1 rounded-full bg-white/40" />
-        <div className="absolute top-10 right-20 w-2 h-2 rounded-full bg-white/50" />
+        {/* Large centered badge with glow */}
+        <div className="flex flex-col items-center -mt-28 mb-4">
+          {/* Sparkle decorations around badge */}
+          <div className="relative">
+            <Sparkles className="absolute -left-8 top-1/4 h-6 w-6 text-white/80 animate-pulse" />
+            <Sparkles className="absolute -right-8 top-1/4 h-6 w-6 text-white/80 animate-pulse delay-100" />
+            <Sparkles className="absolute left-0 bottom-0 h-5 w-5 text-white/60 animate-pulse delay-200" />
+            <Sparkles className="absolute right-0 bottom-0 h-5 w-5 text-white/60 animate-pulse delay-300" />
+            
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-amber-400/30 blur-3xl rounded-full scale-150" />
+            
+            {/* Badge image */}
+            <img 
+              ref={badgeRef}
+              src={BADGE_IMAGES.gold} 
+              alt="Gold badge" 
+              className={cn(
+                'w-40 h-40 object-contain relative z-10 drop-shadow-2xl transition-all',
+                flyingBadge && 'animate-fly-to-header'
+              )}
+              style={{
+                filter: 'drop-shadow(0 0 30px rgba(255, 215, 0, 0.5))',
+              }}
+            />
+          </div>
+        </div>
 
         {/* Text content */}
-        <div className="text-center mb-6 mt-4">
-          <h2 className="text-2xl font-bold text-orange-800 mb-2">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-white mb-2">
             Legendary day!
           </h2>
-          <p className="text-orange-700/80 text-sm leading-relaxed">
-            Every task completed today is a testament to your dedication.
+          <p className="text-white/80 text-sm leading-relaxed">
+            Every task completed today is a{'\n'}testament to your dedication.
           </p>
         </div>
 
         {/* Collect button */}
         <Button
           onClick={handleCollectGold}
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 rounded-xl text-base h-auto shadow-lg"
+          className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-4 rounded-xl text-base h-auto"
         >
           Collect my Gold Badge
         </Button>
