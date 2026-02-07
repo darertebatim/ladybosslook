@@ -1,12 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
 
 interface RoundTourProps {
   isFirstVisit?: boolean;
+  onTourReady?: (startTour: () => void) => void;
 }
 
-export function RoundTour({ isFirstVisit = false }: RoundTourProps) {
+export function RoundTour({ isFirstVisit = false, onTourReady }: RoundTourProps) {
   const steps = useMemo((): TourStep[] => [
     {
       id: 'welcome',
@@ -185,6 +186,13 @@ export function RoundTour({ isFirstVisit = false }: RoundTourProps) {
     // Scroll to top after completing the tour
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Expose forceStartTour to parent
+  useEffect(() => {
+    if (onTourReady) {
+      onTourReady(tour.forceStartTour);
+    }
+  }, [onTourReady, tour.forceStartTour]);
 
   return (
     <TourOverlay
