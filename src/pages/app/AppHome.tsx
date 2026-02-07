@@ -37,7 +37,9 @@ import { WelcomeRitualCard } from '@/components/app/WelcomeRitualCard';
 import { toast } from 'sonner';
 import { useWeeklyTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 import { BadgeCelebration } from '@/components/app/BadgeCelebration';
+import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
+import { useGoldStreak, useGoldDatesThisWeek, useUpdateGoldStreak } from '@/hooks/useGoldStreak';
 
 import badgeBronze from '@/assets/badge-bronze.png';
 import badgeSilver from '@/assets/badge-silver.png';
@@ -87,6 +89,12 @@ const AppHome = () => {
   // Streak goal selection state
   const [showGoalSelection, setShowGoalSelection] = useState(false);
   const setStreakGoal = useSetStreakGoal();
+  
+  // Gold streak celebration state
+  const [showGoldStreakCelebration, setShowGoldStreakCelebration] = useState(false);
+  const { data: goldStreakData } = useGoldStreak();
+  const { data: goldDatesThisWeek = [] } = useGoldDatesThisWeek();
+  const updateGoldStreak = useUpdateGoldStreak();
   
   // Welcome card dismissed state - persisted in localStorage
   const [welcomeCardDismissed, setWelcomeCardDismissed] = useState(() => 
@@ -813,8 +821,24 @@ const AppHome = () => {
           type={badgeCelebrationType}
           onClose={closeBadgeCelebration}
           onCollectGold={closeBadgeCelebration}
+          onGoldCollected={() => {
+            // Update gold streak and show celebration
+            updateGoldStreak.mutate(undefined, {
+              onSuccess: () => {
+                setShowGoldStreakCelebration(true);
+              },
+            });
+          }}
           completedCount={badgeCompletedCount}
           totalCount={badgeTotalCount}
+        />
+
+        {/* Gold Streak Celebration - shows after gold badge collected */}
+        <GoldStreakCelebration
+          open={showGoldStreakCelebration}
+          onClose={() => setShowGoldStreakCelebration(false)}
+          currentGoldStreak={goldStreakData?.currentGoldStreak || 1}
+          goldDatesThisWeek={goldDatesThisWeek}
         />
 
         {/* Task Skip Sheet */}

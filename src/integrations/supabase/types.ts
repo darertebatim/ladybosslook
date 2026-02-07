@@ -2982,9 +2982,12 @@ export type Database = {
       }
       user_streaks: {
         Row: {
+          current_gold_streak: number | null
           current_streak: number
           id: string
           last_completion_date: string | null
+          last_gold_date: string | null
+          longest_gold_streak: number | null
           longest_streak: number
           streak_goal: number | null
           streak_goal_set_at: string | null
@@ -2992,9 +2995,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          current_gold_streak?: number | null
           current_streak?: number
           id?: string
           last_completion_date?: string | null
+          last_gold_date?: string | null
+          longest_gold_streak?: number | null
           longest_streak?: number
           streak_goal?: number | null
           streak_goal_set_at?: string | null
@@ -3002,9 +3008,12 @@ export type Database = {
           user_id: string
         }
         Update: {
+          current_gold_streak?: number | null
           current_streak?: number
           id?: string
           last_completion_date?: string | null
+          last_gold_date?: string | null
+          longest_gold_streak?: number | null
           longest_streak?: number
           streak_goal?: number | null
           streak_goal_set_at?: string | null

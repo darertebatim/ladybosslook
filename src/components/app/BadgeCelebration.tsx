@@ -21,6 +21,7 @@ interface BadgeCelebrationProps {
   type: BadgeCelebrationLevel | null;
   onClose: () => void;
   onCollectGold?: () => void; // Callback when gold badge is collected (for fly animation)
+  onGoldCollected?: () => void; // Callback AFTER gold collection animation completes (for gold streak)
   completedCount?: number;
   totalCount?: number;
 }
@@ -37,6 +38,7 @@ export function BadgeCelebration({
   type,
   onClose,
   onCollectGold,
+  onGoldCollected,
   completedCount = 0,
   totalCount = 0,
 }: BadgeCelebrationProps) {
@@ -95,6 +97,8 @@ export function BadgeCelebration({
     if (!badgeRef.current) {
       onCollectGold?.();
       onClose();
+      // Trigger gold streak celebration after a small delay
+      setTimeout(() => onGoldCollected?.(), 100);
       return;
     }
 
@@ -122,6 +126,8 @@ export function BadgeCelebration({
     setTimeout(() => {
       onCollectGold?.();
       onClose();
+      // Trigger gold streak celebration after a small delay
+      setTimeout(() => onGoldCollected?.(), 200);
     }, 600);
   };
 
