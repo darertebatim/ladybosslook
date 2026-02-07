@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Menu, Compass, Music, Users, MessageCircle,
-  BookOpen, Wind, Droplets, HeartHandshake, Heart, Sparkles, GraduationCap, User
+  BookOpen, Wind, Droplets, HeartHandshake, Heart, Sparkles, GraduationCap, User, HelpCircle
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { haptic } from '@/lib/haptics';
@@ -37,7 +37,11 @@ const accountItems: NavItem[] = [
   { id: 'profile', name: 'My Profile', icon: <User className="h-4 w-4" />, route: '/app/profile', color: 'text-slate-600 bg-slate-100' },
 ];
 
-export function HomeMenu() {
+interface HomeMenuProps {
+  onStartTour?: () => void;
+}
+
+export function HomeMenu({ onStartTour }: HomeMenuProps) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -45,6 +49,15 @@ export function HomeMenu() {
     haptic.light();
     setOpen(false);
     navigate(route);
+  };
+
+  const handleTakeTour = () => {
+    haptic.light();
+    setOpen(false);
+    // Small delay to let menu close animation complete
+    setTimeout(() => {
+      onStartTour?.();
+    }, 200);
   };
 
   const renderPills = (items: NavItem[]) => (
@@ -105,6 +118,23 @@ export function HomeMenu() {
             </h3>
             {renderPills(accountItems)}
           </section>
+
+          {/* Take Tour Button */}
+          {onStartTour && (
+            <section className="pt-2 border-t border-border/40">
+              <button
+                onClick={handleTakeTour}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-full',
+                  'text-[13px] font-medium transition-all active:scale-95',
+                  'text-indigo-600 bg-indigo-100'
+                )}
+              >
+                <HelpCircle className="h-4 w-4" />
+                <span>Take a Tour</span>
+              </button>
+            </section>
+          )}
         </div>
       </SheetContent>
     </Sheet>
