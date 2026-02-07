@@ -905,6 +905,7 @@ const AppHome = () => {
         {/* New Interactive Home Tour */}
         <HomeTour 
           isFirstOpen={isFirstOpen}
+          forceShow={serverIndicatesNewUser}
           hasEnrolledPrograms={activeRounds.length > 0}
           hasSuggestedRituals={suggestedRoutines.length > 0}
           hasWelcomeCard={showWelcomeCard}
