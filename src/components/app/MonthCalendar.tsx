@@ -4,14 +4,14 @@ import { cn } from '@/lib/utils';
 import { Star } from 'lucide-react';
 import type { BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 
-import badgeBronze from '@/assets/badge-bronze.png';
-import badgeSilver from '@/assets/badge-silver.png';
-import badgeGold from '@/assets/badge-gold.png';
+import coinBronze from '@/assets/coin-bronze.png';
+import coinSilver from '@/assets/coin-silver.png';
+import coinGold from '@/assets/coin-gold.png';
 
 const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
-  bronze: badgeBronze,
-  silver: badgeSilver,
-  gold: badgeGold,
+  bronze: coinBronze,
+  silver: coinSilver,
+  gold: coinGold,
 };
 
 interface DayStats {
@@ -97,7 +97,7 @@ export const MonthCalendar = ({
                     <img 
                       src={BADGE_IMAGES[badgeLevel]} 
                       alt={`${badgeLevel} badge`}
-                      className="w-[140%] h-[140%] object-cover"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <>

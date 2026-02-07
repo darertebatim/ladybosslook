@@ -41,14 +41,14 @@ import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
 import { useGoldStreak, useGoldDatesThisWeek, useUpdateGoldStreak } from '@/hooks/useGoldStreak';
 
-import badgeBronze from '@/assets/badge-bronze.png';
-import badgeSilver from '@/assets/badge-silver.png';
-import badgeGold from '@/assets/badge-gold.png';
+import coinBronze from '@/assets/coin-bronze.png';
+import coinSilver from '@/assets/coin-silver.png';
+import coinGold from '@/assets/coin-gold.png';
 
 const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
-  bronze: badgeBronze,
-  silver: badgeSilver,
-  gold: badgeGold,
+  bronze: coinBronze,
+  silver: coinSilver,
+  gold: coinGold,
 };
 const AppHome = () => {
   const navigate = useNavigate();
@@ -592,7 +592,7 @@ const AppHome = () => {
                               <img 
                                 src={BADGE_IMAGES[badgeLevel]} 
                                 alt={`${badgeLevel} badge`}
-                                className="w-[140%] h-[140%] object-cover"
+                                className="w-full h-full object-cover"
                               />
                             ) : (
                               <>
