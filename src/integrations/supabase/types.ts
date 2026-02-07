@@ -2986,6 +2986,8 @@ export type Database = {
           id: string
           last_completion_date: string | null
           longest_streak: number
+          streak_goal: number | null
+          streak_goal_set_at: string | null
           updated_at: string
           user_id: string
         }
@@ -2994,6 +2996,8 @@ export type Database = {
           id?: string
           last_completion_date?: string | null
           longest_streak?: number
+          streak_goal?: number | null
+          streak_goal_set_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -3002,6 +3006,8 @@ export type Database = {
           id?: string
           last_completion_date?: string | null
           longest_streak?: number
+          streak_goal?: number | null
+          streak_goal_set_at?: string | null
           updated_at?: string
           user_id?: string
         }
