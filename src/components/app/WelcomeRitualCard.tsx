@@ -105,6 +105,10 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
       
       setJustAddedActions(prev => new Set([...prev, actionId]));
       haptic.success();
+      
+      // Mark that user has added at least one action - hide welcome card permanently
+      localStorage.setItem('simora_welcome_card_action_added', 'true');
+      
       onActionAdded?.();
       // Don't dismiss - let user add more actions (auto-dismiss will happen when all are added)
     } catch (error) {
