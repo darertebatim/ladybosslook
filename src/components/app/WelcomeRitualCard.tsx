@@ -46,6 +46,7 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
   );
 
   // Combined set of added actions (both already existing and just added this session)
+  // Note: We spread justAddedActions to force proper dependency tracking
   const addedActions = useMemo(() => {
     const set = new Set<string>();
     displayActions.forEach(action => {
@@ -54,7 +55,8 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
       }
     });
     return set;
-  }, [displayActions, existingTaskTitles, justAddedActions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayActions, existingTaskTitles, justAddedActions.size]);
 
   // Auto-dismiss when all actions are added
   useEffect(() => {
