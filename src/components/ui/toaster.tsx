@@ -27,7 +27,7 @@ export function Toaster() {
           </Toast>
         )
       })}
-      <ToastViewport />
+      <ToastViewport className="!top-auto !right-auto !bottom-[160px] !left-1/2 !-translate-x-1/2 !flex-col-reverse !items-center" />
     </ToastProvider>
   )
 }
