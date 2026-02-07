@@ -134,15 +134,15 @@ export function BadgeCelebration({
         className="fixed bottom-24 left-4 right-4 z-[100] animate-in slide-in-from-bottom-4 duration-300"
         onClick={onClose}
       >
-        <div className="bg-slate-900 rounded-2xl p-4 shadow-xl flex items-center gap-3">
+        <div className="bg-gradient-to-r from-violet-600 to-purple-700 rounded-2xl p-4 shadow-xl flex items-center gap-3">
           {/* Left icon/badge */}
           <div className="relative shrink-0">
             {type === 'silver' ? (
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
                 <img 
                   src={BADGE_IMAGES.silver} 
                   alt="Silver badge" 
-                  className="w-10 h-10 object-contain"
+                  className="w-[120%] h-[120%] object-cover"
                 />
               </div>
             ) : (
@@ -151,8 +151,8 @@ export function BadgeCelebration({
               </div>
             )}
             {/* Sparkle decorations */}
-            <Sparkles className="absolute -top-1 -right-1 h-4 w-4 text-violet-400 animate-pulse" />
-            <Sparkles className="absolute -bottom-0.5 -left-1 h-3 w-3 text-pink-400 animate-pulse delay-150" />
+            <Sparkles className="absolute -top-1 -right-1 h-4 w-4 text-white/80 animate-pulse" />
+            <Sparkles className="absolute -bottom-0.5 -left-1 h-3 w-3 text-pink-300 animate-pulse delay-150" />
           </div>
 
           {/* Content */}
@@ -164,10 +164,10 @@ export function BadgeCelebration({
               }
             </p>
             {type === 'silver' ? (
-              <p className="text-slate-400 text-sm">Silver Badge collected!</p>
+              <p className="text-white/70 text-sm">Silver Badge collected!</p>
             ) : (
               <div className="mt-1.5">
-                <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div className="h-2 bg-white/20 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500"
                     style={{ 
