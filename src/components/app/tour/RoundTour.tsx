@@ -180,6 +180,12 @@ export function RoundTour({ isFirstVisit = false }: RoundTourProps) {
     triggerOnMount: isFirstVisit,
   });
 
+  const handleComplete = () => {
+    tour.completeTour();
+    // Scroll to top after completing the tour
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <TourOverlay
       isActive={tour.isActive}
@@ -189,8 +195,8 @@ export function RoundTour({ isFirstVisit = false }: RoundTourProps) {
       isLastStep={tour.isLastStep}
       onNext={tour.nextStep}
       onPrev={tour.prevStep}
-      onSkip={tour.completeTour}
-      onComplete={tour.completeTour}
+      onSkip={handleComplete}
+      onComplete={handleComplete}
     />
   );
 }
