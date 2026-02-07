@@ -55,7 +55,7 @@ export function PlaylistTour({ isFirstVisit = false, onTourReady }: PlaylistTour
   const tour = useFeatureTour({
     feature: 'playlist',
     steps,
-    triggerOnMount: isFirstVisit,
+    triggerOnMount: false,
   });
 
   // Expose forceStartTour to parent

@@ -91,7 +91,7 @@ export function PlayerTour({ isFirstVisit = false, onTourReady }: PlayerTourProp
   const tour = useFeatureTour({
     feature: 'player',
     steps,
-    triggerOnMount: isFirstVisit,
+    triggerOnMount: false,
   });
 
   // Expose forceStartTour to parent

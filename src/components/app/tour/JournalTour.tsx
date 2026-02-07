@@ -55,7 +55,7 @@ export function JournalTour({ isFirstVisit = false, onTourReady }: JournalTourPr
   const tour = useFeatureTour({
     feature: 'journal',
     steps,
-    triggerOnMount: isFirstVisit,
+    triggerOnMount: false,
   });
 
   // Expose forceStartTour to parent

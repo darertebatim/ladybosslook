@@ -66,7 +66,7 @@ export function ProgramsTour({ isFirstVisit = false, hasPrograms = false, onTour
   const tour = useFeatureTour({
     feature: 'programs',
     steps,
-    triggerOnMount: isFirstVisit,
+    triggerOnMount: false,
   });
 
   // Expose forceStartTour to parent

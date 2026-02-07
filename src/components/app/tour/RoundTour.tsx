@@ -177,7 +177,7 @@ export function RoundTour({ isFirstVisit = false }: RoundTourProps) {
   const tour = useFeatureTour({
     feature: 'round',
     steps,
-    triggerOnMount: isFirstVisit,
+    triggerOnMount: false,
   });
 
   const handleComplete = () => {
