@@ -1,5 +1,4 @@
 import { HelpCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface TourHelpButtonProps {
@@ -9,14 +8,17 @@ interface TourHelpButtonProps {
 
 export function TourHelpButton({ onClick, className }: TourHelpButtonProps) {
   return (
-    <Button
-      variant="ghost"
-      size="icon"
+    <button
       onClick={onClick}
-      className={cn("h-9 w-9", className)}
+      className={cn(
+        "h-9 w-9 flex items-center justify-center rounded-full",
+        "text-muted-foreground hover:text-foreground transition-colors",
+        "active:scale-95",
+        className
+      )}
       aria-label="Start page tour"
     >
-      <HelpCircle className="h-5 w-5 text-muted-foreground" />
-    </Button>
+      <HelpCircle className="h-5 w-5" />
+    </button>
   );
 }
