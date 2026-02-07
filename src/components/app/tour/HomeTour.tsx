@@ -1,13 +1,16 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
-import { TourWelcomePopup } from './TourWelcomePopup';
+import { TourBanner } from './TourBanner';
 
 interface HomeTourProps {
   hasEnrolledPrograms?: boolean;
   hasSuggestedRituals?: boolean;
   hasWelcomeCard?: boolean;
   isFirstOpen?: boolean;
+  // Portal target ID for banner placement
+  bannerPortalId?: string;
 }
 
 export function HomeTour({
@@ -15,8 +18,16 @@ export function HomeTour({
   hasSuggestedRituals = false,
   hasWelcomeCard = false,
   isFirstOpen = false,
+  bannerPortalId = 'tour-banner-slot',
 }: HomeTourProps) {
   const [userWantsTour, setUserWantsTour] = useState(false);
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+
+  // Find portal target after mount
+  useEffect(() => {
+    const target = document.getElementById(bannerPortalId);
+    setPortalTarget(target);
+  }, [bannerPortalId]);
 
   // Build steps dynamically based on available content
   const steps = useMemo((): TourStep[] => {
@@ -147,32 +158,30 @@ export function HomeTour({
   const tour = useFeatureTour({
     feature: 'home',
     steps,
-    // Don't auto-trigger - wait for user to accept via popup
+    // Don't auto-trigger - wait for user to click banner
     triggerOnMount: false,
   });
 
-  // Handle user accepting tour from popup
+  // Handle user clicking banner to start tour
   const handleStartTour = useCallback(() => {
     setUserWantsTour(true);
-    // Small delay to ensure popup is closed
     setTimeout(() => {
       tour.forceStartTour();
     }, 100);
   }, [tour]);
 
-  // Handle user declining tour
-  const handleSkipTour = useCallback(() => {
-    tour.completeTour();
-  }, [tour]);
+  // The banner element
+  const bannerElement = (
+    <TourBanner
+      isFirstOpen={isFirstOpen}
+      onStartTour={handleStartTour}
+    />
+  );
 
   return (
     <>
-      {/* Welcome popup - shows before tour */}
-      <TourWelcomePopup
-        isFirstOpen={isFirstOpen}
-        onStartTour={handleStartTour}
-        onSkipTour={handleSkipTour}
-      />
+      {/* Banner - rendered via portal if target exists */}
+      {portalTarget ? createPortal(bannerElement, portalTarget) : null}
 
       {/* Actual tour overlay */}
       <TourOverlay
