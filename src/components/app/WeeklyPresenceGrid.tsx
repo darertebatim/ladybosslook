@@ -1,12 +1,22 @@
 import { format, addDays, startOfWeek, isSameDay, isBefore, startOfDay } from 'date-fns';
-import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useWeeklyTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
+
+import badgeBronze from '@/assets/badge-bronze.png';
+import badgeSilver from '@/assets/badge-silver.png';
+import badgeGold from '@/assets/badge-gold.png';
 
 interface WeeklyPresenceGridProps {
   lastActiveDate?: Date | null;
   showedUpToday?: boolean;
   variant?: 'light' | 'dark';
 }
+
+const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
+  bronze: badgeBronze,
+  silver: badgeSilver,
+  gold: badgeGold,
+};
 
 export function WeeklyPresenceGrid({ 
   lastActiveDate, 
@@ -15,25 +25,30 @@ export function WeeklyPresenceGrid({
 }: WeeklyPresenceGridProps) {
   const today = new Date();
   const weekStart = startOfWeek(today, { weekStartsOn: 0 });
+  const { data: weeklyCompletion } = useWeeklyTaskCompletion();
   
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const day = addDays(weekStart, i);
+    const dateStr = format(day, 'yyyy-MM-dd');
     const isToday = isSameDay(day, today);
     const isPast = isBefore(startOfDay(day), startOfDay(today));
     
-    // Day is active if it's before or equal to lastActiveDate, or it's today and user showed up
-    const isActive = lastActiveDate && (
-      (isPast && isBefore(startOfDay(day), startOfDay(addDays(lastActiveDate, 1)))) ||
-      (isToday && showedUpToday)
-    );
+    // Get badge level for this day
+    const dayStats = weeklyCompletion?.[dateStr];
+    const badgeLevel = dayStats?.badgeLevel || 'none';
+    
+    // Day is active if it has a badge (completed at least 1 task)
+    const isActive = badgeLevel !== 'none';
     
     return {
       date: day,
+      dateStr,
       label: format(day, 'EEEEE'),
       fullLabel: format(day, 'EEE'),
       isActive,
       isToday,
       isPast,
+      badgeLevel,
     };
   });
 
@@ -51,23 +66,25 @@ export function WeeklyPresenceGrid({
             {day.fullLabel}
           </span>
           
-          {/* Circle */}
+          {/* Badge or Circle */}
           <div 
             className={cn(
               'w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium transition-all',
               day.isToday && isDark && 'ring-2 ring-violet-300',
               day.isToday && !isDark && 'ring-2 ring-primary/30',
-              day.isActive
-                ? isDark 
-                  ? 'bg-violet-500 text-white' 
-                  : 'bg-primary text-primary-foreground'
-                : isDark
+              !day.isActive && (
+                isDark
                   ? 'bg-white/10 text-white/40'
                   : 'bg-muted text-muted-foreground'
+              )
             )}
           >
-            {day.isActive ? (
-              <Check className="h-4 w-4" />
+            {day.isActive && day.badgeLevel !== 'none' ? (
+              <img 
+                src={BADGE_IMAGES[day.badgeLevel]} 
+                alt={`${day.badgeLevel} badge`}
+                className="w-9 h-9 object-contain"
+              />
             ) : (
               format(day.date, 'd')
             )}
