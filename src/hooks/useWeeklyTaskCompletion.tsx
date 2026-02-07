@@ -131,3 +131,82 @@ export function useWeeklyTaskCompletion() {
     staleTime: 30 * 1000, // 30 seconds - refresh more often for live updates
   });
 }
+
+/**
+ * Hook to fetch badge data for a custom date range (for month calendar)
+ */
+export function useDateRangeTaskCompletion(startDate: Date, endDate: Date) {
+  const { user } = useAuth();
+  const startStr = format(startDate, 'yyyy-MM-dd');
+  const endStr = format(endDate, 'yyyy-MM-dd');
+
+  return useQuery({
+    queryKey: ['date-range-task-completion', user?.id, startStr, endStr],
+    queryFn: async (): Promise<Record<string, DailyTaskCompletion>> => {
+      if (!user?.id) throw new Error('User not authenticated');
+
+      // Generate all dates in range
+      const dates: string[] = [];
+      let current = startDate;
+      while (current <= endDate) {
+        dates.push(format(current, 'yyyy-MM-dd'));
+        current = addDays(current, 1);
+      }
+
+      // Fetch ALL active user tasks (including repeating ones)
+      const { data: tasks, error: tasksError } = await supabase
+        .from('user_tasks')
+        .select('id, scheduled_date, repeat_pattern, repeat_days')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (tasksError) throw tasksError;
+
+      // Fetch completions for the date range
+      const { data: completions, error: completionsError } = await supabase
+        .from('task_completions')
+        .select('task_id, completed_date')
+        .eq('user_id', user.id)
+        .gte('completed_date', startStr)
+        .lte('completed_date', endStr);
+
+      if (completionsError) throw completionsError;
+
+      // Build a map of completions by date
+      const completionsByDate: Record<string, Set<string>> = {};
+      completions?.forEach(c => {
+        if (!completionsByDate[c.completed_date]) {
+          completionsByDate[c.completed_date] = new Set();
+        }
+        completionsByDate[c.completed_date].add(c.task_id);
+      });
+
+      // Calculate stats per day
+      const result: Record<string, DailyTaskCompletion> = {};
+
+      dates.forEach(dateStr => {
+        // Filter tasks that apply to this specific date
+        const dayTasks = (tasks || []).filter(task => 
+          taskAppliesToDate(task, dateStr)
+        );
+        
+        const dayCompletions = completionsByDate[dateStr] || new Set();
+        
+        // Count completed tasks for this day
+        const completedCount = dayTasks.filter(t => dayCompletions.has(t.id)).length;
+        const totalCount = dayTasks.length;
+
+        result[dateStr] = {
+          date: dateStr,
+          totalTasks: totalCount,
+          completedTasks: completedCount,
+          badgeLevel: calculateBadgeLevel(completedCount, totalCount),
+        };
+      });
+
+      return result;
+    },
+    enabled: !!user?.id,
+    staleTime: 60 * 1000, // 1 minute for expanded calendar
+  });
+}

@@ -35,7 +35,7 @@ import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
 import { WelcomeRitualCard } from '@/components/app/WelcomeRitualCard';
 import { toast } from 'sonner';
-import { useWeeklyTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
+import { useWeeklyTaskCompletion, useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 import { BadgeCelebration } from '@/components/app/BadgeCelebration';
 import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
@@ -276,6 +276,9 @@ const AppHome = () => {
   const {
     data: programEventDates
   } = useProgramEventDates(dateRange.start, dateRange.end);
+  
+  // Fetch badge data for expanded month calendar
+  const { data: monthBadgeData } = useDateRangeTaskCompletion(dateRange.start, dateRange.end);
 
   // Filter tasks by tag and exclude skipped tasks
   const filteredTasks = useMemo(() => {
@@ -541,7 +544,7 @@ const AppHome = () => {
                         {day}
                       </div>)}
                   </div>
-                  <MonthCalendar selectedDate={selectedDate} currentMonth={currentMonth} onDateSelect={handleDateSelect} completedDates={completedDates} programEventDates={programEventDates} />
+                  <MonthCalendar selectedDate={selectedDate} currentMonth={currentMonth} onDateSelect={handleDateSelect} completedDates={completedDates} programEventDates={programEventDates} badgeData={monthBadgeData} />
                 </div>
               </div>
             </div>
