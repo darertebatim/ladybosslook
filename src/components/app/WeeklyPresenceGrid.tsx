@@ -2,9 +2,9 @@ import { format, addDays, startOfWeek, isSameDay, isBefore, startOfDay } from 'd
 import { cn } from '@/lib/utils';
 import { useWeeklyTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 
-import badgeBronze from '@/assets/badge-bronze.png';
-import badgeSilver from '@/assets/badge-silver.png';
-import badgeGold from '@/assets/badge-gold.png';
+import coinBronze from '@/assets/coin-bronze.png';
+import coinSilver from '@/assets/coin-silver.png';
+import coinGold from '@/assets/coin-gold.png';
 
 interface WeeklyPresenceGridProps {
   lastActiveDate?: Date | null;
@@ -13,9 +13,9 @@ interface WeeklyPresenceGridProps {
 }
 
 const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
-  bronze: badgeBronze,
-  silver: badgeSilver,
-  gold: badgeGold,
+  bronze: coinBronze,
+  silver: coinSilver,
+  gold: coinGold,
 };
 
 export function WeeklyPresenceGrid({ 

@@ -5,16 +5,16 @@ import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
 import { Sparkles, Trophy } from 'lucide-react';
 
-import badgeGold from '@/assets/badge-gold.png';
-import badgeSilver from '@/assets/badge-silver.png';
-import badgeBronze from '@/assets/badge-bronze.png';
+import coinGold from '@/assets/coin-gold.png';
+import coinSilver from '@/assets/coin-silver.png';
+import coinBronze from '@/assets/coin-bronze.png';
 
 export type BadgeCelebrationLevel = 'silver' | 'gold' | 'almostGold';
 
 const BADGE_IMAGES = {
-  bronze: badgeBronze,
-  silver: badgeSilver,
-  gold: badgeGold,
+  bronze: coinBronze,
+  silver: coinSilver,
+  gold: coinGold,
 };
 
 interface BadgeCelebrationProps {
