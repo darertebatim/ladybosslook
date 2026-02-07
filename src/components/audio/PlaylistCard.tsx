@@ -67,11 +67,14 @@ export const PlaylistCard = memo(function PlaylistCard({
     navigate(`/app/player/playlist/${id}`);
   };
 
+  // Determine tour class for first free or first locked playlist
+  const tourClass = isFree && !isLocked ? 'tour-free-playlist' : isLocked ? 'tour-locked-playlist' : '';
+
   return (
     <Card 
       className={`overflow-hidden rounded-2xl border-border/50 cursor-pointer hover:shadow-lg hover:border-border transition-all hover:scale-[1.02] active:scale-[0.98] ${
         isLocked ? 'opacity-80' : ''
-      }`}
+      } ${tourClass}`}
       onClick={handleClick}
     >
       <div className="relative aspect-square">

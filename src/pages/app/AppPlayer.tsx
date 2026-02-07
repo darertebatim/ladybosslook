@@ -261,7 +261,7 @@ export default function AppPlayer() {
           ) : (
             <>
               <h1 className="text-xl font-bold">Listen</h1>
-              <button onClick={() => setShowSearch(true)} className="p-2 -mr-2">
+              <button onClick={() => setShowSearch(true)} className="tour-player-search p-2 -mr-2">
                 <Search className="h-5 w-5 text-muted-foreground" />
               </button>
             </>
@@ -269,7 +269,7 @@ export default function AppPlayer() {
         </div>
 
         {/* Category Circles */}
-        <div className="px-4 pb-3">
+        <div className="tour-player-categories px-4 pb-3">
           <div className="flex gap-3 overflow-x-auto py-2 scrollbar-hide">
             {availableCategories.map((cat) => {
               const config = categoryConfig[cat] || { name: cat, icon: 'Sparkles', color: 'purple' };
@@ -288,7 +288,7 @@ export default function AppPlayer() {
         </div>
 
         {/* Progress Filter Pills */}
-        <div className="px-4 pb-3 flex gap-2">
+        <div className="tour-player-progress-filter px-4 pb-3 flex gap-2">
           {(['all', 'in_progress', 'completed'] as const).map((filter) => (
             <button
               key={filter}
@@ -345,7 +345,7 @@ export default function AppPlayer() {
 
           {/* All Playlists Section */}
           <div className="space-y-3 tour-playlists">
-            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <h2 className="tour-playlists-header text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               {selectedCategory === 'all' ? 'All Playlists' : categoryConfig[selectedCategory]?.name || selectedCategory}
             </h2>
             
