@@ -81,6 +81,9 @@ export interface UserStreak {
   longest_streak: number;
   last_completion_date: string | null;
   updated_at: string;
+  // Streak goal challenge fields
+  streak_goal: number | null;
+  streak_goal_set_at: string | null;
 }
 
 export interface TaskTemplate {
@@ -1428,6 +1431,38 @@ export const useUndoSkip = () => {
     onError: (error) => {
       console.error('Undo skip error:', error);
       toast({ title: 'Failed to undo skip', variant: 'destructive' });
+    },
+  });
+};
+
+/**
+ * Set streak goal for the challenge
+ */
+export const useSetStreakGoal = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (goal: 7 | 14 | 30 | 50) => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('user_streaks')
+        .update({
+          streak_goal: goal,
+          streak_goal_set_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      return goal;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
+    },
+    onError: (error) => {
+      console.error('Set streak goal error:', error);
+      toast({ title: 'Failed to set goal', variant: 'destructive' });
     },
   });
 };

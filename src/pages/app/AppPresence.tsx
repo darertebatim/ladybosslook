@@ -2,9 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart } from 'lucide-react';
 import { usePresenceStats } from '@/hooks/usePresenceStats';
 import { useUserPresence } from '@/hooks/useUserPresence';
+import { useUserStreak } from '@/hooks/useTaskPlanner';
 import { ACHIEVEMENTS, getAchievementStatus } from '@/lib/achievements';
 import { AchievementCard } from '@/components/app/AchievementCard';
 import { WeeklyPresenceGrid } from '@/components/app/WeeklyPresenceGrid';
+import { StreakChallengeCard } from '@/components/app/StreakChallengeCard';
 import { BackButton } from '@/components/app/BackButton';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -14,6 +16,7 @@ const AppPresence = () => {
   const navigate = useNavigate();
   const { data: stats, isLoading } = usePresenceStats();
   const { data: presence } = useUserPresence();
+  const { data: streak } = useUserStreak();
   
   const lastActiveDate = presence?.lastActiveDate ? new Date(presence.lastActiveDate) : null;
   const showedUpToday = presence?.showedUpToday || false;
@@ -22,6 +25,9 @@ const AppPresence = () => {
   const { unlocked, locked } = stats 
     ? getAchievementStatus(stats) 
     : { unlocked: [], locked: ACHIEVEMENTS };
+  
+  // Check if user has a streak goal challenge active
+  const hasStreakChallenge = streak?.streak_goal && streak.streak_goal > 0;
 
   return (
     <>
@@ -114,6 +120,14 @@ const AppPresence = () => {
         
         {/* Content */}
         <div className="px-4 py-6 space-y-6">
+          
+          {/* Streak Challenge Card - only show if user has a goal set */}
+          {hasStreakChallenge && (
+            <StreakChallengeCard
+              currentStreak={streak.current_streak}
+              streakGoal={streak.streak_goal!}
+            />
+          )}
           
           {/* Quick Stats Row */}
           <div className="grid grid-cols-3 gap-3">

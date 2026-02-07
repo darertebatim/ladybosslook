@@ -12,6 +12,8 @@ interface StreakCelebrationProps {
   open: boolean;
   onClose: () => void;
   isFirstAction?: boolean; // When true, shows special first-action celebration
+  onShowGoalSelection?: () => void; // Callback to show goal selection after first streak day
+  shouldShowGoalSelection?: boolean; // Whether to trigger goal selection on close
 }
 
 const CONFETTI_COLORS = [
@@ -31,7 +33,13 @@ const CONFETTI_COLORS = [
  * - Reinforces identity: "Your strength is still here"
  * - Special celebration for first action ever
  */
-export const StreakCelebration = ({ open, onClose, isFirstAction = false }: StreakCelebrationProps) => {
+export const StreakCelebration = ({ 
+  open, 
+  onClose, 
+  isFirstAction = false,
+  onShowGoalSelection,
+  shouldShowGoalSelection = false,
+}: StreakCelebrationProps) => {
   const { data: presence } = useUserPresence();
   const { maybeRequestReview, shouldShowForStreak } = useAppReview();
   const [isAnimating, setIsAnimating] = useState(false);
@@ -40,9 +48,18 @@ export const StreakCelebration = ({ open, onClose, isFirstAction = false }: Stre
   const thisMonthDays = presence?.thisMonthActiveDays || 1;
   const isReturning = presence?.isReturning || false;
 
-  // Handle close with potential review prompt
+  // Handle close with potential review prompt or goal selection
   const handleClose = async () => {
     onClose();
+    
+    // Check if we should show goal selection (first streak day, no goal set)
+    if (shouldShowGoalSelection && onShowGoalSelection) {
+      // Small delay to let this modal close smoothly first
+      setTimeout(() => {
+        onShowGoalSelection();
+      }, 300);
+      return;
+    }
     
     // Check if we should show review after closing
     if (shouldShowForStreak(thisMonthDays)) {

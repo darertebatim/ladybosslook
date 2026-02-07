@@ -4,7 +4,7 @@ import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMon
 import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart } from 'lucide-react';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
-import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate } from '@/hooks/useTaskPlanner';
+import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate, useSetStreakGoal } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { useNewHomeData } from '@/hooks/useNewHomeData';
 import { TaskCard } from '@/components/app/TaskCard';
@@ -12,6 +12,7 @@ import { SortableTaskList } from '@/components/app/SortableTaskList';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
+import { StreakGoalSelection } from '@/components/app/StreakGoalSelection';
 import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
 import { PromoBanner } from '@/components/app/PromoBanner';
@@ -82,6 +83,10 @@ const AppHome = () => {
   
   // First action celebration - tracks if this is user's first ever completion (uses unified StreakCelebration)
   const [isFirstActionCelebration, setIsFirstActionCelebration] = useState(false);
+  
+  // Streak goal selection state
+  const [showGoalSelection, setShowGoalSelection] = useState(false);
+  const setStreakGoal = useSetStreakGoal();
   
   // Welcome card dismissed state - persisted in localStorage
   const [welcomeCardDismissed, setWelcomeCardDismissed] = useState(() => 
@@ -778,6 +783,29 @@ const AppHome = () => {
             setIsFirstActionCelebration(false);
           }}
           isFirstAction={isFirstActionCelebration}
+          shouldShowGoalSelection={
+            // Show goal selection if: first streak day (current_streak === 1) and no goal set
+            !!streak && 
+            streak.current_streak === 1 && 
+            !streak.streak_goal &&
+            streak.last_completion_date === format(new Date(), 'yyyy-MM-dd')
+          }
+          onShowGoalSelection={() => setShowGoalSelection(true)}
+        />
+
+        {/* Streak Goal Selection - Full screen modal */}
+        <StreakGoalSelection
+          open={showGoalSelection}
+          onClose={() => setShowGoalSelection(false)}
+          onSelectGoal={(goal) => {
+            setStreakGoal.mutate(goal, {
+              onSuccess: () => {
+                setShowGoalSelection(false);
+                toast.success('Challenge accepted! Let\'s do this! 🔥');
+              },
+            });
+          }}
+          isLoading={setStreakGoal.isPending}
         />
 
         {/* Badge celebration (silver/almost-there toasts + gold modal) */}
