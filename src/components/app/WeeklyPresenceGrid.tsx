@@ -57,36 +57,34 @@ export function WeeklyPresenceGrid({
   return (
     <div className="flex justify-center gap-2">
       {weekDays.map((day, i) => (
-        <div key={i} className="flex flex-col items-center gap-1">
+        <div key={i} className="flex flex-col items-center gap-1.5">
           {/* Day label */}
           <span className={cn(
-            'text-[10px] font-medium',
-            isDark ? 'text-white/50' : 'text-muted-foreground'
+            'text-[11px] font-medium',
+            isDark ? 'text-white/60' : 'text-orange-600/60'
           )}>
             {day.fullLabel}
           </span>
           
-          {/* Badge or Circle */}
+          {/* Badge or Circle - fixed sizing with no margins */}
           <div 
             className={cn(
-              'w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium transition-all',
-              day.isToday && isDark && 'ring-2 ring-orange-300',
-              day.isToday && !isDark && 'ring-2 ring-primary/30',
-              !day.isActive && (
-                isDark
-                  ? 'bg-white/10 text-white/40'
-                  : 'bg-muted text-muted-foreground'
-              )
+              'w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold transition-all overflow-hidden',
+              day.isToday && 'ring-2 ring-offset-1',
+              day.isToday && isDark && 'ring-orange-300 ring-offset-transparent',
+              day.isToday && !isDark && 'ring-orange-400 ring-offset-white',
+              !day.isActive && isDark && 'bg-white/15 text-white/50',
+              !day.isActive && !isDark && 'bg-orange-100 text-orange-400'
             )}
           >
             {day.isActive && day.badgeLevel !== 'none' ? (
               <img 
                 src={BADGE_IMAGES[day.badgeLevel]} 
                 alt={`${day.badgeLevel} badge`}
-                className="w-9 h-9 object-contain"
+                className="w-full h-full object-cover"
               />
             ) : (
-              format(day.date, 'd')
+              <span>{format(day.date, 'd')}</span>
             )}
           </div>
         </div>
