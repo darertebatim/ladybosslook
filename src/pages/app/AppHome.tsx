@@ -589,7 +589,7 @@ const AppHome = () => {
                               <img 
                                 src={BADGE_IMAGES[badgeLevel]} 
                                 alt={`${badgeLevel} badge`}
-                                className="w-full h-full object-cover"
+                                className="w-[115%] h-[115%] object-cover"
                               />
                             ) : (
                               <>
