@@ -52,21 +52,41 @@ export function TourOverlay({
     tooltipEl: HTMLDivElement | null
   ): React.CSSProperties => {
     const padding = 16;
+    const safeMargin = 12;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    
+
+    const isMobile = viewportWidth <= 430;
+    const maxTooltipHeight = Math.max(220, viewportHeight - safeMargin * 2);
+
     // For center position or no target
     if (position === 'center' || !targetRect) {
+      const width = Math.min(viewportWidth - safeMargin * 2, 360);
       return {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
+        width: `${width}px`,
+        maxHeight: `${maxTooltipHeight}px`,
+      };
+    }
+
+    // Mobile: always pin to bottom so it never goes off-screen (prevents "stuck" tours)
+    if (isMobile) {
+      return {
+        top: 'auto',
+        left: `${safeMargin}px`,
+        right: `${safeMargin}px`,
+        bottom: `${safeMargin}px`,
+        transform: 'none',
+        maxHeight: `${maxTooltipHeight}px`,
       };
     }
 
     const tooltipWidth = Math.min(viewportWidth - padding * 2, 320);
-    const tooltipHeight = tooltipEl?.offsetHeight || 200;
-    
+    const measuredHeight = tooltipEl?.offsetHeight || 200;
+    const tooltipHeight = Math.min(measuredHeight, maxTooltipHeight);
+
     let top: number;
     let left: number;
 
@@ -92,9 +112,6 @@ export function TourOverlay({
         left = targetRect.left + targetRect.width / 2 - tooltipWidth / 2;
     }
 
-    // Keep tooltip within viewport bounds (mobile-optimized)
-    const safeMargin = 12;
-    
     // Horizontal bounds
     if (left < safeMargin) {
       left = safeMargin;
@@ -124,6 +141,7 @@ export function TourOverlay({
       top: `${top}px`,
       left: `${left}px`,
       width: `${tooltipWidth}px`,
+      maxHeight: `${maxTooltipHeight}px`,
     };
   }, []);
 
@@ -311,7 +329,9 @@ export function TourOverlay({
           "absolute bg-card rounded-2xl shadow-2xl border border-border/50",
           "animate-in fade-in-0 zoom-in-95 duration-200",
           // Mobile-first padding
-          "p-4 sm:p-5"
+          "p-4 sm:p-5",
+          // Prevent long text from pushing buttons off-screen
+          "flex flex-col max-h-[calc(100vh-24px)] overflow-hidden"
         )}
         style={{ ...tooltipStyle, zIndex: 100001 }}
       >
@@ -339,10 +359,12 @@ export function TourOverlay({
           {currentStep.title}
         </h3>
 
-        {/* Description */}
-        <p className="text-foreground text-sm leading-relaxed mb-4">
-          {currentStep.description}
-        </p>
+        {/* Scrollable body (keeps buttons visible) */}
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <p className="text-foreground text-sm leading-relaxed pb-4">
+            {currentStep.description}
+          </p>
+        </div>
 
         {/* Footer */}
         <div className="flex flex-col gap-3">
