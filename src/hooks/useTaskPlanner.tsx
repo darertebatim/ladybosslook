@@ -6,6 +6,7 @@ import { format, subDays, isEqual, parseISO } from 'date-fns';
 import { scheduleUrgentAlarm, cancelUrgentAlarms, isUrgentAlarmAvailable } from '@/lib/taskAlarm';
 import { scheduleTaskReminder, cancelTaskReminder, isLocalNotificationsAvailable } from '@/lib/localNotifications';
 import { getTimePeriodSortOrder, TimePeriod } from '@/lib/taskScheduling';
+import { updatePresence } from '@/hooks/useUserPresence';
 
 // ============================================
 // TYPES
@@ -834,6 +835,9 @@ export const useCompleteTask = () => {
 
       // Update streak
       const streakResult = await updateStreak(user.id, dateStr);
+      
+      // Update presence metrics
+      await updatePresence(user.id, dateStr);
 
       return { completion: data, streakIncreased: streakResult.increased };
     },
@@ -846,6 +850,9 @@ export const useCompleteTask = () => {
       queryClient.invalidateQueries({ queryKey: ['new-home-data', user?.id] });
       // Update weekly task completion badges
       queryClient.invalidateQueries({ queryKey: ['weekly-task-completion'] });
+      // Update presence stats
+      queryClient.invalidateQueries({ queryKey: ['user-presence'] });
+      queryClient.invalidateQueries({ queryKey: ['presence-stats'] });
     },
     onError: (error) => {
       console.error('Complete task error:', error);
@@ -1010,6 +1017,9 @@ export const useAddGoalProgress = () => {
         // Update streak
         const streakResult = await updateStreak(user.id, dateStr);
         
+        // Update presence metrics
+        await updatePresence(user.id, dateStr);
+        
         return { completion: data, newProgress: amount, addedAmount: amount, streakIncreased: streakResult.increased };
       }
     },
@@ -1018,6 +1028,9 @@ export const useAddGoalProgress = () => {
       queryClient.invalidateQueries({ queryKey: ['planner-completions', user?.id, dateStr] });
       queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
       queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
+      // Update presence stats
+      queryClient.invalidateQueries({ queryKey: ['user-presence'] });
+      queryClient.invalidateQueries({ queryKey: ['presence-stats'] });
     },
     onError: (error) => {
       console.error('Add goal progress error:', error);
