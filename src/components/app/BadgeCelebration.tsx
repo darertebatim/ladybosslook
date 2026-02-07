@@ -134,7 +134,7 @@ export function BadgeCelebration({
         className="fixed bottom-24 left-4 right-4 z-[100] animate-in slide-in-from-bottom-4 duration-300"
         onClick={onClose}
       >
-        <div className="bg-gradient-to-r from-violet-600 to-purple-700 rounded-2xl p-4 shadow-xl flex items-center gap-3">
+        <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl p-4 shadow-xl flex items-center gap-3">
           {/* Left icon/badge */}
           <div className="relative shrink-0">
             {type === 'silver' ? (
@@ -152,7 +152,7 @@ export function BadgeCelebration({
             )}
             {/* Sparkle decorations */}
             <Sparkles className="absolute -top-1 -right-1 h-4 w-4 text-white/80 animate-pulse" />
-            <Sparkles className="absolute -bottom-0.5 -left-1 h-3 w-3 text-pink-300 animate-pulse delay-150" />
+            <Sparkles className="absolute -bottom-0.5 -left-1 h-3 w-3 text-amber-200 animate-pulse delay-150" />
           </div>
 
           {/* Content */}
@@ -196,7 +196,7 @@ export function BadgeCelebration({
         <div 
           className="absolute inset-0 opacity-30"
           style={{
-            background: 'repeating-conic-gradient(from 0deg, rgba(139, 92, 246, 0.3) 0deg 10deg, transparent 10deg 20deg)',
+            background: 'repeating-conic-gradient(from 0deg, rgba(251, 146, 60, 0.3) 0deg 10deg, transparent 10deg 20deg)',
             transformOrigin: 'center 60%',
           }}
         />
@@ -205,7 +205,7 @@ export function BadgeCelebration({
       {/* Celebration content */}
       <div 
         className={cn(
-          'relative w-full max-w-md mx-4 bg-gradient-to-t from-violet-500 via-violet-500 to-violet-600 rounded-t-[40px] pt-8 pb-8 px-6 transition-all duration-500',
+          'relative w-full max-w-md mx-4 bg-gradient-to-t from-orange-400 via-orange-500 to-orange-600 rounded-t-[40px] pt-8 pb-8 px-6 transition-all duration-500',
           isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
         )}
       >

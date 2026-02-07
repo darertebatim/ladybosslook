@@ -15,10 +15,11 @@ interface StreakCelebrationProps {
 }
 
 const CONFETTI_COLORS = [
-  '#a855f7', // violet-500
-  '#8b5cf6', // violet-500
-  '#6366f1', // indigo-500
-  '#ec4899', // pink-500
+  '#fb923c', // orange-400
+  '#f97316', // orange-500
+  '#ea580c', // orange-600
+  '#fbbf24', // amber-400
+  '#fcd34d', // amber-300
 ];
 
 /**
@@ -163,7 +164,7 @@ export const StreakCelebration = ({ open, onClose, isFirstAction = false }: Stre
       {/* Modal content */}
       <div 
         className={cn(
-          'relative bg-gradient-to-b from-violet-900 to-indigo-900 rounded-3xl p-8 w-full max-w-[300px] text-center transition-all duration-500',
+          'relative bg-gradient-to-b from-orange-500 to-orange-600 rounded-3xl p-8 w-full max-w-[300px] text-center transition-all duration-500',
           isAnimating ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
         )}
         onClick={(e) => e.stopPropagation()}
@@ -174,7 +175,7 @@ export const StreakCelebration = ({ open, onClose, isFirstAction = false }: Stre
           isAnimating && 'animate-pulse'
         )}>
           {isFirstAction ? (
-            <div className="grid place-items-center size-20 rounded-2xl bg-violet-500 text-white shadow-lg">
+            <div className="grid place-items-center size-20 rounded-2xl bg-orange-400 text-white shadow-lg">
               {getIcon()}
             </div>
           ) : (
@@ -210,9 +211,9 @@ export const StreakCelebration = ({ open, onClose, isFirstAction = false }: Stre
                   className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all',
                     day.isToday
-                      ? 'bg-violet-500 text-white ring-2 ring-violet-300'
+                      ? 'bg-orange-400 text-white ring-2 ring-orange-300'
                       : day.isActive
-                      ? 'bg-violet-500/50 text-white'
+                      ? 'bg-orange-400/50 text-white'
                       : 'bg-white/10 text-white/40'
                   )}
                 >
@@ -230,7 +231,7 @@ export const StreakCelebration = ({ open, onClose, isFirstAction = false }: Stre
         {/* Button */}
         <Button
           onClick={handleClose}
-          className="w-full bg-white hover:bg-white/90 text-violet-900 font-medium py-3 rounded-xl"
+          className="w-full bg-white hover:bg-white/90 text-orange-600 font-medium py-3 rounded-xl"
         >
           {isFirstAction ? (
             'Continue'
