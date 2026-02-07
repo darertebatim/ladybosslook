@@ -64,7 +64,12 @@ export function fullClientReset(): void {
     localStorage.removeItem(key);
   });
   
-  // Also set force new user flag for testing
+  // Clear tour prompt flags so banner re-appears
+  localStorage.removeItem('simora_tour_prompt_shown');
+  localStorage.removeItem('simora_tour_prompt_dismissed_at');
+  
+  // Set flags to force tour banner/popup to show immediately
+  localStorage.setItem('simora_tours_just_reset', 'true');
   localStorage.setItem('simora_force_new_user', 'true');
   
   console.log('[clientReset] Full client reset complete');
