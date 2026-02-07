@@ -101,7 +101,7 @@ export const GoldStreakCelebration = ({
 
   return (
     <div 
-      className="fixed inset-0 z-[100] flex flex-col"
+      className="fixed inset-0 z-[9999] flex flex-col"
       onClick={onClose}
     >
       {/* Elegant dark gradient background */}
@@ -241,16 +241,21 @@ export const GoldStreakCelebration = ({
         {/* Spacer */}
         <div className="flex-1 min-h-4" />
 
-        {/* CTA Button - elegant gold style */}
-        <Button
-          onClick={onClose}
-          className="w-full max-w-[320px] h-14 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 hover:from-amber-300 hover:via-yellow-300 hover:to-amber-300 text-stone-900 font-bold text-base rounded-2xl shadow-xl border-0 mb-8"
-          style={{
-            boxShadow: '0 4px 20px rgba(255, 193, 7, 0.3), 0 8px 32px rgba(0, 0, 0, 0.2)',
-          }}
+        {/* CTA Button - positioned above nav menu */}
+        <div 
+          className="w-full flex justify-center"
+          style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 16px)' }}
         >
-          I'm in! 💪
-        </Button>
+          <Button
+            onClick={onClose}
+            className="w-full max-w-[320px] h-14 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 hover:from-amber-300 hover:via-yellow-300 hover:to-amber-300 text-stone-900 font-bold text-base rounded-2xl shadow-xl border-0"
+            style={{
+              boxShadow: '0 4px 20px rgba(255, 193, 7, 0.3), 0 8px 32px rgba(0, 0, 0, 0.2)',
+            }}
+          >
+            I'm in! 💪
+          </Button>
+        </div>
       </div>
     </div>
   );

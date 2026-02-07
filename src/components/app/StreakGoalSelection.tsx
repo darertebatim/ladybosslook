@@ -50,7 +50,7 @@ export const StreakGoalSelection = ({
   const currentMultiplier = MULTIPLIERS[selectedGoal];
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col">
+    <div className="fixed inset-0 z-[9999] flex flex-col">
       {/* Purple gradient background */}
       <div 
         className="absolute inset-0"
@@ -166,14 +166,19 @@ export const StreakGoalSelection = ({
         {/* Spacer */}
         <div className="flex-1" />
         
-        {/* CTA Button */}
-        <Button
-          onClick={handleConfirm}
-          disabled={isLoading}
-          className="w-full max-w-xs h-14 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-base rounded-2xl mb-8"
+        {/* CTA Button - positioned above nav menu */}
+        <div 
+          className="w-full flex justify-center"
+          style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 16px)' }}
         >
-          {isLoading ? 'Saving...' : 'Commit to my goal'}
-        </Button>
+          <Button
+            onClick={handleConfirm}
+            disabled={isLoading}
+            className="w-full max-w-xs h-14 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-base rounded-2xl"
+          >
+            {isLoading ? 'Saving...' : 'Commit to my goal'}
+          </Button>
+        </div>
       </div>
     </div>
   );
