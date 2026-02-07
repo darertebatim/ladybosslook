@@ -708,8 +708,8 @@ const AppHome = () => {
                 <div>
                   {/* My Actions header - always show */}
                   <div className="flex items-center gap-2 mb-3">
-                    <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">
-                      My Actions
+                    <h2 className="text-sm font-semibold text-foreground tracking-wide">
+                      My actions
                     </h2>
                     <span className="text-xs text-foreground/40 ml-auto">Hold to reorder</span>
                   </div>
@@ -721,8 +721,8 @@ const AppHome = () => {
               {suggestedRoutines.length > 0 && selectedTag === null && <div className="tour-suggested-ritual mt-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="h-4 w-4 text-violet-500" />
-                    <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
-                      Try a Ritual
+                    <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
+                      Try a ritual
                     </h2>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
