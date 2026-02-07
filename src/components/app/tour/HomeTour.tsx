@@ -11,6 +11,8 @@ interface HomeTourProps {
   isFirstOpen?: boolean;
   // Portal target ID for banner placement
   bannerPortalId?: string;
+  // Callback to expose the tour trigger function
+  onTourReady?: (startTour: () => void) => void;
 }
 
 export function HomeTour({
@@ -19,6 +21,7 @@ export function HomeTour({
   hasWelcomeCard = false,
   isFirstOpen = false,
   bannerPortalId = 'tour-banner-slot',
+  onTourReady,
 }: HomeTourProps) {
   const [userWantsTour, setUserWantsTour] = useState(false);
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
@@ -169,6 +172,13 @@ export function HomeTour({
       tour.forceStartTour();
     }, 100);
   }, [tour]);
+
+  // Expose tour trigger to parent
+  useEffect(() => {
+    if (onTourReady) {
+      onTourReady(handleStartTour);
+    }
+  }, [onTourReady, handleStartTour]);
 
   // The banner element
   const bannerElement = (

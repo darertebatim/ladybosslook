@@ -61,6 +61,12 @@ const AppHome = () => {
   // Skip task state
   const [skipTask, setSkipTask] = useState<UserTask | null>(null);
   
+  // Home tour trigger for menu
+  const [startHomeTour, setStartHomeTour] = useState<(() => void) | null>(null);
+  const handleHomeTourReady = useCallback((tourStart: () => void) => {
+    setStartHomeTour(() => tourStart);
+  }, []);
+  
   // First action celebration - tracks if this is user's first ever completion (uses unified StreakCelebration)
   const [isFirstActionCelebration, setIsFirstActionCelebration] = useState(false);
   
@@ -441,7 +447,7 @@ const AppHome = () => {
           <div className="grid grid-cols-[auto_1fr_auto] items-center px-4 h-12">
             {/* Left: Menu button */}
             <div className="justify-self-start tour-menu-button">
-              <HomeMenu />
+              <HomeMenu onStartTour={startHomeTour || undefined} />
             </div>
 
             {/* Center: Title - changes to month/year when expanded */}
@@ -772,6 +778,7 @@ const AppHome = () => {
           hasEnrolledPrograms={activeRounds.length > 0}
           hasSuggestedRituals={suggestedRoutines.length > 0}
           hasWelcomeCard={showWelcomeCard}
+          onTourReady={handleHomeTourReady}
         />
       </div>
     </>;
