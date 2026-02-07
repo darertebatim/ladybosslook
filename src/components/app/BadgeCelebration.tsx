@@ -187,7 +187,7 @@ export function BadgeCelebration({
   // Full-screen Gold celebration modal
   return (
     <div 
-      className="fixed inset-0 z-[100] flex items-end justify-center"
+      className="fixed inset-0 z-[100] flex items-center justify-center"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       {/* Dark overlay with subtle rays */}
@@ -197,7 +197,7 @@ export function BadgeCelebration({
           className="absolute inset-0 opacity-20"
           style={{
             background: 'repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.15) 0deg 5deg, transparent 5deg 10deg)',
-            transformOrigin: 'center 70%',
+            transformOrigin: 'center 50%',
           }}
         />
       </div>
@@ -205,11 +205,11 @@ export function BadgeCelebration({
       {/* Celebration content - elegant gradient like AppPresence */}
       <div 
         className={cn(
-          'relative w-full max-w-md mx-4 rounded-t-[40px] pt-8 pb-8 px-6 transition-all duration-500 overflow-hidden',
-          isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+          'relative w-full max-w-md mx-4 rounded-[40px] pt-12 pb-8 px-6 transition-all duration-500',
+          isAnimating ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
         )}
         style={{
-          background: 'linear-gradient(0deg, #fffbeb 0%, #fef3c7 20%, #fdba74 60%, #fb923c 100%)',
+          background: 'linear-gradient(180deg, #fb923c 0%, #fdba74 40%, #fef3c7 80%, #fffbeb 100%)',
         }}
       >
         {/* Decorative sparkle dots */}
@@ -217,15 +217,17 @@ export function BadgeCelebration({
         <div className="absolute top-16 right-10 w-1.5 h-1.5 rounded-full bg-white/50" />
         <div className="absolute top-24 left-12 w-1 h-1 rounded-full bg-white/40" />
         <div className="absolute top-12 right-20 w-2 h-2 rounded-full bg-white/50" />
+        <div className="absolute bottom-20 right-8 w-1.5 h-1.5 rounded-full bg-orange-400/40" />
+        <div className="absolute bottom-32 left-8 w-2 h-2 rounded-full bg-orange-400/30" />
 
         {/* Large centered badge with glow */}
-        <div className="flex flex-col items-center -mt-28 mb-4">
+        <div className="flex flex-col items-center mb-6">
           {/* Sparkle decorations around badge */}
           <div className="relative">
-            <Sparkles className="absolute -left-8 top-1/4 h-6 w-6 text-orange-500/80 animate-pulse" />
-            <Sparkles className="absolute -right-8 top-1/4 h-6 w-6 text-orange-500/80 animate-pulse delay-100" />
-            <Sparkles className="absolute left-0 bottom-0 h-5 w-5 text-amber-500/60 animate-pulse delay-200" />
-            <Sparkles className="absolute right-0 bottom-0 h-5 w-5 text-amber-500/60 animate-pulse delay-300" />
+            <Sparkles className="absolute -left-10 top-1/4 h-6 w-6 text-white/80 animate-pulse" />
+            <Sparkles className="absolute -right-10 top-1/4 h-6 w-6 text-white/80 animate-pulse delay-100" />
+            <Sparkles className="absolute -left-6 bottom-4 h-5 w-5 text-white/60 animate-pulse delay-200" />
+            <Sparkles className="absolute -right-6 bottom-4 h-5 w-5 text-white/60 animate-pulse delay-300" />
             
             {/* Glow effect */}
             <div className="absolute inset-0 bg-orange-300/40 blur-3xl rounded-full scale-150" />
@@ -236,7 +238,7 @@ export function BadgeCelebration({
               src={BADGE_IMAGES.gold} 
               alt="Gold badge" 
               className={cn(
-                'w-40 h-40 object-contain relative z-10 drop-shadow-2xl transition-all',
+                'w-36 h-36 object-contain relative z-10 drop-shadow-2xl transition-all',
                 flyingBadge && 'animate-fly-to-header'
               )}
               style={{
@@ -252,7 +254,7 @@ export function BadgeCelebration({
             Legendary day!
           </h2>
           <p className="text-orange-700/80 text-sm leading-relaxed">
-            Every task completed today is a{'\n'}testament to your dedication.
+            Every task completed today is a testament to your dedication.
           </p>
         </div>
 
