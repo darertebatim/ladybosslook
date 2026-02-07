@@ -34,6 +34,17 @@ import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
 import { WelcomeRitualCard } from '@/components/app/WelcomeRitualCard';
 import { toast } from 'sonner';
+import { useWeeklyTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
+
+import badgeBronze from '@/assets/badge-bronze.png';
+import badgeSilver from '@/assets/badge-silver.png';
+import badgeGold from '@/assets/badge-gold.png';
+
+const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
+  bronze: badgeBronze,
+  silver: badgeSilver,
+  gold: badgeGold,
+};
 const AppHome = () => {
   const navigate = useNavigate();
   const {
@@ -125,6 +136,9 @@ const AppHome = () => {
     data: programEvents = [],
     isLoading: programEventsLoading
   } = useProgramEventsForDate(selectedDate);
+  const {
+    data: weeklyCompletion
+  } = useWeeklyTaskCompletion();
 
   // Home data for stats and rounds
   const homeDataQuery = useNewHomeData();
@@ -500,7 +514,7 @@ const AppHome = () => {
               </div>
             </div>
 
-            {/* Week strip - Me+ style */}
+            {/* Week strip - Me+ style with badges */}
             <div 
               className={cn("grid overflow-hidden")} 
               style={{ gridTemplateRows: showCalendar ? '0fr' : '1fr' }}
@@ -511,8 +525,13 @@ const AppHome = () => {
                   const isSelected = isSameDay(day, selectedDate);
                   const isTodayDate = isToday(day);
                   const dateStr = format(day, 'yyyy-MM-dd');
-                  const hasCompletions = completedDates?.has(dateStr);
                   const hasProgramEvents = programEventDates?.has(dateStr);
+                  
+                  // Get badge level for this day
+                  const dayStats = weeklyCompletion?.[dateStr];
+                  const badgeLevel = dayStats?.badgeLevel || 'none';
+                  const hasBadge = badgeLevel !== 'none';
+                  
                   return <button key={day.toISOString()} onClick={() => setSelectedDate(day)} className="flex-1 flex justify-center">
                         {/* Pill wraps around both day name and number for selected */}
                         <div className={cn('flex flex-col items-center px-1 py-0.5 rounded-full transition-all', isSelected && 'bg-chip-lavender')}>
@@ -521,12 +540,30 @@ const AppHome = () => {
                             {format(day, 'EEE')}
                           </span>
                           
-                          {/* Number with white circle for selected, lavender for today */}
-                          <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5', isSelected ? 'bg-white text-foreground dark:bg-white dark:text-foreground' // White circle inside lavender pill
-                      : isTodayDate ? 'bg-violet-200/70 text-foreground/80 dark:bg-violet-800/50 dark:text-violet-300' : 'text-foreground/70')}>
-                            {hasCompletions && !isSelected && <Flame className="absolute h-5 w-5 text-orange-400 opacity-50" />}
-                            {hasProgramEvents && <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />}
-                            <span className="relative z-10">{format(day, 'd')}</span>
+                          {/* Badge or Number */}
+                          <div className={cn(
+                            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5',
+                            !hasBadge && (isSelected 
+                              ? 'bg-white text-foreground dark:bg-white dark:text-foreground'
+                              : isTodayDate 
+                                ? 'bg-violet-200/70 text-foreground/80 dark:bg-violet-800/50 dark:text-violet-300' 
+                                : 'text-foreground/70')
+                          )}>
+                            {hasBadge ? (
+                              <img 
+                                src={BADGE_IMAGES[badgeLevel]} 
+                                alt={`${badgeLevel} badge`}
+                                className={cn(
+                                  "w-8 h-8 object-contain",
+                                  isSelected && "ring-2 ring-white ring-offset-1 ring-offset-chip-lavender rounded-full"
+                                )}
+                              />
+                            ) : (
+                              <>
+                                {hasProgramEvents && <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />}
+                                <span className="relative z-10">{format(day, 'd')}</span>
+                              </>
+                            )}
                           </div>
                         </div>
                       </button>;
