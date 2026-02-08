@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import tourBannerImage from '@/assets/tour-banner.png';
+import { supabase } from '@/integrations/supabase/client';
 
 const TOUR_PROMPT_KEY = 'simora_tour_prompt_shown';
 const TOUR_PROMPT_DISMISSED_KEY = 'simora_tour_prompt_dismissed_at';
 const TOUR_RE_PROMPT_DAYS = 3;
+const TOUR_SERVER_FORCE_SEEN_KEY = 'simora_tour_server_force_seen_at';
 
 interface TourBannerProps {
   isFirstOpen: boolean;
@@ -44,6 +46,47 @@ export function TourBanner({ isFirstOpen, onStartTour, forceShow = false }: Tour
     };
   }, []);
 
+  // Check server-side force show setting for existing users
+  useEffect(() => {
+    const checkServerForce = async () => {
+      try {
+        const { data } = await supabase
+          .from('app_settings')
+          .select('value')
+          .eq('key', 'force_tour_banner_until')
+          .single();
+        
+        if (!data?.value) return;
+        
+        const forceUntil = new Date(data.value);
+        const now = new Date();
+        
+        // If we're past the force period, don't show
+        if (now > forceUntil) return;
+        
+        // Check if user already saw the banner after the force was set
+        const lastSeenAt = localStorage.getItem(TOUR_SERVER_FORCE_SEEN_KEY);
+        if (lastSeenAt) {
+          const seenDate = new Date(lastSeenAt);
+          // If they saw it after the current force period started, don't show again
+          // The force period started 7 days before forceUntil
+          const forceStarted = new Date(forceUntil.getTime() - 7 * 24 * 60 * 60 * 1000);
+          if (seenDate > forceStarted) return;
+        }
+        
+        // Show banner for existing users
+        setTimeout(() => setIsVisible(true), 500);
+      } catch (error) {
+        // Silently fail - not critical
+      }
+    };
+    
+    // Only check if not already showing for new users
+    if (!isFirstOpen && !forceShow) {
+      checkServerForce();
+    }
+  }, [isFirstOpen, forceShow]);
+
   // Normal first-open flow
   useEffect(() => {
     if (!isFirstOpen) return;
@@ -76,6 +119,7 @@ export function TourBanner({ isFirstOpen, onStartTour, forceShow = false }: Tour
 
   const handleStartTour = () => {
     localStorage.setItem(TOUR_PROMPT_KEY, 'true');
+    localStorage.setItem(TOUR_SERVER_FORCE_SEEN_KEY, new Date().toISOString());
     setIsVisible(false);
     setTimeout(() => {
       onStartTour();
@@ -84,6 +128,7 @@ export function TourBanner({ isFirstOpen, onStartTour, forceShow = false }: Tour
 
   const handleDismiss = () => {
     localStorage.setItem(TOUR_PROMPT_DISMISSED_KEY, Date.now().toString());
+    localStorage.setItem(TOUR_SERVER_FORCE_SEEN_KEY, new Date().toISOString());
     setIsVisible(false);
   };
 
