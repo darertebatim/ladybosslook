@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionNav } from '@/components/app/profile/SectionNav';
 import { 
   LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell,
-  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, Trash2, AlertTriangle, Settings, PlayCircle, Headset
+  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, Trash2, AlertTriangle, Settings, PlayCircle, Headset, Megaphone
 } from 'lucide-react';
 import { NativeSettings, IOSSettings, AndroidSettings } from 'capacitor-native-settings';
 import {
@@ -1227,8 +1227,8 @@ const AppProfile = () => {
             </CardContent>
           </Card>
 
-          {/* Admin Support Inbox - Only visible for staff with support access */}
-          {canAccessAdminPage('support') && (
+          {/* Admin Tools - Only visible for staff with relevant access */}
+          {(canAccessAdminPage('support') || canAccessAdminPage('community')) && (
             <Card className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -1236,15 +1236,27 @@ const AppProfile = () => {
                   Admin Tools
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => navigate('/app/support')}
-                >
-                  <Headset className="mr-2 h-4 w-4" />
-                  Support Inbox
-                </Button>
+              <CardContent className="space-y-2">
+                {canAccessAdminPage('support') && (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => navigate('/app/support', { state: { from: '/app/profile' } })}
+                  >
+                    <Headset className="mr-2 h-4 w-4" />
+                    Support Inbox
+                  </Button>
+                )}
+                {canAccessAdminPage('community') && (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => navigate('/app/channels/new', { state: { from: '/app/profile' } })}
+                  >
+                    <Megaphone className="mr-2 h-4 w-4" />
+                    Post to Channel
+                  </Button>
+                )}
               </CardContent>
             </Card>
           )}
