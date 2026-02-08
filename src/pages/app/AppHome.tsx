@@ -40,7 +40,7 @@ import { BadgeCelebration } from '@/components/app/BadgeCelebration';
 import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
 import { useGoldStreak, useGoldDatesThisWeek, useUpdateGoldStreak } from '@/hooks/useGoldStreak';
-import { QuickMoodCheckIn } from '@/components/app/QuickMoodCheckIn';
+
 
 import coinBronze from '@/assets/coin-bronze.png';
 import coinSilver from '@/assets/coin-silver.png';
@@ -91,8 +91,6 @@ const AppHome = () => {
   const [showGoalSelection, setShowGoalSelection] = useState(false);
   const setStreakGoal = useSetStreakGoal();
   
-  // Quick mood check-in state
-  const [showMoodCheckIn, setShowMoodCheckIn] = useState(false);
   
   // Gold streak celebration state - use localStorage to prevent re-showing on navigation
   const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -537,7 +535,7 @@ const AppHome = () => {
               <button 
                 onClick={() => {
                   haptic.light();
-                  setShowMoodCheckIn(true);
+                  navigate('/app/mood');
                 }}
                 className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
               >
@@ -928,12 +926,7 @@ const AppHome = () => {
           onTourReady={handleHomeTourReady}
         />
       </div>
-      
-      {/* Quick Mood Check-in */}
-      <QuickMoodCheckIn 
-        open={showMoodCheckIn} 
-        onOpenChange={setShowMoodCheckIn} 
-      />
-    </>;
+    </>
+  );
 };
 export default AppHome;

@@ -47,6 +47,8 @@ const AppWater = lazy(() => import("@/pages/app/AppWater"));
 const AppPeriod = lazy(() => import("@/pages/app/AppPeriod"));
 const AppEmotion = lazy(() => import("@/pages/app/AppEmotion"));
 const AppEmotionHistory = lazy(() => import("@/pages/app/AppEmotionHistory"));
+const AppMood = lazy(() => import("@/pages/app/AppMood"));
+const AppMoodHistory = lazy(() => import("@/pages/app/AppMoodHistory"));
 const AppPresence = lazy(() => import("@/pages/app/AppPresence"));
 
 // Lazy load admin pages
@@ -311,6 +313,8 @@ const App = () => (
                   <Route path="/app/period" element={<ProtectedRoute><AppPeriod /></ProtectedRoute>} />
                   <Route path="/app/emotion" element={<ProtectedRoute><AppEmotion /></ProtectedRoute>} />
                   <Route path="/app/emotion/history" element={<ProtectedRoute><AppEmotionHistory /></ProtectedRoute>} />
+                  <Route path="/app/mood" element={<ProtectedRoute><AppMood /></ProtectedRoute>} />
+                  <Route path="/app/mood/history" element={<ProtectedRoute><AppMoodHistory /></ProtectedRoute>} />
                   <Route path="/app/presence" element={<ProtectedRoute><AppPresence /></ProtectedRoute>} />
                   {/* Redirect old feed post route */}
                   <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
