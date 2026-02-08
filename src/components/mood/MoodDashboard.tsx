@@ -157,14 +157,12 @@ export function MoodDashboard() {
       <div className="flex flex-col h-full">
         {/* Mood Grid */}
         <div className="flex-1 flex flex-col justify-center px-4">
-          {/* Today's logged mood indicator */}
-          {todayMood && !selectedMood && (
-            <div className="text-center mb-6">
-              <span className="text-sm text-muted-foreground">
-                You logged your mood today
-              </span>
-            </div>
-          )}
+          {/* Title - always visible */}
+          <div className="text-center mb-6">
+            <span className="text-lg font-medium text-foreground">
+              How are you Feeling?
+            </span>
+          </div>
 
           {/* Top row - 3 moods */}
           <div className="flex justify-center gap-3 mb-4">
@@ -257,12 +255,13 @@ export function MoodDashboard() {
               {isSubmitting ? 'Saving...' : (selectedMoodData?.buttonText || 'I feel...')}
             </Button>
 
-            {/* Add to Rituals Button */}
+            {/* Add to Rituals Button - icon only */}
             <AddedToRoutineButton
               isAdded={!!isAdded}
               onAddClick={handleRoutineClick}
               isLoading={addRoutinePlan.isPending}
-              className="w-auto min-w-12"
+              iconOnly
+              className="w-12 h-12"
               size="default"
             />
           </div>
