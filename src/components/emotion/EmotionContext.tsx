@@ -1,11 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, Loader2 } from 'lucide-react';
+import { 
+  ChevronLeft, Loader2, Heart, Cloud, Briefcase, GraduationCap,
+  Dumbbell, HeartPulse, Home, Palette, Moon, Users, Wallet, MapPin
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { CONTEXT_OPTIONS, getEmotionLabel, type Valence } from '@/lib/emotionData';
+import { CONTEXT_OPTIONS, getEmotionLabel, type Valence, type ContextOption } from '@/lib/emotionData';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { useKeyboard } from '@/hooks/useKeyboard';
+
+// Icon mapping
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Heart, Cloud, Briefcase, GraduationCap, Dumbbell, HeartPulse,
+  Home, Palette, Moon, Users, Wallet, MapPin
+};
 
 // Valence-based colors matching the first page buttons
 const VALENCE_COLORS: Record<Valence, { text: string; selectedBg: string; selectedText: string }> = {
@@ -17,7 +26,7 @@ const VALENCE_COLORS: Record<Valence, { text: string; selectedBg: string; select
 interface EmotionContextProps {
   valence: Valence;
   category: string;
-  emotions: string[]; // Now accepts array
+  emotions: string[];
   onSave: (contexts: string[], notes: string) => void;
   onBack: () => void;
   isSaving: boolean;
@@ -46,18 +55,13 @@ export const EmotionContext = ({
 
   // Handle keyboard - scroll textarea into view when focused
   const handleNotesFocus = () => {
-    // Multi-stage scroll to ensure visibility on iOS
     const scrollIntoView = () => {
       notesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
-    
-    // Initial delay for keyboard to start appearing
     setTimeout(scrollIntoView, 100);
-    // After keyboard animation
     setTimeout(scrollIntoView, 300);
   };
 
-  // Auto-scroll when keyboard opens while textarea is focused
   useEffect(() => {
     if (isKeyboardOpen && document.activeElement === notesRef.current) {
       setTimeout(() => {
@@ -87,7 +91,7 @@ export const EmotionContext = ({
 
   return (
     <div 
-      className="h-[100dvh] flex flex-col bg-[#F8F9FA]"
+      className="h-[100dvh] flex flex-col bg-[#F4F5F7]"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* Header */}
@@ -107,28 +111,35 @@ export const EmotionContext = ({
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {/* Title with emotions highlighted using valence color */}
-        <h2 className="text-xl font-semibold text-foreground mb-6">
-          What made you feel{' '}
+        <h2 className="text-xl font-semibold text-foreground text-center mb-6">
+          What's making you feel{' '}
           <span className={valenceColors.text}>{emotionDisplayText}</span>?
         </h2>
 
-        {/* Context grid - Finch style with valence-colored selection */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {CONTEXT_OPTIONS.map((context) => {
+        {/* Context grid - Me+ style with icons */}
+        <div className="grid grid-cols-4 gap-3 mb-6">
+          {CONTEXT_OPTIONS.map((context: ContextOption) => {
             const isSelected = selectedContexts.includes(context.value);
+            const IconComponent = ICON_MAP[context.icon];
+            
             return (
               <button
                 key={context.value}
                 onClick={() => toggleContext(context.value)}
                 className={cn(
-                  "px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200",
+                  "flex flex-col items-center justify-center py-4 px-2 rounded-2xl transition-all duration-200",
                   "active:scale-95",
                   isSelected
                     ? cn(valenceColors.selectedBg, valenceColors.selectedText)
-                    : "bg-[#ECEFF1] text-[#546E7A]"
+                    : "bg-white text-foreground/80"
                 )}
               >
-                {context.label}
+                {IconComponent && (
+                  <IconComponent className="h-6 w-6 mb-1.5" />
+                )}
+                <span className="text-xs font-medium text-center leading-tight">
+                  {context.label}
+                </span>
               </button>
             );
           })}
@@ -140,8 +151,8 @@ export const EmotionContext = ({
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           onFocus={handleNotesFocus}
-          placeholder="Add details or more reflection..."
-          className="min-h-[140px] resize-none rounded-2xl bg-white border-slate-200 text-base"
+          placeholder="Add Note"
+          className="min-h-[80px] resize-none rounded-2xl bg-white border-0 text-base shadow-sm"
         />
       </div>
 
@@ -150,7 +161,7 @@ export const EmotionContext = ({
         <Button 
           onClick={handleSave}
           disabled={isSaving}
-          className="w-full h-12 text-base rounded-xl bg-[#4CAF50] hover:bg-[#43A047] text-white font-medium"
+          className="w-full h-12 text-base rounded-xl bg-foreground hover:bg-foreground/90 text-background font-medium"
         >
           {isSaving ? (
             <>
@@ -158,7 +169,7 @@ export const EmotionContext = ({
               Saving...
             </>
           ) : (
-            'Save'
+            'Because of this.'
           )}
         </Button>
       </div>

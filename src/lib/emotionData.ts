@@ -385,21 +385,25 @@ export const EMOTION_CATEGORIES: Record<Valence, EmotionCategory[]> = {
   ],
 };
 
-export const CONTEXT_OPTIONS: EmotionOption[] = [
-  { value: 'family', label: 'Family' },
-  { value: 'myself', label: 'Myself' },
-  { value: 'health', label: 'Health' },
-  { value: 'pets', label: 'Pets' },
-  { value: 'coworkers', label: 'Co-workers' },
-  { value: 'friends', label: 'Friends' },
-  { value: 'partner', label: 'Partner' },
-  { value: 'acquaintances', label: 'Acquaintances' },
-  { value: 'work', label: 'Work' },
-  { value: 'home', label: 'Home' },
-  { value: 'school', label: 'School' },
-  { value: 'hobby', label: 'Hobby' },
-  { value: 'commuting', label: 'Commuting' },
-  { value: 'outside', label: 'Outside' },
+export interface ContextOption {
+  value: string;
+  label: string;
+  icon: string; // Lucide icon name
+}
+
+export const CONTEXT_OPTIONS: ContextOption[] = [
+  { value: 'relationships', label: 'Relationships', icon: 'Heart' },
+  { value: 'weather', label: 'Weather', icon: 'Cloud' },
+  { value: 'work', label: 'Work', icon: 'Briefcase' },
+  { value: 'school', label: 'School', icon: 'GraduationCap' },
+  { value: 'exercise', label: 'Exercise', icon: 'Dumbbell' },
+  { value: 'health', label: 'Health', icon: 'HeartPulse' },
+  { value: 'family', label: 'Family', icon: 'Home' },
+  { value: 'hobbies', label: 'Hobbies', icon: 'Palette' },
+  { value: 'sleep', label: 'Sleep', icon: 'Moon' },
+  { value: 'friends', label: 'Friends', icon: 'Users' },
+  { value: 'finances', label: 'Finances', icon: 'Wallet' },
+  { value: 'location', label: 'Location', icon: 'MapPin' },
 ];
 
 // Helper to get category by value
