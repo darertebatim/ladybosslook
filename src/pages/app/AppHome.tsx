@@ -603,8 +603,8 @@ const AppHome = () => {
                   return <button key={day.toISOString()} onClick={() => setSelectedDate(day)} className="flex-1 flex justify-center">
                         {/* Pill wraps around both day name and number for selected */}
                         <div className={cn('flex flex-col items-center px-1 py-0.5 rounded-full transition-all', isSelected && 'bg-chip-lavender')}>
-                          {/* Day name */}
-                          <span className={cn('text-[11px] font-medium leading-tight', isSelected ? 'text-foreground/70' : 'text-foreground/50')}>
+                          {/* Day name - selected is black, others are grey */}
+                          <span className={cn('text-[11px] font-medium leading-tight', isSelected ? 'text-foreground' : 'text-[#C6C1CF]')}>
                             {format(day, 'EEE')}
                           </span>
                           
@@ -614,8 +614,8 @@ const AppHome = () => {
                             !hasBadge && (isSelected 
                               ? 'bg-white text-foreground dark:bg-white dark:text-foreground'
                               : isTodayDate 
-                                ? 'bg-violet-200/70 text-foreground/80 dark:bg-violet-800/50 dark:text-violet-300' 
-                                : 'text-foreground/70'),
+                                ? 'bg-violet-200/70 text-[#C6C1CF] dark:bg-violet-800/50 dark:text-violet-300' 
+                                : 'text-[#C6C1CF]'),
                             hasBadge && isSelected && "ring-2 ring-white ring-offset-1 ring-offset-chip-lavender"
                           )}>
                             {hasBadge ? (
