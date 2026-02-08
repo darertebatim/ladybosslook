@@ -1,8 +1,8 @@
-import { memo } from 'react';
-import { FeedPost } from '@/hooks/useFeed';
+import { memo, useState } from 'react';
+import { FeedPost, useDeleteUserPost } from '@/hooks/useFeed';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
-import { Pin, CheckCheck, ExternalLink, Reply } from 'lucide-react';
+import { Pin, CheckCheck, ExternalLink, Reply, Trash2, Loader2 } from 'lucide-react';
 import { FeedReactions } from './FeedReactions';
 import { FeedActionButton } from './FeedActionButton';
 import { FeedVoiceMessage } from './FeedVoiceMessage';
@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { detectVideoType, getVideoEmbedUrl } from '@/lib/videoUtils';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 import appIcon from '@/assets/app-icon.png';
 
 interface FeedMessageProps {
@@ -18,6 +19,7 @@ interface FeedMessageProps {
   isFollowUp?: boolean;
   onReply?: (post: FeedPost) => void;
   replyToPost?: FeedPost | null;
+  isLastMessage?: boolean;
 }
 
 export const FeedMessage = memo(function FeedMessage({ 
@@ -25,9 +27,13 @@ export const FeedMessage = memo(function FeedMessage({
   allowReactions = true, 
   isFollowUp = false,
   onReply,
-  replyToPost
+  replyToPost,
+  isLastMessage = false
 }: FeedMessageProps) {
   const { user } = useAuth();
+  const deletePost = useDeleteUserPost();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
   const isVoiceMessage = post.post_type === 'voice_message' || post.audio_url;
   
   // Check if this is a system/admin-panel message (announcements, system posts, etc.)
@@ -37,6 +43,9 @@ export const FeedMessage = memo(function FeedMessage({
   // Only treat as current user's message if it's a discussion post they authored
   const isCurrentUser = !isSystemMessage && user?.id === post.author_id;
   
+  // Can delete if: current user's message, is a discussion, and is the last message
+  const canDelete = isCurrentUser && post.post_type === 'discussion' && isLastMessage;
+  
   // System messages show as "Simora", otherwise use author info
   const senderName = isSystemMessage 
     ? 'Simora' 
@@ -44,6 +53,16 @@ export const FeedMessage = memo(function FeedMessage({
   
   // Detect Persian text for proper font and direction
   const { direction, className: bilingualClassName } = useBilingualText(post.content || '');
+
+  const handleDelete = async () => {
+    try {
+      await deletePost.mutateAsync({ postId: post.id, channelId: post.channel_id });
+      toast.success('Message deleted');
+    } catch (error: any) {
+      toast.error(error?.message || 'Failed to delete message');
+    }
+    setShowDeleteConfirm(false);
+  };
 
   // Get a consistent color index for a user based on their ID
   const getUserColorIndex = (authorId: string | null): number => {
@@ -302,6 +321,32 @@ export const FeedMessage = memo(function FeedMessage({
                 >
                   <Reply className="h-4 w-4" />
                 </button>
+              )}
+              {/* Delete button - only for current user's last message */}
+              {canDelete && !showDeleteConfirm && (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="p-1 rounded-full hover:bg-destructive/20 transition-colors text-foreground/50 hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
+              {canDelete && showDeleteConfirm && (
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={handleDelete}
+                    disabled={deletePost.isPending}
+                    className="px-2 py-0.5 text-xs rounded bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                  >
+                    {deletePost.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Delete'}
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-2 py-0.5 text-xs rounded bg-muted hover:bg-muted/80 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
               )}
             </div>
 
