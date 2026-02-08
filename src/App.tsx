@@ -258,7 +258,7 @@ const App = () => (
                       <Route path="users" element={<ProtectedRoute requiredPage="users"><Users /></ProtectedRoute>} />
                       <Route path="enrollment" element={<ProtectedRoute requiredPage="enrollment"><Enrollment /></ProtectedRoute>} />
                       <Route path="audio" element={<ProtectedRoute requiredPage="audio"><Audio /></ProtectedRoute>} />
-                      <Route path="community" element={<ProtectedRoute requiredPage="community"><Community /></ProtectedRoute>} />
+                      <Route path="channels" element={<ProtectedRoute requiredPage="community"><Community /></ProtectedRoute>} />
                       
                       <Route path="communications" element={<ProtectedRoute requiredPage="communications"><Communications /></ProtectedRoute>} />
                       <Route path="programs" element={<ProtectedRoute requiredPage="programs"><ProgramsAdmin /></ProtectedRoute>} />

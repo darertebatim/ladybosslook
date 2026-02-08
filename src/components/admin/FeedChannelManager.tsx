@@ -9,7 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Archive, ArchiveRestore, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Archive, ArchiveRestore, Loader2, Image as ImageIcon, Smile } from 'lucide-react';
+import { EmojiPicker } from '@/components/app/EmojiPicker';
+import { ImageUploader } from '@/components/admin/ImageUploader';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface Channel {
   id: string;
@@ -22,12 +25,18 @@ interface Channel {
   allow_comments: boolean;
   is_archived: boolean;
   sort_order: number;
+  cover_image_url: string | null;
 }
+
+// Helper functions for cover storage
+const isEmojiCover = (url: string | null) => url?.startsWith('emoji:');
+const getEmojiFromCover = (url: string | null) => url?.replace('emoji:', '') || '';
 
 export function FeedChannelManager() {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -37,6 +46,9 @@ export function FeedChannelManager() {
     round_id: '',
     allow_reactions: true,
     allow_comments: true,
+    cover_type: 'none' as 'none' | 'emoji' | 'image',
+    cover_emoji: '📢',
+    cover_image_url: '',
   });
 
   const { data: channels, isLoading } = useQuery({
@@ -78,6 +90,14 @@ export function FeedChannelManager() {
 
   const createChannel = useMutation({
     mutationFn: async (channelData: typeof formData) => {
+      // Compute cover_image_url from form data
+      let cover_image_url: string | null = null;
+      if (channelData.cover_type === 'emoji' && channelData.cover_emoji) {
+        cover_image_url = `emoji:${channelData.cover_emoji}`;
+      } else if (channelData.cover_type === 'image' && channelData.cover_image_url) {
+        cover_image_url = channelData.cover_image_url;
+      }
+
       const { error } = await supabase.from('feed_channels').insert({
         name: channelData.name,
         slug: channelData.slug,
@@ -86,6 +106,7 @@ export function FeedChannelManager() {
         round_id: channelData.type === 'round' ? channelData.round_id : null,
         allow_reactions: channelData.allow_reactions,
         allow_comments: channelData.allow_comments,
+        cover_image_url,
       });
       if (error) throw error;
     },
@@ -146,11 +167,30 @@ export function FeedChannelManager() {
       round_id: '',
       allow_reactions: true,
       allow_comments: true,
+      cover_type: 'none',
+      cover_emoji: '📢',
+      cover_image_url: '',
     });
   };
 
   const openEditDialog = (channel: Channel) => {
     setEditingChannel(channel);
+    
+    // Determine cover type from stored value
+    let cover_type: 'none' | 'emoji' | 'image' = 'none';
+    let cover_emoji = '📢';
+    let cover_image_url = '';
+    
+    if (channel.cover_image_url) {
+      if (isEmojiCover(channel.cover_image_url)) {
+        cover_type = 'emoji';
+        cover_emoji = getEmojiFromCover(channel.cover_image_url);
+      } else {
+        cover_type = 'image';
+        cover_image_url = channel.cover_image_url;
+      }
+    }
+    
     setFormData({
       name: channel.name,
       slug: channel.slug,
@@ -159,11 +199,22 @@ export function FeedChannelManager() {
       round_id: channel.round_id || '',
       allow_reactions: channel.allow_reactions,
       allow_comments: channel.allow_comments,
+      cover_type,
+      cover_emoji,
+      cover_image_url,
     });
     setIsDialogOpen(true);
   };
 
   const handleSubmit = () => {
+    // Compute cover_image_url from form data
+    let cover_image_url: string | null = null;
+    if (formData.cover_type === 'emoji' && formData.cover_emoji) {
+      cover_image_url = `emoji:${formData.cover_emoji}`;
+    } else if (formData.cover_type === 'image' && formData.cover_image_url) {
+      cover_image_url = formData.cover_image_url;
+    }
+
     if (editingChannel) {
       updateChannel.mutate({
         id: editingChannel.id,
@@ -174,6 +225,7 @@ export function FeedChannelManager() {
         round_id: formData.type === 'round' ? formData.round_id : null,
         allow_reactions: formData.allow_reactions,
         allow_comments: formData.allow_comments,
+        cover_image_url,
       });
     } else {
       createChannel.mutate(formData);
@@ -280,6 +332,63 @@ export function FeedChannelManager() {
                 </div>
               )}
 
+              {/* Cover selector */}
+              <div>
+                <Label>Cover</Label>
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    type="button"
+                    variant={formData.cover_type === 'none' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setFormData({ ...formData, cover_type: 'none' })}
+                  >
+                    None
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={formData.cover_type === 'emoji' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setFormData({ ...formData, cover_type: 'emoji' })}
+                  >
+                    <Smile className="h-4 w-4 mr-1" /> Emoji
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={formData.cover_type === 'image' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setFormData({ ...formData, cover_type: 'image' })}
+                  >
+                    <ImageIcon className="h-4 w-4 mr-1" /> Image
+                  </Button>
+                </div>
+              </div>
+
+              {formData.cover_type === 'emoji' && (
+                <div>
+                  <Label>Emoji</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full justify-start mt-1 h-12 text-2xl"
+                    onClick={() => setEmojiPickerOpen(true)}
+                  >
+                    <FluentEmoji emoji={formData.cover_emoji} size={28} />
+                    <span className="ml-2 text-sm text-muted-foreground">Click to change</span>
+                  </Button>
+                </div>
+              )}
+
+              {formData.cover_type === 'image' && (
+                <ImageUploader
+                  value={formData.cover_image_url}
+                  onChange={(url) => setFormData({ ...formData, cover_image_url: url })}
+                  bucket="routine-images"
+                  folder="channel-covers"
+                  label="Cover Image"
+                  previewHeight="h-24"
+                />
+              )}
+
               <div className="flex items-center justify-between">
                 <Label>Allow Reactions</Label>
                 <Switch
@@ -320,12 +429,28 @@ export function FeedChannelManager() {
             <Card key={channel.id} className={channel.is_archived ? 'opacity-60' : ''}>
               <CardHeader className="py-3">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-base">{channel.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">
-                      /{channel.slug} • {channel.type}
-                      {channel.is_archived && ' • Archived'}
-                    </p>
+                  <div className="flex items-center gap-3">
+                    {/* Channel cover */}
+                    {channel.cover_image_url && (
+                      isEmojiCover(channel.cover_image_url) ? (
+                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+                          <FluentEmoji emoji={getEmojiFromCover(channel.cover_image_url)} size={24} />
+                        </div>
+                      ) : (
+                        <img 
+                          src={channel.cover_image_url} 
+                          alt="" 
+                          className="h-10 w-10 rounded-full object-cover shrink-0"
+                        />
+                      )
+                    )}
+                    <div>
+                      <CardTitle className="text-base">{channel.name}</CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        /{channel.slug} • {channel.type}
+                        {channel.is_archived && ' • Archived'}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
@@ -371,6 +496,17 @@ export function FeedChannelManager() {
           ))}
         </div>
       )}
+
+      {/* Emoji Picker */}
+      <EmojiPicker
+        open={emojiPickerOpen}
+        onOpenChange={setEmojiPickerOpen}
+        selectedEmoji={formData.cover_emoji}
+        onSelect={(emoji) => {
+          setFormData({ ...formData, cover_emoji: emoji });
+          setEmojiPickerOpen(false);
+        }}
+      />
     </div>
   );
 }

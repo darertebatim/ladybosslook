@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FeedChannelManager } from '@/components/admin/FeedChannelManager';
 import { FeedChatComposer } from '@/components/admin/FeedChatComposer';
-import { FeedPostsList } from '@/components/admin/FeedPostsList';
+import { AdminChannelChat } from '@/components/admin/AdminChannelChat';
 import { SharedJournalsManager } from '@/components/admin/SharedJournalsManager';
 
 export default function Community() {
@@ -11,7 +11,7 @@ export default function Community() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Community Feed</h1>
+        <h1 className="text-2xl font-bold">Channels</h1>
         <p className="text-muted-foreground">
           Send messages and manage your community channels
         </p>
@@ -20,24 +20,24 @@ export default function Community() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="create">New Message</TabsTrigger>
-          <TabsTrigger value="posts">History</TabsTrigger>
+          <TabsTrigger value="messages">Messages</TabsTrigger>
           <TabsTrigger value="journals">Journals</TabsTrigger>
-          <TabsTrigger value="channels">Channels</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="create" className="mt-6">
-          <FeedChatComposer onSuccess={() => setActiveTab('posts')} />
+          <FeedChatComposer onSuccess={() => setActiveTab('messages')} />
         </TabsContent>
 
-        <TabsContent value="posts" className="mt-6">
-          <FeedPostsList />
+        <TabsContent value="messages" className="mt-6">
+          <AdminChannelChat />
         </TabsContent>
 
         <TabsContent value="journals" className="mt-6">
           <SharedJournalsManager />
         </TabsContent>
 
-        <TabsContent value="channels" className="mt-6">
+        <TabsContent value="settings" className="mt-6">
           <FeedChannelManager />
         </TabsContent>
       </Tabs>
