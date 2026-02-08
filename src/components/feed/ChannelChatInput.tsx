@@ -1,19 +1,28 @@
-import { useState, useRef } from 'react';
-import { Send, Loader2 } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Send, Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { useCreateUserPost } from '@/hooks/useFeed';
+import { useCreateUserPost, FeedPost } from '@/hooks/useFeed';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 interface ChannelChatInputProps {
   channelId: string;
+  replyTo?: FeedPost | null;
+  onCancelReply?: () => void;
 }
 
-export function ChannelChatInput({ channelId }: ChannelChatInputProps) {
+export function ChannelChatInput({ channelId, replyTo, onCancelReply }: ChannelChatInputProps) {
   const [content, setContent] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const createPost = useCreateUserPost();
+
+  // Focus textarea when replying
+  useEffect(() => {
+    if (replyTo && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [replyTo]);
 
   const handleSubmit = async () => {
     const trimmedContent = content.trim();
@@ -23,8 +32,10 @@ export function ChannelChatInput({ channelId }: ChannelChatInputProps) {
       await createPost.mutateAsync({
         channelId,
         content: trimmedContent,
+        replyToPostId: replyTo?.id,
       });
       setContent('');
+      onCancelReply?.();
       // Reset textarea height
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
@@ -41,6 +52,10 @@ export function ChannelChatInput({ channelId }: ChannelChatInputProps) {
       e.preventDefault();
       handleSubmit();
     }
+    // Cancel reply on Escape
+    if (e.key === 'Escape' && replyTo) {
+      onCancelReply?.();
+    }
   };
 
   const handleInput = () => {
@@ -53,19 +68,41 @@ export function ChannelChatInput({ channelId }: ChannelChatInputProps) {
 
   const canSend = content.trim().length > 0 && !createPost.isPending;
 
+  const replyToName = replyTo?.display_name || replyTo?.author?.full_name || 'Simora';
+
   return (
     <div 
-      className="sticky bottom-0 bg-background border-t border-border/50 px-3 py-2"
+      className="sticky bottom-0 bg-background border-t border-border/50"
       style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}
     >
-      <div className="flex items-end gap-2">
+      {/* Reply preview */}
+      {replyTo && (
+        <div className="flex items-center gap-2 px-3 pt-2 pb-1">
+          <div className="flex-1 pl-2 border-l-2 border-primary text-xs">
+            <div className="font-medium text-primary truncate">
+              Replying to {replyToName}
+            </div>
+            <div className="text-muted-foreground truncate">
+              {replyTo.content?.slice(0, 60)}{replyTo.content && replyTo.content.length > 60 ? '...' : ''}
+            </div>
+          </div>
+          <button
+            onClick={onCancelReply}
+            className="p-1 rounded-full hover:bg-muted transition-colors text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      <div className="flex items-end gap-2 px-3 py-2">
         <Textarea
           ref={textareaRef}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyDown}
           onInput={handleInput}
-          placeholder="Message..."
+          placeholder={replyTo ? `Reply to ${replyToName}...` : "Message..."}
           className={cn(
             "min-h-[40px] max-h-[120px] resize-none py-2.5 px-3",
             "rounded-2xl border-border/50 bg-muted/50",

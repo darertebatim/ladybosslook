@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { FeedPost } from '@/hooks/useFeed';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
-import { Pin, CheckCheck, ExternalLink } from 'lucide-react';
+import { Pin, CheckCheck, ExternalLink, Reply } from 'lucide-react';
 import { FeedReactions } from './FeedReactions';
 import { FeedActionButton } from './FeedActionButton';
 import { FeedVoiceMessage } from './FeedVoiceMessage';
@@ -16,12 +16,16 @@ interface FeedMessageProps {
   post: FeedPost;
   allowReactions?: boolean;
   isFollowUp?: boolean;
+  onReply?: (post: FeedPost) => void;
+  replyToPost?: FeedPost | null;
 }
 
 export const FeedMessage = memo(function FeedMessage({ 
   post, 
   allowReactions = true, 
-  isFollowUp = false
+  isFollowUp = false,
+  onReply,
+  replyToPost
 }: FeedMessageProps) {
   const { user } = useAuth();
   const isVoiceMessage = post.post_type === 'voice_message' || post.audio_url;
@@ -107,6 +111,23 @@ export const FeedMessage = memo(function FeedMessage({
           // Align bubbles
           isCurrentUser && "ml-auto"
         )}>
+          {/* Reply preview - if this message is a reply */}
+          {replyToPost && (
+            <div className={cn(
+              "mb-2 pl-2 border-l-2 rounded-sm text-xs",
+              isCurrentUser 
+                ? "border-primary-foreground/40 text-primary-foreground/70" 
+                : "border-primary/50 text-muted-foreground"
+            )}>
+              <div className="font-medium truncate">
+                {replyToPost.display_name || replyToPost.author?.full_name || 'Simora'}
+              </div>
+              <div className="truncate opacity-80">
+                {replyToPost.content?.slice(0, 50)}{replyToPost.content && replyToPost.content.length > 50 ? '...' : ''}
+              </div>
+            </div>
+          )}
+
           {/* Header - show sender name for non-current-user messages, hidden for follow-ups */}
           {!isFollowUp && !isCurrentUser && (
             <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -241,35 +262,47 @@ export const FeedMessage = memo(function FeedMessage({
             </div>
           )}
 
-          {/* Footer: Timestamp + Read indicator */}
+          {/* Footer: Reactions, Reply, Timestamp */}
           <div className={cn(
-            "flex items-center gap-1.5 mt-1.5 text-[11px]",
-            isCurrentUser 
-              ? "justify-end text-primary-foreground/60" 
-              : "justify-end text-muted-foreground"
+            "flex items-center gap-2 mt-1.5",
+            isCurrentUser ? "justify-end" : "justify-between"
           )}>
-            <span>{format(new Date(post.created_at), 'HH:mm')}</span>
-            {isCurrentUser && (
-              <CheckCheck className="h-3 w-3" />
-            )}
+            {/* Left side: Reactions + Reply button */}
+            <div className="flex items-center gap-1">
+              {allowReactions && (
+                <FeedReactions
+                  postId={post.id}
+                  reactionsCount={post.reactions_count || {}}
+                  userReactions={post.user_reactions || []}
+                  allowReactions={allowReactions}
+                />
+              )}
+              {onReply && (
+                <button
+                  onClick={() => onReply(post)}
+                  className={cn(
+                    "p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors",
+                    isCurrentUser ? "text-primary-foreground/60" : "text-muted-foreground"
+                  )}
+                >
+                  <Reply className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Right side: Timestamp + Read indicator */}
+            <div className={cn(
+              "flex items-center gap-1.5 text-[11px]",
+              isCurrentUser ? "text-primary-foreground/60" : "text-muted-foreground"
+            )}>
+              <span>{format(new Date(post.created_at), 'HH:mm')}</span>
+              {isCurrentUser && (
+                <CheckCheck className="h-3 w-3" />
+              )}
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Reactions - always show for adding/viewing */}
-      {allowReactions && (
-        <div className={cn(
-          "flex items-center gap-4 mt-1",
-          isCurrentUser ? "justify-end mr-2" : "ml-10"
-        )}>
-          <FeedReactions
-            postId={post.id}
-            reactionsCount={post.reactions_count || {}}
-            userReactions={post.user_reactions || []}
-            allowReactions={allowReactions}
-          />
-        </div>
-      )}
     </div>
   );
 });
