@@ -373,3 +373,106 @@ export function useMarkPostRead() {
     },
   });
 }
+
+// Channel summaries for channel list (last message + unread count per channel)
+export interface ChannelSummary {
+  lastMessage: {
+    content: string;
+    created_at: string;
+    display_name: string | null;
+    author?: {
+      full_name: string | null;
+    };
+  } | null;
+  unreadCount: number;
+}
+
+export function useChannelSummaries() {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['channel-summaries'],
+    queryFn: async () => {
+      if (!user) return {};
+
+      // Get all channels first
+      const { data: channels } = await supabase
+        .from('feed_channels')
+        .select('id');
+
+      if (!channels || channels.length === 0) return {};
+
+      const channelIds = channels.map(c => c.id);
+
+      // Fetch last message for each channel and unread counts in parallel
+      const [postsResult, readsResult] = await Promise.all([
+        supabase
+          .from('feed_posts')
+          .select('id, channel_id, content, created_at, display_name, author:profiles!feed_posts_author_id_fkey(full_name)')
+          .in('channel_id', channelIds)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('feed_post_reads')
+          .select('post_id')
+          .eq('user_id', user.id)
+      ]);
+
+      const posts = postsResult.data || [];
+      const reads = readsResult.data || [];
+      const readPostIds = new Set(reads.map(r => r.post_id));
+
+      // Build summaries per channel
+      const summaries: Record<string, ChannelSummary> = {};
+      
+      for (const channelId of channelIds) {
+        const channelPosts = posts.filter(p => p.channel_id === channelId);
+        const lastMessage = channelPosts[0] || null;
+        const unreadCount = channelPosts.filter(p => !readPostIds.has(p.id)).length;
+
+        summaries[channelId] = {
+          lastMessage: lastMessage ? {
+            content: lastMessage.content,
+            created_at: lastMessage.created_at,
+            display_name: lastMessage.display_name,
+            author: lastMessage.author as { full_name: string | null } | undefined,
+          } : null,
+          unreadCount,
+        };
+      }
+
+      return summaries;
+    },
+    enabled: !!user,
+    staleTime: 1000 * 30,
+  });
+}
+
+// Create a user post in a group channel
+export function useCreateUserPost() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ channelId, content }: { channelId: string; content: string }) => {
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('feed_posts')
+        .insert({
+          channel_id: channelId,
+          author_id: user.id,
+          content,
+          post_type: 'discussion',
+          is_system: false,
+          send_push: false,
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: (_, { channelId }) => {
+      queryClient.invalidateQueries({ queryKey: ['feed-posts', channelId] });
+      queryClient.invalidateQueries({ queryKey: ['channel-summaries'] });
+      queryClient.invalidateQueries({ queryKey: ['feed-unread-count'] });
+    },
+  });
+}
