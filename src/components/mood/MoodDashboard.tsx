@@ -219,8 +219,11 @@ export function MoodDashboard() {
           </div>
         </div>
 
-        {/* Bottom Action Bar */}
-        <div className="px-4 pb-8 pt-4">
+        {/* Bottom Action Bar with iOS safe area */}
+        <div 
+          className="shrink-0 px-4 pt-4"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
+        >
           <div className="flex items-center gap-3">
             {/* Stats Button */}
             <button
