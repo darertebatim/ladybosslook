@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionNav } from '@/components/app/profile/SectionNav';
 import { 
   LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell,
-  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, Trash2, AlertTriangle, Settings, PlayCircle
+  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, Trash2, AlertTriangle, Settings, PlayCircle, Headset
 } from 'lucide-react';
 import { NativeSettings, IOSSettings, AndroidSettings } from 'capacitor-native-settings';
 import {
@@ -77,7 +77,7 @@ const calculateMonthlyPresence = (entries: JournalEntry[]): number => {
 };
 
 const AppProfile = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, hasAdminAccess, canAccessAdminPage } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -1227,7 +1227,28 @@ const AppProfile = () => {
             </CardContent>
           </Card>
 
-          {/* Push Notifications Card - Native Only */}
+          {/* Admin Support Inbox - Only visible for staff with support access */}
+          {canAccessAdminPage('support') && (
+            <Card className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Admin Tools
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => navigate('/app/support')}
+                >
+                  <Headset className="mr-2 h-4 w-4" />
+                  Support Inbox
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
           {showNativeSettings && (
             <Card ref={pushNotificationsRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
               <CardHeader className="pb-2">
