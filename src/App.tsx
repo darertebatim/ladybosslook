@@ -35,7 +35,8 @@ const AppPlayer = lazy(() => import("@/pages/app/AppPlayer"));
 const AppPlaylistDetail = lazy(() => import("@/pages/app/AppPlaylistDetail"));
 const AppAudioPlayer = lazy(() => import("@/pages/app/AppAudioPlayer"));
 const AppChat = lazy(() => import("@/pages/app/AppChat"));
-const AppFeed = lazy(() => import("@/pages/app/AppFeed"));
+const AppChannelsList = lazy(() => import("@/pages/app/AppChannelsList"));
+const AppChannelDetail = lazy(() => import("@/pages/app/AppChannelDetail"));
 const AppFeedPost = lazy(() => import("@/pages/app/AppFeedPost"));
 const AppJournal = lazy(() => import("@/pages/app/AppJournal"));
 const AppJournalEntry = lazy(() => import("@/pages/app/AppJournalEntry"));
@@ -331,7 +332,8 @@ const App = () => (
                     <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />
                     <Route path="player/:audioId" element={<AppAudioPlayer />} />
                     <Route path="chat" element={<AppChat />} />
-                    <Route path="channels" element={<AppFeed />} />
+                    <Route path="channels" element={<AppChannelsList />} />
+                    <Route path="channels/:slug" element={<AppChannelDetail />} />
                     {/* Redirect old feed route */}
                     <Route path="feed" element={<Navigate to="/app/channels" replace />} />
                     <Route path="journal" element={<AppJournal />} />
