@@ -12,9 +12,10 @@ interface ChannelChatInputProps {
   replyTo?: FeedPost | null;
   onCancelReply?: () => void;
   onKeyboardChange?: (isOpen: boolean) => void;
+  onMessageSent?: () => void;
 }
 
-export function ChannelChatInput({ channelId, replyTo, onCancelReply, onKeyboardChange }: ChannelChatInputProps) {
+export function ChannelChatInput({ channelId, replyTo, onCancelReply, onKeyboardChange, onMessageSent }: ChannelChatInputProps) {
   const [content, setContent] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,6 +70,8 @@ export function ChannelChatInput({ channelId, replyTo, onCancelReply, onKeyboard
         if (textareaRef.current) {
           textareaRef.current.focus();
         }
+        // Notify parent to scroll to bottom after sending
+        onMessageSent?.();
       });
     } catch (error: any) {
       console.error('Failed to send message:', error);

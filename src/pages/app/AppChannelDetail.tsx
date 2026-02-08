@@ -401,6 +401,7 @@ export default function AppChannelDetail() {
           replyTo={replyTo}
           onCancelReply={() => setReplyTo(null)}
           onKeyboardChange={handleKeyboardChange}
+          onMessageSent={scrollToBottomSmooth}
         />
       )}
     </div>
