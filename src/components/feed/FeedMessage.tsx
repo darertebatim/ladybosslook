@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { detectVideoType, getVideoEmbedUrl } from '@/lib/videoUtils';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { useAuth } from '@/hooks/useAuth';
+import appIcon from '@/assets/app-icon.png';
 
 interface FeedMessageProps {
   post: FeedPost;
@@ -78,8 +79,8 @@ export const FeedMessage = memo(function FeedMessage({
         {!isCurrentUser && (
           !isFollowUp ? (
             <Avatar className="h-8 w-8 shrink-0">
-              {isSystemMessage ? (
-                <AvatarImage src="/lovable-uploads/2b5ed3ea-9c87-4ea0-8dba-7ccf2da22dd1.png" />
+            {isSystemMessage ? (
+                <AvatarImage src={appIcon} alt="Simora" />
               ) : (
                 <AvatarImage src={post.author?.avatar_url || undefined} />
               )}
