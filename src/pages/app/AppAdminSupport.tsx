@@ -3,8 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { ChatConversationList } from "@/components/admin/ChatConversationList";
 import { ChatPanel } from "@/components/admin/ChatPanel";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface Conversation {
   id: string;
@@ -22,6 +22,7 @@ interface Conversation {
 
 export default function AppAdminSupport() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(true);
@@ -121,49 +122,76 @@ export default function AppAdminSupport() {
     setSelectedConversation(null);
   };
 
+  const handleBack = () => {
+    if (selectedConversation) {
+      handleBackToList();
+    } else {
+      // Navigate back to profile or previous page
+      const from = (location.state as any)?.from;
+      if (from) {
+        navigate(from);
+      } else {
+        navigate('/app/profile');
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col h-[100dvh] bg-background">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 safe-area-top">
+      {/* iOS-style Header with safe area */}
+      <div 
+        className="flex items-center gap-2 px-2 py-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 8px)" }}
+      >
         <Button 
           variant="ghost" 
-          size="icon" 
-          onClick={selectedConversation ? handleBackToList : () => navigate(-1)}
+          size="sm"
+          className="h-10 px-2 gap-1 text-primary hover:text-primary active:scale-95"
+          onClick={handleBack}
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ChevronLeft className="h-5 w-5" />
+          <span className="text-[17px]">
+            {selectedConversation ? 'Inbox' : 'Back'}
+          </span>
         </Button>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-lg font-semibold truncate">
+        <div className="flex-1 min-w-0 text-center pr-12">
+          <h1 className="text-[17px] font-semibold truncate">
             {selectedConversation 
               ? (selectedConversation.profiles?.full_name || 'Unknown User')
               : 'Support Inbox'
             }
           </h1>
-          <p className="text-xs text-muted-foreground truncate">
-            {selectedConversation 
-              ? selectedConversation.profiles?.email 
-              : `${conversations.length} conversations`
-            }
-          </p>
+          {selectedConversation && (
+            <p className="text-[11px] text-muted-foreground truncate">
+              {selectedConversation.profiles?.email}
+            </p>
+          )}
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-hidden">
+      {/* Content with proper overflow handling */}
+      <div className="flex-1 overflow-hidden flex flex-col">
         {selectedConversation ? (
           <ChatPanel 
             conversation={selectedConversation} 
             onStatusChange={fetchConversations}
           />
         ) : (
-          <ChatConversationList
-            conversations={conversations}
-            selectedId={null}
-            onSelect={handleSelectConversation}
-            loading={loading}
-          />
+          <div className="flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <ChatConversationList
+              conversations={conversations}
+              selectedId={null}
+              onSelect={handleSelectConversation}
+              loading={loading}
+            />
+          </div>
         )}
       </div>
+
+      {/* Safe area bottom spacer for list view */}
+      {!selectedConversation && (
+        <div className="shrink-0" style={{ height: "env(safe-area-inset-bottom)" }} />
+      )}
     </div>
   );
 }
