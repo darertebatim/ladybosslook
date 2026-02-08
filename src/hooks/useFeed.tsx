@@ -34,6 +34,7 @@ export interface FeedPost {
   is_system: boolean;
   send_push: boolean;
   display_name: string | null;
+  reply_to_post_id: string | null;
   created_at: string;
   updated_at: string;
   author?: {
@@ -453,7 +454,7 @@ export function useCreateUserPost() {
   const { user } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ channelId, content }: { channelId: string; content: string }) => {
+    mutationFn: async ({ channelId, content, replyToPostId }: { channelId: string; content: string; replyToPostId?: string }) => {
       if (!user) throw new Error('Not authenticated');
 
       const { error } = await supabase
@@ -465,6 +466,7 @@ export function useCreateUserPost() {
           post_type: 'discussion',
           is_system: false,
           send_push: false,
+          reply_to_post_id: replyToPostId || null,
         });
 
       if (error) throw error;

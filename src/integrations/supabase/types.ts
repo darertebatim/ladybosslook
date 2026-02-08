@@ -1011,6 +1011,7 @@ export type Database = {
           is_pinned: boolean
           is_system: boolean
           post_type: string
+          reply_to_post_id: string | null
           send_push: boolean
           title: string | null
           updated_at: string
@@ -1031,6 +1032,7 @@ export type Database = {
           is_pinned?: boolean
           is_system?: boolean
           post_type?: string
+          reply_to_post_id?: string | null
           send_push?: boolean
           title?: string | null
           updated_at?: string
@@ -1051,6 +1053,7 @@ export type Database = {
           is_pinned?: boolean
           is_system?: boolean
           post_type?: string
+          reply_to_post_id?: string | null
           send_push?: boolean
           title?: string | null
           updated_at?: string
@@ -1069,6 +1072,13 @@ export type Database = {
             columns: ["channel_id"]
             isOneToOne: false
             referencedRelation: "feed_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feed_posts_reply_to_post_id_fkey"
+            columns: ["reply_to_post_id"]
+            isOneToOne: false
+            referencedRelation: "feed_posts"
             referencedColumns: ["id"]
           },
         ]

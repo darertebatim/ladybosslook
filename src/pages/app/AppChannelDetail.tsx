@@ -27,6 +27,7 @@ export default function AppChannelDetail() {
   
   const bottomRef = useRef<HTMLDivElement>(null);
   const hasScrolledRef = useRef(false);
+  const [replyTo, setReplyTo] = useState<FeedPost | null>(null);
   
   const { data: channels, isLoading: channelsLoading } = useChannels();
   
@@ -39,6 +40,12 @@ export default function AppChannelDetail() {
 
   // Subscribe to real-time updates for this channel
   useFeedRealtime(selectedChannelId || undefined);
+
+  // Build a map of posts by ID for reply lookups
+  const postsById = useMemo(() => {
+    if (!posts) return new Map<string, FeedPost>();
+    return new Map(posts.map(p => [p.id, p]));
+  }, [posts]);
 
   // Scroll to bottom when posts load (only first time)
   useEffect(() => {
@@ -206,6 +213,8 @@ export default function AppChannelDetail() {
                     post={post}
                     allowReactions={selectedChannel.allow_reactions}
                     isFollowUp={post.isFollowUp}
+                    onReply={isGroupChat ? setReplyTo : undefined}
+                    replyToPost={post.reply_to_post_id ? postsById.get(post.reply_to_post_id) : null}
                   />
                 ))}
               </div>
@@ -226,7 +235,11 @@ export default function AppChannelDetail() {
 
       {/* Chat input for group channels */}
       {isGroupChat && selectedChannelId && (
-        <ChannelChatInput channelId={selectedChannelId} />
+        <ChannelChatInput 
+          channelId={selectedChannelId} 
+          replyTo={replyTo}
+          onCancelReply={() => setReplyTo(null)}
+        />
       )}
     </div>
   );
