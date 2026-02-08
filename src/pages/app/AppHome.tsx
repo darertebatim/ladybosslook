@@ -1,3 +1,4 @@
+// AppHome - Main home page component
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
@@ -51,6 +52,7 @@ const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
   silver: coinSilver,
   gold: coinGold,
 };
+
 const AppHome = () => {
   const navigate = useNavigate();
   const {
@@ -492,7 +494,8 @@ const AppHome = () => {
     activeRounds = [],
     nextSessionMap = new Map()
   } = homeData || {};
-  return <>
+  return (
+    <>
       <SEOHead title="Home - LadyBoss" description="Your personal dashboard and planner" />
       
       <div className="flex flex-col h-full overflow-hidden bg-background">
@@ -914,7 +917,13 @@ const AppHome = () => {
           />
         )}
 
-        {user && showNotificationFlow && <PushNotificationOnboarding userId={user.id} onComplete={() => setShowNotificationFlow(false)} onSkip={() => setShowNotificationFlow(false)} />}
+        {user && showNotificationFlow && (
+          <PushNotificationOnboarding 
+            userId={user.id} 
+            onComplete={() => setShowNotificationFlow(false)} 
+            onSkip={() => setShowNotificationFlow(false)} 
+          />
+        )}
 
         {/* New Interactive Home Tour */}
         <HomeTour 
