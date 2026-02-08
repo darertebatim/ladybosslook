@@ -526,7 +526,7 @@ export default function AppChat() {
               <div>
                 <h1 className="font-semibold text-[17px]">Support</h1>
                 <p className="text-[13px] text-muted-foreground">
-                  {conversation?.status === 'resolved' ? 'Resolved' : 'Usually replies within hours'}
+                  {conversation?.status === 'resolved' ? 'Resolved' : 'This conversation is private'}
                 </p>
               </div>
             </div>
