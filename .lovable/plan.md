@@ -1,181 +1,140 @@
 
-# Community Channels Redesign - Telegram/WhatsApp Style
+# Admin Channels Overhaul Plan
 
-## Current Problem
+This plan redesigns the admin community page into a full-featured channel management system with chat-style message viewing and enhanced admin controls.
 
-1. **Twitter-like tab interface**: The horizontal tabs with "All" and hashtags are confusing for users who are familiar with Telegram/WhatsApp
-2. **Mixed UX patterns**: Posts have replies (comments) which creates a hybrid between announcement channels and group chats
-3. **No clear entry point**: Users land directly into a combined feed view, not a list of channels to choose from
+## Overview
 
-## Proposed Solution
+We're making three key changes:
+1. Rename route from `/admin/community` to `/admin/channels`
+2. Add emoji/picture cover selection for channels
+3. Replace the "History" tab with a chat-style view matching the app, with admin controls (delete all messages, pin, edit)
 
-Transform the community feature into a **Telegram-style experience**:
+---
 
-```text
-+-----------------------------+
-|  Community                  |
-+-----------------------------+
-| [Channel Card]              |
-|   Announcements (General)   |
-|   Latest: Hey everyone...   |
-|   2 unread                  |
-+-----------------------------+
-| [Channel Card]              |
-|   Premium Members           |
-|   Latest: New content...    |
-|   5 unread                  |
-+-----------------------------+
-| [Channel Card]              |
-|   Round 12 Group            |
-|   Latest: Who's joining...  |
-|   Chat enabled              |
-+-----------------------------+
+## Changes Summary
+
+### 1. Route Change: `/admin/community` to `/admin/channels`
+
+**Files to modify:**
+- `src/App.tsx` - Update route path
+- `src/components/admin/AdminNav.tsx` - Update nav menu URL and title
+- `src/pages/admin/Community.tsx` - Rename file to `Channels.tsx` and update header text
+
+### 2. Channel Cover (Emoji or Image)
+
+**Database:** The `feed_channels` table already has a `cover_image_url` column.
+
+**UI Changes in `FeedChannelManager.tsx`:**
+- Add emoji picker button using existing `EmojiPicker` component
+- Add image upload option using existing `ImageUploader` component  
+- Store emoji as a special value (e.g., `emoji:☀️`) or image URL
+- Display cover in channel cards with 3D Fluent Emoji rendering
+
+**Form fields:**
+```
+Cover Type: [Emoji] [Image] [None]
+├─ Emoji selected → Show emoji picker button
+└─ Image selected → Show ImageUploader component
 ```
 
-When a channel is selected, it opens a **full-screen chat view** like Telegram:
+### 3. Chat-Style Channel View (Replacing "History" Tab)
 
-- **Broadcast channels** (allow_comments: false): Admin messages only, users can only react
-- **Group channels** (allow_comments: true): Real-time chat experience where users can send messages
+**New component:** `AdminChannelChat.tsx`
 
-## Implementation Plan
+This replaces the current `FeedPostsList` card-based view with a chat interface similar to `AppChannelDetail.tsx`, but with admin controls.
 
-### Phase 1: Create Channel List Page (New)
+**Features:**
+- Channel selector dropdown at top
+- Chat messages displayed like the app (using `FeedMessage` component styling)
+- Date separators between message groups
+- Scroll to bottom behavior
 
-**New file: `src/pages/app/AppChannelsList.tsx`**
+**Admin controls on every message:**
+- **Delete** - Remove any message (not just user's own)
+- **Pin/Unpin** - Toggle pinned status
+- **Edit** - Open edit dialog for admin/announcement posts
 
-- Displays all channels the user has access to as a list of cards
-- Each card shows:
-  - Channel icon (based on type: megaphone for general, graduation cap for program, etc.)
-  - Channel name
-  - Last message preview (truncated)
-  - Unread count badge
-  - Timestamp of last message
-  - "Chat" indicator if comments are enabled
-- Tapping a channel navigates to the channel detail page
-- Pull-to-refresh support
-- Real-time updates for unread counts
-
-### Phase 2: Refactor Channel Detail Page
-
-**Modify: `src/pages/app/AppFeed.tsx`** (rename to `AppChannelDetail.tsx`)
-
-Transform from a feed with tabs to a **single-channel chat view**:
-
-- Remove the horizontal channel tabs completely
-- Full-screen chat experience for the selected channel
-- Header shows channel name and back button to channel list
-- Messages displayed in Telegram-style bubbles (already done)
-- **If allow_comments is true**: Show chat input at bottom for user messages
-- **If allow_comments is false**: Only show reactions, no input bar (broadcast mode)
-
-### Phase 3: Update Routing
-
-**Modify: `src/App.tsx`**
-
-```text
-/app/channels         -> AppChannelsList (new channel list)
-/app/channels/:slug   -> AppChannelDetail (single channel view)
-/app/channels/post/:postId -> AppFeedPost (post detail/thread)
+**UI Layout:**
+```
+┌─────────────────────────────────────┐
+│ [Channel Dropdown ▼]                │
+├─────────────────────────────────────┤
+│        ── Today ──                  │
+│                                     │
+│ [Avatar] Simora              12:30  │
+│ ┌─────────────────────────┐         │
+│ │ Welcome to the channel! │ [⋮]    │
+│ └─────────────────────────┘         │
+│                                     │
+│ [Avatar] Ali Lotfi           14:22  │
+│ ┌─────────────────────────┐         │
+│ │ Thanks for the update!  │ [⋮]    │
+│ └─────────────────────────┘         │
+│                                     │
+└─────────────────────────────────────┘
 ```
 
-### Phase 4: Database Changes
+**Message actions menu (⋮):**
+- Pin / Unpin
+- Edit (for admin posts only)
+- Delete
 
-**Add column to `feed_posts` table:**
+---
 
-- `user_id` (uuid, nullable) - Allow regular users to post messages in group channels
+## Tab Structure (Updated)
 
-**New RLS policy:**
+```
+Channels Admin Page
+├── Tab: "New Message" (compose) 
+├── Tab: "Messages" (new chat view - replaces "History")
+├── Tab: "Journals" (unchanged)
+└── Tab: "Settings" (rename from "Channels" - channel management)
+```
 
-- Users can INSERT posts in channels where `allow_comments = true`
-- Posts from users are automatically `post_type = 'discussion'`
+---
 
-### Phase 5: Update Admin Composer
+## Technical Details
 
-**Modify: `src/components/admin/FeedChatComposer.tsx`**
-
-- Add option to enable "Group Chat Mode" for channels
-- When group chat is enabled, the channel becomes a two-way conversation
-
-### Phase 6: Component Changes
-
-**New file: `src/components/feed/ChannelCard.tsx`**
-
-- Reusable card component for the channel list
-- Shows channel info, last message, unread count
-
-**Modify: `src/components/feed/FeedMessage.tsx`**
-
-- Add support for user-authored messages (not just admin)
-- Different bubble styling for user vs admin messages
-
-**Modify: `src/hooks/useFeed.tsx`**
-
-- Add `useChannelUnreadCounts()` hook for channel list badges
-- Add `useLatestChannelMessages()` for preview text
-- Add `useCreateUserPost()` mutation for group chat mode
-
-**New file: `src/components/feed/ChannelChatInput.tsx`**
-
-- Chat input component for group channels
-- Similar to existing `FeedReplyInput` but for top-level posts
-
-### Phase 7: Navigation Updates
-
-**Modify: `src/layouts/NativeAppLayout.tsx`**
-
-- Update tab bar to point to `/app/channels` (channel list)
-
-**Modify: `src/components/app/HomeMenu.tsx`**
-
-- Update menu item to point to channel list
-
-## Files to Create/Modify
+### File Changes
 
 | File | Action |
 |------|--------|
-| `src/pages/app/AppChannelsList.tsx` | Create |
-| `src/pages/app/AppChannelDetail.tsx` | Create (from refactored AppFeed) |
-| `src/pages/app/AppFeed.tsx` | Delete or redirect |
-| `src/components/feed/ChannelCard.tsx` | Create |
-| `src/components/feed/ChannelChatInput.tsx` | Create |
-| `src/components/feed/FeedChannelTabs.tsx` | Delete (no longer needed) |
-| `src/hooks/useFeed.tsx` | Modify (add new hooks) |
-| `src/App.tsx` | Modify (update routes) |
-| Database migration | Add user_id column, RLS policies |
+| `src/App.tsx` | Change route `community` → `channels` |
+| `src/components/admin/AdminNav.tsx` | Update URL and label to "Channels" |
+| `src/pages/admin/Community.tsx` | Rename to `Channels.tsx`, update title |
+| `src/components/admin/FeedChannelManager.tsx` | Add emoji/image cover selector |
+| `src/components/admin/FeedPostsList.tsx` | Refactor into chat-style `AdminChannelChat.tsx` |
+| New: `src/components/admin/AdminChannelChat.tsx` | Chat-style message list with admin controls |
 
-## UX Flow
+### Cover Storage Format
 
-```text
-1. User taps "Channels" tab
-   |
-   v
-2. AppChannelsList - Shows all accessible channels
-   - Announcements (General)     [3 unread]
-   - Premium Content             [1 unread]  
-   - Round 12 Group              [Chat]
-   |
-   v
-3. User taps "Round 12 Group"
-   |
-   v
-4. AppChannelDetail - Full chat experience
-   - Header: "Round 12 Group" + back button
-   - Messages in chronological order
-   - Chat input at bottom (group mode)
-   - OR just reactions (broadcast mode)
+The `cover_image_url` column will store:
+- Image URL: `https://...` (standard URL)
+- Emoji: `emoji:☀️` (prefixed to distinguish from URLs)
+
+Helper functions to detect type:
+```typescript
+const isEmojiCover = (url: string) => url?.startsWith('emoji:');
+const getEmojiFromCover = (url: string) => url?.replace('emoji:', '');
 ```
 
-## Benefits
+### Admin Message Controls
 
-1. **Familiar UX**: Users understand channel lists from Telegram/WhatsApp
-2. **Clear separation**: Each channel is its own space
-3. **Flexible modes**: Broadcast channels vs Group chat channels
-4. **Better engagement**: Group channels encourage real-time discussion
-5. **Cleaner navigation**: No confusing tabs or hashtags
+Each message will have a dropdown menu with:
+```typescript
+const adminActions = [
+  { label: post.is_pinned ? 'Unpin' : 'Pin', action: togglePin },
+  { label: 'Edit', action: openEditDialog, show: !isUserPost },
+  { label: 'Delete', action: confirmDelete, destructive: true },
+];
+```
 
-## Technical Notes
+### Reusing App Components
 
-- Real-time subscriptions already exist (`useFeedRealtime`)
-- Chat UI patterns already implemented in `AppChat.tsx`
-- Message grouping by date/author already works
-- Can reuse existing components for the chat experience
+We'll adapt patterns from:
+- `AppChannelDetail.tsx` - Message grouping by date, scroll behavior
+- `FeedMessage.tsx` - Message bubble styling (will wrap with admin controls)
+- `EmojiPicker.tsx` - For channel emoji selection
+- `ImageUploader.tsx` - For channel cover image upload
+- `FluentEmoji.tsx` - For rendering 3D emoji covers
