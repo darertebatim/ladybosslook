@@ -2,7 +2,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
-import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart, Smile } from 'lucide-react';
+import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart, Sun } from 'lucide-react';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
 import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate, useSetStreakGoal } from '@/hooks/useTaskPlanner';
@@ -542,7 +542,7 @@ const AppHome = () => {
                 }}
                 className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
               >
-                <Smile className="h-4 w-4 text-violet-600" />
+                <Sun className="h-4 w-4 text-violet-600" />
               </button>
               
               {/* Streak badge - navigates to presence page */}
