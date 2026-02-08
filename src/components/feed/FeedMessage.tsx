@@ -256,8 +256,8 @@ export const FeedMessage = memo(function FeedMessage({
         </div>
       </div>
 
-      {/* Reactions - outside the bubble */}
-      {Object.keys(post.reactions_count || {}).length > 0 && (
+      {/* Reactions - always show for adding/viewing */}
+      {allowReactions && (
         <div className={cn(
           "flex items-center gap-4 mt-1",
           isCurrentUser ? "justify-end mr-2" : "ml-10"
