@@ -64,19 +64,48 @@ export const FeedMessage = memo(function FeedMessage({
     setShowDeleteConfirm(false);
   };
 
-  // Get a consistent color index for a user based on their ID
-  const getUserColorIndex = (authorId: string | null): number => {
-    if (!authorId) return 0;
+  // Get a consistent color class for a user based on their ID
+  const getUserColorClass = (authorId: string | null): string => {
+    if (!authorId) return 'bg-muted text-muted-foreground';
     // Simple hash to get a number from the UUID
     let hash = 0;
     for (let i = 0; i < authorId.length; i++) {
       hash = ((hash << 5) - hash) + authorId.charCodeAt(i);
       hash = hash & hash; // Convert to 32bit integer
     }
-    return Math.abs(hash) % 6 + 1; // Returns 1-6
+    const colorIndex = Math.abs(hash) % 5;
+    // Use existing palette colors
+    const colors = [
+      'bg-primary text-primary-foreground',        // Black/dark
+      'bg-destructive text-destructive-foreground', // Red
+      'bg-success text-success-foreground',         // Green
+      'bg-muted-foreground text-background',        // Gray
+      'bg-foreground/70 text-background',           // Dark gray
+    ];
+    return colors[colorIndex];
   };
 
-  const bubbleColorIndex = getUserColorIndex(post.author_id);
+  // Get border color class for message bubbles
+  const getBorderColorClass = (authorId: string | null): string => {
+    if (!authorId) return 'border-l-muted-foreground';
+    let hash = 0;
+    for (let i = 0; i < authorId.length; i++) {
+      hash = ((hash << 5) - hash) + authorId.charCodeAt(i);
+      hash = hash & hash;
+    }
+    const colorIndex = Math.abs(hash) % 5;
+    const borderColors = [
+      'border-l-primary',
+      'border-l-destructive',
+      'border-l-success',
+      'border-l-muted-foreground',
+      'border-l-foreground/70',
+    ];
+    return borderColors[colorIndex];
+  };
+
+  const avatarColorClass = getUserColorClass(post.author_id);
+  const borderColorClass = getBorderColorClass(post.author_id);
 
   // Dynamic border radius based on message type (Telegram-style)
   const getBubbleRadius = () => {
@@ -87,18 +116,6 @@ export const FeedMessage = memo(function FeedMessage({
       // Admin/other user messages on left - tail on left
       return "rounded-2xl rounded-tl-md";
     }
-  };
-
-  // Get bubble background style based on message type
-  const getBubbleStyle = () => {
-    if (isCurrentUser) {
-      return { backgroundColor: 'hsl(var(--chat-bubble-user))' };
-    }
-    if (isSystemMessage) {
-      return { backgroundColor: 'hsl(var(--chat-bubble-system))' };
-    }
-    // Other users get colors 1-6 based on their ID
-    return { backgroundColor: `hsl(var(--chat-bubble-${bubbleColorIndex}))` };
   };
 
   return (
@@ -127,13 +144,13 @@ export const FeedMessage = memo(function FeedMessage({
         {/* Avatar - hidden for follow-up messages and current user */}
         {!isCurrentUser && (
           !isFollowUp ? (
-            <Avatar className="h-8 w-8 shrink-0">
-            {isSystemMessage ? (
+            <Avatar className="h-8 w-8 shrink-0 ring-2 ring-offset-1 ring-offset-background ring-border">
+              {isSystemMessage ? (
                 <AvatarImage src={appIcon} alt="Simora" />
               ) : (
                 <AvatarImage src={post.author?.avatar_url || undefined} />
               )}
-              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+              <AvatarFallback className={cn("text-xs font-semibold", avatarColorClass)}>
                 {senderName.charAt(0)}
               </AvatarFallback>
             </Avatar>
@@ -148,10 +165,13 @@ export const FeedMessage = memo(function FeedMessage({
             "flex-1 min-w-0 max-w-[80%]",
             getBubbleRadius(),
             "shadow-sm px-3.5 py-2.5 text-foreground",
+            // Neutral background with colored left border for non-current users
+            isCurrentUser 
+              ? "bg-primary text-primary-foreground" 
+              : cn("bg-card border-l-4", isSystemMessage ? "border-l-primary" : borderColorClass),
             // Align bubbles
             isCurrentUser && "ml-auto"
           )}
-          style={getBubbleStyle()}
         >
           {/* Reply preview - if this message is a reply */}
           {replyToPost && (
@@ -211,8 +231,7 @@ export const FeedMessage = memo(function FeedMessage({
           {isVoiceMessage && post.content && (
             <p 
               className={cn(
-                "text-sm mt-2",
-                isCurrentUser ? "text-primary-foreground/80" : "text-muted-foreground",
+                "text-sm mt-2 opacity-80",
                 bilingualClassName
               )}
               dir={direction}
