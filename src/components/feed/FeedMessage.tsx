@@ -72,7 +72,7 @@ export const FeedMessage = memo(function FeedMessage({
       )}
 
       <div className={cn(
-        "flex gap-2",
+        "flex gap-2 items-end",
         isCurrentUser && "flex-row-reverse"
       )}>
         {/* Avatar - hidden for follow-up messages and current user */}
