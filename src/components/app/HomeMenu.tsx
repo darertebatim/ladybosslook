@@ -90,7 +90,7 @@ export function HomeMenu({ onStartTour }: HomeMenuProps) {
           <Menu className="h-5 w-5" />
         </button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[260px] p-0 overflow-y-auto">
+      <SheetContent side="left" className="w-[260px] p-0 overflow-y-auto" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <SheetHeader className="p-4 pb-3 border-b border-border/40">
           <SheetTitle className="text-left text-base font-semibold">Menu</SheetTitle>
         </SheetHeader>
