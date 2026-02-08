@@ -45,6 +45,20 @@ export const FeedMessage = memo(function FeedMessage({
   // Detect Persian text for proper font and direction
   const { direction, className: bilingualClassName } = useBilingualText(post.content || '');
 
+  // Get a consistent color index for a user based on their ID
+  const getUserColorIndex = (authorId: string | null): number => {
+    if (!authorId) return 0;
+    // Simple hash to get a number from the UUID
+    let hash = 0;
+    for (let i = 0; i < authorId.length; i++) {
+      hash = ((hash << 5) - hash) + authorId.charCodeAt(i);
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash) % 6 + 1; // Returns 1-6
+  };
+
+  const bubbleColorIndex = getUserColorIndex(post.author_id);
+
   // Dynamic border radius based on message type (Telegram-style)
   const getBubbleRadius = () => {
     if (isCurrentUser) {
@@ -54,6 +68,18 @@ export const FeedMessage = memo(function FeedMessage({
       // Admin/other user messages on left - tail on left
       return "rounded-2xl rounded-tl-md";
     }
+  };
+
+  // Get bubble background style based on message type
+  const getBubbleStyle = () => {
+    if (isCurrentUser) {
+      return { backgroundColor: 'hsl(var(--chat-bubble-user))' };
+    }
+    if (isSystemMessage) {
+      return { backgroundColor: 'hsl(var(--chat-bubble-system))' };
+    }
+    // Other users get colors 1-6 based on their ID
+    return { backgroundColor: `hsl(var(--chat-bubble-${bubbleColorIndex}))` };
   };
 
   return (
@@ -98,31 +124,23 @@ export const FeedMessage = memo(function FeedMessage({
         )}
 
         {/* Message bubble */}
-        <div className={cn(
-          "flex-1 min-w-0 max-w-[80%]",
-          getBubbleRadius(),
-          "shadow-sm px-3.5 py-2.5",
-          // Different colors for user vs admin/others
-          isCurrentUser 
-            ? "bg-primary text-primary-foreground" 
-            : isSystemMessage
-              ? "bg-card border border-border/50"
-              : "bg-muted/80",
-          // Align bubbles
-          isCurrentUser && "ml-auto"
-        )}>
+        <div 
+          className={cn(
+            "flex-1 min-w-0 max-w-[80%]",
+            getBubbleRadius(),
+            "shadow-sm px-3.5 py-2.5 text-foreground",
+            // Align bubbles
+            isCurrentUser && "ml-auto"
+          )}
+          style={getBubbleStyle()}
+        >
           {/* Reply preview - if this message is a reply */}
           {replyToPost && (
-            <div className={cn(
-              "mb-2 pl-2 border-l-2 rounded-sm text-xs",
-              isCurrentUser 
-                ? "border-primary-foreground/40 text-primary-foreground/70" 
-                : "border-primary/50 text-muted-foreground"
-            )}>
-              <div className="font-medium truncate">
+            <div className="mb-2 pl-2 border-l-2 border-foreground/30 rounded-sm text-xs">
+              <div className="font-medium truncate text-foreground/80">
                 {replyToPost.display_name || replyToPost.author?.full_name || 'Simora'}
               </div>
-              <div className="truncate opacity-80">
+              <div className="truncate text-foreground/60">
                 {replyToPost.content?.slice(0, 50)}{replyToPost.content && replyToPost.content.length > 50 ? '...' : ''}
               </div>
             </div>
@@ -280,10 +298,7 @@ export const FeedMessage = memo(function FeedMessage({
               {onReply && (
                 <button
                   onClick={() => onReply(post)}
-                  className={cn(
-                    "p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors",
-                    isCurrentUser ? "text-primary-foreground/60" : "text-muted-foreground"
-                  )}
+                  className="p-1 rounded-full hover:bg-black/10 transition-colors text-foreground/50"
                 >
                   <Reply className="h-4 w-4" />
                 </button>
@@ -291,13 +306,10 @@ export const FeedMessage = memo(function FeedMessage({
             </div>
 
             {/* Right side: Timestamp + Read indicator */}
-            <div className={cn(
-              "flex items-center gap-1.5 text-[11px]",
-              isCurrentUser ? "text-primary-foreground/60" : "text-muted-foreground"
-            )}>
+            <div className="flex items-center gap-1.5 text-[11px] text-foreground/50">
               <span>{format(new Date(post.created_at), 'HH:mm')}</span>
               {isCurrentUser && (
-                <CheckCheck className="h-3 w-3" />
+                <CheckCheck className="h-3 w-3 text-success" />
               )}
             </div>
           </div>
