@@ -7,7 +7,8 @@ import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, User, Mail, Calendar, BookOpen, CheckCircle } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Loader2, User, Mail, Calendar, BookOpen } from "lucide-react";
 import { format } from "date-fns";
 
 interface Message {
@@ -257,6 +258,62 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
     }
   };
 
+  // User Info Panel Content
+  const UserInfoContent = () => (
+    <div className="space-y-4">
+      {/* Profile */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 text-sm">
+          <User className="h-4 w-4 text-muted-foreground" />
+          <span className="truncate">{conversation?.profiles?.full_name || 'No name'}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Mail className="h-4 w-4 text-muted-foreground" />
+          <span className="truncate text-xs">{conversation?.profiles?.email}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Calendar className="h-4 w-4 text-muted-foreground" />
+          <span className="text-xs">Joined {conversation && format(new Date(conversation.created_at), 'MMM d, yyyy')}</span>
+        </div>
+      </div>
+
+      {/* Enrollments */}
+      {userContext?.enrollments && userContext.enrollments.length > 0 && (
+        <div>
+          <h4 className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
+            <BookOpen className="h-3 w-3" />
+            Enrollments
+          </h4>
+          <div className="space-y-1">
+            {userContext.enrollments.map((e, i) => (
+              <div key={i} className="text-xs p-2 bg-background rounded border">
+                <p className="font-medium truncate">{e.course_name}</p>
+                <Badge variant="outline" className="text-[10px] mt-1">
+                  {e.status}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recent Orders */}
+      {userContext?.orders && userContext.orders.length > 0 && (
+        <div>
+          <h4 className="text-xs font-medium text-muted-foreground mb-2">Recent Orders</h4>
+          <div className="space-y-1">
+            {userContext.orders.map((o, i) => (
+              <div key={i} className="text-xs p-2 bg-background rounded border">
+                <p className="font-medium truncate">{o.product_name}</p>
+                <p className="text-muted-foreground">${(o.amount / 100).toFixed(2)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   if (!conversation) {
     return (
       <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -280,7 +337,7 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
           </div>
           <div className="flex items-center gap-2">
             <Select value={conversation.status} onValueChange={handleStatusChange}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-28 h-9">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -289,16 +346,23 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
                 <SelectItem value="resolved">Resolved</SelectItem>
               </SelectContent>
             </Select>
-            {conversation.status !== 'resolved' && (
-              <Button 
-                size="sm" 
-                variant="outline"
-                onClick={() => handleStatusChange('resolved')}
-              >
-                <CheckCircle className="h-4 w-4 mr-1" />
-                Resolve
-              </Button>
-            )}
+            
+            {/* User Info Button - Sheet for mobile */}
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="lg:hidden h-9 w-9">
+                  <User className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-72">
+                <SheetHeader>
+                  <SheetTitle>User Info</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">
+                  <UserInfoContent />
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
 
@@ -329,20 +393,22 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
           )}
         </div>
 
-        {/* Quick Replies */}
-        <div className="px-4 py-2 border-t flex gap-2 flex-wrap">
-          {QUICK_REPLIES.map((reply, i) => (
-            <Button
-              key={i}
-              variant="outline"
-              size="sm"
-              className="text-xs"
-              onClick={() => handleQuickReply(reply)}
-              disabled={sending}
-            >
-              {reply.substring(0, 30)}...
-            </Button>
-          ))}
+        {/* Quick Replies - Horizontal Scroll */}
+        <div className="px-4 py-2 border-t overflow-x-auto">
+          <div className="flex gap-2 min-w-max">
+            {QUICK_REPLIES.map((reply, i) => (
+              <Button
+                key={i}
+                variant="outline"
+                size="sm"
+                className="text-xs whitespace-nowrap shrink-0"
+                onClick={() => handleQuickReply(reply)}
+                disabled={sending}
+              >
+                {reply.substring(0, 30)}...
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* Input */}
@@ -354,62 +420,10 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
         />
       </div>
 
-      {/* User Context Panel */}
+      {/* User Context Panel - Desktop Only */}
       <div className="w-64 border-l bg-muted/20 p-3 overflow-y-auto hidden lg:block">
         <h3 className="font-semibold text-sm mb-3">User Info</h3>
-        
-        <div className="space-y-4">
-          {/* Profile */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="truncate">{conversation.profiles?.full_name || 'No name'}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Mail className="h-4 w-4 text-muted-foreground" />
-              <span className="truncate text-xs">{conversation.profiles?.email}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs">Joined {format(new Date(conversation.created_at), 'MMM d, yyyy')}</span>
-            </div>
-          </div>
-
-          {/* Enrollments */}
-          {userContext?.enrollments && userContext.enrollments.length > 0 && (
-            <div>
-              <h4 className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
-                <BookOpen className="h-3 w-3" />
-                Enrollments
-              </h4>
-              <div className="space-y-1">
-                {userContext.enrollments.map((e, i) => (
-                  <div key={i} className="text-xs p-2 bg-background rounded border">
-                    <p className="font-medium truncate">{e.course_name}</p>
-                    <Badge variant="outline" className="text-[10px] mt-1">
-                      {e.status}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recent Orders */}
-          {userContext?.orders && userContext.orders.length > 0 && (
-            <div>
-              <h4 className="text-xs font-medium text-muted-foreground mb-2">Recent Orders</h4>
-              <div className="space-y-1">
-                {userContext.orders.map((o, i) => (
-                  <div key={i} className="text-xs p-2 bg-background rounded border">
-                    <p className="font-medium truncate">{o.product_name}</p>
-                    <p className="text-muted-foreground">${(o.amount / 100).toFixed(2)}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        <UserInfoContent />
       </div>
     </div>
   );
