@@ -3,6 +3,7 @@ import { format, isToday, isYesterday, parseISO } from 'date-fns';
 import { getMoodEmoji } from './MoodSelector';
 import { Card, CardContent } from '@/components/ui/card';
 import { haptic } from '@/lib/haptics';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface JournalEntryCardProps {
   id: string;
@@ -72,7 +73,9 @@ export const JournalEntryCard = memo(function JournalEntryCard({
             </p>
           </div>
           {moodEmoji && (
-            <span className="text-xl flex-shrink-0">{moodEmoji}</span>
+            <div className="flex-shrink-0">
+              <FluentEmoji emoji={moodEmoji} size={24} />
+            </div>
           )}
         </div>
         <p className="text-xs text-muted-foreground mt-3">
