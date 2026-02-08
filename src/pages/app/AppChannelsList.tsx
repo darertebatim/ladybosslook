@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, MessageCircle } from 'lucide-react';
+import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, Headset } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useChannels, useChannelSummaries } from '@/hooks/useFeed';
@@ -86,7 +86,7 @@ export default function AppChannelsList() {
             >
               {/* Support icon */}
               <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary">
-                <MessageCircle className="h-5 w-5" />
+                <Headset className="h-5 w-5" />
               </div>
 
               {/* Support info */}
