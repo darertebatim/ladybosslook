@@ -157,7 +157,10 @@ export const FeedMessage = memo(function FeedMessage({
           {replyToPost && (
             <div className="mb-2 pl-2 border-l-2 border-foreground/30 rounded-sm text-xs">
               <div className="font-medium truncate text-foreground/80">
-                {replyToPost.display_name || replyToPost.author?.full_name || 'Simora'}
+                {/* Show "Simora" for system messages, otherwise show author name */}
+                {(replyToPost.is_system || replyToPost.post_type !== 'discussion')
+                  ? 'Simora'
+                  : (replyToPost.display_name || replyToPost.author?.full_name || 'User')}
               </div>
               <div className="truncate text-foreground/60">
                 {replyToPost.content?.slice(0, 50)}{replyToPost.content && replyToPost.content.length > 50 ? '...' : ''}
