@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
-import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart } from 'lucide-react';
+import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart, Smile } from 'lucide-react';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
 import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate, useSetStreakGoal } from '@/hooks/useTaskPlanner';
@@ -40,6 +40,7 @@ import { BadgeCelebration } from '@/components/app/BadgeCelebration';
 import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
 import { useGoldStreak, useGoldDatesThisWeek, useUpdateGoldStreak } from '@/hooks/useGoldStreak';
+import { QuickMoodCheckIn } from '@/components/app/QuickMoodCheckIn';
 
 import coinBronze from '@/assets/coin-bronze.png';
 import coinSilver from '@/assets/coin-silver.png';
@@ -89,6 +90,9 @@ const AppHome = () => {
   // Streak goal selection state
   const [showGoalSelection, setShowGoalSelection] = useState(false);
   const setStreakGoal = useSetStreakGoal();
+  
+  // Quick mood check-in state
+  const [showMoodCheckIn, setShowMoodCheckIn] = useState(false);
   
   // Gold streak celebration state - use localStorage to prevent re-showing on navigation
   const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -527,8 +531,20 @@ const AppHome = () => {
               )}
             </div>
 
-            {/* Right: Streak badge - navigates to presence page */}
-            <div className="flex items-center justify-end justify-self-end">
+            {/* Right: Mood button + Streak badge */}
+            <div className="flex items-center gap-2 justify-end justify-self-end">
+              {/* Mood check-in button */}
+              <button 
+                onClick={() => {
+                  haptic.light();
+                  setShowMoodCheckIn(true);
+                }}
+                className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
+              >
+                <Smile className="h-4 w-4 text-violet-600" />
+              </button>
+              
+              {/* Streak badge - navigates to presence page */}
               <button onClick={() => navigate('/app/presence')} className="tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-sm active:scale-95 transition-transform">
                 <Flame className="h-4 w-4 fill-current" />
                 <span className="text-sm font-semibold">{streak?.current_streak || 0}</span>
@@ -912,6 +928,12 @@ const AppHome = () => {
           onTourReady={handleHomeTourReady}
         />
       </div>
+      
+      {/* Quick Mood Check-in */}
+      <QuickMoodCheckIn 
+        open={showMoodCheckIn} 
+        onOpenChange={setShowMoodCheckIn} 
+      />
     </>;
 };
 export default AppHome;
