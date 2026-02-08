@@ -229,34 +229,39 @@ const NativeAppLayout = () => {
         />
       )}
 
-      {/* Unread Messages Popup - iOS Style */}
+      {/* Unread Messages Popup - Friendly iOS Style */}
       <AlertDialog open={showUnreadPopup} onOpenChange={dismissPopup}>
-        <AlertDialogContent className="max-w-[280px] p-0 rounded-2xl border border-border/50 shadow-xl overflow-hidden">
-          <AlertDialogHeader className="pt-5 pb-4 px-4">
-            <div className="flex justify-center mb-3">
-              <div className="rounded-full bg-primary/10 p-3">
-                <MessageCircle className="h-6 w-6 text-primary" />
+        <AlertDialogContent className="max-w-[300px] p-0 rounded-3xl border-0 shadow-2xl overflow-hidden bg-gradient-to-b from-background to-muted/30">
+          <AlertDialogHeader className="pt-6 pb-4 px-5">
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                <div className="rounded-full bg-gradient-to-br from-primary/20 to-primary/5 p-4">
+                  <MessageCircle className="h-7 w-7 text-primary" />
+                </div>
+                <div className="absolute -top-1 -right-1 h-5 w-5 bg-primary rounded-full flex items-center justify-center text-[11px] font-bold text-primary-foreground">
+                  {unreadMessageCount}
+                </div>
               </div>
             </div>
-            <AlertDialogTitle className="text-center text-[17px] font-semibold leading-tight">
-              {unreadMessageCount} New Message{unreadMessageCount > 1 ? 's' : ''}
+            <AlertDialogTitle className="text-center text-lg font-semibold leading-tight">
+              You have a message! 💬
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-[13px] text-muted-foreground mt-1">
-              Support has replied to you
+            <AlertDialogDescription className="text-center text-sm text-muted-foreground mt-2">
+              Our support team has replied to your conversation
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col gap-0 sm:flex-col p-0 border-t border-border/50">
+          <AlertDialogFooter className="flex-col gap-0 sm:flex-col p-4 pt-2">
             <AlertDialogAction 
               onClick={goToChat} 
-              className="w-full h-11 rounded-none border-0 bg-transparent text-primary hover:bg-muted/50 text-[17px] font-normal"
+              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-base font-medium shadow-md"
             >
-              View
+              View Message
             </AlertDialogAction>
             <AlertDialogCancel 
               onClick={dismissPopup} 
-              className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent hover:bg-muted/50 text-[17px] font-normal text-muted-foreground"
+              className="w-full h-10 rounded-xl border-0 m-0 mt-2 bg-transparent hover:bg-muted/50 text-sm font-normal text-muted-foreground"
             >
-              Later
+              Maybe later
             </AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
