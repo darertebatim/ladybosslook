@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreateUserPost } from '@/hooks/useFeed';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface ChannelChatInputProps {
   channelId: string;
@@ -28,8 +29,9 @@ export function ChannelChatInput({ channelId }: ChannelChatInputProps) {
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to send message:', error);
+      toast.error(error?.message || 'Failed to send message');
     }
   };
 
