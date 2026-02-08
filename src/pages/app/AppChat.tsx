@@ -331,6 +331,11 @@ export default function AppChat() {
       // Send push notification to admins
       await sendNotification(conversationId, messageContent);
 
+      // Auto-scroll to bottom after sending
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+
       // Note: No fetchMessages needed - realtime subscription handles new messages
     } catch (error: any) {
       console.error('Error sending message:', error);
@@ -432,7 +437,8 @@ export default function AppChat() {
     if (!scrollContainerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-    setShowScrollButton(distanceFromBottom > 200);
+    // Show button very quickly - at just 20px scroll
+    setShowScrollButton(distanceFromBottom > 20);
   }, []);
 
   const scrollToBottomSmooth = useCallback(() => {
