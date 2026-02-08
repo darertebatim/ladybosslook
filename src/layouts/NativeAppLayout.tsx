@@ -16,6 +16,7 @@ import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnb
 import { usePushNotificationFlow } from '@/hooks/usePushNotificationFlow';
 import { useTimezoneSync } from '@/hooks/useTimezoneSync';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
+import { useLocalNotificationScheduler } from '@/hooks/useLocalNotificationScheduler';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
@@ -47,6 +48,9 @@ const NativeAppLayout = () => {
   
   // Track app version on every app open
   useAppInstallTracking(user?.id);
+  
+  // Schedule local notifications on app startup (morning summary, evening check-in, etc.)
+  useLocalNotificationScheduler(user?.id);
   
   // Custom hooks after useState declarations
   const { unreadCount } = useUnreadChat();
