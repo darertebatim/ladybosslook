@@ -47,7 +47,7 @@ export default function AppChannelsList() {
 
       {/* Header */}
       <header 
-        className="sticky top-0 z-10 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
+        className="sticky top-0 z-10 bg-accent dark:bg-accent rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="px-4 pt-3 pb-4">
@@ -66,7 +66,18 @@ export default function AppChannelsList() {
           </div>
         ) : channels && channels.length > 0 ? (
           <div className="divide-y divide-border/50">
-            {channels.map((channel) => {
+            {/* Sort channels by last message time (most recent first) */}
+            {[...channels]
+              .sort((a, b) => {
+                const aLastMsg = summaries?.[a.id]?.lastMessage?.created_at;
+                const bLastMsg = summaries?.[b.id]?.lastMessage?.created_at;
+                // Channels with messages come first, sorted by most recent
+                if (!aLastMsg && !bLastMsg) return 0;
+                if (!aLastMsg) return 1;
+                if (!bLastMsg) return -1;
+                return new Date(bLastMsg).getTime() - new Date(aLastMsg).getTime();
+              })
+              .map((channel) => {
               const summary = summaries?.[channel.id];
               const Icon = CHANNEL_ICONS[channel.type] || Megaphone;
               const unreadCount = summary?.unreadCount || 0;
