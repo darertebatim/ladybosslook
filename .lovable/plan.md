@@ -1,161 +1,181 @@
 
-# Plan: Enhanced Mood Check-in Tool
+# Community Channels Redesign - Telegram/WhatsApp Style
 
-## Overview
+## Current Problem
 
-Transform the current Quick Mood Check-in (bottom sheet) into a full-page wellness tool similar to the Emotions and Period tracker tools. The tool will feature:
+1. **Twitter-like tab interface**: The horizontal tabs with "All" and hashtags are confusing for users who are familiar with Telegram/WhatsApp
+2. **Mixed UX patterns**: Posts have replies (comments) which creates a hybrid between announcement channels and group chats
+3. **No clear entry point**: Users land directly into a combined feed view, not a list of channels to choose from
 
-1. **Interactive "I feel..." button** that updates based on mood selection
-2. **Calendar/Stats view** for mood history (like Period tracker)
-3. **Add to Rituals integration** as a Pro-linked tool
-4. **Auto-complete for planner** when mood is logged
+## Proposed Solution
 
----
+Transform the community feature into a **Telegram-style experience**:
 
-## Architecture Design
-
-```
-Current Flow:
-Home Header → Click Smile → Bottom Sheet Drawer → Select Mood → Done
-
-New Flow:
-Home Header → Click Smile → Full Page Tool (/app/mood)
-                                    │
-                          ┌─────────┴─────────┐
-                          ▼                   ▼
-                    Stats Button        Add to Rituals
-                    (Calendar)            (Pro Task)
-                          │
-                          ▼
-              Mood History Calendar
-             (shows mood per day)
-```
-
----
-
-## Changes Summary
-
-### 1. Create New Mood Page (`/app/mood`)
-
-A full-page tool matching the aesthetic of the Emotions tool but with a yellow/amber gradient theme. Features:
-
-- **Header**: Back button, "Mood Check-in" title, History button (calendar icon)
-- **5 Mood Options**: Great, Good, Okay, Not Great, Bad with 3D Fluent Emoji
-- **Selection indicator**: Checkmark badge on selected mood (like screenshots)
-- **Bottom action bar**:
-  - Left: Stats/Calendar button (black circle)
-  - Center: "I feel..." button that updates to "I feel great!!!", "I feel good!", etc.
-  - Right: Add to Rituals button (black circle)
-
-### 2. Create Mood History Page (`/app/mood/history`)
-
-Similar to Period tracker calendar:
-- Monthly calendar view
-- Each day shows the mood emoji logged
-- Color-coded by mood level
-- Tap day to see details
-
-### 3. Add Mood as Pro Link Type
-
-Update the Pro Task system to support `mood` as a new link type:
-- Add `'mood'` to `ProLinkType` union
-- Add `PRO_LINK_CONFIGS.mood` configuration
-- Add `autoCompleteMood()` to `useAutoCompleteProTask`
-- Add route `/app/mood` to `getProTaskNavigationPath`
-
-### 4. Update Home Header Integration
-
-Change the Smile button behavior:
-- Navigate to `/app/mood` instead of opening drawer
-- Remove the QuickMoodCheckIn drawer component usage
-
-### 5. Create Mood Logging Hook
-
-Extend journal entry creation to track mood separately for calendar display. Create `useMoodLogs` hook:
-- `useMoodLogs()` - fetch mood entries from journal_entries
-- `useMoodLogsForMonth(month)` - get moods for calendar display
-- `useTodayMood()` - check if mood logged today
-
----
-
-## Technical Details
-
-### New Files to Create
-
-| File | Purpose |
-|------|---------|
-| `src/pages/app/AppMood.tsx` | Main mood check-in page |
-| `src/pages/app/AppMoodHistory.tsx` | Mood calendar/history page |
-| `src/components/mood/MoodDashboard.tsx` | Main UI with mood grid and action bar |
-| `src/components/mood/MoodCalendar.tsx` | Monthly calendar with mood indicators |
-| `src/hooks/useMoodLogs.tsx` | Hook for mood data fetching |
-
-### Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/lib/proTaskTypes.ts` | Add `'mood'` to ProLinkType, add config |
-| `src/hooks/useAutoCompleteProTask.tsx` | Add `autoCompleteMood()` function |
-| `src/hooks/useTaskPlanner.tsx` | Add `'mood'` to pro_link_type union |
-| `src/hooks/useRoutinePlans.tsx` | Add `'mood'` to pro_link_type union |
-| `src/pages/app/AppHome.tsx` | Change Smile button to navigate to /app/mood |
-| `src/App.tsx` | Add routes for /app/mood and /app/mood/history |
-| `src/components/app/HomeMenu.tsx` | Add Mood tool to menu |
-
-### UI Design
-
-The "I feel..." button states:
-- **No selection**: "I feel..." (gray, disabled)
-- **Great**: "I feel great!!!" (black, bold)
-- **Good**: "I feel good!" (black)
-- **Okay**: "I feel just Okay." (black)
-- **Not Great**: "I feel not great..." (black)
-- **Bad**: "I feel bad..." (black)
-
-### Synthetic Task Definition
-
-```typescript
-const SYNTHETIC_MOOD_TASK: RoutinePlanTask = {
-  id: 'synthetic-mood-task',
-  plan_id: 'synthetic-mood',
-  title: 'Daily Mood Check-in',
-  icon: '😊',
-  color: 'yellow',
-  task_order: 0,
-  is_active: true,
-  pro_link_type: 'mood',
-  pro_link_value: null,
-  tag: 'pro',
-};
+```text
++-----------------------------+
+|  Community                  |
++-----------------------------+
+| [Channel Card]              |
+|   Announcements (General)   |
+|   Latest: Hey everyone...   |
+|   2 unread                  |
++-----------------------------+
+| [Channel Card]              |
+|   Premium Members           |
+|   Latest: New content...    |
+|   5 unread                  |
++-----------------------------+
+| [Channel Card]              |
+|   Round 12 Group            |
+|   Latest: Who's joining...  |
+|   Chat enabled              |
++-----------------------------+
 ```
 
-### Data Model
+When a channel is selected, it opens a **full-screen chat view** like Telegram:
 
-Mood data continues to use `journal_entries` table:
-- `mood` column stores: 'great', 'good', 'okay', 'not_great', 'bad'
-- Calendar aggregates by `created_at` date
-- Each day shows the most recent mood logged
+- **Broadcast channels** (allow_comments: false): Admin messages only, users can only react
+- **Group channels** (allow_comments: true): Real-time chat experience where users can send messages
 
----
+## Implementation Plan
 
-## Implementation Steps
+### Phase 1: Create Channel List Page (New)
 
-1. **Add 'mood' to Pro Link types** - Update type definitions and configs
-2. **Create useMoodLogs hook** - Data fetching from journal_entries
-3. **Create AppMood page** - Full-page UI with all features
-4. **Create MoodCalendar component** - Calendar visualization
-5. **Create AppMoodHistory page** - History view wrapper
-6. **Add autoCompleteMood** - Planner integration
-7. **Update routes** - Add /app/mood routes to App.tsx
-8. **Update Home header** - Navigate to /app/mood
-9. **Update HomeMenu** - Add Mood tool entry
-10. **Clean up** - Remove unused QuickMoodCheckIn drawer usage
+**New file: `src/pages/app/AppChannelsList.tsx`**
 
----
+- Displays all channels the user has access to as a list of cards
+- Each card shows:
+  - Channel icon (based on type: megaphone for general, graduation cap for program, etc.)
+  - Channel name
+  - Last message preview (truncated)
+  - Unread count badge
+  - Timestamp of last message
+  - "Chat" indicator if comments are enabled
+- Tapping a channel navigates to the channel detail page
+- Pull-to-refresh support
+- Real-time updates for unread counts
 
-## Edge Cases Handled
+### Phase 2: Refactor Channel Detail Page
 
-- **Multiple moods per day**: Show most recent on calendar, list all in history
-- **No mood logged**: Calendar shows empty day (no indicator)
-- **Legacy moods**: Maintain backward compatibility with existing journal entries
-- **Already added ritual**: Show "Added - Go to Planner" state
+**Modify: `src/pages/app/AppFeed.tsx`** (rename to `AppChannelDetail.tsx`)
+
+Transform from a feed with tabs to a **single-channel chat view**:
+
+- Remove the horizontal channel tabs completely
+- Full-screen chat experience for the selected channel
+- Header shows channel name and back button to channel list
+- Messages displayed in Telegram-style bubbles (already done)
+- **If allow_comments is true**: Show chat input at bottom for user messages
+- **If allow_comments is false**: Only show reactions, no input bar (broadcast mode)
+
+### Phase 3: Update Routing
+
+**Modify: `src/App.tsx`**
+
+```text
+/app/channels         -> AppChannelsList (new channel list)
+/app/channels/:slug   -> AppChannelDetail (single channel view)
+/app/channels/post/:postId -> AppFeedPost (post detail/thread)
+```
+
+### Phase 4: Database Changes
+
+**Add column to `feed_posts` table:**
+
+- `user_id` (uuid, nullable) - Allow regular users to post messages in group channels
+
+**New RLS policy:**
+
+- Users can INSERT posts in channels where `allow_comments = true`
+- Posts from users are automatically `post_type = 'discussion'`
+
+### Phase 5: Update Admin Composer
+
+**Modify: `src/components/admin/FeedChatComposer.tsx`**
+
+- Add option to enable "Group Chat Mode" for channels
+- When group chat is enabled, the channel becomes a two-way conversation
+
+### Phase 6: Component Changes
+
+**New file: `src/components/feed/ChannelCard.tsx`**
+
+- Reusable card component for the channel list
+- Shows channel info, last message, unread count
+
+**Modify: `src/components/feed/FeedMessage.tsx`**
+
+- Add support for user-authored messages (not just admin)
+- Different bubble styling for user vs admin messages
+
+**Modify: `src/hooks/useFeed.tsx`**
+
+- Add `useChannelUnreadCounts()` hook for channel list badges
+- Add `useLatestChannelMessages()` for preview text
+- Add `useCreateUserPost()` mutation for group chat mode
+
+**New file: `src/components/feed/ChannelChatInput.tsx`**
+
+- Chat input component for group channels
+- Similar to existing `FeedReplyInput` but for top-level posts
+
+### Phase 7: Navigation Updates
+
+**Modify: `src/layouts/NativeAppLayout.tsx`**
+
+- Update tab bar to point to `/app/channels` (channel list)
+
+**Modify: `src/components/app/HomeMenu.tsx`**
+
+- Update menu item to point to channel list
+
+## Files to Create/Modify
+
+| File | Action |
+|------|--------|
+| `src/pages/app/AppChannelsList.tsx` | Create |
+| `src/pages/app/AppChannelDetail.tsx` | Create (from refactored AppFeed) |
+| `src/pages/app/AppFeed.tsx` | Delete or redirect |
+| `src/components/feed/ChannelCard.tsx` | Create |
+| `src/components/feed/ChannelChatInput.tsx` | Create |
+| `src/components/feed/FeedChannelTabs.tsx` | Delete (no longer needed) |
+| `src/hooks/useFeed.tsx` | Modify (add new hooks) |
+| `src/App.tsx` | Modify (update routes) |
+| Database migration | Add user_id column, RLS policies |
+
+## UX Flow
+
+```text
+1. User taps "Channels" tab
+   |
+   v
+2. AppChannelsList - Shows all accessible channels
+   - Announcements (General)     [3 unread]
+   - Premium Content             [1 unread]  
+   - Round 12 Group              [Chat]
+   |
+   v
+3. User taps "Round 12 Group"
+   |
+   v
+4. AppChannelDetail - Full chat experience
+   - Header: "Round 12 Group" + back button
+   - Messages in chronological order
+   - Chat input at bottom (group mode)
+   - OR just reactions (broadcast mode)
+```
+
+## Benefits
+
+1. **Familiar UX**: Users understand channel lists from Telegram/WhatsApp
+2. **Clear separation**: Each channel is its own space
+3. **Flexible modes**: Broadcast channels vs Group chat channels
+4. **Better engagement**: Group channels encourage real-time discussion
+5. **Cleaner navigation**: No confusing tabs or hashtags
+
+## Technical Notes
+
+- Real-time subscriptions already exist (`useFeedRealtime`)
+- Chat UI patterns already implemented in `AppChat.tsx`
+- Message grouping by date/author already works
+- Can reuse existing components for the chat experience
