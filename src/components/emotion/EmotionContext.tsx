@@ -17,10 +17,15 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 // Valence-based colors matching the first page buttons
-const VALENCE_COLORS: Record<Valence, { text: string; selectedBg: string; selectedText: string }> = {
-  pleasant: { text: 'text-orange-600', selectedBg: 'bg-orange-500', selectedText: 'text-white' },
-  neutral: { text: 'text-blue-600', selectedBg: 'bg-blue-500', selectedText: 'text-white' },
-  unpleasant: { text: 'text-purple-600', selectedBg: 'bg-purple-500', selectedText: 'text-white' },
+const VALENCE_COLORS: Record<Valence, { 
+  text: string; 
+  selectedBg: string; 
+  selectedText: string;
+  pageBg: string;
+}> = {
+  pleasant: { text: 'text-orange-600', selectedBg: 'bg-orange-500', selectedText: 'text-white', pageBg: '#FFF3E0' },
+  neutral: { text: 'text-blue-600', selectedBg: 'bg-blue-500', selectedText: 'text-white', pageBg: '#E3F2FD' },
+  unpleasant: { text: 'text-purple-600', selectedBg: 'bg-purple-500', selectedText: 'text-white', pageBg: '#F3E5F5' },
 };
 
 interface EmotionContextProps {
@@ -91,8 +96,11 @@ export const EmotionContext = ({
 
   return (
     <div 
-      className="h-[100dvh] flex flex-col bg-[#F4F5F7]"
-      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      className="h-[100dvh] flex flex-col"
+      style={{ 
+        paddingTop: 'env(safe-area-inset-top)',
+        backgroundColor: valenceColors.pageBg 
+      }}
     >
       {/* Header */}
       <header className="shrink-0 flex items-center px-4 py-3">
