@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Menu, Compass, Music, Users, MessageCircle,
-  BookOpen, Wind, Droplets, HeartHandshake, Heart, Sparkles, GraduationCap, User, HelpCircle
+  BookOpen, Wind, Droplets, HeartHandshake, Heart, Sparkles, GraduationCap, User, HelpCircle, LogOut
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
-
+import { useAuth } from '@/hooks/useAuth';
 interface NavItem {
   id: string;
   name: string;
@@ -45,11 +45,19 @@ interface HomeMenuProps {
 export function HomeMenu({ onStartTour }: HomeMenuProps) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   const handleNavClick = (route: string) => {
     haptic.light();
     setOpen(false);
     navigate(route);
+  };
+
+  const handleSignOut = async () => {
+    haptic.medium();
+    setOpen(false);
+    await signOut();
+    navigate('/auth');
   };
 
   const handleTakeTour = () => {
@@ -128,7 +136,7 @@ export function HomeMenu({ onStartTour }: HomeMenuProps) {
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-full',
                   'text-[13px] font-medium transition-all active:scale-95',
-                  'text-indigo-600 bg-indigo-100'
+                  'text-primary bg-primary/10'
                 )}
               >
                 <HelpCircle className="h-4 w-4" />
@@ -136,6 +144,21 @@ export function HomeMenu({ onStartTour }: HomeMenuProps) {
               </button>
             </section>
           )}
+
+          {/* Sign Out */}
+          <section className="pt-2 border-t border-border/40">
+            <button
+              onClick={handleSignOut}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full',
+                'text-[13px] font-medium transition-all active:scale-95',
+                'text-destructive bg-destructive/10'
+              )}
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Sign Out</span>
+            </button>
+          </section>
         </div>
       </SheetContent>
     </Sheet>
