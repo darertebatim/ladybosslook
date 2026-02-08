@@ -106,6 +106,16 @@ const AppJournalEntry = () => {
     }
   }, [content, title, mood, entryIdState, createMutation, updateMutation]);
 
+  // Pre-navigation cleanup (doesn't navigate - BackButton handles that)
+  const handleBackCleanup = useCallback(() => {
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+    if (content.trim() && saveStatus !== 'saved') {
+      saveEntry(); // Fire and forget - mutation completes in background
+    }
+  }, [content, saveStatus, saveEntry]);
+
   const triggerAutoSave = useCallback(() => {
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
@@ -133,16 +143,6 @@ const AppJournalEntry = () => {
   const handlePromptSelect = (prompt: string) => {
     setContent(prompt + '\n\n');
     textareaRef.current?.focus();
-  };
-
-  const handleBack = async () => {
-    if (autoSaveTimeoutRef.current) {
-      clearTimeout(autoSaveTimeoutRef.current);
-    }
-    if (content.trim() && saveStatus !== 'saved') {
-      await saveEntry();
-    }
-    navigate('/app/journal');
   };
 
   const handleDone = async () => {
@@ -215,7 +215,7 @@ const AppJournalEntry = () => {
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
           <div className="flex items-center gap-3">
-            <BackButton onClick={handleBack} />
+            <BackButton to="/app/journal" onClick={handleBackCleanup} />
             <h1 className="text-lg font-medium">
               {isNewEntry ? 'New Entry' : 'Edit Entry'}
             </h1>
