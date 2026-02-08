@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ChatConversationList } from "@/components/admin/ChatConversationList";
 import { ChatPanel } from "@/components/admin/ChatPanel";
+import { MobileSupportPreview } from "@/components/admin/MobileSupportPreview";
+import { Button } from "@/components/ui/button";
+import { Smartphone, Monitor } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Conversation {
   id: string;
@@ -13,6 +17,7 @@ interface Conversation {
   profiles?: {
     full_name: string | null;
     email: string;
+    avatar_url?: string | null;
   };
   last_message?: string;
 }
@@ -21,6 +26,7 @@ export default function Support() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   const fetchConversations = async () => {
     try {
@@ -38,7 +44,7 @@ export default function Support() {
           const [profileRes, lastMsgRes] = await Promise.all([
             supabase
               .from('profiles')
-              .select('full_name, email')
+              .select('full_name, email, avatar_url')
               .eq('id', conv.user_id)
               .maybeSingle(),
             supabase
@@ -120,30 +126,91 @@ export default function Support() {
 
   return (
     <div className="h-[calc(100vh-8rem)]">
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold">Support Chat</h1>
-        <p className="text-muted-foreground">Manage customer support conversations</p>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Support Chat</h1>
+          <p className="text-muted-foreground">Manage customer support conversations</p>
+        </div>
+        
+        {/* View mode toggle */}
+        <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setViewMode('desktop')}
+            className={cn(
+              "h-8 px-3 gap-1.5",
+              viewMode === 'desktop' && "bg-background shadow-sm"
+            )}
+          >
+            <Monitor className="h-4 w-4" />
+            Desktop
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setViewMode('mobile')}
+            className={cn(
+              "h-8 px-3 gap-1.5",
+              viewMode === 'mobile' && "bg-background shadow-sm"
+            )}
+          >
+            <Smartphone className="h-4 w-4" />
+            Mobile
+          </Button>
+        </div>
       </div>
 
-      <div className="flex h-[calc(100%-4rem)] border rounded-lg overflow-hidden bg-background">
-        {/* Conversation List */}
-        <div className="w-80 shrink-0">
-          <ChatConversationList
-            conversations={conversations}
-            selectedId={selectedConversation?.id || null}
-            onSelect={handleSelectConversation}
-            loading={loading}
-          />
-        </div>
+      {viewMode === 'desktop' ? (
+        <div className="flex h-[calc(100%-4rem)] border rounded-lg overflow-hidden bg-background">
+          {/* Conversation List */}
+          <div className="w-80 shrink-0">
+            <ChatConversationList
+              conversations={conversations}
+              selectedId={selectedConversation?.id || null}
+              onSelect={handleSelectConversation}
+              loading={loading}
+            />
+          </div>
 
-        {/* Chat Panel */}
-        <div className="flex-1">
-          <ChatPanel 
-            conversation={selectedConversation} 
-            onStatusChange={fetchConversations}
-          />
+          {/* Chat Panel */}
+          <div className="flex-1">
+            <ChatPanel 
+              conversation={selectedConversation} 
+              onStatusChange={fetchConversations}
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex h-[calc(100%-4rem)] gap-4">
+          {/* Conversation List */}
+          <div className="w-80 shrink-0 border rounded-lg overflow-hidden bg-background">
+            <ChatConversationList
+              conversations={conversations}
+              selectedId={selectedConversation?.id || null}
+              onSelect={handleSelectConversation}
+              loading={loading}
+            />
+          </div>
+
+          {/* Mobile Preview Frame */}
+          <div className="flex-1 flex items-center justify-center bg-muted/30 rounded-lg p-6">
+            <div className="w-[390px] h-[700px] bg-background rounded-[40px] border-[8px] border-foreground/20 overflow-hidden shadow-2xl relative">
+              {/* Phone notch */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-foreground/20 rounded-b-2xl z-20" />
+              
+              {/* Screen content */}
+              <div className="h-full pt-6 overflow-hidden">
+                <MobileSupportPreview
+                  conversation={selectedConversation}
+                  onBack={() => setSelectedConversation(null)}
+                  onStatusChange={fetchConversations}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
