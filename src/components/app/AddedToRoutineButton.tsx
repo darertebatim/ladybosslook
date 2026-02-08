@@ -14,6 +14,8 @@ interface AddedToRoutineButtonProps {
   variant?: 'default' | 'emotion' | 'outline';
   /** Custom add button text */
   addText?: string;
+  /** Show only the icon without text */
+  iconOnly?: boolean;
 }
 
 /**
@@ -28,6 +30,7 @@ export const AddedToRoutineButton = ({
   size = 'default',
   variant = 'default',
   addText = 'Add to My Rituals',
+  iconOnly = false,
 }: AddedToRoutineButtonProps) => {
   const navigate = useNavigate();
 
@@ -64,6 +67,43 @@ export const AddedToRoutineButton = ({
         return "bg-[#F4ECFE] hover:bg-[#E8DCF8]";
     }
   };
+
+  // Icon-only mode when added - just show checkmark icon button
+  if (isAdded && iconOnly) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleGoToPlanner}
+        className={cn(
+          "rounded-full bg-success/20 text-success hover:bg-success/30 shrink-0",
+          className
+        )}
+        title="Added — Go to Planner"
+      >
+        <Check className="h-5 w-5" />
+      </Button>
+    );
+  }
+
+  // Icon-only mode when not added - just show calendar plus icon button
+  if (iconOnly) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onAddClick}
+        disabled={isLoading}
+        className={cn(
+          "rounded-full bg-foreground text-background hover:bg-foreground/90 shrink-0",
+          className
+        )}
+        title="Add to My Rituals"
+      >
+        <CalendarPlus className="h-5 w-5" />
+      </Button>
+    );
+  }
 
   if (isAdded) {
     return (
