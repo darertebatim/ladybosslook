@@ -3,6 +3,7 @@ import { Send, Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreateUserPost, FeedPost } from '@/hooks/useFeed';
+import { useKeyboard } from '@/hooks/useKeyboard';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -10,12 +11,20 @@ interface ChannelChatInputProps {
   channelId: string;
   replyTo?: FeedPost | null;
   onCancelReply?: () => void;
+  onKeyboardChange?: (isOpen: boolean) => void;
 }
 
-export function ChannelChatInput({ channelId, replyTo, onCancelReply }: ChannelChatInputProps) {
+export function ChannelChatInput({ channelId, replyTo, onCancelReply, onKeyboardChange }: ChannelChatInputProps) {
   const [content, setContent] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const createPost = useCreateUserPost();
+  const { isKeyboardOpen } = useKeyboard();
+
+  // Notify parent when keyboard state changes
+  useEffect(() => {
+    onKeyboardChange?.(isKeyboardOpen);
+  }, [isKeyboardOpen, onKeyboardChange]);
 
   // Focus textarea when replying
   useEffect(() => {
@@ -24,10 +33,24 @@ export function ChannelChatInput({ channelId, replyTo, onCancelReply }: ChannelC
     }
   }, [replyTo]);
 
+  // Scroll input into view when focused on iOS
+  const handleFocus = () => {
+    // Delay to let iOS keyboard animation complete
+    setTimeout(() => {
+      textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+    setTimeout(() => {
+      textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  };
+
   const handleSubmit = async () => {
     const trimmedContent = content.trim();
     if (!trimmedContent || createPost.isPending) return;
 
+    // Keep keyboard open using requestAnimationFrame trick
+    const activeElement = document.activeElement;
+    
     try {
       await createPost.mutateAsync({
         channelId,
@@ -40,6 +63,13 @@ export function ChannelChatInput({ channelId, replyTo, onCancelReply }: ChannelC
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
+      
+      // Keep focus on input to prevent keyboard dismissal
+      requestAnimationFrame(() => {
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+        }
+      });
     } catch (error: any) {
       console.error('Failed to send message:', error);
       toast.error(error?.message || 'Failed to send message');
@@ -72,8 +102,12 @@ export function ChannelChatInput({ channelId, replyTo, onCancelReply }: ChannelC
 
   return (
     <div 
-      className="sticky bottom-0 bg-background border-t border-border/50"
-      style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}
+      ref={containerRef}
+      className="shrink-0 bg-background border-t border-border/50"
+      style={{ 
+        paddingBottom: 'max(env(safe-area-inset-bottom), 8px)',
+        WebkitOverflowScrolling: 'touch'
+      }}
     >
       {/* Reply preview */}
       {replyTo && (
@@ -102,6 +136,7 @@ export function ChannelChatInput({ channelId, replyTo, onCancelReply }: ChannelC
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyDown}
           onInput={handleInput}
+          onFocus={handleFocus}
           placeholder={replyTo ? `Reply to ${replyToName}...` : "Message..."}
           className={cn(
             "min-h-[40px] max-h-[120px] resize-none py-2.5 px-3",

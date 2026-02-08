@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2, ChevronLeft, Megaphone, Users, GraduationCap, MessageSquare } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -26,8 +26,22 @@ export default function AppChannelDetail() {
   const navigate = useNavigate();
   
   const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const hasScrolledRef = useRef(false);
   const [replyTo, setReplyTo] = useState<FeedPost | null>(null);
+
+  // Scroll to bottom when keyboard opens (iOS)
+  const handleKeyboardChange = useCallback((isOpen: boolean) => {
+    if (isOpen) {
+      // Delay to let keyboard animation complete
+      setTimeout(() => {
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+      setTimeout(() => {
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    }
+  }, []);
   
   const { data: channels, isLoading: channelsLoading } = useChannels();
   
@@ -187,7 +201,11 @@ export default function AppChannelDetail() {
       </header>
 
       {/* Messages container */}
-      <div className="flex-1 overflow-y-auto overscroll-contain">
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto overscroll-contain"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
         <div className="pb-safe">
           {postsLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -247,6 +265,7 @@ export default function AppChannelDetail() {
           channelId={selectedChannelId} 
           replyTo={replyTo}
           onCancelReply={() => setReplyTo(null)}
+          onKeyboardChange={handleKeyboardChange}
         />
       )}
     </div>
