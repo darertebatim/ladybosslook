@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { 
   ChevronLeft, Loader2, Heart, Cloud, Briefcase, GraduationCap,
-  Dumbbell, HeartPulse, Home, Palette, Moon, Users, Wallet, MapPin
+  Dumbbell, HeartPulse, Home, Palette, Moon, Users, Wallet, MoreHorizontal
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,7 +13,7 @@ import { useKeyboard } from '@/hooks/useKeyboard';
 // Icon mapping
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Heart, Cloud, Briefcase, GraduationCap, Dumbbell, HeartPulse,
-  Home, Palette, Moon, Users, Wallet, MapPin
+  Home, Palette, Moon, Users, Wallet, MoreHorizontal
 };
 
 // Valence-based colors matching the first page buttons

@@ -403,7 +403,7 @@ export const CONTEXT_OPTIONS: ContextOption[] = [
   { value: 'sleep', label: 'Sleep', icon: 'Moon' },
   { value: 'friends', label: 'Friends', icon: 'Users' },
   { value: 'finances', label: 'Finances', icon: 'Wallet' },
-  { value: 'location', label: 'Location', icon: 'MapPin' },
+  { value: 'other', label: 'Other', icon: 'MoreHorizontal' },
 ];
 
 // Helper to get category by value
