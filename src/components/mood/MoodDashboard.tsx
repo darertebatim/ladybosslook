@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Check } from 'lucide-react';
+import { ChartColumn, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useCreateJournalEntry } from '@/hooks/useJournal';
@@ -238,7 +238,7 @@ export function MoodDashboard() {
               }}
               className="w-12 h-12 rounded-full bg-foreground flex items-center justify-center shrink-0 active:scale-95 transition-transform"
             >
-              <Calendar className="h-5 w-5 text-background" />
+              <ChartColumn className="h-5 w-5 text-background" />
             </button>
 
             {/* Main "I feel..." Button */}
