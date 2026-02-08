@@ -42,6 +42,19 @@ export default function AppChannelDetail() {
       }, 300);
     }
   }, []);
+
+  // Scroll to a specific post by ID (for reply navigation)
+  const handleScrollToPost = useCallback((postId: string) => {
+    const element = document.querySelector(`[data-post-id="${postId}"]`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Highlight briefly
+      element.classList.add('bg-primary/10');
+      setTimeout(() => {
+        element.classList.remove('bg-primary/10');
+      }, 1500);
+    }
+  }, []);
   
   const { data: channels, isLoading: channelsLoading } = useChannels();
   
@@ -232,15 +245,17 @@ export default function AppChannelDetail() {
                   const isLastMessage = isLastInGroup && isLastGroup;
                   
                   return (
-                    <FeedMessage
-                      key={post.id}
-                      post={post}
-                      allowReactions={selectedChannel.allow_reactions}
-                      isFollowUp={post.isFollowUp}
-                      onReply={isGroupChat ? setReplyTo : undefined}
-                      replyToPost={post.reply_to_post_id ? postsById.get(post.reply_to_post_id) : null}
-                      isLastMessage={isLastMessage}
-                    />
+                    <div key={post.id} data-post-id={post.id} className="transition-colors duration-500">
+                      <FeedMessage
+                        post={post}
+                        allowReactions={selectedChannel.allow_reactions}
+                        isFollowUp={post.isFollowUp}
+                        onReply={isGroupChat ? setReplyTo : undefined}
+                        replyToPost={post.reply_to_post_id ? postsById.get(post.reply_to_post_id) : null}
+                        isLastMessage={isLastMessage}
+                        onScrollToPost={handleScrollToPost}
+                      />
+                    </div>
                   );
                 })}
               </div>

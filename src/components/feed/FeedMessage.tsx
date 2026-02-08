@@ -20,6 +20,7 @@ interface FeedMessageProps {
   onReply?: (post: FeedPost) => void;
   replyToPost?: FeedPost | null;
   isLastMessage?: boolean;
+  onScrollToPost?: (postId: string) => void;
 }
 
 export const FeedMessage = memo(function FeedMessage({ 
@@ -28,7 +29,8 @@ export const FeedMessage = memo(function FeedMessage({
   isFollowUp = false,
   onReply,
   replyToPost,
-  isLastMessage = false
+  isLastMessage = false,
+  onScrollToPost
 }: FeedMessageProps) {
   const { user } = useAuth();
   const deletePost = useDeleteUserPost();
@@ -164,7 +166,10 @@ export const FeedMessage = memo(function FeedMessage({
         >
           {/* Reply preview - if this message is a reply */}
           {replyToPost && (
-            <div className="mb-2 pl-2 border-l-2 border-foreground/30 rounded-sm text-xs">
+            <button
+              onClick={() => onScrollToPost?.(replyToPost.id)}
+              className="w-full text-left mb-2 pl-2 border-l-2 border-foreground/30 rounded-sm text-xs hover:bg-black/5 transition-colors py-1 -ml-1 pr-1"
+            >
               <div className="font-medium truncate text-foreground/80">
                 {/* Show "Simora" for system messages, otherwise show author name */}
                 {(replyToPost.is_system || replyToPost.post_type !== 'discussion')
@@ -174,7 +179,7 @@ export const FeedMessage = memo(function FeedMessage({
               <div className="truncate text-foreground/60">
                 {replyToPost.content?.slice(0, 50)}{replyToPost.content && replyToPost.content.length > 50 ? '...' : ''}
               </div>
-            </div>
+            </button>
           )}
 
           {/* Header - show sender name for non-current-user messages, hidden for follow-ups */}
