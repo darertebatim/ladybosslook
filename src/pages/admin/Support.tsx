@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ChatConversationList } from "@/components/admin/ChatConversationList";
 import { ChatPanel } from "@/components/admin/ChatPanel";
+import { Button } from "@/components/ui/button";
+import { Monitor, Smartphone, ArrowLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Conversation {
   id: string;
@@ -21,6 +24,7 @@ export default function Support() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mobileMode, setMobileMode] = useState(false);
 
   const fetchConversations = async () => {
     try {
@@ -118,11 +122,78 @@ export default function Support() {
     }
   };
 
+  const handleBackToList = () => {
+    setSelectedConversation(null);
+  };
+
+  // Mobile mode layout (similar to channel chat)
+  if (mobileMode) {
+    return (
+      <div className="h-[calc(100vh-8rem)] flex flex-col">
+        {/* Header with back button in mobile mode */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            {selectedConversation && (
+              <Button variant="ghost" size="icon" onClick={handleBackToList}>
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            )}
+            <div>
+              <h1 className="text-2xl font-bold">
+                {selectedConversation ? (selectedConversation.profiles?.full_name || 'Unknown User') : 'Support Chat'}
+              </h1>
+              <p className="text-muted-foreground">
+                {selectedConversation ? selectedConversation.profiles?.email : 'Manage customer support conversations'}
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setMobileMode(false)}
+            className="gap-2"
+          >
+            <Monitor className="h-4 w-4" />
+            Desktop
+          </Button>
+        </div>
+
+        <div className="flex-1 border rounded-lg overflow-hidden bg-background">
+          {selectedConversation ? (
+            <ChatPanel 
+              conversation={selectedConversation} 
+              onStatusChange={fetchConversations}
+            />
+          ) : (
+            <ChatConversationList
+              conversations={conversations}
+              selectedId={null}
+              onSelect={handleSelectConversation}
+              loading={loading}
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop mode layout (original side-by-side)
   return (
     <div className="h-[calc(100vh-8rem)]">
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold">Support Chat</h1>
-        <p className="text-muted-foreground">Manage customer support conversations</p>
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-2xl font-bold">Support Chat</h1>
+          <p className="text-muted-foreground">Manage customer support conversations</p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setMobileMode(true)}
+          className="gap-2"
+        >
+          <Smartphone className="h-4 w-4" />
+          Mobile Mode
+        </Button>
       </div>
 
       <div className="flex h-[calc(100%-4rem)] border rounded-lg overflow-hidden bg-background">
