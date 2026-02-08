@@ -10,11 +10,12 @@ import {
   Droplets,
   Heart,
   HeartHandshake,
-  Headphones
+  Headphones,
+  Smile
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -187,6 +188,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Link to a specific audio track',
     requiresValue: true,
   },
+  mood: {
+    value: 'mood',
+    label: 'Mood Check-in',
+    icon: Smile,
+    badgeText: 'Check',
+    color: 'yellow',
+    gradientClass: 'bg-gradient-to-br from-yellow-100 to-amber-100 dark:from-yellow-900/40 dark:to-amber-900/40',
+    iconColorClass: 'text-yellow-600 dark:text-yellow-400',
+    badgeColorClass: 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open the mood check-in tool',
+    requiresValue: false,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
@@ -218,6 +232,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return linkValue ? `/app/routines/${linkValue}` : '/app/routines';
     case 'route':
       return linkValue || '/app/home';
+    case 'mood':
+      return '/app/mood';
     default:
       return '/app/home';
   }

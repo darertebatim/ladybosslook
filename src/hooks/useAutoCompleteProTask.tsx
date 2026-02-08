@@ -270,11 +270,19 @@ export const useAutoCompleteProTask = () => {
     return autoComplete('emotion');
   }, [autoComplete]);
 
+  /**
+   * Auto-complete mood pro tasks
+   */
+  const autoCompleteMood = useCallback(async (): Promise<number> => {
+    return autoComplete('mood');
+  }, [autoComplete]);
+
   return {
     autoComplete,
     autoCompleteJournal,
     autoCompletePlaylist,
     autoCompleteBreathe,
     autoCompleteEmotion,
+    autoCompleteMood,
   };
 };
