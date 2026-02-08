@@ -205,8 +205,6 @@ export default function AppChannelDetail() {
                     key={post.id}
                     post={post}
                     allowReactions={selectedChannel.allow_reactions}
-                    showChannelBadge={false}
-                    commentsCount={post.comments_count || 0}
                     isFollowUp={post.isFollowUp}
                   />
                 ))}

@@ -1,58 +1,41 @@
 import { memo } from 'react';
 import { FeedPost } from '@/hooks/useFeed';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { Pin, CheckCheck, ExternalLink } from 'lucide-react';
 import { FeedReactions } from './FeedReactions';
 import { FeedActionButton } from './FeedActionButton';
 import { FeedVoiceMessage } from './FeedVoiceMessage';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
-import { detectVideoType, getVideoEmbedUrl, getVideoPlatformLabel } from '@/lib/videoUtils';
+import { detectVideoType, getVideoEmbedUrl } from '@/lib/videoUtils';
 import { useBilingualText } from '@/components/ui/BilingualText';
 
 interface FeedMessageProps {
   post: FeedPost;
   allowReactions?: boolean;
-  showChannelBadge?: boolean;
-  commentsCount?: number;
   isFollowUp?: boolean;
 }
 
 export const FeedMessage = memo(function FeedMessage({ 
   post, 
   allowReactions = true, 
-  showChannelBadge = false,
-  commentsCount = 0,
   isFollowUp = false
 }: FeedMessageProps) {
-  const navigate = useNavigate();
   const isVoiceMessage = post.post_type === 'voice_message' || post.audio_url;
 
   // Use display_name if set, otherwise fallback to author's name or 'Admin'
   const senderName = post.display_name || post.author?.full_name || 'Admin';
   
   // Detect Persian text for proper font and direction
-  const { isPersian, direction, className: bilingualClassName } = useBilingualText(post.content || '');
-
-  const handleClick = (e: React.MouseEvent) => {
-    // Don't navigate if clicking on interactive elements
-    const target = e.target as HTMLElement;
-    if (target.closest('button') || target.closest('a') || target.closest('audio')) {
-      return;
-    }
-    navigate(`/app/channels/post/${post.id}`);
-  };
+  const { direction, className: bilingualClassName } = useBilingualText(post.content || '');
 
   return (
     <div 
       className={cn(
-        "group relative px-4 py-2 cursor-pointer",
+        "group relative px-4 py-2",
         post.is_pinned && "bg-primary/5",
         !isFollowUp && "pt-3"
       )}
-      onClick={handleClick}
     >
       {/* Pinned indicator */}
       {post.is_pinned && !isFollowUp && (
@@ -87,11 +70,6 @@ export const FeedMessage = memo(function FeedMessage({
               <span className="font-semibold text-sm text-foreground">
                 {senderName}
               </span>
-              {showChannelBadge && post.channel && (
-                <Badge variant="secondary" className="text-xs h-5 px-1.5">
-                  {post.channel.name}
-                </Badge>
-              )}
             </div>
           )}
 
@@ -163,8 +141,7 @@ export const FeedMessage = memo(function FeedMessage({
                       href={post.video_url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center h-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white"
-                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-center h-full bg-gradient-to-br from-primary via-primary/80 to-primary/60 text-primary-foreground"
                     >
                       <div className="text-center">
                         <ExternalLink className="h-8 w-8 mx-auto mb-2" />
@@ -178,8 +155,7 @@ export const FeedMessage = memo(function FeedMessage({
                       href={post.video_url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center h-full bg-black text-white"
-                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-center h-full bg-foreground text-background"
                     >
                       <div className="text-center">
                         <ExternalLink className="h-8 w-8 mx-auto mb-2" />
@@ -194,7 +170,6 @@ export const FeedMessage = memo(function FeedMessage({
                       src={post.video_url} 
                       controls 
                       className="w-full h-full object-contain"
-                      onClick={(e) => e.stopPropagation()}
                     />
                   );
                 }
@@ -220,8 +195,8 @@ export const FeedMessage = memo(function FeedMessage({
         </div>
       </div>
 
-      {/* Reactions + Comments - outside the bubble */}
-      {(Object.keys(post.reactions_count || {}).length > 0 || commentsCount > 0) && (
+      {/* Reactions - outside the bubble */}
+      {Object.keys(post.reactions_count || {}).length > 0 && (
         <div className="flex items-center gap-4 mt-2 ml-[52px]">
           <FeedReactions
             postId={post.id}
@@ -229,12 +204,6 @@ export const FeedMessage = memo(function FeedMessage({
             userReactions={post.user_reactions || []}
             allowReactions={allowReactions}
           />
-          
-          {commentsCount > 0 && (
-            <span className="text-xs text-muted-foreground">
-              {commentsCount} {commentsCount === 1 ? 'reply' : 'replies'}
-            </span>
-          )}
         </div>
       )}
     </div>
