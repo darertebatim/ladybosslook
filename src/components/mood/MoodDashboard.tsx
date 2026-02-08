@@ -98,7 +98,7 @@ export function MoodDashboard() {
     
     try {
       const moodData = MOODS.find(m => m.value === selectedMood);
-      const entry = await createJournalEntry.mutateAsync({
+      await createJournalEntry.mutateAsync({
         content: `Feeling ${moodData?.label.toLowerCase()} today.`,
         mood: selectedMood,
       });
@@ -107,19 +107,13 @@ export function MoodDashboard() {
       await autoCompleteMood();
       
       haptic.success();
-      toast.success('Mood logged!', {
-        action: {
-          label: 'Write more',
-          onClick: () => navigate(`/app/journal/${entry.id}`),
-        },
-      });
+      toast.success('Mood logged! 🎉');
       
-      // Reset selection after successful submission
-      setSelectedMood(null);
+      // Navigate back to home after successful submission
+      navigate('/app/home');
     } catch (error) {
       console.error('Failed to log mood:', error);
       toast.error('Failed to log mood');
-    } finally {
       setIsSubmitting(false);
     }
   }, [selectedMood, createJournalEntry, autoCompleteMood, navigate]);
