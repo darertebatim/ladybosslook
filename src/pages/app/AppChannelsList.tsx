@@ -7,6 +7,11 @@ import { useFeedRealtime } from '@/hooks/useFeedRealtime';
 import { SEOHead } from '@/components/SEOHead';
 import { format, isToday, isYesterday } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
+
+// Helper to check if cover is an emoji
+const isEmojiCover = (url: string | null) => url?.startsWith('emoji:');
+const getEmojiFromCover = (url: string | null) => url?.replace('emoji:', '') || '';
 
 const CHANNEL_ICONS: Record<string, React.ElementType> = {
   general: Megaphone,
@@ -94,15 +99,17 @@ export default function AppChannelsList() {
                 >
                   {/* Channel icon */}
                   <div className={cn(
-                    "h-12 w-12 rounded-full flex items-center justify-center shrink-0",
+                    "h-12 w-12 rounded-full flex items-center justify-center shrink-0 overflow-hidden",
                     channel.type === 'general' && "bg-primary/10 text-primary",
                     channel.type === 'program' && "bg-accent/10 text-accent-foreground",
                     channel.type === 'round' && "bg-muted text-muted-foreground",
                     !['general', 'program', 'round'].includes(channel.type) && "bg-muted text-muted-foreground"
                   )}>
-                    {channel.cover_image_url ? (
+                    {isEmojiCover(channel.cover_image_url) ? (
+                      <FluentEmoji emoji={getEmojiFromCover(channel.cover_image_url)} size={28} />
+                    ) : channel.cover_image_url ? (
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={channel.cover_image_url} />
+                        <AvatarImage src={channel.cover_image_url} className="object-cover" />
                         <AvatarFallback>
                           <Icon className="h-5 w-5" />
                         </AvatarFallback>
