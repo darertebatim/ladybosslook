@@ -199,15 +199,15 @@ html.native-app [data-scroll-container="true"] {
     --gradient-cta: linear-gradient(135deg, hsl(15 90% 55%), hsl(10 85% 45%));
     --gradient-success: linear-gradient(135deg, hsl(140 60% 45%), hsl(145 65% 55%));
 
-    /* Chat Bubble Colors - Elegant palette for different users */
-    --chat-bubble-user: 142 45% 82%; /* Soft sage green for current user */
-    --chat-bubble-system: 280 50% 88%; /* Light violet for Simora/system */
-    --chat-bubble-1: 200 55% 88%; /* Sky blue */
-    --chat-bubble-2: 330 50% 90%; /* Rose pink */
-    --chat-bubble-3: 40 55% 88%; /* Warm sand */
-    --chat-bubble-4: 170 45% 85%; /* Mint */
-    --chat-bubble-5: 15 55% 88%; /* Coral peach */
-    --chat-bubble-6: 260 45% 90%; /* Lavender */
+    /* Chat Accent Colors - Using action colors for borders/avatars */
+    --chat-accent-user: 142 71% 45%; /* success green for current user */
+    --chat-accent-system: 280 60% 50%; /* primary purple for Simora */
+    --chat-accent-1: 200 85% 50%; /* bright blue */
+    --chat-accent-2: 330 65% 55%; /* rose pink */
+    --chat-accent-3: 38 92% 50%; /* warning gold */
+    --chat-accent-4: 170 65% 40%; /* teal */
+    --chat-accent-5: 15 90% 55%; /* urgency coral */
+    --chat-accent-6: 268 68% 55%; /* lavender purple */
 
     --sidebar-background: 0 0% 98%;
 
