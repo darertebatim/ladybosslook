@@ -97,7 +97,7 @@ export function useFeedPosts(channelId?: string) {
   return useQuery({
     queryKey: ['feed-posts', channelId],
     queryFn: async () => {
-      // Single optimized query with all data
+      // Single optimized query with all data - keep chronological order (no pinned first)
       let query = supabase
         .from('feed_posts')
         .select(`
@@ -105,7 +105,6 @@ export function useFeedPosts(channelId?: string) {
           author:profiles!feed_posts_author_id_fkey(full_name, avatar_url),
           channel:feed_channels!feed_posts_channel_id_fkey(*)
         `)
-        .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: true });
 
       if (channelId) {
