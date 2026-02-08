@@ -68,14 +68,14 @@ export const FeedMessage = memo(function FeedMessage({
 
   // Get a consistent color index for a user based on their ID
   const getUserColorIndex = (authorId: string | null): number => {
-    if (!authorId) return 0;
-    // Simple hash to get a number from the UUID
-    let hash = 0;
+    if (!authorId) return 1;
+    // Better hash using djb2 algorithm for more even distribution
+    let hash = 5381;
     for (let i = 0; i < authorId.length; i++) {
-      hash = ((hash << 5) - hash) + authorId.charCodeAt(i);
-      hash = hash & hash; // Convert to 32bit integer
+      hash = ((hash << 5) + hash) ^ authorId.charCodeAt(i);
     }
-    return Math.abs(hash) % 6 + 1; // Returns 1-6
+    // Use all 6 colors (1-6)
+    return (Math.abs(hash) % 6) + 1;
   };
 
   const accentColorIndex = getUserColorIndex(post.author_id);
@@ -158,9 +158,9 @@ export const FeedMessage = memo(function FeedMessage({
             "flex-1 min-w-0 max-w-[80%]",
             getBubbleRadius(),
             "px-3.5 py-2.5 text-foreground",
-            "bg-muted/50 border-l-[3px]",
+            "bg-background border-2",
             // Align bubbles
-            isCurrentUser && "ml-auto border-l-0 border-r-[3px]"
+            isCurrentUser && "ml-auto"
           )}
           style={{ borderColor: accentColor }}
         >
@@ -168,7 +168,7 @@ export const FeedMessage = memo(function FeedMessage({
           {replyToPost && (
             <button
               onClick={() => onScrollToPost?.(replyToPost.id)}
-              className="w-full text-left mb-2 pl-2 border-l-2 border-foreground/30 rounded-sm text-xs hover:bg-black/5 transition-colors py-1 -ml-1 pr-1"
+              className="w-full text-left mb-2 pl-2 border-l-2 border-foreground/30 rounded-sm text-xs active:scale-[0.98] active:bg-black/5 transition-transform py-1 -ml-1 pr-1"
             >
               <div className="font-medium truncate text-foreground/80">
                 {/* Show "Simora" for system messages, otherwise show author name */}
@@ -334,7 +334,7 @@ export const FeedMessage = memo(function FeedMessage({
               {onReply && (
                 <button
                   onClick={() => onReply(post)}
-                  className="p-1 rounded-full hover:bg-black/10 transition-colors text-foreground/50"
+                  className="p-1 rounded-full active:scale-95 active:bg-black/10 transition-transform text-foreground/50"
                 >
                   <Reply className="h-4 w-4" />
                 </button>
@@ -343,7 +343,7 @@ export const FeedMessage = memo(function FeedMessage({
               {canDelete && !showDeleteConfirm && (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="p-1 rounded-full hover:bg-destructive/20 transition-colors text-foreground/50 hover:text-destructive"
+                  className="p-1 rounded-full active:scale-95 active:bg-destructive/20 transition-transform text-foreground/50 active:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -353,13 +353,13 @@ export const FeedMessage = memo(function FeedMessage({
                   <button
                     onClick={handleDelete}
                     disabled={deletePost.isPending}
-                    className="px-2 py-0.5 text-xs rounded bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                    className="px-2 py-0.5 text-xs rounded bg-destructive text-destructive-foreground active:scale-95 active:opacity-90 transition-transform"
                   >
                     {deletePost.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Delete'}
                   </button>
                   <button
                     onClick={() => setShowDeleteConfirm(false)}
-                    className="px-2 py-0.5 text-xs rounded bg-muted hover:bg-muted/80 transition-colors"
+                    className="px-2 py-0.5 text-xs rounded bg-muted active:scale-95 active:opacity-80 transition-transform"
                   >
                     Cancel
                   </button>
