@@ -27,20 +27,24 @@ import {
 const AppJournalEntry = () => {
   const navigate = useNavigate();
   const { entryId } = useParams<{ entryId: string }>();
-  const isNewEntry = !entryId;
+  const isNewEntry = !entryId || entryId === 'new';
+  
+  // Get mood from URL params for new entries (e.g., /app/journal/new?mood=great)
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialMood = urlParams.get('mood');
   
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [mood, setMood] = useState<string | null>(null);
+  const [mood, setMood] = useState<string | null>(initialMood);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [entryIdState, setEntryIdState] = useState<string | null>(entryId || null);
+  const [entryIdState, setEntryIdState] = useState<string | null>(isNewEntry ? null : entryId || null);
   const [isTextareaFocused, setIsTextareaFocused] = useState(false);
   
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
-  const { data: existingEntry, isLoading } = useJournalEntry(entryId);
+  const { data: existingEntry, isLoading } = useJournalEntry(isNewEntry ? undefined : entryId);
   const createMutation = useCreateJournalEntry();
   const updateMutation = useUpdateJournalEntry();
   const deleteMutation = useDeleteJournalEntry();
