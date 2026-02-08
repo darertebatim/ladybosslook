@@ -76,7 +76,7 @@ export const FeedMessage = memo(function FeedMessage({
     return Math.abs(hash) % 6 + 1; // Returns 1-6
   };
 
-  const bubbleColorIndex = getUserColorIndex(post.author_id);
+  const accentColorIndex = getUserColorIndex(post.author_id);
 
   // Dynamic border radius based on message type (Telegram-style)
   const getBubbleRadius = () => {
@@ -89,17 +89,19 @@ export const FeedMessage = memo(function FeedMessage({
     }
   };
 
-  // Get bubble background style based on message type
-  const getBubbleStyle = () => {
+  // Get accent color for border based on message type
+  const getAccentColor = () => {
     if (isCurrentUser) {
-      return { backgroundColor: 'hsl(var(--chat-bubble-user))' };
+      return 'hsl(var(--chat-accent-user))';
     }
     if (isSystemMessage) {
-      return { backgroundColor: 'hsl(var(--chat-bubble-system))' };
+      return 'hsl(var(--chat-accent-system))';
     }
     // Other users get colors 1-6 based on their ID
-    return { backgroundColor: `hsl(var(--chat-bubble-${bubbleColorIndex}))` };
+    return `hsl(var(--chat-accent-${accentColorIndex}))`;
   };
+
+  const accentColor = getAccentColor();
 
   return (
     <div 
@@ -127,13 +129,19 @@ export const FeedMessage = memo(function FeedMessage({
         {/* Avatar - hidden for follow-up messages and current user */}
         {!isCurrentUser && (
           !isFollowUp ? (
-            <Avatar className="h-8 w-8 shrink-0">
-            {isSystemMessage ? (
+            <Avatar 
+              className="h-8 w-8 shrink-0 ring-2"
+              style={{ '--tw-ring-color': accentColor } as React.CSSProperties}
+            >
+              {isSystemMessage ? (
                 <AvatarImage src={appIcon} alt="Simora" />
               ) : (
                 <AvatarImage src={post.author?.avatar_url || undefined} />
               )}
-              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+              <AvatarFallback 
+                className="text-xs font-semibold text-white"
+                style={{ backgroundColor: accentColor }}
+              >
                 {senderName.charAt(0)}
               </AvatarFallback>
             </Avatar>
@@ -147,11 +155,12 @@ export const FeedMessage = memo(function FeedMessage({
           className={cn(
             "flex-1 min-w-0 max-w-[80%]",
             getBubbleRadius(),
-            "shadow-sm px-3.5 py-2.5 text-foreground",
+            "px-3.5 py-2.5 text-foreground",
+            "bg-muted/50 border-l-[3px]",
             // Align bubbles
-            isCurrentUser && "ml-auto"
+            isCurrentUser && "ml-auto border-l-0 border-r-[3px]"
           )}
-          style={getBubbleStyle()}
+          style={{ borderColor: accentColor }}
         >
           {/* Reply preview - if this message is a reply */}
           {replyToPost && (
