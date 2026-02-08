@@ -42,6 +42,7 @@ import { BadgeCelebration } from '@/components/app/BadgeCelebration';
 import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
 import { useGoldStreak, useGoldDatesThisWeek, useUpdateGoldStreak } from '@/hooks/useGoldStreak';
+import { useTodayMood } from '@/hooks/useMoodLogs';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
@@ -102,6 +103,7 @@ const AppHome = () => {
   const { data: goldStreakData } = useGoldStreak();
   const { data: goldDatesThisWeek = [] } = useGoldDatesThisWeek();
   const updateGoldStreak = useUpdateGoldStreak();
+  const { data: todayMood } = useTodayMood();
   
   // Welcome card dismissed state - persisted in localStorage
   // Also hide if user has ever added an action from the welcome card
@@ -535,15 +537,22 @@ const AppHome = () => {
 
             {/* Right: Mood button + Streak badge */}
             <div className="flex items-center gap-2 justify-end justify-self-end">
-              {/* Mood check-in button */}
+              {/* Mood check-in button with badge */}
               <button 
                 onClick={() => {
                   haptic.light();
                   navigate('/app/mood');
                 }}
-                className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
+                className="relative w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center active:scale-95 transition-transform"
               >
-                <FluentEmoji emoji="🙂" size={18} />
+                <FluentEmoji emoji="🙂" size={26} />
+                {/* Badge indicator */}
+                <div className={cn(
+                  "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-sm",
+                  todayMood ? "bg-green-500" : "bg-red-500"
+                )}>
+                  {todayMood ? "✓" : "+"}
+                </div>
               </button>
               
               {/* Streak badge - navigates to presence page */}
