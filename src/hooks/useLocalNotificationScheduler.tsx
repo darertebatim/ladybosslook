@@ -57,13 +57,33 @@ function isWithinActiveHours(hour: number, wakeTime: string, sleepTime: string):
 
 /**
  * Hook to schedule local notifications based on user preferences
- * This handles time-based notifications that don't require server calculations
+ * 
+ * DISABLED: Server-side notifications via send-daily-notifications edge function
+ * now handle all recurring notifications. This was causing duplicate notifications
+ * when both systems ran simultaneously. Keeping hook structure for potential
+ * future use with task-specific reminders that require local scheduling.
  */
 export function useLocalNotificationScheduler(userId: string | undefined) {
   
   const scheduleNotifications = useCallback(async (prefs: NotificationPreferences) => {
+    // DISABLED: Server-side handles all daily notifications now
+    // This prevents duplicate notifications from both systems firing
     if (!Capacitor.isNativePlatform()) return;
     
+    // Cancel any previously scheduled local notifications to clean up
+    try {
+      await LocalNotifications.cancel({
+        notifications: Object.values(NOTIFICATION_IDS).map(id => ({ id }))
+      });
+      console.log('[LocalScheduler] Cleared local notifications - server-side handles delivery');
+    } catch (e) {
+      console.log('[LocalScheduler] No notifications to clear');
+    }
+    
+    // Early return - don't schedule new local notifications
+    return;
+    
+    // Below code is disabled but preserved for reference
     const notifications: ScheduledNotification[] = [];
     const { wake_time, sleep_time } = prefs;
     
