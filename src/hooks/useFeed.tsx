@@ -478,3 +478,39 @@ export function useCreateUserPost() {
     },
   });
 }
+
+// Delete user's own post (only allowed for discussion posts)
+export function useDeleteUserPost() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ postId, channelId }: { postId: string; channelId: string }) => {
+      if (!user) throw new Error('Not authenticated');
+
+      // First verify this is the user's own post
+      const { data: post, error: fetchError } = await supabase
+        .from('feed_posts')
+        .select('author_id, post_type')
+        .eq('id', postId)
+        .single();
+
+      if (fetchError) throw fetchError;
+      if (post.author_id !== user.id) throw new Error('You can only delete your own messages');
+      if (post.post_type !== 'discussion') throw new Error('You can only delete your own chat messages');
+
+      const { error } = await supabase
+        .from('feed_posts')
+        .delete()
+        .eq('id', postId)
+        .eq('author_id', user.id);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, { channelId }) => {
+      queryClient.invalidateQueries({ queryKey: ['feed-posts', channelId] });
+      queryClient.invalidateQueries({ queryKey: ['channel-summaries'] });
+      queryClient.invalidateQueries({ queryKey: ['feed-unread-count'] });
+    },
+  });
+}

@@ -207,16 +207,24 @@ export default function AppChannelDetail() {
                 </div>
 
                 {/* Posts in this date group */}
-                {group.posts.map((post) => (
-                  <FeedMessage
-                    key={post.id}
-                    post={post}
-                    allowReactions={selectedChannel.allow_reactions}
-                    isFollowUp={post.isFollowUp}
-                    onReply={isGroupChat ? setReplyTo : undefined}
-                    replyToPost={post.reply_to_post_id ? postsById.get(post.reply_to_post_id) : null}
-                  />
-                ))}
+                {group.posts.map((post, postIndex) => {
+                  // Check if this is the last message in the entire channel
+                  const isLastInGroup = postIndex === group.posts.length - 1;
+                  const isLastGroup = groupedPosts.indexOf(group) === groupedPosts.length - 1;
+                  const isLastMessage = isLastInGroup && isLastGroup;
+                  
+                  return (
+                    <FeedMessage
+                      key={post.id}
+                      post={post}
+                      allowReactions={selectedChannel.allow_reactions}
+                      isFollowUp={post.isFollowUp}
+                      onReply={isGroupChat ? setReplyTo : undefined}
+                      replyToPost={post.reply_to_post_id ? postsById.get(post.reply_to_post_id) : null}
+                      isLastMessage={isLastMessage}
+                    />
+                  );
+                })}
               </div>
             ))
           ) : (
