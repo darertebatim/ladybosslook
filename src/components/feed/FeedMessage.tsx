@@ -25,14 +25,17 @@ export const FeedMessage = memo(function FeedMessage({
   const { user } = useAuth();
   const isVoiceMessage = post.post_type === 'voice_message' || post.audio_url;
   
-  // Check if this is the current user's message
-  const isCurrentUser = user?.id === post.author_id;
+  // Check if this is a system/admin-panel message (announcements, system posts, etc.)
+  // These should always show as "Simora" on the left, never as current user
+  const isSystemMessage = post.is_system || post.post_type !== 'discussion';
   
-  // Check if this is an admin/system message (no author_id or is_system)
-  const isAdminMessage = !post.author_id || post.is_system;
-
-  // Use display_name if set, otherwise fallback to author's name or 'Admin'
-  const senderName = post.display_name || post.author?.full_name || 'Admin';
+  // Only treat as current user's message if it's a discussion post they authored
+  const isCurrentUser = !isSystemMessage && user?.id === post.author_id;
+  
+  // System messages show as "Simora", otherwise use author info
+  const senderName = isSystemMessage 
+    ? 'Simora' 
+    : (post.display_name || post.author?.full_name || 'User');
   
   // Detect Persian text for proper font and direction
   const { direction, className: bilingualClassName } = useBilingualText(post.content || '');
@@ -75,7 +78,11 @@ export const FeedMessage = memo(function FeedMessage({
         {!isCurrentUser && (
           !isFollowUp ? (
             <Avatar className="h-8 w-8 shrink-0">
-              <AvatarImage src={post.author?.avatar_url || undefined} />
+              {isSystemMessage ? (
+                <AvatarImage src="/lovable-uploads/2b5ed3ea-9c87-4ea0-8dba-7ccf2da22dd1.png" />
+              ) : (
+                <AvatarImage src={post.author?.avatar_url || undefined} />
+              )}
               <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                 {senderName.charAt(0)}
               </AvatarFallback>
@@ -93,7 +100,7 @@ export const FeedMessage = memo(function FeedMessage({
           // Different colors for user vs admin/others
           isCurrentUser 
             ? "bg-primary text-primary-foreground" 
-            : isAdminMessage
+            : isSystemMessage
               ? "bg-card border border-border/50"
               : "bg-muted/80",
           // Align bubbles
@@ -104,7 +111,7 @@ export const FeedMessage = memo(function FeedMessage({
             <div className="flex items-center gap-2 flex-wrap mb-1">
               <span className={cn(
                 "font-semibold text-sm",
-                isAdminMessage ? "text-primary" : "text-foreground"
+                isSystemMessage ? "text-primary" : "text-foreground"
               )}>
                 {senderName}
               </span>
