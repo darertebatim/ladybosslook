@@ -55,10 +55,9 @@ const AppEmotion = () => {
   }, [state, createLog, autoCompleteEmotion]);
 
   const handleDone = useCallback(() => {
-    // Reset state and go back to dashboard
-    setState({ valence: null, category: null, emotions: [] });
-    setStep('dashboard');
-  }, []);
+    // Navigate to planner/home after completing
+    navigate('/app/home');
+  }, [navigate]);
 
   const handleBack = useCallback(() => {
     switch (step) {
