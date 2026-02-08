@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, ChevronLeft, Megaphone, Users, GraduationCap, MessageSquare, ChevronDown, Pin, X } from 'lucide-react';
+import { Loader2, ChevronLeft, Megaphone, Users, GraduationCap, MessageSquare, ChevronDown, Pin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useChannels, useFeedPosts, useMarkPostRead, FeedPost } from '@/hooks/useFeed';
 import { useFeedRealtime } from '@/hooks/useFeedRealtime';
@@ -33,7 +33,6 @@ export default function AppChannelDetail() {
   const hasScrolledRef = useRef(false);
   const [replyTo, setReplyTo] = useState<FeedPost | null>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [showPinnedBar, setShowPinnedBar] = useState(true);
   const [readPostIds, setReadPostIds] = useState<Set<string>>(new Set());
   const [initialReadPostIds, setInitialReadPostIds] = useState<Set<string> | null>(null);
 
@@ -109,7 +108,6 @@ export default function AppChannelDetail() {
   // Reset initial read posts when channel changes
   useEffect(() => {
     setInitialReadPostIds(null);
-    setShowPinnedBar(true);
   }, [selectedChannelId]);
 
   // Scroll to bottom when posts load (only first time)
@@ -145,8 +143,8 @@ export default function AppChannelDetail() {
     if (!scrollContainerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-    // Show button quickly - at just 100px scroll
-    setShowScrollButton(distanceFromBottom > 100);
+    // Show button very quickly - at just 20px scroll
+    setShowScrollButton(distanceFromBottom > 20);
   }, []);
 
   const scrollToBottomSmooth = useCallback(() => {
@@ -156,7 +154,6 @@ export default function AppChannelDetail() {
   const scrollToPinnedMessage = useCallback(() => {
     if (pinnedMessage) {
       handleScrollToPost(pinnedMessage.id);
-      setShowPinnedBar(false);
     }
   }, [pinnedMessage, handleScrollToPost]);
 
@@ -367,7 +364,7 @@ export default function AppChannelDetail() {
       </div>
 
       {/* Pinned message bar - floating above input */}
-      {pinnedMessage && showPinnedBar && (
+      {pinnedMessage && (
         <div 
           className="bg-primary/10 border-t border-primary/20 px-3 py-2 flex items-center gap-2 cursor-pointer active:bg-primary/15 transition-colors"
           onClick={scrollToPinnedMessage}
@@ -382,15 +379,7 @@ export default function AppChannelDetail() {
               {pinnedMessage.content && pinnedMessage.content.length > 60 && !pinnedMessage.title ? '...' : ''}
             </p>
           </div>
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowPinnedBar(false);
-            }}
-            className="p-1 rounded-full hover:bg-primary/10 active:scale-95 transition-all"
-          >
-            <X className="h-4 w-4 text-muted-foreground" />
-          </button>
+          <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
         </div>
       )}
 
