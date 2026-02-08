@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { ChartColumn, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { useCreateJournalEntry } from '@/hooks/useJournal';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { useTodayMood } from '@/hooks/useMoodLogs';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
+import { MoodCelebrationSheet } from './MoodCelebrationSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -72,7 +72,6 @@ const SYNTHETIC_MOOD_TASK: RoutinePlanTask = {
 
 export function MoodDashboard() {
   const navigate = useNavigate();
-  const createJournalEntry = useCreateJournalEntry();
   const { autoCompleteMood } = useAutoCompleteProTask();
   const { data: todayMood } = useTodayMood();
   const { data: existingTask } = useExistingProTask('mood');
@@ -81,6 +80,7 @@ export function MoodDashboard() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
 
   const isAdded = existingTask || justAdded;
@@ -97,26 +97,24 @@ export function MoodDashboard() {
     haptic.medium();
     
     try {
-      const moodData = MOODS.find(m => m.value === selectedMood);
-      await createJournalEntry.mutateAsync({
-        content: `Feeling ${moodData?.label.toLowerCase()} today.`,
-        mood: selectedMood,
-      });
-      
       // Auto-complete any mood pro tasks for today
       await autoCompleteMood();
       
       haptic.success();
-      toast.success('Mood logged! 🎉');
       
-      // Navigate back to home after successful submission
-      navigate('/app/home');
+      // Show celebration sheet instead of auto-saving to journal
+      setShowCelebration(true);
+      setIsSubmitting(false);
     } catch (error) {
       console.error('Failed to log mood:', error);
       toast.error('Failed to log mood');
       setIsSubmitting(false);
     }
-  }, [selectedMood, createJournalEntry, autoCompleteMood, navigate]);
+  }, [selectedMood, autoCompleteMood]);
+
+  const handleCelebrationDone = useCallback(() => {
+    navigate('/app/home');
+  }, [navigate]);
 
   const handleRoutineClick = () => {
     haptic.light();
@@ -270,6 +268,14 @@ export function MoodDashboard() {
         routineTitle="Daily Mood Check-in"
         onSave={handleSaveRoutine}
         isSaving={addRoutinePlan.isPending}
+      />
+
+      {/* Mood Celebration Sheet */}
+      <MoodCelebrationSheet
+        open={showCelebration}
+        onOpenChange={setShowCelebration}
+        mood={selectedMood}
+        onDone={handleCelebrationDone}
       />
     </>
   );
