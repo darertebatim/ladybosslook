@@ -9,6 +9,7 @@ import { FeedVoiceMessage } from './FeedVoiceMessage';
 import { cn } from '@/lib/utils';
 import { detectVideoType, getVideoEmbedUrl } from '@/lib/videoUtils';
 import { useBilingualText } from '@/components/ui/BilingualText';
+import { useAuth } from '@/hooks/useAuth';
 
 interface FeedMessageProps {
   post: FeedPost;
@@ -21,7 +22,14 @@ export const FeedMessage = memo(function FeedMessage({
   allowReactions = true, 
   isFollowUp = false
 }: FeedMessageProps) {
+  const { user } = useAuth();
   const isVoiceMessage = post.post_type === 'voice_message' || post.audio_url;
+  
+  // Check if this is the current user's message
+  const isCurrentUser = user?.id === post.author_id;
+  
+  // Check if this is an admin/system message (no author_id or is_system)
+  const isAdminMessage = !post.author_id || post.is_system;
 
   // Use display_name if set, otherwise fallback to author's name or 'Admin'
   const senderName = post.display_name || post.author?.full_name || 'Admin';
@@ -29,45 +37,75 @@ export const FeedMessage = memo(function FeedMessage({
   // Detect Persian text for proper font and direction
   const { direction, className: bilingualClassName } = useBilingualText(post.content || '');
 
+  // Dynamic border radius based on message type (Telegram-style)
+  const getBubbleRadius = () => {
+    if (isCurrentUser) {
+      // User messages on right - tail on right
+      return "rounded-2xl rounded-br-md";
+    } else {
+      // Admin/other user messages on left - tail on left
+      return "rounded-2xl rounded-tl-md";
+    }
+  };
+
   return (
     <div 
       className={cn(
-        "group relative px-4 py-2",
+        "group relative px-4 py-1",
         post.is_pinned && "bg-primary/5",
-        !isFollowUp && "pt-3"
+        !isFollowUp && "pt-2"
       )}
     >
       {/* Pinned indicator */}
       {post.is_pinned && !isFollowUp && (
-        <div className="flex items-center gap-1.5 text-xs text-primary mb-2 ml-12">
+        <div className={cn(
+          "flex items-center gap-1.5 text-xs text-primary mb-2",
+          isCurrentUser ? "justify-end mr-2" : "ml-12"
+        )}>
           <Pin className="h-3 w-3" />
           <span>Pinned message</span>
         </div>
       )}
 
-      <div className="flex gap-3">
-        {/* Avatar - hidden for follow-up messages */}
-        {!isFollowUp ? (
-          <Avatar className="h-10 w-10 shrink-0">
-            <AvatarImage src={post.author?.avatar_url || undefined} />
-            <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-              {senderName.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
-        ) : (
-          <div className="w-10 shrink-0" /> // Spacer for alignment
+      <div className={cn(
+        "flex gap-2",
+        isCurrentUser && "flex-row-reverse"
+      )}>
+        {/* Avatar - hidden for follow-up messages and current user */}
+        {!isCurrentUser && (
+          !isFollowUp ? (
+            <Avatar className="h-8 w-8 shrink-0">
+              <AvatarImage src={post.author?.avatar_url || undefined} />
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                {senderName.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+          ) : (
+            <div className="w-8 shrink-0" /> // Spacer for alignment
+          )
         )}
 
         {/* Message bubble */}
         <div className={cn(
-          "flex-1 min-w-0",
-          "bg-card rounded-2xl rounded-tl-md shadow-sm border border-border/50",
-          "px-4 py-3 max-w-[85%]"
+          "flex-1 min-w-0 max-w-[80%]",
+          getBubbleRadius(),
+          "shadow-sm px-3.5 py-2.5",
+          // Different colors for user vs admin/others
+          isCurrentUser 
+            ? "bg-primary text-primary-foreground" 
+            : isAdminMessage
+              ? "bg-card border border-border/50"
+              : "bg-muted/80",
+          // Align bubbles
+          isCurrentUser && "ml-auto"
         )}>
-          {/* Header - hidden for follow-up messages */}
-          {!isFollowUp && (
-            <div className="flex items-center gap-2 flex-wrap mb-1.5">
-              <span className="font-semibold text-sm text-foreground">
+          {/* Header - show sender name for non-current-user messages, hidden for follow-ups */}
+          {!isFollowUp && !isCurrentUser && (
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <span className={cn(
+                "font-semibold text-sm",
+                isAdminMessage ? "text-primary" : "text-foreground"
+              )}>
                 {senderName}
               </span>
             </div>
@@ -83,13 +121,17 @@ export const FeedMessage = memo(function FeedMessage({
             <FeedVoiceMessage 
               audioUrl={post.audio_url} 
               duration={post.audio_duration || 0}
+              isCurrentUser={isCurrentUser}
             />
           )}
 
           {/* Text content */}
           {post.content && !isVoiceMessage && (
             <p 
-              className={cn("text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed", bilingualClassName)}
+              className={cn(
+                "text-[15px] whitespace-pre-wrap break-words leading-relaxed", 
+                bilingualClassName
+              )}
               dir={direction}
             >
               {post.content}
@@ -99,7 +141,11 @@ export const FeedMessage = memo(function FeedMessage({
           {/* Caption for voice message */}
           {isVoiceMessage && post.content && (
             <p 
-              className={cn("text-sm text-muted-foreground mt-2", bilingualClassName)}
+              className={cn(
+                "text-sm mt-2",
+                isCurrentUser ? "text-primary-foreground/80" : "text-muted-foreground",
+                bilingualClassName
+              )}
               dir={direction}
             >
               {post.content}
@@ -188,16 +234,26 @@ export const FeedMessage = memo(function FeedMessage({
           )}
 
           {/* Footer: Timestamp + Read indicator */}
-          <div className="flex items-center justify-end gap-1.5 mt-2 text-[10px] text-muted-foreground">
+          <div className={cn(
+            "flex items-center gap-1.5 mt-1.5 text-[11px]",
+            isCurrentUser 
+              ? "justify-end text-primary-foreground/60" 
+              : "justify-end text-muted-foreground"
+          )}>
             <span>{format(new Date(post.created_at), 'HH:mm')}</span>
-            <CheckCheck className="h-3 w-3 text-primary" />
+            {isCurrentUser && (
+              <CheckCheck className="h-3 w-3" />
+            )}
           </div>
         </div>
       </div>
 
       {/* Reactions - outside the bubble */}
       {Object.keys(post.reactions_count || {}).length > 0 && (
-        <div className="flex items-center gap-4 mt-2 ml-[52px]">
+        <div className={cn(
+          "flex items-center gap-4 mt-1",
+          isCurrentUser ? "justify-end mr-2" : "ml-10"
+        )}>
           <FeedReactions
             postId={post.id}
             reactionsCount={post.reactions_count || {}}

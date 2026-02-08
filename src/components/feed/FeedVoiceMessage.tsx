@@ -5,9 +5,10 @@ import { cn } from '@/lib/utils';
 interface FeedVoiceMessageProps {
   audioUrl: string;
   duration: number;
+  isCurrentUser?: boolean;
 }
 
-export function FeedVoiceMessage({ audioUrl, duration }: FeedVoiceMessageProps) {
+export function FeedVoiceMessage({ audioUrl, duration, isCurrentUser = false }: FeedVoiceMessageProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -74,13 +75,21 @@ export function FeedVoiceMessage({ audioUrl, duration }: FeedVoiceMessageProps) 
   });
 
   return (
-    <div className="flex items-center gap-3 bg-primary/10 rounded-2xl px-3 py-2.5 max-w-xs">
+    <div className={cn(
+      "flex items-center gap-3 rounded-2xl px-3 py-2.5 max-w-xs",
+      isCurrentUser ? "bg-primary-foreground/20" : "bg-primary/10"
+    )}>
       <audio ref={audioRef} src={audioUrl} preload="metadata" />
       
       {/* Play/Pause button */}
       <button
         onClick={togglePlay}
-        className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground shrink-0 hover:opacity-90 transition-opacity"
+        className={cn(
+          "flex items-center justify-center w-10 h-10 rounded-full shrink-0 hover:opacity-90 transition-opacity",
+          isCurrentUser 
+            ? "bg-primary-foreground text-primary" 
+            : "bg-primary text-primary-foreground"
+        )}
       >
         {isPlaying ? (
           <Pause className="h-5 w-5" />
@@ -104,7 +113,9 @@ export function FeedVoiceMessage({ audioUrl, duration }: FeedVoiceMessageProps) 
                 key={i}
                 className={cn(
                   "w-1 rounded-full transition-colors",
-                  isActive ? "bg-primary" : "bg-muted-foreground/30"
+                  isActive 
+                    ? (isCurrentUser ? "bg-primary-foreground" : "bg-primary") 
+                    : (isCurrentUser ? "bg-primary-foreground/30" : "bg-muted-foreground/30")
                 )}
                 style={{ height: `${height}%` }}
               />
@@ -113,7 +124,10 @@ export function FeedVoiceMessage({ audioUrl, duration }: FeedVoiceMessageProps) 
         </div>
 
         {/* Time display */}
-        <div className="flex justify-between text-xs text-muted-foreground">
+        <div className={cn(
+          "flex justify-between text-xs",
+          isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground"
+        )}>
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(audioDuration)}</span>
         </div>
