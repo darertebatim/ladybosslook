@@ -91,7 +91,7 @@ export function usePeriodNotifications(userId: string | undefined) {
           id: idCounter++,
           title: '🌸 Period May Have Started',
           body: 'Your period may have started today. Tap to log.',
-          schedule: { at: getScheduleDate(daysUntilStart, 10, 0) },
+          schedule: { at: getScheduleDate(daysUntilStart, 10) },
           sound: 'default',
           extra: { type: 'period_reminder', url: '/app/period' },
         });
