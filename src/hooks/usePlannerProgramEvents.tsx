@@ -341,11 +341,13 @@ export function useProgramEventDates(startDate: Date, endDate: Date) {
           id,
           program_slug,
           round_id,
+          enrolled_at,
           program_rounds (
             id,
             first_session_date,
             drip_offset_days,
-            audio_playlist_id
+            audio_playlist_id,
+            is_self_paced
           )
         `)
         .eq('user_id', user.id)
