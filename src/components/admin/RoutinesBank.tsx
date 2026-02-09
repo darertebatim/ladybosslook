@@ -404,6 +404,8 @@ export default function RoutinesBank() {
       emoji: t.emoji,
       section_id: t.section_id,
       task_order: t.task_order,
+      schedule_days: (t as any).schedule_days || [],
+      drip_day: (t as any).drip_day ?? null,
     }));
 
     return { sections, tasks };
