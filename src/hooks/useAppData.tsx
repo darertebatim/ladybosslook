@@ -233,7 +233,8 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
         video_url,
         important_message,
         audio_playlist_id,
-        drip_offset_days
+        drip_offset_days,
+        is_self_paced
       )
     `)
     .eq('user_id', userId)
