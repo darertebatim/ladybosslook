@@ -362,15 +362,19 @@ const AppTaskCreate = ({
     }
   }, [isSheet, initialData, sheetOpen]);
 
-  // Populate form when editing (page mode)
+  // Populate form when editing (page mode) - only once when task first loads
+  const hasPopulatedRef = useRef(false);
   useEffect(() => {
-    if (!isSheet && existingTask) {
+    if (!isSheet && existingTask && !hasPopulatedRef.current) {
+      hasPopulatedRef.current = true;
       setTitle(existingTask.title);
       setDescription(existingTask.description ?? null);
       setIcon(existingTask.emoji);
       setColor(existingTask.color as TaskColor);
       if (existingTask.scheduled_date) {
-        setScheduledDate(new Date(existingTask.scheduled_date));
+        // Parse date components manually to avoid UTC timezone shift
+        const [year, month, day] = existingTask.scheduled_date.split('-').map(Number);
+        setScheduledDate(new Date(year, month - 1, day));
       }
       setScheduledTime(existingTask.scheduled_time);
       // Map legacy time_period values to new 4-period system using helper
