@@ -2,6 +2,7 @@ import { useEffect, useCallback } from 'react';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
+import { clearLegacyDailyLocalNotificationsOnce } from '@/lib/dailyLocalNotificationCleanup';
 
 interface NotificationPreferences {
   morning_summary: boolean;
@@ -70,16 +71,16 @@ export function useLocalNotificationScheduler(userId: string | undefined) {
     // This prevents duplicate notifications from both systems firing
     if (!Capacitor.isNativePlatform()) return;
     
-    // Cancel any previously scheduled local notifications to clean up
+    // Clear any legacy daily local notifications (old builds may still have repeating schedules)
     try {
-      await LocalNotifications.cancel({
-        notifications: Object.values(NOTIFICATION_IDS).map(id => ({ id }))
-      });
-      console.log('[LocalScheduler] Cleared local notifications - server-side handles delivery');
+      const result = await clearLegacyDailyLocalNotificationsOnce();
+      if (result.ran) {
+        console.log(`[LocalScheduler] Cleared ${result.cleared} legacy daily local notifications (pending: ${result.pending})`);
+      }
     } catch (e) {
-      console.log('[LocalScheduler] No notifications to clear');
+      console.log('[LocalScheduler] Legacy cleanup skipped/failed');
     }
-    
+
     // Early return - don't schedule new local notifications
     return;
     
@@ -191,7 +192,14 @@ export function useLocalNotificationScheduler(userId: string | undefined) {
   
   // Fetch preferences and schedule on mount and when user changes
   useEffect(() => {
-    if (!userId || !Capacitor.isNativePlatform()) return;
+    if (!Capacitor.isNativePlatform()) return;
+
+    // Always clear legacy daily local notifications on app startup (even before login)
+    clearLegacyDailyLocalNotificationsOnce().catch(() => {
+      // ignore
+    });
+
+    if (!userId) return;
     
     const fetchAndSchedule = async () => {
       try {
