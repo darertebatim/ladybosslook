@@ -207,12 +207,14 @@ export default function AppPlaylistDetail() {
         .from('course_enrollments')
         .select(`
           round_id,
+          enrolled_at,
           program_rounds!inner (
             id,
             start_date,
             first_session_date,
             drip_offset_days,
-            audio_playlist_id
+            audio_playlist_id,
+            is_self_paced
           )
         `)
         .eq('user_id', user.id)
@@ -221,7 +223,8 @@ export default function AppPlaylistDetail() {
         .maybeSingle();
       
       if (error) throw error;
-      return data?.program_rounds;
+      if (!data?.program_rounds) return null;
+      return { ...data.program_rounds, enrolled_at: data.enrolled_at };
     },
     enabled: !!playlistId && !playlist?.is_free,
   });
