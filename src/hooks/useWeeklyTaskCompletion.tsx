@@ -4,6 +4,22 @@ import { useAuth } from '@/hooks/useAuth';
 import { format, startOfWeek, addDays } from 'date-fns';
 import { taskAppliesToDate } from '@/lib/localDate';
 
+export type BadgeLevel = 'none' | 'bronze' | 'silver' | 'gold';
+
+export interface DailyTaskCompletion {
+  date: string;
+  totalTasks: number;
+  completedTasks: number;
+  badgeLevel: BadgeLevel;
+}
+
+function calculateBadgeLevel(completed: number, total: number): BadgeLevel {
+  if (total === 0 || completed === 0) return 'none';
+  if (completed >= total) return 'gold';
+  if (completed >= total * 0.5) return 'silver';
+  return 'bronze';
+}
+
 export function useWeeklyTaskCompletion() {
   const { user } = useAuth();
   const today = new Date();
