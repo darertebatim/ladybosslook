@@ -1931,6 +1931,7 @@ export type Database = {
           google_meet_link: string | null
           id: string
           important_message: string | null
+          is_self_paced: boolean
           mailchimp_tags: Json | null
           max_students: number | null
           program_slug: string
@@ -1956,6 +1957,7 @@ export type Database = {
           google_meet_link?: string | null
           id?: string
           important_message?: string | null
+          is_self_paced?: boolean
           mailchimp_tags?: Json | null
           max_students?: number | null
           program_slug: string
@@ -1981,6 +1983,7 @@ export type Database = {
           google_meet_link?: string | null
           id?: string
           important_message?: string | null
+          is_self_paced?: boolean
           mailchimp_tags?: Json | null
           max_students?: number | null
           program_slug?: string
