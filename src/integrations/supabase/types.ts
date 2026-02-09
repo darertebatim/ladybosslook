@@ -2579,6 +2579,7 @@ export type Database = {
           is_active: boolean | null
           is_popular: boolean | null
           is_welcome_popup: boolean
+          schedule_type: string
           sort_order: number | null
           subtitle: string | null
           title: string
@@ -2595,6 +2596,7 @@ export type Database = {
           is_active?: boolean | null
           is_popular?: boolean | null
           is_welcome_popup?: boolean
+          schedule_type?: string
           sort_order?: number | null
           subtitle?: string | null
           title: string
@@ -2611,6 +2613,7 @@ export type Database = {
           is_active?: boolean | null
           is_popular?: boolean | null
           is_welcome_popup?: boolean
+          schedule_type?: string
           sort_order?: number | null
           subtitle?: string | null
           title?: string
@@ -2662,10 +2665,12 @@ export type Database = {
       routines_bank_tasks: {
         Row: {
           created_at: string | null
+          drip_day: number | null
           duration_minutes: number | null
           emoji: string | null
           id: string
           routine_id: string
+          schedule_days: number[] | null
           section_id: string | null
           section_title: string | null
           task_id: string | null
@@ -2674,10 +2679,12 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          drip_day?: number | null
           duration_minutes?: number | null
           emoji?: string | null
           id?: string
           routine_id: string
+          schedule_days?: number[] | null
           section_id?: string | null
           section_title?: string | null
           task_id?: string | null
@@ -2686,10 +2693,12 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          drip_day?: number | null
           duration_minutes?: number | null
           emoji?: string | null
           id?: string
           routine_id?: string
+          schedule_days?: number[] | null
           section_id?: string | null
           section_title?: string | null
           task_id?: string | null
