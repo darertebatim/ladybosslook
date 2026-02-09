@@ -79,7 +79,7 @@ export function usePeriodNotifications(userId: string | undefined) {
           id: idCounter++,
           title: '🌸 Period Reminder',
           body: `Your period may start in ${reminderDays} day${reminderDays > 1 ? 's' : ''}. Prepare yourself.`,
-          schedule: { at: getScheduleDate(reminderDaysOut, 9, 0) },
+          schedule: { at: getScheduleDate(reminderDaysOut, 9) },
           sound: 'default',
           extra: { type: 'period_reminder', url: '/app/period' },
         });
