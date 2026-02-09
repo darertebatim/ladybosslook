@@ -232,7 +232,7 @@ export function RoutinePreviewSheet({
 
             <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
               <p className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                Daily Actions
+                {scheduleType === 'challenge' ? 'Challenge Actions' : scheduleType === 'weekly' ? 'Weekly Actions' : 'Daily Actions'}
               </p>
               
               <div className="space-y-3">
