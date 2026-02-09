@@ -130,6 +130,7 @@ export default function RoutinesBank() {
     category: 'general',
     color: 'yellow',
     emoji: '✨',
+    schedule_type: 'daily' as 'daily' | 'weekly' | 'challenge',
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
   const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
