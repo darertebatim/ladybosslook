@@ -44,9 +44,24 @@ const ACTION_BODIES = [
   "Small steps, big change. Let's go.",
 ];
 
+function avoidRoundedMinute(minute: number): number {
+  const rounded = [0, 15, 30, 45];
+  if (rounded.includes(minute)) {
+    return minute + (Math.random() > 0.5 ? Math.floor(Math.random() * 7) + 1 : -(Math.floor(Math.random() * 7) + 1) + 60) % 60;
+  }
+  return minute;
+}
+
 function randomTimeBetween(startHour: number, endHour: number): { hour: number; minute: number } {
-  const hour = startHour + Math.floor(Math.random() * (endHour - startHour));
-  const minute = Math.floor(Math.random() * 60);
+  // Schedule between 8:03 and 19:47 to avoid exact boundary times
+  const effectiveStart = startHour === 8 ? 8 : startHour;
+  const effectiveEnd = endHour === 20 ? 20 : endHour;
+  const hour = effectiveStart + Math.floor(Math.random() * (effectiveEnd - effectiveStart));
+  let minute = Math.floor(Math.random() * 60);
+  minute = avoidRoundedMinute(minute);
+  // Clamp to 8:03 - 19:47 range
+  if (hour === 8 && minute < 3) minute = 3 + Math.floor(Math.random() * 10);
+  if (hour === 19 && minute > 47) minute = 40 + Math.floor(Math.random() * 8);
   return { hour, minute };
 }
 

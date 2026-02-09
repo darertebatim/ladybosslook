@@ -105,7 +105,7 @@ export function usePeriodNotifications(userId: string | undefined) {
             id: idCounter++,
             title: '🌸 Log Your Day',
             body: "Don't forget to log today.",
-            schedule: { at: getScheduleDate(dayOffset, 10, 0) },
+            schedule: { at: getScheduleDate(dayOffset, 10) },
             sound: 'default',
             extra: { type: 'period_reminder', url: '/app/period' },
           });
