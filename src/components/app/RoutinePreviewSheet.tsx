@@ -56,6 +56,7 @@ interface RoutinePreviewSheetProps {
   tasks: RoutinePlanTask[];
   routineTitle: string;
   defaultTag?: string | null;
+  scheduleType?: 'daily' | 'weekly' | 'challenge';
   onSave: (selectedTaskIds: string[], editedTasks: EditedTask[]) => void;
   isSaving?: boolean;
 }
@@ -66,6 +67,7 @@ export function RoutinePreviewSheet({
   tasks,
   routineTitle,
   defaultTag,
+  scheduleType = 'daily',
   onSave,
   isSaving,
 }: RoutinePreviewSheetProps) {
@@ -191,7 +193,16 @@ export function RoutinePreviewSheet({
     onSave(Array.from(selectedTaskIds), editedTasksList);
   };
 
-  const getRepeatLabel = (pattern: string) => {
+  const WEEKDAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const getRepeatLabel = (task: RoutinePlanTask, pattern: string) => {
+    if (scheduleType === 'challenge' && (task as any).drip_day) {
+      return `Day ${(task as any).drip_day}`;
+    }
+    if (scheduleType === 'weekly' && (task as any).schedule_days?.length > 0) {
+      const days = ((task as any).schedule_days as number[]).sort();
+      return days.map(d => WEEKDAY_NAMES[d]).join(', ');
+    }
     switch (pattern) {
       case 'daily': return 'Repeats every day';
       case 'weekly': return 'Repeats every week';
@@ -221,7 +232,7 @@ export function RoutinePreviewSheet({
 
             <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
               <p className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                Daily Actions
+                {scheduleType === 'challenge' ? 'Challenge Actions' : scheduleType === 'weekly' ? 'Weekly Actions' : 'Daily Actions'}
               </p>
               
               <div className="space-y-3">
@@ -260,7 +271,7 @@ export function RoutinePreviewSheet({
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-black truncate">{display.title}</p>
                             <p className="text-xs text-black/70 truncate">
-                              {getRepeatLabel(display.repeatPattern)}
+                              {getRepeatLabel(task, display.repeatPattern)}
                             </p>
                           </div>
 

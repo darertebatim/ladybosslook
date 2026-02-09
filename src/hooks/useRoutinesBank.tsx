@@ -17,6 +17,7 @@ export interface RoutineBankItem {
   sort_order: number | null;
   created_at: string | null;
   updated_at: string | null;
+  schedule_type?: string; // 'daily' | 'weekly' | 'challenge'
 }
 
 export interface RoutineBankSection {
@@ -40,6 +41,9 @@ export interface RoutineBankTask {
   section_title: string | null;
   task_order: number | null;
   created_at: string | null;
+  // Schedule fields
+  schedule_days?: number[] | null; // For weekly mode: weekday numbers (0=Sun..6=Sat)
+  drip_day?: number | null; // For challenge mode: day number (1-based)
   // Fields from joined admin_task_bank
   pro_link_type?: string | null;
   pro_link_value?: string | null;
@@ -343,7 +347,7 @@ export function useAddRoutineFromBank() {
         title?: string;
         icon?: string;
         color?: string;
-        repeatPattern?: 'daily' | 'weekly' | 'monthly' | 'none';
+        repeatPattern?: string;
         scheduledTime?: string | null;
         tag?: string | null;
         pro_link_type?: string | null;
@@ -425,6 +429,10 @@ export function useAddRoutineFromBank() {
 
       const startOrderIndex = (existingTasks?.[0]?.order_index ?? -1) + 1;
 
+      // Determine schedule type from ritual
+      const scheduleType = (routine as any).schedule_type || 'daily';
+      const today = new Date();
+
       // Create user tasks
       if (tasks.length > 0) {
         const userTasks = tasks.map((task, index) => {
@@ -434,12 +442,30 @@ export function useAddRoutineFromBank() {
           const proLinkType = edited?.pro_link_type ?? bankTask?.pro_link_type ?? null;
           const proLinkValue = edited?.pro_link_value ?? bankTask?.pro_link_value ?? bankTask?.linked_playlist_id ?? null;
 
+          // Determine repeat_pattern and scheduling based on ritual schedule_type
+          let repeatPattern = edited?.repeatPattern || 'daily';
+          let repeatDays: number[] | null = null;
+          let scheduledDate: string | null = null;
+
+          if (scheduleType === 'weekly' && (task as any).schedule_days?.length > 0) {
+            repeatPattern = 'custom';
+            repeatDays = (task as any).schedule_days;
+          } else if (scheduleType === 'challenge' && (task as any).drip_day) {
+            repeatPattern = 'none';
+            const dripDay = (task as any).drip_day as number;
+            const taskDate = new Date(today);
+            taskDate.setDate(taskDate.getDate() + (dripDay - 1));
+            scheduledDate = taskDate.toISOString().split('T')[0]; // YYYY-MM-DD
+          }
+
           return {
             user_id: user.id,
             title: edited?.title || task.title,
             emoji: edited?.icon || task.emoji || routine.emoji || '✨',
             color: edited?.color || bankTask?.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
-            repeat_pattern: edited?.repeatPattern || 'daily',
+            repeat_pattern: repeatPattern,
+            repeat_days: repeatDays,
+            scheduled_date: scheduledDate,
             scheduled_time: edited?.scheduledTime || null,
             // Use category from admin_task_bank (the source of truth), fallback to routine.category
             tag: edited?.tag ?? bankTask?.category ?? routine.category,
