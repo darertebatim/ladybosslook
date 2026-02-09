@@ -54,6 +54,7 @@ interface ProgramRound {
   audio_playlist_id: string | null;
   video_url: string | null;
   drip_offset_days: number;
+  is_self_paced: boolean;
 }
 
 interface RoundFormData {
