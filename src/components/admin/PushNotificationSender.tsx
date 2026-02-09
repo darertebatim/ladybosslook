@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, Send, Beaker, Radio } from 'lucide-react';
+import { Bell, Send, Beaker, Radio, AlertTriangle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
 interface Program {
@@ -41,6 +42,7 @@ function NotificationForm({ environment }: NotificationFormProps) {
   const [targetCourse, setTargetCourse] = useState('');
   const [targetRoundId, setTargetRoundId] = useState('all-rounds');
   const [targetUserEmail, setTargetUserEmail] = useState('');
+  const [isUrgent, setIsUrgent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
@@ -147,7 +149,8 @@ function NotificationForm({ environment }: NotificationFormProps) {
         title,
         body: message,
         url: destinationUrl,
-        environment, // Pass environment to edge function
+        environment,
+        isUrgent,
       };
 
       if (targetType === 'course') {
@@ -180,6 +183,7 @@ function NotificationForm({ environment }: NotificationFormProps) {
       setTargetCourse('');
       setTargetRoundId('all-rounds');
       setTargetUserEmail('');
+      setIsUrgent(false);
     } catch (error: any) {
       console.error('Error sending push notification:', error);
       toast({
@@ -341,16 +345,43 @@ function NotificationForm({ environment }: NotificationFormProps) {
         </div>
       )}
 
+      {/* Urgent Toggle */}
+      <div className="flex items-center justify-between rounded-lg border border-border p-3">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className={`h-4 w-4 ${isUrgent ? 'text-destructive' : 'text-muted-foreground'}`} />
+          <div>
+            <Label htmlFor={`urgent-${environment}`} className="text-sm font-medium cursor-pointer">
+              Urgent (Time-Sensitive)
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              Bypasses Focus & Do Not Disturb on iOS 15+
+            </p>
+          </div>
+        </div>
+        <Switch
+          id={`urgent-${environment}`}
+          checked={isUrgent}
+          onCheckedChange={setIsUrgent}
+        />
+      </div>
+
       {/* Preview */}
-      <div className="rounded-lg border border-border bg-muted/50 p-4">
+      <div className={`rounded-lg border p-4 ${isUrgent ? 'border-destructive/50 bg-destructive/5' : 'border-border bg-muted/50'}`}>
         <div className="flex items-start gap-3">
-          <div className="rounded-full bg-primary p-2">
+          <div className={`rounded-full p-2 ${isUrgent ? 'bg-destructive' : 'bg-primary'}`}>
             <Bell className="h-4 w-4 text-primary-foreground" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-foreground">
-              {title || 'Notification Title'}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="font-semibold text-sm text-foreground">
+                {title || 'Notification Title'}
+              </p>
+              {isUrgent && (
+                <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-destructive text-destructive-foreground">
+                  Urgent
+                </span>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               {message || 'Notification message will appear here'}
             </p>
