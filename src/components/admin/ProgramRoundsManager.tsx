@@ -859,7 +859,26 @@ export const ProgramRoundsManager = () => {
               <p className="text-xs text-muted-foreground">Select the audio playlist for this round's supplementary materials</p>
             </div>
 
-            <DialogFooter className="mt-6">
+            <div className="space-y-2 mt-4">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="is_self_paced"
+                  checked={formData.is_self_paced}
+                  onChange={(e) =>
+                    setFormData({ ...formData, is_self_paced: e.target.checked })
+                  }
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <Label htmlFor="is_self_paced" className="cursor-pointer font-semibold">
+                  Self-Paced Round
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                When enabled, drip content dates are based on each user's enrollment date instead of the round's first session date. Start Date and First Session Date become relative to enrollment.
+              </p>
+            </div>
+
               <Button type="button" variant="outline" onClick={() => setIsFormDialogOpen(false)}>
                 Cancel
               </Button>
