@@ -26,7 +26,7 @@ interface NewHomeData {
 
 async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
   const today = new Date();
-  const dateStr = format(today, 'yyyy-MM-dd');
+  const dateStr = getLocalDateStr(today);
   const dayOfWeek = today.getDay();
 
   const [
