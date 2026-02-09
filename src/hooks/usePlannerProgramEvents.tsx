@@ -382,7 +382,8 @@ export function useProgramEventDates(startDate: Date, endDate: Date) {
         }
 
         // Get content unlocks (modules and tracks) in range
-        if (round.audio_playlist_id && round.first_session_date) {
+        const dripAnchorDate = round.is_self_paced ? enrollment.enrolled_at : round.first_session_date;
+        if (round.audio_playlist_id && dripAnchorDate) {
           // Get modules
           const { data: modules } = await supabase
             .from('playlist_supplements')
@@ -392,7 +393,7 @@ export function useProgramEventDates(startDate: Date, endDate: Date) {
           for (const module of modules || []) {
             const { unlockDate } = getUnlockDateTime(
               module.drip_delay_days,
-              round.first_session_date,
+              dripAnchorDate,
               round.drip_offset_days || 0
             );
             
@@ -410,7 +411,7 @@ export function useProgramEventDates(startDate: Date, endDate: Date) {
           for (const item of playlistItems || []) {
             const { unlockDate } = getUnlockDateTime(
               item.drip_delay_days,
-              round.first_session_date,
+              dripAnchorDate,
               round.drip_offset_days || 0
             );
             
