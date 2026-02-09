@@ -17,6 +17,7 @@ export interface RoutineBankItem {
   sort_order: number | null;
   created_at: string | null;
   updated_at: string | null;
+  schedule_type?: string; // 'daily' | 'weekly' | 'challenge'
 }
 
 export interface RoutineBankSection {
