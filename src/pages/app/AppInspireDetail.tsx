@@ -337,6 +337,7 @@ export default function AppInspireDetail() {
           tasks={previewTasks}
           routineTitle={routine.title}
           defaultTag={routine.category}
+          scheduleType={(routine as any).schedule_type || 'daily'}
           onSave={handleSaveRoutine}
           isSaving={addRoutineFromBank.isPending}
         />
