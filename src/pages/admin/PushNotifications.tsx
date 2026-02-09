@@ -265,7 +265,7 @@ const localPNs: PNType[] = [
     name: 'Urgent Alarm',
     function: 'local-urgent-alarm',
     trigger: 'Multiple triggers with vibration',
-    description: 'High-priority alarms with sound and vibration for critical reminders.',
+    description: 'High-priority alarms with sound and vibration for critical reminders. Uses time-sensitive interruption level.',
     icon: <Bell className="h-5 w-5" />,
     codeFile: 'src/hooks/useLocalNotificationScheduler.ts',
     deliveryType: 'local',
