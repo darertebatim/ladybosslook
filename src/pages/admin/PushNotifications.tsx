@@ -770,32 +770,23 @@ function PNDocumentation() {
         </CardContent>
       </Card>
 
-      {/* Recent Logs */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Recent Server Runs</CardTitle>
-          <CardDescription>History of server-side push notification jobs</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <RecentLogsTable />
-        </CardContent>
-      </Card>
-      
-      {/* Hybrid Strategy Note */}
+      {/* Delivery Strategy Note */}
       <Card className="border-primary/30 bg-accent/50">
         <CardHeader>
           <CardTitle className="text-base">📋 Delivery Strategy</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
           <p>
-            <strong>Local-first:</strong> Daily notifications are scheduled on-device for reliability. 
-            Config changes sync via realtime or silent push.
+            <strong>Local-first (Smart Nudges):</strong> Action reminders, water, and period notifications are generated from on-device planner data. Random times between 8 AM - 8 PM.
           </p>
           <p>
-            <strong>Hybrid:</strong> Task reminders use local as primary (better offline), server as fallback for old app versions.
+            <strong>Server (Momentum Keeper):</strong> Detects user inactivity and sends nudges to bring them back. Includes coins context.
           </p>
           <p>
-            <strong>Server-only:</strong> Content drip, session reminders, and event-triggered notifications use APNs directly.
+            <strong>Server (Drip Follow-up):</strong> Follows up on unlocked content that hasn't been listened to after 2+ days.
+          </p>
+          <p>
+            <strong>Hybrid:</strong> Session reminders and content unlocks use local as primary, server as fallback.
           </p>
         </CardContent>
       </Card>
