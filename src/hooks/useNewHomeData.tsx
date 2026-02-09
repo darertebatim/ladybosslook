@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
+import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
 
 const STALE_TIME = 2 * 60 * 1000;
 const GC_TIME = 10 * 60 * 1000;

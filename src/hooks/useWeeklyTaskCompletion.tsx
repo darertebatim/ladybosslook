@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { format, startOfWeek, addDays, parseISO } from 'date-fns';
+import { format, startOfWeek, addDays } from 'date-fns';
+import { taskAppliesToDate } from '@/lib/localDate';
 
 export type BadgeLevel = 'none' | 'bronze' | 'silver' | 'gold';
 
