@@ -249,6 +249,8 @@ export default function RoutinesBank() {
           emoji: t.emoji,
           section_id: t.section_id ? sectionIdMap[t.section_id] || null : null,
           task_order: idx,
+          schedule_days: t.schedule_days?.length ? t.schedule_days : [],
+          drip_day: t.drip_day,
         }));
         await supabase.from('routines_bank_tasks').insert(taskRecords);
       }
