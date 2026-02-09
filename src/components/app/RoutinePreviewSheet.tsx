@@ -271,7 +271,7 @@ export function RoutinePreviewSheet({
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-black truncate">{display.title}</p>
                             <p className="text-xs text-black/70 truncate">
-                              {getRepeatLabel(display.repeatPattern)}
+                              {getRepeatLabel(task, display.repeatPattern)}
                             </p>
                           </div>
 
