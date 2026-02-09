@@ -11,7 +11,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Gift } from 'lucide-react';
+import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Gift, Calendar, Flame } from 'lucide-react';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
 import EmojiPicker from '@/components/app/EmojiPicker';
@@ -48,6 +49,7 @@ interface RoutineBankItem {
   is_popular: boolean;
   is_welcome_popup: boolean;
   sort_order: number;
+  schedule_type: string;
   created_at: string;
   updated_at: string;
 }
@@ -100,6 +102,8 @@ interface LocalTask {
   emoji: string;
   section_id: string | null;
   task_order: number;
+  schedule_days: number[];
+  drip_day: number | null;
 }
 
 export default function RoutinesBank() {
@@ -126,6 +130,7 @@ export default function RoutinesBank() {
     category: 'general',
     color: 'yellow',
     emoji: '✨',
+    schedule_type: 'daily' as 'daily' | 'weekly' | 'challenge',
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
   const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
@@ -205,6 +210,7 @@ export default function RoutinesBank() {
           category: data.formData.category,
           color: data.formData.color,
           emoji: data.formData.emoji,
+          schedule_type: data.formData.schedule_type,
         })
         .select()
         .single();
@@ -243,6 +249,8 @@ export default function RoutinesBank() {
           emoji: t.emoji,
           section_id: t.section_id ? sectionIdMap[t.section_id] || null : null,
           task_order: idx,
+          schedule_days: t.schedule_days?.length ? t.schedule_days : [],
+          drip_day: t.drip_day,
         }));
         await supabase.from('routines_bank_tasks').insert(taskRecords);
       }
@@ -271,6 +279,7 @@ export default function RoutinesBank() {
           category: data.formData.category,
           color: data.formData.color,
           emoji: data.formData.emoji,
+          schedule_type: data.formData.schedule_type,
         })
         .eq('id', data.id);
       if (error) throw error;
@@ -311,6 +320,8 @@ export default function RoutinesBank() {
           emoji: t.emoji,
           section_id: t.section_id ? sectionIdMap[t.section_id] || null : null,
           task_order: idx,
+          schedule_days: t.schedule_days?.length ? t.schedule_days : [],
+          drip_day: t.drip_day,
         }));
         await supabase.from('routines_bank_tasks').insert(taskRecords);
       }
@@ -399,6 +410,8 @@ export default function RoutinesBank() {
       emoji: t.emoji,
       section_id: t.section_id,
       task_order: t.task_order,
+      schedule_days: (t as any).schedule_days || [],
+      drip_day: (t as any).drip_day ?? null,
     }));
 
     return { sections, tasks };
@@ -414,6 +427,7 @@ export default function RoutinesBank() {
       category: 'general',
       color: 'yellow',
       emoji: '✨',
+      schedule_type: 'daily',
     });
     setLocalSections([]);
     setLocalTasks([]);
@@ -431,6 +445,7 @@ export default function RoutinesBank() {
       category: routine.category,
       color: routine.color,
       emoji: routine.emoji,
+      schedule_type: (routine.schedule_type || 'daily') as 'daily' | 'weekly' | 'challenge',
     });
     const { sections, tasks } = await fetchRoutineData(routine.id);
     setLocalSections(sections);
@@ -530,6 +545,8 @@ export default function RoutinesBank() {
       emoji: task.emoji,
       section_id: sectionId,
       task_order: localTasks.filter(t => t.section_id === sectionId).length,
+      schedule_days: [],
+      drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : null,
     };
     setLocalTasks([...localTasks, newTask]);
     setTaskSearchOpen(false);
@@ -597,6 +614,54 @@ export default function RoutinesBank() {
 
   const getSectionTaskCount = (sectionId: string) => {
     return localTasks.filter(t => t.section_id === sectionId).length;
+  };
+
+  const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const renderTaskScheduleConfig = (task: LocalTask) => {
+    if (formData.schedule_type === 'weekly') {
+      return (
+        <div className="flex gap-0.5">
+          {WEEKDAYS.map((day, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => {
+                const days = task.schedule_days || [];
+                const newDays = days.includes(idx) ? days.filter(d => d !== idx) : [...days, idx].sort();
+                setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: newDays } : t));
+              }}
+              className={cn(
+                "w-6 h-6 rounded text-[10px] font-medium transition-all",
+                (task.schedule_days || []).includes(idx)
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-accent"
+              )}
+            >
+              {day[0]}
+            </button>
+          ))}
+        </div>
+      );
+    }
+    if (formData.schedule_type === 'challenge') {
+      return (
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] text-muted-foreground">Day</span>
+          <Input
+            type="number"
+            min={1}
+            value={task.drip_day ?? ''}
+            onChange={(e) => {
+              const val = e.target.value ? parseInt(e.target.value) : null;
+              setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, drip_day: val } : t));
+            }}
+            className="w-12 h-6 text-xs text-center p-0"
+          />
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -668,6 +733,15 @@ export default function RoutinesBank() {
                       <span className="flex items-center gap-1"><TaskIcon iconName={catInfo.icon} size={12} /> {catInfo.label}</span>
                       <span>•</span>
                       <span>{stats.count} action{stats.count !== 1 ? 's' : ''}</span>
+                      {routine.schedule_type !== 'daily' && (
+                        <>
+                          <span>•</span>
+                          <span className="flex items-center gap-1">
+                            {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : <Flame className="h-3 w-3" />}
+                            {routine.schedule_type === 'weekly' ? 'Weekly' : 'Challenge'}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                   <button
@@ -868,6 +942,34 @@ export default function RoutinesBank() {
                     />
                   </div>
 
+                  {/* Schedule Type */}
+                  <div className="space-y-2 border-t pt-4">
+                    <Label>Ritual Type</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: 'daily', label: 'Daily', desc: 'All actions every day', icon: '☀️' },
+                        { value: 'weekly', label: 'Weekly Plan', desc: 'Actions on specific weekdays', icon: '📅' },
+                        { value: 'challenge', label: 'Challenge', desc: 'Sequential drip (Day 1, 2...)', icon: '🔥' },
+                      ].map(opt => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, schedule_type: opt.value as any })}
+                          className={cn(
+                            "flex flex-col items-center gap-1 p-3 rounded-lg border-2 text-center transition-all",
+                            formData.schedule_type === opt.value 
+                              ? "border-primary bg-primary/5" 
+                              : "border-border hover:border-muted-foreground/30"
+                          )}
+                        >
+                          <span className="text-lg">{opt.icon}</span>
+                          <span className="text-xs font-medium">{opt.label}</span>
+                          <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Summary stats */}
                   <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4">
                     <span className="flex items-center gap-1">
@@ -944,58 +1046,61 @@ export default function RoutinesBank() {
                             <p className="text-center text-muted-foreground text-xs py-2">No tasks in this section</p>
                           ) : (
                             sectionTasks.map((task, tIdx) => (
-                              <div key={task.id} className="flex items-center gap-2 p-2 rounded bg-background border">
-                                <div className="flex flex-col">
+                              <div key={task.id} className="rounded bg-background border">
+                                <div className="flex items-center gap-2 p-2">
+                                  <div className="flex flex-col">
+                                    <button
+                                      type="button"
+                                      onClick={() => moveTaskUp(task.id, section.id)}
+                                      disabled={tIdx === 0}
+                                      className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                    >
+                                      <ChevronUp className="h-3 w-3" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => moveTaskDown(task.id, section.id)}
+                                      disabled={tIdx === sectionTasks.length - 1}
+                                      className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                    >
+                                      <ChevronDown className="h-3 w-3" />
+                                    </button>
+                                  </div>
+                                  <TaskIcon iconName={task.emoji} size={16} />
+                                  <span className="flex-1 text-sm truncate">{task.title}</span>
+                                  {renderTaskScheduleConfig(task)}
+                                  {/* Move to section dropdown */}
+                                  <Select
+                                    value=""
+                                    onValueChange={(targetSectionId) => {
+                                      const newSectionId = targetSectionId === '_uncategorized' ? null : targetSectionId;
+                                      setLocalTasks(localTasks.map(t =>
+                                        t.id === task.id ? { ...t, section_id: newSectionId } : t
+                                      ));
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-[100px] h-7 text-xs">
+                                      <span className="text-muted-foreground">Move to...</span>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="_uncategorized" className="text-xs">
+                                        Uncategorized
+                                      </SelectItem>
+                                      {localSections.filter(s => s.id !== section.id).map((s) => (
+                                        <SelectItem key={s.id} value={s.id} className="text-xs">
+                                          {s.title}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
                                   <button
                                     type="button"
-                                    onClick={() => moveTaskUp(task.id, section.id)}
-                                    disabled={tIdx === 0}
-                                    className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                    onClick={() => removeTask(task.id)}
+                                    className="p-1 text-destructive hover:bg-destructive/10 rounded"
                                   >
-                                    <ChevronUp className="h-3 w-3" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => moveTaskDown(task.id, section.id)}
-                                    disabled={tIdx === sectionTasks.length - 1}
-                                    className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                                  >
-                                    <ChevronDown className="h-3 w-3" />
+                                    <X className="h-3 w-3" />
                                   </button>
                                 </div>
-                                <TaskIcon iconName={task.emoji} size={16} />
-                                <span className="flex-1 text-sm truncate">{task.title}</span>
-                                {/* Move to section dropdown */}
-                                <Select
-                                  value=""
-                                  onValueChange={(targetSectionId) => {
-                                    const newSectionId = targetSectionId === '_uncategorized' ? null : targetSectionId;
-                                    setLocalTasks(localTasks.map(t =>
-                                      t.id === task.id ? { ...t, section_id: newSectionId } : t
-                                    ));
-                                  }}
-                                >
-                                  <SelectTrigger className="w-[100px] h-7 text-xs">
-                                    <span className="text-muted-foreground">Move to...</span>
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="_uncategorized" className="text-xs">
-                                      Uncategorized
-                                    </SelectItem>
-                                    {localSections.filter(s => s.id !== section.id).map((s) => (
-                                      <SelectItem key={s.id} value={s.id} className="text-xs">
-                                        {s.title}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <button
-                                  type="button"
-                                  onClick={() => removeTask(task.id)}
-                                  className="p-1 text-destructive hover:bg-destructive/10 rounded"
-                                >
-                                  <X className="h-3 w-3" />
-                                </button>
                               </div>
                             ))
                           )}
@@ -1082,56 +1187,59 @@ export default function RoutinesBank() {
                       </div>
                       <div className="p-2 space-y-1">
                         {uncategorizedTasks.map((task, tIdx) => (
-                          <div key={task.id} className="flex items-center gap-2 p-2 rounded bg-background border">
-                            <div className="flex flex-col">
+                          <div key={task.id} className="rounded bg-background border">
+                            <div className="flex items-center gap-2 p-2">
+                              <div className="flex flex-col">
+                                <button
+                                  type="button"
+                                  onClick={() => moveTaskUp(task.id, null)}
+                                  disabled={tIdx === 0}
+                                  className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                >
+                                  <ChevronUp className="h-3 w-3" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => moveTaskDown(task.id, null)}
+                                  disabled={tIdx === uncategorizedTasks.length - 1}
+                                  className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                >
+                                  <ChevronDown className="h-3 w-3" />
+                                </button>
+                              </div>
+                              <TaskIcon iconName={task.emoji} size={16} />
+                              <span className="flex-1 text-sm truncate">{task.title}</span>
+                              {renderTaskScheduleConfig(task)}
+                              {/* Move to section dropdown */}
+                              {localSections.length > 0 && (
+                                <Select
+                                  value=""
+                                  onValueChange={(sectionId) => {
+                                    setLocalTasks(localTasks.map(t =>
+                                      t.id === task.id ? { ...t, section_id: sectionId } : t
+                                    ));
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[100px] h-7 text-xs">
+                                    <span className="text-muted-foreground">Move to...</span>
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {localSections.map((s) => (
+                                      <SelectItem key={s.id} value={s.id} className="text-xs">
+                                        {s.title}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              )}
                               <button
                                 type="button"
-                                onClick={() => moveTaskUp(task.id, null)}
-                                disabled={tIdx === 0}
-                                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                onClick={() => removeTask(task.id)}
+                                className="p-1 text-destructive hover:bg-destructive/10 rounded"
                               >
-                                <ChevronUp className="h-3 w-3" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => moveTaskDown(task.id, null)}
-                                disabled={tIdx === uncategorizedTasks.length - 1}
-                                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                              >
-                                <ChevronDown className="h-3 w-3" />
+                                <X className="h-3 w-3" />
                               </button>
                             </div>
-                            <TaskIcon iconName={task.emoji} size={16} />
-                            <span className="flex-1 text-sm truncate">{task.title}</span>
-                            {/* Move to section dropdown */}
-                            {localSections.length > 0 && (
-                              <Select
-                                value=""
-                                onValueChange={(sectionId) => {
-                                  setLocalTasks(localTasks.map(t =>
-                                    t.id === task.id ? { ...t, section_id: sectionId } : t
-                                  ));
-                                }}
-                              >
-                                <SelectTrigger className="w-[100px] h-7 text-xs">
-                                  <span className="text-muted-foreground">Move to...</span>
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {localSections.map((s) => (
-                                    <SelectItem key={s.id} value={s.id} className="text-xs">
-                                      {s.title}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => removeTask(task.id)}
-                              className="p-1 text-destructive hover:bg-destructive/10 rounded"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
                           </div>
                         ))}
                         

@@ -2363,6 +2363,7 @@ export type Database = {
       routine_plan_tasks: {
         Row: {
           created_at: string
+          drip_day: number | null
           duration_minutes: number
           icon: string
           id: string
@@ -2371,12 +2372,14 @@ export type Database = {
           plan_id: string
           pro_link_type: string | null
           pro_link_value: string | null
+          schedule_days: number[] | null
           source_task_id: string | null
           task_order: number
           title: string
         }
         Insert: {
           created_at?: string
+          drip_day?: number | null
           duration_minutes?: number
           icon?: string
           id?: string
@@ -2385,12 +2388,14 @@ export type Database = {
           plan_id: string
           pro_link_type?: string | null
           pro_link_value?: string | null
+          schedule_days?: number[] | null
           source_task_id?: string | null
           task_order?: number
           title: string
         }
         Update: {
           created_at?: string
+          drip_day?: number | null
           duration_minutes?: number
           icon?: string
           id?: string
@@ -2399,6 +2404,7 @@ export type Database = {
           plan_id?: string
           pro_link_type?: string | null
           pro_link_value?: string | null
+          schedule_days?: number[] | null
           source_task_id?: string | null
           task_order?: number
           title?: string
@@ -2442,7 +2448,9 @@ export type Database = {
           is_featured: boolean
           is_popular: boolean
           is_pro_routine: boolean
+          linked_round_id: string | null
           points: number
+          schedule_type: string
           subtitle: string | null
           title: string
         }
@@ -2460,7 +2468,9 @@ export type Database = {
           is_featured?: boolean
           is_popular?: boolean
           is_pro_routine?: boolean
+          linked_round_id?: string | null
           points?: number
+          schedule_type?: string
           subtitle?: string | null
           title: string
         }
@@ -2478,7 +2488,9 @@ export type Database = {
           is_featured?: boolean
           is_popular?: boolean
           is_pro_routine?: boolean
+          linked_round_id?: string | null
           points?: number
+          schedule_type?: string
           subtitle?: string | null
           title?: string
         }
@@ -2488,6 +2500,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "routine_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "routine_plans_linked_round_id_fkey"
+            columns: ["linked_round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
             referencedColumns: ["id"]
           },
         ]
@@ -2560,6 +2579,7 @@ export type Database = {
           is_active: boolean | null
           is_popular: boolean | null
           is_welcome_popup: boolean
+          schedule_type: string
           sort_order: number | null
           subtitle: string | null
           title: string
@@ -2576,6 +2596,7 @@ export type Database = {
           is_active?: boolean | null
           is_popular?: boolean | null
           is_welcome_popup?: boolean
+          schedule_type?: string
           sort_order?: number | null
           subtitle?: string | null
           title: string
@@ -2592,6 +2613,7 @@ export type Database = {
           is_active?: boolean | null
           is_popular?: boolean | null
           is_welcome_popup?: boolean
+          schedule_type?: string
           sort_order?: number | null
           subtitle?: string | null
           title?: string
@@ -2643,10 +2665,12 @@ export type Database = {
       routines_bank_tasks: {
         Row: {
           created_at: string | null
+          drip_day: number | null
           duration_minutes: number | null
           emoji: string | null
           id: string
           routine_id: string
+          schedule_days: number[] | null
           section_id: string | null
           section_title: string | null
           task_id: string | null
@@ -2655,10 +2679,12 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          drip_day?: number | null
           duration_minutes?: number | null
           emoji?: string | null
           id?: string
           routine_id: string
+          schedule_days?: number[] | null
           section_id?: string | null
           section_title?: string | null
           task_id?: string | null
@@ -2667,10 +2693,12 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          drip_day?: number | null
           duration_minutes?: number | null
           emoji?: string | null
           id?: string
           routine_id?: string
+          schedule_days?: number[] | null
           section_id?: string | null
           section_title?: string | null
           task_id?: string | null
@@ -3030,6 +3058,7 @@ export type Database = {
           id: string
           is_active: boolean
           plan_id: string
+          started_at: string | null
           user_id: string
         }
         Insert: {
@@ -3037,6 +3066,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           plan_id: string
+          started_at?: string | null
           user_id: string
         }
         Update: {
@@ -3044,6 +3074,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           plan_id?: string
+          started_at?: string | null
           user_id?: string
         }
         Relationships: [
