@@ -241,8 +241,11 @@ export const useTasksForDate = (date: Date) => {
       return task.scheduled_date === dateStr;
     }
 
-    // Daily tasks - always show
-    if (task.repeat_pattern === 'daily') return true;
+    // Daily tasks - show on or after scheduled_date (start date)
+    if (task.repeat_pattern === 'daily') {
+      if (task.scheduled_date && task.scheduled_date > dateStr) return false;
+      return true;
+    }
 
     // Weekend tasks - only Sat/Sun
     if (task.repeat_pattern === 'weekend') {
