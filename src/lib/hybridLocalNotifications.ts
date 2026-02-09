@@ -1,4 +1,4 @@
-import { LocalNotifications } from '@capacitor/local-notifications';
+import { LocalNotifications, LocalNotificationSchema } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { logLocalNotificationEvent } from './localNotificationLogger';
 import type { PNConfig } from '@/hooks/usePNConfig';
@@ -105,14 +105,7 @@ export async function scheduleHybridNotifications(
   }
 
   // Schedule enabled notifications
-  const toSchedule: Array<{
-    id: number;
-    title: string;
-    body: string;
-    schedule: any;
-    sound: string;
-    extra: any;
-  }> = [];
+  const toSchedule: LocalNotificationSchema[] = [];
 
   for (const config of configs) {
     // Skip if disabled on server
@@ -135,32 +128,38 @@ export async function scheduleHybridNotifications(
 
     const notificationId = getNotificationId(config.notification_key);
 
-    // Build schedule
-    const schedule: any = {
+    // Build schedule - use allowWhileIdle for urgent notifications
+    const scheduleOptions: {
+      on: { hour: number; minute: number; weekday?: number };
+      repeats: boolean;
+      allowWhileIdle?: boolean;
+    } = {
       on: {
         hour: config.schedule_hour,
         minute: config.schedule_minute,
       },
       repeats: true,
+      // Urgent notifications can fire even in Doze/low-power mode
+      allowWhileIdle: config.is_urgent || false,
     };
 
     // If specific days configured, add weekday constraint (iOS only supports one day)
     // For multi-day support, we'd need multiple notifications
     if (config.repeat_days && config.repeat_days.length === 1) {
-      schedule.on.weekday = config.repeat_days[0] + 1; // iOS uses 1-7
+      scheduleOptions.on.weekday = config.repeat_days[0] + 1; // iOS uses 1-7
     }
 
     toSchedule.push({
       id: notificationId,
       title: `${config.emoji} ${config.title}`,
       body: config.body,
-      schedule,
-      sound: config.sound || 'default',
+      schedule: scheduleOptions as any,
+      sound: config.is_urgent ? 'alarm.wav' : (config.sound || 'default'),
       extra: {
         type: config.notification_key,
         category: config.category,
         url: '/app/home',
-        isUrgent: config.is_urgent,
+        isUrgent: config.is_urgent || false,
       },
     });
 
