@@ -235,9 +235,12 @@ export default function AppAudioPlayer() {
   // Check if a track is available based on drip delay - uses first_session_date
   // drip_delay_days=0 = immediate, 1 = at first session, 2 = 1 day after first session, etc.
   const getTrackAvailability = (dripDelayDays: number) => {
+    const anchorDate = userRound?.is_self_paced 
+      ? userRound?.enrolled_at 
+      : (userRound?.first_session_date || userRound?.start_date);
     return getTrackAvailabilityWithCountdown(
       dripDelayDays, 
-      userRound?.first_session_date || userRound?.start_date, // Prefer first_session_date
+      anchorDate,
       userRound?.drip_offset_days || 0
     );
   };

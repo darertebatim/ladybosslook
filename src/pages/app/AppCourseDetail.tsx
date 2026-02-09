@@ -825,21 +825,23 @@ const AppCourseDetail = () => {
     );
   };
 
-  // Calculate module unlock date based on first_session_date
+  // Calculate module unlock date based on first_session_date (or enrolled_at for self-paced)
   const getModuleUnlockDate = (dripDelayDays: number): Date | null => {
     if (dripDelayDays === 0) return null; // Immediate availability
     
-    const firstSessionDate = round?.first_session_date;
-    if (!firstSessionDate) return null; // No drip if no first session date
+    // For self-paced rounds, use enrollment date as the drip anchor
+    const isSelfPaced = round?.is_self_paced;
+    const anchorDate = isSelfPaced ? enrollment?.enrolled_at : round?.first_session_date;
+    if (!anchorDate) return null; // No drip if no anchor date
     
-    // Parse first session date - supports both date-only and ISO timestamp formats
-    const firstSession = firstSessionDate.includes('T') 
-      ? new Date(firstSessionDate)
-      : new Date(firstSessionDate + 'T00:00:00');
+    // Parse anchor date - supports both date-only and ISO timestamp formats
+    const anchor = anchorDate.includes('T') 
+      ? new Date(anchorDate)
+      : new Date(anchorDate + 'T00:00:00');
     
-    // drip_delay_days = 1 means at first session time
-    // drip_delay_days = 2 means 1 day after first session
-    const unlockDate = new Date(firstSession);
+    // drip_delay_days = 1 means at anchor time
+    // drip_delay_days = 2 means 1 day after anchor
+    const unlockDate = new Date(anchor);
     unlockDate.setDate(unlockDate.getDate() + (dripDelayDays - 1) + (round?.drip_offset_days || 0));
     
     return unlockDate;
