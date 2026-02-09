@@ -247,25 +247,29 @@ export const useTasksForDate = (date: Date) => {
       return true;
     }
 
-    // Weekend tasks - only Sat/Sun
+    // Weekend tasks - only Sat/Sun, on or after start date
     if (task.repeat_pattern === 'weekend') {
+      if (task.scheduled_date && task.scheduled_date > dateStr) return false;
       return dayOfWeek === 0 || dayOfWeek === 6;
     }
 
-    // Weekly tasks - show on same day of week as original
+    // Weekly tasks - show on same day of week as original, on or after start date
     if (task.repeat_pattern === 'weekly' && task.scheduled_date) {
+      if (task.scheduled_date > dateStr) return false;
       const originalDay = parseISO(task.scheduled_date).getDay();
       return dayOfWeek === originalDay;
     }
 
-    // Monthly tasks - show on same day of month
+    // Monthly tasks - show on same day of month, on or after start date
     if (task.repeat_pattern === 'monthly' && task.scheduled_date) {
+      if (task.scheduled_date > dateStr) return false;
       const originalDate = parseISO(task.scheduled_date).getDate();
       return date.getDate() === originalDate;
     }
 
-    // Custom - check repeat_days array
+    // Custom - check repeat_days array, on or after start date
     if (task.repeat_pattern === 'custom' && task.repeat_days) {
+      if (task.scheduled_date && task.scheduled_date > dateStr) return false;
       return task.repeat_days.includes(dayOfWeek);
     }
 
