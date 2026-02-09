@@ -106,10 +106,30 @@ The app includes persistent audio playback for educational content. This is the 
 
 This background audio capability is essential for users to listen to educational audio courses and podcasts while multitasking, driving, or exercising - a core use case for our learning platform.
 
-**What's New in Version 1.1.04:**
-- NEW: App renamed to "Simora - ladybosslook"
-- FIXED: Close button positioning on Water, Timer, and Breathing screens - now properly respects iOS safe area on all iPhone models
-- FIXED: Header elements no longer overlap with notch/status bar on fullscreen pages
+**What's New in Version 1.1.05:**
+- NEW: Mood Check-in tool — a daily wellness feature accessible from the Home screen
+- NEW: Urgent task reminders using Time-Sensitive notifications
+
+**Mood Check-in Feature (Home → Mood emoji button):**
+1. **Log in** with the test account
+2. **Tap the mood emoji button** (🙂) in the top-right area of the Home screen header
+3. **Select a mood level** — choose from 5 options: Great, Good, Okay, Not Great, or Bad
+4. **Submit your mood** — a celebration sheet appears with an option to write a journal entry
+5. **View mood history** — tap "History" to see a monthly calendar with daily mood emojis
+6. The mood button on Home shows a red "+" badge when no mood is logged today, and a green "✓" after logging
+
+**Time-Sensitive Notifications / Urgent Reminders (Guideline 2.5.4 - UIBackgroundModes):**
+This app uses Time-Sensitive notifications (interruption-level: time-sensitive) for user-created task reminders marked as "Urgent." These notifications can bypass Focus and Do Not Disturb modes to ensure critical personal reminders are delivered on time.
+
+To test:
+1. **Log in** with the test account
+2. **Go to Home → tap "+" to create a new task** (or tap any existing task to edit)
+3. **Enable a reminder** and toggle **"Urgent"** ON — a confirmation dialog explains the alarm behavior
+4. **Set a reminder time** a few minutes in the future
+5. **Enable Focus/Do Not Disturb** on the device
+6. **Wait for the reminder** — the notification should appear even in Focus mode
+
+This feature is entirely user-initiated: users must explicitly create a task, enable a reminder, and toggle Urgent mode. It is never used for marketing or promotional content — only for personal task reminders the user has specifically configured to be time-sensitive.
 
 Thank you for reviewing Simora - ladybosslook Academy!
 
