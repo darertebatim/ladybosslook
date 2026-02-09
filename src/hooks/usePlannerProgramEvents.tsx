@@ -88,6 +88,7 @@ export function useProgramEventsForDate(date: Date) {
           program_slug,
           course_name,
           round_id,
+          enrolled_at,
           program_rounds (
             id,
             program_slug,
@@ -95,7 +96,8 @@ export function useProgramEventsForDate(date: Date) {
             first_session_date,
             drip_offset_days,
             audio_playlist_id,
-            google_meet_link
+            google_meet_link,
+            is_self_paced
           )
         `)
         .eq('user_id', user.id)
