@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { format, subDays, isEqual, parseISO } from 'date-fns';
+import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
 import { scheduleUrgentAlarm, cancelUrgentAlarms, isUrgentAlarmAvailable } from '@/lib/taskAlarm';
 import { scheduleTaskReminder, cancelTaskReminder, isLocalNotificationsAvailable } from '@/lib/localNotifications';
 import { getTimePeriodSortOrder, TimePeriod } from '@/lib/taskScheduling';
