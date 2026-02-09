@@ -41,6 +41,9 @@ export interface RoutineBankTask {
   section_title: string | null;
   task_order: number | null;
   created_at: string | null;
+  // Schedule fields
+  schedule_days?: number[] | null; // For weekly mode: weekday numbers (0=Sun..6=Sat)
+  drip_day?: number | null; // For challenge mode: day number (1-based)
   // Fields from joined admin_task_bank
   pro_link_type?: string | null;
   pro_link_value?: string | null;
