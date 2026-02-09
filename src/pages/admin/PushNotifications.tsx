@@ -120,14 +120,14 @@ const scheduledPNs: PNType[] = [
   {
     name: 'Drip Content Follow-up',
     function: 'send-drip-followup',
-    schedule: 'Daily (cron)',
-    description: 'Follow-up for users who unlocked content 2+ days ago but haven\'t listened. Only 1 follow-up per content item.',
+    schedule: 'Every 2h (cron)',
+    description: 'Follow-up for users who unlocked content 2+ days ago but haven\'t listened. Timezone-aware (8 AM - 8 PM local). Only 1 follow-up per content item.',
     userPreference: 'content_drip',
     icon: <BookOpen className="h-5 w-5" />,
     codeFile: 'supabase/functions/send-drip-followup/index.ts',
     deliveryType: 'server',
     messages: [
-      { title: '🎧 Content Waiting', body: '"{title}" is waiting for you. Tap to listen.', condition: 'Unlocked 2+ days, no progress' },
+      { title: '🎧 Content Waiting', body: '"{title}" is waiting for you. Tap to listen.', condition: 'Unlocked 2+ days, no progress, user in active window' },
     ],
   },
   {
