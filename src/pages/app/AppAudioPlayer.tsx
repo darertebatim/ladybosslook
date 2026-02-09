@@ -294,7 +294,7 @@ export default function AppAudioPlayer() {
       setPlaylistContext({
         tracks: playlistContextTracks,
         currentIndex: currentTrackIndex,
-        roundStartDate: userRound?.first_session_date || userRound?.start_date, // Use first_session_date for drip
+        roundStartDate: userRound?.is_self_paced ? userRound?.enrolled_at : (userRound?.first_session_date || userRound?.start_date),
         roundDripOffset: userRound?.drip_offset_days || 0,
       });
     }
