@@ -7,8 +7,9 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { usePNConfig, useUpdatePNConfig, type PNConfig } from '@/hooks/usePNConfig';
-import { ChevronDown, ChevronUp, Clock, Bell, BellOff, Save, RefreshCw, AlertTriangle } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, Bell, Save, RefreshCw, AlertTriangle, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const CATEGORY_LABELS: Record<string, string> = {
   daily: '📅 Daily',
@@ -25,12 +26,32 @@ export function PNConfigEditor() {
   const { updateConfig, isUpdating } = useUpdatePNConfig();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingConfig, setEditingConfig] = useState<Partial<PNConfig> | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   // Group configs by category
   const groupedConfigs = CATEGORY_ORDER.reduce((acc, category) => {
     acc[category] = configs.filter(c => c.category === category);
     return acc;
   }, {} as Record<string, PNConfig[]>);
+
+  // Send silent push to sync config to all devices
+  const handleSyncToDevices = async () => {
+    setIsSyncing(true);
+    try {
+      const { data, error: syncError } = await supabase.functions.invoke('sync-pn-config');
+      
+      if (syncError) throw syncError;
+      
+      toast.success(`Synced to ${data.sent} devices`, {
+        description: data.failed > 0 ? `${data.failed} failed` : undefined,
+      });
+    } catch (err) {
+      console.error('Sync failed:', err);
+      toast.error('Failed to sync to devices');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const handleToggleEnabled = async (config: PNConfig) => {
     const success = await updateConfig(config.id, { is_enabled: !config.is_enabled });
@@ -83,7 +104,7 @@ export function PNConfigEditor() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="text-sm text-muted-foreground">
           {configs.length} notification configs
           {lastSyncedAt && (
@@ -92,10 +113,21 @@ export function PNConfigEditor() {
             </span>
           )}
         </div>
-        <Button variant="outline" size="sm" onClick={refetch} disabled={isLoading}>
-          <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={handleSyncToDevices} 
+            disabled={isSyncing}
+          >
+            <Send className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-pulse' : ''}`} />
+            Sync to Devices
+          </Button>
+          <Button variant="outline" size="sm" onClick={refetch} disabled={isLoading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {CATEGORY_ORDER.map(category => {
