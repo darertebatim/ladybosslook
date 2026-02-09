@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { getLocalDateStr } from '@/lib/localDate';
 
 // Types
 export interface RoutineCategory {
@@ -455,7 +456,7 @@ export function useAddRoutinePlan() {
             const dripDay = (task as any).drip_day as number;
             const taskDate = new Date(today);
             taskDate.setDate(taskDate.getDate() + (dripDay - 1));
-            scheduledDate = taskDate.toISOString().split('T')[0];
+            scheduledDate = getLocalDateStr(taskDate);
           }
 
           return {
