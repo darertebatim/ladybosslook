@@ -1,14 +1,20 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
 
 /**
- * Momentum Celebration Push Notifications
+ * Momentum Keeper Push Notifications
  * 
- * Celebrates user consistency milestones:
- * - Every 3 active days (3, 6, 9, 12...)
- * - Weekly milestones (7, 14, 21, 30 days)
+ * Detects user INACTIVITY and nudges them back before they lose momentum.
+ * Also celebrates key milestones (7, 14, 21, 30 days) as in-app only.
  * 
- * Runs daily at midnight UTC to check all users' active day counts.
- * Uses strength-first language - celebrating presence, not streaks.
+ * Logic (checks last_active_date gap):
+ * - 1 day inactive: gentle nudge with active days count
+ * - 2 days: momentum-focused nudge
+ * - 3+ days: empathetic come-back message
+ * - 5+ days: minimal pressure nudge
+ * - 7+ days: final gentle message, then stops
+ * 
+ * Runs daily. Respects 8 AM - 8 PM in user timezone.
+ * Uses momentum_celebration preference toggle.
  */
 
 const corsHeaders = {
@@ -16,97 +22,86 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Milestone configurations with Simora-aligned messaging
-const MILESTONES: Record<number, { title: string; body: string; isMajor: boolean }> = {
-  3: { title: '✨ 3 Days of Presence', body: "You're showing up for yourself. That's strength.", isMajor: false },
-  6: { title: '✨ 6 Days Strong', body: "You keep choosing to be here. Beautiful.", isMajor: false },
-  7: { title: '🌟 A Full Week!', body: "7 days of honoring yourself. Your strength is growing.", isMajor: true },
-  9: { title: '✨ 9 Days Present', body: "Steady and strong. You're building something real.", isMajor: false },
-  12: { title: '✨ 12 Days', body: "You keep returning. That's what strength looks like.", isMajor: false },
-  14: { title: '💫 Two Weeks!', body: "14 days of showing up. You're becoming who you want to be.", isMajor: true },
-  15: { title: '✨ 15 Days', body: "Halfway through the month. You're still here. 🌸", isMajor: false },
-  18: { title: '✨ 18 Days', body: "Almost three weeks of presence. Remarkable.", isMajor: false },
-  21: { title: '🌙 Three Weeks!', body: "21 days. This is who you're becoming now.", isMajor: true },
-  24: { title: '✨ 24 Days', body: "You keep showing up. Your strength inspires.", isMajor: false },
-  27: { title: '✨ 27 Days', body: "Almost a month of presence. Extraordinary.", isMajor: false },
-  30: { title: '🏛️ One Month!', body: "30 days of honoring yourself. That's extraordinary strength.", isMajor: true },
-};
+interface InactivityMessage {
+  minGap: number;
+  maxGap: number;
+  title: string;
+  body: (ctx: { gap: number; activeDays: number; coins: number; firstName?: string }) => string;
+}
+
+const INACTIVITY_MESSAGES: InactivityMessage[] = [
+  {
+    minGap: 1, maxGap: 1,
+    title: '💪 Keep Going!',
+    body: ({ activeDays }) => `You showed up ${activeDays} days this month. One more today?`,
+  },
+  {
+    minGap: 2, maxGap: 2,
+    title: '✨ Your Momentum is Waiting',
+    body: ({ activeDays }) => `Your ${activeDays}-day momentum is waiting. Come back and keep it alive.`,
+  },
+  {
+    minGap: 3, maxGap: 4,
+    title: '🌿 We Miss You',
+    body: ({ gap }) => `You've been away for ${gap} days. Your strength doesn't expire — come back when you're ready.`,
+  },
+  {
+    minGap: 5, maxGap: 6,
+    title: '🌸 Your Actions Miss You',
+    body: ({ coins }) => coins > 0
+      ? `You have ${coins} coins waiting. Even 1 minute counts. Tap to return.`
+      : 'Your actions miss you. Even 1 minute counts. Tap to return.',
+  },
+  {
+    minGap: 7, maxGap: 14,
+    title: '🕊️ No Pressure',
+    body: () => "No pressure. When you're ready, everything is still here for you.",
+  },
+];
+
+function getInactivityMessage(gap: number): InactivityMessage | null {
+  return INACTIVITY_MESSAGES.find(m => gap >= m.minGap && gap <= m.maxGap) || null;
+}
+
+function isWithinActiveWindow(userTimezone: string | null): boolean {
+  try {
+    const tz = userTimezone || 'UTC';
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hour12: false });
+    const hour = parseInt(formatter.format(now), 10);
+    return hour >= 8 && hour < 20; // 8 AM - 8 PM
+  } catch {
+    return true; // default to sending if timezone parsing fails
+  }
+}
 
 async function signJWT(header: Record<string, unknown>, payload: Record<string, unknown>, privateKey: string): Promise<string> {
   const encoder = new TextEncoder();
-  
   const base64urlEncode = (data: Uint8Array): string => {
     const base64 = btoa(String.fromCharCode(...data));
     return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   };
-  
-  const stringToBase64url = (str: string): string => {
-    const bytes = encoder.encode(str);
-    return base64urlEncode(bytes);
-  };
+  const stringToBase64url = (str: string): string => base64urlEncode(encoder.encode(str));
   
   const headerB64 = stringToBase64url(JSON.stringify(header));
   const payloadB64 = stringToBase64url(JSON.stringify(payload));
   const signingInput = `${headerB64}.${payloadB64}`;
   
-  const pemContents = privateKey
-    .replace('-----BEGIN PRIVATE KEY-----', '')
-    .replace('-----END PRIVATE KEY-----', '')
-    .replace(/\s/g, '');
-  
+  const pemContents = privateKey.replace('-----BEGIN PRIVATE KEY-----', '').replace('-----END PRIVATE KEY-----', '').replace(/\s/g, '');
   const binaryKey = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
   
-  const cryptoKey = await crypto.subtle.importKey(
-    'pkcs8',
-    binaryKey,
-    { name: 'ECDSA', namedCurve: 'P-256' },
-    false,
-    ['sign']
-  );
+  const cryptoKey = await crypto.subtle.importKey('pkcs8', binaryKey, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']);
+  const signature = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, cryptoKey, encoder.encode(signingInput));
   
-  const signature = await crypto.subtle.sign(
-    { name: 'ECDSA', hash: 'SHA-256' },
-    cryptoKey,
-    encoder.encode(signingInput)
-  );
-  
-  const signatureArray = new Uint8Array(signature);
-  const signatureB64 = base64urlEncode(signatureArray);
-  
-  return `${signingInput}.${signatureB64}`;
-}
-
-function generateAPNsJWT(keyId: string, teamId: string, privateKey: string): Promise<string> {
-  const header = { alg: 'ES256', kid: keyId };
-  const now = Math.floor(Date.now() / 1000);
-  const payload = { iss: teamId, iat: now };
-  return signJWT(header, payload, privateKey);
+  return `${signingInput}.${base64urlEncode(new Uint8Array(signature))}`;
 }
 
 async function sendToApns(
-  deviceToken: string,
-  title: string,
-  body: string,
-  data: Record<string, unknown>,
-  jwt: string,
-  topic: string,
-  environment: string
+  deviceToken: string, title: string, body: string,
+  data: Record<string, unknown>, jwt: string, topic: string, environment: string
 ): Promise<{ success: boolean; error?: string; shouldRemove?: boolean }> {
-  const host = environment === 'production' 
-    ? 'api.push.apple.com' 
-    : 'api.sandbox.push.apple.com';
-  
+  const host = environment === 'production' ? 'api.push.apple.com' : 'api.sandbox.push.apple.com';
   const url = `https://${host}/3/device/${deviceToken}`;
-  
-  const payload = {
-    aps: {
-      alert: { title, body },
-      sound: 'default',
-      badge: 1,
-      'mutable-content': 1,
-    },
-    ...data,
-  };
   
   try {
     const response = await fetch(url, {
@@ -118,20 +113,18 @@ async function sendToApns(
         'apns-priority': '10',
         'content-type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        aps: { alert: { title, body }, sound: 'default', badge: 1, 'mutable-content': 1 },
+        ...data,
+      }),
     });
     
-    if (response.ok) {
-      return { success: true };
-    }
+    if (response.ok) return { success: true };
     
     const errorBody = await response.text();
-    console.error(`[Momentum] APNs error for ${deviceToken.substring(0, 20)}...:`, response.status, errorBody);
-    
-    const shouldRemove = response.status === 410 || response.status === 400;
-    return { success: false, error: `APNs ${response.status}: ${errorBody}`, shouldRemove };
+    console.error(`[MomentumKeeper] APNs error for ${deviceToken.substring(0, 20)}...:`, response.status, errorBody);
+    return { success: false, error: `APNs ${response.status}: ${errorBody}`, shouldRemove: response.status === 410 || response.status === 400 };
   } catch (error) {
-    console.error(`[Momentum] Failed to send to ${deviceToken.substring(0, 20)}...:`, error);
     return { success: false, error: String(error) };
   }
 }
@@ -151,87 +144,66 @@ Deno.serve(async (req) => {
     const bundleId = Deno.env.get('APNS_TOPIC') || 'app.lovable.9d54663c1af540669ceb1723206ae5f8';
     
     if (!apnsKeyId || !apnsTeamId || !apnsPrivateKey) {
-      console.error('[Momentum] Missing APNs credentials');
-      return new Response(
-        JSON.stringify({ error: 'APNs not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'APNs not configured' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
     const now = new Date();
     const today = now.toISOString().split('T')[0];
     
-    console.log(`[Momentum] Running at ${now.toISOString()}`);
+    console.log(`[MomentumKeeper] Running at ${now.toISOString()}`);
     
-    // Get all users who have this_month_active_days at a milestone number
-    const milestoneNumbers = Object.keys(MILESTONES).map(Number);
-    
-    const { data: eligibleUsers, error: usersError } = await supabase
+    // Get all users with last_active_date to check inactivity
+    const { data: allUsers, error: usersError } = await supabase
       .from('profiles')
-      .select('id, full_name, this_month_active_days')
-      .in('this_month_active_days', milestoneNumbers);
+      .select('id, full_name, last_active_date, this_month_active_days, timezone')
+      .not('last_active_date', 'is', null);
     
-    if (usersError) {
-      console.error('[Momentum] Error fetching profiles:', usersError);
-      throw usersError;
+    if (usersError) throw usersError;
+    if (!allUsers || allUsers.length === 0) {
+      console.log('[MomentumKeeper] No users with activity data');
+      return new Response(JSON.stringify({ success: true, message: 'No users', count: 0 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
     
-    if (!eligibleUsers || eligibleUsers.length === 0) {
-      console.log('[Momentum] No users at milestone counts');
-      return new Response(
-        JSON.stringify({ success: true, message: 'No milestone users', count: 0 }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-    
-    console.log(`[Momentum] Found ${eligibleUsers.length} users at milestones`);
-    
-    // Check user preferences - only send to users who have momentum_celebration enabled
-    const userIds = eligibleUsers.map(u => u.id);
-    
-    const { data: preferences } = await supabase
-      .from('user_notification_preferences')
-      .select('user_id, momentum_celebration')
-      .in('user_id', userIds);
-    
-    const prefsMap = new Map(preferences?.map(p => [p.user_id, p.momentum_celebration]) || []);
-    
-    // Filter users who want momentum celebrations (default to true if no preferences)
-    const usersToNotify = eligibleUsers.filter(u => {
-      const pref = prefsMap.get(u.id);
-      return pref === undefined || pref === true; // Default to true
+    // Filter users who are inactive (1-14 days gap) and within active window
+    const inactiveUsers = allUsers.filter(u => {
+      const lastActive = new Date(u.last_active_date!);
+      const gap = Math.floor((now.getTime() - lastActive.getTime()) / (1000 * 60 * 60 * 24));
+      return gap >= 1 && gap <= 14 && isWithinActiveWindow(u.timezone);
     });
     
-    console.log(`[Momentum] ${usersToNotify.length} users want momentum celebrations`);
+    console.log(`[MomentumKeeper] Found ${inactiveUsers.length} inactive users in active window`);
     
-    // Check which users already received this milestone notification today
+    if (inactiveUsers.length === 0) {
+      return new Response(JSON.stringify({ success: true, message: 'No inactive users in active window', count: 0 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    
+    // Check preferences
+    const userIds = inactiveUsers.map(u => u.id);
+    const { data: preferences } = await supabase.from('user_notification_preferences').select('user_id, momentum_celebration').in('user_id', userIds);
+    const prefsMap = new Map(preferences?.map(p => [p.user_id, p.momentum_celebration]) || []);
+    
+    const usersToNotify = inactiveUsers.filter(u => {
+      const pref = prefsMap.get(u.id);
+      return pref === undefined || pref === true;
+    });
+    
+    // Check already sent today
     const { data: sentToday } = await supabase
       .from('pn_schedule_logs')
       .select('user_id, notification_type')
       .in('user_id', userIds)
-      .like('notification_type', 'momentum_%')
+      .like('notification_type', 'momentum_keeper_%')
       .gte('sent_at', `${today}T00:00:00Z`);
     
-    const alreadySentSet = new Set(sentToday?.map(s => `${s.user_id}:${s.notification_type}`) || []);
+    const alreadySentSet = new Set(sentToday?.map(s => s.user_id) || []);
     
     // Get push subscriptions
-    const { data: subscriptions } = await supabase
-      .from('push_subscriptions')
-      .select('user_id, endpoint, id')
-      .in('user_id', userIds)
-      .like('endpoint', 'native:%');
-    
+    const { data: subscriptions } = await supabase.from('push_subscriptions').select('user_id, endpoint, id').in('user_id', userIds).like('endpoint', 'native:%');
     if (!subscriptions || subscriptions.length === 0) {
-      console.log('[Momentum] No push subscriptions found');
-      return new Response(
-        JSON.stringify({ success: true, message: 'No devices', count: 0 }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ success: true, message: 'No devices', count: 0 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
     
-    // Build user -> subscriptions map
     const userSubscriptions = new Map<string, typeof subscriptions>();
     for (const sub of subscriptions) {
       const existing = userSubscriptions.get(sub.user_id) || [];
@@ -239,8 +211,11 @@ Deno.serve(async (req) => {
       userSubscriptions.set(sub.user_id, existing);
     }
     
-    // Generate JWT
-    const jwt = await generateAPNsJWT(apnsKeyId, apnsTeamId, apnsPrivateKey);
+    // Get coins for users (for messaging)
+    const { data: wallets } = await supabase.from('user_wallets').select('user_id, credits_balance').in('user_id', userIds);
+    const walletMap = new Map(wallets?.map(w => [w.user_id, w.credits_balance]) || []);
+    
+    const jwt = await signJWT({ alg: 'ES256', kid: apnsKeyId }, { iss: apnsTeamId, iat: Math.floor(Date.now() / 1000) }, apnsPrivateKey);
     
     let sentCount = 0;
     let skipCount = 0;
@@ -248,88 +223,56 @@ Deno.serve(async (req) => {
     const logsToInsert: any[] = [];
     
     for (const user of usersToNotify) {
-      const activeDays = user.this_month_active_days || 0;
-      const milestone = MILESTONES[activeDays];
+      if (alreadySentSet.has(user.id)) { skipCount++; continue; }
       
-      if (!milestone) continue;
-      
-      const notificationType = `momentum_${activeDays}`;
-      
-      // Skip if already sent today
-      if (alreadySentSet.has(`${user.id}:${notificationType}`)) {
-        skipCount++;
-        continue;
-      }
+      const lastActive = new Date(user.last_active_date!);
+      const gap = Math.floor((now.getTime() - lastActive.getTime()) / (1000 * 60 * 60 * 24));
+      const message = getInactivityMessage(gap);
+      if (!message) continue;
       
       const userSubs = userSubscriptions.get(user.id);
-      if (!userSubs || userSubs.length === 0) {
-        continue;
-      }
+      if (!userSubs || userSubs.length === 0) continue;
       
-      // Personalize if we have a name
       const firstName = user.full_name?.split(' ')[0];
-      let title = milestone.title;
-      if (firstName && milestone.isMajor) {
-        title = `${milestone.title.split('!')[0]}, ${firstName}!`;
-      }
+      const activeDays = user.this_month_active_days || 0;
+      const coins = walletMap.get(user.id) || 0;
       
-      const data = {
-        type: 'momentum_celebration',
-        url: '/app/home',
-        milestone: activeDays,
-      };
+      const title = firstName ? `${message.title.split('!')[0]}, ${firstName}!` : message.title;
+      const body = message.body({ gap, activeDays, coins, firstName });
       
-      // Send to all devices
+      const data = { type: 'momentum_keeper', url: '/app/home', gap };
+      
       for (const sub of userSubs) {
         const deviceToken = sub.endpoint.replace('native:', '');
-        const result = await sendToApns(deviceToken, title, milestone.body, data, jwt, bundleId, apnsEnvironment);
-        
+        const result = await sendToApns(deviceToken, title, body, data, jwt, bundleId, apnsEnvironment);
         if (result.success) {
           sentCount++;
-          console.log(`[Momentum] ✅ Sent ${activeDays}-day celebration to ${user.id}`);
+          console.log(`[MomentumKeeper] ✅ Sent ${gap}-day nudge to ${user.id}`);
         } else if (result.shouldRemove) {
           invalidSubscriptionIds.push(sub.id);
         }
       }
       
-      // Log to prevent duplicates
       logsToInsert.push({
         user_id: user.id,
-        notification_type: notificationType,
+        function_name: 'send-momentum-celebration',
+        notification_type: `momentum_keeper_${gap}d`,
         scheduled_for: now.toISOString(),
         sent_at: now.toISOString(),
         status: 'sent',
       });
     }
     
-    // Insert logs
-    if (logsToInsert.length > 0) {
-      await supabase.from('pn_schedule_logs').insert(logsToInsert);
-    }
-    
-    // Remove invalid subscriptions
+    if (logsToInsert.length > 0) await supabase.from('pn_schedule_logs').insert(logsToInsert);
     if (invalidSubscriptionIds.length > 0) {
-      console.log(`[Momentum] Removing ${invalidSubscriptionIds.length} invalid subscriptions`);
       await supabase.from('push_subscriptions').delete().in('id', invalidSubscriptionIds);
     }
     
-    console.log(`[Momentum] Complete: Sent ${sentCount}, Skipped ${skipCount}`);
+    console.log(`[MomentumKeeper] Complete: Sent ${sentCount}, Skipped ${skipCount}`);
     
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        sent: sentCount,
-        skipped: skipCount,
-        eligibleUsers: eligibleUsers.length,
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-    
+    return new Response(JSON.stringify({ success: true, sent: sentCount, skipped: skipCount, checked: inactiveUsers.length }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error) {
-    console.error('[Momentum] Error:', error);
-    return new Response(
-      JSON.stringify({ error: String(error) }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    console.error('[MomentumKeeper] Error:', error);
+    return new Response(JSON.stringify({ error: String(error) }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 });

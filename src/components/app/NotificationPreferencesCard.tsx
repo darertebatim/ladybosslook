@@ -101,19 +101,6 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['notification-preferences', userId] });
-      
-      // Re-schedule local notifications when preferences change
-      const newPrefs = queryClient.getQueryData(['notification-preferences', userId]) as NotificationPreferences | null;
-      if (newPrefs) {
-        scheduleNotifications({
-          morning_summary: newPrefs.morning_summary,
-          evening_checkin: newPrefs.evening_checkin,
-          time_period_reminders: newPrefs.time_period_reminders,
-          goal_nudges: newPrefs.goal_nudges,
-          wake_time: newPrefs.wake_time || '07:00',
-          sleep_time: newPrefs.sleep_time || '22:00',
-        });
-      }
     },
     onError: (error) => {
       console.error('Failed to update preference:', error);

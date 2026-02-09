@@ -73,22 +73,34 @@ interface PNLog {
 
 const scheduledPNs: PNType[] = [
   {
-    name: 'Daily Notifications',
-    function: 'send-daily-notifications',
-    schedule: 'Hourly (timezone-aware)',
-    description: 'Morning summary, evening check-in, time period reminders, goal nudges - all based on user\'s local timezone',
-    userPreference: 'Per-type toggles: morning_summary, evening_checkin, time_period_reminders, goal_nudges',
-    icon: <Clock className="h-5 w-5" />,
-    codeFile: 'supabase/functions/send-daily-notifications/index.ts',
+    name: 'Smart Action Nudges',
+    function: 'local-smart-nudges',
+    schedule: 'On app launch (local)',
+    description: 'Random reminders from user\'s actual planner data: incomplete actions, proactions (journal, breathe, emotion), and water reminders. Scheduled between 8 AM - 8 PM.',
+    userPreference: 'Auto (based on active tasks)',
+    icon: <Sparkles className="h-5 w-5" />,
+    codeFile: 'src/hooks/useSmartActionNudges.ts',
     deliveryType: 'local',
     messages: [
-      { title: '☀️ Good morning!', body: "Your actions for today are ready. Let's make it count.", condition: '7 AM or wake_time (morning_summary)' },
-      { title: '🌅 Evening check-in', body: 'A few actions are still waiting for you today.', condition: '6 PM (evening_checkin)' },
-      { title: '🌅 Morning time', body: 'Your morning actions are waiting gently.', condition: '6 AM (time_period_reminders)' },
-      { title: '🌤️ Afternoon is here', body: 'Time for your afternoon actions.', condition: '12 PM' },
-      { title: '🌇 Evening ritual', body: 'Your evening actions await.', condition: '5 PM' },
-      { title: '🌙 Bedtime routine', body: 'Time to wind down with your bedtime actions.', condition: '9 PM' },
-      { title: '💧 Goal Check', body: "How's your water intake going? 💧", condition: '9 AM, 12 PM, 3 PM, 6 PM (goal_nudges)' },
+      { title: '{emoji} {taskTitle}', body: 'Time to do this! Your strength grows with each action.', condition: 'Random incomplete action' },
+      { title: '🫁 Time for breathing', body: 'A few deep breaths can change your whole day.', condition: 'Random proaction' },
+      { title: '📝 Your journal is waiting', body: 'Take a moment to write. Even a few words matter.', condition: 'Random proaction' },
+      { title: '💧 Water Reminder', body: 'Have you had water recently? 💧', condition: '3-4x daily if water tracking' },
+    ],
+  },
+  {
+    name: 'Period Reminders',
+    function: 'local-period-reminders',
+    schedule: 'On app launch (local)',
+    description: 'Period tracker notifications: before predicted start, on start day, and daily during predicted period for logging.',
+    userPreference: 'reminder_enabled in period_settings',
+    icon: <Calendar className="h-5 w-5" />,
+    codeFile: 'src/hooks/usePeriodNotifications.ts',
+    deliveryType: 'local',
+    messages: [
+      { title: '🌸 Period Reminder', body: 'Your period may start in {X} days. Prepare yourself.', condition: 'reminder_days before' },
+      { title: '🌸 Period May Have Started', body: 'Your period may have started today. Tap to log.', condition: 'Predicted start day' },
+      { title: '🌸 Log Your Day', body: "Don't forget to log today.", condition: 'During predicted period' },
     ],
   },
   {
@@ -106,6 +118,19 @@ const scheduledPNs: PNType[] = [
     ],
   },
   {
+    name: 'Drip Content Follow-up',
+    function: 'send-drip-followup',
+    schedule: 'Daily (cron)',
+    description: 'Follow-up for users who unlocked content 2+ days ago but haven\'t listened. Only 1 follow-up per content item.',
+    userPreference: 'content_drip',
+    icon: <BookOpen className="h-5 w-5" />,
+    codeFile: 'supabase/functions/send-drip-followup/index.ts',
+    deliveryType: 'server',
+    messages: [
+      { title: '🎧 Content Waiting', body: '"{title}" is waiting for you. Tap to listen.', condition: 'Unlocked 2+ days, no progress' },
+    ],
+  },
+  {
     name: 'Session Reminders',
     function: 'send-session-reminders',
     schedule: 'On enrollment sync (local)',
@@ -119,7 +144,6 @@ const scheduledPNs: PNType[] = [
       { title: '📅 Session Starting in 1 Hour!', body: '"{sessionTitle}" starts at {time}. Get ready to join!', condition: '1h before (local)' },
     ],
   },
-  // Task Reminders removed - now fully handled by local notifications (useLocalNotificationScheduler.ts)
   {
     name: 'Weekly Summary',
     function: 'send-weekly-summary',
@@ -148,20 +172,20 @@ const scheduledPNs: PNType[] = [
     ],
   },
   {
-    name: 'Momentum Celebration',
+    name: 'Momentum Keeper',
     function: 'send-momentum-celebration',
     schedule: 'Daily',
-    description: 'Milestone celebrations based on this_month_active_days. Uses strength-first language.',
+    description: 'Detects user INACTIVITY (1-14 days) and sends nudges to bring them back. Includes coins context. Respects 8 AM - 8 PM user timezone.',
     userPreference: 'momentum_celebration',
     icon: <Trophy className="h-5 w-5" />,
     codeFile: 'supabase/functions/send-momentum-celebration/index.ts',
     deliveryType: 'server',
     messages: [
-      { title: '✨ 3 Days of Presence', body: "You're showing up for yourself. That's strength.", condition: '3 days' },
-      { title: '🌟 A Full Week!', body: '7 days of honoring yourself. Your strength is growing.', condition: '7 days' },
-      { title: '💫 Two Weeks!', body: "14 days of showing up. You're becoming who you want to be.", condition: '14 days' },
-      { title: '🌙 Three Weeks!', body: "21 days. This is who you're becoming now.", condition: '21 days' },
-      { title: '🏛️ One Month!', body: "30 days of honoring yourself. That's extraordinary strength.", condition: '30 days' },
+      { title: '💪 Keep Going!', body: 'You showed up {X} days this month. One more today?', condition: '1 day inactive' },
+      { title: '✨ Your Momentum is Waiting', body: 'Your {X}-day momentum is waiting. Come back and keep it alive.', condition: '2 days inactive' },
+      { title: '🌿 We Miss You', body: "You've been away for {X} days. Your strength doesn't expire.", condition: '3-4 days inactive' },
+      { title: '🌸 Your Actions Miss You', body: 'You have {coins} coins waiting. Even 1 minute counts.', condition: '5-6 days inactive' },
+      { title: '🕊️ No Pressure', body: "When you're ready, everything is still here for you.", condition: '7-14 days inactive' },
     ],
   },
 ];
@@ -241,7 +265,7 @@ const localPNs: PNType[] = [
     name: 'Urgent Alarm',
     function: 'local-urgent-alarm',
     trigger: 'Multiple triggers with vibration',
-    description: 'High-priority alarms with sound and vibration for critical reminders.',
+    description: 'High-priority alarms with sound and vibration for critical reminders. Uses time-sensitive interruption level.',
     icon: <Bell className="h-5 w-5" />,
     codeFile: 'src/hooks/useLocalNotificationScheduler.ts',
     deliveryType: 'local',
@@ -425,6 +449,137 @@ function getStatusBadge(status: string | null) {
   }
 }
 
+function FullLogsTab() {
+  const queryClient = useQueryClient();
+  const [functionFilter, setFunctionFilter] = useState('');
+  
+  const { data: logs, isLoading } = useQuery({
+    queryKey: ['pn-schedule-logs-full', functionFilter],
+    queryFn: async () => {
+      let query = supabase
+        .from('pn_schedule_logs')
+        .select('*, profiles:user_id(full_name, email)')
+        .order('created_at', { ascending: false })
+        .limit(100);
+      
+      if (functionFilter) {
+        query = query.eq('function_name', functionFilter);
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Summary stats
+  const todayLogs = logs?.filter(l => {
+    const logDate = new Date(l.created_at).toISOString().split('T')[0];
+    return logDate === new Date().toISOString().split('T')[0];
+  }) || [];
+  
+  const totalSentToday = todayLogs.reduce((sum, l) => sum + (l.sent_count || 0), 0);
+  const totalFailedToday = todayLogs.reduce((sum, l) => sum + (l.failed_count || 0), 0);
+  const uniqueUsersToday = new Set(todayLogs.filter(l => l.user_id).map(l => l.user_id)).size;
+
+  const functionNames = [...new Set(logs?.map(l => l.function_name) || [])].sort();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Summary Stats */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-2xl font-bold text-primary">{totalSentToday}</div>
+            <div className="text-xs text-muted-foreground">Sent today</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-2xl font-bold text-destructive">{totalFailedToday}</div>
+            <div className="text-xs text-muted-foreground">Failed today</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-2xl font-bold">{uniqueUsersToday}</div>
+            <div className="text-xs text-muted-foreground">Users notified today</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <select
+          className="text-sm border rounded px-2 py-1 bg-background"
+          value={functionFilter}
+          onChange={(e) => setFunctionFilter(e.target.value)}
+        >
+          <option value="">All functions</option>
+          {functionNames.map(fn => (
+            <option key={fn} value={fn}>{fn}</option>
+          ))}
+        </select>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => queryClient.invalidateQueries({ queryKey: ['pn-schedule-logs-full'] })}
+        >
+          <RefreshCw className="h-4 w-4 mr-1" />
+          Refresh
+        </Button>
+      </div>
+
+      {/* Logs Table */}
+      {!logs || logs.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
+          <AlertCircle className="h-8 w-8 mb-2" />
+          <p>No logs yet.</p>
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Function</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>User</TableHead>
+              <TableHead>Time</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Sent</TableHead>
+              <TableHead className="text-right">Failed</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {logs.map((log: any) => (
+              <TableRow key={log.id}>
+                <TableCell className="font-medium text-xs">{log.function_name}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{log.notification_type || '—'}</TableCell>
+                <TableCell className="text-xs">
+                  {log.profiles?.full_name || log.profiles?.email || (log.user_id ? log.user_id.slice(0, 8) + '...' : '—')}
+                </TableCell>
+                <TableCell className="text-xs text-muted-foreground">
+                  {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
+                </TableCell>
+                <TableCell>{getStatusBadge(log.status)}</TableCell>
+                <TableCell className="text-right text-xs font-medium" style={{ color: 'hsl(var(--primary))' }}>{log.sent_count}</TableCell>
+                <TableCell className="text-right text-xs font-medium text-destructive">{log.failed_count}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
+  );
+}
+
 function RecentLogsTable() {
   const queryClient = useQueryClient();
   
@@ -489,8 +644,8 @@ function RecentLogsTable() {
                 {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
               </TableCell>
               <TableCell>{getStatusBadge(log.status)}</TableCell>
-              <TableCell className="text-right text-green-600 font-medium">{log.sent_count}</TableCell>
-              <TableCell className="text-right text-red-600 font-medium">{log.failed_count}</TableCell>
+              <TableCell className="text-right font-medium" style={{ color: 'hsl(var(--primary))' }}>{log.sent_count}</TableCell>
+              <TableCell className="text-right font-medium text-destructive">{log.failed_count}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -615,32 +770,23 @@ function PNDocumentation() {
         </CardContent>
       </Card>
 
-      {/* Recent Logs */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Recent Server Runs</CardTitle>
-          <CardDescription>History of server-side push notification jobs</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <RecentLogsTable />
-        </CardContent>
-      </Card>
-      
-      {/* Hybrid Strategy Note */}
+      {/* Delivery Strategy Note */}
       <Card className="border-primary/30 bg-accent/50">
         <CardHeader>
           <CardTitle className="text-base">📋 Delivery Strategy</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
           <p>
-            <strong>Local-first:</strong> Daily notifications are scheduled on-device for reliability. 
-            Config changes sync via realtime or silent push.
+            <strong>Local-first (Smart Nudges):</strong> Action reminders, water, and period notifications are generated from on-device planner data. Random times between 8 AM - 8 PM.
           </p>
           <p>
-            <strong>Hybrid:</strong> Task reminders use local as primary (better offline), server as fallback for old app versions.
+            <strong>Server (Momentum Keeper):</strong> Detects user inactivity and sends nudges to bring them back. Includes coins context.
           </p>
           <p>
-            <strong>Server-only:</strong> Content drip, session reminders, and event-triggered notifications use APNs directly.
+            <strong>Server (Drip Follow-up):</strong> Follows up on unlocked content that hasn't been listened to after 2+ days.
+          </p>
+          <p>
+            <strong>Hybrid:</strong> Session reminders and content unlocks use local as primary, server as fallback.
           </p>
         </CardContent>
       </Card>
@@ -675,6 +821,10 @@ export default function PushNotifications() {
             <Smartphone className="h-4 w-4" />
             Local Analytics
           </TabsTrigger>
+          <TabsTrigger value="logs" className="flex items-center gap-2">
+            <Server className="h-4 w-4" />
+            Logs
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="map">
@@ -704,6 +854,10 @@ export default function PushNotifications() {
 
         <TabsContent value="local">
           <NotificationAnalytics />
+        </TabsContent>
+
+        <TabsContent value="logs">
+          <FullLogsTab />
         </TabsContent>
       </Tabs>
     </div>

@@ -184,3 +184,9 @@ verify_jwt = false
 
 [functions.admin-assistant]
 verify_jwt = false
+
+[functions.send-drip-followup]
+verify_jwt = false
+
+[functions.send-momentum-celebration]
+verify_jwt = false
