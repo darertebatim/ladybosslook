@@ -149,7 +149,8 @@ function NotificationForm({ environment }: NotificationFormProps) {
         title,
         body: message,
         url: destinationUrl,
-        environment, // Pass environment to edge function
+        environment,
+        isUrgent,
       };
 
       if (targetType === 'course') {
