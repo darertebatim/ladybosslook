@@ -42,6 +42,7 @@ function NotificationForm({ environment }: NotificationFormProps) {
   const [targetCourse, setTargetCourse] = useState('');
   const [targetRoundId, setTargetRoundId] = useState('all-rounds');
   const [targetUserEmail, setTargetUserEmail] = useState('');
+  const [isUrgent, setIsUrgent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   const { toast } = useToast();
