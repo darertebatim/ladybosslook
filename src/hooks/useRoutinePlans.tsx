@@ -356,7 +356,7 @@ export function useAddRoutinePlan() {
         title?: string; 
         icon?: string; 
         color?: string;
-        repeatPattern?: 'daily' | 'weekly' | 'monthly' | 'none';
+        repeatPattern?: string;
         scheduledTime?: string | null;
         tag?: string | null;
         linked_playlist_id?: string | null;
