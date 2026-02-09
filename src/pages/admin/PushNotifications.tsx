@@ -119,22 +119,7 @@ const scheduledPNs: PNType[] = [
       { title: '📅 Session Starting in 1 Hour!', body: '"{sessionTitle}" starts at {time}. Get ready to join!', condition: '1h before (local)' },
     ],
   },
-  {
-    name: 'Task Reminders',
-    function: 'send-task-reminders',
-    schedule: 'Every 5 min (deduped)',
-    description: 'Server fallback for task reminders. Local notifications are primary. Logs to task_reminder_logs to prevent duplicates - each task fires once per day.',
-    userPreference: 'reminder_enabled per task, reminder_offset (0/10/30/60 min)',
-    icon: <CheckSquare className="h-5 w-5" />,
-    codeFile: 'supabase/functions/send-task-reminders/index.ts',
-    deliveryType: 'hybrid',
-    messages: [
-      { title: '{emoji} {taskTitle}', body: "It's time!", condition: 'offset = 0' },
-      { title: '{emoji} {taskTitle}', body: 'Starting in 10 minutes', condition: 'offset = 10' },
-      { title: '{emoji} {taskTitle}', body: 'Starting in 30 minutes', condition: 'offset = 30' },
-      { title: '{emoji} {taskTitle}', body: 'Starting in 1 hour', condition: 'offset = 60' },
-    ],
-  },
+  // Task Reminders removed - now fully handled by local notifications (useLocalNotificationScheduler.ts)
   {
     name: 'Weekly Summary',
     function: 'send-weekly-summary',
@@ -237,15 +222,19 @@ const triggeredPNs: PNType[] = [
 
 const localPNs: PNType[] = [
   {
-    name: 'Task Reminder (Local)',
+    name: 'Task Reminders',
     function: 'local-task-reminder',
     trigger: 'Capacitor LocalNotifications',
-    description: 'Scheduled reminders for user tasks with configured times. Primary method - server is fallback.',
+    description: 'Scheduled reminders for user actions with configured times. 100% local - no server involved.',
+    userPreference: 'reminder_enabled per task, reminder_offset (0/10/30/60 min)',
     icon: <CheckSquare className="h-5 w-5" />,
     codeFile: 'src/hooks/useLocalNotificationScheduler.ts',
     deliveryType: 'local',
     messages: [
-      { title: '{emoji} {taskTitle}', body: 'Reminder based on offset timing' },
+      { title: '{emoji} {taskTitle}', body: "It's time!", condition: 'offset = 0' },
+      { title: '{emoji} {taskTitle}', body: 'Starting in 10 minutes', condition: 'offset = 10' },
+      { title: '{emoji} {taskTitle}', body: 'Starting in 30 minutes', condition: 'offset = 30' },
+      { title: '{emoji} {taskTitle}', body: 'Starting in 1 hour', condition: 'offset = 60' },
     ],
   },
   {
