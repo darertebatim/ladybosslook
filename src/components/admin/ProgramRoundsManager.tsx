@@ -76,6 +76,7 @@ interface RoundFormData {
   support_link_label: string;
   audio_playlist_id: string;
   video_url: string;
+  is_self_paced: boolean;
 }
 
 export const ProgramRoundsManager = () => {
