@@ -210,6 +210,7 @@ export default function RoutinesBank() {
           category: data.formData.category,
           color: data.formData.color,
           emoji: data.formData.emoji,
+          schedule_type: data.formData.schedule_type,
         })
         .select()
         .single();
