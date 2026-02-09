@@ -190,3 +190,6 @@ verify_jwt = false
 
 [functions.send-momentum-celebration]
 verify_jwt = false
+
+[functions.send-streak-challenges]
+verify_jwt = false

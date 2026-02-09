@@ -64,6 +64,18 @@ async function sendToApns(
   }
 }
 
+function isWithinActiveWindow(userTimezone: string | null): boolean {
+  try {
+    const tz = userTimezone || 'UTC';
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hour12: false });
+    const hour = parseInt(formatter.format(now), 10);
+    return hour >= 8 && hour < 20;
+  } catch {
+    return true;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
@@ -135,7 +147,7 @@ Deno.serve(async (req) => {
       .select('user_id, audio_id');
     const progressSet = new Set(progress?.map(p => `${p.user_id}:${p.audio_id}`) || []);
 
-    // Check preferences
+    // Check preferences and get timezones
     const allUserIds = [...new Set(enrollments.map(e => e.user_id))];
     const { data: prefs } = await supabase
       .from('user_notification_preferences')
@@ -143,12 +155,23 @@ Deno.serve(async (req) => {
       .in('user_id', allUserIds);
     const prefsMap = new Map(prefs?.map(p => [p.user_id, p.content_drip]) || []);
 
+    // Get user timezones for active window check
+    const { data: userProfiles } = await supabase
+      .from('profiles')
+      .select('id, timezone')
+      .in('id', allUserIds);
+    const timezoneMap = new Map(userProfiles?.map(p => [p.id, p.timezone]) || []);
+
     // Build notifications to send
     const toSend: { userId: string; audioId: string; title: string; itemId: string }[] = [];
 
     for (const enrollment of enrollments) {
       const pref = prefsMap.get(enrollment.user_id);
       if (pref === false) continue;
+
+      // Skip if user is outside their active window (8 AM - 8 PM local)
+      const userTz = timezoneMap.get(enrollment.user_id);
+      if (!isWithinActiveWindow(userTz)) continue;
 
       const playlistId = enrollment.round_id ? roundPlaylistMap.get(enrollment.round_id) : null;
       if (!playlistId) continue;

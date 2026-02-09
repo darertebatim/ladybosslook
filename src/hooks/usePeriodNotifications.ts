@@ -18,10 +18,19 @@ import { logLocalNotificationEvent } from '@/lib/localNotificationLogger';
 
 const ID_RANGE = { start: 200031, end: 200040 };
 
-function getScheduleDate(daysFromNow: number, hour: number = 9, minute: number = 0): Date {
+function randomMinuteOffset(): number {
+  // Generate non-rounded minutes (avoid :00, :15, :30, :45)
+  let m = Math.floor(Math.random() * 60);
+  const rounded = [0, 15, 30, 45];
+  if (rounded.includes(m)) m = m + Math.floor(Math.random() * 7) + 1;
+  return m % 60;
+}
+
+function getScheduleDate(daysFromNow: number, baseHour: number = 9, useRandomMinute: boolean = true): Date {
   const d = new Date();
   d.setDate(d.getDate() + daysFromNow);
-  d.setHours(hour, minute, 0, 0);
+  const minute = useRandomMinute ? randomMinuteOffset() : 0;
+  d.setHours(baseHour, minute, 0, 0);
   return d;
 }
 
@@ -70,7 +79,7 @@ export function usePeriodNotifications(userId: string | undefined) {
           id: idCounter++,
           title: '🌸 Period Reminder',
           body: `Your period may start in ${reminderDays} day${reminderDays > 1 ? 's' : ''}. Prepare yourself.`,
-          schedule: { at: getScheduleDate(reminderDaysOut, 9, 0) },
+          schedule: { at: getScheduleDate(reminderDaysOut, 9) },
           sound: 'default',
           extra: { type: 'period_reminder', url: '/app/period' },
         });
@@ -82,7 +91,7 @@ export function usePeriodNotifications(userId: string | undefined) {
           id: idCounter++,
           title: '🌸 Period May Have Started',
           body: 'Your period may have started today. Tap to log.',
-          schedule: { at: getScheduleDate(daysUntilStart, 10, 0) },
+          schedule: { at: getScheduleDate(daysUntilStart, 10) },
           sound: 'default',
           extra: { type: 'period_reminder', url: '/app/period' },
         });
@@ -96,7 +105,7 @@ export function usePeriodNotifications(userId: string | undefined) {
             id: idCounter++,
             title: '🌸 Log Your Day',
             body: "Don't forget to log today.",
-            schedule: { at: getScheduleDate(dayOffset, 10, 0) },
+            schedule: { at: getScheduleDate(dayOffset, 10) },
             sound: 'default',
             extra: { type: 'period_reminder', url: '/app/period' },
           });

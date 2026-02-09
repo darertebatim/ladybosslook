@@ -120,14 +120,14 @@ const scheduledPNs: PNType[] = [
   {
     name: 'Drip Content Follow-up',
     function: 'send-drip-followup',
-    schedule: 'Daily (cron)',
-    description: 'Follow-up for users who unlocked content 2+ days ago but haven\'t listened. Only 1 follow-up per content item.',
+    schedule: 'Every 2h (cron)',
+    description: 'Follow-up for users who unlocked content 2+ days ago but haven\'t listened. Timezone-aware (8 AM - 8 PM local). Only 1 follow-up per content item.',
     userPreference: 'content_drip',
     icon: <BookOpen className="h-5 w-5" />,
     codeFile: 'supabase/functions/send-drip-followup/index.ts',
     deliveryType: 'server',
     messages: [
-      { title: '🎧 Content Waiting', body: '"{title}" is waiting for you. Tap to listen.', condition: 'Unlocked 2+ days, no progress' },
+      { title: '🎧 Content Waiting', body: '"{title}" is waiting for you. Tap to listen.', condition: 'Unlocked 2+ days, no progress, user in active window' },
     ],
   },
   {
@@ -174,7 +174,7 @@ const scheduledPNs: PNType[] = [
   {
     name: 'Momentum Keeper',
     function: 'send-momentum-celebration',
-    schedule: 'Daily',
+    schedule: 'Every 2h (cron)',
     description: 'Detects user INACTIVITY (1-14 days) and sends nudges to bring them back. Includes coins context. Respects 8 AM - 8 PM user timezone.',
     userPreference: 'momentum_celebration',
     icon: <Trophy className="h-5 w-5" />,
@@ -186,6 +186,25 @@ const scheduledPNs: PNType[] = [
       { title: '🌿 We Miss You', body: "You've been away for {X} days. Your strength doesn't expire.", condition: '3-4 days inactive' },
       { title: '🌸 Your Actions Miss You', body: 'You have {coins} coins waiting. Even 1 minute counts.', condition: '5-6 days inactive' },
       { title: '🕊️ No Pressure', body: "When you're ready, everything is still here for you.", condition: '7-14 days inactive' },
+    ],
+  },
+  {
+    name: 'Streak Challenges',
+    function: 'send-streak-challenges',
+    schedule: 'Every 2h (cron)',
+    description: 'Smart streak-based nudges: first-week critical path, streak continuation, goal proximity, and gold badge encouragement. Max 1/day per user.',
+    userPreference: 'momentum_celebration',
+    icon: <TrendingUp className="h-5 w-5" />,
+    codeFile: 'supabase/functions/send-streak-challenges/index.ts',
+    deliveryType: 'server',
+    messages: [
+      { title: '🌱 Your First Step', body: 'Your first action is waiting. Just one tap to start.', condition: 'First week, no completions' },
+      { title: '🌱 Day 2!', body: "Day 2! You came back. That's already more than most.", condition: 'First week, came yesterday' },
+      { title: '🔥 Almost There', body: '{n} of {goal} days done. Just {remaining} more to hit your target.', condition: 'Streak goal proximity' },
+      { title: '🏆 Goal Reached!', body: "You did it. {goal} days. That's not luck, that's you.", condition: 'Streak goal reached' },
+      { title: '🔥 2 Days!', body: '2 days in a row! Come back for day 3.', condition: '2-day streak' },
+      { title: '🥇 Gold Streak', body: "Gold streak: {n} days. Don't break the chain.", condition: 'Gold streak 2+' },
+      { title: '🥇 Finish for Gold', body: "You've done {x}/{y} actions today. Finish all to earn Gold.", condition: 'Partial completions today' },
     ],
   },
 ];
@@ -777,16 +796,22 @@ function PNDocumentation() {
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
           <p>
-            <strong>Local-first (Smart Nudges):</strong> Action reminders, water, and period notifications are generated from on-device planner data. Random times between 8 AM - 8 PM.
+            <strong>Local-first (Smart Nudges):</strong> Action reminders, water, and period notifications are generated from on-device planner data. Non-rounded random times between 8:03 AM - 7:47 PM for natural feel.
           </p>
           <p>
-            <strong>Server (Momentum Keeper):</strong> Detects user inactivity and sends nudges to bring them back. Includes coins context.
+            <strong>Server (Momentum Keeper):</strong> Detects user inactivity and sends nudges to bring them back. Includes coins context. Runs every 2h to cover all timezones.
           </p>
           <p>
-            <strong>Server (Drip Follow-up):</strong> Follows up on unlocked content that hasn't been listened to after 2+ days.
+            <strong>Server (Streak Challenges):</strong> Smart streak-based nudges for first-week users, streak continuation, goal proximity, and gold badge encouragement. Max 1/day per user. Runs every 2h.
+          </p>
+          <p>
+            <strong>Server (Drip Follow-up):</strong> Follows up on unlocked content not listened to after 2+ days. Timezone-aware. Runs every 2h.
           </p>
           <p>
             <strong>Hybrid:</strong> Session reminders and content unlocks use local as primary, server as fallback.
+          </p>
+          <p>
+            <strong>⏰ Timezone:</strong> All server-side functions run every 2h and check user's local timezone (8 AM - 8 PM window) before sending. Local notifications use device time.
           </p>
         </CardContent>
       </Card>
