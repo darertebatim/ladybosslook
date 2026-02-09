@@ -434,6 +434,7 @@ export function useAddRoutinePlan() {
       const startOrderIndex = (existingTasks?.[0]?.order_index ?? -1) + 1;
 
       // Create individual tasks for each routine plan task
+      const today = new Date();
       if (tasks && tasks.length > 0) {
         const userTasks = tasks.map((task, index) => {
           const edited = editedTasksMap.get(task.id);
@@ -441,12 +442,30 @@ export function useAddRoutinePlan() {
           const proLinkType = edited?.pro_link_type ?? task.pro_link_type ?? (task.linked_playlist_id ? 'playlist' : null);
           const proLinkValue = edited?.pro_link_value ?? task.pro_link_value ?? task.linked_playlist_id ?? null;
           
+          // Determine repeat_pattern and scheduling based on plan schedule_type
+          let repeatPattern = edited?.repeatPattern || 'daily';
+          let repeatDays: number[] | null = null;
+          let scheduledDate: string | null = null;
+
+          if (planScheduleType === 'weekly' && (task as any).schedule_days?.length > 0) {
+            repeatPattern = 'custom';
+            repeatDays = (task as any).schedule_days;
+          } else if (planScheduleType === 'challenge' && (task as any).drip_day) {
+            repeatPattern = 'none';
+            const dripDay = (task as any).drip_day as number;
+            const taskDate = new Date(today);
+            taskDate.setDate(taskDate.getDate() + (dripDay - 1));
+            scheduledDate = taskDate.toISOString().split('T')[0];
+          }
+
           return {
             user_id: user.id,
             title: edited?.title || task.title,
             emoji: edited?.icon || task.icon || planIcon,
             color: edited?.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
-            repeat_pattern: edited?.repeatPattern || 'daily',
+            repeat_pattern: repeatPattern,
+            repeat_days: repeatDays,
+            scheduled_date: scheduledDate,
             scheduled_time: edited?.scheduledTime || null,
             // For pro-linked tasks, use 'pro' as category; otherwise use the category name or plan title
             // Priority: edited tag > task's own tag > proLinkType check > planCategoryName > planTitle
