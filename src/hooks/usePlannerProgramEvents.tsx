@@ -161,7 +161,9 @@ export function useProgramEventsForDate(date: Date) {
         }
 
         // 3. Get content unlocks for this date (modules/supplements)
-        if (round.audio_playlist_id) {
+        // For self-paced rounds, use enrolled_at as the drip anchor
+        const dripAnchorDate = round.is_self_paced ? enrollment.enrolled_at : round.first_session_date;
+        if (round.audio_playlist_id && dripAnchorDate) {
           // Get modules (supplements)
           const { data: modules } = await supabase
             .from('playlist_supplements')
@@ -171,7 +173,7 @@ export function useProgramEventsForDate(date: Date) {
           for (const module of modules || []) {
             const { unlockDate, unlockTime } = getUnlockDateTime(
               module.drip_delay_days,
-              round.first_session_date,
+              dripAnchorDate,
               round.drip_offset_days || 0
             );
             
