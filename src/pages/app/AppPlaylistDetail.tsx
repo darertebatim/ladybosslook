@@ -207,12 +207,14 @@ export default function AppPlaylistDetail() {
         .from('course_enrollments')
         .select(`
           round_id,
+          enrolled_at,
           program_rounds!inner (
             id,
             start_date,
             first_session_date,
             drip_offset_days,
-            audio_playlist_id
+            audio_playlist_id,
+            is_self_paced
           )
         `)
         .eq('user_id', user.id)
@@ -221,7 +223,8 @@ export default function AppPlaylistDetail() {
         .maybeSingle();
       
       if (error) throw error;
-      return data?.program_rounds;
+      if (!data?.program_rounds) return null;
+      return { ...data.program_rounds, enrolled_at: data.enrolled_at };
     },
     enabled: !!playlistId && !playlist?.is_free,
   });
@@ -275,9 +278,12 @@ export default function AppPlaylistDetail() {
       return { isAvailable: true, availableDate: null, countdownText: null };
     }
     
+    const anchorDate = userRound?.is_self_paced 
+      ? userRound?.enrolled_at 
+      : (userRound?.first_session_date || userRound?.start_date);
     return getTrackAvailabilityWithCountdown(
       dripDelayDays, 
-      userRound?.first_session_date || userRound?.start_date, // Prefer first_session_date, fallback to start_date
+      anchorDate,
       userRound?.drip_offset_days || 0
     );
   };

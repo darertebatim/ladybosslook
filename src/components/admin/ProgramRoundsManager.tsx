@@ -54,6 +54,7 @@ interface ProgramRound {
   audio_playlist_id: string | null;
   video_url: string | null;
   drip_offset_days: number;
+  is_self_paced: boolean;
 }
 
 interface RoundFormData {
@@ -75,6 +76,7 @@ interface RoundFormData {
   support_link_label: string;
   audio_playlist_id: string;
   video_url: string;
+  is_self_paced: boolean;
 }
 
 export const ProgramRoundsManager = () => {
@@ -107,6 +109,7 @@ export const ProgramRoundsManager = () => {
     support_link_label: "",
     audio_playlist_id: "none",
     video_url: "",
+    is_self_paced: false,
   });
 
   // Fetch programs for dropdown
@@ -185,6 +188,7 @@ export const ProgramRoundsManager = () => {
         support_link_label: data.support_link_label || null,
         audio_playlist_id: data.audio_playlist_id === "none" ? null : data.audio_playlist_id || null,
         video_url: data.video_url || null,
+        is_self_paced: data.is_self_paced,
       };
 
       if (editingId) {
@@ -301,6 +305,7 @@ export const ProgramRoundsManager = () => {
       support_link_label: "",
       audio_playlist_id: "none",
       video_url: "",
+      is_self_paced: false,
     });
     setEditingId(null);
   };
@@ -347,6 +352,7 @@ export const ProgramRoundsManager = () => {
       support_link_label: (round as any).support_link_label || "",
       audio_playlist_id: round.audio_playlist_id || "none",
       video_url: round.video_url || "",
+      is_self_paced: round.is_self_paced || false,
     });
     setEditingId(round.id);
     setIsFormDialogOpen(true);
@@ -376,6 +382,7 @@ export const ProgramRoundsManager = () => {
       support_link_label: (round as any).support_link_label || "",
       audio_playlist_id: round.audio_playlist_id || "none",
       video_url: round.video_url || "",
+      is_self_paced: round.is_self_paced || false,
     });
     setEditingId(null); // This is a new round, not editing
     setIsFormDialogOpen(true);
@@ -850,6 +857,26 @@ export const ProgramRoundsManager = () => {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">Select the audio playlist for this round's supplementary materials</p>
+            </div>
+
+            <div className="space-y-2 mt-4">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="is_self_paced"
+                  checked={formData.is_self_paced}
+                  onChange={(e) =>
+                    setFormData({ ...formData, is_self_paced: e.target.checked })
+                  }
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <Label htmlFor="is_self_paced" className="cursor-pointer font-semibold">
+                  Self-Paced Round
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                When enabled, drip content dates are based on each user's enrollment date instead of the round's first session date. Start Date and First Session Date become relative to enrollment.
+              </p>
             </div>
 
             <DialogFooter className="mt-6">

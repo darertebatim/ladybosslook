@@ -190,12 +190,14 @@ export default function AppAudioPlayer() {
         .from('course_enrollments')
         .select(`
           round_id,
+          enrolled_at,
           program_rounds!inner (
             id,
             start_date,
             first_session_date,
             drip_offset_days,
-            audio_playlist_id
+            audio_playlist_id,
+            is_self_paced
           )
         `)
         .eq('user_id', user.id)
@@ -204,7 +206,8 @@ export default function AppAudioPlayer() {
         .maybeSingle();
       
       if (error) throw error;
-      return data?.program_rounds;
+      if (!data?.program_rounds) return null;
+      return { ...data.program_rounds, enrolled_at: data.enrolled_at };
     },
     enabled: !!effectivePlaylistId,
   });
@@ -232,9 +235,12 @@ export default function AppAudioPlayer() {
   // Check if a track is available based on drip delay - uses first_session_date
   // drip_delay_days=0 = immediate, 1 = at first session, 2 = 1 day after first session, etc.
   const getTrackAvailability = (dripDelayDays: number) => {
+    const anchorDate = userRound?.is_self_paced 
+      ? userRound?.enrolled_at 
+      : (userRound?.first_session_date || userRound?.start_date);
     return getTrackAvailabilityWithCountdown(
       dripDelayDays, 
-      userRound?.first_session_date || userRound?.start_date, // Prefer first_session_date
+      anchorDate,
       userRound?.drip_offset_days || 0
     );
   };
@@ -288,7 +294,7 @@ export default function AppAudioPlayer() {
       setPlaylistContext({
         tracks: playlistContextTracks,
         currentIndex: currentTrackIndex,
-        roundStartDate: userRound?.first_session_date || userRound?.start_date, // Use first_session_date for drip
+        roundStartDate: userRound?.is_self_paced ? userRound?.enrolled_at : (userRound?.first_session_date || userRound?.start_date),
         roundDripOffset: userRound?.drip_offset_days || 0,
       });
     }

@@ -88,6 +88,7 @@ export function useProgramEventsForDate(date: Date) {
           program_slug,
           course_name,
           round_id,
+          enrolled_at,
           program_rounds (
             id,
             program_slug,
@@ -95,7 +96,8 @@ export function useProgramEventsForDate(date: Date) {
             first_session_date,
             drip_offset_days,
             audio_playlist_id,
-            google_meet_link
+            google_meet_link,
+            is_self_paced
           )
         `)
         .eq('user_id', user.id)
@@ -159,7 +161,9 @@ export function useProgramEventsForDate(date: Date) {
         }
 
         // 3. Get content unlocks for this date (modules/supplements)
-        if (round.audio_playlist_id) {
+        // For self-paced rounds, use enrolled_at as the drip anchor
+        const dripAnchorDate = round.is_self_paced ? enrollment.enrolled_at : round.first_session_date;
+        if (round.audio_playlist_id && dripAnchorDate) {
           // Get modules (supplements)
           const { data: modules } = await supabase
             .from('playlist_supplements')
@@ -169,7 +173,7 @@ export function useProgramEventsForDate(date: Date) {
           for (const module of modules || []) {
             const { unlockDate, unlockTime } = getUnlockDateTime(
               module.drip_delay_days,
-              round.first_session_date,
+              dripAnchorDate,
               round.drip_offset_days || 0
             );
             
@@ -205,7 +209,7 @@ export function useProgramEventsForDate(date: Date) {
           for (const item of playlistItems || []) {
             const { unlockDate, unlockTime } = getUnlockDateTime(
               item.drip_delay_days,
-              round.first_session_date,
+              dripAnchorDate,
               round.drip_offset_days || 0
             );
             
@@ -337,11 +341,13 @@ export function useProgramEventDates(startDate: Date, endDate: Date) {
           id,
           program_slug,
           round_id,
+          enrolled_at,
           program_rounds (
             id,
             first_session_date,
             drip_offset_days,
-            audio_playlist_id
+            audio_playlist_id,
+            is_self_paced
           )
         `)
         .eq('user_id', user.id)
@@ -376,7 +382,8 @@ export function useProgramEventDates(startDate: Date, endDate: Date) {
         }
 
         // Get content unlocks (modules and tracks) in range
-        if (round.audio_playlist_id && round.first_session_date) {
+        const dripAnchorDate = round.is_self_paced ? enrollment.enrolled_at : round.first_session_date;
+        if (round.audio_playlist_id && dripAnchorDate) {
           // Get modules
           const { data: modules } = await supabase
             .from('playlist_supplements')
@@ -386,7 +393,7 @@ export function useProgramEventDates(startDate: Date, endDate: Date) {
           for (const module of modules || []) {
             const { unlockDate } = getUnlockDateTime(
               module.drip_delay_days,
-              round.first_session_date,
+              dripAnchorDate,
               round.drip_offset_days || 0
             );
             
@@ -404,7 +411,7 @@ export function useProgramEventDates(startDate: Date, endDate: Date) {
           for (const item of playlistItems || []) {
             const { unlockDate } = getUnlockDateTime(
               item.drip_delay_days,
-              round.first_session_date,
+              dripAnchorDate,
               round.drip_offset_days || 0
             );
             
