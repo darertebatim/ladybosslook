@@ -49,6 +49,7 @@ interface RoutineBankItem {
   is_popular: boolean;
   is_welcome_popup: boolean;
   sort_order: number;
+  schedule_type: string;
   created_at: string;
   updated_at: string;
 }
