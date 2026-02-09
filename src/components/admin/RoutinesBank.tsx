@@ -616,6 +616,54 @@ export default function RoutinesBank() {
     return localTasks.filter(t => t.section_id === sectionId).length;
   };
 
+  const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const renderTaskScheduleConfig = (task: LocalTask) => {
+    if (formData.schedule_type === 'weekly') {
+      return (
+        <div className="flex gap-0.5">
+          {WEEKDAYS.map((day, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => {
+                const days = task.schedule_days || [];
+                const newDays = days.includes(idx) ? days.filter(d => d !== idx) : [...days, idx].sort();
+                setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: newDays } : t));
+              }}
+              className={cn(
+                "w-6 h-6 rounded text-[10px] font-medium transition-all",
+                (task.schedule_days || []).includes(idx)
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-accent"
+              )}
+            >
+              {day[0]}
+            </button>
+          ))}
+        </div>
+      );
+    }
+    if (formData.schedule_type === 'challenge') {
+      return (
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] text-muted-foreground">Day</span>
+          <Input
+            type="number"
+            min={1}
+            value={task.drip_day ?? ''}
+            onChange={(e) => {
+              const val = e.target.value ? parseInt(e.target.value) : null;
+              setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, drip_day: val } : t));
+            }}
+            className="w-12 h-6 text-xs text-center p-0"
+          />
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
