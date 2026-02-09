@@ -209,7 +209,7 @@ export function useProgramEventsForDate(date: Date) {
           for (const item of playlistItems || []) {
             const { unlockDate, unlockTime } = getUnlockDateTime(
               item.drip_delay_days,
-              round.first_session_date,
+              dripAnchorDate,
               round.drip_offset_days || 0
             );
             
