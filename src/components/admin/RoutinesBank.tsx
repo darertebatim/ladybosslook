@@ -1187,56 +1187,59 @@ export default function RoutinesBank() {
                       </div>
                       <div className="p-2 space-y-1">
                         {uncategorizedTasks.map((task, tIdx) => (
-                          <div key={task.id} className="flex items-center gap-2 p-2 rounded bg-background border">
-                            <div className="flex flex-col">
+                          <div key={task.id} className="rounded bg-background border">
+                            <div className="flex items-center gap-2 p-2">
+                              <div className="flex flex-col">
+                                <button
+                                  type="button"
+                                  onClick={() => moveTaskUp(task.id, null)}
+                                  disabled={tIdx === 0}
+                                  className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                >
+                                  <ChevronUp className="h-3 w-3" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => moveTaskDown(task.id, null)}
+                                  disabled={tIdx === uncategorizedTasks.length - 1}
+                                  className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                >
+                                  <ChevronDown className="h-3 w-3" />
+                                </button>
+                              </div>
+                              <TaskIcon iconName={task.emoji} size={16} />
+                              <span className="flex-1 text-sm truncate">{task.title}</span>
+                              {renderTaskScheduleConfig(task)}
+                              {/* Move to section dropdown */}
+                              {localSections.length > 0 && (
+                                <Select
+                                  value=""
+                                  onValueChange={(sectionId) => {
+                                    setLocalTasks(localTasks.map(t =>
+                                      t.id === task.id ? { ...t, section_id: sectionId } : t
+                                    ));
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[100px] h-7 text-xs">
+                                    <span className="text-muted-foreground">Move to...</span>
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {localSections.map((s) => (
+                                      <SelectItem key={s.id} value={s.id} className="text-xs">
+                                        {s.title}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              )}
                               <button
                                 type="button"
-                                onClick={() => moveTaskUp(task.id, null)}
-                                disabled={tIdx === 0}
-                                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                onClick={() => removeTask(task.id)}
+                                className="p-1 text-destructive hover:bg-destructive/10 rounded"
                               >
-                                <ChevronUp className="h-3 w-3" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => moveTaskDown(task.id, null)}
-                                disabled={tIdx === uncategorizedTasks.length - 1}
-                                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                              >
-                                <ChevronDown className="h-3 w-3" />
+                                <X className="h-3 w-3" />
                               </button>
                             </div>
-                            <TaskIcon iconName={task.emoji} size={16} />
-                            <span className="flex-1 text-sm truncate">{task.title}</span>
-                            {/* Move to section dropdown */}
-                            {localSections.length > 0 && (
-                              <Select
-                                value=""
-                                onValueChange={(sectionId) => {
-                                  setLocalTasks(localTasks.map(t =>
-                                    t.id === task.id ? { ...t, section_id: sectionId } : t
-                                  ));
-                                }}
-                              >
-                                <SelectTrigger className="w-[100px] h-7 text-xs">
-                                  <span className="text-muted-foreground">Move to...</span>
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {localSections.map((s) => (
-                                    <SelectItem key={s.id} value={s.id} className="text-xs">
-                                      {s.title}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => removeTask(task.id)}
-                              className="p-1 text-destructive hover:bg-destructive/10 rounded"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
                           </div>
                         ))}
                         
