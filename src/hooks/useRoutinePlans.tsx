@@ -386,7 +386,7 @@ export function useAddRoutinePlan() {
           planIcon = tasks[0].icon || '✨';
         }
       } else {
-        // Get plan details from database
+        // Get plan details from database (including schedule_type)
         const { data: plan, error: planError } = await supabase
           .from('routine_plans')
           .select('*, category:routine_categories(*)')
@@ -398,6 +398,7 @@ export function useAddRoutinePlan() {
         planTitle = plan.title;
         planIcon = plan.icon;
         planCategoryName = plan.category?.name;
+        planScheduleType = (plan as any).schedule_type || 'daily';
 
         // Get plan tasks with linked playlist info
         const { data: allTasks, error: tasksError } = await supabase
