@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, Send, Beaker, Radio } from 'lucide-react';
+import { Bell, Send, Beaker, Radio, AlertTriangle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
 interface Program {
