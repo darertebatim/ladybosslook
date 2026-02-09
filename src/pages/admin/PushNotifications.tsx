@@ -796,16 +796,22 @@ function PNDocumentation() {
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
           <p>
-            <strong>Local-first (Smart Nudges):</strong> Action reminders, water, and period notifications are generated from on-device planner data. Random times between 8 AM - 8 PM.
+            <strong>Local-first (Smart Nudges):</strong> Action reminders, water, and period notifications are generated from on-device planner data. Non-rounded random times between 8:03 AM - 7:47 PM for natural feel.
           </p>
           <p>
-            <strong>Server (Momentum Keeper):</strong> Detects user inactivity and sends nudges to bring them back. Includes coins context.
+            <strong>Server (Momentum Keeper):</strong> Detects user inactivity and sends nudges to bring them back. Includes coins context. Runs every 2h to cover all timezones.
           </p>
           <p>
-            <strong>Server (Drip Follow-up):</strong> Follows up on unlocked content that hasn't been listened to after 2+ days.
+            <strong>Server (Streak Challenges):</strong> Smart streak-based nudges for first-week users, streak continuation, goal proximity, and gold badge encouragement. Max 1/day per user. Runs every 2h.
+          </p>
+          <p>
+            <strong>Server (Drip Follow-up):</strong> Follows up on unlocked content not listened to after 2+ days. Timezone-aware. Runs every 2h.
           </p>
           <p>
             <strong>Hybrid:</strong> Session reminders and content unlocks use local as primary, server as fallback.
+          </p>
+          <p>
+            <strong>⏰ Timezone:</strong> All server-side functions run every 2h and check user's local timezone (8 AM - 8 PM window) before sending. Local notifications use device time.
           </p>
         </CardContent>
       </Card>
