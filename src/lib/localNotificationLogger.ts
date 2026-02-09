@@ -10,7 +10,7 @@ import type { Json } from '@/integrations/supabase/types';
  */
 
 export type NotificationEventType = 'scheduled' | 'delivered' | 'tapped' | 'cancelled';
-export type NotificationType = 'task_reminder' | 'urgent_alarm' | 'session_reminder' | 'content_reminder';
+export type NotificationType = 'task_reminder' | 'urgent_alarm' | 'session_reminder' | 'content_reminder' | 'session_reminder_24h' | 'session_reminder_1h' | 'content_unlock';
 
 interface LogEventParams {
   notificationType: NotificationType;

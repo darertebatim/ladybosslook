@@ -18,6 +18,7 @@ import { useTimezoneSync } from '@/hooks/useTimezoneSync';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
 import { useLocalNotificationScheduler } from '@/hooks/useLocalNotificationScheduler';
 import { useHybridNotificationScheduler } from '@/hooks/useHybridNotificationScheduler';
+import { useProgramEventNotificationScheduler } from '@/hooks/useProgramEventNotificationScheduler';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
@@ -55,6 +56,9 @@ const NativeAppLayout = () => {
   
   // Hybrid notification scheduler - syncs server config to local notifications
   useHybridNotificationScheduler(user?.id);
+  
+  // Program event notifications - sessions and drip content (local-first)
+  useProgramEventNotificationScheduler();
   
   // Custom hooks after useState declarations
   const { unreadCount } = useUnreadChat();
