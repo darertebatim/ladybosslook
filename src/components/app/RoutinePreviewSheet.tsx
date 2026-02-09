@@ -193,7 +193,16 @@ export function RoutinePreviewSheet({
     onSave(Array.from(selectedTaskIds), editedTasksList);
   };
 
-  const getRepeatLabel = (pattern: string) => {
+  const WEEKDAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const getRepeatLabel = (task: RoutinePlanTask, pattern: string) => {
+    if (scheduleType === 'challenge' && (task as any).drip_day) {
+      return `Day ${(task as any).drip_day}`;
+    }
+    if (scheduleType === 'weekly' && (task as any).schedule_days?.length > 0) {
+      const days = ((task as any).schedule_days as number[]).sort();
+      return days.map(d => WEEKDAY_NAMES[d]).join(', ');
+    }
     switch (pattern) {
       case 'daily': return 'Repeats every day';
       case 'weekly': return 'Repeats every week';
