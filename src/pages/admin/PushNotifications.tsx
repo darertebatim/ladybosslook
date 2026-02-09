@@ -449,6 +449,137 @@ function getStatusBadge(status: string | null) {
   }
 }
 
+function FullLogsTab() {
+  const queryClient = useQueryClient();
+  const [functionFilter, setFunctionFilter] = useState('');
+  
+  const { data: logs, isLoading } = useQuery({
+    queryKey: ['pn-schedule-logs-full', functionFilter],
+    queryFn: async () => {
+      let query = supabase
+        .from('pn_schedule_logs')
+        .select('*, profiles:user_id(full_name, email)')
+        .order('created_at', { ascending: false })
+        .limit(100);
+      
+      if (functionFilter) {
+        query = query.eq('function_name', functionFilter);
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Summary stats
+  const todayLogs = logs?.filter(l => {
+    const logDate = new Date(l.created_at).toISOString().split('T')[0];
+    return logDate === new Date().toISOString().split('T')[0];
+  }) || [];
+  
+  const totalSentToday = todayLogs.reduce((sum, l) => sum + (l.sent_count || 0), 0);
+  const totalFailedToday = todayLogs.reduce((sum, l) => sum + (l.failed_count || 0), 0);
+  const uniqueUsersToday = new Set(todayLogs.filter(l => l.user_id).map(l => l.user_id)).size;
+
+  const functionNames = [...new Set(logs?.map(l => l.function_name) || [])].sort();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Summary Stats */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-2xl font-bold text-primary">{totalSentToday}</div>
+            <div className="text-xs text-muted-foreground">Sent today</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-2xl font-bold text-destructive">{totalFailedToday}</div>
+            <div className="text-xs text-muted-foreground">Failed today</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-2xl font-bold">{uniqueUsersToday}</div>
+            <div className="text-xs text-muted-foreground">Users notified today</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <select
+          className="text-sm border rounded px-2 py-1 bg-background"
+          value={functionFilter}
+          onChange={(e) => setFunctionFilter(e.target.value)}
+        >
+          <option value="">All functions</option>
+          {functionNames.map(fn => (
+            <option key={fn} value={fn}>{fn}</option>
+          ))}
+        </select>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => queryClient.invalidateQueries({ queryKey: ['pn-schedule-logs-full'] })}
+        >
+          <RefreshCw className="h-4 w-4 mr-1" />
+          Refresh
+        </Button>
+      </div>
+
+      {/* Logs Table */}
+      {!logs || logs.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
+          <AlertCircle className="h-8 w-8 mb-2" />
+          <p>No logs yet.</p>
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Function</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>User</TableHead>
+              <TableHead>Time</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Sent</TableHead>
+              <TableHead className="text-right">Failed</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {logs.map((log: any) => (
+              <TableRow key={log.id}>
+                <TableCell className="font-medium text-xs">{log.function_name}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{log.notification_type || '—'}</TableCell>
+                <TableCell className="text-xs">
+                  {log.profiles?.full_name || log.profiles?.email || (log.user_id ? log.user_id.slice(0, 8) + '...' : '—')}
+                </TableCell>
+                <TableCell className="text-xs text-muted-foreground">
+                  {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
+                </TableCell>
+                <TableCell>{getStatusBadge(log.status)}</TableCell>
+                <TableCell className="text-right text-xs font-medium" style={{ color: 'hsl(var(--primary))' }}>{log.sent_count}</TableCell>
+                <TableCell className="text-right text-xs font-medium text-destructive">{log.failed_count}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
+  );
+}
+
 function RecentLogsTable() {
   const queryClient = useQueryClient();
   
@@ -513,8 +644,8 @@ function RecentLogsTable() {
                 {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
               </TableCell>
               <TableCell>{getStatusBadge(log.status)}</TableCell>
-              <TableCell className="text-right text-green-600 font-medium">{log.sent_count}</TableCell>
-              <TableCell className="text-right text-red-600 font-medium">{log.failed_count}</TableCell>
+              <TableCell className="text-right font-medium" style={{ color: 'hsl(var(--primary))' }}>{log.sent_count}</TableCell>
+              <TableCell className="text-right font-medium text-destructive">{log.failed_count}</TableCell>
             </TableRow>
           ))}
         </TableBody>
