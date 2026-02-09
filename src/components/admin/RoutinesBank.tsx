@@ -685,6 +685,15 @@ export default function RoutinesBank() {
                       <span className="flex items-center gap-1"><TaskIcon iconName={catInfo.icon} size={12} /> {catInfo.label}</span>
                       <span>•</span>
                       <span>{stats.count} action{stats.count !== 1 ? 's' : ''}</span>
+                      {routine.schedule_type !== 'daily' && (
+                        <>
+                          <span>•</span>
+                          <span className="flex items-center gap-1">
+                            {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : <Flame className="h-3 w-3" />}
+                            {routine.schedule_type === 'weekly' ? 'Weekly' : 'Challenge'}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                   <button
