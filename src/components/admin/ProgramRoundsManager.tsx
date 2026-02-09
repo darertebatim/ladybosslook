@@ -879,6 +879,7 @@ export const ProgramRoundsManager = () => {
               </p>
             </div>
 
+            <DialogFooter className="mt-6">
               <Button type="button" variant="outline" onClick={() => setIsFormDialogOpen(false)}>
                 Cancel
               </Button>
