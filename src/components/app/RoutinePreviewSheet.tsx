@@ -67,6 +67,7 @@ export function RoutinePreviewSheet({
   tasks,
   routineTitle,
   defaultTag,
+  scheduleType = 'daily',
   onSave,
   isSaving,
 }: RoutinePreviewSheetProps) {
