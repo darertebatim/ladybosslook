@@ -374,6 +374,7 @@ export function useAddRoutinePlan() {
       let planTitle = 'Routine';
       let planIcon = '✨';
       let planCategoryName: string | null = null;
+      let planScheduleType = 'daily';
 
       if (isSyntheticPlan && syntheticTasks) {
         // Use the provided synthetic tasks directly
