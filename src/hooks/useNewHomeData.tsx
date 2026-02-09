@@ -142,27 +142,7 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
 
   // Filter tasks for today
   const allTasks = tasksRes.data || [];
-  const todayTasks = allTasks.filter(task => {
-    if (task.repeat_pattern === 'none') {
-      return task.scheduled_date === dateStr;
-    }
-    if (task.repeat_pattern === 'daily') return true;
-    if (task.repeat_pattern === 'weekend') {
-      return dayOfWeek === 0 || dayOfWeek === 6;
-    }
-    if (task.repeat_pattern === 'weekly' && task.scheduled_date) {
-      const originalDay = new Date(task.scheduled_date + 'T00:00:00').getDay();
-      return dayOfWeek === originalDay;
-    }
-    if (task.repeat_pattern === 'monthly' && task.scheduled_date) {
-      const originalDate = new Date(task.scheduled_date + 'T00:00:00').getDate();
-      return today.getDate() === originalDate;
-    }
-    if (task.repeat_pattern === 'custom' && task.repeat_days) {
-      return task.repeat_days.includes(dayOfWeek);
-    }
-    return false;
-  });
+  const todayTasks = allTasks.filter(task => taskAppliesToDate(task, dateStr));
 
   const completedTaskIds = new Set((completionsRes.data || []).map(c => c.task_id));
   const todayCompletedCount = todayTasks.filter(t => completedTaskIds.has(t.id)).length;

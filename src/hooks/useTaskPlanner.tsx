@@ -236,46 +236,7 @@ export const useTasksForDate = (date: Date) => {
   const dayOfWeek = date.getDay(); // 0 = Sunday
 
   // Filter tasks that apply to this date - computed from cached data
-  const tasksForDate = allTasks.filter(task => {
-    // Non-repeating tasks - only show on scheduled date
-    if (task.repeat_pattern === 'none') {
-      return task.scheduled_date === dateStr;
-    }
-
-    // Daily tasks - show on or after scheduled_date (start date)
-    if (task.repeat_pattern === 'daily') {
-      if (task.scheduled_date && task.scheduled_date > dateStr) return false;
-      return true;
-    }
-
-    // Weekend tasks - only Sat/Sun, on or after start date
-    if (task.repeat_pattern === 'weekend') {
-      if (task.scheduled_date && task.scheduled_date > dateStr) return false;
-      return dayOfWeek === 0 || dayOfWeek === 6;
-    }
-
-    // Weekly tasks - show on same day of week as original, on or after start date
-    if (task.repeat_pattern === 'weekly' && task.scheduled_date) {
-      if (task.scheduled_date > dateStr) return false;
-      const originalDay = parseISO(task.scheduled_date).getDay();
-      return dayOfWeek === originalDay;
-    }
-
-    // Monthly tasks - show on same day of month, on or after start date
-    if (task.repeat_pattern === 'monthly' && task.scheduled_date) {
-      if (task.scheduled_date > dateStr) return false;
-      const originalDate = parseISO(task.scheduled_date).getDate();
-      return date.getDate() === originalDate;
-    }
-
-    // Custom - check repeat_days array, on or after start date
-    if (task.repeat_pattern === 'custom' && task.repeat_days) {
-      if (task.scheduled_date && task.scheduled_date > dateStr) return false;
-      return task.repeat_days.includes(dayOfWeek);
-    }
-
-    return false;
-  });
+  const tasksForDate = allTasks.filter(task => taskAppliesToDate(task, dateStr));
 
   // Sort tasks: specific times first (chronologically), then time periods (by category order), then Anytime by order_index
   const sortedTasks = [...tasksForDate].sort((a, b) => {

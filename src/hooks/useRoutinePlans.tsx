@@ -455,7 +455,7 @@ export function useAddRoutinePlan() {
             const dripDay = (task as any).drip_day as number;
             const taskDate = new Date(today);
             taskDate.setDate(taskDate.getDate() + (dripDay - 1));
-            scheduledDate = taskDate.toISOString().split('T')[0];
+            scheduledDate = format(taskDate, 'yyyy-MM-dd');
           }
 
           return {
