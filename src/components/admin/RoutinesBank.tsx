@@ -539,6 +539,8 @@ export default function RoutinesBank() {
       emoji: task.emoji,
       section_id: sectionId,
       task_order: localTasks.filter(t => t.section_id === sectionId).length,
+      schedule_days: [],
+      drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : null,
     };
     setLocalTasks([...localTasks, newTask]);
     setTaskSearchOpen(false);
