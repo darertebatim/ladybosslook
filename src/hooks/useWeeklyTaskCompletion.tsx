@@ -30,12 +30,14 @@ function taskAppliesToDate(task: {
   const date = parseISO(dateStr);
   const dayOfWeek = date.getDay();
 
-  // Check if task existed on or before this date
+  // Check if task existed on or before this date (using local timezone)
   // This prevents newly added tasks from retroactively affecting past badges
   if (task.created_at) {
-    const taskCreatedDate = parseISO(task.created_at.split('T')[0]);
-    if (taskCreatedDate > date) {
-      return false; // Task didn't exist on this day
+    // Parse the UTC timestamp and convert to local date for comparison
+    const taskCreatedUTC = new Date(task.created_at);
+    const taskCreatedLocalDate = format(taskCreatedUTC, 'yyyy-MM-dd');
+    if (taskCreatedLocalDate > dateStr) {
+      return false; // Task didn't exist on this day in local timezone
     }
   }
 
