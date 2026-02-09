@@ -162,8 +162,8 @@ Deno.serve(async (req) => {
       .in('id', allUserIds);
     const timezoneMap = new Map(userProfiles?.map(p => [p.id, p.timezone]) || []);
 
-    // Build notifications to send
-    const toSend: { userId: string; audioId: string; title: string; itemId: string }[] = [];
+    // Build notifications to send — MAX 1 per user (most recently unlocked item)
+    const userBestItem = new Map<string, { userId: string; audioId: string; title: string; itemId: string; dripDelay: number }>();
 
     for (const enrollment of enrollments) {
       const pref = prefsMap.get(enrollment.user_id);
@@ -191,9 +191,16 @@ Deno.serve(async (req) => {
         if (progressSet.has(`${enrollment.user_id}:${item.audio_id}`)) continue;
 
         const title = audioTitles.get(item.audio_id) || 'New Content';
-        toSend.push({ userId: enrollment.user_id, audioId: item.audio_id, title, itemId: item.id });
+        
+        // Keep only the most recently unlocked item per user
+        const existing = userBestItem.get(enrollment.user_id);
+        if (!existing || item.drip_delay_days > existing.dripDelay) {
+          userBestItem.set(enrollment.user_id, { userId: enrollment.user_id, audioId: item.audio_id, title, itemId: item.id, dripDelay: item.drip_delay_days });
+        }
       }
     }
+
+    const toSend = Array.from(userBestItem.values());
 
     console.log(`[DripFollowup] Found ${toSend.length} follow-ups to send`);
 
