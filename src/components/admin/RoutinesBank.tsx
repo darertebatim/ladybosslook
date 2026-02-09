@@ -439,6 +439,7 @@ export default function RoutinesBank() {
       category: routine.category,
       color: routine.color,
       emoji: routine.emoji,
+      schedule_type: (routine.schedule_type || 'daily') as 'daily' | 'weekly' | 'challenge',
     });
     const { sections, tasks } = await fetchRoutineData(routine.id);
     setLocalSections(sections);
