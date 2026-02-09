@@ -147,13 +147,20 @@ Deno.serve(async (req) => {
       .select('user_id, audio_id');
     const progressSet = new Set(progress?.map(p => `${p.user_id}:${p.audio_id}`) || []);
 
-    // Check preferences
+    // Check preferences and get timezones
     const allUserIds = [...new Set(enrollments.map(e => e.user_id))];
     const { data: prefs } = await supabase
       .from('user_notification_preferences')
       .select('user_id, content_drip')
       .in('user_id', allUserIds);
     const prefsMap = new Map(prefs?.map(p => [p.user_id, p.content_drip]) || []);
+
+    // Get user timezones for active window check
+    const { data: userProfiles } = await supabase
+      .from('profiles')
+      .select('id, timezone')
+      .in('id', allUserIds);
+    const timezoneMap = new Map(userProfiles?.map(p => [p.id, p.timezone]) || []);
 
     // Build notifications to send
     const toSend: { userId: string; audioId: string; title: string; itemId: string }[] = [];
