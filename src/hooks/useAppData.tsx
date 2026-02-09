@@ -305,12 +305,16 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
     // For each enrollment, find the next upcoming content
     for (const enrollment of enrollments) {
       const round = enrollment.program_rounds;
-      if (!round?.audio_playlist_id || !round?.first_session_date) continue;
+      if (!round?.audio_playlist_id) continue;
+      
+      // For self-paced rounds, use enrolled_at; otherwise use first_session_date
+      const anchorDate = round.is_self_paced ? enrollment.enrolled_at : round.first_session_date;
+      if (!anchorDate) continue;
       
       const playlistId = round.audio_playlist_id;
-      const firstSession = round.first_session_date.includes('T') 
-        ? new Date(round.first_session_date)
-        : new Date(round.first_session_date + 'T00:00:00');
+      const firstSession = anchorDate.includes('T') 
+        ? new Date(anchorDate)
+        : new Date(anchorDate + 'T00:00:00');
       const dripOffset = round.drip_offset_days || 0;
       
       // Check modules first
