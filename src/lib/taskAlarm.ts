@@ -1,6 +1,8 @@
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications, LocalNotificationSchema } from '@capacitor/local-notifications';
 import { addDays, format } from 'date-fns';
+import { logLocalNotificationEvent, logLocalNotificationEventsBatch } from './localNotificationLogger';
+import type { Json } from '@/integrations/supabase/types';
 
 export interface UrgentTaskAlarm {
   taskId: string;
@@ -197,6 +199,21 @@ export async function scheduleUrgentAlarm(task: UrgentTaskAlarm): Promise<{ succ
     await LocalNotifications.schedule({ notifications });
     
     console.log(`[TaskAlarm] ✅ Scheduled ${notifications.length} urgent alarms for "${task.title}"`);
+    
+    // Log all scheduled alarms
+    const events = notifications.map(n => ({
+      notificationType: 'urgent_alarm' as const,
+      event: 'scheduled' as const,
+      taskId: task.taskId,
+      notificationId: n.id,
+      metadata: {
+        title: task.title,
+        scheduledDate: n.extra?.scheduledDate,
+        alarmTime: n.schedule?.at instanceof Date ? n.schedule.at.toISOString() : String(n.schedule?.at),
+      } as Record<string, Json>,
+    }));
+    logLocalNotificationEventsBatch(events);
+    
     return { success: true, scheduledCount: notifications.length };
   } catch (error: any) {
     console.error('[TaskAlarm] Failed to schedule urgent alarm:', error);
@@ -221,6 +238,15 @@ export async function cancelUrgentAlarms(taskId: string): Promise<void> {
         notifications: taskNotifications.map(n => ({ id: n.id }))
       });
       console.log(`[TaskAlarm] Cancelled ${taskNotifications.length} alarms for task ${taskId}`);
+      
+      // Log cancellations
+      const events = taskNotifications.map(n => ({
+        notificationType: 'urgent_alarm' as const,
+        event: 'cancelled' as const,
+        taskId,
+        notificationId: n.id,
+      }));
+      logLocalNotificationEventsBatch(events);
     }
   } catch (error) {
     console.error('[TaskAlarm] Failed to cancel alarms:', error);
