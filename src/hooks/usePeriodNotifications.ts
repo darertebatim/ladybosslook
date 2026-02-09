@@ -18,10 +18,19 @@ import { logLocalNotificationEvent } from '@/lib/localNotificationLogger';
 
 const ID_RANGE = { start: 200031, end: 200040 };
 
-function getScheduleDate(daysFromNow: number, hour: number = 9, minute: number = 0): Date {
+function randomMinuteOffset(): number {
+  // Generate non-rounded minutes (avoid :00, :15, :30, :45)
+  let m = Math.floor(Math.random() * 60);
+  const rounded = [0, 15, 30, 45];
+  if (rounded.includes(m)) m = m + Math.floor(Math.random() * 7) + 1;
+  return m % 60;
+}
+
+function getScheduleDate(daysFromNow: number, baseHour: number = 9, useRandomMinute: boolean = true): Date {
   const d = new Date();
   d.setDate(d.getDate() + daysFromNow);
-  d.setHours(hour, minute, 0, 0);
+  const minute = useRandomMinute ? randomMinuteOffset() : 0;
+  d.setHours(baseHour, minute, 0, 0);
   return d;
 }
 
