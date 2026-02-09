@@ -821,6 +821,10 @@ export default function PushNotifications() {
             <Smartphone className="h-4 w-4" />
             Local Analytics
           </TabsTrigger>
+          <TabsTrigger value="logs" className="flex items-center gap-2">
+            <Server className="h-4 w-4" />
+            Logs
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="map">
@@ -850,6 +854,10 @@ export default function PushNotifications() {
 
         <TabsContent value="local">
           <NotificationAnalytics />
+        </TabsContent>
+
+        <TabsContent value="logs">
+          <FullLogsTab />
         </TabsContent>
       </Tabs>
     </div>
