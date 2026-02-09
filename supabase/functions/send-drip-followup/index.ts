@@ -64,6 +64,18 @@ async function sendToApns(
   }
 }
 
+function isWithinActiveWindow(userTimezone: string | null): boolean {
+  try {
+    const tz = userTimezone || 'UTC';
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hour12: false });
+    const hour = parseInt(formatter.format(now), 10);
+    return hour >= 8 && hour < 20;
+  } catch {
+    return true;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
