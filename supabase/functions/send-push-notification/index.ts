@@ -20,6 +20,7 @@ interface PushNotificationRequest {
   destinationUrl?: string; // Alias for url
   badge?: number;
   environment?: 'development' | 'production';
+  isUrgent?: boolean; // For time-sensitive notifications that bypass Focus/DND
 }
 
 // Helper function to convert PEM format to ArrayBuffer
@@ -69,7 +70,7 @@ async function generateApnsJwt(authKey: string, keyId: string, teamId: string): 
 // Send push notification to iOS via APNs (JWT passed in to avoid rate limits)
 async function sendToApns(
   deviceToken: string, 
-  payload: { title: string; body: string; url: string; badge?: number }, 
+  payload: { title: string; body: string; url: string; badge?: number; isUrgent?: boolean }, 
   jwt: string,
   topic: string,
   environment: string
@@ -79,7 +80,24 @@ async function sendToApns(
   const apnsHost = isProduction ? 'api.push.apple.com' : 'api.sandbox.push.apple.com';
   const apnsUrl = `https://${apnsHost}/3/device/${deviceToken}`;
   
-  console.log(`📱 Sending to APNs (${isProduction ? 'production' : 'sandbox'}):`, deviceToken.substring(0, 20) + '...');
+  console.log(`📱 Sending to APNs (${isProduction ? 'production' : 'sandbox'}):`, deviceToken.substring(0, 20) + '...', payload.isUrgent ? '⚠️ URGENT' : '');
+  
+  // Build APNs payload
+  const apsPayload: Record<string, unknown> = {
+    alert: {
+      title: payload.title,
+      body: payload.body,
+    },
+    sound: payload.isUrgent ? 'alarm.wav' : 'default',
+    badge: payload.badge || 1,
+  };
+  
+  // Add interruption-level for iOS 15+ time-sensitive notifications
+  // This allows the notification to bypass Focus/DND modes
+  if (payload.isUrgent) {
+    apsPayload['interruption-level'] = 'time-sensitive';
+    apsPayload['relevance-score'] = 1.0; // Highest relevance
+  }
   
   const response = await fetch(apnsUrl, {
     method: 'POST',
@@ -87,19 +105,13 @@ async function sendToApns(
       'authorization': `bearer ${jwt}`,
       'apns-topic': topic,
       'apns-push-type': 'alert',
-      'apns-priority': '10',
+      'apns-priority': '10', // High priority for immediate delivery
       'content-type': 'application/json',
     },
     body: JSON.stringify({
-      aps: {
-        alert: {
-          title: payload.title,
-          body: payload.body,
-        },
-        sound: 'default',
-        badge: payload.badge || 1,
-      },
+      aps: apsPayload,
       url: payload.url,
+      isUrgent: payload.isUrgent || false,
     }),
   });
   
@@ -113,7 +125,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const requestBody: PushNotificationRequest = await req.json();
-    const { userIds, targetCourse, targetRoundId, targetUserEmail, title, icon, badge, environment } = requestBody;
+    const { userIds, targetCourse, targetRoundId, targetUserEmail, title, icon, badge, environment, isUrgent } = requestBody;
     const body = requestBody.body || requestBody.message || '';
     const url = requestBody.url || requestBody.destinationUrl || '';
 
@@ -295,6 +307,7 @@ const handler = async (req: Request): Promise<Response> => {
             body,
             url: url || '/app/home',
             badge,
+            isUrgent: isUrgent || false,
           },
           apnsJwt,
           topic,
