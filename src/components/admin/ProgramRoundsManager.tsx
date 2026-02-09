@@ -352,6 +352,7 @@ export const ProgramRoundsManager = () => {
       support_link_label: (round as any).support_link_label || "",
       audio_playlist_id: round.audio_playlist_id || "none",
       video_url: round.video_url || "",
+      is_self_paced: round.is_self_paced || false,
     });
     setEditingId(round.id);
     setIsFormDialogOpen(true);
