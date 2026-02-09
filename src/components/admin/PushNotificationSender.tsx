@@ -345,6 +345,26 @@ function NotificationForm({ environment }: NotificationFormProps) {
         </div>
       )}
 
+      {/* Urgent Toggle */}
+      <div className="flex items-center justify-between rounded-lg border border-border p-3">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className={`h-4 w-4 ${isUrgent ? 'text-destructive' : 'text-muted-foreground'}`} />
+          <div>
+            <Label htmlFor={`urgent-${environment}`} className="text-sm font-medium cursor-pointer">
+              Urgent (Time-Sensitive)
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              Bypasses Focus & Do Not Disturb on iOS 15+
+            </p>
+          </div>
+        </div>
+        <Switch
+          id={`urgent-${environment}`}
+          checked={isUrgent}
+          onCheckedChange={setIsUrgent}
+        />
+      </div>
+
       {/* Preview */}
       <div className="rounded-lg border border-border bg-muted/50 p-4">
         <div className="flex items-start gap-3">
