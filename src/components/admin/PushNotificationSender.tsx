@@ -183,6 +183,7 @@ function NotificationForm({ environment }: NotificationFormProps) {
       setTargetCourse('');
       setTargetRoundId('all-rounds');
       setTargetUserEmail('');
+      setIsUrgent(false);
     } catch (error: any) {
       console.error('Error sending push notification:', error);
       toast({
