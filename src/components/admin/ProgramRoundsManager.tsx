@@ -188,6 +188,7 @@ export const ProgramRoundsManager = () => {
         support_link_label: data.support_link_label || null,
         audio_playlist_id: data.audio_playlist_id === "none" ? null : data.audio_playlist_id || null,
         video_url: data.video_url || null,
+        is_self_paced: data.is_self_paced,
       };
 
       if (editingId) {
