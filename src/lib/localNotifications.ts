@@ -1,5 +1,7 @@
 import { LocalNotifications, ScheduleOn } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
+import { logLocalNotificationEvent } from './localNotificationLogger';
+import type { Json } from '@/integrations/supabase/types';
 
 /**
  * Local Notifications Service for Task Reminders
@@ -136,6 +138,22 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
     });
     
     console.log(`[LocalNotifications] ✅ Scheduled reminder for "${task.title}" at ${notificationTime.toISOString()}`);
+    
+    // Log the scheduled event
+    logLocalNotificationEvent({
+      notificationType: 'task_reminder',
+      event: 'scheduled',
+      taskId: task.taskId,
+      notificationId,
+      metadata: {
+        title: task.title,
+        scheduledDate: task.scheduledDate,
+        scheduledTime: task.scheduledTime,
+        reminderOffset: task.reminderOffset,
+        notificationTime: notificationTime.toISOString(),
+      } as Record<string, Json>,
+    });
+    
     return { success: true };
   } catch (error) {
     console.error('[LocalNotifications] Failed to schedule reminder:', error);
@@ -155,6 +173,14 @@ export async function cancelTaskReminder(taskId: string): Promise<void> {
       notifications: [{ id: notificationId }],
     });
     console.log(`[LocalNotifications] Cancelled reminder for task ${taskId}`);
+    
+    // Log the cancellation
+    logLocalNotificationEvent({
+      notificationType: 'task_reminder',
+      event: 'cancelled',
+      taskId,
+      notificationId,
+    });
   } catch (error) {
     console.error('[LocalNotifications] Failed to cancel reminder:', error);
   }
@@ -193,14 +219,34 @@ export function initializeLocalNotificationHandlers(navigate: (url: string) => v
   LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
     console.log('[LocalNotifications] Notification tapped:', action.notification);
     const url = action.notification.extra?.url || '/app/home';
+    const taskId = action.notification.extra?.taskId;
+    const isUrgent = action.notification.extra?.isUrgent;
+    
+    // Log the tap event
+    logLocalNotificationEvent({
+      notificationType: isUrgent ? 'urgent_alarm' : 'task_reminder',
+      event: 'tapped',
+      taskId: typeof taskId === 'string' ? taskId : undefined,
+      notificationId: action.notification.id,
+      metadata: { url } as Record<string, Json>,
+    });
+    
     navigate(url);
   });
   
   // Handle notification received while app is in foreground
   LocalNotifications.addListener('localNotificationReceived', (notification) => {
     console.log('[LocalNotifications] Notification received in foreground:', notification);
-    // The notification will show as a banner on iOS
-    // We could optionally show a toast here for in-app notification
+    const taskId = notification.extra?.taskId;
+    const isUrgent = notification.extra?.isUrgent;
+    
+    // Log the delivery event
+    logLocalNotificationEvent({
+      notificationType: isUrgent ? 'urgent_alarm' : 'task_reminder',
+      event: 'delivered',
+      taskId: typeof taskId === 'string' ? taskId : undefined,
+      notificationId: notification.id,
+    });
   });
   
   console.log('[LocalNotifications] Handlers initialized');
