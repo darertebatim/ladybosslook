@@ -305,6 +305,7 @@ export const ProgramRoundsManager = () => {
       support_link_label: "",
       audio_playlist_id: "none",
       video_url: "",
+      is_self_paced: false,
     });
     setEditingId(null);
   };
