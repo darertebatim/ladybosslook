@@ -421,6 +421,7 @@ export default function RoutinesBank() {
       category: 'general',
       color: 'yellow',
       emoji: '✨',
+      schedule_type: 'daily',
     });
     setLocalSections([]);
     setLocalTasks([]);
