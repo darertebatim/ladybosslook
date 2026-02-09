@@ -1,140 +1,100 @@
 
-# Admin Channels Overhaul Plan
-
-This plan redesigns the admin community page into a full-featured channel management system with chat-style message viewing and enhanced admin controls.
+# Push Notifications Hub
 
 ## Overview
+Create a unified admin page at `/admin/pn` that consolidates all push notification functionality into one place. This will bring together the existing **PushNotificationCenter** (server-side scheduled jobs) and **NotificationAnalytics** (local notification tracking), plus add a comprehensive documentation section mapping all push notification systems.
 
-We're making three key changes:
-1. Rename route from `/admin/community` to `/admin/channels`
-2. Add emoji/picture cover selection for channels
-3. Replace the "History" tab with a chat-style view matching the app, with admin controls (delete all messages, pin, edit)
+## Current State
+- **PushNotificationCenter** is in Communications tab (PN Center)
+- **NotificationAnalytics** is in Tools tab (Notifications)
+- No single place documenting all push notification types
 
----
+## Implementation
 
-## Changes Summary
+### 1. Create New Page: `/admin/pn`
 
-### 1. Route Change: `/admin/community` to `/admin/channels`
+Create `src/pages/admin/PushNotifications.tsx` with tabs:
 
-**Files to modify:**
-- `src/App.tsx` - Update route path
-- `src/components/admin/AdminNav.tsx` - Update nav menu URL and title
-- `src/pages/admin/Community.tsx` - Rename file to `Channels.tsx` and update header text
+| Tab | Content |
+|-----|---------|
+| **Scheduled Jobs** | Current PushNotificationCenter component (server-side cron jobs) |
+| **Local Analytics** | Current NotificationAnalytics component (client-side local notifications) |
+| **PN Map** | New comprehensive documentation of all push notification types |
 
-### 2. Channel Cover (Emoji or Image)
+### 2. PN Map Content
 
-**Database:** The `feed_channels` table already has a `cover_image_url` column.
+A reference table documenting all notification systems:
 
-**UI Changes in `FeedChannelManager.tsx`:**
-- Add emoji picker button using existing `EmojiPicker` component
-- Add image upload option using existing `ImageUploader` component  
-- Store emoji as a special value (e.g., `emoji:☀️`) or image URL
-- Display cover in channel cards with 3D Fluent Emoji rendering
+**A. Server-Side Scheduled (Cron Jobs)**
 
-**Form fields:**
+| Function | Schedule | Description | User Preference |
+|----------|----------|-------------|-----------------|
+| `send-daily-notifications` | Hourly | Morning summary, evening check-in, time period reminders, goal nudges - timezone-aware | Per-type toggles |
+| `send-drip-notifications` | Hourly | New course content unlocks based on round start date | `content_drip` |
+| `send-session-reminders` | Every 15 min | Live session reminders (24h and 1h before) | `session_reminders` |
+| `send-task-reminders` | Every 5 min | Fallback server-side task reminders for older app versions | `reminder_enabled` per task |
+| `send-weekly-summary` | Hourly | Monday 9 AM local time - weekly progress summary | Default enabled |
+| `send-feed-post-notifications` | Every 15 min | New feed posts to channel members | Channel membership |
+| `send-momentum-celebration` | Daily | Milestone celebrations (3, 7, 14, 21, 30 days) | `momentum_celebration` |
+
+**B. Triggered (On-Demand)**
+
+| Function | Trigger | Description |
+|----------|---------|-------------|
+| `send-push-notification` | Admin action | Manual push to specific users/courses/rounds |
+| `send-broadcast-message` | Admin action | Broadcast with optional email + push |
+| `send-chat-notification` | New chat message | Real-time support chat notifications |
+| `send-update-push-notification` | Admin action | Targeted updates to users on old app versions |
+
+**C. Client-Side (Local Notifications)**
+
+| Type | Trigger | Tracked Events |
+|------|---------|----------------|
+| Task Reminder | Capacitor LocalNotifications | scheduled, delivered, tapped, cancelled |
+| Urgent Alarm | Multiple triggers with vibration | scheduled, delivered, tapped, cancelled |
+
+### 3. Navigation Updates
+
+- Add new nav item: "Push" with Bell icon at `/admin/pn`
+- Keep Communications tab but remove "PN Center" subtab (redirect to new page)
+- Keep Tools tab but remove "Notifications" subtab (redirect to new page)
+
+### 4. Route Registration
+
+Add to App.tsx admin routes:
 ```
-Cover Type: [Emoji] [Image] [None]
-├─ Emoji selected → Show emoji picker button
-└─ Image selected → Show ImageUploader component
-```
-
-### 3. Chat-Style Channel View (Replacing "History" Tab)
-
-**New component:** `AdminChannelChat.tsx`
-
-This replaces the current `FeedPostsList` card-based view with a chat interface similar to `AppChannelDetail.tsx`, but with admin controls.
-
-**Features:**
-- Channel selector dropdown at top
-- Chat messages displayed like the app (using `FeedMessage` component styling)
-- Date separators between message groups
-- Scroll to bottom behavior
-
-**Admin controls on every message:**
-- **Delete** - Remove any message (not just user's own)
-- **Pin/Unpin** - Toggle pinned status
-- **Edit** - Open edit dialog for admin/announcement posts
-
-**UI Layout:**
-```
-┌─────────────────────────────────────┐
-│ [Channel Dropdown ▼]                │
-├─────────────────────────────────────┤
-│        ── Today ──                  │
-│                                     │
-│ [Avatar] Simora              12:30  │
-│ ┌─────────────────────────┐         │
-│ │ Welcome to the channel! │ [⋮]    │
-│ └─────────────────────────┘         │
-│                                     │
-│ [Avatar] Ali Lotfi           14:22  │
-│ ┌─────────────────────────┐         │
-│ │ Thanks for the update!  │ [⋮]    │
-│ └─────────────────────────┘         │
-│                                     │
-└─────────────────────────────────────┘
-```
-
-**Message actions menu (⋮):**
-- Pin / Unpin
-- Edit (for admin posts only)
-- Delete
-
----
-
-## Tab Structure (Updated)
-
-```
-Channels Admin Page
-├── Tab: "New Message" (compose) 
-├── Tab: "Messages" (new chat view - replaces "History")
-├── Tab: "Journals" (unchanged)
-└── Tab: "Settings" (rename from "Channels" - channel management)
+/admin/pn → PushNotifications page
 ```
 
 ---
 
 ## Technical Details
 
-### File Changes
+### Files to Create
+- `src/pages/admin/PushNotifications.tsx` - Main page with three tabs
 
-| File | Action |
-|------|--------|
-| `src/App.tsx` | Change route `community` → `channels` |
-| `src/components/admin/AdminNav.tsx` | Update URL and label to "Channels" |
-| `src/pages/admin/Community.tsx` | Rename to `Channels.tsx`, update title |
-| `src/components/admin/FeedChannelManager.tsx` | Add emoji/image cover selector |
-| `src/components/admin/FeedPostsList.tsx` | Refactor into chat-style `AdminChannelChat.tsx` |
-| New: `src/components/admin/AdminChannelChat.tsx` | Chat-style message list with admin controls |
+### Files to Modify
+- `src/components/admin/AdminNav.tsx` - Add "Push" nav item
+- `src/App.tsx` - Add route for `/admin/pn`
+- `src/pages/admin/Communications.tsx` - Remove PN Center tab, add link to new page
+- `src/pages/admin/Tools.tsx` - Remove Notifications tab, add link to new page
 
-### Cover Storage Format
+### Component Structure
 
-The `cover_image_url` column will store:
-- Image URL: `https://...` (standard URL)
-- Emoji: `emoji:☀️` (prefixed to distinguish from URLs)
-
-Helper functions to detect type:
-```typescript
-const isEmojiCover = (url: string) => url?.startsWith('emoji:');
-const getEmojiFromCover = (url: string) => url?.replace('emoji:', '');
+```
+PushNotifications.tsx
+├── Tabs
+│   ├── "Scheduled" → <PushNotificationCenter />
+│   ├── "Local" → <NotificationAnalytics />
+│   └── "PN Map" → <PNDocumentation /> (new inline component)
 ```
 
-### Admin Message Controls
+### PN Map Visual Design
 
-Each message will have a dropdown menu with:
-```typescript
-const adminActions = [
-  { label: post.is_pinned ? 'Unpin' : 'Pin', action: togglePin },
-  { label: 'Edit', action: openEditDialog, show: !isUserPost },
-  { label: 'Delete', action: confirmDelete, destructive: true },
-];
-```
+Cards organized by category with:
+- Function name and icon
+- Schedule/trigger description
+- User preference key
+- Deep link to Supabase logs
+- Status indicator (if connected to schedule table)
 
-### Reusing App Components
-
-We'll adapt patterns from:
-- `AppChannelDetail.tsx` - Message grouping by date, scroll behavior
-- `FeedMessage.tsx` - Message bubble styling (will wrap with admin controls)
-- `EmojiPicker.tsx` - For channel emoji selection
-- `ImageUploader.tsx` - For channel cover image upload
-- `FluentEmoji.tsx` - For rendering 3D emoji covers
