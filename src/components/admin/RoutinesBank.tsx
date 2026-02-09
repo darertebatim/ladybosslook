@@ -102,6 +102,8 @@ interface LocalTask {
   emoji: string;
   section_id: string | null;
   task_order: number;
+  schedule_days: number[];
+  drip_day: number | null;
 }
 
 export default function RoutinesBank() {
