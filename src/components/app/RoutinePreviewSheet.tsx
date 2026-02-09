@@ -56,6 +56,7 @@ interface RoutinePreviewSheetProps {
   tasks: RoutinePlanTask[];
   routineTitle: string;
   defaultTag?: string | null;
+  scheduleType?: 'daily' | 'weekly' | 'challenge';
   onSave: (selectedTaskIds: string[], editedTasks: EditedTask[]) => void;
   isSaving?: boolean;
 }
