@@ -366,15 +366,22 @@ function NotificationForm({ environment }: NotificationFormProps) {
       </div>
 
       {/* Preview */}
-      <div className="rounded-lg border border-border bg-muted/50 p-4">
+      <div className={`rounded-lg border p-4 ${isUrgent ? 'border-destructive/50 bg-destructive/5' : 'border-border bg-muted/50'}`}>
         <div className="flex items-start gap-3">
-          <div className="rounded-full bg-primary p-2">
+          <div className={`rounded-full p-2 ${isUrgent ? 'bg-destructive' : 'bg-primary'}`}>
             <Bell className="h-4 w-4 text-primary-foreground" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-foreground">
-              {title || 'Notification Title'}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="font-semibold text-sm text-foreground">
+                {title || 'Notification Title'}
+              </p>
+              {isUrgent && (
+                <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-destructive text-destructive-foreground">
+                  Urgent
+                </span>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               {message || 'Notification message will appear here'}
             </p>
