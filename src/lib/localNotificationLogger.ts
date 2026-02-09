@@ -5,12 +5,21 @@ import type { Json } from '@/integrations/supabase/types';
  * Local Notification Event Logger
  * 
  * Tracks when local notifications are scheduled, delivered, tapped, or cancelled.
- * This provides visibility into client-side notification behavior for debugging
- * and analytics purposes.
  */
 
 export type NotificationEventType = 'scheduled' | 'delivered' | 'tapped' | 'cancelled';
-export type NotificationType = 'task_reminder' | 'urgent_alarm' | 'session_reminder' | 'content_reminder' | 'session_reminder_24h' | 'session_reminder_1h' | 'content_unlock';
+export type NotificationType = 
+  | 'task_reminder' 
+  | 'urgent_alarm' 
+  | 'session_reminder' 
+  | 'content_reminder' 
+  | 'session_reminder_24h' 
+  | 'session_reminder_1h' 
+  | 'content_unlock'
+  | 'action_nudge'
+  | 'proaction_nudge'
+  | 'water_reminder'
+  | 'period_reminder';
 
 interface LogEventParams {
   notificationType: NotificationType;
@@ -20,17 +29,10 @@ interface LogEventParams {
   metadata?: Record<string, Json>;
 }
 
-/**
- * Log a local notification event to the database
- * Fails silently to avoid disrupting the user experience
- */
 export async function logLocalNotificationEvent(params: LogEventParams): Promise<void> {
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.log('[NotificationLogger] No user session, skipping log');
-      return;
-    }
+    if (!user) return;
 
     const { error } = await supabase
       .from('local_notification_events')
@@ -44,21 +46,17 @@ export async function logLocalNotificationEvent(params: LogEventParams): Promise
       });
 
     if (error) {
-      console.error('[NotificationLogger] Failed to log event:', error.message);
+      console.error('[NotificationLogger] Failed:', error.message);
     } else {
       console.log(`[NotificationLogger] ✓ ${params.event} ${params.notificationType}${params.taskId ? ` (task: ${params.taskId.slice(0, 8)}...)` : ''}`);
     }
   } catch (err) {
-    console.error('[NotificationLogger] Error logging event:', err);
+    console.error('[NotificationLogger] Error:', err);
   }
 }
 
-/**
- * Batch log multiple events (e.g., when cancelling multiple notifications)
- */
 export async function logLocalNotificationEventsBatch(events: LogEventParams[]): Promise<void> {
   if (events.length === 0) return;
-
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -72,15 +70,9 @@ export async function logLocalNotificationEventsBatch(events: LogEventParams[]):
       metadata: (e.metadata || {}) as Json,
     }));
 
-    const { error } = await supabase
-      .from('local_notification_events')
-      .insert(rows);
-
-    if (error) {
-      console.error('[NotificationLogger] Batch log failed:', error.message);
-    } else {
-      console.log(`[NotificationLogger] ✓ Logged ${events.length} events`);
-    }
+    const { error } = await supabase.from('local_notification_events').insert(rows);
+    if (error) console.error('[NotificationLogger] Batch failed:', error.message);
+    else console.log(`[NotificationLogger] ✓ Logged ${events.length} events`);
   } catch (err) {
     console.error('[NotificationLogger] Batch error:', err);
   }
