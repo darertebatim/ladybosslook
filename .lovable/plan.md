@@ -1,100 +1,133 @@
 
-# Push Notifications Hub
+
+# Push Notification System Overhaul
 
 ## Overview
-Create a unified admin page at `/admin/pn` that consolidates all push notification functionality into one place. This will bring together the existing **PushNotificationCenter** (server-side scheduled jobs) and **NotificationAnalytics** (local notification tracking), plus add a comprehensive documentation section mapping all push notification systems.
-
-## Current State
-- **PushNotificationCenter** is in Communications tab (PN Center)
-- **NotificationAnalytics** is in Tools tab (Notifications)
-- No single place documenting all push notification types
-
-## Implementation
-
-### 1. Create New Page: `/admin/pn`
-
-Create `src/pages/admin/PushNotifications.tsx` with tabs:
-
-| Tab | Content |
-|-----|---------|
-| **Scheduled Jobs** | Current PushNotificationCenter component (server-side cron jobs) |
-| **Local Analytics** | Current NotificationAnalytics component (client-side local notifications) |
-| **PN Map** | New comprehensive documentation of all push notification types |
-
-### 2. PN Map Content
-
-A reference table documenting all notification systems:
-
-**A. Server-Side Scheduled (Cron Jobs)**
-
-| Function | Schedule | Description | User Preference |
-|----------|----------|-------------|-----------------|
-| `send-daily-notifications` | Hourly | Morning summary, evening check-in, time period reminders, goal nudges - timezone-aware | Per-type toggles |
-| `send-drip-notifications` | Hourly | New course content unlocks based on round start date | `content_drip` |
-| `send-session-reminders` | Every 15 min | Live session reminders (24h and 1h before) | `session_reminders` |
-| `send-task-reminders` | Every 5 min | Fallback server-side task reminders for older app versions | `reminder_enabled` per task |
-| `send-weekly-summary` | Hourly | Monday 9 AM local time - weekly progress summary | Default enabled |
-| `send-feed-post-notifications` | Every 15 min | New feed posts to channel members | Channel membership |
-| `send-momentum-celebration` | Daily | Milestone celebrations (3, 7, 14, 21, 30 days) | `momentum_celebration` |
-
-**B. Triggered (On-Demand)**
-
-| Function | Trigger | Description |
-|----------|---------|-------------|
-| `send-push-notification` | Admin action | Manual push to specific users/courses/rounds |
-| `send-broadcast-message` | Admin action | Broadcast with optional email + push |
-| `send-chat-notification` | New chat message | Real-time support chat notifications |
-| `send-update-push-notification` | Admin action | Targeted updates to users on old app versions |
-
-**C. Client-Side (Local Notifications)**
-
-| Type | Trigger | Tracked Events |
-|------|---------|----------------|
-| Task Reminder | Capacitor LocalNotifications | scheduled, delivered, tapped, cancelled |
-| Urgent Alarm | Multiple triggers with vibration | scheduled, delivered, tapped, cancelled |
-
-### 3. Navigation Updates
-
-- Add new nav item: "Push" with Bell icon at `/admin/pn`
-- Keep Communications tab but remove "PN Center" subtab (redirect to new page)
-- Keep Tools tab but remove "Notifications" subtab (redirect to new page)
-
-### 4. Route Registration
-
-Add to App.tsx admin routes:
-```
-/admin/pn → PushNotifications page
-```
+Restructure the notification strategy to focus on driving users to take action, maintain momentum, and stay engaged -- not just tell them the time of day.
 
 ---
 
-## Technical Details
+## 1. Momentum Celebration --> "Momentum Keeper" (Rewrite)
 
-### Files to Create
-- `src/pages/admin/PushNotifications.tsx` - Main page with three tabs
+**Problem**: Current momentum celebration only fires when users are already active (reaching milestones). It doesn't help bring them back.
 
-### Files to Modify
-- `src/components/admin/AdminNav.tsx` - Add "Push" nav item
-- `src/App.tsx` - Add route for `/admin/pn`
-- `src/pages/admin/Communications.tsx` - Remove PN Center tab, add link to new page
-- `src/pages/admin/Tools.tsx` - Remove Notifications tab, add link to new page
+**New Strategy -- "Momentum Keeper"**: Server-side notifications that detect INACTIVITY and nudge users back before they lose momentum.
 
-### Component Structure
+**Logic** (runs daily, checks each user's `last_active_date` and `this_month_active_days`):
+- **1 day inactive**: "You showed up {X} days this month. One more today?" (gentle)
+- **2 days inactive**: "Your {thisMonthActiveDays}-day momentum is waiting. Come back and keep it alive."
+- **3+ days inactive**: "You've been away for {gap} days. Your strength doesn't expire -- come back when you're ready."
+- **5+ days inactive**: "Your actions miss you. Even 1 minute counts. Tap to return."
+- **7+ days inactive** (final): "No pressure. When you're ready, everything is still here for you."
 
-```
-PushNotifications.tsx
-├── Tabs
-│   ├── "Scheduled" → <PushNotificationCenter />
-│   ├── "Local" → <NotificationAnalytics />
-│   └── "PN Map" → <PNDocumentation /> (new inline component)
-```
+Also keeps milestone celebrations but only for key ones (7, 14, 21, 30 days) and sends them as local notifications when the user opens the app (in-app toast), not push.
 
-### PN Map Visual Design
+**Changes**:
+- Rewrite `send-momentum-celebration` edge function with inactivity-based logic
+- Add `coins` context to messages when applicable (e.g., "You have {coins} coins waiting")
+- Respect 8 AM - 8 PM window using user timezone
+- Rename preference toggle from `momentum_celebration` to keep the same DB column but update label in UI
 
-Cards organized by category with:
-- Function name and icon
-- Schedule/trigger description
-- User preference key
-- Deep link to Supabase logs
-- Status indicator (if connected to schedule table)
+---
+
+## 2. Daily Notifications --> "Smart Action Nudges" (Replace)
+
+**Problem**: Current system sends generic time-of-day messages ("Morning time", "Afternoon is here") like a clock. Not useful.
+
+**New Strategy**: Local notifications generated from the user's actual planner data. Since all data is on-device, these are 100% local.
+
+### 2a. Random Action Reminder
+- On app launch, read user's tasks for today from `user_tasks`
+- Pick 1-3 random actions and schedule local notifications at random times between 8 AM and 8 PM
+- Message uses actual task data: `"{emoji} {title}" -- "Time to do this! Your strength grows with each action."`
+- Only pick incomplete actions
+- Reschedule daily on app open
+
+### 2b. ProAction Nudges
+- Filter tasks where `pro_link_type` is not null (emotion, journal, breathe, playlist, water)
+- Pick one random proaction and schedule at a random time
+- Messages like: "🫁 Time for your breathing exercise" or "📝 Your journal is waiting"
+
+### 2c. Water Reminders
+- Filter tasks where `pro_link_type = 'water'` or `goal_type = 'water'`
+- If user has water tracking: schedule 3-4 random notifications between 8 AM - 8 PM
+- Messages: "💧 Have you had water recently?" / "💧 Stay hydrated -- your body will thank you"
+
+### 2d. Period Tracker Notifications (NEW)
+- On app launch, if user has `period_settings` with `reminder_enabled = true`:
+  - Calculate predicted next period start from `last_period_start + average_cycle`
+  - Schedule local notification `reminder_days` before it starts: "🌸 Your period may start in {X} days. Prepare yourself."
+  - On predicted start day: "🌸 Your period may have started. Tap to log today."
+  - Daily during predicted period (for `average_period` days): "🌸 Don't forget to log today"
+- Respect 8 AM - 8 PM window
+
+### Implementation
+- Rewrite `useLocalNotificationScheduler.tsx` (currently disabled) as the new "Smart Action Nudge" scheduler
+- Remove `send-daily-notifications` edge function's cron job (no longer needed)
+- Remove old time-period and goal-nudge notification IDs
+- New notification ID ranges: 200001-200010 for action nudges, 200011-200020 for proactions, 200021-200030 for water, 200031-200040 for period
+- Add `randomTimeBetween(8, 20)` utility for scheduling
+- Update `useLocalNotificationScheduler` to fetch user's tasks and period settings on app launch
+
+---
+
+## 3. Drip Content Follow-up (NEW)
+
+**Problem**: If a user gets a "New content unlocked" notification but never opens the playlist, there's no follow-up.
+
+**Strategy**: Server-side check (daily cron) for users who have unlocked content but haven't listened.
+
+**Logic**:
+- Query `audio_playlist_items` with `drip_delay_days` that have been unlocked (based on enrollment date)
+- Cross-reference with `audio_progress` to see if user has started/completed
+- If unlocked 2+ days ago and no progress: send follow-up
+- Only 1 follow-up per content item (track in `pn_schedule_logs`)
+- Messages: "🎧 '{title}' is waiting for you. Tap to listen." / "🔓 You unlocked '{title}' {X} days ago. Don't miss it!"
+
+**Changes**:
+- Create new edge function `send-drip-followup` 
+- Add cron job (daily)
+- Add `content_drip` preference check (reuse existing toggle)
+
+---
+
+## 4. Server Logs --> Separate "Logs" Tab (UI)
+
+**Problem**: "Recent Server Runs" is cramped and shows limited data (15 rows).
+
+**Changes**:
+- Move logs to a new 4th tab: "Logs"
+- Show last 100 entries (up from 15)
+- Add columns: `user_id` (show user name via join), `notification_type`
+- Add filters: by function name, by date range
+- Show summary stats at top: total sent today, total failed, unique users notified
+- Make it clear which users are getting notifications and how many
+
+---
+
+## 5. PN Map Updates
+
+Update the PN Map documentation to reflect all changes:
+- Rename "Daily Notifications" to "Smart Action Nudges" (Local)
+- Rename "Momentum Celebration" to "Momentum Keeper" (Server) 
+- Add "Period Reminders" (Local)
+- Add "Drip Content Follow-up" (Server)
+- Remove old time-based message templates
+- Update delivery strategy note at bottom
+
+---
+
+## Technical Summary
+
+| Change | Type | Files |
+|--------|------|-------|
+| Momentum Keeper | Rewrite edge function | `supabase/functions/send-momentum-celebration/index.ts` |
+| Smart Action Nudges | Rewrite local scheduler | `src/hooks/useLocalNotificationScheduler.tsx` |
+| Period Reminders | Add to local scheduler | `src/hooks/useLocalNotificationScheduler.tsx` |
+| Water Reminders | Add to local scheduler | `src/hooks/useLocalNotificationScheduler.tsx` |
+| Drip Follow-up | New edge function + cron | `supabase/functions/send-drip-followup/index.ts` |
+| Logs Tab | UI refactor | `src/pages/admin/PushNotifications.tsx` |
+| PN Map | Update docs | `src/pages/admin/PushNotifications.tsx` |
+| Remove daily-notifications cron | Migration | New migration SQL |
+| Notification logger types | Update | `src/lib/localNotificationLogger.ts` |
 
