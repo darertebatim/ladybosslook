@@ -894,6 +894,34 @@ export default function RoutinesBank() {
                     />
                   </div>
 
+                  {/* Schedule Type */}
+                  <div className="space-y-2 border-t pt-4">
+                    <Label>Ritual Type</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: 'daily', label: 'Daily', desc: 'All actions every day', icon: '☀️' },
+                        { value: 'weekly', label: 'Weekly Plan', desc: 'Actions on specific weekdays', icon: '📅' },
+                        { value: 'challenge', label: 'Challenge', desc: 'Sequential drip (Day 1, 2...)', icon: '🔥' },
+                      ].map(opt => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, schedule_type: opt.value as any })}
+                          className={cn(
+                            "flex flex-col items-center gap-1 p-3 rounded-lg border-2 text-center transition-all",
+                            formData.schedule_type === opt.value 
+                              ? "border-primary bg-primary/5" 
+                              : "border-border hover:border-muted-foreground/30"
+                          )}
+                        >
+                          <span className="text-lg">{opt.icon}</span>
+                          <span className="text-xs font-medium">{opt.label}</span>
+                          <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Summary stats */}
                   <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4">
                     <span className="flex items-center gap-1">
