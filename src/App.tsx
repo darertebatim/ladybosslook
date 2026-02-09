@@ -68,6 +68,7 @@ const Community = lazy(() => import("@/pages/admin/Community"));
 const Tools = lazy(() => import("@/pages/admin/Tools"));
 const TasksBank = lazy(() => import("@/pages/admin/TasksBank"));
 const AppTest = lazy(() => import("@/pages/admin/AppTest"));
+const NotificationAnalytics = lazy(() => import("@/pages/admin/NotificationAnalytics"));
 
 // Lazy load marketing/landing pages
 const Programs = lazy(() => import("@/pages/Programs"));
@@ -270,6 +271,7 @@ const App = () => (
                       <Route path="app-icon" element={<ProtectedRoute requiredPage="system"><AppIconGenerator /></ProtectedRoute>} />
                       <Route path="tools" element={<ProtectedRoute requiredPage="tools"><Tools /></ProtectedRoute>} />
                       <Route path="tools/tasks" element={<ProtectedRoute requiredPage="tools"><TasksBank /></ProtectedRoute>} />
+                      <Route path="tools/notifications" element={<ProtectedRoute requiredPage="tools"><NotificationAnalytics /></ProtectedRoute>} />
                       <Route path="app" element={<ProtectedRoute requiredPage="system"><AppTest /></ProtectedRoute>} />
                     </Route>
                   )}
