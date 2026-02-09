@@ -69,6 +69,7 @@ const Tools = lazy(() => import("@/pages/admin/Tools"));
 const TasksBank = lazy(() => import("@/pages/admin/TasksBank"));
 const AppTest = lazy(() => import("@/pages/admin/AppTest"));
 const NotificationAnalytics = lazy(() => import("@/pages/admin/NotificationAnalytics"));
+const PushNotifications = lazy(() => import("@/pages/admin/PushNotifications"));
 
 // Lazy load marketing/landing pages
 const Programs = lazy(() => import("@/pages/Programs"));
@@ -264,6 +265,7 @@ const App = () => (
                       <Route path="channels" element={<ProtectedRoute requiredPage="community"><Community /></ProtectedRoute>} />
                       
                       <Route path="communications" element={<ProtectedRoute requiredPage="communications"><Communications /></ProtectedRoute>} />
+                      <Route path="pn" element={<ProtectedRoute requiredPage="communications"><PushNotifications /></ProtectedRoute>} />
                       <Route path="programs" element={<ProtectedRoute requiredPage="programs"><ProgramsAdmin /></ProtectedRoute>} />
                       <Route path="payments" element={<ProtectedRoute requiredPage="payments"><Payments /></ProtectedRoute>} />
                       <Route path="support" element={<ProtectedRoute requiredPage="support"><Support /></ProtectedRoute>} />
