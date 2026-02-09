@@ -53,8 +53,14 @@ const NativeAppLayout = () => {
   // Track app version on every app open
   useAppInstallTracking(user?.id);
   
-  // Schedule local notifications on app startup (legacy cleanup)
+  // Legacy cleanup of old daily local notifications
   useLocalNotificationScheduler(user?.id);
+  
+  // Smart Action Nudges - random reminders from user's planner data
+  useSmartActionNudges(user?.id);
+  
+  // Period tracker notifications
+  usePeriodNotifications(user?.id);
   
   // Hybrid notification scheduler - syncs server config to local notifications
   useHybridNotificationScheduler(user?.id);
