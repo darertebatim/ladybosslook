@@ -108,8 +108,8 @@ const scheduledPNs: PNType[] = [
   {
     name: 'Session Reminders',
     function: 'send-session-reminders',
-    schedule: 'Every 15 min',
-    description: 'Live session reminders 24h and 1h before. Creates feed posts and sends push notifications.',
+    schedule: 'Hourly (deduped)',
+    description: 'Live session reminders 24h and 1h before. Creates feed posts and sends push. Each reminder fires once per session (tracked via reminderKey).',
     userPreference: 'session_reminders',
     icon: <Calendar className="h-5 w-5" />,
     codeFile: 'supabase/functions/send-session-reminders/index.ts',
@@ -122,8 +122,8 @@ const scheduledPNs: PNType[] = [
   {
     name: 'Task Reminders',
     function: 'send-task-reminders',
-    schedule: 'Every 5 min',
-    description: 'Task reminders at scheduled times. Local notifications are primary, server is fallback for old app versions.',
+    schedule: 'Every 5 min (deduped)',
+    description: 'Server fallback for task reminders. Local notifications are primary. Logs to task_reminder_logs to prevent duplicates - each task fires once per day.',
     userPreference: 'reminder_enabled per task, reminder_offset (0/10/30/60 min)',
     icon: <CheckSquare className="h-5 w-5" />,
     codeFile: 'supabase/functions/send-task-reminders/index.ts',
@@ -152,8 +152,8 @@ const scheduledPNs: PNType[] = [
   {
     name: 'Feed Post Notifications',
     function: 'send-feed-post-notifications',
-    schedule: 'Every 15 min',
-    description: 'New feed posts to channel members. Only sends for posts with send_push=true.',
+    schedule: 'Every 15 min (deduped)',
+    description: 'New feed posts to channel members. Only sends for posts with send_push=true. Tracks last_notified_at to prevent duplicates.',
     userPreference: 'Channel membership',
     icon: <MessageCircle className="h-5 w-5" />,
     codeFile: 'supabase/functions/send-feed-post-notifications/index.ts',
