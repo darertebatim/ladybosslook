@@ -7,6 +7,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { PushNotificationCenter } from '@/components/admin/PushNotificationCenter';
 import NotificationAnalytics from '@/pages/admin/NotificationAnalytics';
 import { PNConfigEditor } from '@/components/admin/pn/PNConfigEditor';
+import { LNHealthMonitor } from '@/components/admin/pn/LNHealthMonitor';
 import { usePNDeliveryStats } from '@/hooks/usePNDeliveryStats';
 import { 
   Bell, 
@@ -514,21 +515,25 @@ export default function PushNotifications() {
         </TabsList>
 
         <TabsContent value="config">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
-                Notification Config
-              </CardTitle>
-              <CardDescription>
-                Edit notification messages, timing, and enabled state. Changes sync to all user devices in real-time.
-                Apps schedule <strong>local notifications</strong> based on this config — no app update required.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PNConfigEditor />
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            <LNHealthMonitor />
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Notification Config
+                </CardTitle>
+                <CardDescription>
+                  Edit notification messages, timing, and enabled state. Changes sync to all user devices in real-time.
+                  Apps schedule <strong>local notifications</strong> based on this config — no app update required.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PNConfigEditor />
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="scheduled">
