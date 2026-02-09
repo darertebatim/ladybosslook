@@ -118,6 +118,180 @@ interface AppTaskCreateProps {
   onSaveSheet?: (data: TaskFormData) => void;
 }
 
+/** Buffered Time Picker Sheet - uses local state so changes only commit on Save */
+const TimePickerSheet = ({
+  open,
+  onOpenChange,
+  scheduledTime,
+  timePeriod,
+  onSave,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  scheduledTime: string | null;
+  timePeriod: TimePeriod | null;
+  onSave: (time: string | null, period: TimePeriod | null) => void;
+}) => {
+  const [localTime, setLocalTime] = useState<string | null>(scheduledTime);
+  const [localPeriod, setLocalPeriod] = useState<TimePeriod | null>(timePeriod);
+
+  // Sync local state when sheet opens
+  useEffect(() => {
+    if (open) {
+      setLocalTime(scheduledTime);
+      setLocalPeriod(timePeriod);
+    }
+  }, [open, scheduledTime, timePeriod]);
+
+  const localTimeMode: TimeMode = localPeriod ? 'part_of_day' : localTime ? 'specific' : 'anytime';
+
+  const handleSave = () => {
+    onSave(localTime, localPeriod);
+    onOpenChange(false);
+  };
+
+  const handleCancel = () => {
+    onOpenChange(false);
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="h-auto max-h-[85vh] rounded-t-3xl" hideCloseButton>
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
+            <button onClick={handleCancel} className="p-2 -ml-2">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <span className="text-lg font-medium">Time</span>
+            <Button
+              variant="ghost"
+              onClick={handleSave}
+              className="text-primary font-medium"
+            >
+              Save
+            </Button>
+          </div>
+
+          <div className="px-6 pb-4">
+            <div className="flex items-center justify-between py-3 mb-4 border-b border-muted/30">
+              <span className="font-medium text-foreground">Specific time</span>
+              <Switch
+                checked={localTimeMode === 'specific'}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setLocalPeriod(null);
+                    if (!localTime) setLocalTime('09:00');
+                  } else {
+                    setLocalTime(null);
+                  }
+                }}
+              />
+            </div>
+
+            {localTimeMode === 'specific' && localTime && (
+              <div className="mb-4">
+                <TimeWheelPicker
+                  value={localTime}
+                  onChange={setLocalTime}
+                />
+              </div>
+            )}
+
+            {localTimeMode !== 'specific' && (
+              <>
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  {TIME_PERIODS.map((period) => (
+                    <button
+                      key={period.id}
+                      onClick={() => {
+                        setLocalTime(null);
+                        setLocalPeriod(period.id);
+                      }}
+                      className={cn(
+                        "relative flex flex-col items-center justify-center py-5 rounded-2xl transition-all border outline-none",
+                        "bg-muted/30 border-border",
+                        localPeriod === period.id &&
+                          "bg-background shadow-sm border-primary ring-2 ring-primary ring-offset-2 ring-offset-background",
+                        "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      )}
+                      aria-pressed={localPeriod === period.id}
+                    >
+                      <div className="mb-2">
+                        {period.icon === 'sun' && (
+                          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <circle cx="20" cy="20" r="8" fill="#FFB800"/>
+                            <g stroke="#FFB800" strokeWidth="2.5" strokeLinecap="round">
+                              <line x1="20" y1="4" x2="20" y2="8"/>
+                              <line x1="20" y1="32" x2="20" y2="36"/>
+                              <line x1="4" y1="20" x2="8" y2="20"/>
+                              <line x1="32" y1="20" x2="36" y2="20"/>
+                              <line x1="8.69" y1="8.69" x2="11.52" y2="11.52"/>
+                              <line x1="28.48" y1="28.48" x2="31.31" y2="31.31"/>
+                              <line x1="8.69" y1="31.31" x2="11.52" y2="28.48"/>
+                              <line x1="28.48" y1="11.52" x2="31.31" y2="8.69"/>
+                            </g>
+                          </svg>
+                        )}
+                        {period.icon === 'mountains' && (
+                          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <circle cx="28" cy="10" r="3" fill="#FFB800"/>
+                            <path d="M8 32L18 16L24 24L28 18L36 32H8Z" fill="#4CAF50"/>
+                            <path d="M14 32L22 20L28 28L32 22L38 32H14Z" fill="#66BB6A"/>
+                          </svg>
+                        )}
+                        {period.icon === 'sunset' && (
+                          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <circle cx="20" cy="22" r="8" fill="#FF9800"/>
+                            <rect x="4" y="26" width="32" height="8" fill="#64B5F6"/>
+                            <path d="M4 26C10 26 14 22 20 22C26 22 30 26 36 26" stroke="#2196F3" strokeWidth="2"/>
+                          </svg>
+                        )}
+                        {period.icon === 'moon' && (
+                          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <path d="M28 8C22 10 18 16 18 23C18 30 22 34 28 36C20 38 12 32 12 22C12 12 20 6 28 8Z" fill="#7C4DFF"/>
+                            <circle cx="30" cy="12" r="1.5" fill="#7C4DFF"/>
+                            <circle cx="34" cy="18" r="1" fill="#7C4DFF"/>
+                            <circle cx="32" cy="26" r="1.2" fill="#7C4DFF"/>
+                          </svg>
+                        )}
+                      </div>
+                      <span className={cn(
+                        "text-sm font-medium",
+                        localPeriod === period.id ? "text-foreground" : "text-muted-foreground"
+                      )}>
+                        {period.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => {
+                    setLocalTime(null);
+                    setLocalPeriod(null);
+                  }}
+                  className={cn(
+                    "w-full py-3.5 rounded-2xl text-center font-medium transition-all border-2 outline-none",
+                    localTimeMode === 'anytime'
+                      ? "bg-background border-primary ring-2 ring-primary ring-offset-2 ring-offset-background"
+                      : "bg-muted/30 border-border text-muted-foreground",
+                    "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  )}
+                  aria-pressed={localTimeMode === 'anytime'}
+                >
+                  Any time
+                </button>
+              </>
+            )}
+          </div>
+
+          <div className="pb-safe h-4" />
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+};
+
 const AppTaskCreate = ({ 
   isSheet = false, 
   sheetOpen = false, 
