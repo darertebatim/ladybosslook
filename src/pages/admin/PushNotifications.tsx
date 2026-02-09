@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { PushNotificationCenter } from '@/components/admin/PushNotificationCenter';
 import NotificationAnalytics from '@/pages/admin/NotificationAnalytics';
+import { PNConfigEditor } from '@/components/admin/pn/PNConfigEditor';
 import { usePNDeliveryStats } from '@/hooks/usePNDeliveryStats';
 import { 
   Bell, 
@@ -26,7 +27,8 @@ import {
   ChevronRight,
   Code,
   BarChart3,
-  FileText
+  FileText,
+  Settings
 } from 'lucide-react';
 
 const PROJECT_ID = 'mnukhzjcvbwpktxqlej';
@@ -491,8 +493,12 @@ export default function PushNotifications() {
         </p>
       </div>
 
-      <Tabs defaultValue="scheduled" className="space-y-4">
+      <Tabs defaultValue="config" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="config" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Config
+          </TabsTrigger>
           <TabsTrigger value="scheduled" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
             Scheduled Jobs
@@ -506,6 +512,24 @@ export default function PushNotifications() {
             PN Map
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="config">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Notification Config
+              </CardTitle>
+              <CardDescription>
+                Edit notification messages, timing, and enabled state. Changes sync to all user devices in real-time.
+                Apps schedule <strong>local notifications</strong> based on this config — no app update required.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PNConfigEditor />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="scheduled">
           <PushNotificationCenter />
