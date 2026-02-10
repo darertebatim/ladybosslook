@@ -5,10 +5,12 @@ import { haptic } from '@/lib/haptics';
 import { RoutineBankItem } from '@/hooks/useRoutinesBank';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { isEmoji } from '@/lib/fluentEmoji';
+import { X } from 'lucide-react';
 
 interface RoutineBankCardProps {
   routine: RoutineBankItem;
   onClick?: () => void;
+  onDismiss?: () => void;
   variant?: 'default' | 'compact';
   className?: string;
 }
