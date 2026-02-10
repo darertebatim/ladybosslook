@@ -148,7 +148,7 @@ serve(async (req) => {
             sound: "default",
             badge: 1,
           },
-          url: "https://apps.apple.com/app/id6746970920",
+          url: "https://apps.apple.com/app/ladyboss-look-academy/id6746970920",
         };
 
         const response = await fetch(
