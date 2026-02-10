@@ -112,10 +112,12 @@ const AppHome = () => {
     localStorage.getItem('simora_welcome_card_action_added') === 'true'
   );
   
-  // Suggested rituals dismissed state
-  const [ritualsDismissed, setRitualsDismissed] = useState(() => 
-    localStorage.getItem('simora_suggested_rituals_dismissed') === 'true'
-  );
+  // Dismissed individual ritual card IDs
+  const [dismissedRitualIds, setDismissedRitualIds] = useState<Set<string>>(() => {
+    try {
+      return new Set(JSON.parse(localStorage.getItem('simora_dismissed_ritual_ids') || '[]'));
+    } catch { return new Set(); }
+  });
   
   // Track if user started this session as a new user (so card stays visible after adding tasks)
   const [startedAsNewUser, setStartedAsNewUser] = useState<boolean | null>(null);
