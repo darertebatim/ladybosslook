@@ -48,6 +48,7 @@ const colorBackgrounds: Record<string, string> = {
 export function RoutineBankCard({ 
   routine, 
   onClick, 
+  onDismiss,
   variant = 'default',
   className,
 }: RoutineBankCardProps) {
