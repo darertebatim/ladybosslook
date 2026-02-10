@@ -39,7 +39,6 @@ export const TaskQuickStartSheet = ({
   const [isRolling, setIsRolling] = useState(false);
   const [showIdeas, setShowIdeas] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
-  const [startTour, setStartTour] = useState<(() => void) | null>(null);
   const { data: templates = [] } = useTaskTemplates();
   const { data: categories = [] } = useRoutineBankCategories();
 
