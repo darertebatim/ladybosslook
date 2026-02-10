@@ -117,6 +117,21 @@ export function RoutineBankCard({
         {/* Bottom Gradient for Title Overlay */}
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         
+        {/* Close/Dismiss button */}
+        {onDismiss && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              haptic.light();
+              onDismiss();
+            }}
+            className="absolute top-1.5 right-1.5 p-1 rounded-full bg-black/40 active:scale-95 transition-transform z-10"
+            aria-label="Dismiss suggestion"
+          >
+            <X className="h-3.5 w-3.5 text-white" />
+          </button>
+        )}
+        
         {/* Title Overlay - Bottom */}
         <h3 className="absolute bottom-2.5 left-2.5 right-2.5 font-semibold text-sm text-white line-clamp-2 drop-shadow-lg">
           {routine.title}
