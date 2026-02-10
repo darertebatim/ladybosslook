@@ -139,7 +139,6 @@ export function BadgeCelebration({
       <div 
         className="fixed left-4 right-4 z-[9999] animate-in slide-in-from-bottom-4 duration-300"
         style={{ bottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 16px)' }}
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={onClose}
       >
         <div className="bg-gradient-to-r from-orange-500 to-orange-400 rounded-2xl p-4 shadow-xl flex items-center gap-3">
