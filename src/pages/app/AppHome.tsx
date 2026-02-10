@@ -253,8 +253,8 @@ const AppHome = () => {
   } = useUserAddedBankRoutines();
   const addedRoutineIdsSet = useMemo(() => new Set(addedRoutineIds), [addedRoutineIds]);
   const suggestedRoutines = useMemo(() => 
-    popularRoutines.filter(r => !addedRoutineIdsSet.has(r.id)).slice(0, 4), 
-    [popularRoutines, addedRoutineIdsSet]
+    popularRoutines.filter(r => !addedRoutineIdsSet.has(r.id) && !dismissedRitualIds.has(r.id)).slice(0, 4), 
+    [popularRoutines, addedRoutineIdsSet, dismissedRitualIds]
   );
 
   // Generate week days
