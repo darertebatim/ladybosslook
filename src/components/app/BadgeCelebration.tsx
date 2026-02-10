@@ -137,8 +137,8 @@ export function BadgeCelebration({
   if (type === 'silver' || type === 'almostGold') {
     return (
       <div 
-        className="fixed bottom-32 left-4 right-4 z-[100] animate-in slide-in-from-bottom-4 duration-300"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        className="fixed left-4 right-4 z-[9999] animate-in slide-in-from-bottom-4 duration-300"
+        style={{ bottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 16px)' }}
         onClick={onClose}
       >
         <div className="bg-gradient-to-r from-orange-500 to-orange-400 rounded-2xl p-4 shadow-xl flex items-center gap-3">
@@ -198,8 +198,7 @@ export function BadgeCelebration({
   // Full-screen Gold celebration modal
   return (
     <div 
-      className="fixed inset-0 z-[100] flex items-end justify-center"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="fixed inset-0 z-[9999] flex items-end justify-center"
     >
       {/* Dark overlay with rays effect */}
       <div className="absolute inset-0 bg-black/80">
@@ -216,9 +215,10 @@ export function BadgeCelebration({
       {/* Celebration content */}
       <div 
         className={cn(
-          'relative w-full max-w-md mx-4 bg-gradient-to-t from-orange-400 via-orange-500 to-orange-600 rounded-t-[40px] pt-8 pb-8 px-6 transition-all duration-500',
+          'relative w-full max-w-md mx-4 bg-gradient-to-t from-orange-400 via-orange-500 to-orange-600 rounded-t-[40px] pt-8 px-6 transition-all duration-500',
           isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
         )}
+        style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))' }}
       >
         {/* Large centered badge with glow */}
         <div className="flex flex-col items-center -mt-28 mb-4">
