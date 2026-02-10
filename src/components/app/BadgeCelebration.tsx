@@ -198,8 +198,7 @@ export function BadgeCelebration({
   // Full-screen Gold celebration modal
   return (
     <div 
-      className="fixed inset-0 z-[100] flex items-end justify-center"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="fixed inset-0 z-[9999] flex items-end justify-center"
     >
       {/* Dark overlay with rays effect */}
       <div className="absolute inset-0 bg-black/80">
