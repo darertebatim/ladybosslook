@@ -4,7 +4,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Dices, BookOpen, X, CalendarPlus, HelpCircle } from 'lucide-react';
+import { Dices, BookOpen, X, CalendarPlus, HelpCircle, Lightbulb } from 'lucide-react';
 import { useTaskTemplates, TaskTemplate, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { cn } from '@/lib/utils';
