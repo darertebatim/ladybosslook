@@ -26,7 +26,7 @@ export function useAppUpdateChecker(): UpdateStatus {
   
   const [updateAvailable, setUpdateAvailable] = useState(debugUpdate);
   const [latestVersion, setLatestVersion] = useState<string | null>(debugUpdate ? '99.0.0' : null);
-  const [storeUrl, setStoreUrl] = useState('https://apps.apple.com/app/id6746970920');
+  const [storeUrl, setStoreUrl] = useState('https://apps.apple.com/app/simora-ladybosslook/id6755076134');
   const [isChecking, setIsChecking] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
@@ -78,7 +78,7 @@ export function useAppUpdateChecker(): UpdateStatus {
           console.log('[useAppUpdateChecker] Update check result:', data);
           
           setLatestVersion(data.latestVersion);
-          setStoreUrl(data.storeUrl || 'https://apps.apple.com/app/id6746970920');
+          setStoreUrl(data.storeUrl || 'https://apps.apple.com/app/simora-ladybosslook/id6755076134');
           
           // Log the check to database if user is authenticated
           if (user?.id) {

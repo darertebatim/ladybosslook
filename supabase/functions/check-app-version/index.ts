@@ -24,7 +24,7 @@ async function getLatestAppStoreVersion(): Promise<{ version: string; storeUrl: 
     console.log('[check-app-version] Using cached version:', cachedVersion.version);
     return {
       version: cachedVersion.version,
-      storeUrl: 'https://apps.apple.com/app/id6746970920',
+      storeUrl: 'https://apps.apple.com/app/simora-ladybosslook/id6755076134',
     };
   }
 
@@ -63,7 +63,7 @@ async function getLatestAppStoreVersion(): Promise<{ version: string; storeUrl: 
 
     return {
       version: result.version,
-      storeUrl: result.trackViewUrl || `https://apps.apple.com/app/id${result.trackId}`,
+      storeUrl: result.trackViewUrl || `https://apps.apple.com/app/simora-ladybosslook/id${result.trackId}`,
     };
   } catch (error) {
     console.error('[check-app-version] Error fetching from iTunes:', error);
@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     let latestVersion: string | null = null;
-    let storeUrl = 'https://apps.apple.com/app/id6746970920';
+    let storeUrl = 'https://apps.apple.com/app/simora-ladybosslook/id6755076134';
 
     if (overrideData?.value) {
       console.log('[check-app-version] Using admin override:', overrideData.value);
