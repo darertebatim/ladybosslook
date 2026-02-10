@@ -2,7 +2,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
-import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart } from 'lucide-react';
+import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart, X } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
@@ -110,6 +110,11 @@ const AppHome = () => {
   const [welcomeCardDismissed, setWelcomeCardDismissed] = useState(() => 
     localStorage.getItem('simora_welcome_card_dismissed') === 'true' ||
     localStorage.getItem('simora_welcome_card_action_added') === 'true'
+  );
+  
+  // Suggested rituals dismissed state
+  const [ritualsDismissed, setRitualsDismissed] = useState(() => 
+    localStorage.getItem('simora_suggested_rituals_dismissed') === 'true'
   );
   
   // Track if user started this session as a new user (so card stays visible after adding tasks)
@@ -751,12 +756,22 @@ const AppHome = () => {
               ) : null}
 
               {/* Popular Rituals Suggestions - only show rituals user hasn't added */}
-              {suggestedRoutines.length > 0 && selectedTag === null && <div className="tour-suggested-ritual mt-6">
+              {suggestedRoutines.length > 0 && selectedTag === null && !ritualsDismissed && <div className="tour-suggested-ritual mt-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="h-4 w-4 text-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
                       Try a ritual
                     </h2>
+                    <button 
+                      onClick={() => {
+                        setRitualsDismissed(true);
+                        localStorage.setItem('simora_suggested_rituals_dismissed', 'true');
+                      }}
+                      className="ml-auto p-1.5 rounded-full text-muted-foreground/60 active:scale-95 transition-transform"
+                      aria-label="Dismiss suggested rituals"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {suggestedRoutines.slice(0, 4).map(routine => (
