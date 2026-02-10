@@ -334,7 +334,7 @@ export function UpdateNotificationSender() {
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Button will link to the App Store. Banner will be shown to all users on the home screen.
+            Button links to the App Store. {targetVersion ? `Banner will only show to users below v${targetVersion}.` : 'Set a target version above to limit visibility, or leave empty to show to all users.'}
           </p>
 
           <Button

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { X, Play, ExternalLink, Megaphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { detectVideoType, extractYouTubeId, getVideoEmbedUrl, getVideoPlatformLabel } from '@/lib/videoUtils';
+import { BUILD_INFO } from '@/lib/buildInfo';
 
 interface HomeBannerData {
   id: string;
@@ -13,6 +14,7 @@ interface HomeBannerData {
   button_url: string | null;
   video_url: string | null;
   background_color: string | null;
+  target_below_version: string | null;
 }
 
 const DISMISSED_BANNERS_KEY = 'dismissedBannerIds';
