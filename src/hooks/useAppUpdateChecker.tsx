@@ -78,7 +78,7 @@ export function useAppUpdateChecker(): UpdateStatus {
           console.log('[useAppUpdateChecker] Update check result:', data);
           
           setLatestVersion(data.latestVersion);
-          setStoreUrl(data.storeUrl || 'https://apps.apple.com/app/id6746970920');
+          setStoreUrl(data.storeUrl || 'https://apps.apple.com/app/simora-ladybosslook/id6755076134');
           
           // Log the check to database if user is authenticated
           if (user?.id) {
