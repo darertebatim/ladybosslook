@@ -43,7 +43,7 @@ export function HomeBanner() {
     try {
       const { data, error } = await supabase
         .from('home_banners')
-        .select('id, title, description, button_text, button_url, video_url, background_color')
+        .select('id, title, description, button_text, button_url, video_url, background_color, target_below_version')
         .eq('is_active', true)
         .or('starts_at.is.null,starts_at.lte.now()')
         .or('ends_at.is.null,ends_at.gte.now()')
@@ -51,7 +51,15 @@ export function HomeBanner() {
         .limit(3);
 
       if (error) throw error;
-      setBanners(data || []);
+
+      // Filter out banners that target a specific version if user is already on that version or above
+      const currentVersion = BUILD_INFO.version;
+      const filtered = (data || []).map(d => ({ ...d, target_below_version: (d as any).target_below_version ?? null })).filter((banner) => {
+        if (!banner.target_below_version) return true; // No version filter = show to all
+        return isVersionLessThan(currentVersion, banner.target_below_version);
+      });
+
+      setBanners(filtered);
     } catch (error) {
       console.error('Error fetching banners:', error);
     }
