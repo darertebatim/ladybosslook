@@ -63,7 +63,7 @@ async function getLatestAppStoreVersion(): Promise<{ version: string; storeUrl: 
 
     return {
       version: result.version,
-      storeUrl: result.trackViewUrl || `https://apps.apple.com/app/id${result.trackId}`,
+      storeUrl: result.trackViewUrl || `https://apps.apple.com/app/simora-ladybosslook/id${result.trackId}`,
     };
   } catch (error) {
     console.error('[check-app-version] Error fetching from iTunes:', error);
