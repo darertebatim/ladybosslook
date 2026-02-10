@@ -235,7 +235,7 @@ function getUserLocalHour(timezone: string | null): number {
 
 // Get today's date in user's timezone (for duplicate prevention)
 function getUserLocalDate(timezone: string | null): string {
-  const tz = timezone || 'America/New_York';
+  const tz = timezone || 'America/Los_Angeles';
   try {
     const now = new Date();
     return now.toLocaleDateString('en-CA', { timeZone: tz }); // YYYY-MM-DD format
