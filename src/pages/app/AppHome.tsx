@@ -364,30 +364,8 @@ const AppHome = () => {
     setTimerTask(task);
   }, []);
 
-  const handleOpenWaterTracking = useCallback((task: UserTask) => {
-    setWaterTask(task);
-  }, []);
 
-  const handleAddWater = useCallback((amount: number) => {
-    if (!waterTask) return;
-    
-    addGoalProgress.mutate(
-      { taskId: waterTask.id, date: selectedDate, amount },
-      {
-        onSuccess: (result) => {
-          haptic.success();
-          const unit = waterTask.goal_unit || 'oz';
-          toast(`+${amount} ${unit}`, {
-            description: `Progress: ${result.newProgress}/${waterTask.goal_target}`,
-            duration: 2000,
-          });
-          if (result.streakIncreased) {
-            setShowStreakModal(true);
-          }
-        },
-      }
-    );
-  }, [waterTask, selectedDate, addGoalProgress]);
+
 
   const handleGoalInputConfirm = useCallback((amount: number) => {
     if (!goalInputTask) return;
