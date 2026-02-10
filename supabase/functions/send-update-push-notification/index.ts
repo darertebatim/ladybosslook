@@ -97,57 +97,48 @@ serve(async (req) => {
     let successCount = 0;
     let failCount = 0;
 
+    // Generate JWT for APNs ONCE and reuse for all notifications
+    const header = { alg: "ES256", kid: apnKeyId };
+    const now = Math.floor(Date.now() / 1000);
+    const claims = { iss: apnTeamId, iat: now };
+
+    const encoder = new TextEncoder();
+    const headerB64 = btoa(JSON.stringify(header))
+      .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    const claimsB64 = btoa(JSON.stringify(claims))
+      .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+    const signatureInput = `${headerB64}.${claimsB64}`;
+
+    const pemContent = apnKey
+      .replace(/-----BEGIN PRIVATE KEY-----/, "")
+      .replace(/-----END PRIVATE KEY-----/, "")
+      .replace(/\s/g, "");
+    const binaryKey = Uint8Array.from(atob(pemContent), (c) => c.charCodeAt(0));
+
+    const cryptoKey = await crypto.subtle.importKey(
+      "pkcs8",
+      binaryKey,
+      { name: "ECDSA", namedCurve: "P-256" },
+      false,
+      ["sign"]
+    );
+
+    const signature = await crypto.subtle.sign(
+      { name: "ECDSA", hash: "SHA-256" },
+      cryptoKey,
+      encoder.encode(signatureInput)
+    );
+
+    const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
+      .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+    const jwt = `${signatureInput}.${signatureB64}`;
+
     for (const sub of outdatedSubscriptions) {
       const deviceToken = sub.endpoint.replace("native:", "");
 
       try {
-        // Generate JWT for APNs
-        const header = { alg: "ES256", kid: apnKeyId };
-        const now = Math.floor(Date.now() / 1000);
-        const claims = { iss: apnTeamId, iat: now };
-
-        const encoder = new TextEncoder();
-        const headerB64 = btoa(JSON.stringify(header))
-          .replace(/\+/g, "-")
-          .replace(/\//g, "_")
-          .replace(/=+$/, "");
-        const claimsB64 = btoa(JSON.stringify(claims))
-          .replace(/\+/g, "-")
-          .replace(/\//g, "_")
-          .replace(/=+$/, "");
-
-        const signatureInput = `${headerB64}.${claimsB64}`;
-
-        // Import key and sign
-        const pemContent = apnKey
-          .replace(/-----BEGIN PRIVATE KEY-----/, "")
-          .replace(/-----END PRIVATE KEY-----/, "")
-          .replace(/\s/g, "");
-        const binaryKey = Uint8Array.from(atob(pemContent), (c) => c.charCodeAt(0));
-
-        const cryptoKey = await crypto.subtle.importKey(
-          "pkcs8",
-          binaryKey,
-          { name: "ECDSA", namedCurve: "P-256" },
-          false,
-          ["sign"]
-        );
-
-        const signature = await crypto.subtle.sign(
-          { name: "ECDSA", hash: "SHA-256" },
-          cryptoKey,
-          encoder.encode(signatureInput)
-        );
-
-        // Convert signature to base64url
-        const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
-          .replace(/\+/g, "-")
-          .replace(/\//g, "_")
-          .replace(/=+$/, "");
-
-        const jwt = `${signatureInput}.${signatureB64}`;
-
-        // Send to APNs
         const payload = {
           aps: {
             alert: {
@@ -181,7 +172,6 @@ serve(async (req) => {
           console.error(`[UpdatePush] APNs error for ${sub.user_id}:`, errorText);
           failCount++;
 
-          // Remove invalid tokens
           if (response.status === 410 || response.status === 400) {
             await supabase
               .from("push_subscriptions")
