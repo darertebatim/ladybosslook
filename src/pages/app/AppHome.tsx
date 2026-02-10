@@ -806,7 +806,7 @@ const AppHome = () => {
           onStreakIncrease={() => setShowStreakModal(true)}
           onOpenGoalInput={handleOpenGoalInput}
           onOpenTimer={handleOpenTimer}
-          onOpenWaterTracking={handleOpenWaterTracking}
+          
           onSkip={handleSkipTask}
         />
 
