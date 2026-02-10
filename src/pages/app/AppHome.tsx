@@ -780,13 +780,13 @@ const AppHome = () => {
                       />
                     ))}
                   </div>
-                  
-                  {/* Tour Banner - placed below rituals */}
-                  <div id="tour-banner-slot" className="mt-4" />
-                  
-                  {/* Promo Banner - Home Page */}
-                  <PromoBanner location="home_rituals" className="mt-4" />
                 </div>}
+
+              {/* Tour Banner & Promo - always visible regardless of ritual cards */}
+              {selectedTag === null && <>
+                <div id="tour-banner-slot" className="mt-4" />
+                <PromoBanner location="home_rituals" className="mt-4" />
+              </>}
 
             </>}
           </div>
