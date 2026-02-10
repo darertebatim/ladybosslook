@@ -75,8 +75,7 @@ const AppHome = () => {
   // Timer screen state
   const [timerTask, setTimerTask] = useState<UserTask | null>(null);
   
-  // Water tracking screen state
-  const [waterTask, setWaterTask] = useState<UserTask | null>(null);
+  
   
   // Skip task state
   const [skipTask, setSkipTask] = useState<UserTask | null>(null);
