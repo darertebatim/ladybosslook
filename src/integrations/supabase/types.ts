@@ -1178,6 +1178,7 @@ export type Database = {
           is_active: boolean | null
           priority: number | null
           starts_at: string | null
+          target_below_version: string | null
           title: string
           updated_at: string | null
           video_url: string | null
@@ -1195,6 +1196,7 @@ export type Database = {
           is_active?: boolean | null
           priority?: number | null
           starts_at?: string | null
+          target_below_version?: string | null
           title: string
           updated_at?: string | null
           video_url?: string | null
@@ -1212,6 +1214,7 @@ export type Database = {
           is_active?: boolean | null
           priority?: number | null
           starts_at?: string | null
+          target_below_version?: string | null
           title?: string
           updated_at?: string | null
           video_url?: string | null
