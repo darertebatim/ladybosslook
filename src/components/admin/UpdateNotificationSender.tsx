@@ -142,13 +142,14 @@ export function UpdateNotificationSender() {
           button_text: bannerButtonText,
           button_url: 'https://apps.apple.com/app/simora-ladybosslook/id6755076134',
           is_active: true,
-          priority: 100, // High priority
+          priority: 100,
           icon: 'sparkles',
-        });
+          target_below_version: targetVersion || null,
+        } as any);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Update banner created and is now live on the home screen');
+      toast.success(`Update banner created${targetVersion ? ` (visible to users below v${targetVersion})` : ' (visible to all users)'}`);
       queryClient.invalidateQueries({ queryKey: ['home-banners'] });
     },
     onError: (error: any) => {
