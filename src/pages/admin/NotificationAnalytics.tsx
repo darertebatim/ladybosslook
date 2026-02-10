@@ -35,8 +35,8 @@ interface Stats {
 export default function NotificationAnalytics() {
   const [userFilter, setUserFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [eventFilter, setEventFilter] = useState<string>('all');
-  const [daysBack, setDaysBack] = useState(7);
+  const [eventFilter, setEventFilter] = useState<string>('delivered');
+  const [daysBack, setDaysBack] = useState(1);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

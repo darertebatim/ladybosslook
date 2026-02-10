@@ -477,7 +477,7 @@ function FullLogsTab() {
     queryFn: async () => {
       let query = supabase
         .from('pn_schedule_logs')
-        .select('*, profiles:user_id(full_name, email)')
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(100);
       
@@ -487,7 +487,26 @@ function FullLogsTab() {
       
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      
+      // Fetch profile names for logs that have user_id
+      const userIds = [...new Set((data || []).filter(l => l.user_id).map(l => l.user_id))];
+      let profileMap: Record<string, { full_name: string | null; email: string }> = {};
+      
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .in('id', userIds);
+        
+        for (const p of profiles || []) {
+          profileMap[p.id] = { full_name: p.full_name, email: p.email };
+        }
+      }
+      
+      return (data || []).map(log => ({
+        ...log,
+        profiles: log.user_id ? profileMap[log.user_id] || null : null,
+      }));
     },
   });
 
