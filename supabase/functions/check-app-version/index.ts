@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     let latestVersion: string | null = null;
-    let storeUrl = 'https://apps.apple.com/app/id6746970920';
+    let storeUrl = 'https://apps.apple.com/app/simora-ladybosslook/id6755076134';
 
     if (overrideData?.value) {
       console.log('[check-app-version] Using admin override:', overrideData.value);
