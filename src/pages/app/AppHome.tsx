@@ -762,23 +762,19 @@ const AppHome = () => {
                     <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
                       Try a ritual
                     </h2>
-                    <button 
-                      onClick={() => {
-                        setRitualsDismissed(true);
-                        localStorage.setItem('simora_suggested_rituals_dismissed', 'true');
-                      }}
-                      className="ml-auto p-1.5 rounded-full text-muted-foreground/60 active:scale-95 transition-transform"
-                      aria-label="Dismiss suggested rituals"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {suggestedRoutines.slice(0, 4).map(routine => (
                       <RoutineBankCard 
                         key={routine.id} 
                         routine={routine} 
-                        onClick={() => navigate(`/app/routines/${routine.id}`)} 
+                        onClick={() => navigate(`/app/routines/${routine.id}`)}
+                        onDismiss={() => {
+                          const dismissed = JSON.parse(localStorage.getItem('simora_dismissed_ritual_ids') || '[]');
+                          dismissed.push(routine.id);
+                          localStorage.setItem('simora_dismissed_ritual_ids', JSON.stringify(dismissed));
+                          setDismissedRitualIds(new Set(dismissed));
+                        }}
                       />
                     ))}
                   </div>
