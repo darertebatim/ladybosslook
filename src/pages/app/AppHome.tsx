@@ -2,7 +2,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
-import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart, X } from 'lucide-react';
+import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
@@ -112,10 +112,12 @@ const AppHome = () => {
     localStorage.getItem('simora_welcome_card_action_added') === 'true'
   );
   
-  // Suggested rituals dismissed state
-  const [ritualsDismissed, setRitualsDismissed] = useState(() => 
-    localStorage.getItem('simora_suggested_rituals_dismissed') === 'true'
-  );
+  // Dismissed individual ritual card IDs
+  const [dismissedRitualIds, setDismissedRitualIds] = useState<Set<string>>(() => {
+    try {
+      return new Set(JSON.parse(localStorage.getItem('simora_dismissed_ritual_ids') || '[]'));
+    } catch { return new Set(); }
+  });
   
   // Track if user started this session as a new user (so card stays visible after adding tasks)
   const [startedAsNewUser, setStartedAsNewUser] = useState<boolean | null>(null);
@@ -251,8 +253,8 @@ const AppHome = () => {
   } = useUserAddedBankRoutines();
   const addedRoutineIdsSet = useMemo(() => new Set(addedRoutineIds), [addedRoutineIds]);
   const suggestedRoutines = useMemo(() => 
-    popularRoutines.filter(r => !addedRoutineIdsSet.has(r.id)).slice(0, 4), 
-    [popularRoutines, addedRoutineIdsSet]
+    popularRoutines.filter(r => !addedRoutineIdsSet.has(r.id) && !dismissedRitualIds.has(r.id)).slice(0, 4), 
+    [popularRoutines, addedRoutineIdsSet, dismissedRitualIds]
   );
 
   // Generate week days
@@ -756,29 +758,25 @@ const AppHome = () => {
               ) : null}
 
               {/* Popular Rituals Suggestions - only show rituals user hasn't added */}
-              {suggestedRoutines.length > 0 && selectedTag === null && !ritualsDismissed && <div className="tour-suggested-ritual mt-6">
+              {suggestedRoutines.length > 0 && selectedTag === null && <div className="tour-suggested-ritual mt-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="h-4 w-4 text-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
                       Try a ritual
                     </h2>
-                    <button 
-                      onClick={() => {
-                        setRitualsDismissed(true);
-                        localStorage.setItem('simora_suggested_rituals_dismissed', 'true');
-                      }}
-                      className="ml-auto p-1.5 rounded-full text-muted-foreground/60 active:scale-95 transition-transform"
-                      aria-label="Dismiss suggested rituals"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {suggestedRoutines.slice(0, 4).map(routine => (
                       <RoutineBankCard 
                         key={routine.id} 
                         routine={routine} 
-                        onClick={() => navigate(`/app/routines/${routine.id}`)} 
+                        onClick={() => navigate(`/app/routines/${routine.id}`)}
+                        onDismiss={() => {
+                          const dismissed = JSON.parse(localStorage.getItem('simora_dismissed_ritual_ids') || '[]');
+                          dismissed.push(routine.id);
+                          localStorage.setItem('simora_dismissed_ritual_ids', JSON.stringify(dismissed));
+                          setDismissedRitualIds(new Set(dismissed));
+                        }}
                       />
                     ))}
                   </div>
