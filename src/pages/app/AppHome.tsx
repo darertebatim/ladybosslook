@@ -901,20 +901,8 @@ const AppHome = () => {
           />
         )}
 
-        {/* Water Tracking Screen - Full screen overlay */}
-        {waterTask && (
-          <WaterTrackingScreen
-            task={waterTask}
-            date={selectedDate}
-            goalProgress={goalProgressMap.get(waterTask.id) || 0}
-            onClose={() => setWaterTask(null)}
-            onAddWater={handleAddWater}
-            onOpenSettings={() => {
-              setWaterTask(null);
-              handleEditTask(waterTask);
-            }}
-          />
-        )}
+
+
 
         {user && showNotificationFlow && (
           <PushNotificationOnboarding 

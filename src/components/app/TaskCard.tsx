@@ -121,9 +121,9 @@ export const TaskCard = memo(function TaskCard({
     
     haptic.light();
     
-    // Check if this is a water task - open water tracking screen instead
-    if (isWater && onOpenWaterTracking) {
-      onOpenWaterTracking(task);
+    // Water tasks: navigate to the dedicated water tracking page
+    if (isWater) {
+      navigate('/app/water', { state: { from: 'planner' } });
       return;
     }
     
