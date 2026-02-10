@@ -178,6 +178,9 @@ Deno.serve(async (req) => {
       const pref = prefsMap.get(enrollment.user_id);
       if (pref === false) continue;
 
+      // Skip if user already got a drip followup today (max 1 per day)
+      if (sentTodaySet.has(enrollment.user_id)) continue;
+
       // Skip if user is outside their active window (8 AM - 8 PM local)
       const userTz = timezoneMap.get(enrollment.user_id);
       if (!isWithinActiveWindow(userTz)) continue;
