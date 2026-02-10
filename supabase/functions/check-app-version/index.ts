@@ -24,7 +24,7 @@ async function getLatestAppStoreVersion(): Promise<{ version: string; storeUrl: 
     console.log('[check-app-version] Using cached version:', cachedVersion.version);
     return {
       version: cachedVersion.version,
-      storeUrl: 'https://apps.apple.com/app/id6746970920',
+      storeUrl: 'https://apps.apple.com/app/simora-ladybosslook/id6755076134',
     };
   }
 
