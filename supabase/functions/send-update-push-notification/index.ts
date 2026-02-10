@@ -82,10 +82,10 @@ serve(async (req) => {
     }
 
     // Send push notifications
-    const apnKey = Deno.env.get("APN_KEY");
-    const apnKeyId = Deno.env.get("APN_KEY_ID");
-    const apnTeamId = Deno.env.get("APN_TEAM_ID");
-    const apnBundleId = Deno.env.get("APN_BUNDLE_ID") || "app.simora.ios";
+    const apnKey = Deno.env.get("APNS_AUTH_KEY");
+    const apnKeyId = Deno.env.get("APNS_KEY_ID");
+    const apnTeamId = Deno.env.get("APNS_TEAM_ID");
+    const apnBundleId = Deno.env.get("APNS_TOPIC") || "app.simora.ios";
 
     if (!apnKey || !apnKeyId || !apnTeamId) {
       return new Response(
