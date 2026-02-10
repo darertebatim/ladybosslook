@@ -121,9 +121,9 @@ export const TaskCard = memo(function TaskCard({
     
     haptic.light();
     
-    // Check if this is a water task - open water tracking screen instead
-    if (isWater && onOpenWaterTracking) {
-      onOpenWaterTracking(task);
+    // Water tasks: navigate to the dedicated water tracking page
+    if (isWater) {
+      navigate('/app/water', { state: { from: 'planner' } });
       return;
     }
     
@@ -237,12 +237,7 @@ export const TaskCard = memo(function TaskCard({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              // Water tasks: open inline tracking screen instead of navigating away
-              if (isWater && onOpenWaterTracking) {
-                onOpenWaterTracking(task);
-              } else {
-                navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
-              }
+              navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
             }}
             className={cn(
               'flex items-center justify-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all shadow-sm active:scale-95',

@@ -218,8 +218,8 @@ export const TaskDetailModal = ({
               <button
                 onClick={() => {
                   haptic.light();
-                  if (isWater && onOpenWaterTracking) {
-                    onOpenWaterTracking(task);
+                  if (isWater) {
+                    navigate('/app/water', { state: { from: 'planner' } });
                   } else {
                     onOpenGoalInput?.(task);
                   }
