@@ -215,9 +215,10 @@ export function BadgeCelebration({
       {/* Celebration content */}
       <div 
         className={cn(
-          'relative w-full max-w-md mx-4 bg-gradient-to-t from-orange-400 via-orange-500 to-orange-600 rounded-t-[40px] pt-8 pb-8 px-6 transition-all duration-500',
+          'relative w-full max-w-md mx-4 bg-gradient-to-t from-orange-400 via-orange-500 to-orange-600 rounded-t-[40px] pt-8 px-6 transition-all duration-500',
           isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
         )}
+        style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))' }}
       >
         {/* Large centered badge with glow */}
         <div className="flex flex-col items-center -mt-28 mb-4">
