@@ -217,7 +217,7 @@ function isWithinActiveHours(notificationHour: number, wakeHour: number, sleepHo
 
 // Get user's current local hour based on their timezone
 function getUserLocalHour(timezone: string | null): number {
-  const tz = timezone || 'America/New_York'; // Default timezone
+  const tz = timezone || 'America/Los_Angeles'; // Default timezone (LA)
   try {
     const now = new Date();
     const options: Intl.DateTimeFormatOptions = { 
@@ -235,7 +235,7 @@ function getUserLocalHour(timezone: string | null): number {
 
 // Get today's date in user's timezone (for duplicate prevention)
 function getUserLocalDate(timezone: string | null): string {
-  const tz = timezone || 'America/New_York';
+  const tz = timezone || 'America/Los_Angeles';
   try {
     const now = new Date();
     return now.toLocaleDateString('en-CA', { timeZone: tz }); // YYYY-MM-DD format

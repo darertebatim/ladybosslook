@@ -24,7 +24,7 @@ const corsHeaders = {
 
 function isWithinActiveWindow(userTimezone: string | null): boolean {
   try {
-    const tz = userTimezone || 'UTC';
+    const tz = userTimezone || 'America/Los_Angeles';
     const now = new Date();
     const formatter = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hour12: false });
     const hour = parseInt(formatter.format(now), 10);
