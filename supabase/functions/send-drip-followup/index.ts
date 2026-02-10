@@ -134,12 +134,21 @@ Deno.serve(async (req) => {
       .in('id', roundIds);
     const roundPlaylistMap = new Map(rounds?.map(r => [r.id, r.audio_playlist_id]) || []);
 
-    // Check which followups we already sent
+    // Check which followups we already sent (per audio_id, all-time)
     const { data: alreadySent } = await supabase
       .from('pn_schedule_logs')
       .select('user_id, notification_type')
       .like('notification_type', 'drip_followup_%');
     const sentSet = new Set(alreadySent?.map(s => `${s.user_id}:${s.notification_type}`) || []);
+
+    // Check which users already got a drip followup TODAY (max 1 per user per day)
+    const todayStart = `${today}T00:00:00.000Z`;
+    const { data: sentToday } = await supabase
+      .from('pn_schedule_logs')
+      .select('user_id')
+      .eq('function_name', 'send-drip-followup')
+      .gte('created_at', todayStart);
+    const sentTodaySet = new Set(sentToday?.map(s => s.user_id) || []);
 
     // Get all user audio progress
     const { data: progress } = await supabase
