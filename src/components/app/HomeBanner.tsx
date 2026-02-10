@@ -6,6 +6,18 @@ import { useNavigate } from 'react-router-dom';
 import { detectVideoType, extractYouTubeId, getVideoEmbedUrl, getVideoPlatformLabel } from '@/lib/videoUtils';
 import { BUILD_INFO } from '@/lib/buildInfo';
 
+function isVersionLessThan(v1: string, v2: string): boolean {
+  const parts1 = v1.split('.').map(p => parseInt(p, 10) || 0);
+  const parts2 = v2.split('.').map(p => parseInt(p, 10) || 0);
+  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+    const p1 = parts1[i] || 0;
+    const p2 = parts2[i] || 0;
+    if (p1 < p2) return true;
+    if (p1 > p2) return false;
+  }
+  return false;
+}
+
 interface HomeBannerData {
   id: string;
   title: string;
