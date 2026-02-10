@@ -97,6 +97,7 @@ export const TaskQuickStartSheet = ({
   const handleClose = () => {
     setTaskName('');
     setSelectedCategory('popular');
+    setShowIdeas(false);
     onOpenChange(false);
   };
 
