@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { App } from '@capacitor/app';
+import { Device } from '@capacitor/device';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -10,48 +11,36 @@ import { supabase } from '@/integrations/supabase/client';
 export const useAppInstallTracking = (userId: string | undefined) => {
   useEffect(() => {
     const trackVersion = async () => {
-      // Only track on native platforms with logged-in user
-      if (!Capacitor.isNativePlatform() || !userId) {
-        return;
-      }
+      if (!Capacitor.isNativePlatform() || !userId) return;
 
       try {
-        // Get current app version from native
-        const appInfo = await App.getInfo();
+        const [appInfo, deviceInfo] = await Promise.all([
+          App.getInfo(),
+          Device.getId(),
+        ]);
         const appVersion = appInfo.version;
         const platform = Capacitor.getPlatform();
+        const deviceId = deviceInfo.identifier;
 
-        console.log('[VersionTracking] Tracking version:', appVersion, 'for user:', userId.substring(0, 8));
+        console.log('[VersionTracking] Tracking version:', appVersion, 'device:', deviceId.substring(0, 8));
 
-        // Update app_installations - upsert by user_id
+        // Upsert app_installations by device_id (the actual unique constraint)
         const { error: installError } = await supabase
           .from('app_installations')
           .upsert(
             {
               user_id: userId,
-              device_id: userId, // Use user_id as device_id for simplicity
+              device_id: deviceId,
               platform,
               app_version: appVersion,
               last_seen_at: new Date().toISOString(),
               last_seen_version: appVersion,
             },
-            { onConflict: 'user_id' }
+            { onConflict: 'device_id' }
           );
 
         if (installError) {
-          // If conflict on device_id, try update instead
-          if (installError.code === '23505') {
-            await supabase
-              .from('app_installations')
-              .update({
-                last_seen_at: new Date().toISOString(),
-                last_seen_version: appVersion,
-                app_version: appVersion,
-              })
-              .eq('user_id', userId);
-          } else {
-            console.error('[VersionTracking] Error updating app_installations:', installError);
-          }
+          console.error('[VersionTracking] Error updating app_installations:', installError);
         }
 
         // Update push_subscriptions with current version
