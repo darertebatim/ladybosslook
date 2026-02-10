@@ -1,0 +1,1 @@
+ALTER TABLE public.home_banners ADD COLUMN target_below_version TEXT DEFAULT NULL;

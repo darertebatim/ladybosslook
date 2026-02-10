@@ -4,6 +4,19 @@ import { Button } from '@/components/ui/button';
 import { X, Play, ExternalLink, Megaphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { detectVideoType, extractYouTubeId, getVideoEmbedUrl, getVideoPlatformLabel } from '@/lib/videoUtils';
+import { BUILD_INFO } from '@/lib/buildInfo';
+
+function isVersionLessThan(v1: string, v2: string): boolean {
+  const parts1 = v1.split('.').map(p => parseInt(p, 10) || 0);
+  const parts2 = v2.split('.').map(p => parseInt(p, 10) || 0);
+  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+    const p1 = parts1[i] || 0;
+    const p2 = parts2[i] || 0;
+    if (p1 < p2) return true;
+    if (p1 > p2) return false;
+  }
+  return false;
+}
 
 interface HomeBannerData {
   id: string;
@@ -13,6 +26,7 @@ interface HomeBannerData {
   button_url: string | null;
   video_url: string | null;
   background_color: string | null;
+  target_below_version: string | null;
 }
 
 const DISMISSED_BANNERS_KEY = 'dismissedBannerIds';
@@ -41,7 +55,7 @@ export function HomeBanner() {
     try {
       const { data, error } = await supabase
         .from('home_banners')
-        .select('id, title, description, button_text, button_url, video_url, background_color')
+        .select('id, title, description, button_text, button_url, video_url, background_color, target_below_version')
         .eq('is_active', true)
         .or('starts_at.is.null,starts_at.lte.now()')
         .or('ends_at.is.null,ends_at.gte.now()')
@@ -49,7 +63,15 @@ export function HomeBanner() {
         .limit(3);
 
       if (error) throw error;
-      setBanners(data || []);
+
+      // Filter out banners that target a specific version if user is already on that version or above
+      const currentVersion = BUILD_INFO.version;
+      const filtered = (data || []).map(d => ({ ...d, target_below_version: (d as any).target_below_version ?? null })).filter((banner) => {
+        if (!banner.target_below_version) return true; // No version filter = show to all
+        return isVersionLessThan(currentVersion, banner.target_below_version);
+      });
+
+      setBanners(filtered);
     } catch (error) {
       console.error('Error fetching banners:', error);
     }
