@@ -160,8 +160,9 @@ export function useSmartActionNudges(userId: string | undefined) {
         });
       }
 
-      // 2c. Water Reminders
-      const hasWater = tasks.some(t => t.pro_link_type === 'water' || t.goal_type === 'water');
+      // 2c. Water Reminders (always show if water task exists, even if completed — hydration is recurring)
+      const hasWater = incompleteTasks.some(t => t.pro_link_type === 'water' || t.goal_type === 'water')
+        || tasks.some(t => t.pro_link_type === 'water' || t.goal_type === 'water');
       if (hasWater) {
         const waterCount = 3 + Math.floor(Math.random() * 2); // 3-4
         for (let i = 0; i < waterCount; i++) {
