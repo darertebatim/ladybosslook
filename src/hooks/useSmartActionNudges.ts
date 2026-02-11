@@ -93,15 +93,32 @@ export function useSmartActionNudges(userId: string | undefined) {
       
       await LocalNotifications.cancel({ notifications: allIds });
 
-      // Fetch user's active tasks
-      const { data: tasks } = await supabase
-        .from('user_tasks')
-        .select('id, title, emoji, pro_link_type, goal_type, is_active')
-        .eq('user_id', userId)
-        .eq('is_active', true);
+      // Fetch user's active tasks AND today's completions in parallel
+      const todayStr = new Date().toISOString().split('T')[0];
+      const [{ data: tasks }, { data: completions }] = await Promise.all([
+        supabase
+          .from('user_tasks')
+          .select('id, title, emoji, pro_link_type, goal_type, is_active')
+          .eq('user_id', userId)
+          .eq('is_active', true),
+        supabase
+          .from('task_completions')
+          .select('task_id')
+          .eq('user_id', userId)
+          .eq('completed_date', todayStr),
+      ]);
 
       if (!tasks || tasks.length === 0) {
         console.log('[SmartNudges] No active tasks, skipping');
+        return;
+      }
+
+      // Filter out tasks already completed today
+      const completedTaskIds = new Set((completions || []).map(c => c.task_id));
+      const incompleteTasks = tasks.filter(t => !completedTaskIds.has(t.id));
+
+      if (incompleteTasks.length === 0) {
+        console.log('[SmartNudges] All tasks completed today, skipping');
         return;
       }
 
