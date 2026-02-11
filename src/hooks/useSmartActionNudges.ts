@@ -142,8 +142,8 @@ export function useSmartActionNudges(userId: string | undefined) {
         });
       });
 
-      // 2b. ProAction Nudges
-      const proTasks = tasks.filter(t => t.pro_link_type && t.pro_link_type !== 'water');
+      // 2b. ProAction Nudges (incomplete only)
+      const proTasks = incompleteTasks.filter(t => t.pro_link_type && t.pro_link_type !== 'water');
       if (proTasks.length > 0) {
         const selected = pickRandom(proTasks, 1)[0];
         const msgConfig = PROACTION_MESSAGES[selected.pro_link_type!] || PROACTION_MESSAGES.playlist;
