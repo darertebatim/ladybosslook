@@ -35,6 +35,12 @@ export function ActiveRoundsCarousel({
   // Check if any programs have the "new" or "updated" tag
   const hasUnseenPrograms = unseenEnrollments.size > 0 || unseenRounds.size > 0;
   
+  // Persist collapsed state - default to collapsed
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem(COLLAPSED_KEY);
+    return saved !== 'false';
+  });
+
   // Track if we've already auto-expanded for the current unseen items (persisted across navigations)
   const hasAutoExpanded = sessionStorage.getItem('programsAutoExpanded') === 'true';
 
