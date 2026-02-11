@@ -124,8 +124,8 @@ export function useSmartActionNudges(userId: string | undefined) {
 
       const notifications: any[] = [];
 
-      // 2a. Random Action Reminders (non-proaction tasks)
-      const regularTasks = tasks.filter(t => !t.pro_link_type);
+      // 2a. Random Action Reminders (non-proaction, incomplete tasks)
+      const regularTasks = incompleteTasks.filter(t => !t.pro_link_type);
       const selectedTasks = pickRandom(regularTasks, 3);
       
       selectedTasks.forEach((task, idx) => {
