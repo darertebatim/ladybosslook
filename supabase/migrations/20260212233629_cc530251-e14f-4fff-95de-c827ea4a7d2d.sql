@@ -1,0 +1,2 @@
+ALTER TABLE public.routines_bank ADD COLUMN start_day_of_week integer DEFAULT NULL;
+COMMENT ON COLUMN public.routines_bank.start_day_of_week IS 'Day of week to start (0=Sun, 1=Mon, ..., 6=Sat). When set, the ritual starts on the next occurrence of this day.';

@@ -19,6 +19,7 @@ export interface RoutineBankItem {
   updated_at: string | null;
   schedule_type?: string; // 'daily' | 'challenge'
   challenge_start_date?: string | null;
+  start_day_of_week?: number | null;
 }
 
 export interface RoutineBankSection {
@@ -440,9 +441,23 @@ export function useAddRoutineFromBank() {
 
       // Determine schedule type from ritual
       const scheduleType = (routine as any).schedule_type || 'daily';
-      const challengeStartDate = (routine as any).challenge_start_date 
-        ? new Date((routine as any).challenge_start_date) 
-        : new Date();
+      const startDayOfWeek = (routine as any).start_day_of_week as number | null;
+      
+      // Calculate the effective start date
+      let effectiveStartDate: Date;
+      if ((routine as any).challenge_start_date) {
+        effectiveStartDate = new Date((routine as any).challenge_start_date);
+      } else if (startDayOfWeek != null) {
+        // Find the next occurrence of this weekday (0=Sun..6=Sat)
+        const today = new Date();
+        const currentDay = today.getDay();
+        let daysUntil = startDayOfWeek - currentDay;
+        if (daysUntil <= 0) daysUntil += 7; // always next week if today or past
+        effectiveStartDate = new Date(today);
+        effectiveStartDate.setDate(today.getDate() + daysUntil);
+      } else {
+        effectiveStartDate = new Date();
+      }
 
       // Create user tasks
       if (tasks.length > 0) {
@@ -463,7 +478,7 @@ export function useAddRoutineFromBank() {
             repeatPattern = 'none';
             const dripDay = (task as any).drip_day as number;
             if (dripDay) {
-              const taskDate = new Date(challengeStartDate);
+              const taskDate = new Date(effectiveStartDate);
               taskDate.setDate(taskDate.getDate() + (dripDay - 1));
               scheduledDate = taskDate.toISOString().split('T')[0];
             }
@@ -471,6 +486,10 @@ export function useAddRoutineFromBank() {
             // Normal rituals: use per-task repeat from bank, allow user edits to override
             repeatPattern = edited?.repeatPattern || bankTask?.repeat_pattern || 'daily';
             repeatDays = bankTask?.repeat_days || null;
+            // If a start date is configured, set scheduled_date so tasks don't appear before it
+            if (startDayOfWeek != null || (routine as any).challenge_start_date) {
+              scheduledDate = effectiveStartDate.toISOString().split('T')[0];
+            }
           }
 
           return {

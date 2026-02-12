@@ -2585,6 +2585,7 @@ export type Database = {
           is_welcome_popup: boolean
           schedule_type: string
           sort_order: number | null
+          start_day_of_week: number | null
           subtitle: string | null
           title: string
           updated_at: string | null
@@ -2603,6 +2604,7 @@ export type Database = {
           is_welcome_popup?: boolean
           schedule_type?: string
           sort_order?: number | null
+          start_day_of_week?: number | null
           subtitle?: string | null
           title: string
           updated_at?: string | null
@@ -2621,6 +2623,7 @@ export type Database = {
           is_welcome_popup?: boolean
           schedule_type?: string
           sort_order?: number | null
+          start_day_of_week?: number | null
           subtitle?: string | null
           title?: string
           updated_at?: string | null
