@@ -145,11 +145,24 @@ export function RoutinePreviewSheet({
     const edited = editedTasks[task.id];
     // Priority: edited color > task.color > pro_link_type color > cycle color
     const defaultColor = task.color as TaskColor || getProLinkColor(task.pro_link_type, index);
+    
+    // Derive repeatPattern from schedule context, not hardcoded 'daily'
+    let repeatPattern: string = 'daily';
+    if (scheduleType === 'weekly' && (task as any).schedule_days?.length > 0) {
+      repeatPattern = 'custom';
+    } else if (scheduleType === 'challenge' && (task as any).drip_day) {
+      repeatPattern = 'none';
+    }
+    // Only allow edited override for daily rituals
+    if (scheduleType === 'daily' && edited?.repeatPattern) {
+      repeatPattern = edited.repeatPattern;
+    }
+    
     return {
       title: edited?.title || task.title,
       icon: edited?.icon || task.icon,
       color: edited?.color || defaultColor,
-      repeatPattern: edited?.repeatPattern || 'daily',
+      repeatPattern,
     };
   };
 
@@ -161,6 +174,26 @@ export function RoutinePreviewSheet({
     // Priority: edited color > task.color > pro_link_type color > cycle color
     const defaultColor = task.color as TaskColor || getProLinkColor(task.pro_link_type, index);
     
+    // Derive repeat settings from ritual schedule type
+    let repeatEnabled = true;
+    let repeatPatternValue: 'daily' | 'weekly' | 'monthly' = 'daily';
+    
+    if (scheduleType === 'weekly') {
+      repeatEnabled = true;
+      repeatPatternValue = 'weekly';
+    } else if (scheduleType === 'challenge') {
+      repeatEnabled = false;
+      repeatPatternValue = 'daily'; // won't matter since repeat is disabled
+    }
+    
+    // For daily rituals, respect user edits
+    if (scheduleType === 'daily' && existing?.repeatPattern) {
+      repeatEnabled = existing.repeatPattern !== 'none';
+      repeatPatternValue = (existing.repeatPattern !== 'none' 
+        ? existing.repeatPattern as 'daily' | 'weekly' | 'monthly'
+        : 'daily');
+    }
+
     return {
       title: existing?.title || task.title,
       description: existing?.description ?? task.description ?? null,
@@ -168,10 +201,8 @@ export function RoutinePreviewSheet({
       color: existing?.color || defaultColor,
       scheduledDate: new Date(),
       scheduledTime: existing?.scheduledTime ?? null,
-      repeatEnabled: existing?.repeatPattern ? existing.repeatPattern !== 'none' : true,
-      repeatPattern: (existing?.repeatPattern && existing.repeatPattern !== 'none') 
-        ? existing.repeatPattern as 'daily' | 'weekly' | 'monthly'
-        : 'daily',
+      repeatEnabled,
+      repeatPattern: repeatPatternValue,
       repeatInterval: 1,
       reminderEnabled: existing?.reminderEnabled ?? false,
       reminderTime: existing?.reminderTime || '09:00',

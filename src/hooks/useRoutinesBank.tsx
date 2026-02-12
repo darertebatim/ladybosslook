@@ -443,19 +443,27 @@ export function useAddRoutineFromBank() {
           const proLinkValue = edited?.pro_link_value ?? bankTask?.pro_link_value ?? bankTask?.linked_playlist_id ?? null;
 
           // Determine repeat_pattern and scheduling based on ritual schedule_type
-          let repeatPattern = edited?.repeatPattern || 'daily';
+          // Weekly/challenge ALWAYS override edited task data to maintain ritual structure
+          let repeatPattern = 'daily';
           let repeatDays: number[] | null = null;
           let scheduledDate: string | null = null;
 
-          if (scheduleType === 'weekly' && (task as any).schedule_days?.length > 0) {
+          if (scheduleType === 'weekly') {
             repeatPattern = 'custom';
-            repeatDays = (task as any).schedule_days;
-          } else if (scheduleType === 'challenge' && (task as any).drip_day) {
+            repeatDays = (task as any).schedule_days?.length > 0 
+              ? (task as any).schedule_days 
+              : null;
+          } else if (scheduleType === 'challenge') {
             repeatPattern = 'none';
             const dripDay = (task as any).drip_day as number;
-            const taskDate = new Date(today);
-            taskDate.setDate(taskDate.getDate() + (dripDay - 1));
-            scheduledDate = taskDate.toISOString().split('T')[0]; // YYYY-MM-DD
+            if (dripDay) {
+              const taskDate = new Date(today);
+              taskDate.setDate(taskDate.getDate() + (dripDay - 1));
+              scheduledDate = taskDate.toISOString().split('T')[0];
+            }
+          } else {
+            // Only respect edited repeatPattern for daily rituals
+            repeatPattern = edited?.repeatPattern || 'daily';
           }
 
           return {
