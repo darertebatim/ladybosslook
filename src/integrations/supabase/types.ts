@@ -2573,6 +2573,7 @@ export type Database = {
       routines_bank: {
         Row: {
           category: string
+          challenge_start_date: string | null
           color: string | null
           cover_image_url: string | null
           created_at: string | null
@@ -2590,6 +2591,7 @@ export type Database = {
         }
         Insert: {
           category?: string
+          challenge_start_date?: string | null
           color?: string | null
           cover_image_url?: string | null
           created_at?: string | null
@@ -2607,6 +2609,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          challenge_start_date?: string | null
           color?: string | null
           cover_image_url?: string | null
           created_at?: string | null

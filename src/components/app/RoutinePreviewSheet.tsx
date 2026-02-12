@@ -146,17 +146,9 @@ export function RoutinePreviewSheet({
     // Priority: edited color > task.color > pro_link_type color > cycle color
     const defaultColor = task.color as TaskColor || getProLinkColor(task.pro_link_type, index);
     
-    // Derive repeatPattern from schedule context, not hardcoded 'daily'
-    let repeatPattern: string = 'daily';
-    if (scheduleType === 'weekly' && (task as any).schedule_days?.length > 0) {
-      repeatPattern = 'custom';
-    } else if (scheduleType === 'challenge' && (task as any).drip_day) {
-      repeatPattern = 'none';
-    }
-    // Only allow edited override for daily rituals
-    if (scheduleType === 'daily' && edited?.repeatPattern) {
-      repeatPattern = edited.repeatPattern;
-    }
+    // Use per-task repeat_pattern (from admin_task_bank), or edited override
+    const taskRepeatPattern = (task as any).repeat_pattern || 'daily';
+    const repeatPattern = edited?.repeatPattern || taskRepeatPattern;
     
     return {
       title: edited?.title || task.title,
@@ -174,25 +166,10 @@ export function RoutinePreviewSheet({
     // Priority: edited color > task.color > pro_link_type color > cycle color
     const defaultColor = task.color as TaskColor || getProLinkColor(task.pro_link_type, index);
     
-    // Derive repeat settings from ritual schedule type
-    let repeatEnabled = true;
-    let repeatPatternValue: 'daily' | 'weekly' | 'monthly' = 'daily';
-    
-    if (scheduleType === 'weekly') {
-      repeatEnabled = true;
-      repeatPatternValue = 'weekly';
-    } else if (scheduleType === 'challenge') {
-      repeatEnabled = false;
-      repeatPatternValue = 'daily'; // won't matter since repeat is disabled
-    }
-    
-    // For daily rituals, respect user edits
-    if (scheduleType === 'daily' && existing?.repeatPattern) {
-      repeatEnabled = existing.repeatPattern !== 'none';
-      repeatPatternValue = (existing.repeatPattern !== 'none' 
-        ? existing.repeatPattern as 'daily' | 'weekly' | 'monthly'
-        : 'daily');
-    }
+    // Use per-task repeat settings from the bank
+    const taskRepeatPattern = (task as any).repeat_pattern || 'daily';
+    const repeatPattern = existing?.repeatPattern || taskRepeatPattern;
+    const repeatEnabled = repeatPattern !== 'none';
 
     return {
       title: existing?.title || task.title,
@@ -202,7 +179,7 @@ export function RoutinePreviewSheet({
       scheduledDate: new Date(),
       scheduledTime: existing?.scheduledTime ?? null,
       repeatEnabled,
-      repeatPattern: repeatPatternValue,
+      repeatPattern: (repeatEnabled ? repeatPattern : 'daily') as 'daily' | 'weekly' | 'monthly',
       repeatInterval: 1,
       reminderEnabled: existing?.reminderEnabled ?? false,
       reminderTime: existing?.reminderTime || '09:00',
@@ -230,20 +207,66 @@ export function RoutinePreviewSheet({
     if (scheduleType === 'challenge' && (task as any).drip_day) {
       return `Day ${(task as any).drip_day}`;
     }
-    if (scheduleType === 'weekly' && (task as any).schedule_days?.length > 0) {
-      const days = ((task as any).schedule_days as number[]).sort();
-      return days.map(d => WEEKDAY_NAMES[d]).join(', ');
-    }
     switch (pattern) {
       case 'daily': return 'Repeats every day';
       case 'weekly': return 'Repeats every week';
       case 'monthly': return 'Repeats every month';
-      default: return 'No repeat';
+      case 'none': return 'One-time';
+      default: return 'Repeats every day';
     }
   };
 
   // Find the task being edited
   const editingTask = editingTaskId ? tasks.find(t => t.id === editingTaskId) : null;
+
+  const renderTaskCard = (task: RoutinePlanTask, index: number) => {
+    const isSelected = selectedTaskIds.has(task.id);
+    const display = getTaskDisplay(task, index);
+    const colorClass = TASK_COLOR_CLASSES[display.color];
+    
+    return (
+      <div key={task.id} className="flex items-start gap-3">
+        <button
+          onClick={() => toggleTask(task.id)}
+          className={cn(
+            'w-6 h-6 mt-3 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors',
+            isSelected 
+              ? 'bg-emerald-500 border-emerald-500' 
+              : 'border-muted-foreground/40 bg-transparent'
+          )}
+        >
+          {isSelected && <Check className="w-4 h-4 text-white" />}
+        </button>
+        <div className={cn(
+          'flex-1 rounded-xl border border-border/50 overflow-hidden',
+          colorClass
+        )}>
+          <div className="flex items-center gap-3 p-3">
+            <FluentEmoji emoji={display.icon || '📝'} size={28} className="shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-black truncate">{display.title}</p>
+              <p className="text-xs text-black/70 truncate">
+                {getRepeatLabel(task, display.repeatPattern)}
+              </p>
+            </div>
+            <button 
+              className="shrink-0 p-2 text-black/60 hover:text-black"
+              onClick={() => openTaskEditor(task, index)}
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+          </div>
+          {task.description && (
+            <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
+              <p className="text-xs text-black/80 leading-relaxed">
+                {task.description}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -262,72 +285,57 @@ export function RoutinePreviewSheet({
             </SheetHeader>
 
             <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
-              <p className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                {scheduleType === 'challenge' ? 'Challenge Actions' : scheduleType === 'weekly' ? 'Weekly Actions' : 'Daily Actions'}
-              </p>
-              
-              <div className="space-y-3">
-              {tasks.map((task, index) => {
-                  const isSelected = selectedTaskIds.has(task.id);
-                  const display = getTaskDisplay(task, index);
-                  const colorClass = TASK_COLOR_CLASSES[display.color];
-                  
-                  return (
-                    <div 
-                      key={task.id}
-                      className="flex items-start gap-3"
-                    >
-                      {/* Checkbox */}
-                      <button
-                        onClick={() => toggleTask(task.id)}
-                        className={cn(
-                          'w-6 h-6 mt-3 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-                          isSelected 
-                            ? 'bg-emerald-500 border-emerald-500' 
-                            : 'border-muted-foreground/40 bg-transparent'
-                        )}
-                      >
-                        {isSelected && <Check className="w-4 h-4 text-white" />}
-                      </button>
-
-                      {/* Task Card - matches TaskTemplateCard style */}
-                      <div className={cn(
-                        'flex-1 rounded-xl border border-border/50 overflow-hidden',
-                        colorClass
-                      )}>
-                        {/* Main content row */}
-                        <div className="flex items-center gap-3 p-3">
-                          <FluentEmoji emoji={display.icon || '📝'} size={28} className="shrink-0" />
-                          
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-black truncate">{display.title}</p>
-                            <p className="text-xs text-black/70 truncate">
-                              {getRepeatLabel(task, display.repeatPattern)}
-                            </p>
+              {scheduleType === 'challenge' ? (
+                <>
+                  <p className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+                    Challenge Actions
+                  </p>
+                  <div className="space-y-3">
+                    {tasks.map((task, index) => renderTaskCard(task, index))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Group tasks by repeat_pattern */}
+                  {(() => {
+                    const groups = [
+                      { key: 'daily', label: '☀️ Daily Tasks', filter: (t: RoutinePlanTask) => {
+                        const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern || 'daily';
+                        return p === 'daily';
+                      }},
+                      { key: 'weekly', label: '📅 Weekly Tasks', filter: (t: RoutinePlanTask) => {
+                        const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern;
+                        return p === 'weekly';
+                      }},
+                      { key: 'monthly', label: '📆 Monthly Tasks', filter: (t: RoutinePlanTask) => {
+                        const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern;
+                        return p === 'monthly';
+                      }},
+                      { key: 'none', label: '⭐ Special Events', filter: (t: RoutinePlanTask) => {
+                        const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern;
+                        return p === 'none';
+                      }},
+                    ];
+                    return groups.map(group => {
+                      const groupTasks = tasks.filter(group.filter);
+                      if (groupTasks.length === 0) return null;
+                      return (
+                        <div key={group.key} className="mb-4">
+                          <p className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+                            {group.label}
+                          </p>
+                          <div className="space-y-3">
+                            {groupTasks.map((task) => {
+                              const originalIndex = tasks.indexOf(task);
+                              return renderTaskCard(task, originalIndex);
+                            })}
                           </div>
-
-                          {/* Edit button */}
-                          <button 
-                            className="shrink-0 p-2 text-black/60 hover:text-black"
-                            onClick={() => openTaskEditor(task, index)}
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
                         </div>
-
-                        {/* Description box */}
-                        {task.description && (
-                          <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
-                            <p className="text-xs text-black/80 leading-relaxed">
-                              {task.description}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                      );
+                    });
+                  })()}
+                </>
+              )}
             </div>
 
             {/* Footer with toggle and save */}
