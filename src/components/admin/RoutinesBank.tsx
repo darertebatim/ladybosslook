@@ -135,6 +135,8 @@ export default function RoutinesBank() {
     emoji: '✨',
     schedule_type: 'daily' as 'daily' | 'challenge',
     challenge_start_date: null as Date | null,
+    start_day_of_week: null as number | null,
+    start_mode: 'none' as 'none' | 'date' | 'weekday',
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
   const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
@@ -215,7 +217,8 @@ export default function RoutinesBank() {
           color: data.formData.color,
           emoji: data.formData.emoji,
           schedule_type: data.formData.schedule_type,
-          challenge_start_date: data.formData.challenge_start_date ? data.formData.challenge_start_date.toISOString().split('T')[0] : null,
+          challenge_start_date: data.formData.start_mode === 'date' && data.formData.challenge_start_date ? data.formData.challenge_start_date.toISOString().split('T')[0] : null,
+          start_day_of_week: data.formData.start_mode === 'weekday' ? data.formData.start_day_of_week : null,
         })
         .select()
         .single();
@@ -285,7 +288,8 @@ export default function RoutinesBank() {
           color: data.formData.color,
           emoji: data.formData.emoji,
           schedule_type: data.formData.schedule_type,
-          challenge_start_date: data.formData.challenge_start_date ? data.formData.challenge_start_date.toISOString().split('T')[0] : null,
+          challenge_start_date: data.formData.start_mode === 'date' && data.formData.challenge_start_date ? data.formData.challenge_start_date.toISOString().split('T')[0] : null,
+          start_day_of_week: data.formData.start_mode === 'weekday' ? data.formData.start_day_of_week : null,
         })
         .eq('id', data.id);
       if (error) throw error;
@@ -435,6 +439,8 @@ export default function RoutinesBank() {
       emoji: '✨',
       schedule_type: 'daily',
       challenge_start_date: null,
+      start_day_of_week: null,
+      start_mode: 'none',
     });
     setLocalSections([]);
     setLocalTasks([]);
@@ -454,6 +460,8 @@ export default function RoutinesBank() {
       emoji: routine.emoji,
       schedule_type: ((routine.schedule_type === 'challenge' ? 'challenge' : 'daily') as 'daily' | 'challenge'),
       challenge_start_date: (routine as any).challenge_start_date ? new Date((routine as any).challenge_start_date) : null,
+      start_day_of_week: (routine as any).start_day_of_week ?? null,
+      start_mode: (routine as any).start_day_of_week != null ? 'weekday' : ((routine as any).challenge_start_date ? 'date' : 'none'),
     });
     const { sections, tasks } = await fetchRoutineData(routine.id);
     setLocalSections(sections);
@@ -951,35 +959,80 @@ export default function RoutinesBank() {
                       ))}
                     </div>
 
-                    {/* Start Date Picker - for all ritual types */}
-                    <div className="mt-3 space-y-1.5">
-                      <Label className="text-xs">
-                        {formData.schedule_type === 'challenge' ? 'Challenge Starts On' : 'Starts On'}
-                      </Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
+                    {/* Start Mode Selector */}
+                    <div className="mt-3 space-y-2">
+                      <Label className="text-xs">When does it start?</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { value: 'none', label: 'Immediately', desc: 'Starts today' },
+                          { value: 'date', label: 'Specific date', desc: 'Pick a date' },
+                          { value: 'weekday', label: 'Day of week', desc: 'e.g. Next Monday' },
+                        ].map(opt => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, start_mode: opt.value as any })}
                             className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !formData.challenge_start_date && "text-muted-foreground"
+                              "flex flex-col items-center gap-0.5 p-2 rounded-lg border-2 text-center transition-all",
+                              formData.start_mode === opt.value
+                                ? "border-primary bg-primary/5"
+                                : "border-border hover:border-muted-foreground/30"
                             )}
                           >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {formData.challenge_start_date 
-                              ? format(formData.challenge_start_date, 'PPP')
-                              : <span>Pick a start date (defaults to today)</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <CalendarComponent
-                            mode="single"
-                            selected={formData.challenge_start_date || undefined}
-                            onSelect={(date) => setFormData({ ...formData, challenge_start_date: date || null })}
-                            className={cn("p-3 pointer-events-auto")}
-                          />
-                        </PopoverContent>
-                      </Popover>
+                            <span className="text-xs font-medium">{opt.label}</span>
+                            <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Date picker */}
+                      {formData.start_mode === 'date' && (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !formData.challenge_start_date && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {formData.challenge_start_date
+                                ? format(formData.challenge_start_date, 'PPP')
+                                : <span>Pick a start date</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                              mode="single"
+                              selected={formData.challenge_start_date || undefined}
+                              onSelect={(date) => setFormData({ ...formData, challenge_start_date: date || null })}
+                              className={cn("p-3 pointer-events-auto")}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      )}
+
+                      {/* Weekday picker */}
+                      {formData.start_mode === 'weekday' && (
+                        <div className="flex gap-1.5 justify-center">
+                          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
+                            <button
+                              key={day}
+                              type="button"
+                              onClick={() => setFormData({ ...formData, start_day_of_week: idx })}
+                              className={cn(
+                                "w-9 h-9 rounded-full text-xs font-medium transition-all",
+                                formData.start_day_of_week === idx
+                                  ? "bg-primary text-primary-foreground"
+                                  : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                              )}
+                            >
+                              {day}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
