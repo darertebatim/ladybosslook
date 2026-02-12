@@ -1,0 +1,1 @@
+ALTER TABLE public.routines_bank ADD COLUMN challenge_start_date date;

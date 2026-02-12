@@ -31,7 +31,7 @@ const isEmoji = (str: string) =>
   /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
 
 // Convert RoutineBankTask to RoutinePlanTask format for preview sheet
-function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { schedule_days?: number[] | null; drip_day?: number | null } {
+function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { schedule_days?: number[] | null; drip_day?: number | null; repeat_pattern?: string | null } {
   return {
     id: task.id,
     plan_id: task.routine_id,
@@ -50,9 +50,10 @@ function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { sc
     goal_type: task.goal_type ?? null,
     goal_unit: task.goal_unit ?? null,
     linked_playlist: null,
-    // Pass through schedule fields for weekly/challenge rituals
+    // Pass through schedule fields and per-task repeat settings
     schedule_days: task.schedule_days,
     drip_day: task.drip_day,
+    repeat_pattern: task.repeat_pattern || 'daily',
   };
 }
 

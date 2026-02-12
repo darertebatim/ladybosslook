@@ -17,7 +17,8 @@ export interface RoutineBankItem {
   sort_order: number | null;
   created_at: string | null;
   updated_at: string | null;
-  schedule_type?: string; // 'daily' | 'weekly' | 'challenge'
+  schedule_type?: string; // 'daily' | 'challenge'
+  challenge_start_date?: string | null;
 }
 
 export interface RoutineBankSection {
@@ -387,12 +388,14 @@ export function useAddRoutineFromBank() {
         goal_target: number | null;
         goal_type: string | null;
         goal_unit: string | null;
+        repeat_pattern: string | null;
+        repeat_days: number[] | null;
       }> = {};
       
       if (taskIds.length > 0) {
         const { data: bankTasks } = await supabase
           .from('admin_task_bank')
-          .select('id, pro_link_type, pro_link_value, linked_playlist_id, color, category, time_period, goal_enabled, goal_target, goal_type, goal_unit')
+          .select('id, pro_link_type, pro_link_value, linked_playlist_id, color, category, time_period, goal_enabled, goal_target, goal_type, goal_unit, repeat_pattern, repeat_days')
           .in('id', taskIds);
 
         bankTasks?.forEach(bt => {
@@ -407,6 +410,8 @@ export function useAddRoutineFromBank() {
             goal_target: bt.goal_target,
             goal_type: bt.goal_type,
             goal_unit: bt.goal_unit,
+            repeat_pattern: bt.repeat_pattern ?? 'daily',
+            repeat_days: bt.repeat_days ?? null,
           };
         });
       }
@@ -431,7 +436,9 @@ export function useAddRoutineFromBank() {
 
       // Determine schedule type from ritual
       const scheduleType = (routine as any).schedule_type || 'daily';
-      const today = new Date();
+      const challengeStartDate = (routine as any).challenge_start_date 
+        ? new Date((routine as any).challenge_start_date) 
+        : new Date();
 
       // Create user tasks
       if (tasks.length > 0) {
@@ -442,28 +449,24 @@ export function useAddRoutineFromBank() {
           const proLinkType = edited?.pro_link_type ?? bankTask?.pro_link_type ?? null;
           const proLinkValue = edited?.pro_link_value ?? bankTask?.pro_link_value ?? bankTask?.linked_playlist_id ?? null;
 
-          // Determine repeat_pattern and scheduling based on ritual schedule_type
-          // Weekly/challenge ALWAYS override edited task data to maintain ritual structure
-          let repeatPattern = 'daily';
+          // Determine repeat_pattern and scheduling
+          let repeatPattern: string;
           let repeatDays: number[] | null = null;
           let scheduledDate: string | null = null;
 
-          if (scheduleType === 'weekly') {
-            repeatPattern = 'custom';
-            repeatDays = (task as any).schedule_days?.length > 0 
-              ? (task as any).schedule_days 
-              : null;
-          } else if (scheduleType === 'challenge') {
+          if (scheduleType === 'challenge') {
+            // Challenge rituals: sequential drip dates, no repeat
             repeatPattern = 'none';
             const dripDay = (task as any).drip_day as number;
             if (dripDay) {
-              const taskDate = new Date(today);
+              const taskDate = new Date(challengeStartDate);
               taskDate.setDate(taskDate.getDate() + (dripDay - 1));
               scheduledDate = taskDate.toISOString().split('T')[0];
             }
           } else {
-            // Only respect edited repeatPattern for daily rituals
-            repeatPattern = edited?.repeatPattern || 'daily';
+            // Normal rituals: use per-task repeat from bank, allow user edits to override
+            repeatPattern = edited?.repeatPattern || bankTask?.repeat_pattern || 'daily';
+            repeatDays = bankTask?.repeat_days || null;
           }
 
           return {

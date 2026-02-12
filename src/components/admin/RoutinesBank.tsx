@@ -11,13 +11,16 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Gift, Calendar, Flame } from 'lucide-react';
+import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Gift, Calendar, Flame, CalendarIcon } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
 import EmojiPicker from '@/components/app/EmojiPicker';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 import { AITextGenerator } from '@/components/admin/AITextGenerator';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
 
 const COLOR_OPTIONS = [
   { name: 'pink', hex: '#FFD6E8' },
@@ -130,7 +133,8 @@ export default function RoutinesBank() {
     category: 'general',
     color: 'yellow',
     emoji: '✨',
-    schedule_type: 'daily' as 'daily' | 'weekly' | 'challenge',
+    schedule_type: 'daily' as 'daily' | 'challenge',
+    challenge_start_date: null as Date | null,
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
   const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
@@ -211,6 +215,7 @@ export default function RoutinesBank() {
           color: data.formData.color,
           emoji: data.formData.emoji,
           schedule_type: data.formData.schedule_type,
+          challenge_start_date: data.formData.challenge_start_date ? data.formData.challenge_start_date.toISOString().split('T')[0] : null,
         })
         .select()
         .single();
@@ -280,6 +285,7 @@ export default function RoutinesBank() {
           color: data.formData.color,
           emoji: data.formData.emoji,
           schedule_type: data.formData.schedule_type,
+          challenge_start_date: data.formData.challenge_start_date ? data.formData.challenge_start_date.toISOString().split('T')[0] : null,
         })
         .eq('id', data.id);
       if (error) throw error;
@@ -428,6 +434,7 @@ export default function RoutinesBank() {
       color: 'yellow',
       emoji: '✨',
       schedule_type: 'daily',
+      challenge_start_date: null,
     });
     setLocalSections([]);
     setLocalTasks([]);
@@ -445,7 +452,8 @@ export default function RoutinesBank() {
       category: routine.category,
       color: routine.color,
       emoji: routine.emoji,
-      schedule_type: (routine.schedule_type || 'daily') as 'daily' | 'weekly' | 'challenge',
+      schedule_type: ((routine.schedule_type === 'challenge' ? 'challenge' : 'daily') as 'daily' | 'challenge'),
+      challenge_start_date: (routine as any).challenge_start_date ? new Date((routine as any).challenge_start_date) : null,
     });
     const { sections, tasks } = await fetchRoutineData(routine.id);
     setLocalSections(sections);
@@ -619,31 +627,6 @@ export default function RoutinesBank() {
   const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const renderTaskScheduleConfig = (task: LocalTask) => {
-    if (formData.schedule_type === 'weekly') {
-      return (
-        <div className="flex gap-0.5">
-          {WEEKDAYS.map((day, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => {
-                const days = task.schedule_days || [];
-                const newDays = days.includes(idx) ? days.filter(d => d !== idx) : [...days, idx].sort();
-                setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: newDays } : t));
-              }}
-              className={cn(
-                "w-6 h-6 rounded text-[10px] font-medium transition-all",
-                (task.schedule_days || []).includes(idx)
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-accent"
-              )}
-            >
-              {day[0]}
-            </button>
-          ))}
-        </div>
-      );
-    }
     if (formData.schedule_type === 'challenge') {
       return (
         <div className="flex items-center gap-1">
@@ -945,10 +928,9 @@ export default function RoutinesBank() {
                   {/* Schedule Type */}
                   <div className="space-y-2 border-t pt-4">
                     <Label>Ritual Type</Label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       {[
-                        { value: 'daily', label: 'Daily', desc: 'All actions every day', icon: '☀️' },
-                        { value: 'weekly', label: 'Weekly Plan', desc: 'Actions on specific weekdays', icon: '📅' },
+                        { value: 'daily', label: 'Normal', desc: 'Actions with their own repeat settings', icon: '☀️' },
                         { value: 'challenge', label: 'Challenge', desc: 'Sequential drip (Day 1, 2...)', icon: '🔥' },
                       ].map(opt => (
                         <button
@@ -968,6 +950,37 @@ export default function RoutinesBank() {
                         </button>
                       ))}
                     </div>
+
+                    {/* Challenge Start Date Picker */}
+                    {formData.schedule_type === 'challenge' && (
+                      <div className="mt-3 space-y-1.5">
+                        <Label className="text-xs">Challenge Starts On</Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !formData.challenge_start_date && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {formData.challenge_start_date 
+                                ? format(formData.challenge_start_date, 'PPP')
+                                : <span>Pick a start date (defaults to today)</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                              mode="single"
+                              selected={formData.challenge_start_date || undefined}
+                              onSelect={(date) => setFormData({ ...formData, challenge_start_date: date || null })}
+                              className={cn("p-3 pointer-events-auto")}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    )}
                   </div>
 
                   {/* Summary stats */}
