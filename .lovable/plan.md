@@ -1,95 +1,47 @@
 
+# Fix Weekly & Challenge Ritual Scheduling
 
-# Push Notification Enhancements
+## Problem
+When adding a weekly ritual (like "Ladyboss Workout Plan") to the planner, all tasks show as "Repeats every day" and "Starting from: Today" -- ignoring the weekly schedule_days configuration set in the admin. The root cause is in three places:
 
-## 1. Streak Challenge Notifications (NEW - Server-side)
+## Root Causes
 
-A new edge function `send-streak-challenges` that runs daily and sends smart, scenario-based notifications to users with active streaks or streak goals.
+1. **Preview label ignores schedule_days**: In `RoutinePreviewSheet.tsx`, `getTaskDisplay()` (line 152) hardcodes `repeatPattern: 'daily'` as default. While `getRepeatLabel()` does check `schedule_days`, the data flows through `display.repeatPattern` which is always `'daily'`.
 
-### Scenarios
+2. **Edit form ignores weekly/challenge config**: `getInitialDataForEdit()` sets `scheduledDate: new Date()` (today) and `repeatPattern: 'daily'` regardless of the ritual's `scheduleType` or the task's `schedule_days`.
 
-**A. Streak Continuation (has active streak, came yesterday)**
-- 2-day streak: "2 days in a row! Come back for day 3 and make it a real streak."
-- 3-day streak: "3 days strong. You're building something real."
-- 5+ days: "Day {n}. You're proving it to yourself."
-- Approaching goal (e.g., goal=7, current=5): "{n} of {goal} days done. Just {remaining} more to hit your target."
-- Goal reached: "You did it. {goal} days. That's not luck, that's you."
+3. **Edited tasks override weekly logic on save**: In `useRoutinesBank.tsx` line 446, `edited?.repeatPattern || 'daily'` takes precedence. If a user clicks edit on any task, the save logic skips the weekly schedule_days mapping at line 450 because `edited.repeatPattern` is set to `'daily'`.
 
-**B. Gold Badge Encouragement (completed some tasks today but not all)**
-- Has completions but not 100%: "You've done {completed}/{total} actions today. Finish all to earn your Gold badge."
-- Had gold yesterday: "Yesterday was Gold. Can you do it again today?"
-- On a gold streak of 2+: "Gold streak: {n} days. Don't break the chain."
+## Plan
 
-**C. First Week Critical Path (account created within 7 days)**
-- Day 1 (no completions yet): "Your first action is waiting. Just one tap to start."
-- Day 2 (came yesterday): "Day 2! You came back. That's already more than most."
-- Day 3-7: "Day {n} of your first week. You're building a habit."
-- Didn't come back after day 1: "You started something yesterday. Come back and keep it going."
+### 1. Fix RoutinePreviewSheet -- getTaskDisplay()
+Update `getTaskDisplay()` to derive `repeatPattern` from the ritual's `scheduleType` and the task's `schedule_days`:
+- If `scheduleType === 'weekly'` and task has `schedule_days`, show the correct weekday label
+- If `scheduleType === 'challenge'` and task has `drip_day`, show "Day X"
+- Only fall back to `'daily'` for daily rituals
 
-### Logic
-- Runs daily via cron
-- Reads from `user_streaks` (current_streak, streak_goal, last_completion_date, current_gold_streak, last_gold_date)
-- Reads from `profiles` (created_at for first-week detection, timezone for window check)
-- Each user gets MAX 1 notification per day from this function
-- Picks the highest-priority scenario (first week > goal proximity > gold > general streak)
-- Respects `momentum_celebration` preference toggle (reuses same column)
-- Respects 8 AM - 8 PM in user's local timezone
-- Deduplicates via `pn_schedule_logs` (type: `streak_challenge_{scenario}`)
+### 2. Fix RoutinePreviewSheet -- getInitialDataForEdit()
+When opening the edit modal for a task inside a weekly/challenge ritual:
+- For weekly rituals: set `repeatPattern` to `'weekly'` (not `'daily'`)
+- For challenge rituals: set `repeatEnabled` to `false` and `repeatPattern` to `'none'`
+- Don't hardcode `scheduledDate: new Date()` for challenge tasks; instead derive from drip_day
 
-### Files
-- New: `supabase/functions/send-streak-challenges/index.ts`
-- New cron job via SQL (not migration -- contains project-specific keys)
-- Update `supabase/config.toml` to add the function
-- Update PN Map in admin UI
+### 3. Fix useRoutinesBank.tsx -- Save Logic
+Update the save mutation to not let edited task data override weekly/challenge scheduling:
+- When `scheduleType === 'weekly'`, always use `'custom'` repeat_pattern with the task's `schedule_days` from the bank, regardless of what the edit form says
+- When `scheduleType === 'challenge'`, always use `'none'` with the calculated drip date
+- Only respect `edited.repeatPattern` for daily rituals
 
----
+### 4. Fix RoutinePreviewSheet -- Edit Action Modal UI
+When editing a task within a weekly ritual, either:
+- Make the repeat field read-only showing the assigned weekday(s)
+- Or hide the repeat/date fields entirely since they're controlled by the ritual structure
 
-## 2. Non-Rounded Notification Times
+## Technical Details
 
-You're right -- notifications at :00 or :30 feel scheduled and ignorable. Odd times like 9:47 or 2:13 feel personal and catch attention.
+### Files to modify:
+- `src/components/app/RoutinePreviewSheet.tsx` -- Fix display, edit form initialization, and pass schedule context
+- `src/hooks/useRoutinesBank.tsx` -- Fix save logic to prioritize ritual schedule_type over edited task data
 
-### Changes to `useSmartActionNudges.ts`
-- Replace `randomTimeBetween(8, 20)` to generate non-rounded minutes (already does `Math.random() * 60` which naturally produces odd minutes -- this is already correct)
-- BUT: avoid exact :00, :15, :30, :45 by adding a small offset if the random minute lands on those values
-- Add slight jitter: schedule between 8:03 and 19:47 instead of exactly 8:00-20:00 to avoid edge cases
-
-### Changes to `usePeriodNotifications.ts`
-- Currently hardcoded to `hour=9, minute=0` and `hour=10, minute=0` -- change to randomized times like 9:17, 10:43 etc.
-
----
-
-## 3. Timezone Awareness Audit
-
-Currently timezone is NOT respected in these server-side functions:
-
-| Function | Current | Fix |
-|----------|---------|-----|
-| `send-drip-followup` | Runs at 10 AM UTC, sends immediately | Add timezone check: only send if user is in 8 AM - 8 PM window |
-| `send-momentum-celebration` | Already has `isWithinActiveWindow()` | Good, no change needed |
-| `send-streak-challenges` (new) | Will include timezone check | Built-in from the start |
-| Drip followup cron | `0 10 * * *` (10 AM UTC) | Change to run every 2 hours so it catches all timezones in their active window |
-
-### Drip Followup Fix
-- Update the cron schedule from `0 10 * * *` to `0 */2 * * *` (every 2 hours)
-- Add `isWithinActiveWindow()` check to `send-drip-followup/index.ts` using user's `profiles.timezone`
-- This way users in any timezone get their notification during their local daytime
-
-### Momentum Keeper Cron
-- Currently NOT scheduled as a cron job (missing from `cron.job` table)
-- Add cron: run every 2 hours to catch all timezones
-
----
-
-## Technical Summary
-
-| Change | Type | Files |
-|--------|------|-------|
-| Streak Challenges | New edge function | `supabase/functions/send-streak-challenges/index.ts` |
-| Streak Challenges cron | SQL insert | Via SQL editor (not migration) |
-| Momentum Keeper cron | SQL insert | Via SQL editor (not migration) |
-| Non-rounded times | Update local scheduler | `src/hooks/useSmartActionNudges.ts` |
-| Non-rounded times | Update period notifications | `src/hooks/usePeriodNotifications.ts` |
-| Drip timezone fix | Update edge function | `supabase/functions/send-drip-followup/index.ts` |
-| Drip cron reschedule | SQL update | Via SQL editor |
-| Config + PN Map | Update | `supabase/config.toml`, `src/pages/admin/PushNotifications.tsx` |
-
+### No database changes needed
+The `routines_bank_tasks.schedule_days` data is already correct (e.g., Day1 has `[1]` for Monday, Day2 has `[2]` for Tuesday, etc.).
