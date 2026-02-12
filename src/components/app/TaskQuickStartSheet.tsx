@@ -270,7 +270,7 @@ export const TaskQuickStartSheet = ({
                     onClick={handleRandomAction}
                     disabled={isRolling}
                     className={cn(
-                      "w-full flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-muted hover:bg-muted/80 transition-all active:scale-[0.98]",
+                      "w-full flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-muted active:bg-muted/70 transition-all active:scale-[0.98]",
                       isRolling && "opacity-70"
                     )}
                   >
@@ -283,7 +283,7 @@ export const TaskQuickStartSheet = ({
                   </button>
                   <button
                     onClick={handleBrowseAll}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-muted hover:bg-muted/80 transition-all active:scale-[0.98]"
+                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-muted active:bg-muted/70 transition-all active:scale-[0.98]"
                   >
                     <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
                       <BookOpen className="w-4 h-4 text-muted-foreground" />
