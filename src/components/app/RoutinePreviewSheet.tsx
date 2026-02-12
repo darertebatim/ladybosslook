@@ -209,9 +209,17 @@ export function RoutinePreviewSheet({
     }
     switch (pattern) {
       case 'daily': return 'Repeats every day';
-      case 'weekly': return 'Repeats every week';
+      case 'weekly': {
+        const days = (task as any).repeat_days as number[] | null;
+        if (days && days.length > 0) {
+          const dayNames = days.map(d => WEEKDAY_NAMES[d] || `Day ${d}`).join(', ');
+          return `Repeats every week on ${dayNames}`;
+        }
+        return 'Repeats every week';
+      }
       case 'monthly': return 'Repeats every month';
-      case 'none': return 'One-time';
+      case 'none':
+      case 'once': return 'Repeat is off';
       default: return 'Repeats every day';
     }
   };
@@ -287,8 +295,8 @@ export function RoutinePreviewSheet({
             <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
               {scheduleType === 'challenge' ? (
                 <>
-                  <p className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                    Challenge Actions
+                  <p className="text-base font-semibold text-foreground mb-3">
+                    Challenge actions
                   </p>
                   <div className="space-y-3">
                     {tasks.map((task, index) => renderTaskCard(task, index))}
@@ -299,21 +307,21 @@ export function RoutinePreviewSheet({
                   {/* Group tasks by repeat_pattern */}
                   {(() => {
                     const groups = [
-                      { key: 'daily', label: '☀️ Daily Tasks', filter: (t: RoutinePlanTask) => {
+                      { key: 'daily', label: 'Daily tasks', filter: (t: RoutinePlanTask) => {
                         const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern || 'daily';
                         return p === 'daily';
                       }},
-                      { key: 'weekly', label: '📅 Weekly Tasks', filter: (t: RoutinePlanTask) => {
+                      { key: 'weekly', label: 'Weekly tasks', filter: (t: RoutinePlanTask) => {
                         const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern;
                         return p === 'weekly';
                       }},
-                      { key: 'monthly', label: '📆 Monthly Tasks', filter: (t: RoutinePlanTask) => {
+                      { key: 'monthly', label: 'Monthly tasks', filter: (t: RoutinePlanTask) => {
                         const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern;
                         return p === 'monthly';
                       }},
-                      { key: 'none', label: '⭐ Special Events', filter: (t: RoutinePlanTask) => {
+                      { key: 'none', label: 'Special events', filter: (t: RoutinePlanTask) => {
                         const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern;
-                        return p === 'none';
+                        return p === 'none' || p === 'once';
                       }},
                     ];
                     return groups.map(group => {
@@ -321,7 +329,7 @@ export function RoutinePreviewSheet({
                       if (groupTasks.length === 0) return null;
                       return (
                         <div key={group.key} className="mb-4">
-                          <p className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+                          <p className="text-base font-semibold text-foreground mb-3">
                             {group.label}
                           </p>
                           <div className="space-y-3">
