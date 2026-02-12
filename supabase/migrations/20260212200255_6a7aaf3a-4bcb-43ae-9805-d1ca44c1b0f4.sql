@@ -1,0 +1,1 @@
+UPDATE admin_task_bank SET category = 'Workoutplus' WHERE category = 'workoutplus';
