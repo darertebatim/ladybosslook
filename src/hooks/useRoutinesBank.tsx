@@ -474,13 +474,23 @@ export function useAddRoutineFromBank() {
           let scheduledDate: string | null = null;
 
           if (scheduleType === 'challenge') {
-            // Challenge rituals: sequential drip dates, no repeat
-            repeatPattern = 'none';
             const dripDay = (task as any).drip_day as number;
-            if (dripDay) {
+            const taskScheduleDays = (task as any).schedule_days as number[] | null;
+            
+            if (taskScheduleDays && taskScheduleDays.length > 0) {
+              // Challenge with per-task weekly schedule (e.g. Ladyboss Workout Plan)
+              repeatPattern = 'weekly';
+              repeatDays = taskScheduleDays;
+              // Set scheduled_date to the effective start date so tasks don't appear before it
+              scheduledDate = effectiveStartDate.toISOString().split('T')[0];
+            } else if (dripDay) {
+              // Sequential drip challenge
+              repeatPattern = 'none';
               const taskDate = new Date(effectiveStartDate);
               taskDate.setDate(taskDate.getDate() + (dripDay - 1));
               scheduledDate = taskDate.toISOString().split('T')[0];
+            } else {
+              repeatPattern = 'none';
             }
           } else {
             // Normal rituals: use per-task repeat from bank, allow user edits to override
