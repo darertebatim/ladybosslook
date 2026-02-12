@@ -181,6 +181,7 @@ export function RoutinePreviewSheet({
       repeatEnabled,
       repeatPattern: (repeatEnabled ? repeatPattern : 'daily') as 'daily' | 'weekly' | 'monthly',
       repeatInterval: 1,
+      repeatDays: (task as any).repeat_days || [],
       reminderEnabled: existing?.reminderEnabled ?? false,
       reminderTime: existing?.reminderTime || '09:00',
       tag: existing?.tag ?? defaultTag ?? routineTitle,

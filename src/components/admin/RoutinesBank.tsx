@@ -951,36 +951,36 @@ export default function RoutinesBank() {
                       ))}
                     </div>
 
-                    {/* Challenge Start Date Picker */}
-                    {formData.schedule_type === 'challenge' && (
-                      <div className="mt-3 space-y-1.5">
-                        <Label className="text-xs">Challenge Starts On</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !formData.challenge_start_date && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {formData.challenge_start_date 
-                                ? format(formData.challenge_start_date, 'PPP')
-                                : <span>Pick a start date (defaults to today)</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <CalendarComponent
-                              mode="single"
-                              selected={formData.challenge_start_date || undefined}
-                              onSelect={(date) => setFormData({ ...formData, challenge_start_date: date || null })}
-                              className={cn("p-3 pointer-events-auto")}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    )}
+                    {/* Start Date Picker - for all ritual types */}
+                    <div className="mt-3 space-y-1.5">
+                      <Label className="text-xs">
+                        {formData.schedule_type === 'challenge' ? 'Challenge Starts On' : 'Starts On'}
+                      </Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !formData.challenge_start_date && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {formData.challenge_start_date 
+                              ? format(formData.challenge_start_date, 'PPP')
+                              : <span>Pick a start date (defaults to today)</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={formData.challenge_start_date || undefined}
+                            onSelect={(date) => setFormData({ ...formData, challenge_start_date: date || null })}
+                            className={cn("p-3 pointer-events-auto")}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   </div>
 
                   {/* Summary stats */}
