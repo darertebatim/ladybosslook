@@ -72,10 +72,15 @@ export function taskAppliesToDate(
     return dayOfWeek === 0 || dayOfWeek === 6;
   }
 
-  // Weekly tasks - show on same day of week as original
-  if (task.repeat_pattern === 'weekly' && task.scheduled_date) {
-    const originalDay = parseISO(task.scheduled_date).getDay();
-    return dayOfWeek === originalDay;
+  // Weekly tasks - check repeat_days first, fall back to scheduled_date day
+  if (task.repeat_pattern === 'weekly') {
+    if (task.repeat_days && task.repeat_days.length > 0) {
+      return task.repeat_days.includes(dayOfWeek);
+    }
+    if (task.scheduled_date) {
+      const originalDay = parseISO(task.scheduled_date).getDay();
+      return dayOfWeek === originalDay;
+    }
   }
 
   // Monthly tasks - show on same day of month
