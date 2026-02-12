@@ -215,43 +215,18 @@ export const TaskQuickStartSheet = ({
             )}
 
             {/* Action buttons - visible when toggled OR searching */}
-            {(showIdeas || taskName.trim()) && (
-              <div className="px-4 pb-3 flex gap-2 tour-action-buttons">
-                <button
-                  onClick={handleRandomAction}
-                  disabled={isRolling}
-                  className={cn(
-                    "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-muted/50 hover:bg-muted border border-border/30 transition-all active:scale-[0.98]",
-                    isRolling && "opacity-70"
-                  )}
-                >
-                  <Dices className={cn("w-4 h-4 text-muted-foreground", isRolling && "animate-spin")} />
-                  <span className="text-sm font-medium text-foreground">
-                    {isRolling ? 'Rolling...' : 'Random'}
-                  </span>
-                </button>
-                <button
-                  onClick={handleBrowseAll}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-muted/50 hover:bg-muted border border-border/30 transition-all active:scale-[0.98]"
-                >
-                  <BookOpen className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-foreground">Browse All</span>
-                </button>
-              </div>
-            )}
-
             {/* Category Pills - only when browsing, not searching */}
             {(showIdeas || taskName.trim()) && !taskName.trim() && (
-              <div className="pb-3">
+              <div className="pb-2">
                 <ScrollArea className="w-full">
-                  <div className="flex gap-2 px-4">
+                  <div className="flex gap-1.5 px-4">
                     <button
                       onClick={() => {
                         haptic.light();
                         setSelectedCategory('popular');
                       }}
                       className={cn(
-                        "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0 border",
+                        "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
                         selectedCategory === 'popular'
                           ? "bg-primary/15 text-primary border-primary/30"
                           : "bg-muted text-foreground hover:bg-muted/80 border-transparent"
@@ -267,13 +242,13 @@ export const TaskQuickStartSheet = ({
                           setSelectedCategory(cat.slug);
                         }}
                         className={cn(
-                          "px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0 border",
+                          "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
                           selectedCategory === cat.slug
                             ? "bg-primary/15 text-primary border-primary/30"
                             : "bg-muted text-foreground hover:bg-muted/80 border-transparent"
                         )}
                       >
-                        {cat.emoji && <span className="mr-1">{cat.emoji}</span>}
+                        {cat.emoji && <span className="mr-0.5">{cat.emoji}</span>}
                         {cat.name}
                       </button>
                     ))}
@@ -282,70 +257,103 @@ export const TaskQuickStartSheet = ({
                 </ScrollArea>
               </div>
             )}
+
           </div>
 
           {/* Scrollable suggestions area */}
           <div className="flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
-            {(showIdeas || taskName.trim()) && filteredSuggestions.length > 0 && (
+            {(showIdeas || taskName.trim()) && (
               <div className="px-4 pb-4 tour-action-suggestions">
-                <p className="text-xs text-muted-foreground mb-2">
-                  {taskName.trim() ? 'Matching actions' : 'Suggestions'}
-                </p>
-                <div className="space-y-2 tour-action-list">
-                  {filteredSuggestions.map((template) => {
-                    const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
-                    const timePeriodLabel = template.time_period 
-                      ? TIME_PERIOD_LABELS[template.time_period] || template.time_period
-                      : 'Anytime';
+                {filteredSuggestions.length > 0 && (
+                  <>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      {taskName.trim() ? 'Matching actions' : 'Suggestions'}
+                    </p>
+                    <div className="space-y-2 tour-action-list">
+                      {filteredSuggestions.map((template) => {
+                        const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
+                        const timePeriodLabel = template.time_period 
+                          ? TIME_PERIOD_LABELS[template.time_period] || template.time_period
+                          : 'Anytime';
 
-                    return (
-                      <button 
-                        key={template.id}
-                        onClick={() => handleTemplateSelect(template)}
-                        className="w-full text-left rounded-xl border border-border/50 overflow-hidden active:scale-[0.98] transition-transform"
-                        style={{ backgroundColor: bgColor }}
-                      >
-                        <div className="flex items-center gap-3 p-3">
-                          <FluentEmoji emoji={template.emoji || '📝'} size={32} className="shrink-0" />
-                          
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-black truncate">{template.title}</p>
-                            <p className="text-xs text-black/70 truncate">
-                              {template.category}
-                              {template.repeat_pattern && template.repeat_pattern !== 'none' && (
-                                <span>
-                                  {' • '}
-                                  {template.repeat_pattern === 'daily' ? 'Daily' : 
-                                   template.repeat_pattern === 'weekly' ? 'Weekly' : 
-                                   template.repeat_pattern === 'monthly' ? 'Monthly' :
-                                   template.repeat_pattern === 'weekend' ? 'Weekends' : ''}
-                                </span>
-                              )}
-                              {(!template.repeat_pattern || template.repeat_pattern === 'none') && (
-                                <span>{' • '}Once</span>
-                              )}
-                              <span>{' • '}{timePeriodLabel}</span>
-                            </p>
-                          </div>
-
-                          <div
-                            className="shrink-0 p-2.5 rounded-full bg-foreground"
-                            aria-hidden="true"
+                        return (
+                          <button 
+                            key={template.id}
+                            onClick={() => handleTemplateSelect(template)}
+                            className="w-full text-left rounded-xl border border-border/50 overflow-hidden active:scale-[0.98] transition-transform"
+                            style={{ backgroundColor: bgColor }}
                           >
-                            <CalendarPlus className="h-5 w-5 text-background" />
-                          </div>
-                        </div>
+                            <div className="flex items-center gap-3 p-3">
+                              <FluentEmoji emoji={template.emoji || '📝'} size={32} className="shrink-0" />
+                              
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-black truncate">{template.title}</p>
+                                <p className="text-xs text-black/70 truncate">
+                                  {template.category}
+                                  {template.repeat_pattern && template.repeat_pattern !== 'none' && (
+                                    <span>
+                                      {' • '}
+                                      {template.repeat_pattern === 'daily' ? 'Daily' : 
+                                       template.repeat_pattern === 'weekly' ? 'Weekly' : 
+                                       template.repeat_pattern === 'monthly' ? 'Monthly' :
+                                       template.repeat_pattern === 'weekend' ? 'Weekends' : ''}
+                                    </span>
+                                  )}
+                                  {(!template.repeat_pattern || template.repeat_pattern === 'none') && (
+                                    <span>{' • '}Once</span>
+                                  )}
+                                  <span>{' • '}{timePeriodLabel}</span>
+                                </p>
+                              </div>
 
-                        {template.description && (
-                          <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
-                            <p className="text-xs text-black/80 leading-relaxed line-clamp-2">
-                              {template.description}
-                            </p>
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
+                              <div
+                                className="shrink-0 p-2.5 rounded-full bg-foreground"
+                                aria-hidden="true"
+                              >
+                                <CalendarPlus className="h-5 w-5 text-background" />
+                              </div>
+                            </div>
+
+                            {template.description && (
+                              <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
+                                <p className="text-xs text-black/80 leading-relaxed line-clamp-2">
+                                  {template.description}
+                                </p>
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+
+                {/* Random & Browse All as wide list items */}
+                <div className="tour-action-buttons space-y-2 mt-3">
+                  <button
+                    onClick={handleRandomAction}
+                    disabled={isRolling}
+                    className={cn(
+                      "w-full flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-muted/40 hover:bg-muted/60 transition-all active:scale-[0.98]",
+                      isRolling && "opacity-70"
+                    )}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                      <Dices className={cn("w-4 h-4 text-muted-foreground", isRolling && "animate-spin")} />
+                    </div>
+                    <span className="text-sm font-medium text-foreground">
+                      {isRolling ? 'Rolling...' : 'Random Action'}
+                    </span>
+                  </button>
+                  <button
+                    onClick={handleBrowseAll}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-muted/40 hover:bg-muted/60 transition-all active:scale-[0.98]"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                      <BookOpen className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <span className="text-sm font-medium text-foreground">Browse All Rituals</span>
+                  </button>
                 </div>
               </div>
             )}
