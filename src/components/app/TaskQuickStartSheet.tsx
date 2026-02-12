@@ -264,6 +264,34 @@ export const TaskQuickStartSheet = ({
           <div className="flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
             {(showIdeas || taskName.trim()) && (
               <div className="px-4 pb-4 tour-action-suggestions">
+                {/* Random & Browse All - above suggestions */}
+                <div className="tour-action-buttons space-y-2 mb-3">
+                  <button
+                    onClick={handleRandomAction}
+                    disabled={isRolling}
+                    className={cn(
+                      "w-full flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-muted/40 hover:bg-muted/60 transition-all active:scale-[0.98]",
+                      isRolling && "opacity-70"
+                    )}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                      <Dices className={cn("w-4 h-4 text-muted-foreground", isRolling && "animate-spin")} />
+                    </div>
+                    <span className="text-sm font-medium text-foreground">
+                      {isRolling ? 'Rolling...' : 'Random Action'}
+                    </span>
+                  </button>
+                  <button
+                    onClick={handleBrowseAll}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-muted/40 hover:bg-muted/60 transition-all active:scale-[0.98]"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                      <BookOpen className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <span className="text-sm font-medium text-foreground">Browse All Rituals</span>
+                  </button>
+                </div>
+
                 {filteredSuggestions.length > 0 && (
                   <>
                     <p className="text-xs text-muted-foreground mb-2">
@@ -327,34 +355,6 @@ export const TaskQuickStartSheet = ({
                     </div>
                   </>
                 )}
-
-                {/* Random & Browse All as wide list items */}
-                <div className="tour-action-buttons space-y-2 mt-3">
-                  <button
-                    onClick={handleRandomAction}
-                    disabled={isRolling}
-                    className={cn(
-                      "w-full flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-muted/40 hover:bg-muted/60 transition-all active:scale-[0.98]",
-                      isRolling && "opacity-70"
-                    )}
-                  >
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                      <Dices className={cn("w-4 h-4 text-muted-foreground", isRolling && "animate-spin")} />
-                    </div>
-                    <span className="text-sm font-medium text-foreground">
-                      {isRolling ? 'Rolling...' : 'Random Action'}
-                    </span>
-                  </button>
-                  <button
-                    onClick={handleBrowseAll}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-muted/40 hover:bg-muted/60 transition-all active:scale-[0.98]"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                      <BookOpen className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <span className="text-sm font-medium text-foreground">Browse All Rituals</span>
-                  </button>
-                </div>
               </div>
             )}
 
