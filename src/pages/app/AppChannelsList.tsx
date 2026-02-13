@@ -145,7 +145,7 @@ export default function AppChannelsList() {
                   </span>
                 )}
                 {supportUnreadCount > 0 && (
-                  <Badge className="h-5 min-w-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
+                  <Badge className="h-5 min-w-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-semibold">
                     {supportUnreadCount > 99 ? '99+' : supportUnreadCount}
                   </Badge>
                 )}
