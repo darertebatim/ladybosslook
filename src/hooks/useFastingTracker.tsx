@@ -294,11 +294,20 @@ export function useFastingTracker() {
       } as any, { onConflict: 'user_id' });
   }, [user]);
 
+  const setCustomHours = useCallback((hours: number) => {
+    setState(prev => ({
+      ...prev,
+      selectedProtocol: 'custom',
+      selectedFastingHours: hours,
+    }));
+  }, []);
+
   return {
     ...state,
     startFast,
     endFast,
     deleteFast,
     setProtocol,
+    setCustomHours,
   };
 }
