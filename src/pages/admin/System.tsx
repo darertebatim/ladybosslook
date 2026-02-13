@@ -302,7 +302,7 @@ export default function System() {
                 Complete Reset (Admin Testing)
               </CardTitle>
               <CardDescription>
-                Reset all user data to simulate a fresh "day one" experience. This clears tasks, journal entries, chat history, wallet credits, and all other user-associated data.
+                Reset all user data to simulate a fresh "day one" experience. This clears actions, journal entries, chat history, wallet credits, and all other user-associated data.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -316,7 +316,7 @@ export default function System() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete all your user data including tasks, journal entries, chat messages, wallet credits, and all progress.
+                      This action cannot be undone. This will permanently delete all your user data including actions, journal entries, chat messages, wallet credits, and all progress.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

@@ -248,7 +248,7 @@ function CategoriesManager() {
             <FolderOpen className="h-5 w-5 text-blue-500" />
             Categories
           </CardTitle>
-          <CardDescription>Organize routines into categories</CardDescription>
+          <CardDescription>Organize rituals into categories</CardDescription>
         </div>
         <Button onClick={handleOpenCreate} size="sm">
           <Plus className="h-4 w-4 mr-2" />

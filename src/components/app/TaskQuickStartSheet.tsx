@@ -91,7 +91,7 @@ export const TaskQuickStartSheet = ({
   const handleBrowseAll = () => {
     haptic.light();
     onOpenChange(false);
-    navigate('/app/routines');
+    navigate('/app/rituals');
   };
 
   const handleClose = () => {

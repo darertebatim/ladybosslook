@@ -2,7 +2,7 @@ import React, { Suspense, lazy, useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -240,6 +240,12 @@ const NativeAppRedirect = () => {
   return null;
 };
 
+// Redirect component for old /app/routines/:planId routes
+const RoutineRedirect = () => {
+  const { planId } = useParams();
+  return <Navigate to={`/app/rituals/${planId}`} replace />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <HelmetProvider>
@@ -350,8 +356,11 @@ const App = () => (
                     {/* Redirect old feed route */}
                     <Route path="feed" element={<Navigate to="/app/channels" replace />} />
                     <Route path="journal" element={<AppJournal />} />
-                    <Route path="routines" element={<AppInspire />} />
-                    <Route path="routines/:planId" element={<AppInspireDetail />} />
+                    <Route path="rituals" element={<AppInspire />} />
+                    <Route path="rituals/:planId" element={<AppInspireDetail />} />
+                    {/* Redirects for backward compatibility with older app versions */}
+                    <Route path="routines" element={<Navigate to="/app/rituals" replace />} />
+                    <Route path="routines/:planId" element={<RoutineRedirect />} />
                     <Route path="profile" element={<AppProfile />} />
                     {/* Legacy routes - redirect to home */}
                   </Route>

@@ -407,21 +407,21 @@ export function PromoBannerManager() {
     switch (banner.destination_type) {
       case 'routine':
         const routine = routines?.find(r => r.id === banner.destination_id);
-        return routine?.title || 'Unknown Routine';
+        return routine?.title || 'Unknown Ritual';
       case 'playlist':
         const playlist = playlists?.find(p => p.id === banner.destination_id);
         return playlist?.name || 'Unknown Playlist';
       case 'tasks':
         const task = taskTemplates?.find(t => t.id === banner.destination_id);
-        return task ? `${task.emoji} ${task.title}` : 'Unknown Task';
+        return task ? `${task.emoji} ${task.title}` : 'Unknown Action';
       case 'routines_hub':
         const routineBank = routinesBank?.find(r => r.id === banner.destination_id);
-        return routineBank ? `${routineBank.emoji || '📋'} ${routineBank.title}` : 'Unknown Routine';
+        return routineBank ? `${routineBank.emoji || '📋'} ${routineBank.title}` : 'Unknown Ritual';
       case 'breathe_exercise':
         const exercise = breathingExercises?.find(e => e.id === banner.destination_id);
         return exercise ? `${exercise.emoji || '🫁'} ${exercise.name}` : 'Unknown Exercise';
       case 'tasks_bank':
-        return 'Tasks Bank Page';
+        return 'Actions Bank Page';
       case 'journal':
         return 'Journal';
       case 'programs':
@@ -435,7 +435,7 @@ export function PromoBannerManager() {
       case 'home':
         return 'Home Page';
       case 'inspire':
-        return 'Inspire / Routines';
+        return 'Inspire / Rituals';
       case 'emotion':
         return 'Emotion Tracker';
       case 'period':
@@ -445,7 +445,7 @@ export function PromoBannerManager() {
       case 'profile':
         return 'Profile / Settings';
       case 'planner':
-        return 'Task Planner';
+        return 'Action Planner';
       case 'custom_url':
         return banner.custom_url || 'Custom URL';
       case 'external_url':
@@ -581,7 +581,7 @@ export function PromoBannerManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="home_top">🏠 Home - Above Tasks</SelectItem>
+                    <SelectItem value="home_top">🏠 Home - Above Actions</SelectItem>
                     <SelectItem value="home_rituals">🏠 Home - After Rituals</SelectItem>
                     <SelectItem value="explore">🔍 Explore Page</SelectItem>
                     <SelectItem value="listen">🎧 Listen Page</SelectItem>
@@ -652,12 +652,12 @@ export function PromoBannerManager() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="home">🏠 Home</SelectItem>
-                    <SelectItem value="inspire">✨ Inspire / Routines Hub</SelectItem>
-                    <SelectItem value="routine">📋 Routine Plan (specific)</SelectItem>
-                    <SelectItem value="routines_hub">📚 Routine Bank (specific)</SelectItem>
-                    <SelectItem value="tasks_bank">📝 Tasks Bank Page</SelectItem>
-                    <SelectItem value="tasks">☑️ Task Template (specific)</SelectItem>
-                    <SelectItem value="planner">📅 Task Planner</SelectItem>
+                    <SelectItem value="inspire">✨ Inspire / Rituals Hub</SelectItem>
+                    <SelectItem value="routine">📋 Ritual Plan (specific)</SelectItem>
+                    <SelectItem value="routines_hub">📚 Ritual Bank (specific)</SelectItem>
+                    <SelectItem value="tasks_bank">📝 Actions Bank Page</SelectItem>
+                    <SelectItem value="tasks">☑️ Action Template (specific)</SelectItem>
+                    <SelectItem value="planner">📅 Action Planner</SelectItem>
                     <SelectItem value="playlist">🎧 Playlist (specific)</SelectItem>
                     <SelectItem value="programs">🎓 Programs / Store</SelectItem>
                     <SelectItem value="journal">📔 Journal</SelectItem>
@@ -679,10 +679,10 @@ export function PromoBannerManager() {
               {['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise'].includes(destinationType) && (
                 <div className="space-y-2">
                   <Label>
-                    {destinationType === 'routine' && 'Select Routine Plan'}
+                    {destinationType === 'routine' && 'Select Ritual Plan'}
                     {destinationType === 'playlist' && 'Select Playlist'}
-                    {destinationType === 'tasks' && 'Select Task Template'}
-                    {destinationType === 'routines_hub' && 'Select Routine from Bank'}
+                    {destinationType === 'tasks' && 'Select Action Template'}
+                    {destinationType === 'routines_hub' && 'Select Ritual from Bank'}
                     {destinationType === 'breathe_exercise' && 'Select Breathing Exercise'}
                   </Label>
                   <Select value={destinationId} onValueChange={setDestinationId}>

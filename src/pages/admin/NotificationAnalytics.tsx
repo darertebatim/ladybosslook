@@ -238,7 +238,7 @@ export default function NotificationAnalytics() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All types</SelectItem>
-                <SelectItem value="task_reminder">Task Reminder</SelectItem>
+                <SelectItem value="task_reminder">Action Reminder</SelectItem>
                 <SelectItem value="urgent_alarm">Urgent Alarm</SelectItem>
                 <SelectItem value="session_reminder">Session Reminder</SelectItem>
                 <SelectItem value="content_reminder">Content Reminder</SelectItem>

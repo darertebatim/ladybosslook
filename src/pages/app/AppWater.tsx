@@ -257,7 +257,7 @@ const AppWater = () => {
           {/* No routine notice */}
           {!waterTask && (
             <p className="mt-4 text-sm text-sky-600/80 text-center">
-              Add to routine to track daily
+              Add to ritual to track daily
             </p>
           )}
         </div>

@@ -856,7 +856,7 @@ const AppTaskCreate = ({
                 focusedInputRef.current = e.target;
               }
             }}
-            placeholder="Task name"
+            placeholder="Action name"
             className="w-full text-lg font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0 pr-6"
             maxLength={50}
           />

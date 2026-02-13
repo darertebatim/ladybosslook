@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 const QUICK_ACTIONS = [
   { label: 'Draft announcement', prompt: 'Help me write an announcement for my community' },
   { label: 'Session reminder', prompt: 'Write a session reminder for tomorrow\'s class' },
-  { label: 'Create routine', prompt: 'Create a morning wellness routine with 5 tasks' },
+  { label: 'Create ritual', prompt: 'Create a morning wellness ritual with 5 actions' },
   { label: 'Push notification', prompt: 'Write a short push notification to engage users' },
 ];
 

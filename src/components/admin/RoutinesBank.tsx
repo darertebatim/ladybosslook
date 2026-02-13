@@ -514,7 +514,7 @@ export default function RoutinesBank() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Delete this routine?')) {
+    if (confirm('Delete this ritual?')) {
       deleteRoutine.mutate(id);
     }
   };
@@ -1282,7 +1282,7 @@ export default function RoutinesBank() {
                               <div className="relative">
                                 <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                  placeholder="Search tasks..."
+                                  placeholder="Search actions..."
                                   value={taskSearch}
                                   onChange={(e) => setTaskSearch(e.target.value)}
                                   className="pl-8 h-8 text-sm"
@@ -1420,7 +1420,7 @@ export default function RoutinesBank() {
                             <div className="relative">
                               <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
                               <Input
-                                placeholder="Search tasks..."
+                                placeholder="Search actions..."
                                 value={taskSearch}
                                 onChange={(e) => setTaskSearch(e.target.value)}
                                 className="pl-8 h-8 text-sm"
