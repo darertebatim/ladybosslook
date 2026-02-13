@@ -13,6 +13,8 @@ interface FastingSession {
   created_at: string;
 }
 
+export type FastingMode = 'idle' | 'fasting' | 'eating';
+
 interface FastingState {
   activeSession: FastingSession | null;
   selectedProtocol: string;
@@ -22,6 +24,12 @@ interface FastingState {
   progress: number;
   pastSessions: FastingSession[];
   isLoading: boolean;
+  // Eating window
+  mode: FastingMode;
+  eatingElapsedSeconds: number;
+  eatingTotalSeconds: number;
+  eatingEndTime: Date | null;
+  lastEndedSession: FastingSession | null;
 }
 
 export function useFastingTracker() {
@@ -35,9 +43,38 @@ export function useFastingTracker() {
     progress: 0,
     pastSessions: [],
     isLoading: true,
+    mode: 'idle',
+    eatingElapsedSeconds: 0,
+    eatingTotalSeconds: 0,
+    eatingEndTime: null,
+    lastEndedSession: null,
   });
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const prevZoneRef = useRef<string>('');
+
+  // Compute eating window from the most recent completed session
+  const computeEatingWindow = useCallback((session: FastingSession): { mode: FastingMode; eatingElapsed: number; eatingTotal: number; eatingEnd: Date | null } => {
+    if (!session.ended_at) return { mode: 'idle', eatingElapsed: 0, eatingTotal: 0, eatingEnd: null };
+    
+    const protocol = FASTING_PROTOCOLS.find(p => p.id === session.protocol);
+    const fastingHours = session.fasting_hours;
+    const eatingHours = 24 - fastingHours;
+    
+    if (eatingHours <= 0) return { mode: 'idle', eatingElapsed: 0, eatingTotal: 0, eatingEnd: null };
+    
+    const endedAt = new Date(session.ended_at).getTime();
+    const eatingEndTime = new Date(endedAt + eatingHours * 3600000);
+    const now = Date.now();
+    
+    if (now >= eatingEndTime.getTime()) {
+      return { mode: 'idle', eatingElapsed: 0, eatingTotal: 0, eatingEnd: null };
+    }
+    
+    const eatingElapsed = Math.floor((now - endedAt) / 1000);
+    const eatingTotal = eatingHours * 3600;
+    
+    return { mode: 'eating', eatingElapsed, eatingTotal, eatingEnd: eatingEndTime };
+  }, []);
 
   // Load active session and preferences
   useEffect(() => {
@@ -69,6 +106,25 @@ export function useFastingTracker() {
       const pref = (prefRes.data as any)?.[0];
       const history = (histRes.data as any) || [];
 
+      // Check if most recent completed session has an active eating window
+      let mode: FastingMode = 'idle';
+      let eatingElapsed = 0;
+      let eatingTotal = 0;
+      let eatingEnd: Date | null = null;
+      let lastEnded: FastingSession | null = null;
+
+      if (active) {
+        mode = 'fasting';
+      } else if (history.length > 0) {
+        const lastSession = history[0] as FastingSession;
+        const eating = computeEatingWindow(lastSession);
+        mode = eating.mode;
+        eatingElapsed = eating.eatingElapsed;
+        eatingTotal = eating.eatingTotal;
+        eatingEnd = eating.eatingEnd;
+        if (eating.mode === 'eating') lastEnded = lastSession;
+      }
+
       setState(prev => ({
         ...prev,
         activeSession: active,
@@ -76,45 +132,78 @@ export function useFastingTracker() {
         selectedFastingHours: pref?.default_fasting_hours || 16,
         pastSessions: history,
         isLoading: false,
+        mode,
+        eatingElapsedSeconds: eatingElapsed,
+        eatingTotalSeconds: eatingTotal,
+        eatingEndTime: eatingEnd,
+        lastEndedSession: lastEnded,
       }));
     };
     load();
-  }, [user]);
+  }, [user, computeEatingWindow]);
 
-  // Timer tick
+  // Timer tick — handles both fasting and eating modes
   useEffect(() => {
-    if (!state.activeSession) {
+    if (state.mode === 'idle') {
       if (intervalRef.current) clearInterval(intervalRef.current);
       return;
     }
 
     const tick = () => {
-      const startedAt = new Date(state.activeSession!.started_at).getTime();
-      const now = Date.now();
-      const elapsed = Math.floor((now - startedAt) / 1000);
-      const elapsedHours = elapsed / 3600;
-      const zone = getCurrentZone(elapsedHours);
-      const targetSeconds = state.activeSession!.fasting_hours * 3600;
-      const progress = Math.min(elapsed / targetSeconds, 1);
+      if (state.mode === 'fasting' && state.activeSession) {
+        const startedAt = new Date(state.activeSession.started_at).getTime();
+        const now = Date.now();
+        const elapsed = Math.floor((now - startedAt) / 1000);
+        const elapsedHours = elapsed / 3600;
+        const zone = getCurrentZone(elapsedHours);
+        const targetSeconds = state.activeSession.fasting_hours * 3600;
+        const progress = Math.min(elapsed / targetSeconds, 1);
 
-      // Haptic on zone change
-      if (zone.id !== prevZoneRef.current && prevZoneRef.current !== '') {
-        haptic.success();
+        if (zone.id !== prevZoneRef.current && prevZoneRef.current !== '') {
+          haptic.success();
+        }
+        prevZoneRef.current = zone.id;
+
+        setState(prev => ({
+          ...prev,
+          elapsedSeconds: elapsed,
+          currentZone: zone,
+          progress,
+        }));
+      } else if (state.mode === 'eating' && state.lastEndedSession?.ended_at) {
+        const endedAt = new Date(state.lastEndedSession.ended_at).getTime();
+        const eatingHours = 24 - state.lastEndedSession.fasting_hours;
+        const eatingEndMs = endedAt + eatingHours * 3600000;
+        const now = Date.now();
+
+        if (now >= eatingEndMs) {
+          // Eating window ended
+          setState(prev => ({
+            ...prev,
+            mode: 'idle',
+            eatingElapsedSeconds: 0,
+            eatingTotalSeconds: 0,
+            eatingEndTime: null,
+            lastEndedSession: null,
+          }));
+          return;
+        }
+
+        const eatingElapsed = Math.floor((now - endedAt) / 1000);
+        const eatingTotal = eatingHours * 3600;
+
+        setState(prev => ({
+          ...prev,
+          eatingElapsedSeconds: eatingElapsed,
+          eatingTotalSeconds: eatingTotal,
+        }));
       }
-      prevZoneRef.current = zone.id;
-
-      setState(prev => ({
-        ...prev,
-        elapsedSeconds: elapsed,
-        currentZone: zone,
-        progress,
-      }));
     };
 
     tick();
     intervalRef.current = setInterval(tick, 1000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [state.activeSession]);
+  }, [state.mode, state.activeSession, state.lastEndedSession]);
 
   const startFast = useCallback(async () => {
     if (!user) return;
@@ -131,7 +220,15 @@ export function useFastingTracker() {
       .single();
 
     if (!error && data) {
-      setState(prev => ({ ...prev, activeSession: data as any }));
+      setState(prev => ({
+        ...prev,
+        activeSession: data as any,
+        mode: 'fasting',
+        eatingElapsedSeconds: 0,
+        eatingTotalSeconds: 0,
+        eatingEndTime: null,
+        lastEndedSession: null,
+      }));
     }
   }, [user, state.selectedProtocol, state.selectedFastingHours]);
 
@@ -146,6 +243,10 @@ export function useFastingTracker() {
 
     if (!error) {
       const ended = { ...state.activeSession, ended_at: endedAt };
+      
+      // Compute eating window for the just-ended session
+      const eating = computeEatingWindow(ended);
+      
       setState(prev => ({
         ...prev,
         activeSession: null,
@@ -153,11 +254,16 @@ export function useFastingTracker() {
         progress: 0,
         currentZone: getCurrentZone(0),
         pastSessions: [ended, ...prev.pastSessions],
+        mode: eating.mode,
+        eatingElapsedSeconds: eating.eatingElapsed,
+        eatingTotalSeconds: eating.eatingTotal,
+        eatingEndTime: eating.eatingEnd,
+        lastEndedSession: eating.mode === 'eating' ? ended : null,
       }));
       return ended;
     }
     return null;
-  }, [user, state.activeSession]);
+  }, [user, state.activeSession, computeEatingWindow]);
 
   const deleteFast = useCallback(async (sessionId: string) => {
     if (!user) return;
