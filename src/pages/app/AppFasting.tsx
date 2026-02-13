@@ -52,6 +52,7 @@ export default function AppFasting() {
     endFast,
     deleteFast,
     setProtocol,
+    setCustomHours,
   } = useFastingTracker();
 
   const [protocolOpen, setProtocolOpen] = useState(false);
@@ -212,6 +213,7 @@ export default function AppFasting() {
         onOpenChange={setProtocolOpen}
         selectedProtocol={selectedProtocol}
         onSelect={setProtocol}
+        onSelectCustom={setCustomHours}
       />
       <FastingZonesSheet
         open={zonesOpen}
