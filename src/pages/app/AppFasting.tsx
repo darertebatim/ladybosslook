@@ -112,7 +112,7 @@ export default function AppFasting() {
         className="flex items-center justify-between px-4 pb-2"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
       >
-        <BackButton />
+        <BackButton to="/app/home" />
         <h1 className="font-semibold text-lg">Fasting</h1>
         <button
           onClick={() => setStatsOpen(true)}
@@ -175,8 +175,8 @@ export default function AppFasting() {
         {/* Protocol pill */}
         <button
           onClick={() => setProtocolOpen(true)}
-          className="w-12 h-12 rounded-full flex items-center justify-center text-white text-sm font-bold active:scale-95 transition-transform shadow-sm"
-          style={{ backgroundColor: currentProtocol?.color || '#8B5CF6' }}
+          className="w-12 h-12 rounded-full flex items-center justify-center text-foreground text-xs font-bold active:scale-95 transition-transform shadow-sm border border-border/30"
+          style={{ backgroundColor: currentProtocol?.color || '#FFF59D' }}
         >
           {currentProtocol?.label || '16h'}
         </button>
