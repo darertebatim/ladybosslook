@@ -6,7 +6,7 @@ import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, M
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
-import { useTasksForDate, useCompletionsForDate, useCompletedDates, useUserStreak, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate, useSetStreakGoal } from '@/hooks/useTaskPlanner';
+import { useTasksForDate, useCompletionsForDate, useCompletedDates, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate, useSetStreakGoal } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { useNewHomeData } from '@/hooks/useNewHomeData';
 import { TaskCard } from '@/components/app/TaskCard';
@@ -160,9 +160,7 @@ const AppHome = () => {
   const {
     data: skippedTaskIds = new Set<string>()
   } = useSkipsForDate(selectedDate);
-  const {
-    data: streak
-  } = useUserStreak();
+  // Streak data now comes from useNewHomeData (consolidated RPC)
   const {
     data: programEvents = [],
     isLoading: programEventsLoading
@@ -171,12 +169,13 @@ const AppHome = () => {
     data: weeklyCompletion
   } = useWeeklyTaskCompletion();
 
-  // Home data for stats and rounds
+  // Home data for stats and rounds (consolidated RPC - includes streak)
   const homeDataQuery = useNewHomeData();
   const {
     isNewUser: dataIsNewUser = false,
     totalCompletions = 0,
     isLoading: homeDataLoading,
+    streak = null,
     ...homeData
   } = homeDataQuery;
   
