@@ -1,7 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format, parseISO, differenceInDays, startOfMonth, startOfDay } from 'date-fns';
+import { useEffect, useRef } from 'react';
+import { Capacitor } from '@capacitor/core';
 
 /**
  * User presence data - replaces streak-based metrics with "depth of return" philosophy
@@ -10,11 +12,14 @@ import { format, parseISO, differenceInDays, startOfMonth, startOfDay } from 'da
  * - No "streak broken" anxiety
  * - Returning after a gap is celebrated, not punished
  * - Measures strength through return, not continuity
+ * 
+ * Returns: Now counts every app open/resume, encouraging healthy habit of
+ * coming back to Simora instead of scrolling social media.
  */
 
 export interface UserPresence {
   totalActiveDays: number;      // All-time count of unique days with activity
-  returnCount: number;          // Number of times returned after 2+ day gap
+  returnCount: number;          // Number of times user opened/returned to the app
   lastActiveDate: string | null; // Last date user showed up
   thisMonthActiveDays: number;  // Days active in current month
   showedUpToday: boolean;       // Did user show up today?
@@ -92,7 +97,6 @@ export async function updatePresence(userId: string, completedDateStr: string): 
 
   // Default values
   let totalActiveDays = profile?.total_active_days || 0;
-  let returnCount = profile?.return_count || 0;
   let thisMonthActiveDays = profile?.this_month_active_days || 0;
   const lastActive = profile?.last_active_date;
 
@@ -119,7 +123,7 @@ export async function updatePresence(userId: string, completedDateStr: string): 
   totalActiveDays += 1;
   thisMonthActiveDays += 1;
 
-  // Check if this is a "return" (gap > 2 days)
+  // Check if this is a "return" (gap > 2 days) for welcome-back messaging
   let isReturn = false;
   if (lastActive) {
     const daysSinceActive = differenceInDays(
@@ -127,17 +131,13 @@ export async function updatePresence(userId: string, completedDateStr: string): 
       startOfDay(parseISO(lastActive))
     );
     isReturn = daysSinceActive > 2;
-    if (isReturn) {
-      returnCount += 1;
-    }
   }
 
-  // Update profile
+  // Update profile (return_count is now managed separately by useTrackAppReturn)
   await supabase
     .from('profiles')
     .update({
       total_active_days: totalActiveDays,
-      return_count: returnCount,
       last_active_date: today,
       this_month_active_days: thisMonthActiveDays,
     })
@@ -160,6 +160,65 @@ export async function updatePresence(userId: string, completedDateStr: string): 
     message
   };
 }
+
+/**
+ * Track app returns - increments return_count every time the app opens or resumes.
+ * Encourages healthy habit of coming back to Simora instead of scrolling social media.
+ */
+export const useTrackAppReturn = (userId: string | undefined) => {
+  const queryClient = useQueryClient();
+  const hasTrackedMount = useRef(false);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const incrementReturn = async () => {
+      try {
+        // Use raw RPC-free approach: read current, increment, write
+        const { data } = await supabase
+          .from('profiles')
+          .select('return_count')
+          .eq('id', userId)
+          .maybeSingle();
+        
+        const current = data?.return_count || 0;
+        await supabase
+          .from('profiles')
+          .update({ return_count: current + 1 })
+          .eq('id', userId);
+        
+        queryClient.invalidateQueries({ queryKey: ['user-presence'] });
+        queryClient.invalidateQueries({ queryKey: ['presence-stats'] });
+      } catch (e) {
+        console.warn('[TrackAppReturn] Failed to increment:', e);
+      }
+    };
+
+    // Track initial app open (only once per mount)
+    if (!hasTrackedMount.current) {
+      hasTrackedMount.current = true;
+      incrementReturn();
+    }
+
+    // Track returns from background (Capacitor native only)
+    if (Capacitor.isNativePlatform()) {
+      let listener: any;
+      import('@capacitor/app').then(({ App }) => {
+        listener = App.addListener('appStateChange', ({ isActive }) => {
+          if (isActive) {
+            incrementReturn();
+          }
+        });
+      }).catch(() => {});
+      
+      return () => {
+        if (listener) {
+          listener.then?.((l: any) => l.remove());
+        }
+      };
+    }
+  }, [userId, queryClient]);
+};
 
 /**
  * Calculate monthly presence from a list of entries with dates

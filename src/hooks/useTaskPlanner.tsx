@@ -1420,7 +1420,8 @@ export const useSetStreakGoal = () => {
         .update({
           streak_goal: goal,
           streak_goal_set_at: new Date().toISOString(),
-        })
+          streak_goal_completed_at: null, // Reset completion when upgrading
+        } as any)
         .eq('user_id', user.id);
 
       if (error) throw error;
@@ -1428,6 +1429,7 @@ export const useSetStreakGoal = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
+      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
     },
     onError: (error) => {
       console.error('Set streak goal error:', error);
