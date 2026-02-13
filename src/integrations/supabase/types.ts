@@ -2540,6 +2540,9 @@ export type Database = {
           created_at: string
           description: string | null
           display_order: number
+          end_after_days: number | null
+          end_date: string | null
+          end_mode: string
           estimated_minutes: number
           icon: string
           id: string
@@ -2560,6 +2563,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_order?: number
+          end_after_days?: number | null
+          end_date?: string | null
+          end_mode?: string
           estimated_minutes?: number
           icon?: string
           id?: string
@@ -2580,6 +2586,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_order?: number
+          end_after_days?: number | null
+          end_date?: string | null
+          end_mode?: string
           estimated_minutes?: number
           icon?: string
           id?: string
@@ -2675,6 +2684,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           emoji: string | null
+          end_after_days: number | null
+          end_date: string | null
+          end_mode: string
           id: string
           is_active: boolean | null
           is_popular: boolean | null
@@ -2694,6 +2706,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           emoji?: string | null
+          end_after_days?: number | null
+          end_date?: string | null
+          end_mode?: string
           id?: string
           is_active?: boolean | null
           is_popular?: boolean | null
@@ -2713,6 +2728,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           emoji?: string | null
+          end_after_days?: number | null
+          end_date?: string | null
+          end_mode?: string
           id?: string
           is_active?: boolean | null
           is_popular?: boolean | null

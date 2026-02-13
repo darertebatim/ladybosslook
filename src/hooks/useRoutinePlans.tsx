@@ -376,6 +376,7 @@ export function useAddRoutinePlan() {
       let planIcon = '✨';
       let planCategoryName: string | null = null;
       let planScheduleType = 'daily';
+      let planEndDate: string | null = null;
 
       if (isSyntheticPlan && syntheticTasks) {
         // Use the provided synthetic tasks directly
@@ -401,6 +402,16 @@ export function useAddRoutinePlan() {
         planIcon = plan.icon;
         planCategoryName = plan.category?.name;
         planScheduleType = (plan as any).schedule_type || 'daily';
+        
+        // Calculate the effective end date
+        const endMode = (plan as any).end_mode || 'never';
+        if (endMode === 'date' && (plan as any).end_date) {
+          planEndDate = (plan as any).end_date;
+        } else if (endMode === 'after_days' && (plan as any).end_after_days) {
+          const endDateObj = new Date();
+          endDateObj.setDate(endDateObj.getDate() + (plan as any).end_after_days);
+          planEndDate = getLocalDateStr(endDateObj);
+        }
 
         // Get plan tasks with linked playlist info
         const { data: allTasks, error: tasksError } = await supabase
@@ -476,6 +487,7 @@ export function useAddRoutinePlan() {
             pro_link_value: proLinkValue,
             is_active: true,
             order_index: startOrderIndex + index,
+            repeat_end_date: planEndDate,
           };
         });
 

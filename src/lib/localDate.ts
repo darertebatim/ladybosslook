@@ -38,6 +38,7 @@ export function taskAppliesToDate(
     repeat_pattern: string;
     repeat_days: number[] | null;
     created_at?: string;
+    repeat_end_date?: string | null;
   },
   dateStr: string
 ): boolean {
@@ -50,6 +51,11 @@ export function taskAppliesToDate(
     if (taskCreatedLocalDate > dateStr) {
       return false;
     }
+  }
+
+  // Check if task has ended (repeat_end_date)
+  if (task.repeat_end_date && dateStr > task.repeat_end_date) {
+    return false;
   }
 
   // Non-repeating tasks - only show on scheduled date
