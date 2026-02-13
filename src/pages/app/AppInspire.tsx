@@ -314,7 +314,7 @@ export default function AppInspire() {
                     <RoutineBankCard
                       key={routine.id}
                       routine={routine}
-                      onClick={() => navigate(`/app/routines/${routine.id}`)}
+                      onClick={() => navigate(`/app/rituals/${routine.id}`)}
                       className={index === 0 ? 'tour-ritual-card' : undefined}
                     />
                   ))}

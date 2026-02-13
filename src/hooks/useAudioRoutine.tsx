@@ -84,7 +84,7 @@ export function useQuickAddAudioTask() {
       toast.success("Added to your rituals! 🎧");
     },
     onError: () => {
-      toast.error("Failed to add to routine");
+      toast.error("Failed to add to ritual");
     },
   });
 }

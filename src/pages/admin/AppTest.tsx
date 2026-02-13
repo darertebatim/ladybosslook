@@ -565,8 +565,8 @@ export default function AppTest() {
                 Loading
               </Button>
               <Button 
-                onClick={() => toast('Task completed!', {
-                  description: 'You earned 10 points for completing this task.',
+                onClick={() => toast('Action completed!', {
+                  description: 'You earned 10 points for completing this action.',
                   action: {
                     label: 'Undo',
                     onClick: () => console.log('Undo clicked'),

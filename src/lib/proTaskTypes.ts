@@ -257,7 +257,7 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
     case 'planner':
       return '/app/home';
     case 'inspire':
-      return linkValue ? `/app/routines/${linkValue}` : '/app/routines';
+      return linkValue ? `/app/rituals/${linkValue}` : '/app/rituals';
     case 'route':
       return linkValue || '/app/home';
     case 'mood':

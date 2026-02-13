@@ -71,7 +71,7 @@ export const wellnessTools: ToolConfig[] = [
     icon: 'Sparkles',
     bgColor: 'bg-[#D1FAE5]',
     iconColor: 'text-emerald-600',
-    route: '/app/routines',
+    route: '/app/rituals',
     description: 'Daily rituals',
   },
   {

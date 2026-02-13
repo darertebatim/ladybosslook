@@ -116,7 +116,7 @@ export function RoutineStatisticsManager() {
           <CardContent>
             <div className="text-2xl font-bold">{totalAdoptions}</div>
             <p className="text-xs text-muted-foreground">
-              Routines added by users
+              Rituals added by users
             </p>
           </CardContent>
         </Card>
@@ -142,7 +142,7 @@ export function RoutineStatisticsManager() {
           <CardContent>
             <div className="text-2xl font-bold">{stats?.length || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Published routine templates
+              Published ritual templates
             </p>
           </CardContent>
         </Card>
