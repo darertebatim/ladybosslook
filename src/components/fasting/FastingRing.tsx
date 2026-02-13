@@ -113,7 +113,7 @@ export function FastingRing({ progress, zone, elapsedSeconds, targetHours, isFas
           </>
         ) : (
           <>
-            <span className="text-5xl mb-2">🍽️</span>
+            <span className="text-5xl mb-2">🍴</span>
             <span className="text-sm text-muted-foreground">
               Ready to fast
             </span>
