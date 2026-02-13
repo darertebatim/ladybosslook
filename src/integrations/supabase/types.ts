@@ -3361,6 +3361,10 @@ export type Database = {
         Returns: boolean
       }
       get_current_user_role: { Args: never; Returns: string }
+      get_home_data: {
+        Args: { p_date_str: string; p_user_id: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

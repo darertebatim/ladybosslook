@@ -172,10 +172,11 @@ class ChunkLoadErrorBoundary extends React.Component<
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 2 * 60 * 1000, // 2 minutes - data considered fresh
-      gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache
+      staleTime: 3 * 60 * 1000, // 3 minutes - data considered fresh
+      gcTime: 15 * 60 * 1000, // 15 minutes - keep in cache longer
       retry: 1, // Only retry once on failure
       refetchOnWindowFocus: false, // Don't refetch on tab focus
+      refetchOnMount: 'always', // Refetch only if stale
     },
   },
 });

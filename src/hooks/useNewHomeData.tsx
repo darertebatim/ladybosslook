@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { format } from 'date-fns';
 import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
 
 const STALE_TIME = 2 * 60 * 1000;
@@ -12,7 +11,7 @@ interface NewHomeData {
   listeningMinutes: number;
   completedTracks: number;
   unreadPosts: number;
-  daysThisMonth: number; // Renamed from journalStreak - strength-first
+  daysThisMonth: number;
   todayTasksCount: number;
   todayCompletedCount: number;
   activeRounds: any[];
@@ -20,93 +19,42 @@ interface NewHomeData {
   nextSessionMap: Map<string, string>;
   suggestedRoutine: any | null;
   periodSettings: any | null;
-  isNewUser: boolean; // First 24 hours or no tasks ever added
-  totalCompletions: number; // Total completions ever
+  isNewUser: boolean;
+  totalCompletions: number;
+  streak: any | null;
 }
 
 async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
   const today = new Date();
   const dateStr = getLocalDateStr(today);
-  const dayOfWeek = today.getDay();
 
-  const [
-    profileRes,
-    audioProgressRes,
-    allPostsRes,
-    readPostsRes,
-    journalEntriesRes,
-    tasksRes,
-    completionsRes,
-    totalCompletionsRes,
-    enrollmentsRes,
-    routineRes,
-    periodSettingsRes,
-    addedBankRoutinesRes,
-  ] = await Promise.all([
-    supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single(),
-    supabase
-      .from('audio_progress')
-      .select('current_position_seconds, completed')
-      .eq('user_id', userId),
-    supabase
-      .from('feed_posts')
-      .select('id'),
-    supabase
-      .from('feed_post_reads')
-      .select('post_id')
-      .eq('user_id', userId),
-    supabase
-      .from('journal_entries')
-      .select('created_at')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(100),
-    // All active tasks
+  // 1. Single RPC call replaces 10+ individual queries
+  const { data: rpcData, error: rpcError } = await supabase
+    .rpc('get_home_data', { p_user_id: userId, p_date_str: dateStr });
+
+  if (rpcError) {
+    console.error('get_home_data RPC error:', rpcError);
+    throw rpcError;
+  }
+
+  const d = rpcData as any;
+
+  // 2. Remaining queries that need joins/complex logic (run in parallel)
+  const [tasksRes, routineRes, addedBankRoutinesRes] = await Promise.all([
+    // All active tasks (for today count + isNewUser detection)
     supabase
       .from('user_tasks')
       .select('id, repeat_pattern, scheduled_date, repeat_days')
       .eq('user_id', userId)
       .eq('is_active', true),
-    // Today's completions
-    supabase
-      .from('task_completions')
-      .select('task_id')
-      .eq('user_id', userId)
-      .eq('completed_date', dateStr),
-    // Total completions ever (for first-action detection)
-    supabase
-      .from('task_completions')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', userId),
-    // Active enrollments with rounds
-    supabase
-      .from('course_enrollments')
-      .select(`
-        *,
-        program_rounds (*)
-      `)
-      .eq('user_id', userId)
-      .eq('status', 'active')
-      .not('program_rounds', 'is', null)
-      .order('enrolled_at', { ascending: false }),
-    // Random Pro Routine - get from routines_bank
+    // Random routine suggestion
     supabase
       .from('routines_bank')
       .select('*')
       .eq('is_active', true)
       .eq('is_popular', true)
       .limit(10),
-    // Period settings
-    supabase
-      .from('period_settings')
-      .select('*')
-      .eq('user_id', userId)
-      .single(),
-    // User's added bank routines (to filter out already-added ones)
+    // User's added bank routines
     supabase
       .from('user_routines_bank')
       .select('routine_id')
@@ -114,48 +62,24 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
       .eq('is_active', true),
   ]);
 
-  // Calculate listening stats
-  const audioProgress = audioProgressRes.data || [];
-  const listeningSeconds = audioProgress.reduce((sum, p) => sum + (p.current_position_seconds || 0), 0);
-  const completedTracks = audioProgress.filter(p => p.completed).length;
-
-  // Calculate unread posts
-  const readPostIds = new Set((readPostsRes.data || []).map(r => r.post_id));
-  const unreadPosts = (allPostsRes.data || []).filter(p => !readPostIds.has(p.id)).length;
-
-  // Calculate monthly presence (replaces streak - strength-first philosophy)
-  let daysThisMonth = 0;
-  const entries = journalEntriesRes.data || [];
-  if (entries.length > 0) {
-    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-    const uniqueDays = new Set<string>();
-    
-    entries.forEach(e => {
-      const entryDate = new Date(e.created_at);
-      if (entryDate >= monthStart) {
-        uniqueDays.add(entryDate.toDateString());
-      }
-    });
-    
-    daysThisMonth = uniqueDays.size;
-  }
-
   // Filter tasks for today
   const allTasks = tasksRes.data || [];
   const todayTasks = allTasks.filter(task => taskAppliesToDate(task, dateStr));
 
-  const completedTaskIds = new Set((completionsRes.data || []).map(c => c.task_id));
+  const completedTaskIds = new Set(
+    (d.today_completions || []).map((c: any) => c.task_id)
+  );
   const todayCompletedCount = todayTasks.filter(t => completedTaskIds.has(t.id)).length;
 
-  // Process enrollments
-  const enrollments = enrollmentsRes.data || [];
-  const activeRounds = enrollments.filter(e => e.program_rounds?.status !== 'completed');
-  const completedRounds = enrollments.filter(e => e.program_rounds?.status === 'completed');
+  // Process enrollments from RPC
+  const enrollments = d.active_enrollments || [];
+  const activeRounds = enrollments.filter((e: any) => e.program_rounds?.status !== 'completed');
+  const completedRounds = enrollments.filter((e: any) => e.program_rounds?.status === 'completed');
 
   // Get next sessions for active rounds
   const roundIds = activeRounds
-    .map(e => e.program_rounds?.id)
-    .filter((id): id is string => Boolean(id));
+    .map((e: any) => e.program_rounds?.id)
+    .filter((id: string | undefined): id is string => Boolean(id));
   
   let nextSessionMap = new Map<string, string>();
   if (roundIds.length > 0) {
@@ -175,20 +99,16 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     }
   }
 
-  // Sort active rounds: prioritize those with actual scheduled sessions, then by nearest date
-  activeRounds.sort((a, b) => {
+  // Sort active rounds
+  activeRounds.sort((a: any, b: any) => {
     const aRoundId = a.program_rounds?.id;
     const bRoundId = b.program_rounds?.id;
-    
-    // Get next session from map (actual scheduled sessions)
     const aNextSession = aRoundId ? nextSessionMap.get(aRoundId) : null;
     const bNextSession = bRoundId ? nextSessionMap.get(bRoundId) : null;
-    
-    // Programs with scheduled sessions come first
+
     if (aNextSession && !bNextSession) return -1;
     if (!aNextSession && bNextSession) return 1;
     
-    // Finally sort by nearest date
     const aDate = aNextSession || a.program_rounds?.first_session_date || a.program_rounds?.start_date;
     const bDate = bNextSession || b.program_rounds?.first_session_date || b.program_rounds?.start_date;
     
@@ -199,38 +119,35 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     return new Date(aDate!).getTime() - new Date(bDate!).getTime();
   });
 
-  // Pick a random routine that user hasn't already added
+  // Pick random routine
   const allRoutines = routineRes.data || [];
-  const addedRoutineIds = new Set((addedBankRoutinesRes.data || []).map(r => r.routine_id));
-  const availableRoutines = allRoutines.filter(r => !addedRoutineIds.has(r.id));
+  const addedRoutineIds = new Set((addedBankRoutinesRes.data || []).map((r: any) => r.routine_id));
+  const availableRoutines = allRoutines.filter((r: any) => !addedRoutineIds.has(r.id));
   const suggestedRoutine = availableRoutines.length > 0 
     ? availableRoutines[Math.floor(Math.random() * availableRoutines.length)] 
     : null;
 
-  // New user detection: no tasks and account less than 24 hours old
-  const profile = profileRes.data;
-  const accountAgeHours = profile?.created_at 
-    ? (Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60)
-    : 999;
-  const totalCompletions = totalCompletionsRes.count || 0;
-  // Show as "new user" if they have zero tasks - allows welcome card to show for reset accounts
+  // New user detection
+  const profile = d.profile;
+  const totalCompletions = d.total_completions || 0;
   const isNewUser = allTasks.length === 0;
 
   return {
     profile,
-    listeningMinutes: Math.floor(listeningSeconds / 60),
-    completedTracks,
-    unreadPosts,
-    daysThisMonth,
+    listeningMinutes: d.listening_minutes || 0,
+    completedTracks: d.completed_tracks || 0,
+    unreadPosts: d.unread_posts || 0,
+    daysThisMonth: d.days_this_month || 0,
     todayTasksCount: todayTasks.length,
     todayCompletedCount,
     activeRounds,
     completedRounds,
     nextSessionMap,
     suggestedRoutine,
-    periodSettings: periodSettingsRes.data,
+    periodSettings: d.period_settings || null,
     isNewUser,
     totalCompletions,
+    streak: d.streak || null,
   };
 }
 
@@ -261,5 +178,6 @@ export function useNewHomeData() {
     periodSettings: query.data?.periodSettings || null,
     isNewUser: query.data?.isNewUser || false,
     totalCompletions: query.data?.totalCompletions || 0,
+    streak: query.data?.streak || null,
   };
 }
