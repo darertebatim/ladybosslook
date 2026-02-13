@@ -174,7 +174,12 @@ export const useTrackAppReturn = (userId: string | undefined) => {
 
     const incrementReturn = async () => {
       try {
-        // Use raw RPC-free approach: read current, increment, write
+        // Log individual return event for weekly tracking
+        await supabase
+          .from('app_return_events')
+          .insert({ user_id: userId });
+
+        // Also increment the total counter on profiles
         const { data } = await supabase
           .from('profiles')
           .select('return_count')

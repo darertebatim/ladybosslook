@@ -45,11 +45,12 @@ const AppPresence = () => {
         {/* Fixed Header - iOS standard with safe area */}
         <header 
           className="shrink-0 relative z-10"
-          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
         >
           <div className="px-4 py-2">
             <BackButton 
-              className="text-orange-700 hover:text-orange-800"
+              to="/app"
+              className="text-orange-700"
             />
           </div>
         </header>
@@ -103,11 +104,11 @@ const AppPresence = () => {
                     className="text-7xl font-bold text-orange-700"
                     style={{ textShadow: '0 2px 10px rgba(234, 88, 12, 0.2)' }}
                   >
-                    {stats?.last7DaysActive || 0}
+                    {stats?.weeklyReturns || 0}
                   </span>
                 </div>
               )}
-              <p className="text-orange-600/80 text-lg font-medium mb-8">days in the last week</p>
+              <p className="text-orange-600/80 text-lg font-medium mb-8">returns this week</p>
               
               {/* Week presence grid in a clean white card */}
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm mx-2">
