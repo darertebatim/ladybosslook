@@ -11,7 +11,7 @@ export interface FastingZone {
 export const FASTING_ZONES: FastingZone[] = [
   {
     id: 'anabolic',
-    emoji: '🍽️',
+    emoji: '🍴',
     name: 'Anabolic',
     minHours: 0,
     maxHours: 4,
@@ -20,7 +20,7 @@ export const FASTING_ZONES: FastingZone[] = [
   },
   {
     id: 'catabolic',
-    emoji: '🔥',
+    emoji: '⚡',
     name: 'Catabolic',
     minHours: 4,
     maxHours: 16,
@@ -29,7 +29,7 @@ export const FASTING_ZONES: FastingZone[] = [
   },
   {
     id: 'fat-burning',
-    emoji: '💪',
+    emoji: '🔥',
     name: 'Fat Burning',
     minHours: 16,
     maxHours: 24,
@@ -38,7 +38,7 @@ export const FASTING_ZONES: FastingZone[] = [
   },
   {
     id: 'ketosis',
-    emoji: '⚡',
+    emoji: '🥑',
     name: 'Ketosis',
     minHours: 24,
     maxHours: 72,
@@ -47,7 +47,7 @@ export const FASTING_ZONES: FastingZone[] = [
   },
   {
     id: 'deep-ketosis',
-    emoji: '🧬',
+    emoji: '🚀',
     name: 'Deep Ketosis',
     minHours: 72,
     maxHours: Infinity,
