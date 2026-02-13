@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Timer, Play } from 'lucide-react';
+import { Timer, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { getCurrentZone, FASTING_PROTOCOLS } from '@/lib/fastingZones';
+import { FastingSettingsSheet } from '@/components/fasting/FastingSettingsSheet';
 
 type CardMode = 'idle' | 'fasting' | 'eating';
 
@@ -30,14 +31,16 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
   const [zoneEmoji, setZoneEmoji] = useState('⏳');
   const [badgeText, setBadgeText] = useState('Fast');
   const [isLoading, setIsLoading] = useState(true);
+  const [showOnHome, setShowOnHome] = useState<boolean | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const dataRef = useRef<{ activeSession: any; lastSession: any }>({ activeSession: null, lastSession: null });
 
-  // Load fasting data
+  // Load fasting data + preferences
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const [activeRes, histRes] = await Promise.all([
+      const [activeRes, histRes, prefRes] = await Promise.all([
         supabase
           .from('fasting_sessions' as any)
           .select('*')
@@ -52,7 +55,15 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
           .not('ended_at', 'is', null)
           .order('started_at', { ascending: false })
           .limit(1),
+        supabase
+          .from('fasting_preferences' as any)
+          .select('show_on_home')
+          .eq('user_id', user.id)
+          .limit(1),
       ]);
+
+      const pref = (prefRes.data as any)?.[0];
+      setShowOnHome(pref?.show_on_home ?? true);
 
       const active = (activeRes.data as any)?.[0] || null;
       const last = (histRes.data as any)?.[0] || null;
@@ -80,6 +91,21 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
     };
     load();
   }, [user]);
+
+  // Reload show_on_home when settings close
+  useEffect(() => {
+    if (!settingsOpen && user) {
+      supabase
+        .from('fasting_preferences' as any)
+        .select('show_on_home')
+        .eq('user_id', user.id)
+        .limit(1)
+        .then(({ data }) => {
+          const pref = (data as any)?.[0];
+          setShowOnHome(pref?.show_on_home ?? true);
+        });
+    }
+  }, [settingsOpen, user]);
 
   // Timer tick
   useEffect(() => {
@@ -137,11 +163,18 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [mode, isLoading]);
 
-  if (isLoading) return null;
+  if (isLoading || showOnHome === null) return null;
+  if (!showOnHome) return null;
 
   const handleCardClick = () => {
     haptic.light();
     navigate('/app/fasting');
+  };
+
+  const handleSettingsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    haptic.light();
+    setSettingsOpen(true);
   };
 
   const isFasting = mode === 'fasting';
@@ -149,88 +182,93 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
   const isIdle = mode === 'idle';
 
   return (
-    <div
-      onClick={handleCardClick}
-      className={cn(
-        'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-        'bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30',
-        className
-      )}
-    >
-      <div className="flex items-center gap-3">
-        {/* Icon circle */}
-        <div className={cn(
-          'w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-sm',
-          isFasting ? 'bg-amber-500 text-white' :
-          isEating ? 'bg-emerald-500 text-white' :
-          'bg-amber-400 text-white'
-        )}>
-          <Timer className="h-5 w-5" />
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          {/* Top line with badge */}
-          <div className="flex items-center gap-2 text-xs mb-0.5">
-            <span className={cn(
-              'font-semibold',
-              isFasting ? 'text-amber-700 dark:text-amber-300' :
-              isEating ? 'text-emerald-700 dark:text-emerald-300' :
-              'text-amber-600 dark:text-amber-400'
-            )}>
-              {zoneEmoji} {isIdle ? 'Fasting' : badgeText}
-            </span>
-            <span className={cn(
-              'px-2 py-0.5 rounded-full text-white font-medium text-[10px]',
-              isFasting ? 'bg-amber-500' :
-              isEating ? 'bg-emerald-500' :
-              'bg-amber-400'
-            )}>
-              {isFasting ? 'Active' : isEating ? 'Eating' : 'Ready'}
-            </span>
+    <>
+      <div
+        onClick={handleCardClick}
+        className={cn(
+          'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+          'bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30',
+          className
+        )}
+      >
+        <div className="flex items-center gap-3">
+          {/* Icon circle */}
+          <div className={cn(
+            'w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-sm',
+            isFasting ? 'bg-amber-500 text-white' :
+            isEating ? 'bg-emerald-500 text-white' :
+            'bg-amber-400 text-white'
+          )}>
+            <Timer className="h-5 w-5" />
           </div>
 
-          {/* Main text */}
-          <p className="font-semibold text-foreground truncate">
-            {title}
-          </p>
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            {/* Top line with badge */}
+            <div className="flex items-center gap-2 text-xs mb-0.5">
+              <span className={cn(
+                'font-semibold',
+                isFasting ? 'text-amber-700 dark:text-amber-300' :
+                isEating ? 'text-emerald-700 dark:text-emerald-300' :
+                'text-amber-600 dark:text-amber-400'
+              )}>
+                {zoneEmoji} {isIdle ? 'Fasting' : badgeText}
+              </span>
+              <span className={cn(
+                'px-2 py-0.5 rounded-full text-white font-medium text-[10px]',
+                isFasting ? 'bg-amber-500' :
+                isEating ? 'bg-emerald-500' :
+                'bg-amber-400'
+              )}>
+                {isFasting ? 'Active' : isEating ? 'Eating' : 'Ready'}
+              </span>
+            </div>
 
-          {/* Subtitle */}
-          <p className="text-xs text-foreground/50 truncate">
-            {subtitle}
-          </p>
+            {/* Main text */}
+            <p className="font-semibold text-foreground truncate">
+              {title}
+            </p>
+
+            {/* Subtitle */}
+            <p className="text-xs text-foreground/50 truncate">
+              {subtitle}
+            </p>
+          </div>
+
+          {/* Settings button */}
+          <button
+            onClick={handleSettingsClick}
+            className={cn(
+              'w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-md active:scale-95 transition-transform',
+              'bg-white/60 dark:bg-white/10 text-amber-600 dark:text-amber-400'
+            )}
+          >
+            <Settings className="h-5 w-5" />
+          </button>
         </div>
 
-        {/* Action button */}
-        <button
-          onClick={(e) => { e.stopPropagation(); haptic.light(); navigate('/app/fasting'); }}
-          className={cn(
-            'w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-md active:scale-95 transition-transform text-white',
-            isFasting ? 'bg-amber-500' :
-            isEating ? 'bg-emerald-500' :
-            'bg-amber-400'
-          )}
-        >
-          <Play className="h-5 w-5 ml-0.5" />
-        </button>
+        {/* Progress bar - only during active fasting or eating */}
+        {!isIdle && (
+          <div className="mt-3">
+            <div className="h-1.5 w-full rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
+              <div
+                className={cn(
+                  'h-full rounded-full transition-all duration-1000',
+                  isFasting
+                    ? 'bg-gradient-to-r from-amber-400 to-orange-500'
+                    : 'bg-gradient-to-r from-emerald-400 to-green-500'
+                )}
+                style={{ width: `${Math.min(progress * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Progress bar */}
-      {!isIdle && (
-        <div className="mt-3">
-          <div className="h-1.5 w-full rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
-            <div
-              className={cn(
-                'h-full rounded-full transition-all duration-1000',
-                isFasting
-                  ? 'bg-gradient-to-r from-amber-400 to-orange-500'
-                  : 'bg-gradient-to-r from-emerald-400 to-green-500'
-              )}
-              style={{ width: `${Math.min(progress * 100, 100)}%` }}
-            />
-          </div>
-        </div>
-      )}
-    </div>
+      <FastingSettingsSheet
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+      />
+    </>
   );
 };

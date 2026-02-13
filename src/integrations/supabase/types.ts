@@ -890,6 +890,9 @@ export type Database = {
           default_fasting_hours: number
           default_protocol: string
           id: string
+          reminder_enabled: boolean
+          reminder_zone: string | null
+          show_on_home: boolean
           updated_at: string
           user_id: string
           weight_goal: number | null
@@ -899,6 +902,9 @@ export type Database = {
           default_fasting_hours?: number
           default_protocol?: string
           id?: string
+          reminder_enabled?: boolean
+          reminder_zone?: string | null
+          show_on_home?: boolean
           updated_at?: string
           user_id: string
           weight_goal?: number | null
@@ -908,6 +914,9 @@ export type Database = {
           default_fasting_hours?: number
           default_protocol?: string
           id?: string
+          reminder_enabled?: boolean
+          reminder_zone?: string | null
+          show_on_home?: boolean
           updated_at?: string
           user_id?: string
           weight_goal?: number | null
