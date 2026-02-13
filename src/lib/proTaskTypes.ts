@@ -11,11 +11,12 @@ import {
   Heart,
   HeartHandshake,
   Headphones,
-  Smile
+  Smile,
+  Timer
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -201,6 +202,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open the mood check-in tool',
     requiresValue: false,
   },
+  fasting: {
+    value: 'fasting',
+    label: 'Fasting Timer',
+    icon: Timer,
+    badgeText: 'Fast',
+    color: 'rose',
+    gradientClass: 'bg-gradient-to-br from-rose-100 to-orange-100 dark:from-rose-900/40 dark:to-orange-900/40',
+    iconColorClass: 'text-rose-600 dark:text-rose-400',
+    badgeColorClass: 'bg-rose-500/20 text-rose-700 dark:text-rose-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open the fasting tracker',
+    requiresValue: false,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
@@ -234,6 +248,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return linkValue || '/app/home';
     case 'mood':
       return '/app/mood';
+    case 'fasting':
+      return '/app/fasting';
     default:
       return '/app/home';
   }

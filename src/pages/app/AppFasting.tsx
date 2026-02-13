@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Zap, BarChart3 } from 'lucide-react';
+import { Zap, BarChart3, CalendarPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FastingRing } from '@/components/fasting/FastingRing';
 import { FastingProtocolSheet } from '@/components/fasting/FastingProtocolSheet';
@@ -9,7 +9,29 @@ import { FastingCompletionSheet } from '@/components/fasting/FastingCompletionSh
 import { FastingStatsSheet } from '@/components/fasting/FastingStatsSheet';
 import { useFastingTracker } from '@/hooks/useFastingTracker';
 import { FASTING_PROTOCOLS } from '@/lib/fastingZones';
+import { BackButton } from '@/components/app/BackButton';
+import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
+import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
+import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
+import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
+
+const FALLBACK_FASTING_TASKS: RoutinePlanTask[] = [
+  {
+    id: 'fasting-task-1',
+    plan_id: 'synthetic-fasting',
+    title: 'Intermittent Fasting',
+    icon: '⏳',
+    task_order: 0,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    linked_playlist_id: null,
+    pro_link_type: 'fasting',
+    pro_link_value: null,
+    tag: 'pro',
+  },
+];
 
 export default function AppFasting() {
   const navigate = useNavigate();
@@ -22,6 +44,10 @@ export default function AppFasting() {
     progress,
     pastSessions,
     isLoading,
+    mode,
+    eatingElapsedSeconds,
+    eatingTotalSeconds,
+    eatingEndTime,
     startFast,
     endFast,
     deleteFast,
@@ -33,15 +59,40 @@ export default function AppFasting() {
   const [statsOpen, setStatsOpen] = useState(false);
   const [completionOpen, setCompletionOpen] = useState(false);
   const [completedSession, setCompletedSession] = useState<any>(null);
+  const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
 
-  const isFasting = !!activeSession;
+  const isFasting = mode === 'fasting';
+  const isEating = mode === 'eating';
   const currentProtocol = FASTING_PROTOCOLS.find(p => p.id === selectedProtocol);
+
+  // Pro-link integration
+  const { data: existingTask } = useExistingProTask('fasting');
+  const addRoutinePlan = useAddRoutinePlan();
+  const isAdded = existingTask || justAdded;
 
   const handleEndFast = async () => {
     const ended = await endFast();
     if (ended) {
       setCompletedSession(ended);
       setCompletionOpen(true);
+    }
+  };
+
+  const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
+    try {
+      await addRoutinePlan.mutateAsync({
+        planId: 'synthetic-fasting',
+        selectedTaskIds,
+        editedTasks,
+        syntheticTasks: FALLBACK_FASTING_TASKS,
+      });
+      toast.success('Fasting ritual added to your planner!');
+      setShowRoutineSheet(false);
+      setJustAdded(true);
+    } catch (error) {
+      console.error('Failed to add ritual:', error);
+      toast.error('Failed to add ritual');
     }
   };
 
@@ -55,20 +106,19 @@ export default function AppFasting() {
 
   return (
     <div className="fixed inset-0 bg-gradient-to-b from-[#FFF5EE] to-[#FFE4D6] dark:from-[#1a1020] dark:to-[#2a1a2e] flex flex-col">
-      {/* Header */}
+      {/* Header - iOS standard */}
       <div
-        className="flex items-center justify-between px-4 pt-2 pb-2"
+        className="flex items-center justify-between px-4 pb-2"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
       >
-        <button
-          onClick={() => navigate('/app/home')}
-          className="flex items-center gap-1 text-sm font-medium active:scale-95 transition-transform"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back</span>
-        </button>
+        <BackButton />
         <h1 className="font-semibold text-lg">Fasting</h1>
-        <div className="w-16" />
+        <button
+          onClick={() => setStatsOpen(true)}
+          className="w-10 h-10 flex items-center justify-center active:scale-95 transition-transform"
+        >
+          <BarChart3 className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Main content */}
@@ -81,6 +131,10 @@ export default function AppFasting() {
             elapsedSeconds={elapsedSeconds}
             targetHours={activeSession?.fasting_hours || selectedFastingHours}
             isFasting={isFasting}
+            mode={mode}
+            eatingElapsedSeconds={eatingElapsedSeconds}
+            eatingTotalSeconds={eatingTotalSeconds}
+            eatingEndTime={eatingEndTime}
           />
           {isFasting && (
             <button
@@ -145,17 +199,16 @@ export default function AppFasting() {
             onClick={startFast}
             className="rounded-full px-8 py-3 h-auto text-base font-semibold bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white active:scale-95"
           >
-            Start Fast
+            {isEating ? `Start ${selectedFastingHours}h Fast` : 'Start Fast'}
           </Button>
         )}
 
-        {/* Stats button */}
-        <button
-          onClick={() => setStatsOpen(true)}
-          className="w-11 h-11 rounded-full bg-white/60 dark:bg-white/10 backdrop-blur-sm flex items-center justify-center active:scale-95 transition-transform"
-        >
-          <BarChart3 className="w-5 h-5" />
-        </button>
+        {/* Add to Routine button */}
+        <AddedToRoutineButton
+          isAdded={!!isAdded}
+          onAddClick={() => setShowRoutineSheet(true)}
+          iconOnly
+        />
       </div>
 
       {/* Sheets */}
@@ -187,6 +240,14 @@ export default function AppFasting() {
         onOpenChange={setStatsOpen}
         sessions={pastSessions}
         onDeleteSession={deleteFast}
+      />
+      <RoutinePreviewSheet
+        open={showRoutineSheet}
+        onOpenChange={setShowRoutineSheet}
+        tasks={FALLBACK_FASTING_TASKS}
+        routineTitle="Fasting Routine"
+        onSave={handleSaveRoutine}
+        isSaving={addRoutinePlan.isPending}
       />
     </div>
   );
