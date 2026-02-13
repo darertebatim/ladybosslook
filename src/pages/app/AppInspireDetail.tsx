@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CalendarDays } from 'lucide-react';
+import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
@@ -72,6 +73,26 @@ export default function AppInspireDetail() {
   const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
   const isAdded = isAlreadyAdded || justAdded;
 
+  // Compute effective start date label
+  const startLabel = useMemo(() => {
+    if (!routine) return 'Starts today';
+    const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const startDate = (routine as any).challenge_start_date;
+    const startDow = (routine as any).start_day_of_week as number | null;
+    
+    if (startDate) {
+      const d = new Date(startDate + 'T00:00:00');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (d <= today) return 'Starts today';
+      return `Starts ${format(d, 'MMM d')}`;
+    }
+    if (startDow != null) {
+      return `Starts next ${WEEKDAY_NAMES[startDow]}`;
+    }
+    return 'Starts today';
+  }, [routine]);
+
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
       toast.error('No actions in this ritual');
@@ -96,7 +117,6 @@ export default function AppInspireDetail() {
       setShowPreviewSheet(false);
       setJustAdded(true);
       toast.success(`${selectedTaskIds.length} actions added!`);
-      // Don't navigate away - let user see the button change
     } catch (error) {
       toast.error('Failed to add ritual');
     }
@@ -189,7 +209,7 @@ export default function AppInspireDetail() {
               <p className="text-muted-foreground">{routine.subtitle}</p>
             )}
             
-            <div className="flex items-center gap-2 mt-3">
+            <div className="flex items-center gap-2 mt-3 flex-wrap">
               {routine.category && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-muted text-muted-foreground">
                   {routine.category}
@@ -200,6 +220,10 @@ export default function AppInspireDetail() {
                   {routine.tasks.length} action{routine.tasks.length !== 1 ? 's' : ''}
                 </span>
               )}
+              <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                <CalendarDays className="w-3.5 h-3.5" />
+                {startLabel}
+              </span>
             </div>
           </div>
 
@@ -343,6 +367,8 @@ export default function AppInspireDetail() {
           routineTitle={routine.title}
           defaultTag={routine.category}
           scheduleType={(routine as any).schedule_type || 'daily'}
+          challengeStartDate={(routine as any).challenge_start_date || null}
+          startDayOfWeek={(routine as any).start_day_of_week ?? null}
           onSave={handleSaveRoutine}
           isSaving={addRoutineFromBank.isPending}
         />
