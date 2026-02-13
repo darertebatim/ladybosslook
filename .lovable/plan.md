@@ -1,76 +1,36 @@
 
+# Fix Ritual Detail Page: End Date Display, Unsectioned Tasks, and End Date in Edit
 
-# Chat with Coach -- Multi-Inbox System
+## Issues Found
 
-## Overview
-Add a "Coach" chat inbox alongside the existing "Support" inbox. Users see it as a second private chat in their Channels list. Admins/coaches see it as a separate tab/inbox in the admin Support page.
+### 1. End date not showing in the app frontend
+The database has `end_mode`, `end_date`, and `end_after_days` on `routines_bank` and they are populated (e.g., Strength PLUS has `end_mode='date'`, `end_date='2026-02-28'`). However, neither the ritual detail page (`AppInspireDetail.tsx`) nor the edit sheet (`RoutinePreviewSheet.tsx`) display the end date info. Only the start date banner is shown.
 
-## Database Changes
+**Fix**: Add an end date banner below the start date banner on both:
+- `AppInspireDetail.tsx` (ritual detail page) -- show something like "Ends Feb 28" in a red/rose banner
+- `RoutinePreviewSheet.tsx` (edit ritual sheet) -- same end date banner
 
-### 1. Add `inbox_type` column to `chat_conversations`
-- Add a new column `inbox_type TEXT NOT NULL DEFAULT 'support'` with a check constraint allowing `'support'` and `'coach'`.
-- Existing conversations default to `'support'`.
-- The `update_conversation_on_message` trigger works unchanged since it references `conversation_id`.
+The routine data already includes `end_mode`, `end_date`, and `end_after_days` from the query.
 
-### 2. Update `chat_messages` trigger
-- No changes needed -- it already references conversations by ID.
+### 2. Actions without a section don't appear on the ritual page
+The "Strength PLUS" ritual has 6 tasks, all with `section_id = null`. It also has 1 section ("New Section") with 0 tasks. In the code at `AppInspireDetail.tsx` line 257, tasks are grouped by `section_id`, and the section view iterates `routine.sections` -- so tasks with no section are never rendered. The fallback "What's Included" (line 320) only triggers when there are zero sections. Since there is one (empty) section, unsectioned tasks become invisible.
 
-## User-Facing Changes (Channels List)
+**Fix**: After rendering section-based tasks, also render any "unsorted" tasks (those with `section_id = null`) as a separate group, either under "Other actions" or "What's Included". This ensures all tasks are always visible regardless of section assignment.
 
-### 3. Add "Coach" entry in `AppChannelsList.tsx`
-- Duplicate the Support chat entry below it, but with a different icon (e.g., `GraduationCap`), label "Coach", and route to `/app/coach-chat`.
-- Create a new hook `useUnreadCoachChat` (or extend `useUnreadChat` with an `inbox_type` parameter) to show unread badge.
-- Create `useSupportChatSummary`-like hook for coach chat summary preview.
+### 3. End date in individual action settings
+You mentioned there used to be an ending time in action settings -- looking through the code history, the `repeat_end_date` column exists on `user_tasks` and is used in `taskAppliesToDate`, but there was never a UI field for it in the task editor (`AppTaskCreate`). It was only set programmatically when adopting rituals with end dates. This is by design -- end dates flow from the ritual configuration to the tasks automatically.
 
-### 4. Create `AppCoachChat.tsx` page
-- Copy `AppChat.tsx` and adjust:
-  - Filter conversations by `inbox_type = 'coach'` instead of default.
-  - Change branding: title "Coach" instead of "Support", icon `GraduationCap`, different welcome message/starters (e.g., "Ask about your progress", "Get personalized advice").
-  - Create conversation with `inbox_type: 'coach'`.
-- Register route `/app/coach-chat` in the router.
+## Technical Changes
 
-## Admin-Facing Changes
+### File: `src/pages/app/AppInspireDetail.tsx`
+1. Add an end date info computation (similar to `startInfo`) that reads `end_mode`, `end_date`, `end_after_days` from the routine
+2. Display an end date banner below the start date banner (rose/red colored, e.g., "Ends Feb 28" or "Ends after 28 days")
+3. After the sections loop (line 318), add a block to render tasks where `section_id` is null under an "Actions" or "What's Included" heading -- even when sections exist
 
-### 5. Update Admin Support page (`Support.tsx`)
-- Add tab selector at the top: "Support" | "Coach" tabs.
-- Filter `chat_conversations` by selected `inbox_type`.
-- Both tabs share the same `ChatPanel` component.
+### File: `src/components/app/RoutinePreviewSheet.tsx`
+1. Add props for `endDate`, `endMode`, `endAfterDays` (optional)
+2. Display an end date banner below the start date banner
+3. Update the call site in `AppInspireDetail.tsx` to pass the end date props
 
-### 6. Update Mobile Admin Support (`AppAdminSupport.tsx`)
-- Same tab selector approach for mobile admin view.
-
-### 7. Notification Edge Function
-- The existing `send-chat-notification` function likely works as-is since it references conversation IDs. May want to include inbox type in the notification body for display purposes (e.g., "New coach message" vs "New support message").
-
-## Hook Updates
-
-### 8. Extend `useUnreadChat`
-- Accept an optional `inboxType` parameter (default `'support'`).
-- Filter query by `inbox_type`.
-- Use separate realtime channel names per inbox type to avoid conflicts.
-
-### 9. Extend `useSupportChatSummary`
-- Either parameterize it or create `useCoachChatSummary` that filters by `inbox_type = 'coach'`.
-
-## Navigation & Tab Bar
-- The bottom tab "Support" (Headset icon) continues to go to `/app/chat` (support).
-- Coach chat is accessible from the Channels list only (not a separate tab bar item), keeping navigation clean.
-
-## Technical Details
-
-### New files:
-- `src/pages/app/AppCoachChat.tsx` -- cloned from AppChat with coach-specific branding and `inbox_type` filter
-
-### Modified files:
-- **Migration SQL**: Add `inbox_type` column to `chat_conversations`
-- `src/pages/app/AppChannelsList.tsx` -- add Coach entry
-- `src/pages/admin/Support.tsx` -- add inbox type tabs
-- `src/pages/app/AppAdminSupport.tsx` -- add inbox type tabs
-- `src/hooks/useUnreadChat.tsx` -- parameterize by inbox type
-- `src/hooks/useSupportChatSummary.tsx` -- parameterize or duplicate for coach
-- `src/App.tsx` (or router file) -- add `/app/coach-chat` route
-- `src/integrations/supabase/types.ts` -- auto-updated after migration
-
-### RLS
-- Existing RLS policies on `chat_conversations` and `chat_messages` should work unchanged since they filter by `user_id` and conversation ownership. No new policies needed.
-
+### Passing end date through
+The `RoutinePreviewSheet` is called from `AppInspireDetail.tsx` at line 382. Need to pass end date props from the routine data.
