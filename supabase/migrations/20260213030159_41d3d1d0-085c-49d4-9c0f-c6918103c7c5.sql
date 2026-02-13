@@ -1,0 +1,1 @@
+ALTER TABLE public.audio_playlists ADD COLUMN language text NOT NULL DEFAULT 'american';
