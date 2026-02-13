@@ -60,6 +60,9 @@ interface RoutinePreviewSheetProps {
   scheduleType?: 'daily' | 'weekly' | 'challenge';
   challengeStartDate?: string | null;
   startDayOfWeek?: number | null;
+  endMode?: string | null;
+  endDate?: string | null;
+  endAfterDays?: number | null;
   onSave: (selectedTaskIds: string[], editedTasks: EditedTask[]) => void;
   isSaving?: boolean;
 }
@@ -73,6 +76,9 @@ export function RoutinePreviewSheet({
   scheduleType = 'daily',
   challengeStartDate,
   startDayOfWeek,
+  endMode,
+  endDate,
+  endAfterDays,
   onSave,
   isSaving,
 }: RoutinePreviewSheetProps) {
@@ -335,6 +341,31 @@ export function RoutinePreviewSheet({
                     </span>
                   </div>
                 );
+              })()}
+              {/* End date banner */}
+              {(() => {
+                if (endMode === 'date' && endDate) {
+                  const d = new Date(endDate + 'T00:00:00');
+                  return (
+                    <div className="mt-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
+                      <span className="text-lg">🏁</span>
+                      <span className="text-sm font-medium text-rose-800 dark:text-rose-300">
+                        Ends {format(d, 'MMM d')}
+                      </span>
+                    </div>
+                  );
+                }
+                if (endMode === 'after_days' && endAfterDays) {
+                  return (
+                    <div className="mt-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
+                      <span className="text-lg">🏁</span>
+                      <span className="text-sm font-medium text-rose-800 dark:text-rose-300">
+                        Ends after {endAfterDays} day{endAfterDays !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  );
+                }
+                return null;
               })()}
             </SheetHeader>
 

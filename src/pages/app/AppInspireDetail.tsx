@@ -98,6 +98,23 @@ export default function AppInspireDetail() {
     return { label: 'Ready to start today!', emoji: '🚀', isFuture: false };
   }, [routine]);
 
+  // Compute end date info
+  const endInfo = useMemo(() => {
+    if (!routine) return null;
+    const endMode = (routine as any).end_mode as string | null;
+    const endDate = (routine as any).end_date as string | null;
+    const endAfterDays = (routine as any).end_after_days as number | null;
+
+    if (endMode === 'date' && endDate) {
+      const d = new Date(endDate + 'T00:00:00');
+      return { label: `Ends ${format(d, 'MMM d')}`, emoji: '🏁' };
+    }
+    if (endMode === 'after_days' && endAfterDays) {
+      return { label: `Ends after ${endAfterDays} day${endAfterDays !== 1 ? 's' : ''}`, emoji: '🏁' };
+    }
+    return null;
+  }, [routine]);
+
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
       toast.error('No actions in this ritual');
@@ -244,6 +261,16 @@ export default function AppInspireDetail() {
                 {startInfo.label}
               </span>
             </div>
+
+            {/* End date banner */}
+            {endInfo && (
+              <div className="mt-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
+                <span className="text-lg">{endInfo.emoji}</span>
+                <span className="text-sm font-medium text-rose-800 dark:text-rose-300">
+                  {endInfo.label}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Description */}
@@ -316,6 +343,50 @@ export default function AppInspireDetail() {
                   </div>
                 );
               })}
+              {/* Unsectioned tasks */}
+              {(tasksBySection['unsorted']?.length ?? 0) > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Actions</h3>
+                  <div className="space-y-3">
+                    {tasksBySection['unsorted'].map((task) => {
+                      const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
+                      const repeatLabel = task.repeat_pattern && task.repeat_pattern !== 'none' 
+                        ? task.repeat_pattern === 'daily' ? 'Daily' 
+                          : task.repeat_pattern === 'weekly' ? 'Weekly' 
+                          : task.repeat_pattern === 'monthly' ? 'Monthly'
+                          : task.repeat_pattern === 'weekend' ? 'Weekends' : ''
+                        : 'Once';
+                      return (
+                        <div
+                          key={task.id}
+                          className="rounded-xl border border-border/50 overflow-hidden"
+                          style={{ backgroundColor: bgColor }}
+                        >
+                          <div className="flex items-center gap-3 p-3">
+                            <span className="text-2xl shrink-0">
+                              {task.emoji && isEmoji(task.emoji) ? task.emoji : '📝'}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-black truncate">{task.title}</p>
+                              <p className="text-xs text-black/70 truncate">
+                                {task.category || 'General'}
+                                <span className="ml-1">• {repeatLabel}</span>
+                              </p>
+                            </div>
+                          </div>
+                          {task.description && (
+                            <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
+                              <p className="text-xs text-black/80 leading-relaxed">
+                                {task.description}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           ) : routine.tasks && routine.tasks.length > 0 ? (
             <div className="mt-6">
@@ -388,6 +459,9 @@ export default function AppInspireDetail() {
           scheduleType={(routine as any).schedule_type || 'daily'}
           challengeStartDate={(routine as any).challenge_start_date || null}
           startDayOfWeek={(routine as any).start_day_of_week ?? null}
+          endMode={(routine as any).end_mode || null}
+          endDate={(routine as any).end_date || null}
+          endAfterDays={(routine as any).end_after_days || null}
           onSave={handleSaveRoutine}
           isSaving={addRoutineFromBank.isPending}
         />
