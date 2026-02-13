@@ -82,7 +82,7 @@ export const PlaylistCard = memo(function PlaylistCard({
 
   return (
     <Card 
-      className={`overflow-hidden rounded-2xl border-border/50 cursor-pointer hover:shadow-lg hover:border-border transition-all hover:scale-[1.02] active:scale-[0.98] ${
+      className={`overflow-hidden rounded-2xl border-border/50 cursor-pointer shadow-lg border-border transition-all active:scale-[0.98] ${
         isLocked ? 'opacity-80' : ''
       } ${tourClass}`}
       onClick={handleClick}
