@@ -90,13 +90,13 @@ export function RoutineBankCard({
   return (
     <button 
       className={cn(
-        "overflow-hidden cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] w-full text-left",
+        "overflow-hidden cursor-pointer transition-all active:scale-[0.98] w-full text-left",
         className
       )}
       onClick={handleClick}
     >
       {/* Square Image Container */}
-      <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-md">
+      <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-lg border border-border/50">
         {routine.cover_image_url ? (
           <img
             src={routine.cover_image_url}
