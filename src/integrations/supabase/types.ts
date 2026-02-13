@@ -892,6 +892,8 @@ export type Database = {
           id: string
           updated_at: string
           user_id: string
+          weight_goal: number | null
+          weight_unit: string
         }
         Insert: {
           default_fasting_hours?: number
@@ -899,6 +901,8 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id: string
+          weight_goal?: number | null
+          weight_unit?: string
         }
         Update: {
           default_fasting_hours?: number
@@ -906,6 +910,8 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+          weight_goal?: number | null
+          weight_unit?: string
         }
         Relationships: []
       }
@@ -3429,6 +3435,33 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      weight_logs: {
+        Row: {
+          created_at: string
+          id: string
+          logged_at: string
+          user_id: string
+          weight_unit: string
+          weight_value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logged_at?: string
+          user_id: string
+          weight_unit?: string
+          weight_value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logged_at?: string
+          user_id?: string
+          weight_unit?: string
+          weight_value?: number
         }
         Relationships: []
       }
