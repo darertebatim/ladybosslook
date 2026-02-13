@@ -1,104 +1,108 @@
 
 
-# Three Presence Improvements
+# Fasting Tracker Tool
 
-## 1. Streak Challenge Completion Celebration + Upgrade Prompt
+## Overview
+Build an intermittent fasting tracker at `/app/fasting`, inspired by the "Intermittent Fasting Tracker" app screenshots. The tool features a large circular progress ring, fasting zone indicators, preset fasting protocols, and session history -- all following existing tool patterns (Water, Breathe, etc.).
 
-**Problem**: User ALILOTFIHAMI has `current_streak=9` with `streak_goal=7` -- they completed the challenge but nothing happened. The `StreakChallengeCard` just shows a static "You completed the 7-day challenge!" text.
+## Screens and States
 
-**Solution**:
-- When `current_streak >= streak_goal` is first detected, show a **celebration modal** (similar to the gold celebration style) congratulating the user
-- After dismissing, show the **StreakGoalSelection** modal pre-filtered to show only goals **higher** than the completed one (e.g., completed 7 -> show 14, 30, 50)
-- Track in `user_streaks` table: add a `streak_goal_completed_at` column to know when it was completed and prevent re-showing the celebration
-- The `StreakChallengeCard` should also show a "Level Up" button when the challenge is completed, so users can upgrade anytime
+### 1. Idle State (no active fast)
+- Full-screen layout with warm gradient background (soft peach/rose tones matching the reference app)
+- Large circular ring in the center showing "Time Since Last Fast" with elapsed time
+- Bottom bar with 3 buttons:
+  - **Protocol pill** (left): shows current protocol (e.g., "16h"), tapping opens the protocol selector sheet
+  - **Start Fast** button (center): green rounded button to begin fasting
+  - **Stats button** (right): bar-chart icon, opens history/stats sheet
 
-**Files to change**:
-- `src/components/app/StreakChallengeCard.tsx` -- add "Level Up" CTA when completed
-- `src/components/app/StreakGoalSelection.tsx` -- add `minGoal` prop to filter out already-completed goals, add a congratulatory header variant
-- `src/pages/app/AppHome.tsx` -- detect streak goal completion, trigger celebration + upgrade flow
-- `src/hooks/useTaskPlanner.tsx` -- update `useSetStreakGoal` to also set `streak_goal_completed_at` to null when upgrading
-- New migration -- add `streak_goal_completed_at` column to `user_streaks`
+### 2. Active Fasting State
+- Same circular ring, now filling as a progress indicator
+- Center shows: current fasting zone emoji + name, "Elapsed Time X%", and a large `HH:MM:SS` timer
+- A small zone icon sits on top of the ring at the progress point
+- A lightning bolt button on the right side of the ring opens the Fasting Zones info sheet
+- Below the ring: **STARTED** (date/time) and **GOAL** (target date/time)
+- Bottom bar changes: protocol pill (left), **End Fast** button (center, outlined), stats button (right)
 
-## 2. Redefine "Returns" as App Visit Count
+### 3. Eating Window State (after ending a fast, for protocols with eating windows)
+- Ring shows eating window countdown
+- Center: "Eating window" label, elapsed time, "Ends on [date/time]"
+- A colored dot sits on the ring progress point
+- Bottom bar: protocol pill, **Start Fast** button (green), stats button
 
-**Problem**: Currently `return_count` only increments when a user comes back after a 2+ day absence. The user wants "Returns" to count how many times a user opens/returns to the app, encouraging healthy app visits instead of social media scrolling.
+### 4. Fast Completion Sheet
+- Bottom sheet that appears when ending a fast
+- Shows: "Nice effort!" title, total fasting duration, zone reached
+- Started/Ended timestamps with Edit buttons
+- Delete and Save buttons at bottom
 
-**Solution**:
-- Change the `return_count` logic to increment every time the user opens/visits the app (each app launch or return from background counts as 1)
-- Track via a lightweight mechanism: when the app mounts or returns to foreground, call a simple increment
-- Use the existing Capacitor `App` plugin's `appStateChange` listener (already available) to detect foreground returns
-- Add a new `app_return_count` column to `profiles` (keep old `return_count` for migration safety), or repurpose `return_count` directly since its current value is 0 for most users
+### 5. Protocol Selector Sheet
+- Bottom sheet titled "Change fast goal"
+- **Standard goals** grid (3 columns): Circadian 13h, 15:9 TRF 15h, 16:8 TRF 16h, 18:6 TRF 18h, 20:4 TRF 20h, OMAD 23h
+- Each protocol card has a distinct color
 
-**Files to change**:
-- `src/hooks/useUserPresence.tsx` -- new `useTrackAppReturn()` hook that increments `return_count` on each app open/foreground event
-- `src/components/app/AppShell.tsx` or top-level layout -- call the tracking hook on mount and on `appStateChange` resume
-- `src/pages/app/AppPresence.tsx` -- the "Returns" stat card already shows `returnCount`, so it will automatically reflect the new behavior
-- The `updatePresence` function's return-tracking logic (gap > 2 days) should be removed, as returns are now tracked independently
+### 6. Fasting Zones Sheet
+- Bottom sheet showing metabolic phases with emoji, name, time range, description, and a progress bar for the active zone
+- Zones:
+  - Anabolic (0-4h) -- digestion phase
+  - Catabolic (4-16h) -- glycogen burning
+  - Fat Burning (16-24h) -- fat metabolism
+  - Ketosis (24-72h) -- ketone production
+  - Deep Ketosis (72h+) -- cellular repair
+- Additional info section: Exercise, Nutrition, Body differences, Longer fasts, Research disclaimer
 
-## 3. Fix Push Notification Timing (Double PNs at Same Time)
+## Database
 
-**Problem**: All three 2-hourly crons (`send-momentum-celebration-2h`, `send-streak-challenges-2h`, `send-drip-followup-2h`) run at the exact same schedule: `0 */2 * * *` (top of every 2 hours). This means:
-- User got BOTH a `momentum_keeper_1d` AND a `streak_challenge_gold_streak` at the exact same second
-- The staggering described in the architecture (Drip at :00, Momentum at :20, Streak at :40) was **never implemented**
+### New table: `fasting_sessions`
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid (PK) | Auto-generated |
+| user_id | uuid (FK) | References auth.users |
+| protocol | text | e.g., "16:8", "18:6", "20:4", "OMAD" |
+| fasting_hours | integer | Target fasting hours |
+| started_at | timestamptz | When fasting began |
+| ended_at | timestamptz | When fasting ended (null if active) |
+| created_at | timestamptz | Record creation |
 
-Additionally, there's a **timezone bug**: the momentum function sent a "1 day inactive" notification to a user who was active that same day in their local timezone (PST), because the cron ran at midnight UTC (4 PM PST on Feb 12) and saw `last_active_date = 2026-02-12` as "1 day ago" in UTC terms.
+- RLS: Users can only read/write their own rows
 
-**Solution**:
-- **Stagger the cron schedules** via a migration:
-  - `send-drip-followup-2h`: keep at `0 */2 * * *` (offset :00)
-  - `send-momentum-celebration-2h`: change to `20 */2 * * *` (offset :20)
-  - `send-streak-challenges-2h`: change to `40 */2 * * *` (offset :40)
-- **Add cross-function daily cooldown**: Before sending, each function should check if the user already received ANY server-side PN today (not just from its own function). This prevents the same user from getting both a momentum and a streak notification on the same day.
-- **Fix timezone in momentum function**: The `last_active_date` comparison should use the user's local date, not UTC date, to determine inactivity gap.
+### New table: `fasting_preferences`
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid (PK) | Auto-generated |
+| user_id | uuid (FK, unique) | References auth.users |
+| default_protocol | text | Default protocol (e.g., "16:8") |
+| default_fasting_hours | integer | Default fasting duration |
+| updated_at | timestamptz | Last updated |
 
-**Files to change**:
-- New migration SQL -- `cron.unschedule` + `cron.schedule` with staggered offsets
-- `supabase/functions/send-momentum-celebration/index.ts` -- add cross-function cooldown check + fix timezone date comparison
-- `supabase/functions/send-streak-challenges/index.ts` -- add cross-function cooldown check (query `pn_schedule_logs` for ANY server-side PN today, not just `streak_challenge_%`)
+- RLS: Users can only read/write their own row
 
----
+## New Files
+
+### Hooks
+- **`src/hooks/useFastingTracker.tsx`**: Core hook managing active session state, CRUD for `fasting_sessions`, preferences, computed fasting zones, elapsed time, and stats (total fasts, average duration, longest streak)
+
+### Components (in `src/components/fasting/`)
+- **`FastingRing.tsx`**: SVG circular progress ring with zone indicator dot, zone emoji at progress point
+- **`FastingZonesSheet.tsx`**: Bottom sheet with all zone descriptions and progress indicators
+- **`FastingProtocolSheet.tsx`**: Bottom sheet with protocol grid selector
+- **`FastingCompletionSheet.tsx`**: End-of-fast summary with edit capabilities
+- **`FastingStatsSheet.tsx`**: History and stats view
+
+### Page
+- **`src/pages/app/AppFasting.tsx`**: Main page composing all components, managing state transitions between idle/fasting/eating
+
+### Config Updates
+- **`src/lib/toolsConfig.ts`**: Set `comingSoon: false` and `hidden: false` for the fasting tool
+- **`src/App.tsx`**: Add route for `/app/fasting`
+- **`src/integrations/supabase/types.ts`**: Add types for new tables
 
 ## Technical Details
 
-### Migration: Streak Goal Completion Tracking
-```sql
-ALTER TABLE user_streaks 
-ADD COLUMN IF NOT EXISTS streak_goal_completed_at TIMESTAMPTZ DEFAULT NULL;
-```
-
-### Migration: Stagger Cron Jobs
-```sql
-SELECT cron.unschedule('send-momentum-celebration-2h');
-SELECT cron.schedule('send-momentum-celebration-2h', '20 */2 * * *', ...);
-
-SELECT cron.unschedule('send-streak-challenges-2h');
-SELECT cron.schedule('send-streak-challenges-2h', '40 */2 * * *', ...);
-```
-
-### Cross-Function Cooldown Logic (in both edge functions)
-```typescript
-// Check if user already got ANY server-side PN today
-const { data: anyPnToday } = await supabase
-  .from('pn_schedule_logs')
-  .select('user_id')
-  .in('function_name', ['send-momentum-celebration', 'send-streak-challenges', 'send-drip-followup'])
-  .gte('sent_at', `${todayInUserTz}T00:00:00Z`);
-const alreadyNotifiedSet = new Set(anyPnToday?.map(s => s.user_id));
-```
-
-### App Return Tracking
-```typescript
-// In a top-level component
-useEffect(() => {
-  // Track initial app open
-  incrementReturnCount();
-  
-  // Track returns from background (Capacitor)
-  const listener = App.addListener('appStateChange', ({ isActive }) => {
-    if (isActive) incrementReturnCount();
-  });
-  
-  return () => { listener.then(l => l.remove()); };
-}, []);
-```
+- Timer uses `setInterval` with 1-second ticks (same pattern as `TaskTimerScreen` and `BreathingExerciseScreen`)
+- Active fasting state persists in the database (`ended_at = null`), so reopening the app resumes the timer
+- Fasting zones are computed client-side from elapsed hours -- no server logic needed
+- The circular ring uses SVG `stroke-dasharray` / `stroke-dashoffset` for progress animation (similar to `TaskTimerScreen`)
+- iOS safe areas handled via `env(safe-area-inset-top)` and `env(safe-area-inset-bottom)` padding
+- Haptic feedback on start, end, zone transitions
+- Pro task integration via `pro_link_type: 'fasting'` for routine linking (future phase)
 
