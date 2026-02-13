@@ -186,6 +186,7 @@ export default function AppFasting() {
         open={statsOpen}
         onOpenChange={setStatsOpen}
         sessions={pastSessions}
+        onDeleteSession={deleteFast}
       />
     </div>
   );
