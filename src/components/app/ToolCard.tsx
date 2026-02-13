@@ -96,7 +96,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
       onClick={handleClick}
       disabled={tool.comingSoon}
       className={cn(
-        'flex items-center gap-2.5 px-3 py-2 rounded-xl',
+        'flex items-center gap-2.5 px-3 py-1.5 rounded-xl',
         'shadow-sm border border-black/5',
         'transition-transform active:scale-[0.97]',
         tool.bgColor,
