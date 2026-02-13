@@ -272,7 +272,7 @@ export default function AppInspireDetail() {
           {/* Subtitle & Badges */}
           <div className="pt-4">
             {routine.subtitle && (
-              <p className="text-muted-foreground">{routine.subtitle}</p>
+              <p className="text-foreground">{routine.subtitle}</p>
             )}
             
             <div className="flex items-center gap-2 mt-3 flex-wrap">
@@ -282,7 +282,7 @@ export default function AppInspireDetail() {
                 </span>
               )}
               {routine.tasks && routine.tasks.length > 0 && (
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-foreground">
                   {routine.tasks.length} action{routine.tasks.length !== 1 ? 's' : ''}
                 </span>
               )}
@@ -320,7 +320,7 @@ export default function AppInspireDetail() {
           {/* Description */}
           {routine.description && (
             <div className="mt-5">
-              <p className="text-muted-foreground leading-relaxed">{routine.description}</p>
+              <p className="text-foreground leading-relaxed">{routine.description}</p>
             </div>
           )}
 
@@ -335,7 +335,7 @@ export default function AppInspireDetail() {
                       {section.title}
                     </h3>
                     {section.content && (
-                      <p className="text-sm text-muted-foreground mb-3">{section.content}</p>
+                      <p className="text-sm text-foreground mb-3">{section.content}</p>
                     )}
                     {section.image_url && (
                       <img
