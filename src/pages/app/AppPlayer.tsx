@@ -16,7 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
   { value: 'american', label: 'English', flag: '🇺🇸' },
-  { value: 'persian', label: 'فارسی', flag: '🦁' },
+  { value: 'persian', label: 'فارسی', flag: '🇮🇷' },
   { value: 'turkish', label: 'Türkçe', flag: '🇹🇷' },
   { value: 'spanish', label: 'Español', flag: '🇪🇸' },
 ];
