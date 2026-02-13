@@ -986,7 +986,7 @@ const AppCourseDetail = () => {
             {/* Back to Store Button */}
             <Button 
               variant="ghost" 
-              onClick={() => navigate('/app/browse')}
+              onClick={() => navigate('/app/explore')}
               className="mb-2"
             >
               Browse

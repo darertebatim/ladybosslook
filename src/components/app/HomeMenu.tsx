@@ -18,7 +18,7 @@ interface NavItem {
 
 const navPages: NavItem[] = [
   { id: 'explore', name: 'Explore', icon: <Compass className="h-4 w-4" />, route: '/app/player', color: 'text-violet-600 bg-violet-100' },
-  { id: 'listen', name: 'Listen', icon: <Music className="h-4 w-4" />, route: '/app/inspire', color: 'text-rose-600 bg-rose-100' },
+  { id: 'listen', name: 'Listen', icon: <Music className="h-4 w-4" />, route: '/app/rituals', color: 'text-rose-600 bg-rose-100' },
   { id: 'channels', name: 'Channels', icon: <Users className="h-4 w-4" />, route: '/app/feed', color: 'text-teal-600 bg-teal-100' },
   { id: 'chat', name: 'Chat', icon: <MessageCircle className="h-4 w-4" />, route: '/app/chat', color: 'text-blue-600 bg-blue-100' },
 ];

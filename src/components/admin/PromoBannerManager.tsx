@@ -435,7 +435,7 @@ export function PromoBannerManager() {
       case 'home':
         return 'Home Page';
       case 'inspire':
-        return 'Inspire / Rituals';
+        return 'Explore / Rituals';
       case 'emotion':
         return 'Emotion Tracker';
       case 'period':
@@ -652,7 +652,7 @@ export function PromoBannerManager() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="home">🏠 Home</SelectItem>
-                    <SelectItem value="inspire">✨ Inspire / Rituals Hub</SelectItem>
+                    <SelectItem value="inspire">✨ Explore / Rituals Hub</SelectItem>
                     <SelectItem value="routine">📋 Ritual Plan (specific)</SelectItem>
                     <SelectItem value="routines_hub">📚 Ritual Bank (specific)</SelectItem>
                     <SelectItem value="tasks_bank">📝 Actions Bank Page</SelectItem>
@@ -713,7 +713,7 @@ export function PromoBannerManager() {
               {/* Custom URL */}
               {destinationType === 'custom_url' && (
                 <div className="space-y-2">
-                  <Label>Custom URL (e.g., /app/inspire)</Label>
+                  <Label>Custom URL (e.g., /app/explore)</Label>
                   <Input
                     value={customUrl}
                     onChange={(e) => setCustomUrl(e.target.value)}
