@@ -174,15 +174,10 @@ export default function AppFasting() {
         {/* Protocol pill */}
         <button
           onClick={() => setProtocolOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-white/60 dark:bg-white/10 backdrop-blur-sm active:scale-95 transition-transform"
+          className="w-10 h-10 rounded-full flex items-center justify-center text-white text-[10px] font-bold active:scale-95 transition-transform shadow-sm"
+          style={{ backgroundColor: currentProtocol?.color || '#8B5CF6' }}
         >
-          <div
-            className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
-            style={{ backgroundColor: currentProtocol?.color || '#8B5CF6' }}
-          >
-            {currentProtocol?.label || '16h'}
-          </div>
-          <span className="text-sm font-medium">{currentProtocol?.name || '16:8 TRF'}</span>
+          {currentProtocol?.label || '16h'}
         </button>
 
         {/* Start / End button */}
