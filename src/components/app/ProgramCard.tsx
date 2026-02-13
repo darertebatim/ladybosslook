@@ -1,10 +1,19 @@
 import { CheckCircle2, BookOpen, Users, UserCheck, Headphones, Video, Calendar, Sparkles, Dumbbell, Waves, Heart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
+const LANG_FLAGS: Record<string, string> = {
+  all: '🌐',
+  american: '🇺🇸',
+  persian: '🦁',
+  turkish: '🇹🇷',
+  spanish: '🇪🇸',
+};
+
 interface ProgramCardProps {
   title: string;
   image?: string;
   type?: string;
+  language?: string;
   isFree?: boolean;
   isEnrolled?: boolean;
   onClick?: () => void;
@@ -27,6 +36,7 @@ export const ProgramCard = ({
   title,
   image,
   type,
+  language,
   isFree,
   isEnrolled,
   onClick,
@@ -57,13 +67,20 @@ export const ProgramCard = ({
       {/* Full gradient overlay for depth */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
-      {/* Enrolled Badge - Top Right */}
-      {isEnrolled && (
-        <Badge className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white text-xs rounded-full z-10">
-          <CheckCircle2 className="h-3 w-3 mr-1" />
-          Enrolled
-        </Badge>
-      )}
+      {/* Top Right: Language flag + Enrolled badge */}
+      <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+        {language && LANG_FLAGS[language] && (
+          <span className="text-sm bg-white/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
+            {LANG_FLAGS[language]}
+          </span>
+        )}
+        {isEnrolled && (
+          <Badge className="bg-green-500 hover:bg-green-600 text-white text-xs rounded-full">
+            <CheckCircle2 className="h-3 w-3 mr-1" />
+            Enrolled
+          </Badge>
+        )}
+      </div>
 
       {/* FREE Badge - Top Left */}
       {isFree && !isEnrolled && (

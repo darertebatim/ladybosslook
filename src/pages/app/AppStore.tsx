@@ -291,6 +291,7 @@ const AppStore = () => {
                             title={program.title}
                             image={program.image}
                             type={program.type}
+                            language={(program as any).language}
                             isFree={program.isFree || program.priceAmount === 0}
                             isEnrolled={enrolled}
                             onClick={() => navigate(`/app/course/${program.slug}`)}
