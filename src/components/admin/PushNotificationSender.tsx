@@ -26,7 +26,7 @@ interface NotificationFormProps {
 const IN_APP_LINKS = [
   { value: '/app/home', label: 'Home' },
   { value: '/app/programs', label: 'My Programs' },
-  { value: '/app/browse', label: 'Browse Store' },
+  { value: '/app/explore', label: 'Explore' },
   { value: '/app/player', label: 'Audio Player' },
   { value: '/app/chat', label: 'Support Chat' },
   { value: '/app/profile', label: 'Profile' },

@@ -154,8 +154,8 @@ const AppStore = () => {
   return (
     <div className="h-full overflow-hidden flex flex-col bg-background">
       <SEOHead 
-        title="Browse - LadyBoss Academy"
-        description="Browse tools, audio experiences, and educational programs"
+        title="Explore - Simora"
+        description="Explore tools, audio experiences, and educational programs"
       />
 
       {/* Fixed Header */}

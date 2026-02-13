@@ -147,7 +147,7 @@ const NativeAppLayout = () => {
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
-    { path: '/app/browse', icon: Compass, label: 'Explore', tourClass: 'tour-nav-explore' },
+    { path: '/app/explore', icon: Compass, label: 'Explore', tourClass: 'tour-nav-explore' },
     { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
     { path: '/app/channels', icon: Users, label: 'Channels', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
     { path: '/app/chat', icon: Headset, label: 'Support', tourClass: 'tour-nav-support' },

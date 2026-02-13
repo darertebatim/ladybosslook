@@ -262,7 +262,7 @@ const AppCourses = () => {
                 </Badge>
               </div>
               <Link 
-                to="/app/browse"
+                to="/app/explore"
                 className="text-[10px] text-primary font-medium flex items-center gap-0.5"
               >
                 View All
