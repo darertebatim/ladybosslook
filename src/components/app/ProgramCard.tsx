@@ -37,7 +37,7 @@ export const ProgramCard = ({
   return (
     <button
       onClick={onClick}
-      className="relative rounded-2xl overflow-hidden w-full aspect-[4/5] active:scale-[0.98] transition-transform duration-150 shadow-lg group"
+      className="relative rounded-2xl overflow-hidden w-full aspect-square active:scale-[0.98] transition-transform duration-150 shadow-lg group"
     >
       {/* Cover Image */}
       {image ? (
