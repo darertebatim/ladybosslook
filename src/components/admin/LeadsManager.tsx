@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key, Edit2, Trash2, UserPlus, Smartphone, Send, RotateCcw, GitMerge } from 'lucide-react';
+import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key, Edit2, Trash2, UserPlus, Smartphone, Send, RotateCcw, GitMerge, MessageCircle, Lock, Unlock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -104,6 +104,8 @@ export function LeadsManager() {
   const [mergeEmail, setMergeEmail] = useState('');
   const [sendingTestTo, setSendingTestTo] = useState<string | null>(null);
   const [deletingSubscription, setDeletingSubscription] = useState<string | null>(null);
+  const [coachAccessLoading, setCoachAccessLoading] = useState(false);
+  const [hasCoachAccess, setHasCoachAccess] = useState(false);
   const { toast } = useToast();
   const { programs, isLoading: programsLoading } = usePrograms();
   const queryClient = useQueryClient();
@@ -204,6 +206,14 @@ export function LeadsManager() {
           .eq('user_id', profile.id)
           .order('created_at', { ascending: false });
         pushSubscriptions = pushData || [];
+
+        // Check coach chat access
+        const { data: coachData } = await supabase
+          .from('user_coach_access')
+          .select('id')
+          .eq('user_id', profile.id)
+          .maybeSingle();
+        setHasCoachAccess(!!coachData);
         
         // Fetch available rounds for each unique program_slug
         const uniqueSlugs = [...new Set(enrollments.map(e => e.program_slug).filter(Boolean))];
@@ -615,6 +625,34 @@ export function LeadsManager() {
     }
   };
 
+  const handleToggleCoachAccess = async () => {
+    if (!searchResults?.profile?.id) return;
+    setCoachAccessLoading(true);
+    try {
+      if (hasCoachAccess) {
+        const { error } = await supabase
+          .from('user_coach_access')
+          .delete()
+          .eq('user_id', searchResults.profile.id);
+        if (error) throw error;
+        setHasCoachAccess(false);
+        toast({ title: 'Coach chat locked', description: `${searchResults.profile.email} can no longer chat with coach` });
+      } else {
+        const { error } = await supabase
+          .from('user_coach_access')
+          .insert({ user_id: searchResults.profile.id, granted_by: (await supabase.auth.getUser()).data.user?.id });
+        if (error) throw error;
+        setHasCoachAccess(true);
+        toast({ title: 'Coach chat unlocked', description: `${searchResults.profile.email} can now chat with coach` });
+      }
+    } catch (error: any) {
+      console.error('Toggle coach access error:', error);
+      toast({ title: 'Error', description: error.message || 'Failed to update coach access', variant: 'destructive' });
+    } finally {
+      setCoachAccessLoading(false);
+    }
+  };
+
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -994,6 +1032,35 @@ export function LeadsManager() {
                         This user has no registered devices for push notifications.
                       </p>
                     )}
+                  </div>
+
+                  {/* Coach Chat Access */}
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <GraduationCap className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <span className="text-sm font-medium">Coach Chat</span>
+                          <p className="text-xs text-muted-foreground">
+                            {hasCoachAccess ? 'User can chat with coach' : 'User cannot chat with coach'}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        variant={hasCoachAccess ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={handleToggleCoachAccess}
+                        disabled={coachAccessLoading}
+                      >
+                        {coachAccessLoading ? (
+                          'Loading...'
+                        ) : hasCoachAccess ? (
+                          <><Unlock className="h-4 w-4 mr-1.5" />Unlocked</>
+                        ) : (
+                          <><Lock className="h-4 w-4 mr-1.5" />Locked</>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
