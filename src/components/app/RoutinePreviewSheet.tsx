@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Check, Pencil, CalendarDays } from 'lucide-react';
+import { Check, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -296,23 +296,44 @@ export function RoutinePreviewSheet({
               <p className="text-sm text-muted-foreground">
                 Edit it to create your personalized ritual.
               </p>
-              {/* Start date info */}
+              {/* Start date banner */}
               {(() => {
                 const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                let label = 'Starts today';
+                let label = 'Ready to start today!';
+                let emoji = '🚀';
+                let isFuture = false;
                 if (challengeStartDate) {
                   const d = new Date(challengeStartDate + 'T00:00:00');
                   const today = new Date();
                   today.setHours(0, 0, 0, 0);
-                  label = d <= today ? 'Starts today' : `Starts ${format(d, 'MMM d')}`;
+                  if (d <= today) {
+                    label = 'Ready to start today!';
+                  } else {
+                    const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                    label = `Starts ${format(d, 'MMM d')} · in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+                    emoji = '📅';
+                    isFuture = true;
+                  }
                 } else if (startDayOfWeek != null) {
                   label = `Starts next ${WEEKDAY_NAMES[startDayOfWeek]}`;
+                  emoji = '📅';
+                  isFuture = true;
                 }
                 return (
-                  <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
-                    <CalendarDays className="w-3.5 h-3.5" />
-                    {label}
-                  </p>
+                  <div className={`mt-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border ${
+                    isFuture 
+                      ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800'
+                      : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800'
+                  }`}>
+                    <span className="text-lg">{emoji}</span>
+                    <span className={`text-sm font-medium ${
+                      isFuture 
+                        ? 'text-amber-800 dark:text-amber-300'
+                        : 'text-emerald-800 dark:text-emerald-300'
+                    }`}>
+                      {label}
+                    </span>
+                  </div>
                 );
               })()}
             </SheetHeader>
