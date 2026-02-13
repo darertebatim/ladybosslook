@@ -103,11 +103,11 @@ const AppPresence = () => {
                     className="text-7xl font-bold text-orange-700"
                     style={{ textShadow: '0 2px 10px rgba(234, 88, 12, 0.2)' }}
                   >
-                    {stats?.thisMonthActiveDays || 0}
+                    {stats?.last7DaysActive || 0}
                   </span>
                 </div>
               )}
-              <p className="text-orange-600/80 text-lg font-medium mb-8">days this month</p>
+              <p className="text-orange-600/80 text-lg font-medium mb-8">days in the last week</p>
               
               {/* Week presence grid in a clean white card */}
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm mx-2">
@@ -138,24 +138,7 @@ const AppPresence = () => {
           {/* Content */}
           <div className="px-4 py-6 space-y-6">
             
-            {/* Streak Challenge Card - only show if user has a goal set */}
-            {hasStreakChallenge && (
-              <StreakChallengeCard
-                currentStreak={streak.current_streak}
-                streakGoal={streak.streak_goal!}
-                onLevelUp={() => setShowGoalSelection(true)}
-              />
-            )}
-            
-            {/* Challenge Ritual Cards */}
-            {challenges && challenges.length > 0 && challenges.map(challenge => (
-              <ChallengeRitualCard
-                key={challenge.routineId}
-                challenge={challenge}
-              />
-            ))}
-            
-            {/* Quick Stats Row */}
+            {/* Quick Stats Row - above challenges */}
             <div className="grid grid-cols-3 gap-3">
               <StatCard 
                 icon={Flame}
@@ -179,6 +162,23 @@ const AppPresence = () => {
                 isLoading={isLoading}
               />
             </div>
+            
+            {/* Streak Challenge Card - only show if user has a goal set */}
+            {hasStreakChallenge && (
+              <StreakChallengeCard
+                currentStreak={streak.current_streak}
+                streakGoal={streak.streak_goal!}
+                onLevelUp={() => setShowGoalSelection(true)}
+              />
+            )}
+            
+            {/* Challenge Ritual Cards */}
+            {challenges && challenges.length > 0 && challenges.map(challenge => (
+              <ChallengeRitualCard
+                key={challenge.routineId}
+                challenge={challenge}
+              />
+            ))}
             
             {/* All-Time Activity Stats */}
             <section className="bg-white rounded-2xl p-4 shadow-sm">
