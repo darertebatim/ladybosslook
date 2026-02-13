@@ -1,10 +1,12 @@
-import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell } from 'lucide-react';
+import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+
+import { cn } from '@/lib/utils';
 
 const menuItems = [
   { title: 'Overview', url: '/admin', icon: LayoutDashboard, end: true, pageSlug: 'overview' },
@@ -21,7 +23,12 @@ const menuItems = [
   { title: 'System', url: '/admin/system', icon: Shield, pageSlug: 'system' },
 ];
 
-export function AdminNav() {
+interface AdminNavProps {
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+}
+
+export function AdminNav({ collapsed, onToggleCollapse }: AdminNavProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { canAccessAdminPage } = useAuth();
@@ -47,35 +54,61 @@ export function AdminNav() {
   const visibleMenuItems = menuItems.filter(item => canAccessAdminPage(item.pageSlug));
 
   return (
-    <nav className="border-b bg-background">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-14">
-          <h1 className="text-xl font-semibold">Admin Panel</h1>
-          
-          <div className="flex items-center gap-1">
-            {visibleMenuItems.map((item) => (
-              <NavLink
-                key={item.title}
-                to={item.url}
-                end={item.end}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-muted ${
-                    isActive ? 'bg-muted text-primary' : 'text-muted-foreground'
-                  }`
-                }
-              >
-                <item.icon className="h-4 w-4" />
-                <span className="hidden md:inline">{item.title}</span>
-              </NavLink>
-            ))}
-          </div>
-
-          <Button onClick={handleSignOut} variant="outline" size="sm">
-            <LogOut className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Sign Out</span>
-          </Button>
-        </div>
+    <aside className={cn(
+      "fixed top-0 left-0 h-full border-r bg-background z-40 flex flex-col transition-all duration-200",
+      collapsed ? "w-14" : "w-52"
+    )}>
+      {/* Header */}
+      <div className={cn(
+        "flex items-center h-14 border-b px-3 shrink-0",
+        collapsed ? "justify-center" : "justify-between"
+      )}>
+        {!collapsed && <h1 className="text-sm font-semibold truncate">Admin</h1>}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 shrink-0"
+          onClick={onToggleCollapse}
+        >
+          {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+        </Button>
       </div>
-    </nav>
+
+      {/* Menu items */}
+      <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
+        {visibleMenuItems.map((item) => (
+          <NavLink
+            key={item.title}
+            to={item.url}
+            end={item.end}
+            className={({ isActive }) =>
+              cn(
+                "flex items-center gap-2.5 rounded-md text-sm font-medium transition-colors hover:bg-muted",
+                collapsed ? "justify-center px-2 py-2" : "px-3 py-2",
+                isActive ? 'bg-muted text-primary' : 'text-muted-foreground'
+              )
+            }
+            title={collapsed ? item.title : undefined}
+          >
+            <item.icon className="h-4 w-4 shrink-0" />
+            {!collapsed && <span className="truncate">{item.title}</span>}
+          </NavLink>
+        ))}
+      </nav>
+
+      {/* Sign out */}
+      <div className="border-t p-2 shrink-0">
+        <Button
+          onClick={handleSignOut}
+          variant="ghost"
+          size="sm"
+          className={cn("w-full", collapsed ? "justify-center px-2" : "justify-start")}
+          title={collapsed ? "Sign Out" : undefined}
+        >
+          <LogOut className="h-4 w-4 shrink-0" />
+          {!collapsed && <span className="ml-2">Sign Out</span>}
+        </Button>
+      </div>
+    </aside>
   );
 }

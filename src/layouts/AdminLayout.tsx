@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { AdminNav } from '@/components/admin/AdminNav';
 import { SEOHead } from '@/components/SEOHead';
@@ -5,9 +6,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { AIAssistantProvider } from '@/contexts/AIAssistantContext';
 import { AIAssistantButton } from '@/components/admin/AIAssistantButton';
 import { AIAssistantPanel } from '@/components/admin/AIAssistantPanel';
+import { cn } from '@/lib/utils';
 
 export const AdminLayout = () => {
   const { loading, hasAdminAccess } = useAuth();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   if (loading) {
     return (
@@ -25,8 +28,8 @@ export const AdminLayout = () => {
     <AIAssistantProvider>
       <SEOHead />
       <div className="min-h-screen bg-background">
-        <AdminNav />
-        <main className="container mx-auto p-6">
+        <AdminNav collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
+        <main className={cn("p-6 transition-all duration-200", sidebarCollapsed ? "ml-14" : "ml-52")}>
           <Outlet />
         </main>
       </div>
