@@ -87,18 +87,18 @@ export function FastingProtocolSheet({ open, onOpenChange, selectedProtocol, onS
                 key={protocol.id}
                 onClick={() => handleStandardSelect(protocol.id)}
                 className={cn(
-                  'relative flex flex-col justify-between p-3.5 rounded-2xl text-white text-left aspect-[4/5] active:scale-95 transition-all',
+                  'relative flex flex-col justify-between p-3.5 rounded-2xl text-foreground text-left aspect-[4/5] active:scale-95 transition-all',
                   isSelected && 'ring-2 ring-offset-2 ring-primary'
                 )}
                 style={{ backgroundColor: protocol.color }}
               >
-                <span className="text-xs font-medium leading-tight opacity-90">
-                  {protocol.id === 'omad' ? 'One Meal\nA Day' : `${protocol.name}`}
+                <span className="text-xs font-semibold leading-tight">
+                  {protocol.id === 'omad' ? 'One Meal\nA Day' : protocol.name}
                 </span>
                 <div>
                   <span className="text-3xl font-bold">{protocol.fastingHours}</span>
                   <br />
-                  <span className="text-xs opacity-80">hours</span>
+                  <span className="text-xs font-medium opacity-70">hours</span>
                 </div>
               </button>
             );

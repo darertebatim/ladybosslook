@@ -80,10 +80,10 @@ export interface FastingProtocol {
 }
 
 export const FASTING_PROTOCOLS: FastingProtocol[] = [
-  { id: 'circadian', name: 'Circadian', label: '13h', fastingHours: 13, color: '#F59E0B' },
-  { id: '15:9', name: '15:9 TRF', label: '15h', fastingHours: 15, color: '#EF4444' },
-  { id: '16:8', name: '16:8 TRF', label: '16h', fastingHours: 16, color: '#8B5CF6' },
-  { id: '18:6', name: '18:6 TRF', label: '18h', fastingHours: 18, color: '#3B82F6' },
-  { id: '20:4', name: '20:4 TRF', label: '20h', fastingHours: 20, color: '#06B6D4' },
-  { id: 'omad', name: 'OMAD', label: '23h', fastingHours: 23, color: '#10B981' },
+  { id: 'circadian', name: 'Circadian', label: '13h', fastingHours: 13, color: '#FFD6E8' },
+  { id: '15:9', name: '15:9 TRF', label: '15h', fastingHours: 15, color: '#FFE4C4' },
+  { id: '16:8', name: '16:8 TRF', label: '16h', fastingHours: 16, color: '#FFF59D' },
+  { id: '18:6', name: '18:6 TRF', label: '18h', fastingHours: 18, color: '#C5E8FA' },
+  { id: '20:4', name: '20:4 TRF', label: '20h', fastingHours: 20, color: '#B8F5E4' },
+  { id: 'omad', name: 'OMAD', label: '23h', fastingHours: 23, color: '#E8D4F8' },
 ];
