@@ -38,8 +38,10 @@ export default function AppChannelsList() {
   const { canAccessAdminPage } = useAuth();
   const { data: channels, isLoading: channelsLoading } = useChannels();
   const { data: summaries, isLoading: summariesLoading } = useChannelSummaries();
-  const { unreadCount: supportUnreadCount } = useUnreadChat();
-  const { data: supportSummary } = useSupportChatSummary();
+  const { unreadCount: supportUnreadCount } = useUnreadChat('support');
+  const { data: supportSummary } = useSupportChatSummary('support');
+  const { unreadCount: coachUnreadCount } = useUnreadChat('coach');
+  const { data: coachSummary } = useSupportChatSummary('coach');
 
   // Subscribe to real-time updates for all channels
   useFeedRealtime();
@@ -50,6 +52,10 @@ export default function AppChannelsList() {
 
   const handleSupportClick = () => {
     navigate('/app/chat');
+  };
+
+  const handleCoachClick = () => {
+    navigate('/app/coach-chat');
   };
 
   const isLoading = channelsLoading || summariesLoading;
@@ -151,6 +157,43 @@ export default function AppChannelsList() {
                 )}
               </div>
 
+              <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
+            </button>
+
+            {/* Coach Chat */}
+            <button
+              onClick={handleCoachClick}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors text-left bg-primary/[0.03] border-b-2 border-primary/10"
+            >
+              <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary">
+                <GraduationCap className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-foreground truncate">Coach</span>
+                </div>
+                {coachSummary?.lastMessage ? (
+                  <p className="text-sm text-muted-foreground truncate mt-0.5">
+                    {coachSummary.lastMessage.sender_type === 'user' ? 'You' : 'Coach'}: {coachSummary.lastMessage.content}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground/60 mt-0.5">
+                    Chat with your coach
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                {coachSummary?.lastMessage?.created_at && (
+                  <span className="text-xs text-muted-foreground">
+                    {formatLastMessageTime(new Date(coachSummary.lastMessage.created_at))}
+                  </span>
+                )}
+                {coachUnreadCount > 0 && (
+                  <Badge className="h-5 min-w-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-semibold">
+                    {coachUnreadCount > 99 ? '99+' : coachUnreadCount}
+                  </Badge>
+                )}
+              </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
             </button>
 

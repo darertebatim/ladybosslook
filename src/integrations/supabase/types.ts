@@ -658,6 +658,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          inbox_type: string
           last_message_at: string | null
           status: string
           subject: string | null
@@ -669,6 +670,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          inbox_type?: string
           last_message_at?: string | null
           status?: string
           subject?: string | null
@@ -680,6 +682,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          inbox_type?: string
           last_message_at?: string | null
           status?: string
           subject?: string | null
