@@ -154,8 +154,8 @@ export const comingSoonTools: ToolConfig[] = [
     iconColor: 'text-green-600',
     route: '/app/fasting',
     description: 'Intermittent fasting',
-    comingSoon: true,
-    hidden: true,
+    comingSoon: false,
+    hidden: false,
   },
   {
     id: 'reflections',

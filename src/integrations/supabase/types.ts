@@ -885,6 +885,60 @@ export type Database = {
         }
         Relationships: []
       }
+      fasting_preferences: {
+        Row: {
+          default_fasting_hours: number
+          default_protocol: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          default_fasting_hours?: number
+          default_protocol?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          default_fasting_hours?: number
+          default_protocol?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fasting_sessions: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          fasting_hours: number
+          id: string
+          protocol: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          fasting_hours?: number
+          id?: string
+          protocol?: string
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          fasting_hours?: number
+          id?: string
+          protocol?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       feed_channels: {
         Row: {
           allow_comments: boolean
