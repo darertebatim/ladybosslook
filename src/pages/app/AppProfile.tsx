@@ -10,11 +10,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SectionNav } from '@/components/app/profile/SectionNav';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
   LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell,
-  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, Trash2, AlertTriangle, Settings, PlayCircle, Headset, Megaphone
+  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, ChevronDown, Trash2, AlertTriangle, Settings, PlayCircle, Headset, Megaphone
 } from 'lucide-react';
 import { NativeSettings, IOSSettings, AndroidSettings } from 'capacitor-native-settings';
 import {
@@ -34,7 +33,7 @@ import { checkCalendarPermission, requestCalendarPermission, isCalendarAvailable
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications, unsubscribeFromPushNotifications } from '@/lib/pushNotifications';
 import { resetAllTours } from '@/lib/clientReset';
 import { Capacitor } from '@capacitor/core';
@@ -114,61 +113,17 @@ const AppProfile = () => {
   const { data: journalEntries } = useJournalEntries();
   const daysThisMonth = useMemo(() => calculateMonthlyPresence(journalEntries || []), [journalEntries]);
 
-  // Section refs for scroll navigation - Account tab
-  const personalInfoRef = useRef<HTMLDivElement>(null);
-  const passwordRef = useRef<HTMLDivElement>(null);
-  const actionsRef = useRef<HTMLDivElement>(null);
+  // Accordion open state
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
-  // Section refs for scroll navigation - Settings tab
-  const supportRef = useRef<HTMLDivElement>(null);
-  const pushNotificationsRef = useRef<HTMLDivElement>(null);
-  const notificationPrefsRef = useRef<HTMLDivElement>(null);
-  const calendarSyncRef = useRef<HTMLDivElement>(null);
-
-  // Scroll to section helper
-  const scrollToSection = useCallback((ref: React.RefObject<HTMLDivElement>) => {
-    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const toggleSection = useCallback((id: string) => {
+    setOpenSections(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   }, []);
-
-  // Section nav items for Account tab
-  const accountSections = useMemo(() => [
-    { id: 'personal', label: 'Info', icon: <User className="h-4 w-4" /> },
-    { id: 'password', label: 'Password', icon: <Lock className="h-4 w-4" /> },
-    { id: 'actions', label: 'Actions', icon: <LogOut className="h-4 w-4" /> },
-  ], []);
-
-  // Section nav items for Settings tab
-  const settingsSections = useMemo(() => {
-    const sections = [
-      { id: 'support', label: 'Support', icon: <MessageCircle className="h-4 w-4" /> },
-    ];
-    if (showNativeSettings) {
-      sections.push({ id: 'push', label: 'Push', icon: <Bell className="h-4 w-4" /> });
-    }
-    sections.push({ id: 'prefs', label: 'Preferences', icon: <Settings className="h-4 w-4" /> });
-    if (showNativeSettings) {
-      sections.push({ id: 'calendar', label: 'Calendar', icon: <Calendar className="h-4 w-4" /> });
-    }
-    return sections;
-  }, [showNativeSettings]);
-
-  // Handle section navigation
-  const handleAccountNav = useCallback((id: string) => {
-    switch (id) {
-      case 'personal': scrollToSection(personalInfoRef); break;
-      case 'password': scrollToSection(passwordRef); break;
-      case 'actions': scrollToSection(actionsRef); break;
-    }
-  }, [scrollToSection]);
-
-  const handleSettingsNav = useCallback((id: string) => {
-    switch (id) {
-      case 'support': scrollToSection(supportRef); break;
-      case 'push': scrollToSection(pushNotificationsRef); break;
-      case 'prefs': scrollToSection(notificationPrefsRef); break;
-      case 'calendar': scrollToSection(calendarSyncRef); break;
-    }
-  }, [scrollToSection]);
 
   // Test push notification
   const handleTestNotification = async () => {
@@ -748,735 +703,696 @@ const AppProfile = () => {
         </div>
       </header>
 
-      {/* Tabs */}
-      <Tabs defaultValue="account" className="flex-1 flex flex-col overflow-hidden">
-        <TabsList className="shrink-0 mx-4 mt-4 mb-2 grid grid-cols-3 h-11 bg-muted/50 p-1 rounded-xl">
-          <TabsTrigger value="account" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            Account
-          </TabsTrigger>
-          <TabsTrigger value="activity" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            Activity
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm relative">
-            Settings
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
-                {unreadCount}
-              </span>
-            )}
-          </TabsTrigger>
-        </TabsList>
+      {/* Accordion Sections */}
+      <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe space-y-2 mt-4">
         
-        {/* Account Tab */}
-        <TabsContent value="account" className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe mt-0 space-y-4">
-          {/* Quick Navigation */}
-          <SectionNav items={accountSections} onNavigate={handleAccountNav} />
-          
-          {/* Profile Info Card */}
-          <Card ref={personalInfoRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Personal Info
-              </CardTitle>
-              {!isEditingProfile ? (
-                <Button variant="ghost" size="sm" onClick={() => setIsEditingProfile(true)}>
-                  <Pencil className="h-4 w-4 mr-1" />
-                  Edit
-                </Button>
-              ) : (
-                <div className="flex gap-2">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={handleCancelEdit}
-                    disabled={isSavingProfile}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="default" 
-                    size="sm" 
-                    onClick={handleSaveProfile}
-                    disabled={isSavingProfile}
-                  >
-                    <Check className="h-4 w-4 mr-1" />
-                    {isSavingProfile ? 'Saving...' : 'Save'}
-                  </Button>
-                </div>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
-                <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span className="truncate">{profile?.email || user?.email}</span>
+        {/* Personal Info */}
+        <Collapsible open={openSections.has('personal')} onOpenChange={() => toggleSection('personal')}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                <User className="h-4 w-4 text-primary" />
               </div>
-              
-              {isEditingProfile ? (
-                <>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="editName" className="text-xs text-muted-foreground">Full Name</Label>
-                    <Input
-                      id="editName"
-                      value={editedName}
-                      onChange={(e) => setEditedName(e.target.value)}
-                      placeholder="Your full name"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="editPhone" className="text-xs text-muted-foreground">Phone</Label>
-                    <Input
-                      id="editPhone"
-                      value={editedPhone}
-                      onChange={(e) => setEditedPhone(e.target.value)}
-                      placeholder="Your phone number"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="editCity" className="text-xs text-muted-foreground">City</Label>
-                    <Input
-                      id="editCity"
-                      value={editedCity}
-                      onChange={(e) => setEditedCity(e.target.value)}
-                      placeholder="Your city"
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  {profile?.full_name && (
-                    <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span>{profile.full_name}</span>
-                    </div>
-                  )}
-                  {profile?.phone && (
-                    <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span>{profile.phone}</span>
-                    </div>
-                  )}
-                  {profile?.city && (
-                    <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <span>{profile.city}</span>
-                    </div>
-                  )}
-                  {!profile?.full_name && !profile?.phone && !profile?.city && (
-                    <p className="text-sm text-muted-foreground p-2">Tap Edit to add your details</p>
-                  )}
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Password Card */}
-          <Card ref={passwordRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Lock className="h-4 w-4" />
-                Password
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="newPassword" className="text-xs text-muted-foreground">New Password</Label>
-                <Input
-                  id="newPassword"
-                  type="password"
-                  placeholder="Enter new password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  disabled={isChangingPassword}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="confirmPassword" className="text-xs text-muted-foreground">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Confirm new password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  disabled={isChangingPassword}
-                />
-              </div>
-              <Button
-                onClick={handlePasswordChange}
-                disabled={isChangingPassword || !newPassword || !confirmPassword}
-                className="w-full"
-              >
-                <Lock className="mr-2 h-4 w-4" />
-                {isChangingPassword ? 'Updating...' : 'Update Password'}
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Actions Card */}
-          <Card ref={actionsRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-12 rounded-xl bg-muted/30"
-                onClick={() => {
-                  resetAllTours();
-                  navigate('/app/home');
-                  toast({ title: 'Tours Reset', description: 'All feature tours will restart when you visit each section.' });
-                }}
-              >
-                <PlayCircle className="mr-3 h-4 w-4" />
-                Restart All Tours
-              </Button>
-              
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-12 rounded-xl bg-muted/30"
-                onClick={handleSignOut}
-              >
-                <LogOut className="mr-3 h-4 w-4" />
-                Sign Out
-              </Button>
-              
-              <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start h-12 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
-                  >
-                    <Trash2 className="mr-3 h-4 w-4" />
-                    Delete Account
+              <span className="font-medium text-sm">Personal Info</span>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('personal') ? 'rotate-180' : ''}`} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-1">
+            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+              <CardHeader className="flex flex-row items-center justify-end space-y-0 pb-2 pt-3">
+                {!isEditingProfile ? (
+                  <Button variant="ghost" size="sm" onClick={() => setIsEditingProfile(true)}>
+                    <Pencil className="h-4 w-4 mr-1" />
+                    Edit
                   </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="flex items-center gap-2 text-destructive">
-                      <AlertTriangle className="h-5 w-5" />
-                      Delete Your Account?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription className="space-y-3">
-                      <p>
-                        This action is <strong>permanent and cannot be undone</strong>. 
-                        All your data will be immediately deleted, including:
-                      </p>
-                      <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
-                        <li>Your profile and account information</li>
-                        <li>All course enrollments and progress</li>
-                        <li>Journal entries and chat history</li>
-                        <li>Audio bookmarks and listening history</li>
-                        <li>Wallet balance and transaction history</li>
-                      </ul>
-                      <div className="pt-2">
-                        <Label htmlFor="deleteConfirm" className="text-sm font-medium">
-                          Type <span className="font-bold text-destructive">DELETE</span> to confirm:
-                        </Label>
-                        <Input
-                          id="deleteConfirm"
-                          value={deleteConfirmText}
-                          onChange={(e) => setDeleteConfirmText(e.target.value.toUpperCase())}
-                          placeholder="Type DELETE"
-                          className="mt-2"
-                          disabled={isDeletingAccount}
-                        />
-                      </div>
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel 
-                      disabled={isDeletingAccount}
-                      onClick={() => setDeleteConfirmText('')}
-                    >
-                      Cancel
-                    </AlertDialogCancel>
-                    <Button
-                      variant="destructive"
-                      onClick={handleDeleteAccount}
-                      disabled={deleteConfirmText !== 'DELETE' || isDeletingAccount}
-                    >
-                      {isDeletingAccount ? 'Deleting...' : 'Delete My Account'}
+                ) : (
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="sm" onClick={handleCancelEdit} disabled={isSavingProfile}>
+                      <X className="h-4 w-4" />
                     </Button>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Activity Tab */}
-        <TabsContent value="activity" className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe mt-0 space-y-4">
-          {/* Journal Stats */}
-          <JournalStats className="rounded-2xl shadow-sm border-0" />
-
-          {/* My Programs Card */}
-          <Card className="rounded-2xl shadow-sm border-0 bg-card">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
-                My Programs
-              </CardTitle>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/app/programs">
-                  View All
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Link>
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {enrollments && enrollments.length > 0 ? (
-                <div className="space-y-2">
-                  {enrollments.map((enrollment) => (
-                    <Link
-                      key={enrollment.id}
-                      to={`/app/course/${enrollment.program_slug || enrollment.course_name}`}
-                      className="flex items-center justify-between p-3 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate">{enrollment.course_name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Enrolled {format(new Date(enrollment.enrolled_at), 'MMM d, yyyy')}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {(enrollment.program_rounds as any)?.status || 'active'}
-                        </Badge>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <BookOpen className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">No courses yet</p>
-                  <Button variant="link" size="sm" asChild>
-                    <Link to="/app/store">Browse Programs</Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Wallet Card */}
-          <Card className="rounded-2xl shadow-sm border-0 bg-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Wallet className="h-4 w-4" />
-                Wallet & Credits
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl">
-                <div>
-                  <p className="text-xs text-muted-foreground">Current Balance</p>
-                  <p className="text-2xl font-bold">{wallet?.credits_balance || 0} Credits</p>
-                </div>
-                <Wallet className="h-8 w-8 text-primary/30" />
-              </div>
-
-              {transactions && transactions.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-xs font-medium text-muted-foreground">Recent Transactions</p>
-                  {transactions.map((tx) => (
-                    <div key={tx.id} className="flex items-center justify-between py-2 px-3 bg-muted/30 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        {tx.amount > 0 ? (
-                          <TrendingUp className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <TrendingDown className="h-4 w-4 text-red-500" />
-                        )}
-                        <span className="text-sm truncate max-w-[140px]">{tx.description || tx.transaction_type}</span>
-                      </div>
-                      <span className={`text-sm font-medium ${tx.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {tx.amount > 0 ? '+' : ''}{tx.amount}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Orders Card */}
-          <Card className="rounded-2xl shadow-sm border-0 bg-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Receipt className="h-4 w-4" />
-                Order History
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {orders && orders.length > 0 ? (
-                <div className="space-y-2">
-                  {orders.map((order) => (
-                    <div key={order.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate">{order.product_name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {format(new Date(order.created_at), 'MMM d, yyyy')}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="text-sm font-medium">
-                          {formatCurrency(order.amount, order.currency || 'usd')}
-                        </span>
-                        <Badge variant={getStatusBadgeVariant(order.status || 'completed')}>
-                          {order.refunded ? 'Refunded' : (order.status || 'Completed')}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <Receipt className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">No orders yet</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Settings Tab */}
-        <TabsContent value="settings" className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe mt-0 space-y-4">
-          {/* Quick Navigation */}
-          <SectionNav items={settingsSections} onNavigate={handleSettingsNav} />
-
-          {/* Support Card */}
-          <Card ref={supportRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <MessageCircle className="h-4 w-4" />
-                Support
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button
-                className="w-full relative"
-                onClick={() => navigate('/app/chat')}
-              >
-                <MessageCircle className="mr-2 h-4 w-4" />
-                Chat with Support
-                {unreadCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {unreadCount}
-                  </span>
+                    <Button variant="default" size="sm" onClick={handleSaveProfile} disabled={isSavingProfile}>
+                      <Check className="h-4 w-4 mr-1" />
+                      {isSavingProfile ? 'Saving...' : 'Save'}
+                    </Button>
+                  </div>
                 )}
-              </Button>
-
-              <div className="relative py-2">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">or via Telegram</span>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="subject" className="text-xs text-muted-foreground">Subject</Label>
-                <select
-                  id="subject"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  value={contactSubject}
-                  onChange={(e) => setContactSubject(e.target.value)}
-                >
-                  <option value="">Select a topic...</option>
-                  <option value="General Inquiry">General Inquiry</option>
-                  <option value="Technical Support">Technical Support</option>
-                  <option value="Refund Request">Refund Request</option>
-                  <option value="Cancel Subscription">Cancel Subscription</option>
-                  <option value="Course Question">Course Question</option>
-                  <option value="Billing Issue">Billing Issue</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              
-              <div className="space-y-1.5">
-                <Label htmlFor="message" className="text-xs text-muted-foreground">Message</Label>
-                <Textarea
-                  id="message"
-                  placeholder="Type your message here..."
-                  value={contactMessage}
-                  onChange={(e) => setContactMessage(e.target.value)}
-                  rows={3}
-                />
-              </div>
-
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  if (!contactSubject || !contactMessage.trim()) {
-                    toast({
-                      title: 'Error',
-                      description: 'Please select a subject and enter a message',
-                      variant: 'destructive',
-                    });
-                    return;
-                  }
-                  const telegramMessage = `Subject: ${contactSubject}\n\nMessage:\n${contactMessage}`;
-                  window.open(`https://t.me/ladybosslook?text=${encodeURIComponent(telegramMessage)}`, '_blank');
-                }}
-              >
-                <Send className="mr-2 h-4 w-4" />
-                Send via Telegram
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Admin Tools - Only visible for staff with relevant access */}
-          {(canAccessAdminPage('support') || canAccessAdminPage('community')) && (
-            <Card className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
-                  Admin Tools
-                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-                {canAccessAdminPage('support') && (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() => navigate('/app/support', { state: { from: '/app/profile' } })}
-                  >
-                    <Headset className="mr-2 h-4 w-4" />
-                    Support Inbox
-                  </Button>
-                )}
-                {canAccessAdminPage('community') && (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() => navigate('/app/channels/new', { state: { from: '/app/profile' } })}
-                  >
-                    <Megaphone className="mr-2 h-4 w-4" />
-                    Post to Channel
-                  </Button>
+              <CardContent className="space-y-3 pt-0">
+                <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
+                  <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <span className="truncate">{profile?.email || user?.email}</span>
+                </div>
+                
+                {isEditingProfile ? (
+                  <>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="editName" className="text-xs text-muted-foreground">Full Name</Label>
+                      <Input id="editName" value={editedName} onChange={(e) => setEditedName(e.target.value)} placeholder="Your full name" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="editPhone" className="text-xs text-muted-foreground">Phone</Label>
+                      <Input id="editPhone" value={editedPhone} onChange={(e) => setEditedPhone(e.target.value)} placeholder="Your phone number" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="editCity" className="text-xs text-muted-foreground">City</Label>
+                      <Input id="editCity" value={editedCity} onChange={(e) => setEditedCity(e.target.value)} placeholder="Your city" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {profile?.full_name && (
+                      <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span>{profile.full_name}</span>
+                      </div>
+                    )}
+                    {profile?.phone && (
+                      <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        <span>{profile.phone}</span>
+                      </div>
+                    )}
+                    {profile?.city && (
+                      <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span>{profile.city}</span>
+                      </div>
+                    )}
+                    {!profile?.full_name && !profile?.phone && !profile?.city && (
+                      <p className="text-sm text-muted-foreground p-2">Tap Edit to add your details</p>
+                    )}
+                  </>
                 )}
               </CardContent>
             </Card>
-          )}
+          </CollapsibleContent>
+        </Collapsible>
 
-          {showNativeSettings && (
-            <Card ref={pushNotificationsRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Bell className="h-4 w-4" />
-                  Push Notifications
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {/* Status Badge */}
-                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
-                  <div className="flex items-center gap-2">
-                    <div className={`h-2 w-2 rounded-full ${
-                      notificationPermission === 'granted' && subscriptionStatus === 'active' 
-                        ? 'bg-green-500' 
-                        : notificationPermission === 'denied'
-                        ? 'bg-red-500'
-                        : 'bg-yellow-500'
-                    }`} />
-                    <span className="text-sm font-medium">
-                      {subscriptionStatus === 'checking' 
-                        ? 'Checking status...'
-                        : notificationPermission === 'granted' && subscriptionStatus === 'active'
-                        ? 'Active'
-                        : notificationPermission === 'denied'
-                        ? 'Denied'
-                        : 'Not Enabled'}
-                    </span>
+        {/* Password */}
+        <Collapsible open={openSections.has('password')} onOpenChange={() => toggleSection('password')}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Lock className="h-4 w-4 text-primary" />
+              </div>
+              <span className="font-medium text-sm">Password</span>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('password') ? 'rotate-180' : ''}`} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-1">
+            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+              <CardContent className="space-y-3 pt-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="newPassword" className="text-xs text-muted-foreground">New Password</Label>
+                  <Input id="newPassword" type="password" placeholder="Enter new password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={isChangingPassword} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="confirmPassword" className="text-xs text-muted-foreground">Confirm Password</Label>
+                  <Input id="confirmPassword" type="password" placeholder="Confirm new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isChangingPassword} />
+                </div>
+                <Button onClick={handlePasswordChange} disabled={isChangingPassword || !newPassword || !confirmPassword} className="w-full">
+                  <Lock className="mr-2 h-4 w-4" />
+                  {isChangingPassword ? 'Updating...' : 'Update Password'}
+                </Button>
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Journal Stats */}
+        <Collapsible open={openSections.has('journal')} onOpenChange={() => toggleSection('journal')}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                <BookOpen className="h-4 w-4 text-primary" />
+              </div>
+              <span className="font-medium text-sm">Journal Stats</span>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('journal') ? 'rotate-180' : ''}`} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-1">
+            <JournalStats className="rounded-2xl shadow-sm border-0" />
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* My Programs */}
+        <Collapsible open={openSections.has('programs')} onOpenChange={() => toggleSection('programs')}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                <BookOpen className="h-4 w-4 text-primary" />
+              </div>
+              <span className="font-medium text-sm">My Programs</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {programCount > 0 && <Badge variant="secondary" className="text-xs">{programCount}</Badge>}
+              <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('programs') ? 'rotate-180' : ''}`} />
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-1">
+            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+              <CardContent className="pt-4">
+                {enrollments && enrollments.length > 0 ? (
+                  <div className="space-y-2">
+                    {enrollments.map((enrollment) => (
+                      <Link
+                        key={enrollment.id}
+                        to={`/app/course/${enrollment.program_slug || enrollment.course_name}`}
+                        className="flex items-center justify-between p-3 bg-muted/30 rounded-xl active:bg-muted/50 transition-colors"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">{enrollment.course_name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Enrolled {format(new Date(enrollment.enrolled_at), 'MMM d, yyyy')}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {(enrollment.program_rounds as any)?.status || 'active'}
+                          </Badge>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </Link>
+                    ))}
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    {notificationPermission === 'granted' && subscriptionStatus === 'active' 
-                      ? 'Receiving notifications'
-                      : notificationPermission === 'denied'
-                      ? 'Permission denied'
-                      : 'No notifications'}
-                  </span>
+                ) : (
+                  <div className="text-center py-6">
+                    <BookOpen className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">No courses yet</p>
+                    <Button variant="link" size="sm" asChild>
+                      <Link to="/app/store">Browse Programs</Link>
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Wallet & Credits */}
+        <Collapsible open={openSections.has('wallet')} onOpenChange={() => toggleSection('wallet')}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Wallet className="h-4 w-4 text-primary" />
+              </div>
+              <span className="font-medium text-sm">Wallet & Credits</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground font-medium">${creditBalance}</span>
+              <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('wallet') ? 'rotate-180' : ''}`} />
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-1">
+            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+              <CardContent className="space-y-3 pt-4">
+                <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Current Balance</p>
+                    <p className="text-2xl font-bold">{wallet?.credits_balance || 0} Credits</p>
+                  </div>
+                  <Wallet className="h-8 w-8 text-primary/30" />
                 </div>
 
-                {/* Enabled State */}
-                {notificationPermission === 'granted' && subscriptionStatus === 'active' && (
+                {transactions && transactions.length > 0 && (
                   <div className="space-y-2">
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        onClick={handleDisableNotifications}
-                        className="flex-1"
-                        size="sm"
-                      >
-                        Disable
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        onClick={handleEnableNotifications}
-                        disabled={isEnablingNotifications}
-                        className="flex-1"
-                        size="sm"
-                      >
-                        {isEnablingNotifications ? 'Re-registering...' : 'Re-register'}
-                      </Button>
-                    </div>
-                    <Button 
-                      onClick={handleTestNotification}
-                      disabled={isTestingNotification}
-                      className="w-full"
-                      size="sm"
-                    >
-                      <Bell className="mr-2 h-4 w-4" />
-                      {isTestingNotification ? 'Sending...' : 'Send Test Notification'}
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      onClick={handleOpenAppSettings}
-                      className="w-full text-muted-foreground"
-                      size="sm"
-                    >
-                      <Settings className="mr-2 h-4 w-4" />
-                      Open Settings
-                    </Button>
+                    <p className="text-xs font-medium text-muted-foreground">Recent Transactions</p>
+                    {transactions.map((tx) => (
+                      <div key={tx.id} className="flex items-center justify-between py-2 px-3 bg-muted/30 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          {tx.amount > 0 ? (
+                            <TrendingUp className="h-4 w-4 text-emerald-500" />
+                          ) : (
+                            <TrendingDown className="h-4 w-4 text-destructive" />
+                          )}
+                          <span className="text-sm truncate max-w-[140px]">{tx.description || tx.transaction_type}</span>
+                        </div>
+                        <span className={`text-sm font-medium ${tx.amount > 0 ? 'text-emerald-600' : 'text-destructive'}`}>
+                          {tx.amount > 0 ? '+' : ''}{tx.amount}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
-                
-                {/* Disabled State */}
-                {notificationPermission === 'granted' && subscriptionStatus === 'none' && (
-                  <Button 
-                    onClick={handleEnableNotifications} 
-                    className="w-full"
-                    disabled={isEnablingNotifications}
-                  >
-                    <Bell className="mr-2 h-4 w-4" />
-                    {isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
-                  </Button>
-                )}
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
 
-                {/* Not Enabled State */}
-                {notificationPermission !== 'granted' && (
+        {/* Order History */}
+        <Collapsible open={openSections.has('orders')} onOpenChange={() => toggleSection('orders')}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Receipt className="h-4 w-4 text-primary" />
+              </div>
+              <span className="font-medium text-sm">Order History</span>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('orders') ? 'rotate-180' : ''}`} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-1">
+            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+              <CardContent className="pt-4">
+                {orders && orders.length > 0 ? (
                   <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      {notificationPermission === 'denied'
-                        ? 'Notifications are disabled. Enable them in Settings.'
-                        : 'Get notified about new content and updates'}
-                    </p>
-                    {notificationPermission === 'denied' ? (
-                      <Button onClick={handleOpenAppSettings} className="w-full">
+                    {orders.map((order) => (
+                      <div key={order.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">{order.product_name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(order.created_at), 'MMM d, yyyy')}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className="text-sm font-medium">
+                            {formatCurrency(order.amount, order.currency || 'usd')}
+                          </span>
+                          <Badge variant={getStatusBadgeVariant(order.status || 'completed')}>
+                            {order.refunded ? 'Refunded' : (order.status || 'Completed')}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6">
+                    <Receipt className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">No orders yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Support */}
+        <Collapsible open={openSections.has('support')} onOpenChange={() => toggleSection('support')}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                <MessageCircle className="h-4 w-4 text-primary" />
+              </div>
+              <span className="font-medium text-sm">Support</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {unreadCount > 0 && (
+                <span className="bg-destructive text-destructive-foreground text-[10px] rounded-full h-5 w-5 flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
+              <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('support') ? 'rotate-180' : ''}`} />
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-1">
+            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+              <CardContent className="space-y-3 pt-4">
+                <Button className="w-full relative" onClick={() => navigate('/app/chat')}>
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  Chat with Support
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
+                </Button>
+
+                <div className="relative py-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">or via Telegram</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="subject" className="text-xs text-muted-foreground">Subject</Label>
+                  <select
+                    id="subject"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    value={contactSubject}
+                    onChange={(e) => setContactSubject(e.target.value)}
+                  >
+                    <option value="">Select a topic...</option>
+                    <option value="General Inquiry">General Inquiry</option>
+                    <option value="Technical Support">Technical Support</option>
+                    <option value="Refund Request">Refund Request</option>
+                    <option value="Cancel Subscription">Cancel Subscription</option>
+                    <option value="Course Question">Course Question</option>
+                    <option value="Billing Issue">Billing Issue</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                
+                <div className="space-y-1.5">
+                  <Label htmlFor="message" className="text-xs text-muted-foreground">Message</Label>
+                  <Textarea id="message" placeholder="Type your message here..." value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} rows={3} />
+                </div>
+
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    if (!contactSubject || !contactMessage.trim()) {
+                      toast({ title: 'Error', description: 'Please select a subject and enter a message', variant: 'destructive' });
+                      return;
+                    }
+                    const telegramMessage = `Subject: ${contactSubject}\n\nMessage:\n${contactMessage}`;
+                    window.open(`https://t.me/ladybosslook?text=${encodeURIComponent(telegramMessage)}`, '_blank');
+                  }}
+                >
+                  <Send className="mr-2 h-4 w-4" />
+                  Send via Telegram
+                </Button>
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Admin Tools */}
+        {(canAccessAdminPage('support') || canAccessAdminPage('community')) && (
+          <Collapsible open={openSections.has('admin')} onOpenChange={() => toggleSection('admin')}>
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Settings className="h-4 w-4 text-primary" />
+                </div>
+                <span className="font-medium text-sm">Admin Tools</span>
+              </div>
+              <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('admin') ? 'rotate-180' : ''}`} />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-1">
+              <Card className="rounded-2xl shadow-sm border-0 bg-card">
+                <CardContent className="space-y-2 pt-4">
+                  {canAccessAdminPage('support') && (
+                    <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/app/support', { state: { from: '/app/profile' } })}>
+                      <Headset className="mr-2 h-4 w-4" />
+                      Support Inbox
+                    </Button>
+                  )}
+                  {canAccessAdminPage('community') && (
+                    <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/app/channels/new', { state: { from: '/app/profile' } })}>
+                      <Megaphone className="mr-2 h-4 w-4" />
+                      Post to Channel
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+
+        {/* Push Notifications - Native only */}
+        {showNativeSettings && (
+          <Collapsible open={openSections.has('push')} onOpenChange={() => toggleSection('push')}>
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Bell className="h-4 w-4 text-primary" />
+                </div>
+                <span className="font-medium text-sm">Push Notifications</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`h-2 w-2 rounded-full ${
+                  notificationPermission === 'granted' && subscriptionStatus === 'active' 
+                    ? 'bg-emerald-500' 
+                    : notificationPermission === 'denied'
+                    ? 'bg-destructive'
+                    : 'bg-yellow-500'
+                }`} />
+                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('push') ? 'rotate-180' : ''}`} />
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-1">
+              <Card className="rounded-2xl shadow-sm border-0 bg-card">
+                <CardContent className="space-y-3 pt-4">
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <div className={`h-2 w-2 rounded-full ${
+                        notificationPermission === 'granted' && subscriptionStatus === 'active' 
+                          ? 'bg-emerald-500' 
+                          : notificationPermission === 'denied'
+                          ? 'bg-destructive'
+                          : 'bg-yellow-500'
+                      }`} />
+                      <span className="text-sm font-medium">
+                        {subscriptionStatus === 'checking' 
+                          ? 'Checking status...'
+                          : notificationPermission === 'granted' && subscriptionStatus === 'active'
+                          ? 'Active'
+                          : notificationPermission === 'denied'
+                          ? 'Denied'
+                          : 'Not Enabled'}
+                      </span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {notificationPermission === 'granted' && subscriptionStatus === 'active' 
+                        ? 'Receiving notifications'
+                        : notificationPermission === 'denied'
+                        ? 'Permission denied'
+                        : 'No notifications'}
+                    </span>
+                  </div>
+
+                  {notificationPermission === 'granted' && subscriptionStatus === 'active' && (
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Button variant="outline" onClick={handleDisableNotifications} className="flex-1" size="sm">Disable</Button>
+                        <Button variant="outline" onClick={handleEnableNotifications} disabled={isEnablingNotifications} className="flex-1" size="sm">
+                          {isEnablingNotifications ? 'Re-registering...' : 'Re-register'}
+                        </Button>
+                      </div>
+                      <Button onClick={handleTestNotification} disabled={isTestingNotification} className="w-full" size="sm">
+                        <Bell className="mr-2 h-4 w-4" />
+                        {isTestingNotification ? 'Sending...' : 'Send Test Notification'}
+                      </Button>
+                      <Button variant="ghost" onClick={handleOpenAppSettings} className="w-full text-muted-foreground" size="sm">
                         <Settings className="mr-2 h-4 w-4" />
                         Open Settings
                       </Button>
-                    ) : (
-                      <Button 
-                        onClick={handleEnableNotifications} 
-                        className="w-full"
-                        disabled={isEnablingNotifications}
-                      >
-                        <Bell className="mr-2 h-4 w-4" />
-                        {isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                    </div>
+                  )}
+                  
+                  {notificationPermission === 'granted' && subscriptionStatus === 'none' && (
+                    <Button onClick={handleEnableNotifications} className="w-full" disabled={isEnablingNotifications}>
+                      <Bell className="mr-2 h-4 w-4" />
+                      {isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
+                    </Button>
+                  )}
 
-          {/* Notification Preferences Card - Always shown (server-side notifications work on all platforms) */}
-          <div ref={notificationPrefsRef} className="scroll-mt-4">
+                  {notificationPermission !== 'granted' && (
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        {notificationPermission === 'denied'
+                          ? 'Notifications are disabled. Enable them in Settings.'
+                          : 'Get notified about new content and updates'}
+                      </p>
+                      {notificationPermission === 'denied' ? (
+                        <Button onClick={handleOpenAppSettings} className="w-full">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Open Settings
+                        </Button>
+                      ) : (
+                        <Button onClick={handleEnableNotifications} className="w-full" disabled={isEnablingNotifications}>
+                          <Bell className="mr-2 h-4 w-4" />
+                          {isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+
+        {/* Notification Preferences */}
+        <Collapsible open={openSections.has('prefs')} onOpenChange={() => toggleSection('prefs')}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Settings className="h-4 w-4 text-primary" />
+              </div>
+              <span className="font-medium text-sm">Notification Preferences</span>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('prefs') ? 'rotate-180' : ''}`} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-1">
             <NotificationPreferencesCard 
               userId={user?.id}
               notificationsEnabled={showNativeSettings 
                 ? (notificationPermission === 'granted' && subscriptionStatus === 'active')
-                : true // On web, show preferences (server notifications still work)
+                : true
               }
             />
-          </div>
+          </CollapsibleContent>
+        </Collapsible>
 
-          {/* Calendar Sync Card - Native Only */}
-          {showNativeSettings && (
-            <Card ref={calendarSyncRef} className="rounded-2xl shadow-sm border-0 bg-card scroll-mt-4">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Calendar Sync
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {/* Status Badge */}
-                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
-                  <div className="flex items-center gap-2">
-                    <div className={`h-2 w-2 rounded-full ${
-                      calendarPermission === 'granted' 
-                        ? 'bg-green-500' 
-                        : calendarPermission === 'denied'
-                        ? 'bg-red-500'
-                        : 'bg-yellow-500'
-                    }`} />
-                    <span className="text-sm font-medium">
-                      {calendarPermission === 'granted'
-                        ? 'Enabled'
-                        : calendarPermission === 'denied'
-                        ? 'Denied'
-                        : 'Not Enabled'}
+        {/* Calendar Sync - Native only */}
+        {showNativeSettings && (
+          <Collapsible open={openSections.has('calendar')} onOpenChange={() => toggleSection('calendar')}>
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Calendar className="h-4 w-4 text-primary" />
+                </div>
+                <span className="font-medium text-sm">Calendar Sync</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`h-2 w-2 rounded-full ${
+                  calendarPermission === 'granted' 
+                    ? 'bg-emerald-500' 
+                    : calendarPermission === 'denied'
+                    ? 'bg-destructive'
+                    : 'bg-yellow-500'
+                }`} />
+                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('calendar') ? 'rotate-180' : ''}`} />
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-1">
+              <Card className="rounded-2xl shadow-sm border-0 bg-card">
+                <CardContent className="space-y-3 pt-4">
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <div className={`h-2 w-2 rounded-full ${
+                        calendarPermission === 'granted' 
+                          ? 'bg-emerald-500' 
+                          : calendarPermission === 'denied'
+                          ? 'bg-destructive'
+                          : 'bg-yellow-500'
+                      }`} />
+                      <span className="text-sm font-medium">
+                        {calendarPermission === 'granted' ? 'Enabled' : calendarPermission === 'denied' ? 'Denied' : 'Not Enabled'}
+                      </span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {calendarPermission === 'granted' ? 'Can add events' : calendarPermission === 'denied' ? 'Permission denied' : 'Tap to enable'}
                     </span>
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    {calendarPermission === 'granted' 
-                      ? 'Can add events'
-                      : calendarPermission === 'denied'
-                      ? 'Permission denied'
-                      : 'Tap to enable'}
-                  </span>
-                </div>
 
-                {/* Enabled State */}
-                {calendarPermission === 'granted' && (
-                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
-                    <div className="space-y-0.5">
-                      <p className="text-sm font-medium">Auto-Sync on Enrollment</p>
-                      <p className="text-xs text-muted-foreground">
-                        Automatically add sessions when you enroll
-                      </p>
+                  {calendarPermission === 'granted' && (
+                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
+                      <div className="space-y-0.5">
+                        <p className="text-sm font-medium">Auto-Sync on Enrollment</p>
+                        <p className="text-xs text-muted-foreground">Automatically add sessions when you enroll</p>
+                      </div>
+                      <Switch checked={autoSyncCalendar} onCheckedChange={handleAutoSyncToggle} />
                     </div>
-                    <Switch
-                      checked={autoSyncCalendar}
-                      onCheckedChange={handleAutoSyncToggle}
-                    />
-                  </div>
-                )}
+                  )}
 
-                {/* Not Enabled State */}
-                {calendarPermission !== 'granted' && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      {calendarPermission === 'denied'
-                        ? 'Calendar access is disabled. Enable it in Settings.'
-                        : 'Add course sessions directly to your calendar'}
-                    </p>
-                    {calendarPermission === 'denied' ? (
-                      <Button onClick={handleOpenAppSettings} className="w-full">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Open Settings
-                      </Button>
-                    ) : (
-                      <Button 
-                        onClick={handleEnableCalendar} 
-                        className="w-full"
-                        disabled={isRequestingCalendar}
+                  {calendarPermission !== 'granted' && (
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        {calendarPermission === 'denied' ? 'Calendar access is disabled. Enable it in Settings.' : 'Add course sessions directly to your calendar'}
+                      </p>
+                      {calendarPermission === 'denied' ? (
+                        <Button onClick={handleOpenAppSettings} className="w-full">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Open Settings
+                        </Button>
+                      ) : (
+                        <Button onClick={handleEnableCalendar} className="w-full" disabled={isRequestingCalendar}>
+                          <Calendar className="mr-2 h-4 w-4" />
+                          {isRequestingCalendar ? 'Requesting...' : 'Enable Calendar Access'}
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+
+        {/* Actions */}
+        <Collapsible open={openSections.has('actions')} onOpenChange={() => toggleSection('actions')}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center">
+                <LogOut className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <span className="font-medium text-sm">Account Actions</span>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('actions') ? 'rotate-180' : ''}`} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-1">
+            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+              <CardContent className="space-y-2 pt-4">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start h-12 rounded-xl bg-muted/30"
+                  onClick={() => {
+                    resetAllTours();
+                    navigate('/app/home');
+                    toast({ title: 'Tours Reset', description: 'All feature tours will restart when you visit each section.' });
+                  }}
+                >
+                  <PlayCircle className="mr-3 h-4 w-4" />
+                  Restart All Tours
+                </Button>
+                
+                <Button variant="ghost" className="w-full justify-start h-12 rounded-xl bg-muted/30" onClick={handleSignOut}>
+                  <LogOut className="mr-3 h-4 w-4" />
+                  Sign Out
+                </Button>
+                
+                <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" className="w-full justify-start h-12 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10">
+                      <Trash2 className="mr-3 h-4 w-4" />
+                      Delete Account
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                        <AlertTriangle className="h-5 w-5" />
+                        Delete Your Account?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="space-y-3">
+                        <p>
+                          This action is <strong>permanent and cannot be undone</strong>. 
+                          All your data will be immediately deleted, including:
+                        </p>
+                        <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
+                          <li>Your profile and account information</li>
+                          <li>All course enrollments and progress</li>
+                          <li>Journal entries and chat history</li>
+                          <li>Audio progress and bookmarks</li>
+                          <li>Wallet balance and transaction history</li>
+                        </ul>
+                        <div className="pt-2">
+                          <Label htmlFor="deleteConfirm" className="text-sm font-medium text-foreground">
+                            Type <span className="font-bold text-destructive">DELETE</span> to confirm:
+                          </Label>
+                          <Input
+                            id="deleteConfirm"
+                            value={deleteConfirmText}
+                            onChange={(e) => setDeleteConfirmText(e.target.value)}
+                            placeholder="Type DELETE"
+                            className="mt-2"
+                          />
+                        </div>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDeleteAccount}
+                        disabled={deleteConfirmText !== 'DELETE' || isDeletingAccount}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        <Calendar className="mr-2 h-4 w-4" />
-                        {isRequestingCalendar ? 'Requesting...' : 'Enable Calendar Access'}
-                      </Button>
-                    )}
-                  </div>
-                )}
+                        {isDeletingAccount ? 'Deleting...' : 'Delete Forever'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </CardContent>
             </Card>
-          )}
-        </TabsContent>
-      </Tabs>
+          </CollapsibleContent>
+        </Collapsible>
+
+      </div>
     </div>
   );
 };
