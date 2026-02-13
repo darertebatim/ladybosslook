@@ -174,7 +174,7 @@ export default function AppFasting() {
         {/* Protocol pill */}
         <button
           onClick={() => setProtocolOpen(true)}
-          className="w-10 h-10 rounded-full flex items-center justify-center text-white text-[10px] font-bold active:scale-95 transition-transform shadow-sm"
+          className="w-12 h-12 rounded-full flex items-center justify-center text-white text-sm font-bold active:scale-95 transition-transform shadow-sm"
           style={{ backgroundColor: currentProtocol?.color || '#8B5CF6' }}
         >
           {currentProtocol?.label || '16h'}
