@@ -137,6 +137,9 @@ export default function RoutinesBank() {
     challenge_start_date: null as Date | null,
     start_day_of_week: null as number | null,
     start_mode: 'none' as 'none' | 'date' | 'weekday',
+    end_mode: 'never' as 'never' | 'date' | 'after_days',
+    end_date: null as Date | null,
+    end_after_days: null as number | null,
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
   const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
@@ -219,6 +222,9 @@ export default function RoutinesBank() {
           schedule_type: data.formData.schedule_type,
           challenge_start_date: data.formData.start_mode === 'date' && data.formData.challenge_start_date ? data.formData.challenge_start_date.toISOString().split('T')[0] : null,
           start_day_of_week: data.formData.start_mode === 'weekday' ? data.formData.start_day_of_week : null,
+          end_mode: data.formData.end_mode,
+          end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
+          end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
         })
         .select()
         .single();
@@ -290,6 +296,9 @@ export default function RoutinesBank() {
           schedule_type: data.formData.schedule_type,
           challenge_start_date: data.formData.start_mode === 'date' && data.formData.challenge_start_date ? data.formData.challenge_start_date.toISOString().split('T')[0] : null,
           start_day_of_week: data.formData.start_mode === 'weekday' ? data.formData.start_day_of_week : null,
+          end_mode: data.formData.end_mode,
+          end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
+          end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
         })
         .eq('id', data.id);
       if (error) throw error;
@@ -441,6 +450,9 @@ export default function RoutinesBank() {
       challenge_start_date: null,
       start_day_of_week: null,
       start_mode: 'none',
+      end_mode: 'never',
+      end_date: null,
+      end_after_days: null,
     });
     setLocalSections([]);
     setLocalTasks([]);
@@ -462,6 +474,9 @@ export default function RoutinesBank() {
       challenge_start_date: (routine as any).challenge_start_date ? new Date((routine as any).challenge_start_date) : null,
       start_day_of_week: (routine as any).start_day_of_week ?? null,
       start_mode: (routine as any).start_day_of_week != null ? 'weekday' : ((routine as any).challenge_start_date ? 'date' : 'none'),
+      end_mode: ((routine as any).end_mode || 'never') as 'never' | 'date' | 'after_days',
+      end_date: (routine as any).end_date ? new Date((routine as any).end_date) : null,
+      end_after_days: (routine as any).end_after_days ?? null,
     });
     const { sections, tasks } = await fetchRoutineData(routine.id);
     setLocalSections(sections);
@@ -1034,6 +1049,76 @@ export default function RoutinesBank() {
                         </div>
                       )}
                     </div>
+                  </div>
+
+                  {/* End Mode Selector */}
+                  <div className="space-y-2 border-t pt-4">
+                    <Label className="text-xs">When does it end?</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: 'never', label: 'Never', desc: 'Runs forever' },
+                        { value: 'date', label: 'Specific date', desc: 'Pick an end date' },
+                        { value: 'after_days', label: 'After X days', desc: 'Auto-expire' },
+                      ].map(opt => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, end_mode: opt.value as any })}
+                          className={cn(
+                            "flex flex-col items-center gap-0.5 p-2 rounded-lg border-2 text-center transition-all",
+                            formData.end_mode === opt.value
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-muted-foreground/30"
+                          )}
+                        >
+                          <span className="text-xs font-medium">{opt.label}</span>
+                          <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* End date picker */}
+                    {formData.end_mode === 'date' && (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !formData.end_date && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {formData.end_date
+                              ? format(formData.end_date, 'PPP')
+                              : <span>Pick an end date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={formData.end_date || undefined}
+                            onSelect={(date) => setFormData({ ...formData, end_date: date || null })}
+                            className={cn("p-3 pointer-events-auto")}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    )}
+
+                    {/* After X days input */}
+                    {formData.end_mode === 'after_days' && (
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          min={1}
+                          value={formData.end_after_days ?? ''}
+                          onChange={(e) => setFormData({ ...formData, end_after_days: e.target.value ? parseInt(e.target.value) : null })}
+                          placeholder="Number of days"
+                          className="w-full"
+                        />
+                        <span className="text-sm text-muted-foreground whitespace-nowrap">days</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Summary stats */}

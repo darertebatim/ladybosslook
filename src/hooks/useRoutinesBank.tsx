@@ -459,6 +459,17 @@ export function useAddRoutineFromBank() {
         effectiveStartDate = new Date();
       }
 
+      // Calculate the effective end date
+      let repeatEndDate: string | null = null;
+      const endMode = (routine as any).end_mode || 'never';
+      if (endMode === 'date' && (routine as any).end_date) {
+        repeatEndDate = (routine as any).end_date;
+      } else if (endMode === 'after_days' && (routine as any).end_after_days) {
+        const endDate = new Date(effectiveStartDate);
+        endDate.setDate(endDate.getDate() + (routine as any).end_after_days);
+        repeatEndDate = endDate.toISOString().split('T')[0];
+      }
+
       // Create user tasks
       if (tasks.length > 0) {
         const userTasks = tasks.map((task, index) => {
@@ -525,6 +536,7 @@ export function useAddRoutineFromBank() {
             goal_target: bankTask?.goal_target ?? null,
             goal_type: bankTask?.goal_type ?? null,
             goal_unit: bankTask?.goal_unit ?? null,
+            repeat_end_date: repeatEndDate,
           };
         });
 
