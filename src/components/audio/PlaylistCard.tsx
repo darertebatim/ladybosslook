@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Music, Lock, CheckCircle2, ChevronRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { haptic } from '@/lib/haptics';
 
 const LANG_FLAGS: Record<string, string> = {
@@ -43,7 +43,8 @@ export const PlaylistCard = memo(function PlaylistCard({
   totalDuration,
 }: PlaylistCardProps) {
   const navigate = useNavigate();
-  
+  const location = useLocation();
+  const from = location.pathname;
   const progressPercentage = trackCount > 0 ? (completedTracks / trackCount) * 100 : 0;
   
   const formatDuration = (seconds: number) => {
@@ -69,12 +70,11 @@ export const PlaylistCard = memo(function PlaylistCard({
   const handleClick = () => {
     haptic.light();
     if (isLocked && programSlug) {
-      // Navigate to course detail page where user can enroll
-      navigate(`/app/course/${programSlug}`);
+      navigate(`/app/course/${programSlug}`, { state: { from } });
       return;
     }
-    if (isLocked) return; // No programSlug, can't navigate
-    navigate(`/app/player/playlist/${id}`);
+    if (isLocked) return;
+    navigate(`/app/player/playlist/${id}`, { state: { from } });
   };
 
   // Determine tour class for first free or first locked playlist

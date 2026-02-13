@@ -1,10 +1,10 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 
 interface BackButtonProps {
-  /** Custom navigation path. If not provided, uses browser history */
+  /** Fallback navigation path if no history state. If not provided, uses browser history */
   to?: string;
   /** Text to show next to the icon (default: "Back") */
   label?: string;
@@ -18,7 +18,7 @@ interface BackButtonProps {
 
 /**
  * iOS-style back button with ChevronLeft icon and optional label.
- * Follows iOS HIG with 44px minimum tap target and no hover effects.
+ * Uses location.state.from when available to return to the actual previous page.
  */
 export function BackButton({ 
   to, 
@@ -28,6 +28,8 @@ export function BackButton({
   className 
 }: BackButtonProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as any)?.from;
 
   const handleClick = () => {
     haptic.light();
@@ -36,7 +38,9 @@ export function BackButton({
       onClick();
     }
     
-    if (to) {
+    if (from) {
+      navigate(from);
+    } else if (to) {
       navigate(to);
     } else {
       navigate(-1);
@@ -80,6 +84,8 @@ export function BackButtonCircle({
   className 
 }: BackButtonCircleProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as any)?.from;
 
   const handleClick = () => {
     haptic.light();
@@ -88,7 +94,9 @@ export function BackButtonCircle({
       onClick();
     }
     
-    if (to) {
+    if (from) {
+      navigate(from);
+    } else if (to) {
       navigate(to);
     } else {
       navigate(-1);

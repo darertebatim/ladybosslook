@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { usePrograms } from '@/hooks/usePrograms';
 import { SEOHead } from '@/components/SEOHead';
 import { Search, X, Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useState, useMemo, useCallback } from 'react';
@@ -31,6 +31,7 @@ const categoryConfig = [
 
 const AppStore = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const { programs, isLoading: programsLoading } = usePrograms();
   const [enrollingSlug, setEnrollingSlug] = useState<string | null>(null);
@@ -294,7 +295,7 @@ const AppStore = () => {
                             language={(program as any).language}
                             isFree={program.isFree || program.priceAmount === 0}
                             isEnrolled={enrolled}
-                            onClick={() => navigate(`/app/course/${program.slug}`)}
+                            onClick={() => navigate(`/app/course/${program.slug}`, { state: { from: location.pathname } })}
                           />
                           {isEnrolling && (
                             <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">

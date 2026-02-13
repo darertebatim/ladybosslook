@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, Heart, Loader2, Sparkles, ListTodo } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
@@ -25,6 +25,7 @@ import { RitualsTour, TourHelpButton } from '@/components/app/tour';
 
 export default function AppInspire() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedCategory, setSelectedCategory] = useState<string | null>('popular');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -314,7 +315,7 @@ export default function AppInspire() {
                     <RoutineBankCard
                       key={routine.id}
                       routine={routine}
-                      onClick={() => navigate(`/app/rituals/${routine.id}`)}
+                      onClick={() => navigate(`/app/rituals/${routine.id}`, { state: { from: location.pathname } })}
                       className={index === 0 ? 'tour-ritual-card' : undefined}
                     />
                   ))}
