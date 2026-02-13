@@ -60,8 +60,6 @@ export interface RoutineBankTask {
   goal_target?: number | null;
   goal_type?: string | null;
   goal_unit?: string | null;
-  // Time period from admin_task_bank
-  time_period?: string | null;
 }
 
 export interface RoutineBankWithDetails extends RoutineBankItem {
@@ -250,13 +248,12 @@ export function useRoutineBankDetail(routineId: string | undefined) {
         goal_target: number | null;
         goal_type: string | null;
         goal_unit: string | null;
-        time_period: string | null;
       }> = {};
       
       if (taskIds.length > 0) {
         const { data: bankTasks } = await supabase
           .from('admin_task_bank')
-          .select('id, pro_link_type, pro_link_value, linked_playlist_id, color, description, category, repeat_pattern, repeat_days, goal_enabled, goal_target, goal_type, goal_unit, time_period')
+          .select('id, pro_link_type, pro_link_value, linked_playlist_id, color, description, category, repeat_pattern, repeat_days, goal_enabled, goal_target, goal_type, goal_unit')
           .in('id', taskIds);
 
         bankTasks?.forEach(bt => {
@@ -273,7 +270,6 @@ export function useRoutineBankDetail(routineId: string | undefined) {
             goal_target: bt.goal_target,
             goal_type: bt.goal_type,
             goal_unit: bt.goal_unit,
-            time_period: bt.time_period,
           };
         });
       }
@@ -293,7 +289,6 @@ export function useRoutineBankDetail(routineId: string | undefined) {
         goal_target: task.task_id ? taskDetails[task.task_id]?.goal_target : null,
         goal_type: task.task_id ? taskDetails[task.task_id]?.goal_type : null,
         goal_unit: task.task_id ? taskDetails[task.task_id]?.goal_unit : null,
-        time_period: task.task_id ? taskDetails[task.task_id]?.time_period : null,
       }));
 
       return {
