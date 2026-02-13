@@ -57,6 +57,15 @@ export const wellnessTools: ToolConfig[] = [
     description: 'Cycle tracking',
   },
   {
+    id: 'fasting',
+    name: 'Fasting',
+    icon: 'Timer',
+    bgColor: 'bg-[#FFE4C4]',
+    iconColor: 'text-amber-600',
+    route: '/app/fasting',
+    description: 'Intermittent fasting',
+  },
+  {
     id: 'routines',
     name: 'Rituals',
     icon: 'Sparkles',
@@ -145,17 +154,6 @@ export const comingSoonTools: ToolConfig[] = [
     route: '/app/mood',
     description: 'Track emotions',
     comingSoon: true,
-  },
-  {
-    id: 'fasting',
-    name: 'Fasting',
-    icon: 'Timer',
-    bgColor: 'bg-[#D1FAE5]',
-    iconColor: 'text-green-600',
-    route: '/app/fasting',
-    description: 'Intermittent fasting',
-    comingSoon: false,
-    hidden: false,
   },
   {
     id: 'reflections',
