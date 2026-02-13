@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, Headset } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useChannels, useChannelSummaries } from '@/hooks/useFeed';
 import { useFeedRealtime } from '@/hooks/useFeedRealtime';
 import { SEOHead } from '@/components/SEOHead';
@@ -10,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { useSupportChatSummary } from '@/hooks/useSupportChatSummary';
+import { useAuth } from '@/hooks/useAuth';
 
 // Helper to check if cover is an emoji
 const isEmojiCover = (url: string | null) => url?.startsWith('emoji:');
@@ -33,6 +35,7 @@ function formatLastMessageTime(date: Date): string {
 
 export default function AppChannelsList() {
   const navigate = useNavigate();
+  const { canAccessAdminPage } = useAuth();
   const { data: channels, isLoading: channelsLoading } = useChannels();
   const { data: summaries, isLoading: summariesLoading } = useChannelSummaries();
   const { unreadCount: supportUnreadCount } = useUnreadChat();
@@ -63,11 +66,38 @@ export default function AppChannelsList() {
         className="sticky top-0 z-10 bg-accent dark:bg-accent rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="px-4 pt-3 pb-4">
-          <h1 className="text-2xl font-bold">Channels</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Your community spaces
-          </p>
+        <div className="px-4 pt-3 pb-4 flex items-end justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Channels</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Your community spaces
+            </p>
+          </div>
+          {/* Admin quick actions */}
+          {(canAccessAdminPage('support') || canAccessAdminPage('community')) && (
+            <div className="flex gap-1.5 pb-0.5">
+              {canAccessAdminPage('support') && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-xl bg-background/60"
+                  onClick={() => navigate('/app/support', { state: { from: '/app/channels' } })}
+                >
+                  <Headset className="h-4 w-4" />
+                </Button>
+              )}
+              {canAccessAdminPage('community') && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-xl bg-background/60"
+                  onClick={() => navigate('/app/channels/new', { state: { from: '/app/channels' } })}
+                >
+                  <Megaphone className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
