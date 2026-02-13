@@ -37,6 +37,8 @@ import {
 
 type DisplayMode = 'tracks' | 'modules' | 'both';
 
+type PlaylistLanguage = 'american' | 'persian' | 'turkish' | 'spanish';
+
 interface PlaylistFormData {
   name: string;
   description: string;
@@ -47,6 +49,7 @@ interface PlaylistFormData {
   sort_order: number;
   display_mode: DisplayMode;
   cover_image_url: string;
+  language: PlaylistLanguage;
 }
 
 interface PlaylistFormProps {
@@ -272,6 +275,26 @@ const PlaylistForm = ({
     </div>
 
     <div>
+      <Label htmlFor="playlist_language">Language</Label>
+      <Select
+        value={formData.language}
+        onValueChange={(value: PlaylistLanguage) => 
+          setFormData({ ...formData, language: value })
+        }
+      >
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="american">🇺🇸 American</SelectItem>
+          <SelectItem value="persian">🇮🇷 Persian</SelectItem>
+          <SelectItem value="turkish">🇹🇷 Turkish</SelectItem>
+          <SelectItem value="spanish">🇪🇸 Spanish</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+
+    <div>
       <Label htmlFor="playlist_sort_order">Sort Order</Label>
       <Input
         id="playlist_sort_order"
@@ -325,6 +348,7 @@ export const PlaylistManager = () => {
     sort_order: 0,
     display_mode: "tracks",
     cover_image_url: "",
+    language: "american",
   });
 
   const [editFormData, setEditFormData] = useState<PlaylistFormData>({
@@ -337,6 +361,7 @@ export const PlaylistManager = () => {
     sort_order: 0,
     display_mode: "tracks",
     cover_image_url: "",
+    language: "american",
   });
 
   // Fetch playlists with item count
@@ -551,6 +576,7 @@ export const PlaylistManager = () => {
           sort_order: createFormData.sort_order,
           display_mode: createFormData.display_mode,
           cover_image_url: createFormData.cover_image_url || null,
+          language: createFormData.language,
         });
 
       if (error) throw error;
@@ -638,6 +664,7 @@ export const PlaylistManager = () => {
       sort_order: 0,
       display_mode: "tracks",
       cover_image_url: "",
+      language: "american",
     });
   };
 
@@ -652,6 +679,7 @@ export const PlaylistManager = () => {
       sort_order: 0,
       display_mode: "tracks",
       cover_image_url: "",
+      language: "american",
     });
   };
 
@@ -822,6 +850,7 @@ export const PlaylistManager = () => {
       sort_order: playlist.sort_order,
       display_mode: playlist.display_mode || "tracks",
       cover_image_url: playlist.cover_image_url || "",
+      language: playlist.language || "american",
     });
     setIsEditDialogOpen(true);
   };
@@ -853,6 +882,7 @@ export const PlaylistManager = () => {
         sort_order: editFormData.sort_order,
         display_mode: editFormData.display_mode,
         cover_image_url: editFormData.cover_image_url || null,
+        language: editFormData.language,
       },
     });
   };

@@ -1,0 +1,1 @@
+ALTER TABLE public.program_catalog ADD COLUMN language text NOT NULL DEFAULT 'american';

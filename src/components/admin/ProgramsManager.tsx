@@ -83,6 +83,7 @@ export function ProgramsManager() {
     stripe_price_id: '',
     // Cover image
     cover_image_url: '',
+    language: 'american',
   });
 
   // Fetch playlists for dropdown
@@ -152,6 +153,7 @@ export function ProgramsManager() {
       stripe_product_id: '',
       stripe_price_id: '',
       cover_image_url: '',
+      language: 'american',
     });
     setEditingId(null);
     setShowForm(false);
@@ -231,6 +233,7 @@ export function ProgramsManager() {
       stripe_price_id: (program as any).stripe_price_id || '',
       // Use cover_image_url from DB, or fallback to programImages mapping
       cover_image_url: program.cover_image_url || programImages[program.slug] || '',
+      language: (program as any).language || 'american',
     });
     setEditingId(program.id);
     setShowForm(true);
@@ -954,6 +957,25 @@ export function ProgramsManager() {
                   </div>
                 </div>
               )}
+
+              {/* Language */}
+              <div>
+                <Label htmlFor="language">Language</Label>
+                <Select
+                  value={formData.language}
+                  onValueChange={(value) => setFormData({ ...formData, language: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="american">🇺🇸 American</SelectItem>
+                    <SelectItem value="persian">🇮🇷 Persian</SelectItem>
+                    <SelectItem value="turkish">🇹🇷 Turkish</SelectItem>
+                    <SelectItem value="spanish">🇪🇸 Spanish</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
               {/* Platform Availability Section */}
               <div className="space-y-4 border-t pt-4">
