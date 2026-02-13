@@ -1,62 +1,76 @@
 
 
-# Fasting Action Card for Home Page
+# Chat with Coach -- Multi-Inbox System
 
-## What We're Building
-A dedicated fasting status card (like the Period card) that appears on the home planner and shows live progress for both fasting and eating windows.
+## Overview
+Add a "Coach" chat inbox alongside the existing "Support" inbox. Users see it as a second private chat in their Channels list. Admins/coaches see it as a separate tab/inbox in the admin Support page.
 
-## Card Design
+## Database Changes
 
-The card follows the same pattern as `PeriodStatusCard`:
-- Rounded-2xl card with a warm gradient background (amber/orange tones)
-- Left: Timer icon circle (amber)
-- Center: Status text showing current mode + time remaining
-- Right: Action button (navigate to fasting page)
-- Bottom: A thin progress bar showing fasting or eating progress
+### 1. Add `inbox_type` column to `chat_conversations`
+- Add a new column `inbox_type TEXT NOT NULL DEFAULT 'support'` with a check constraint allowing `'support'` and `'coach'`.
+- Existing conversations default to `'support'`.
+- The `update_conversation_on_message` trigger works unchanged since it references `conversation_id`.
 
-### Card States
+### 2. Update `chat_messages` trigger
+- No changes needed -- it already references conversations by ID.
 
-**1. Idle (no active fast, no eating window)**
-- Title: "Ready to fast"
-- Subtitle: "Tap to start your next fast"
-- No progress bar
-- Right button: Play icon to navigate to /app/fasting
+## User-Facing Changes (Channels List)
 
-**2. Fasting Mode**
-- Title: "Fasting -- [zone emoji] [zone name]"
-- Subtitle: Time remaining (e.g., "4h 23m remaining")
-- Amber/orange striped progress bar showing fasting progress
-- Right button: "Fast" badge button navigating to /app/fasting
+### 3. Add "Coach" entry in `AppChannelsList.tsx`
+- Duplicate the Support chat entry below it, but with a different icon (e.g., `GraduationCap`), label "Coach", and route to `/app/coach-chat`.
+- Create a new hook `useUnreadCoachChat` (or extend `useUnreadChat` with an `inbox_type` parameter) to show unread badge.
+- Create `useSupportChatSummary`-like hook for coach chat summary preview.
 
-**3. Eating Window**
-- Title: "Eating Window"
-- Subtitle: Time remaining (e.g., "5h 12m left to eat")
-- Green progress bar showing eating window progress
-- Right button: "Start Fast" or navigate button
+### 4. Create `AppCoachChat.tsx` page
+- Copy `AppChat.tsx` and adjust:
+  - Filter conversations by `inbox_type = 'coach'` instead of default.
+  - Change branding: title "Coach" instead of "Support", icon `GraduationCap`, different welcome message/starters (e.g., "Ask about your progress", "Get personalized advice").
+  - Create conversation with `inbox_type: 'coach'`.
+- Register route `/app/coach-chat` in the router.
 
-## Technical Plan
+## Admin-Facing Changes
 
-### 1. Create `src/components/app/FastingStatusCard.tsx`
-- New component following `PeriodStatusCard` pattern
-- Uses a lightweight version of `useFastingTracker` data (reuse the hook)
-- Shows live-updating progress with a 1-second interval
-- Card structure:
-  - Icon circle (amber, Timer icon)
-  - Status badge ("Fasting" / "Eating" / "Idle")
-  - Title + subtitle text
-  - Thin progress bar at the bottom (amber for fasting, green for eating)
-  - Navigate button on the right
+### 5. Update Admin Support page (`Support.tsx`)
+- Add tab selector at the top: "Support" | "Coach" tabs.
+- Filter `chat_conversations` by selected `inbox_type`.
+- Both tabs share the same `ChatPanel` component.
 
-### 2. Integrate into `src/pages/app/AppHome.tsx`
-- Import `FastingStatusCard`
-- Show it near the `PeriodStatusCard` section (when user has an active fast or has used fasting before)
-- Only display when `selectedTag === null` (same as Period card)
+### 6. Update Mobile Admin Support (`AppAdminSupport.tsx`)
+- Same tab selector approach for mobile admin view.
 
-### 3. Progress Bar Design
-- Fasting bar: Amber gradient fill, shows elapsed vs target hours
-- Eating bar: Green gradient fill, shows elapsed vs total eating window
-- Both use the same thin rounded-full style (h-1.5)
+### 7. Notification Edge Function
+- The existing `send-chat-notification` function likely works as-is since it references conversation IDs. May want to include inbox type in the notification body for display purposes (e.g., "New coach message" vs "New support message").
 
-## Files to Create/Edit
-- **Create**: `src/components/app/FastingStatusCard.tsx`
-- **Edit**: `src/pages/app/AppHome.tsx` (add import and render the card)
+## Hook Updates
+
+### 8. Extend `useUnreadChat`
+- Accept an optional `inboxType` parameter (default `'support'`).
+- Filter query by `inbox_type`.
+- Use separate realtime channel names per inbox type to avoid conflicts.
+
+### 9. Extend `useSupportChatSummary`
+- Either parameterize it or create `useCoachChatSummary` that filters by `inbox_type = 'coach'`.
+
+## Navigation & Tab Bar
+- The bottom tab "Support" (Headset icon) continues to go to `/app/chat` (support).
+- Coach chat is accessible from the Channels list only (not a separate tab bar item), keeping navigation clean.
+
+## Technical Details
+
+### New files:
+- `src/pages/app/AppCoachChat.tsx` -- cloned from AppChat with coach-specific branding and `inbox_type` filter
+
+### Modified files:
+- **Migration SQL**: Add `inbox_type` column to `chat_conversations`
+- `src/pages/app/AppChannelsList.tsx` -- add Coach entry
+- `src/pages/admin/Support.tsx` -- add inbox type tabs
+- `src/pages/app/AppAdminSupport.tsx` -- add inbox type tabs
+- `src/hooks/useUnreadChat.tsx` -- parameterize by inbox type
+- `src/hooks/useSupportChatSummary.tsx` -- parameterize or duplicate for coach
+- `src/App.tsx` (or router file) -- add `/app/coach-chat` route
+- `src/integrations/supabase/types.ts` -- auto-updated after migration
+
+### RLS
+- Existing RLS policies on `chat_conversations` and `chat_messages` should work unchanged since they filter by `user_id` and conversation ownership. No new policies needed.
+
