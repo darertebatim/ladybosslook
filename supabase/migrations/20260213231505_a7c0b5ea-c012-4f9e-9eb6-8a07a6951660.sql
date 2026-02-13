@@ -1,0 +1,1 @@
+ALTER TABLE public.routines_bank ADD COLUMN video_url TEXT DEFAULT NULL;
