@@ -22,15 +22,7 @@ const HOUR_OPTIONS = Array.from({ length: 720 }, (_, i) => i + 1);
 const DAY_OPTIONS = Array.from({ length: 30 }, (_, i) => i);
 const HOUR_IN_DAY = Array.from({ length: 24 }, (_, i) => i);
 
-// Card colors matching the reference app
-const CARD_COLORS: Record<string, string> = {
-  circadian: '#7B6B9B',
-  '15:9': '#8B9B4B',
-  '16:8': '#D4735C',
-  '18:6': '#5B9B8B',
-  '20:4': '#C4A84B',
-  omad: '#7B8BA8',
-};
+const CUSTOM_BG = 'hsl(var(--muted-foreground))';
 
 export function FastingProtocolSheet({ open, onOpenChange, selectedProtocol, onSelect, onSelectCustom }: FastingProtocolSheetProps) {
   const [customMode, setCustomMode] = useState<CustomMode>(null);
@@ -89,7 +81,6 @@ export function FastingProtocolSheet({ open, onOpenChange, selectedProtocol, onS
         {/* Standard goal cards */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           {FASTING_PROTOCOLS.map(protocol => {
-            const bg = CARD_COLORS[protocol.id] || protocol.color;
             const isSelected = protocol.id === selectedProtocol && !customMode;
             return (
               <button
@@ -99,7 +90,7 @@ export function FastingProtocolSheet({ open, onOpenChange, selectedProtocol, onS
                   'relative flex flex-col justify-between p-3.5 rounded-2xl text-white text-left aspect-[4/5] active:scale-95 transition-all',
                   isSelected && 'ring-2 ring-offset-2 ring-primary'
                 )}
-                style={{ backgroundColor: bg }}
+                style={{ backgroundColor: protocol.color }}
               >
                 <span className="text-xs font-medium leading-tight opacity-90">
                   {protocol.id === 'omad' ? 'One Meal\nA Day' : `${protocol.name}`}
@@ -120,10 +111,9 @@ export function FastingProtocolSheet({ open, onOpenChange, selectedProtocol, onS
           <button
             onClick={() => setCustomMode('hours')}
             className={cn(
-              'flex flex-col justify-between p-3.5 rounded-2xl text-white text-left aspect-[4/5] active:scale-95 transition-all',
-              customMode === 'hours' ? 'ring-2 ring-offset-2 ring-primary' : ''
+              'flex flex-col justify-between p-3.5 rounded-2xl text-white text-left aspect-[4/5] active:scale-95 transition-all bg-muted-foreground/70',
+              customMode === 'hours' && 'ring-2 ring-offset-2 ring-primary'
             )}
-            style={{ backgroundColor: '#6B7280' }}
           >
             <span className="text-xs font-medium opacity-90">Pick hours</span>
             <div>
@@ -135,10 +125,9 @@ export function FastingProtocolSheet({ open, onOpenChange, selectedProtocol, onS
           <button
             onClick={() => setCustomMode('days')}
             className={cn(
-              'flex flex-col justify-between p-3.5 rounded-2xl text-white text-left aspect-[4/5] active:scale-95 transition-all',
-              customMode === 'days' ? 'ring-2 ring-offset-2 ring-primary' : ''
+              'flex flex-col justify-between p-3.5 rounded-2xl text-white text-left aspect-[4/5] active:scale-95 transition-all bg-muted-foreground/70',
+              customMode === 'days' && 'ring-2 ring-offset-2 ring-primary'
             )}
-            style={{ backgroundColor: '#6B7280' }}
           >
             <span className="text-xs font-medium opacity-90">Pick days</span>
             <div>
@@ -150,10 +139,9 @@ export function FastingProtocolSheet({ open, onOpenChange, selectedProtocol, onS
           <button
             onClick={() => setCustomMode('endtime')}
             className={cn(
-              'flex flex-col justify-between p-3.5 rounded-2xl text-white text-left aspect-[4/5] active:scale-95 transition-all',
-              customMode === 'endtime' ? 'ring-2 ring-offset-2 ring-primary' : ''
+              'flex flex-col justify-between p-3.5 rounded-2xl text-white text-left aspect-[4/5] active:scale-95 transition-all bg-muted-foreground/70',
+              customMode === 'endtime' && 'ring-2 ring-offset-2 ring-primary'
             )}
-            style={{ backgroundColor: '#6B7280' }}
           >
             <span className="text-xs font-medium opacity-90">End time</span>
             <div>
