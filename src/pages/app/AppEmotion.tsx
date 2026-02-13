@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useCallback, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { EmotionDashboard } from '@/components/emotion/EmotionDashboard';
 import { EmotionSelector } from '@/components/emotion/EmotionSelector';
 import { EmotionContext } from '@/components/emotion/EmotionContext';
@@ -18,10 +18,19 @@ interface EmotionState {
 
 const AppEmotion = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { createLog } = useEmotionLogs();
   const { autoCompleteEmotion } = useAutoCompleteProTask();
   
-  const [step, setStep] = useState<Step>('dashboard');
+  const initialStep = searchParams.get('step') === 'select' ? 'select' : 'dashboard';
+  const [step, setStep] = useState<Step>(initialStep);
+
+  // Clear the query param after consuming it
+  useEffect(() => {
+    if (searchParams.get('step')) {
+      setSearchParams({}, { replace: true });
+    }
+  }, []);
   const [state, setState] = useState<EmotionState>({
     valence: null,
     category: null,
