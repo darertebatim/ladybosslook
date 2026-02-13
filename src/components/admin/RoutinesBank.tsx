@@ -45,6 +45,7 @@ interface RoutineBankItem {
   subtitle: string | null;
   description: string | null;
   cover_image_url: string | null;
+  video_url: string | null;
   category: string;
   color: string;
   emoji: string;
@@ -130,6 +131,7 @@ export default function RoutinesBank() {
     subtitle: '',
     description: '',
     cover_image_url: '',
+    video_url: '',
     category: 'general',
     color: 'yellow',
     emoji: '✨',
@@ -216,6 +218,7 @@ export default function RoutinesBank() {
           subtitle: data.formData.subtitle || null,
           description: data.formData.description || null,
           cover_image_url: data.formData.cover_image_url || null,
+          video_url: data.formData.video_url || null,
           category: data.formData.category,
           color: data.formData.color,
           emoji: data.formData.emoji,
@@ -290,6 +293,7 @@ export default function RoutinesBank() {
           subtitle: data.formData.subtitle || null,
           description: data.formData.description || null,
           cover_image_url: data.formData.cover_image_url || null,
+          video_url: data.formData.video_url || null,
           category: data.formData.category,
           color: data.formData.color,
           emoji: data.formData.emoji,
@@ -443,6 +447,7 @@ export default function RoutinesBank() {
       subtitle: '',
       description: '',
       cover_image_url: '',
+      video_url: '',
       category: 'general',
       color: 'yellow',
       emoji: '✨',
@@ -467,6 +472,7 @@ export default function RoutinesBank() {
       subtitle: routine.subtitle || '',
       description: routine.description || '',
       cover_image_url: routine.cover_image_url || '',
+      video_url: (routine as any).video_url || '',
       category: routine.category,
       color: routine.color,
       emoji: routine.emoji,
@@ -927,6 +933,20 @@ export default function RoutinesBank() {
                     onChange={(url) => setFormData({ ...formData, cover_image_url: url })}
                     folder="routine-covers"
                   />
+
+                  {/* Video URL */}
+                  <div className="space-y-2">
+                    <Label htmlFor="video_url">Video URL (YouTube, Vimeo, or MP4)</Label>
+                    <Input
+                      id="video_url"
+                      value={formData.video_url}
+                      onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                      placeholder="https://youtube.com/watch?v=... or https://example.com/video.mp4"
+                    />
+                    {formData.video_url && (
+                      <p className="text-xs text-muted-foreground">Video will appear below the cover image on the ritual page.</p>
+                    )}
+                  </div>
 
                   {/* Description */}
                   <div className="space-y-2">

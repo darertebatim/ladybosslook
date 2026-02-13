@@ -31,6 +31,21 @@ const colorGradients: Record<string, string> = {
 const isEmoji = (str: string) => 
   /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
 
+// Convert a video URL to an embeddable format
+const getEmbedUrl = (url: string): { type: 'embed' | 'mp4'; src: string } | null => {
+  if (!url) return null;
+  // YouTube
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
+  if (ytMatch) return { type: 'embed', src: `https://www.youtube.com/embed/${ytMatch[1]}` };
+  // Vimeo
+  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeoMatch) return { type: 'embed', src: `https://player.vimeo.com/video/${vimeoMatch[1]}` };
+  // Direct MP4
+  if (url.match(/\.(mp4|webm|mov)(\?|$)/i)) return { type: 'mp4', src: url };
+  // Fallback: try as embed
+  return { type: 'embed', src: url };
+};
+
 // Convert RoutineBankTask to RoutinePlanTask format for preview sheet
 function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { schedule_days?: number[] | null; drip_day?: number | null; repeat_pattern?: string | null; repeat_days?: number[] | null } {
   return {
@@ -223,6 +238,35 @@ export default function AppInspireDetail() {
             </div>
           </div>
         </div>
+
+        {/* Video Player */}
+        {(routine as any).video_url && (() => {
+          const video = getEmbedUrl((routine as any).video_url);
+          if (!video) return null;
+          return (
+            <div className="px-4 pt-4">
+              {video.type === 'mp4' ? (
+                <video
+                  src={video.src}
+                  controls
+                  playsInline
+                  className="w-full rounded-xl"
+                  style={{ maxHeight: '240px' }}
+                />
+              ) : (
+                <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+                  <iframe
+                    src={video.src}
+                    className="absolute inset-0 w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title="Ritual video"
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         <div className="px-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 160px)' }}>
           {/* Subtitle & Badges */}
