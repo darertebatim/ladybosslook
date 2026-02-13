@@ -11,7 +11,7 @@ export interface FastingZone {
 export const FASTING_ZONES: FastingZone[] = [
   {
     id: 'anabolic',
-    emoji: '🍴',
+    emoji: '🛠️',
     name: 'Anabolic',
     minHours: 0,
     maxHours: 4,
