@@ -409,6 +409,7 @@ export type Database = {
           id: string
           is_free: boolean
           is_hidden: boolean
+          language: string
           name: string
           program_slug: string | null
           sort_order: number
@@ -423,6 +424,7 @@ export type Database = {
           id?: string
           is_free?: boolean
           is_hidden?: boolean
+          language?: string
           name: string
           program_slug?: string | null
           sort_order?: number
@@ -437,6 +439,7 @@ export type Database = {
           id?: string
           is_free?: boolean
           is_hidden?: boolean
+          language?: string
           name?: string
           program_slug?: string | null
           sort_order?: number
