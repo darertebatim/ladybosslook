@@ -983,14 +983,6 @@ const AppCourseDetail = () => {
         ) : !enrollment ? (
           /* Purchase Landing Page */
           <div className="space-y-6">
-            {/* Back to Store Button */}
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/app/explore')}
-              className="mb-2"
-            >
-              Browse
-            </Button>
 
             {/* Program Video */}
             {program?.video_url && (
