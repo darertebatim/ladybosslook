@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Zap, BarChart3, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FastingRing } from '@/components/fasting/FastingRing';
@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 
 export default function AppFasting() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     activeSession,
     selectedProtocol,
@@ -47,6 +48,14 @@ export default function AppFasting() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [editStartOpen, setEditStartOpen] = useState(false);
   const [editGoalOpen, setEditGoalOpen] = useState(false);
+
+  // Auto-open weight logging when navigated with ?weight=1
+  useEffect(() => {
+    if (searchParams.get('weight') === '1') {
+      setStatsOpen(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const isFasting = mode === 'fasting';
   const isEating = mode === 'eating';

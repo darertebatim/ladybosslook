@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Plus } from 'lucide-react';
+import { Heart, Plus, Settings } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { useCycleStatusWithLoading, usePeriodLogsForMonth, useLogPeriodDay, useDeletePeriodLog } from '@/hooks/usePeriodTracker';
 import { getStatusText, getSubtitleText } from '@/lib/periodTracking';
 import { PeriodDaySheet } from './PeriodDaySheet';
+import { PeriodSettingsSheet } from './PeriodSettingsSheet';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 
@@ -18,6 +19,7 @@ export const PeriodStatusCard = ({ className }: PeriodStatusCardProps) => {
   const navigate = useNavigate();
   const { status, settings, isLoading, hasCompletedOnboarding } = useCycleStatusWithLoading();
   const [showDaySheet, setShowDaySheet] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   
   const today = new Date();
   const { data: monthLogs = [] } = usePeriodLogsForMonth(today);
@@ -43,6 +45,12 @@ export const PeriodStatusCard = ({ className }: PeriodStatusCardProps) => {
     e.stopPropagation();
     haptic.light();
     setShowDaySheet(true);
+  };
+
+  const handleSettingsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    haptic.light();
+    setSettingsOpen(true);
   };
 
   // Get existing log for today
@@ -134,14 +142,22 @@ export const PeriodStatusCard = ({ className }: PeriodStatusCardProps) => {
             </p>
           </div>
 
-          {/* Log button */}
+          {/* Action buttons */}
           {hasCompletedOnboarding && (
-            <button
-              onClick={handleLogClick}
-              className="w-10 h-10 rounded-full bg-pink-500 text-white flex items-center justify-center shrink-0 shadow-md active:scale-95 transition-transform"
-            >
-              <Plus className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                onClick={handleLogClick}
+                className="w-9 h-9 rounded-full bg-pink-500 text-white flex items-center justify-center shadow-sm active:scale-95 transition-transform"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+              <button
+                onClick={handleSettingsClick}
+                className="w-9 h-9 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform bg-white/60 dark:bg-white/10 text-pink-600 dark:text-pink-400"
+              >
+                <Settings className="h-4 w-4" />
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -154,6 +170,12 @@ export const PeriodStatusCard = ({ className }: PeriodStatusCardProps) => {
         existingLog={todayLog}
         onSave={handleSaveLog}
         isLoading={logPeriodDay.isPending || deletePeriodLog.isPending}
+      />
+
+      {/* Settings sheet */}
+      <PeriodSettingsSheet
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
       />
     </>
   );

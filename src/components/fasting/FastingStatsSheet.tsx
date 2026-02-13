@@ -129,7 +129,7 @@ const FALLBACK_WEIGHT_TASKS: RoutinePlanTask[] = [
     is_active: true,
     created_at: new Date().toISOString(),
     linked_playlist_id: null,
-    pro_link_type: 'fasting',
+    pro_link_type: 'weight',
     pro_link_value: null,
     tag: 'pro',
   },

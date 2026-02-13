@@ -12,11 +12,12 @@ import {
   HeartHandshake,
   Headphones,
   Smile,
-  Timer
+  Timer,
+  Scale
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -215,6 +216,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open the fasting tracker',
     requiresValue: false,
   },
+  weight: {
+    value: 'weight',
+    label: 'Weight Logging',
+    icon: Scale,
+    badgeText: 'Log',
+    color: 'amber',
+    gradientClass: 'bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40',
+    iconColorClass: 'text-amber-600 dark:text-amber-400',
+    badgeColorClass: 'bg-amber-500/20 text-amber-700 dark:text-amber-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open the weight logger',
+    requiresValue: false,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
@@ -250,6 +264,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return '/app/mood';
     case 'fasting':
       return '/app/fasting';
+    case 'weight':
+      return '/app/fasting?weight=1';
     default:
       return '/app/home';
   }
