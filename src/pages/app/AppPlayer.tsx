@@ -141,9 +141,10 @@ export default function AppPlayer() {
   
   const availableCategories = categoryOrder.filter(cat => cat === 'all' || availableCategoriesSet.has(cat));
 
-  // Filter by language
+  // Filter by language - "all" language playlists always show
   const filterByLanguage = (playlist: any) => {
     if (preferredLanguage === 'all') return true;
+    if (playlist.language === 'all' || !playlist.language) return true;
     return playlist.language === preferredLanguage;
   };
 

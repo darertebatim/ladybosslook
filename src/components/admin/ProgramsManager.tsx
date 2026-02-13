@@ -969,6 +969,7 @@ export function ProgramsManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="all">🌐 All / Multilanguage</SelectItem>
                     <SelectItem value="american">🇺🇸 American</SelectItem>
                     <SelectItem value="persian">🇮🇷 Persian</SelectItem>
                     <SelectItem value="turkish">🇹🇷 Turkish</SelectItem>

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { haptic } from '@/lib/haptics';
 
 const LANG_FLAGS: Record<string, string> = {
+  all: '🌐',
   american: '🇺🇸',
   persian: '🦁',
   turkish: '🇹🇷',
