@@ -35,6 +35,7 @@ import { GoalInputSheet } from '@/components/app/GoalInputSheet';
 import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
 import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
+import { FastingStatusCard } from '@/components/app/FastingStatusCard';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
 import { WelcomeRitualCard } from '@/components/app/WelcomeRitualCard';
 import { toast } from 'sonner';
@@ -714,6 +715,13 @@ const AppHome = () => {
               {selectedTag === null && homeData?.periodSettings?.onboarding_done && homeData?.periodSettings?.show_on_home && (
                 <div className="mb-4">
                   <PeriodStatusCard />
+                </div>
+              )}
+
+              {/* Fasting Status Card */}
+              {selectedTag === null && (
+                <div className="mb-4">
+                  <FastingStatusCard />
                 </div>
               )}
 
