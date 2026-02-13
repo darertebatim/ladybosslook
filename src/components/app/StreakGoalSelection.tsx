@@ -11,6 +11,10 @@ interface StreakGoalSelectionProps {
   onClose: () => void;
   onSelectGoal: (goal: StreakGoalValue) => void;
   isLoading?: boolean;
+  /** Only show goals higher than this value (for upgrade flow) */
+  minGoal?: number;
+  /** Show congratulatory header variant */
+  isUpgrade?: boolean;
 }
 
 const GOALS = [7, 14, 30, 50] as const;
@@ -31,9 +35,12 @@ export const StreakGoalSelection = ({
   open, 
   onClose, 
   onSelectGoal,
-  isLoading 
+  isLoading,
+  minGoal = 0,
+  isUpgrade = false,
 }: StreakGoalSelectionProps) => {
-  const [selectedGoal, setSelectedGoal] = useState<GoalValue>(7);
+  const availableGoals = GOALS.filter(g => g > minGoal);
+  const [selectedGoal, setSelectedGoal] = useState<GoalValue>(availableGoals[0] || 7);
 
   const handleSelectGoal = (goal: GoalValue) => {
     setSelectedGoal(goal);
@@ -127,13 +134,16 @@ export const StreakGoalSelection = ({
         
         {/* Title */}
         <h1 className="text-2xl font-bold text-white text-center mb-8 leading-tight">
-          Pick Your <span className="text-orange-300">Streak Goal</span><br />
-          and Stay on Track!
+          {isUpgrade ? (
+            <>🏆 Challenge Complete!<br /><span className="text-orange-300">Ready for more?</span></>
+          ) : (
+            <>Pick Your <span className="text-orange-300">Streak Goal</span><br />and Stay on Track!</>
+          )}
         </h1>
         
         {/* Goal selection buttons */}
-        <div className="grid grid-cols-4 gap-3 w-full max-w-xs mb-6">
-          {GOALS.map((goal) => (
+        <div className={cn('grid gap-3 w-full max-w-xs mb-6', availableGoals.length <= 3 ? 'grid-cols-3' : 'grid-cols-4')}>
+          {availableGoals.map((goal) => (
             <button
               key={goal}
               onClick={() => handleSelectGoal(goal)}

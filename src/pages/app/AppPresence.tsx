@@ -1,22 +1,27 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart } from 'lucide-react';
 import { usePresenceStats } from '@/hooks/usePresenceStats';
 import { useUserPresence } from '@/hooks/useUserPresence';
-import { useUserStreak } from '@/hooks/useTaskPlanner';
+import { useUserStreak, useSetStreakGoal } from '@/hooks/useTaskPlanner';
 import { ACHIEVEMENTS, getAchievementStatus } from '@/lib/achievements';
 import { AchievementCard } from '@/components/app/AchievementCard';
 import { WeeklyPresenceGrid } from '@/components/app/WeeklyPresenceGrid';
 import { StreakChallengeCard } from '@/components/app/StreakChallengeCard';
+import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
 import { BackButton } from '@/components/app/BackButton';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { SEOHead } from '@/components/SEOHead';
+import { toast } from 'sonner';
 
 const AppPresence = () => {
   const navigate = useNavigate();
   const { data: stats, isLoading } = usePresenceStats();
   const { data: presence } = useUserPresence();
   const { data: streak } = useUserStreak();
+  const setStreakGoal = useSetStreakGoal();
+  const [showGoalSelection, setShowGoalSelection] = useState(false);
   
   const lastActiveDate = presence?.lastActiveDate ? new Date(presence.lastActiveDate) : null;
   const showedUpToday = presence?.showedUpToday || false;
@@ -135,6 +140,7 @@ const AppPresence = () => {
               <StreakChallengeCard
                 currentStreak={streak.current_streak}
                 streakGoal={streak.streak_goal!}
+                onLevelUp={() => setShowGoalSelection(true)}
               />
             )}
             
@@ -241,6 +247,23 @@ const AppPresence = () => {
           </div>
         </div>
       </div>
+
+      {/* Streak Goal Selection for Level Up */}
+      <StreakGoalSelection
+        open={showGoalSelection}
+        onClose={() => setShowGoalSelection(false)}
+        onSelectGoal={(goal) => {
+          setStreakGoal.mutate(goal, {
+            onSuccess: () => {
+              setShowGoalSelection(false);
+              toast.success('New challenge accepted! Let\'s go! 🏆');
+            },
+          });
+        }}
+        isLoading={setStreakGoal.isPending}
+        minGoal={streak?.streak_goal || 0}
+        isUpgrade={true}
+      />
     </>
   );
 };

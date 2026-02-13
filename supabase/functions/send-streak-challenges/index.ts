@@ -211,13 +211,14 @@ Deno.serve(async (req) => {
       .in('user_id', userIds);
     const prefsMap = new Map(prefs?.map(p => [p.user_id, p.momentum_celebration]) || []);
 
-    // Check already sent today
-    const { data: sentToday } = await supabase
+    // Cross-function daily cooldown: check if user already got ANY server-side PN today
+    const { data: anyPnToday } = await supabase
       .from('pn_schedule_logs')
       .select('user_id')
-      .like('notification_type', 'streak_challenge_%')
+      .in('function_name', ['send-momentum-celebration', 'send-streak-challenges', 'send-drip-followup'])
+      .in('user_id', userIds)
       .gte('sent_at', `${today}T00:00:00Z`);
-    const alreadySentSet = new Set(sentToday?.map(s => s.user_id) || []);
+    const alreadySentSet = new Set(anyPnToday?.map(s => s.user_id) || []);
 
     // Get today's task completions for gold badge logic
     const { data: todayCompletions } = await supabase

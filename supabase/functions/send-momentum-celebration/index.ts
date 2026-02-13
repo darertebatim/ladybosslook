@@ -75,6 +75,20 @@ function isWithinActiveWindow(userTimezone: string | null): boolean {
   }
 }
 
+/**
+ * Get today's date string in the user's local timezone
+ */
+function getTodayInUserTz(userTimezone: string | null): string {
+  try {
+    const tz = userTimezone || 'America/Los_Angeles';
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-CA', { timeZone: tz }); // en-CA gives YYYY-MM-DD
+    return formatter.format(now);
+  } catch {
+    return new Date().toISOString().split('T')[0];
+  }
+}
+
 async function signJWT(header: Record<string, unknown>, payload: Record<string, unknown>, privateKey: string): Promise<string> {
   const encoder = new TextEncoder();
   const base64urlEncode = (data: Uint8Array): string => {
@@ -166,10 +180,16 @@ Deno.serve(async (req) => {
     }
     
     // Filter users who are inactive (1-14 days gap) and within active window
+    // Use user's local timezone for gap calculation to prevent false positives
     const inactiveUsers = allUsers.filter(u => {
-      const lastActive = new Date(u.last_active_date!);
-      const gap = Math.floor((now.getTime() - lastActive.getTime()) / (1000 * 60 * 60 * 24));
-      return gap >= 1 && gap <= 14 && isWithinActiveWindow(u.timezone);
+      if (!isWithinActiveWindow(u.timezone)) return false;
+      const userToday = getTodayInUserTz(u.timezone);
+      if (u.last_active_date === userToday) return false; // Active today in their TZ
+      // Calculate gap using local dates
+      const lastActiveDate = new Date(u.last_active_date + 'T12:00:00Z');
+      const todayDate = new Date(userToday + 'T12:00:00Z');
+      const gap = Math.floor((todayDate.getTime() - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24));
+      return gap >= 1 && gap <= 14;
     });
     
     console.log(`[MomentumKeeper] Found ${inactiveUsers.length} inactive users in active window`);
@@ -188,15 +208,14 @@ Deno.serve(async (req) => {
       return pref === undefined || pref === true;
     });
     
-    // Check already sent today
-    const { data: sentToday } = await supabase
+    // Cross-function daily cooldown: check if user already got ANY server-side PN today
+    const { data: anyPnToday } = await supabase
       .from('pn_schedule_logs')
-      .select('user_id, notification_type')
+      .select('user_id')
+      .in('function_name', ['send-momentum-celebration', 'send-streak-challenges', 'send-drip-followup'])
       .in('user_id', userIds)
-      .like('notification_type', 'momentum_keeper_%')
       .gte('sent_at', `${today}T00:00:00Z`);
-    
-    const alreadySentSet = new Set(sentToday?.map(s => s.user_id) || []);
+    const alreadySentSet = new Set(anyPnToday?.map(s => s.user_id) || []);
     
     // Get push subscriptions
     const { data: subscriptions } = await supabase.from('push_subscriptions').select('user_id, endpoint, id').in('user_id', userIds).like('endpoint', 'native:%');
@@ -226,7 +245,11 @@ Deno.serve(async (req) => {
       if (alreadySentSet.has(user.id)) { skipCount++; continue; }
       
       const lastActive = new Date(user.last_active_date!);
-      const gap = Math.floor((now.getTime() - lastActive.getTime()) / (1000 * 60 * 60 * 24));
+      // Use local timezone for accurate gap calculation
+      const userToday = getTodayInUserTz(user.timezone);
+      const todayDate = new Date(userToday + 'T12:00:00Z');
+      const lastActiveDate = new Date(user.last_active_date! + 'T12:00:00Z');
+      const gap = Math.floor((todayDate.getTime() - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24));
       const message = getInactivityMessage(gap);
       if (!message) continue;
       

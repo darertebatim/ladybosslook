@@ -1,6 +1,7 @@
 // AppHome - Main home page component
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
 import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -15,6 +16,7 @@ import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { StreakGoalSelection } from '@/components/app/StreakGoalSelection';
+import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
 import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
 import { PromoBanner } from '@/components/app/PromoBanner';
@@ -91,13 +93,16 @@ const AppHome = () => {
   
   // Streak goal selection state
   const [showGoalSelection, setShowGoalSelection] = useState(false);
+  const [isStreakUpgrade, setIsStreakUpgrade] = useState(false);
   const setStreakGoal = useSetStreakGoal();
   
   
   // Gold streak celebration state - use localStorage to prevent re-showing on navigation
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const goldCelebrationShownKey = `simora_gold_celebration_shown_${todayStr}`;
+  const streakGoalCelebrationShownKey = `simora_streak_goal_celebration_shown`;
   const [showGoldStreakCelebration, setShowGoldStreakCelebration] = useState(false);
+  const [showStreakGoalCompletion, setShowStreakGoalCompletion] = useState(false);
   const { data: goldStreakData } = useGoldStreak();
   const { data: goldDatesThisWeek = [] } = useGoldDatesThisWeek();
   const updateGoldStreak = useUpdateGoldStreak();
@@ -240,6 +245,24 @@ const AppHome = () => {
     }
     prevTotalCompletions.current = totalCompletions;
   }, [totalCompletions, triggerFirstCelebration]);
+
+  // Detect streak goal completion — show celebration once
+  useEffect(() => {
+    if (!streak || !streak.streak_goal || streak.streak_goal <= 0) return;
+    if (streak.current_streak < streak.streak_goal) return;
+    // Already celebrated this goal (check localStorage keyed by goal value)
+    const celebratedKey = `simora_streak_goal_celebrated_${streak.streak_goal}`;
+    if (localStorage.getItem(celebratedKey) === 'true') return;
+    // Also check if streak_goal_completed_at is set (server-side flag)
+    if ((streak as any).streak_goal_completed_at) return;
+    
+    // Mark as celebrated
+    localStorage.setItem(celebratedKey, 'true');
+    // Also mark on server
+    supabase.from('user_streaks').update({ streak_goal_completed_at: new Date().toISOString() } as any).eq('user_id', streak.user_id).then(() => {});
+    
+    setShowStreakGoalCompletion(true);
+  }, [streak]);
 
   // Popular routines for suggestions (filter out already-added ones)
   const {
@@ -824,7 +847,10 @@ const AppHome = () => {
             !streak.streak_goal &&
             streak.last_completion_date === format(new Date(), 'yyyy-MM-dd')
           }
-          onShowGoalSelection={() => setShowGoalSelection(true)}
+          onShowGoalSelection={() => {
+            setIsStreakUpgrade(false);
+            setShowGoalSelection(true);
+          }}
         />
 
         {/* Streak Goal Selection - Full screen modal */}
@@ -835,11 +861,14 @@ const AppHome = () => {
             setStreakGoal.mutate(goal, {
               onSuccess: () => {
                 setShowGoalSelection(false);
-                toast.success('Challenge accepted! Let\'s do this! 🔥');
+                setIsStreakUpgrade(false);
+                toast.success(isStreakUpgrade ? 'New challenge accepted! Let\'s go! 🏆' : 'Challenge accepted! Let\'s do this! 🔥');
               },
             });
           }}
           isLoading={setStreakGoal.isPending}
+          minGoal={isStreakUpgrade ? (streak?.streak_goal || 0) : 0}
+          isUpgrade={isStreakUpgrade}
         />
 
         {/* Badge celebration (silver/almost-there toasts + gold modal) */}
@@ -900,6 +929,18 @@ const AppHome = () => {
           />
         )}
 
+        {/* Streak Goal Completion Celebration */}
+        <StreakGoalCompletionCelebration
+          open={showStreakGoalCompletion}
+          streakGoal={streak?.streak_goal || 7}
+          currentStreak={streak?.current_streak || 0}
+          onClose={() => setShowStreakGoalCompletion(false)}
+          onLevelUp={() => {
+            setShowStreakGoalCompletion(false);
+            setIsStreakUpgrade(true);
+            setShowGoalSelection(true);
+          }}
+        />
 
 
 

@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { AudioPlayerProvider, useAudioPlayer } from '@/contexts/AudioPlayerContext';
+import { useTrackAppReturn } from '@/hooks/useUserPresence';
 import { MiniPlayer } from '@/components/audio/MiniPlayer';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
@@ -52,6 +53,9 @@ const NativeAppLayout = () => {
   
   // Track app version on every app open
   useAppInstallTracking(user?.id);
+  
+  // Track app returns (every open/resume increments return count)
+  useTrackAppReturn(user?.id);
   
   // Legacy cleanup of old daily local notifications
   useLocalNotificationScheduler(user?.id);
