@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast } from "lucide-react";
+import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast, Globe } from "lucide-react";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isNativeApp } from "@/lib/platform";
@@ -11,6 +11,15 @@ import { CategoryCircle } from "@/components/app/CategoryCircle";
 import { cn } from "@/lib/utils";
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { PlayerTour, TourHelpButton } from "@/components/app/tour";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+const LANGUAGE_OPTIONS = [
+  { value: 'all', label: 'All', flag: '🌐' },
+  { value: 'american', label: 'English', flag: '🇺🇸' },
+  { value: 'persian', label: 'فارسی', flag: '🦁' },
+  { value: 'turkish', label: 'Türkçe', flag: '🇹🇷' },
+  { value: 'spanish', label: 'Español', flag: '🇪🇸' },
+];
 
 // Category configuration with icons and colors
 const categoryConfig: Record<string, { name: string; icon: string; color: string }> = {
@@ -30,6 +39,17 @@ export default function AppPlayer() {
   const [showSearch, setShowSearch] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [progressFilter, setProgressFilter] = useState<"all" | "in_progress" | "completed">("all");
+  const [preferredLanguage, setPreferredLanguage] = useState(() => {
+    return localStorage.getItem('player-language') || 'all';
+  });
+
+  const handleLanguageChange = useCallback((lang: string) => {
+    setPreferredLanguage(lang);
+    localStorage.setItem('player-language', lang);
+  }, []);
+
+  const selectedLang = LANGUAGE_OPTIONS.find(l => l.value === preferredLanguage) || LANGUAGE_OPTIONS[0];
+
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
 
   const handleTourReady = useCallback((tourStart: () => void) => {
@@ -121,10 +141,17 @@ export default function AppPlayer() {
   
   const availableCategories = categoryOrder.filter(cat => cat === 'all' || availableCategoriesSet.has(cat));
 
+  // Filter by language
+  const filterByLanguage = (playlist: any) => {
+    if (preferredLanguage === 'all') return true;
+    return playlist.language === preferredLanguage;
+  };
+
   // Filter playlists based on selected category
   const filteredPlaylists = playlists
     ?.filter(p => !p.is_hidden)
     ?.filter(isPlaylistAvailableOnMobile)
+    ?.filter(filterByLanguage)
     ?.filter(p => selectedCategory === 'all' || p.category === selectedCategory)
     ?.filter(filterPlaylistBySearch)
     ?.filter(filterPlaylistByProgress) || [];
@@ -133,7 +160,7 @@ export default function AppPlayer() {
   const continueListening = playlists?.filter(playlist => {
     const stats = getPlaylistStats(playlist.id);
     const progress = stats.trackCount > 0 ? (stats.completedTracks / stats.trackCount) * 100 : 0;
-    return progress > 0 && progress < 100 && !isPlaylistLocked(playlist) && isPlaylistAvailableOnMobile(playlist);
+    return progress > 0 && progress < 100 && !isPlaylistLocked(playlist) && isPlaylistAvailableOnMobile(playlist) && filterByLanguage(playlist);
   }).sort((a, b) => {
     const itemsA = playlistItems?.filter(i => i.playlist_id === a.id) || [];
     const itemsB = playlistItems?.filter(i => i.playlist_id === b.id) || [];
@@ -297,22 +324,50 @@ export default function AppPlayer() {
           </div>
         </div>
 
-        {/* Progress Filter Pills */}
-        <div className="tour-player-progress-filter px-4 pb-3 flex gap-2">
-          {(['all', 'in_progress', 'completed'] as const).map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setProgressFilter(filter)}
-              className={cn(
-                'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
-                progressFilter === filter
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground'
-              )}
-            >
-              {filter === 'all' ? 'All' : filter === 'in_progress' ? 'In Progress' : 'Completed'}
-            </button>
-          ))}
+        {/* Progress Filter Pills + Language Selector */}
+        <div className="tour-player-progress-filter px-4 pb-3 flex items-center justify-between">
+          <div className="flex gap-2">
+            {(['all', 'in_progress', 'completed'] as const).map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setProgressFilter(filter)}
+                className={cn(
+                  'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
+                  progressFilter === filter
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground'
+                )}
+              >
+                {filter === 'all' ? 'All' : filter === 'in_progress' ? 'In Progress' : 'Completed'}
+              </button>
+            ))}
+          </div>
+
+          {/* Language Selector */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
+                <span className="text-sm">{selectedLang.flag}</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-40 p-1">
+              {LANGUAGE_OPTIONS.map((lang) => (
+                <button
+                  key={lang.value}
+                  onClick={() => handleLanguageChange(lang.value)}
+                  className={cn(
+                    'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors',
+                    preferredLanguage === lang.value
+                      ? 'bg-primary/10 text-primary font-medium'
+                      : 'hover:bg-muted text-foreground'
+                  )}
+                >
+                  <span>{lang.flag}</span>
+                  <span>{lang.label}</span>
+                </button>
+              ))}
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
