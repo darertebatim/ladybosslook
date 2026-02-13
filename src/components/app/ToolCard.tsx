@@ -96,7 +96,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
       onClick={handleClick}
       disabled={tool.comingSoon}
       className={cn(
-        'flex items-center gap-2.5 p-3 rounded-xl',
+        'flex items-center gap-2.5 px-3 py-2 rounded-xl',
         'shadow-sm border border-black/5',
         'transition-transform active:scale-[0.97]',
         tool.bgColor,
@@ -104,8 +104,8 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
         className
       )}
     >
-      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-white/60">
-        <IconComponent className={cn('h-5 w-5', tool.iconColor)} />
+      <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-white/60">
+        <IconComponent className={cn('h-4.5 w-4.5', tool.iconColor)} />
       </div>
       <div className="flex flex-col items-start min-w-0">
         <h3 className="font-semibold text-foreground text-[13px] leading-tight">
