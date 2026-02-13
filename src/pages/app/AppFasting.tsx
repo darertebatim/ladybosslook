@@ -1,37 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap, BarChart3, CalendarPlus } from 'lucide-react';
+import { Zap, BarChart3, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FastingRing } from '@/components/fasting/FastingRing';
 import { FastingProtocolSheet } from '@/components/fasting/FastingProtocolSheet';
 import { FastingZonesSheet } from '@/components/fasting/FastingZonesSheet';
 import { FastingCompletionSheet } from '@/components/fasting/FastingCompletionSheet';
 import { FastingStatsSheet } from '@/components/fasting/FastingStatsSheet';
+import { FastingSettingsSheet } from '@/components/fasting/FastingSettingsSheet';
 import { useFastingTracker } from '@/hooks/useFastingTracker';
 import { FASTING_PROTOCOLS } from '@/lib/fastingZones';
 import { BackButton } from '@/components/app/BackButton';
-import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
-import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
-import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
-import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { format } from 'date-fns';
-import { toast } from 'sonner';
-
-const FALLBACK_FASTING_TASKS: RoutinePlanTask[] = [
-  {
-    id: 'fasting-task-1',
-    plan_id: 'synthetic-fasting',
-    title: 'Intermittent Fasting',
-    icon: '⏳',
-    task_order: 0,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    linked_playlist_id: null,
-    pro_link_type: 'fasting',
-    pro_link_value: null,
-    tag: 'pro',
-  },
-];
 
 export default function AppFasting() {
   const navigate = useNavigate();
@@ -60,40 +40,17 @@ export default function AppFasting() {
   const [statsOpen, setStatsOpen] = useState(false);
   const [completionOpen, setCompletionOpen] = useState(false);
   const [completedSession, setCompletedSession] = useState<any>(null);
-  const [showRoutineSheet, setShowRoutineSheet] = useState(false);
-  const [justAdded, setJustAdded] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const isFasting = mode === 'fasting';
   const isEating = mode === 'eating';
   const currentProtocol = FASTING_PROTOCOLS.find(p => p.id === selectedProtocol);
-
-  // Pro-link integration
-  const { data: existingTask } = useExistingProTask('fasting');
-  const addRoutinePlan = useAddRoutinePlan();
-  const isAdded = existingTask || justAdded;
 
   const handleEndFast = async () => {
     const ended = await endFast();
     if (ended) {
       setCompletedSession(ended);
       setCompletionOpen(true);
-    }
-  };
-
-  const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
-    try {
-      await addRoutinePlan.mutateAsync({
-        planId: 'synthetic-fasting',
-        selectedTaskIds,
-        editedTasks,
-        syntheticTasks: FALLBACK_FASTING_TASKS,
-      });
-      toast.success('Fasting ritual added to your planner!');
-      setShowRoutineSheet(false);
-      setJustAdded(true);
-    } catch (error) {
-      console.error('Failed to add ritual:', error);
-      toast.error('Failed to add ritual');
     }
   };
 
@@ -199,12 +156,13 @@ export default function AppFasting() {
           </Button>
         )}
 
-        {/* Add to Routine button */}
-        <AddedToRoutineButton
-          isAdded={!!isAdded}
-          onAddClick={() => setShowRoutineSheet(true)}
-          iconOnly
-        />
+        {/* Settings button */}
+        <button
+          onClick={() => setSettingsOpen(true)}
+          className="w-12 h-12 rounded-full flex items-center justify-center active:scale-95 transition-transform shadow-sm border border-border/30 bg-white/60 dark:bg-white/10 text-amber-600 dark:text-amber-400"
+        >
+          <Settings className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Sheets */}
@@ -238,13 +196,9 @@ export default function AppFasting() {
         sessions={pastSessions}
         onDeleteSession={deleteFast}
       />
-      <RoutinePreviewSheet
-        open={showRoutineSheet}
-        onOpenChange={setShowRoutineSheet}
-        tasks={FALLBACK_FASTING_TASKS}
-        routineTitle="Fasting Routine"
-        onSave={handleSaveRoutine}
-        isSaving={addRoutinePlan.isPending}
+      <FastingSettingsSheet
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
       />
     </div>
   );
