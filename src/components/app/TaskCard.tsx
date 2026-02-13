@@ -1,6 +1,6 @@
 import { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Plus, Play, Droplets } from 'lucide-react';
+import { Check, Plus, Play, Droplets, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   UserTask, 
@@ -17,6 +17,10 @@ import { toast } from 'sonner';
 import { isWaterTask } from '@/lib/waterTracking';
 import { formatTimeLabelWithEmoji } from '@/lib/taskScheduling';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Delete } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface TaskCardProps {
   task: UserTask;
@@ -44,7 +48,12 @@ export const TaskCard = memo(function TaskCard({
   onOpenWaterTracking,
 }: TaskCardProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isAnimating, setIsAnimating] = useState(false);
+  const [weightOpen, setWeightOpen] = useState(false);
+  const [weightValue, setWeightValue] = useState('');
+  const [weightUnit] = useState<'lb' | 'kg'>('lb');
+  const [isLoggingWeight, setIsLoggingWeight] = useState(false);
   
   const { data: subtasks = [] } = useSubtasks(task.id);
   const completeTask = useCompleteTask();
@@ -195,110 +204,197 @@ export const TaskCard = memo(function TaskCard({
     // Use task's emoji if available for 3D display, otherwise fall back to ProIcon
     const hasTaskEmoji = task.emoji && task.emoji.length > 0;
     
-    return (
-      <div
-        onClick={handleCardClick}
-        className={cn(
-          'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-          colorClass
-        )}
-      >
-        {/* Main row */}
-        <div className="flex items-center gap-2">
-          {/* Icon - use 3D emoji if available, else Lucide icon */}
-          <div className="w-10 h-10 flex items-center justify-center shrink-0">
-            {hasTaskEmoji ? (
-              <FluentEmoji emoji={task.emoji} size={32} />
-            ) : (
-              <ProIcon className={cn('h-6 w-6', proConfig.iconColorClass)} />
-            )}
-          </div>
+    const handleWeightKey = (key: string) => {
+      haptic.light();
+      if (key === 'backspace') {
+        setWeightValue(prev => prev.slice(0, -1));
+      } else if (key === '.') {
+        if (!weightValue.includes('.') && weightValue.length < 6) {
+          setWeightValue(prev => prev + '.');
+        }
+      } else if (key === 'confirm') {
+        handleLogWeight();
+      } else if (weightValue.length < 6) {
+        setWeightValue(prev => prev + key);
+      }
+    };
 
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            {/* Top line: Time + Goal (if applicable) */}
-            <div className="flex items-center gap-2">
-              <span className="text-[13px] text-black/80">{formatTime(task)}</span>
-              {hasGoal && (
-                <span className="text-[13px] text-black/80 font-medium">• {formatProGoalLabel()}</span>
+    const handleLogWeight = async () => {
+      if (!user || !weightValue || isLoggingWeight) return;
+      setIsLoggingWeight(true);
+      const { error } = await supabase.from('weight_logs' as any).insert({
+        user_id: user.id,
+        weight_value: parseFloat(weightValue),
+        weight_unit: weightUnit,
+        logged_at: new Date().toISOString(),
+      } as any);
+      if (!error) {
+        toast.success('Weight logged!');
+        setWeightValue('');
+        setWeightOpen(false);
+      } else {
+        toast.error('Failed to log weight');
+      }
+      setIsLoggingWeight(false);
+    };
+
+    const weightKeys = [
+      ['7', '8', '9'],
+      ['4', '5', '6'],
+      ['1', '2', '3'],
+      ['.', '0', 'confirm'],
+    ];
+
+    return (
+      <>
+        <div
+          onClick={handleCardClick}
+          className={cn(
+            'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+            colorClass
+          )}
+        >
+          {/* Main row */}
+          <div className="flex items-center gap-2">
+            {/* Icon - use 3D emoji if available, else Lucide icon */}
+            <div className="w-10 h-10 flex items-center justify-center shrink-0">
+              {hasTaskEmoji ? (
+                <FluentEmoji emoji={task.emoji} size={32} />
+              ) : (
+                <ProIcon className={cn('h-6 w-6', proConfig.iconColorClass)} />
               )}
             </div>
-            
-            {/* Title - strike through when goal reached or completed */}
-            <p className={cn(
-              'text-black text-[15px] font-semibold truncate transition-all',
-              (hasGoal ? goalReached : isCompleted) && 'line-through'
-            )}>
-              {task.title}
-            </p>
-          </div>
 
-          {/* Quick navigation button - prominent action button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
-            }}
-            className={cn(
-              'flex items-center justify-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all shadow-sm active:scale-95',
-              proConfig.buttonClass
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              {/* Top line: Time + Goal (if applicable) */}
+              <div className="flex items-center gap-2">
+                <span className="text-[13px] text-black/80">{formatTime(task)}</span>
+                {hasGoal && (
+                  <span className="text-[13px] text-black/80 font-medium">• {formatProGoalLabel()}</span>
+                )}
+              </div>
+              
+              {/* Title - strike through when goal reached or completed */}
+              <p className={cn(
+                'text-black text-[15px] font-semibold truncate transition-all',
+                (hasGoal ? goalReached : isCompleted) && 'line-through'
+              )}>
+                {task.title}
+              </p>
+            </div>
+
+            {/* Quick navigation button - prominent action button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (proLinkType === 'weight') {
+                  setWeightOpen(true);
+                } else {
+                  navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
+                }
+              }}
+              className={cn(
+                'flex items-center justify-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all shadow-sm active:scale-95',
+                proConfig.buttonClass
+              )}
+            >
+              <ProIcon className="h-3.5 w-3.5" />
+              {proConfig.badgeText}
+            </button>
+
+            {/* Timer goal: Play button, Count goal: + button, Regular: Checkbox */}
+            {isTimerGoal ? (
+              <button
+                onClick={handleOpenTimer}
+                className={cn(
+                  'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+                  goalReached
+                    ? 'bg-emerald-500 text-white shadow-md'
+                    : 'border-2 border-foreground/30 bg-white/60',
+                  isAnimating && 'scale-110'
+                )}
+              >
+                {goalReached ? <Check className="h-4 w-4" strokeWidth={3} /> : <Play className="h-4 w-4 ml-0.5" />}
+              </button>
+            ) : (isCountGoal || isWater) ? (
+              <button
+                onClick={handleOpenGoalInput}
+                className={cn(
+                  'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+                  goalReached
+                    ? 'bg-emerald-500 text-white shadow-md'
+                    : 'border-2 border-foreground/30 bg-white/60',
+                  isAnimating && 'scale-110'
+                )}
+              >
+                {goalReached ? <Check className="h-4 w-4" strokeWidth={3} /> : (
+                  isWater ? <Droplets className="h-4 w-4 text-sky-500" /> : <Plus className="h-4 w-4" />
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={handleToggleComplete}
+                className={cn(
+                  'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+                  isCompleted
+                    ? 'bg-emerald-500 text-white shadow-md'
+                    : 'border-2 border-foreground/30 bg-white/60',
+                  isAnimating && 'scale-110'
+                )}
+              >
+                {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
+              </button>
             )}
-          >
-            <ProIcon className="h-3.5 w-3.5" />
-            {proConfig.badgeText}
-          </button>
-
-          {/* Timer goal: Play button, Count goal: + button, Regular: Checkbox */}
-          {isTimerGoal ? (
-            <button
-              onClick={handleOpenTimer}
-              className={cn(
-                'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
-                goalReached
-                  ? 'bg-emerald-500 text-white shadow-md'
-                  : 'border-2 border-foreground/30 bg-white/60',
-                isAnimating && 'scale-110'
-              )}
-            >
-              {goalReached ? (
-                <Check className="h-4 w-4" strokeWidth={3} />
-              ) : (
-                <Play className="h-5 w-5 text-foreground/70 ml-0.5" fill="currentColor" />
-              )}
-            </button>
-          ) : isCountGoal ? (
-            <button
-              onClick={handleOpenGoalInput}
-              className={cn(
-                'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
-                goalReached
-                  ? 'bg-emerald-500 text-white shadow-md'
-                  : 'border-2 border-foreground/30 bg-white/60',
-                isAnimating && 'scale-110'
-              )}
-            >
-              {goalReached ? (
-                <Check className="h-4 w-4" strokeWidth={3} />
-              ) : (
-                <Plus className="h-5 w-5 text-foreground/70" strokeWidth={2} />
-              )}
-            </button>
-          ) : (
-            <button
-              onClick={handleToggleComplete}
-              className={cn(
-                'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
-                isCompleted
-                  ? 'bg-emerald-500 text-white shadow-md'
-                  : 'border-2 border-foreground/30 bg-white/60',
-                isAnimating && 'scale-110'
-              )}
-            >
-              {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
-            </button>
-          )}
+          </div>
         </div>
-      </div>
+
+        {/* Weight log sheet */}
+        {proLinkType === 'weight' && (
+          <Sheet open={weightOpen} onOpenChange={(o) => { if (!o) setWeightValue(''); setWeightOpen(o); }}>
+            <SheetContent
+              side="bottom"
+              className="rounded-t-3xl px-4 pt-6 pb-8"
+              style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}
+            >
+              <div className="flex items-center justify-center mb-6 relative">
+                <button onClick={() => { setWeightValue(''); setWeightOpen(false); }} className="absolute left-0 p-2 -ml-2">
+                  <X className="h-5 w-5" />
+                </button>
+                <span className="text-lg font-semibold">Weight ({weightUnit})</span>
+              </div>
+
+              <div className="flex items-baseline justify-center gap-2 mb-6">
+                <span className="text-5xl font-bold tracking-tight">{weightValue || '0'}</span>
+                <span className="text-4xl font-bold text-foreground/60">{weightUnit}</span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 bg-amber-50 dark:bg-amber-900/20 rounded-3xl p-4">
+                {weightKeys.flat().map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => handleWeightKey(key)}
+                    className={cn(
+                      'h-16 rounded-2xl text-2xl font-semibold transition-all active:scale-95',
+                      key === 'confirm' && 'bg-amber-500 text-white',
+                      key === '.' && 'bg-amber-100 dark:bg-amber-800/40 text-foreground',
+                      key !== 'confirm' && key !== '.' && 'bg-white dark:bg-background shadow-sm'
+                    )}
+                  >
+                    {key === 'confirm' ? (
+                      <Check className="h-6 w-6 mx-auto" />
+                    ) : key === 'backspace' ? (
+                      <Delete className="h-6 w-6 mx-auto" />
+                    ) : (
+                      key
+                    )}
+                  </button>
+                ))}
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}
+      </>
     );
   }
 
