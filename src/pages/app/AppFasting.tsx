@@ -111,6 +111,7 @@ export default function AppFasting() {
             eatingElapsedSeconds={eatingElapsedSeconds}
             eatingTotalSeconds={eatingTotalSeconds}
             eatingEndTime={eatingEndTime}
+            onZonePress={() => isFasting && setZonesOpen(true)}
           />
           {isFasting && (
             <button
