@@ -5,12 +5,20 @@ import { Clock, Music, Lock, CheckCircle2, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { haptic } from '@/lib/haptics';
 
+const LANG_FLAGS: Record<string, string> = {
+  american: '🇺🇸',
+  persian: '🦁',
+  turkish: '🇹🇷',
+  spanish: '🇪🇸',
+};
+
 interface PlaylistCardProps {
   id: string;
   name: string;
   description?: string;
   coverImageUrl?: string;
   category?: string;
+  language?: string;
   isFree: boolean;
   isLocked: boolean;
   programSlug?: string;
@@ -25,6 +33,7 @@ export const PlaylistCard = memo(function PlaylistCard({
   description,
   coverImageUrl,
   category,
+  language,
   isFree,
   isLocked,
   programSlug,
@@ -95,11 +104,19 @@ export const PlaylistCard = memo(function PlaylistCard({
           </div>
         )}
         
-        {isFree && !isLocked && (
-          <Badge className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 rounded-full">
-            FREE
-          </Badge>
-        )}
+        {/* Top-right: language flag + FREE badge */}
+        <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+          {language && LANG_FLAGS[language] && (
+            <span className="text-sm bg-white/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
+              {LANG_FLAGS[language]}
+            </span>
+          )}
+          {isFree && !isLocked && (
+            <Badge className="bg-green-500 hover:bg-green-600 rounded-full">
+              FREE
+            </Badge>
+          )}
+        </div>
         
         {category && (
           <Badge variant="secondary" className="absolute top-2 left-2 rounded-full">

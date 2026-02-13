@@ -209,6 +209,7 @@ export default function AppPlayer() {
               description={playlist.description}
               coverImageUrl={playlist.cover_image_url}
               category={playlist.category}
+              language={playlist.language}
               isFree={playlist.is_free}
               isLocked={isPlaylistLocked(playlist)}
               programSlug={playlist.program_slug}
@@ -395,6 +396,7 @@ export default function AppPlayer() {
                       description={playlist.description}
                       coverImageUrl={playlist.cover_image_url}
                       category={playlist.category}
+                      language={playlist.language}
                       isFree={playlist.is_free}
                       isLocked={isPlaylistLocked(playlist)}
                       programSlug={playlist.program_slug}
