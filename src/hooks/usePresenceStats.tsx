@@ -8,8 +8,13 @@ export function usePresenceStats() {
 
   return useQuery({
     queryKey: ['presence-stats', user?.id],
-    queryFn: async (): Promise<PresenceStats & { unlockedCount: number; lockedCount: number }> => {
+    queryFn: async (): Promise<PresenceStats & { unlockedCount: number; lockedCount: number; last7DaysActive: number }> => {
       if (!user?.id) throw new Error('User not authenticated');
+
+      // Calculate date 7 days ago
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const sevenDaysAgoStr = sevenDaysAgo.toISOString();
 
       // Fetch all data in parallel
       const [
@@ -20,6 +25,7 @@ export function usePresenceStats() {
         journalResult,
         breathingResult,
         emotionResult,
+        recentCompletionsResult,
       ] = await Promise.all([
         // Profile data (strength-first metrics)
         supabase
@@ -64,12 +70,25 @@ export function usePresenceStats() {
           .from('emotion_logs')
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id),
+        
+        // Recent task completions for last 7 days active count
+        supabase
+          .from('task_completions')
+          .select('completed_date')
+          .eq('user_id', user.id)
+          .gte('completed_date', sevenDaysAgoStr.split('T')[0]),
       ]);
 
       // Calculate listening minutes and completed tracks
       const audioData = audioProgressResult.data || [];
       const listeningSeconds = audioData.reduce((sum, p) => sum + (p.current_position_seconds || 0), 0);
       const completedTracks = audioData.filter(p => p.completed).length;
+
+      // Calculate unique active days in last 7 days
+      const recentDates = new Set(
+        (recentCompletionsResult.data || []).map(c => c.completed_date)
+      );
+      const last7DaysActive = recentDates.size;
 
       const stats: PresenceStats = {
         // Presence metrics
@@ -92,6 +111,7 @@ export function usePresenceStats() {
 
       return {
         ...stats,
+        last7DaysActive,
         unlockedCount: unlocked.length,
         lockedCount: locked.length,
       };
