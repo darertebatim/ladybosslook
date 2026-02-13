@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Carousel,
   CarouselContent,
@@ -33,6 +33,7 @@ const isEmoji = (str: string) =>
 
 export function InspireBanner({ routines }: InspireBannerProps) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   if (!routines || routines.length === 0) return null;
 
@@ -47,7 +48,7 @@ export function InspireBanner({ routines }: InspireBannerProps) {
           return (
             <CarouselItem key={routine.id} className="pl-2 basis-[90%]">
               <button
-                onClick={() => navigate(`/app/rituals/${routine.id}`)}
+                onClick={() => navigate(`/app/rituals/${routine.id}`, { state: { from: location.pathname } })}
                 className={cn(
                   'relative w-full h-36 rounded-2xl overflow-hidden',
                   'bg-gradient-to-br',

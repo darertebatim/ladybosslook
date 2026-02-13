@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Check, Video, BookOpen, Music, ExternalLink, Settings2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -45,6 +45,7 @@ const EVENT_STYLES = {
 
 export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isAnimating, setIsAnimating] = useState(false);
   const [showReminderSheet, setShowReminderSheet] = useState(false);
   
@@ -104,17 +105,17 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
           }
         } else {
           // Navigate to course detail
-          navigate(`/app/course/${event.programSlug}`);
+          navigate(`/app/course/${event.programSlug}`, { state: { from: location.pathname } });
         }
         break;
       case 'module':
         // Navigate to course detail (modules section)
-        navigate(`/app/course/${event.programSlug}`);
+        navigate(`/app/course/${event.programSlug}`, { state: { from: location.pathname } });
         break;
       case 'track':
         // Navigate to audio player
         if (event.playlistId) {
-          navigate(`/app/player/playlist/${event.playlistId}`);
+          navigate(`/app/player/playlist/${event.playlistId}`, { state: { from: location.pathname } });
         }
         break;
     }
