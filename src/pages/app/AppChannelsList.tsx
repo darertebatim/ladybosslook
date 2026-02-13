@@ -12,6 +12,8 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { useSupportChatSummary } from '@/hooks/useSupportChatSummary';
 import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 // Helper to check if cover is an emoji
 const isEmojiCover = (url: string | null) => url?.startsWith('emoji:');
@@ -35,13 +37,29 @@ function formatLastMessageTime(date: Date): string {
 
 export default function AppChannelsList() {
   const navigate = useNavigate();
-  const { canAccessAdminPage } = useAuth();
+  const { canAccessAdminPage, user } = useAuth();
   const { data: channels, isLoading: channelsLoading } = useChannels();
   const { data: summaries, isLoading: summariesLoading } = useChannelSummaries();
   const { unreadCount: supportUnreadCount } = useUnreadChat('support');
   const { data: supportSummary } = useSupportChatSummary('support');
-  const { unreadCount: coachUnreadCount } = useUnreadChat('coach');
-  const { data: coachSummary } = useSupportChatSummary('coach');
+
+  // Check if user has coach access
+  const { data: hasCoachAccess } = useQuery({
+    queryKey: ['coach-access', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return false;
+      const { data } = await supabase
+        .from('user_coach_access')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      return !!data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const { unreadCount: coachUnreadCount } = useUnreadChat(hasCoachAccess ? 'coach' : 'support');
+  const { data: coachSummary } = useSupportChatSummary(hasCoachAccess ? 'coach' : 'support');
 
   // Subscribe to real-time updates for all channels
   useFeedRealtime();
@@ -160,7 +178,8 @@ export default function AppChannelsList() {
               <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
             </button>
 
-            {/* Coach Chat */}
+            {/* Coach Chat - only shown when user has access */}
+            {hasCoachAccess && (
             <button
               onClick={handleCoachClick}
               className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors text-left bg-primary/[0.03] border-b-2 border-primary/10"
@@ -196,6 +215,7 @@ export default function AppChannelsList() {
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
             </button>
+            )}
 
             {/* Sort channels by last message time (most recent first) */}
             {[...channels]

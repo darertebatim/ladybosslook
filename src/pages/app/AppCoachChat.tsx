@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, GraduationCap, RefreshCw, ChevronDown, MessageCircle, Sparkles, Target } from "lucide-react";
+import { ChevronLeft, GraduationCap, RefreshCw, ChevronDown, MessageCircle, Sparkles, Target, Lock } from "lucide-react";
 import { ChatSkeleton } from "@/components/app/skeletons";
 import { SEOHead } from "@/components/SEOHead";
 import { format, isToday, isYesterday, isSameDay } from "date-fns";
@@ -87,6 +87,7 @@ export default function AppCoachChat() {
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [initialScrollDone, setInitialScrollDone] = useState(false);
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -106,6 +107,20 @@ export default function AppCoachChat() {
     
     const fetchConversation = async () => {
       try {
+        // Check access first
+        const { data: accessData } = await supabase
+          .from('user_coach_access')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (!accessData) {
+          setHasAccess(false);
+          setLoading(false);
+          return;
+        }
+        setHasAccess(true);
+
         const { data: existing, error: fetchError } = await supabase
           .from('chat_conversations')
           .select('*')
@@ -408,6 +423,46 @@ export default function AppCoachChat() {
           </header>
           <div style={{ height: 'calc(64px + env(safe-area-inset-top))' }} className="shrink-0" />
           <ChatSkeleton />
+        </div>
+      </>
+    );
+  }
+
+  if (hasAccess === false) {
+    return (
+      <>
+        <SEOHead title="Coach Chat | Ladyboss Academy" description="Chat with your coach" />
+        <div className="flex flex-col bg-background h-full">
+          <header 
+            className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border/30"
+            style={{ paddingTop: 'env(safe-area-inset-top)' }}
+          >
+            <div className="flex items-center gap-1 pt-3 pb-2 px-4">
+              <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground hover:bg-transparent active:opacity-70">
+                <ChevronLeft className="h-7 w-7" />
+                <span className="text-[17px]">Back</span>
+              </Button>
+              <div className="flex items-center gap-3">
+                <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
+                  <GraduationCap className="h-5 w-5 text-foreground" />
+                </div>
+                <div>
+                  <h1 className="font-semibold text-[17px]">Coach</h1>
+                  <p className="text-[13px] text-muted-foreground">Private chat</p>
+                </div>
+              </div>
+            </div>
+          </header>
+          <div style={{ height: 'calc(64px + env(safe-area-inset-top))' }} className="shrink-0" />
+          <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
+            <div className="h-20 w-20 rounded-full bg-muted border border-border flex items-center justify-center mb-5">
+              <Lock className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h2 className="font-semibold text-xl mb-2">Chat with Coach is Locked</h2>
+            <p className="text-muted-foreground text-[15px] max-w-xs">
+              This feature hasn't been unlocked for your account yet. Contact support if you believe this is a mistake.
+            </p>
+          </div>
         </div>
       </>
     );
