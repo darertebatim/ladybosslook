@@ -8,7 +8,7 @@ import { haptic } from '@/lib/haptics';
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
   american: '🇺🇸',
-  persian: '🦁',
+  persian: '🇮🇷',
   turkish: '🇹🇷',
   spanish: '🇪🇸',
 };

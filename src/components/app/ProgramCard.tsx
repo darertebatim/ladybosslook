@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
   american: '🇺🇸',
-  persian: '🦁',
+  persian: '🇮🇷',
   turkish: '🇹🇷',
   spanish: '🇪🇸',
 };
