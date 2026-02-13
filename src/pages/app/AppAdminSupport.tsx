@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ChatConversationList } from "@/components/admin/ChatConversationList";
 import { ChatPanel } from "@/components/admin/ChatPanel";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -26,12 +27,14 @@ export default function AppAdminSupport() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [inboxType, setInboxType] = useState<'support' | 'coach'>('support');
 
   const fetchConversations = async () => {
     try {
       const { data: convData, error: convError } = await supabase
         .from('chat_conversations')
         .select('*')
+        .eq('inbox_type', inboxType)
         .order('last_message_at', { ascending: false });
 
       if (convError) throw convError;
@@ -79,7 +82,7 @@ export default function AppAdminSupport() {
     fetchConversations();
 
     const channel = supabase
-      .channel('app-admin-conversations')
+      .channel(`app-admin-conversations-${inboxType}`)
       .on(
         'postgres_changes',
         {
@@ -107,7 +110,13 @@ export default function AppAdminSupport() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [inboxType]);
+
+  useEffect(() => {
+    setSelectedConversation(null);
+    setLoading(true);
+    fetchConversations();
+  }, [inboxType]);
 
   const handleSelectConversation = (conv: Conversation) => {
     setSelectedConversation(conv);
@@ -155,16 +164,22 @@ export default function AppAdminSupport() {
           </span>
         </Button>
         <div className="flex-1 min-w-0 text-center pr-12">
-          <h1 className="text-[17px] font-semibold truncate">
-            {selectedConversation 
-              ? (selectedConversation.profiles?.full_name || 'Unknown User')
-              : 'Support Inbox'
-            }
-          </h1>
-          {selectedConversation && (
-            <p className="text-[11px] text-muted-foreground truncate">
-              {selectedConversation.profiles?.email}
-            </p>
+          {selectedConversation ? (
+            <>
+              <h1 className="text-[17px] font-semibold truncate">
+                {selectedConversation.profiles?.full_name || 'Unknown User'}
+              </h1>
+              <p className="text-[11px] text-muted-foreground truncate">
+                {selectedConversation.profiles?.email}
+              </p>
+            </>
+          ) : (
+            <Tabs value={inboxType} onValueChange={(v) => setInboxType(v as 'support' | 'coach')} className="w-full flex justify-center">
+              <TabsList className="h-8">
+                <TabsTrigger value="support" className="text-xs px-3 py-1">Support</TabsTrigger>
+                <TabsTrigger value="coach" className="text-xs px-3 py-1">Coach</TabsTrigger>
+              </TabsList>
+            </Tabs>
           )}
         </div>
       </div>

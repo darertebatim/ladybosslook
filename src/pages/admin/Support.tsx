@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ChatConversationList } from "@/components/admin/ChatConversationList";
 import { ChatPanel } from "@/components/admin/ChatPanel";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Monitor, Smartphone, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ export default function Support() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(true);
   const [mobileMode, setMobileMode] = useState(false);
+  const [inboxType, setInboxType] = useState<'support' | 'coach'>('support');
 
   const fetchConversations = async () => {
     try {
@@ -32,6 +34,7 @@ export default function Support() {
       const { data: convData, error: convError } = await supabase
         .from('chat_conversations')
         .select('*')
+        .eq('inbox_type', inboxType)
         .order('last_message_at', { ascending: false });
 
       if (convError) throw convError;
@@ -80,9 +83,8 @@ export default function Support() {
   useEffect(() => {
     fetchConversations();
 
-    // Subscribe to new conversations
     const channel = supabase
-      .channel('admin-conversations')
+      .channel(`admin-conversations-${inboxType}`)
       .on(
         'postgres_changes',
         {
@@ -110,7 +112,14 @@ export default function Support() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [inboxType]);
+
+  // Reset selection when switching inbox type
+  useEffect(() => {
+    setSelectedConversation(null);
+    setLoading(true);
+    fetchConversations();
+  }, [inboxType]);
 
   const handleSelectConversation = (conv: Conversation) => {
     setSelectedConversation(conv);
@@ -147,15 +156,20 @@ export default function Support() {
               </p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setMobileMode(false)}
-            className="gap-2"
-          >
-            <Monitor className="h-4 w-4" />
-            Desktop
-          </Button>
+          <div className="flex items-center gap-2">
+            {!selectedConversation && (
+              <Tabs value={inboxType} onValueChange={(v) => setInboxType(v as 'support' | 'coach')}>
+                <TabsList>
+                  <TabsTrigger value="support">Support</TabsTrigger>
+                  <TabsTrigger value="coach">Coach</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            )}
+            <Button variant="outline" size="sm" onClick={() => setMobileMode(false)} className="gap-2">
+              <Monitor className="h-4 w-4" />
+              Desktop
+            </Button>
+          </div>
         </div>
 
         <div className="flex-1 border rounded-lg overflow-hidden bg-background">
@@ -185,15 +199,18 @@ export default function Support() {
           <h1 className="text-2xl font-bold">Support Chat</h1>
           <p className="text-muted-foreground">Manage customer support conversations</p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setMobileMode(true)}
-          className="gap-2"
-        >
-          <Smartphone className="h-4 w-4" />
-          Mobile Mode
-        </Button>
+        <div className="flex items-center gap-2">
+          <Tabs value={inboxType} onValueChange={(v) => setInboxType(v as 'support' | 'coach')}>
+            <TabsList>
+              <TabsTrigger value="support">Support</TabsTrigger>
+              <TabsTrigger value="coach">Coach</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <Button variant="outline" size="sm" onClick={() => setMobileMode(true)} className="gap-2">
+            <Smartphone className="h-4 w-4" />
+            Mobile Mode
+          </Button>
+        </div>
       </div>
 
       <div className="flex h-[calc(100%-4rem)] border rounded-lg overflow-hidden bg-background">

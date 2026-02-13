@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-export const useUnreadChat = () => {
+export const useUnreadChat = (inboxType: 'support' | 'coach' = 'support') => {
   const { user } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -18,7 +18,8 @@ export const useUnreadChat = () => {
         .from('chat_conversations')
         .select('unread_count_user')
         .eq('user_id', user.id)
-        .single();
+        .eq('inbox_type', inboxType)
+        .maybeSingle();
       
       if (!error && data) {
         setUnreadCount(data.unread_count_user || 0);
@@ -29,7 +30,7 @@ export const useUnreadChat = () => {
 
     // Subscribe to real-time changes on user's conversations
     const channel = supabase
-      .channel('unread-chat-count')
+      .channel(`unread-chat-count-${inboxType}`)
       .on(
         'postgres_changes',
         {
@@ -39,8 +40,9 @@ export const useUnreadChat = () => {
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          if (payload.new && 'unread_count_user' in payload.new) {
-            setUnreadCount((payload.new as any).unread_count_user || 0);
+          const newRow = payload.new as any;
+          if (newRow && newRow.inbox_type === inboxType && 'unread_count_user' in newRow) {
+            setUnreadCount(newRow.unread_count_user || 0);
           }
         }
       )
@@ -49,7 +51,7 @@ export const useUnreadChat = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id]);
+  }, [user?.id, inboxType]);
 
   return { unreadCount };
 };

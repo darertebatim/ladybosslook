@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, MessageCircle, RefreshCw, ChevronDown, Mic, Heart, HelpCircle } from "lucide-react";
+import { ChevronLeft, GraduationCap, RefreshCw, ChevronDown, MessageCircle, Sparkles, Target } from "lucide-react";
 import { ChatSkeleton } from "@/components/app/skeletons";
 import { SEOHead } from "@/components/SEOHead";
 import { format, isToday, isYesterday, isSameDay } from "date-fns";
@@ -32,23 +32,19 @@ interface Conversation {
   unread_count_user: number;
 }
 
-// Helper to get date separator label
 const getDateLabel = (date: Date): string => {
   if (isToday(date)) return "Today";
   if (isYesterday(date)) return "Yesterday";
   return format(date, "MMMM d, yyyy");
 };
 
-// Check if we need a date separator between two messages
 const needsDateSeparator = (currentMsg: Message, prevMsg: Message | null): boolean => {
   if (!prevMsg) return true;
   return !isSameDay(new Date(currentMsg.created_at), new Date(prevMsg.created_at));
 };
 
-// Time threshold for grouping messages (5 minutes)
 const GROUP_TIME_THRESHOLD = 5 * 60 * 1000;
 
-// Check if message should show avatar (first in group)
 const shouldShowAvatar = (msg: Message, prevMsg: Message | null): boolean => {
   if (!prevMsg) return true;
   if (prevMsg.sender_type !== msg.sender_type) return true;
@@ -56,12 +52,10 @@ const shouldShowAvatar = (msg: Message, prevMsg: Message | null): boolean => {
   return timeDiff > GROUP_TIME_THRESHOLD;
 };
 
-// Check if message is first in its group
 const isFirstInGroup = (msg: Message, prevMsg: Message | null): boolean => {
   return shouldShowAvatar(msg, prevMsg);
 };
 
-// Check if message is last in its group
 const isLastInGroup = (msg: Message, nextMsg: Message | null): boolean => {
   if (!nextMsg) return true;
   if (nextMsg.sender_type !== msg.sender_type) return true;
@@ -69,7 +63,6 @@ const isLastInGroup = (msg: Message, nextMsg: Message | null): boolean => {
   return timeDiff > GROUP_TIME_THRESHOLD;
 };
 
-// Time-based greeting
 const getGreeting = () => {
   const hour = new Date().getHours();
   if (hour < 12) return { text: "Good morning", emoji: "🌅" };
@@ -77,27 +70,19 @@ const getGreeting = () => {
   return { text: "Good evening", emoji: "🌙" };
 };
 
-// Conversation starters
 const conversationStarters = [
+  { icon: Target, text: "Ask about my progress" },
+  { icon: Sparkles, text: "Get personalized advice" },
   { icon: MessageCircle, text: "I have a question" },
-  { icon: Mic, text: "I'd rather send a voice note" },
-  { icon: Heart, text: "I just need someone to talk to" },
-  { icon: HelpCircle, text: "Something isn't working" },
+  { icon: GraduationCap, text: "Help me with my goals" },
 ];
 
-/**
- * Full-screen Telegram-style chat page
- * - No tab bar (dedicated full-screen experience)
- * - Native iOS keyboard handling (resize: native)
- * - Simple flexbox layout
- */
-export default function AppChat() {
+export default function AppCoachChat() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const { isKeyboardOpen } = useKeyboard();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -116,7 +101,6 @@ export default function AppChat() {
   const isSwipingBack = useRef(false);
   const swipeStartedFromEdge = useRef(false);
 
-  // Fetch or create conversation
   useEffect(() => {
     if (!user) return;
     
@@ -126,7 +110,7 @@ export default function AppChat() {
           .from('chat_conversations')
           .select('*')
           .eq('user_id', user.id)
-          .eq('inbox_type', 'support')
+          .eq('inbox_type', 'coach')
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
@@ -136,7 +120,6 @@ export default function AppChat() {
         if (existing) {
           setConversation(existing as Conversation);
           await fetchMessages(existing.id);
-          // Mark as read
           await supabase
             .from('chat_conversations')
             .update({ unread_count_user: 0 })
@@ -168,12 +151,11 @@ export default function AppChat() {
     setMessages((data || []) as Message[]);
   };
 
-  // Subscribe to realtime messages
   useEffect(() => {
     if (!conversation?.id) return;
 
     const channel = supabase
-      .channel(`chat-${conversation.id}`)
+      .channel(`coach-chat-${conversation.id}`)
       .on(
         'postgres_changes',
         {
@@ -185,7 +167,6 @@ export default function AppChat() {
         (payload) => {
           const newMessage = payload.new as Message;
           setMessages(prev => [...prev, newMessage]);
-          // Mark as read if from admin
           if (newMessage.sender_type === 'admin') {
             supabase
               .from('chat_conversations')
@@ -201,22 +182,16 @@ export default function AppChat() {
     };
   }, [conversation?.id]);
 
-  // Auto-scroll to bottom - instant on initial load, smooth for new messages
   useEffect(() => {
     if (messages.length === 0) return;
     
     if (!initialScrollDone) {
-      // Use multiple attempts with increasing delays to ensure DOM is ready
       const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
       };
-      
-      // Immediate attempt
       scrollToBottom();
-      // After React commit
       requestAnimationFrame(() => {
         scrollToBottom();
-        // After layout calculations
         setTimeout(scrollToBottom, 100);
         setTimeout(() => {
           scrollToBottom();
@@ -228,10 +203,8 @@ export default function AppChat() {
     }
   }, [messages, initialScrollDone]);
 
-  // Scroll to bottom when keyboard opens so last message stays visible
   useEffect(() => {
     if (isKeyboardOpen && messages.length > 0) {
-      // Small delay to let keyboard animation complete
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
@@ -240,23 +213,15 @@ export default function AppChat() {
 
   const uploadAttachment = async (file: File): Promise<string | null> => {
     if (!user) return null;
-    
     const fileExt = file.name.split('.').pop();
     const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-    
     const { error: uploadError } = await supabase.storage
       .from('chat-attachments')
       .upload(fileName, file);
-
-    if (uploadError) {
-      console.error('Upload error:', uploadError);
-      throw uploadError;
-    }
-
+    if (uploadError) throw uploadError;
     const { data: { publicUrl } } = supabase.storage
       .from('chat-attachments')
       .getPublicUrl(fileName);
-
     return publicUrl;
   };
 
@@ -264,7 +229,6 @@ export default function AppChat() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token || !user) return;
-
       await supabase.functions.invoke('send-chat-notification', {
         body: {
           conversationId,
@@ -289,14 +253,14 @@ export default function AppChat() {
     try {
       let conversationId = conversation?.id;
 
-      // Create conversation if doesn't exist
       if (!conversationId) {
         const { data: newConv, error: convError } = await supabase
           .from('chat_conversations')
           .insert({
             user_id: user.id,
-            status: 'open'
-          })
+            status: 'open',
+            inbox_type: 'coach'
+          } as any)
           .select()
           .single();
 
@@ -305,13 +269,11 @@ export default function AppChat() {
         conversationId = newConv.id;
       }
 
-      // Upload attachment if present
       let attachmentUrl: string | null = null;
       if (attachment) {
         attachmentUrl = await uploadAttachment(attachment.file);
       }
 
-      // Send message
       const messageContent = content || (attachment ? `Sent an attachment: ${attachment.name}` : '');
       
       const { error: msgError } = await supabase
@@ -328,16 +290,11 @@ export default function AppChat() {
         });
 
       if (msgError) throw msgError;
-
-      // Send push notification to admins
       await sendNotification(conversationId, messageContent);
 
-      // Auto-scroll to bottom after sending
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
-
-      // Note: No fetchMessages needed - realtime subscription handles new messages
     } catch (error: any) {
       console.error('Error sending message:', error);
       toast({
@@ -351,27 +308,20 @@ export default function AppChat() {
     }
   };
 
-  // Edge swipe threshold (px from left edge to start swipe-back gesture)
   const EDGE_SWIPE_ZONE = 30;
   const SWIPE_BACK_THRESHOLD = 100;
 
-  // Pull-to-refresh and swipe-back handlers
   const handleTouchStart = (e: React.TouchEvent) => {
     const touchX = e.touches[0].clientX;
     const touchY = e.touches[0].clientY;
-    
     touchStartX.current = touchX;
     touchStartY.current = touchY;
-    
-    // Check if touch started from left edge (iOS-style back gesture zone)
     if (touchX <= EDGE_SWIPE_ZONE) {
       swipeStartedFromEdge.current = true;
       isSwipingBack.current = true;
     } else {
       swipeStartedFromEdge.current = false;
     }
-    
-    // Pull-to-refresh only when at top
     if (scrollContainerRef.current?.scrollTop === 0) {
       isPulling.current = true;
     }
@@ -382,39 +332,27 @@ export default function AppChat() {
     const touchY = e.touches[0].clientY;
     const deltaX = touchX - touchStartX.current;
     const deltaY = touchY - touchStartY.current;
-    
-    // Handle edge swipe-back gesture (right swipe from left edge)
     if (swipeStartedFromEdge.current && isSwipingBack.current) {
-      // Only trigger if horizontal movement is dominant
       if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX > 0) {
-        // Apply resistance to make it feel natural
         const resistance = 0.5;
         const offset = Math.min(deltaX * resistance, 150);
         setSwipeBackOffset(offset);
-        return; // Don't process pull-to-refresh when swiping back
+        return;
       }
     }
-    
-    // Pull-to-refresh logic
     if (!isPulling.current || scrollContainerRef.current?.scrollTop !== 0) return;
-    
     const distance = Math.max(0, Math.min(100, deltaY));
     setPullDistance(distance);
   };
 
   const handleTouchEnd = async () => {
-    // Handle swipe-back completion
     if (isSwipingBack.current && swipeBackOffset > SWIPE_BACK_THRESHOLD) {
       haptic.light();
       navigate(-1);
     }
-    
-    // Reset swipe-back state with animation
     setSwipeBackOffset(0);
     isSwipingBack.current = false;
     swipeStartedFromEdge.current = false;
-    
-    // Handle pull-to-refresh
     if (pullDistance >= 60 && conversation?.id) {
       setIsRefreshing(true);
       try {
@@ -427,18 +365,15 @@ export default function AppChat() {
     isPulling.current = false;
   };
 
-  // Navigate back to app home
   const handleBack = () => {
     haptic.light();
-    navigate('/app/home');
+    navigate('/app/channels');
   };
 
-  // Track scroll position to show/hide scroll-to-bottom button
   const handleScroll = useCallback(() => {
     if (!scrollContainerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-    // Show button very quickly - at just 20px scroll
     setShowScrollButton(distanceFromBottom > 20);
   }, []);
 
@@ -449,37 +384,28 @@ export default function AppChat() {
   if (loading) {
     return (
       <>
-        <SEOHead 
-          title="Chat | Ladyboss Academy"
-          description="Chat with our support team"
-        />
+        <SEOHead title="Coach Chat | Ladyboss Academy" description="Chat with your coach" />
         <div className="flex flex-col bg-background h-full">
-        {/* Header */}
           <header 
             className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border/30"
             style={{ paddingTop: 'env(safe-area-inset-top)' }}
           >
-          <div className="flex items-center gap-1 pt-3 pb-2 px-4">
-            <Button 
-              variant="ghost" 
-              onClick={handleBack}
-              className="-ml-2 h-10 px-2 gap-0.5 text-foreground hover:bg-transparent active:opacity-70"
-            >
+            <div className="flex items-center gap-1 pt-3 pb-2 px-4">
+              <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground hover:bg-transparent active:opacity-70">
                 <ChevronLeft className="h-7 w-7" />
                 <span className="text-[17px]">Back</span>
               </Button>
               <div className="flex items-center gap-3">
-              <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5 text-foreground" />
+                <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
+                  <GraduationCap className="h-5 w-5 text-foreground" />
                 </div>
                 <div>
-                  <h1 className="font-semibold text-[17px]">Support</h1>
+                  <h1 className="font-semibold text-[17px]">Coach</h1>
                   <p className="text-[13px] text-muted-foreground">Loading...</p>
                 </div>
               </div>
             </div>
           </header>
-          {/* Spacer for fixed header */}
           <div style={{ height: 'calc(64px + env(safe-area-inset-top))' }} className="shrink-0" />
           <ChatSkeleton />
         </div>
@@ -489,12 +415,8 @@ export default function AppChat() {
 
   return (
     <>
-      <SEOHead 
-        title="Chat | Ladyboss Academy"
-        description="Chat with our support team"
-      />
+      <SEOHead title="Coach Chat | Ladyboss Academy" description="Chat with your coach" />
       
-      {/* Container - h-full to fill NativeAppLayout's main area, with swipe-back visual feedback */}
       <div 
         className="flex flex-col bg-background h-full transition-transform duration-200 ease-out"
         style={{ 
@@ -502,30 +424,24 @@ export default function AppChat() {
           transition: swipeBackOffset === 0 ? 'transform 0.2s ease-out' : 'none',
         }}
       >
-        {/* iOS-style Blur Header - fixed for proper scroll behavior */}
         <header 
           className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border/30"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="flex items-center gap-1 pt-3 pb-2 px-4">
-            <Button 
-              variant="ghost" 
-              onClick={handleBack}
-              className="-ml-2 h-10 px-2 gap-0.5 text-foreground hover:bg-transparent active:opacity-70"
-            >
+            <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground hover:bg-transparent active:opacity-70">
               <ChevronLeft className="h-7 w-7" />
               <span className="text-[17px]">Back</span>
             </Button>
             <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5 text-foreground" />
+                  <GraduationCap className="h-5 w-5 text-foreground" />
                 </div>
-                {/* Online indicator */}
                 <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-background" />
               </div>
               <div>
-                <h1 className="font-semibold text-[17px]">Support</h1>
+                <h1 className="font-semibold text-[17px]">Coach</h1>
                 <p className="text-[13px] text-muted-foreground">
                   {conversation?.status === 'resolved' ? 'Resolved' : 'This conversation is private'}
                 </p>
@@ -534,10 +450,8 @@ export default function AppChat() {
           </div>
         </header>
 
-        {/* Spacer for fixed header */}
         <div style={{ height: 'calc(64px + env(safe-area-inset-top))' }} className="shrink-0" />
 
-        {/* Messages area - flex-1 takes remaining space, scrollable */}
         <div 
           ref={scrollContainerRef}
           className="flex-1 overflow-y-auto overscroll-contain relative"
@@ -546,21 +460,14 @@ export default function AppChat() {
           onTouchEnd={handleTouchEnd}
           onScroll={handleScroll}
         >
-          {/* Pull to refresh indicator */}
           {(pullDistance > 0 || isRefreshing) && (
             <div 
               className="flex items-center justify-center transition-all duration-200"
-              style={{ 
-                height: isRefreshing ? 50 : pullDistance,
-                opacity: isRefreshing ? 1 : pullDistance / 60
-              }}
+              style={{ height: isRefreshing ? 50 : pullDistance, opacity: isRefreshing ? 1 : pullDistance / 60 }}
             >
               <RefreshCw 
                 className={`h-5 w-5 text-muted-foreground ${isRefreshing ? 'animate-spin' : ''}`}
-                style={{ 
-                  transform: `rotate(${pullDistance * 3.6}deg)`,
-                  transition: isRefreshing ? 'none' : 'transform 0.1s'
-                }}
+                style={{ transform: `rotate(${pullDistance * 3.6}deg)`, transition: isRefreshing ? 'none' : 'transform 0.1s' }}
               />
             </div>
           )}
@@ -568,30 +475,24 @@ export default function AppChat() {
           <div className="p-4">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-fade-in">
-                {/* Welcome card - clean white */}
                 <div className="w-full max-w-sm bg-card rounded-3xl p-6 mb-6 border border-border/50">
-                  {/* Avatar - clean */}
                   <div className="relative mx-auto mb-5">
                     <div className="h-20 w-20 mx-auto rounded-full bg-muted border border-border flex items-center justify-center">
-                      <span className="text-4xl">💜</span>
+                      <span className="text-4xl">🎓</span>
                     </div>
-                    {/* Online indicator */}
                     <div className="absolute bottom-1 right-1/2 translate-x-8 h-4 w-4 rounded-full bg-emerald-500 border-2 border-background" />
                   </div>
                   
-                  {/* Time-based greeting */}
                   <p className="text-muted-foreground text-[15px] mb-1">
                     {getGreeting().text} {getGreeting().emoji}
                   </p>
-                  <h2 className="font-semibold text-xl mb-3">I'm Mary, and I'm here for you</h2>
+                  <h2 className="font-semibold text-xl mb-3">Your personal coach is here</h2>
                   
-                  {/* Core message */}
                   <p className="text-[15px] text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
-                    No rush. No judgment. Just a real person who cares.
+                    Get personalized guidance, track your progress, and reach your goals faster.
                   </p>
                 </div>
                 
-                {/* Conversation starters */}
                 <div className="w-full max-w-sm mb-6">
                   <p className="text-[13px] text-muted-foreground/70 mb-3">Tap to start a conversation</p>
                   <div className="grid grid-cols-2 gap-2">
@@ -609,9 +510,8 @@ export default function AppChat() {
                   </div>
                 </div>
                 
-                {/* Warm footer */}
                 <p className="text-[13px] text-muted-foreground/60 max-w-[260px] leading-relaxed">
-                  Type, or tap the mic if that feels easier — we're listening. We check in throughout the day. 💜
+                  Your coach checks in throughout the day. Feel free to share anything! 🎓
                 </p>
               </div>
             ) : (
@@ -620,15 +520,12 @@ export default function AppChat() {
                   const prevMsg = index > 0 ? messages[index - 1] : null;
                   const nextMsg = index < messages.length - 1 ? messages[index + 1] : null;
                   const showDateSeparator = needsDateSeparator(msg, prevMsg);
-                  
-                  // Grouping logic
                   const showAvatar = shouldShowAvatar(msg, showDateSeparator ? null : prevMsg);
-                  const firstInGroup = isFirstInGroup(msg, showDateSeparator ? null : prevMsg);
-                  const lastInGroup = isLastInGroup(msg, nextMsg);
+                  const firstInGrp = isFirstInGroup(msg, showDateSeparator ? null : prevMsg);
+                  const lastInGrp = isLastInGroup(msg, nextMsg);
                   
                   return (
                     <div key={msg.id}>
-                      {/* Date Separator */}
                       {showDateSeparator && (
                         <div className="flex items-center justify-center my-4">
                           <div className="px-3 py-1 rounded-full bg-muted/60 backdrop-blur-sm">
@@ -648,11 +545,11 @@ export default function AppChat() {
                         attachmentName={msg.attachment_name}
                         attachmentType={msg.attachment_type}
                         isBroadcast={msg.is_broadcast}
-                        senderName="Ladyboss Support"
+                        senderName="Your Coach"
                         showAvatar={showAvatar}
-                        isFirstInGroup={firstInGroup}
-                        isLastInGroup={lastInGroup}
-                        showTimestamp={lastInGroup}
+                        isFirstInGroup={firstInGrp}
+                        isLastInGroup={lastInGrp}
+                        showTimestamp={lastInGrp}
                       />
                     </div>
                   );
@@ -661,10 +558,8 @@ export default function AppChat() {
               </>
             )}
           </div>
-          
         </div>
 
-        {/* Scroll to bottom button - positioned outside scroll container for visibility */}
         {showScrollButton && (
           <button
             onClick={scrollToBottomSmooth}
@@ -675,7 +570,6 @@ export default function AppChat() {
           </button>
         )}
 
-        {/* Input Area - shrink-0 so it stays at its natural height */}
         <div 
           className="shrink-0 bg-background/95 backdrop-blur-xl border-t border-border/30"
           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
@@ -685,7 +579,7 @@ export default function AppChat() {
               onSend={handleSendMessage} 
               disabled={sending}
               uploading={uploading}
-              placeholder="Type a message..."
+              placeholder="Message your coach..."
             />
           </div>
         </div>

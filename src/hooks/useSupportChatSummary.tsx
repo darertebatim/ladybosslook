@@ -11,11 +11,11 @@ interface SupportChatSummary {
   unreadCount: number;
 }
 
-export function useSupportChatSummary() {
+export function useSupportChatSummary(inboxType: 'support' | 'coach' = 'support') {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['support-chat-summary', user?.id],
+    queryKey: ['support-chat-summary', user?.id, inboxType],
     queryFn: async (): Promise<SupportChatSummary> => {
       if (!user?.id) {
         return { lastMessage: null, unreadCount: 0 };
@@ -26,7 +26,8 @@ export function useSupportChatSummary() {
         .from('chat_conversations')
         .select('id, unread_count_user')
         .eq('user_id', user.id)
-        .single();
+        .eq('inbox_type', inboxType)
+        .maybeSingle();
 
       if (convError || !conversation) {
         return { lastMessage: null, unreadCount: 0 };
