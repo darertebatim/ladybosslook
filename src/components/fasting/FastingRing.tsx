@@ -13,6 +13,7 @@ interface FastingRingProps {
   eatingElapsedSeconds?: number;
   eatingTotalSeconds?: number;
   eatingEndTime?: Date | null;
+  onZonePress?: () => void;
 }
 
 function formatTime(totalSeconds: number): string {
@@ -22,7 +23,7 @@ function formatTime(totalSeconds: number): string {
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
-export function FastingRing({ progress, zone, elapsedSeconds, targetHours, isFasting, mode, eatingElapsedSeconds = 0, eatingTotalSeconds = 0, eatingEndTime }: FastingRingProps) {
+export function FastingRing({ progress, zone, elapsedSeconds, targetHours, isFasting, mode, eatingElapsedSeconds = 0, eatingTotalSeconds = 0, eatingEndTime, onZonePress }: FastingRingProps) {
   const size = 280;
   const strokeWidth = 12;
   const radius = (size - strokeWidth) / 2;
@@ -74,15 +75,16 @@ export function FastingRing({ progress, zone, elapsedSeconds, targetHours, isFas
 
       {/* Orbiting zone emoji - positioned on the ring edge */}
       {(isFasting || isEating) && displayProgress > 0.005 && (
-        <div
-          className="absolute w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/40 flex items-center justify-center shadow-md transition-all duration-1000 ease-linear"
+        <button
+          onClick={onZonePress}
+          className="absolute w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/40 flex items-center justify-center shadow-md transition-all duration-1000 ease-linear active:scale-95"
           style={{
             left: `${dotX - 20}px`,
             top: `${dotY - 20}px`,
           }}
         >
           <FluentEmoji emoji={isEating ? '🍽️' : zone.emoji} size={22} />
-        </div>
+        </button>
       )}
 
       {/* Center content */}

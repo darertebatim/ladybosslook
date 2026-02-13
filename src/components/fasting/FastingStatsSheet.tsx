@@ -213,6 +213,8 @@ export function FastingStatsSheet({ open, onOpenChange, sessions, onDeleteSessio
   const [isLoggingWeight, setIsLoggingWeight] = useState(false);
   const [weightUnit, setWeightUnit] = useState<'lb' | 'kg'>('lb');
   const [showKeypad, setShowKeypad] = useState(false);
+  const [showGoalKeypad, setShowGoalKeypad] = useState(false);
+  const [goalKeypadValue, setGoalKeypadValue] = useState('');
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
 
@@ -521,16 +523,35 @@ export function FastingStatsSheet({ open, onOpenChange, sessions, onDeleteSessio
                 <h4 className="font-semibold text-sm mb-2">Weight goal</h4>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm">Goal ({weightUnit})</span>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={weightGoal}
-                    onChange={e => setWeightGoal(e.target.value)}
-                    onBlur={handleSaveGoal}
-                    placeholder="0.0"
-                    className="w-24 text-right bg-muted/50 rounded-lg px-3 py-2 text-sm font-medium outline-none"
-                  />
+                  <button
+                    onClick={() => setShowGoalKeypad(true)}
+                    className="w-24 text-right bg-muted/50 rounded-lg px-3 py-2 text-sm font-medium"
+                  >
+                    {weightGoal || '0.0'}
+                  </button>
                 </div>
+                {showGoalKeypad && (
+                  <div className="mb-3">
+                    <WeightKeypad
+                      value={goalKeypadValue}
+                      unit={weightUnit}
+                      onValueChange={setGoalKeypadValue}
+                      onConfirm={() => {
+                        setWeightGoal(goalKeypadValue);
+                        setShowGoalKeypad(false);
+                        // Save to DB
+                        if (user) {
+                          supabase.from('fasting_preferences' as any).upsert({
+                            user_id: user.id,
+                            weight_goal: goalKeypadValue ? parseFloat(goalKeypadValue) : null,
+                            weight_unit: weightUnit,
+                          } as any, { onConflict: 'user_id' });
+                        }
+                      }}
+                      onClose={() => { setShowGoalKeypad(false); setGoalKeypadValue(''); }}
+                    />
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-y-3">
                   <div>
