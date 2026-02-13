@@ -10,6 +10,24 @@ import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
+const TIME_PERIOD_LABELS: Record<string, string> = {
+  morning: '☀️ Morning',
+  afternoon: '🌤️ Afternoon',
+  evening: '🌙 Evening',
+  bedtime: '😴 Bedtime',
+};
+
+function getGroupTimePeriod(groupTasks: RoutinePlanTask[]): string | null {
+  const periods = groupTasks
+    .map(t => (t as any).time_period)
+    .filter(Boolean);
+  if (periods.length === 0) return null;
+  // If all tasks share the same time_period, show it
+  const unique = [...new Set(periods)];
+  if (unique.length === 1) return TIME_PERIOD_LABELS[unique[0]] || unique[0];
+  return null;
+}
+
 // Color cycle for variety in planner (used when no specific color is set)
 export const ROUTINE_COLOR_CYCLE: TaskColor[] = [
   'sky', 
@@ -298,6 +316,10 @@ export function RoutinePreviewSheet({
                 <>
                   <p className="text-base font-semibold text-foreground mb-3">
                     Challenge actions
+                    {(() => {
+                      const tp = getGroupTimePeriod(tasks);
+                      return tp ? <span className="text-sm font-normal text-muted-foreground ml-2">· {tp}</span> : null;
+                    })()}
                   </p>
                   <div className="space-y-3">
                     {tasks.map((task, index) => renderTaskCard(task, index))}
@@ -332,6 +354,10 @@ export function RoutinePreviewSheet({
                         <div key={group.key} className="mb-4">
                           <p className="text-base font-semibold text-foreground mb-3">
                             {group.label}
+                            {(() => {
+                              const tp = getGroupTimePeriod(groupTasks);
+                              return tp ? <span className="text-sm font-normal text-muted-foreground ml-2">· {tp}</span> : null;
+                            })()}
                           </p>
                           <div className="space-y-3">
                             {groupTasks.map((task) => {
