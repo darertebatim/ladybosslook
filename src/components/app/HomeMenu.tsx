@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Menu, Compass, Music, Users, MessageCircle,
-  BookOpen, Wind, Droplets, HeartHandshake, Heart, Sparkles, GraduationCap, User, HelpCircle, LogOut
+  BookOpen, Wind, Droplets, HeartHandshake, Heart, Sparkles, GraduationCap, User, HelpCircle, LogOut, Zap
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { haptic } from '@/lib/haptics';
@@ -30,6 +30,7 @@ const toolItems: NavItem[] = [
   { id: 'water', name: 'Water', icon: <Droplets className="h-4 w-4" />, route: '/app/water', color: 'text-blue-600 bg-blue-100' },
   { id: 'emotions', name: 'Emotions', icon: <HeartHandshake className="h-4 w-4" />, route: '/app/emotion', color: 'text-violet-600 bg-violet-100' },
   { id: 'period', name: 'Period', icon: <Heart className="h-4 w-4" />, route: '/app/period', color: 'text-pink-600 bg-pink-100' },
+  { id: 'fasting', name: 'Fasting', icon: <Zap className="h-4 w-4" />, route: '/app/fasting', color: 'text-amber-600 bg-amber-100' },
   { id: 'routines', name: 'Rituals', icon: <Sparkles className="h-4 w-4" />, route: '/app/routines', color: 'text-emerald-600 bg-emerald-100' },
 ];
 
