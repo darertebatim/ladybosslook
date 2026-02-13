@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Timer, Settings } from 'lucide-react';
+import { Timer, Settings, Plus, X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { getCurrentZone, FASTING_PROTOCOLS } from '@/lib/fastingZones';
 import { FastingSettingsSheet } from '@/components/fasting/FastingSettingsSheet';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Delete } from 'lucide-react';
+import { toast } from 'sonner';
 
 type CardMode = 'idle' | 'fasting' | 'eating';
 
@@ -33,6 +36,10 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showOnHome, setShowOnHome] = useState<boolean | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [weightOpen, setWeightOpen] = useState(false);
+  const [weightValue, setWeightValue] = useState('');
+  const [weightUnit, setWeightUnit] = useState<'lb' | 'kg'>('lb');
+  const [isLoggingWeight, setIsLoggingWeight] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const dataRef = useRef<{ activeSession: any; lastSession: any }>({ activeSession: null, lastSession: null });
 
@@ -57,13 +64,14 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
           .limit(1),
         supabase
           .from('fasting_preferences' as any)
-          .select('show_on_home')
+          .select('show_on_home, weight_unit')
           .eq('user_id', user.id)
           .limit(1),
       ]);
 
       const pref = (prefRes.data as any)?.[0];
       setShowOnHome(pref?.show_on_home ?? true);
+      if (pref?.weight_unit) setWeightUnit(pref.weight_unit as 'lb' | 'kg');
 
       const active = (activeRes.data as any)?.[0] || null;
       const last = (histRes.data as any)?.[0] || null;
@@ -177,9 +185,57 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
     setSettingsOpen(true);
   };
 
+  const handleWeightClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    haptic.light();
+    setWeightOpen(true);
+  };
+
+  const handleLogWeight = async () => {
+    if (!user || !weightValue || isLoggingWeight) return;
+    setIsLoggingWeight(true);
+    const { error } = await supabase.from('weight_logs' as any).insert({
+      user_id: user.id,
+      weight_value: parseFloat(weightValue),
+      weight_unit: weightUnit,
+      logged_at: new Date().toISOString(),
+    } as any);
+
+    if (!error) {
+      toast.success('Weight logged!');
+      setWeightValue('');
+      setWeightOpen(false);
+    } else {
+      toast.error('Failed to log weight');
+    }
+    setIsLoggingWeight(false);
+  };
+
+  const handleWeightKey = (key: string) => {
+    haptic.light();
+    if (key === 'backspace') {
+      setWeightValue(prev => prev.slice(0, -1));
+    } else if (key === '.') {
+      if (!weightValue.includes('.') && weightValue.length < 6) {
+        setWeightValue(prev => prev + '.');
+      }
+    } else if (key === 'confirm') {
+      handleLogWeight();
+    } else if (weightValue.length < 6) {
+      setWeightValue(prev => prev + key);
+    }
+  };
+
   const isFasting = mode === 'fasting';
   const isEating = mode === 'eating';
   const isIdle = mode === 'idle';
+
+  const weightKeys = [
+    ['7', '8', '9'],
+    ['4', '5', '6'],
+    ['1', '2', '3'],
+    ['.', '0', 'confirm'],
+  ];
 
   return (
     <>
@@ -235,16 +291,23 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
             </p>
           </div>
 
-          {/* Settings button */}
-          <button
-            onClick={handleSettingsClick}
-            className={cn(
-              'w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-md active:scale-95 transition-transform',
-              'bg-white/60 dark:bg-white/10 text-amber-600 dark:text-amber-400'
-            )}
-          >
-            <Settings className="h-5 w-5" />
-          </button>
+          {/* Action buttons */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Weight log button */}
+            <button
+              onClick={handleWeightClick}
+              className="w-9 h-9 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform bg-amber-500 text-white"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+            {/* Settings button */}
+            <button
+              onClick={handleSettingsClick}
+              className="w-9 h-9 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform bg-white/60 dark:bg-white/10 text-amber-600 dark:text-amber-400"
+            >
+              <Settings className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
         {/* Progress bar - only during active fasting or eating */}
@@ -269,6 +332,57 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
         open={settingsOpen}
         onOpenChange={setSettingsOpen}
       />
+
+      {/* Quick weight log sheet */}
+      <Sheet open={weightOpen} onOpenChange={(o) => { if (!o) { setWeightValue(''); } setWeightOpen(o); }}>
+        <SheetContent
+          side="bottom"
+          className="rounded-t-3xl px-4 pt-6 pb-8"
+          style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}
+        >
+          <div className="flex items-center justify-center mb-6 relative">
+            <button
+              onClick={() => { setWeightValue(''); setWeightOpen(false); }}
+              className="absolute left-0 p-2 -ml-2"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <span className="text-lg font-semibold">Weight ({weightUnit})</span>
+          </div>
+
+          <div className="flex items-baseline justify-center gap-2 mb-6">
+            <span className="text-5xl font-bold tracking-tight">
+              {weightValue || '0'}
+            </span>
+            <span className="text-4xl font-bold text-foreground/60">
+              {weightUnit}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 bg-amber-50 dark:bg-amber-900/20 rounded-3xl p-4">
+            {weightKeys.flat().map((key) => (
+              <button
+                key={key}
+                onClick={() => handleWeightKey(key)}
+                className={cn(
+                  'h-16 rounded-2xl text-2xl font-semibold transition-all active:scale-95',
+                  key === 'confirm' && 'bg-amber-500 text-white',
+                  key === '.' && 'bg-amber-100 dark:bg-amber-800/40 text-foreground',
+                  key !== 'confirm' && key !== '.' && 'bg-white dark:bg-background shadow-sm'
+                )}
+              >
+                {key === 'confirm' ? (
+                  <Check className="h-6 w-6 mx-auto" />
+                ) : key === 'backspace' ? (
+                  <Delete className="h-6 w-6 mx-auto" />
+                ) : (
+                  key
+                )}
+              </button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
   );
 };
