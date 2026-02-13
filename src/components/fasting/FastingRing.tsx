@@ -1,6 +1,7 @@
 import { type FastingZone } from '@/lib/fastingZones';
 import { type FastingMode } from '@/hooks/useFastingTracker';
 import { format } from 'date-fns';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface FastingRingProps {
   progress: number;
@@ -32,7 +33,7 @@ export function FastingRing({ progress, zone, elapsedSeconds, targetHours, isFas
   const displayProgress = isEating ? eatingProgress : progress;
   const dashOffset = circumference * (1 - displayProgress);
 
-  // Position of the progress dot
+  // Position of the orbiting emoji on the ring
   const angle = displayProgress * 360 - 90;
   const rad = (angle * Math.PI) / 180;
   const dotX = size / 2 + radius * Math.cos(rad);
@@ -40,7 +41,6 @@ export function FastingRing({ progress, zone, elapsedSeconds, targetHours, isFas
 
   const percentage = Math.min(Math.round(progress * 100), 100);
 
-  const dotColor = isEating ? '#F87171' : zone.color;
   const strokeColor = isEating ? '#F87171' : (isFasting ? zone.color : 'hsl(var(--muted-foreground))');
 
   return (
@@ -70,17 +70,20 @@ export function FastingRing({ progress, zone, elapsedSeconds, targetHours, isFas
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
           className="transition-all duration-1000 ease-linear"
         />
-        {/* Progress dot */}
-        {(isFasting || isEating) && displayProgress > 0.01 && (
-          <circle
-            cx={dotX}
-            cy={dotY}
-            r={8}
-            fill={dotColor}
-            className="drop-shadow-md"
-          />
-        )}
       </svg>
+
+      {/* Orbiting zone emoji - positioned on the ring edge */}
+      {(isFasting || isEating) && displayProgress > 0.005 && (
+        <div
+          className="absolute w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/40 flex items-center justify-center shadow-md transition-all duration-1000 ease-linear"
+          style={{
+            left: `${dotX - 20}px`,
+            top: `${dotY - 20}px`,
+          }}
+        >
+          <FluentEmoji emoji={isEating ? '🍽️' : zone.emoji} size={22} />
+        </div>
+      )}
 
       {/* Center content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -100,8 +103,8 @@ export function FastingRing({ progress, zone, elapsedSeconds, targetHours, isFas
           </>
         ) : isFasting ? (
           <>
-            <span className="text-3xl mb-1">{zone.emoji}</span>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <FluentEmoji emoji={zone.emoji} size={40} />
+            <span className="text-xs font-semibold mt-1" style={{ color: zone.color }}>
               {zone.name}
             </span>
             <span className="text-xs text-muted-foreground mt-0.5">
@@ -113,8 +116,8 @@ export function FastingRing({ progress, zone, elapsedSeconds, targetHours, isFas
           </>
         ) : (
           <>
-            <span className="text-5xl mb-2">🍴</span>
-            <span className="text-sm text-muted-foreground">
+            <FluentEmoji emoji="🛠️" size={56} />
+            <span className="text-sm text-muted-foreground mt-1">
               Ready to fast
             </span>
             <span className="text-lg font-semibold mt-1">

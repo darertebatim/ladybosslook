@@ -274,6 +274,21 @@ export function useFastingTracker() {
     }));
   }, [user]);
 
+  const updateActiveSession = useCallback(async (updates: { started_at?: string; fasting_hours?: number }) => {
+    if (!user || !state.activeSession) return;
+    const { error } = await supabase
+      .from('fasting_sessions' as any)
+      .update(updates as any)
+      .eq('id', state.activeSession.id);
+    if (!error) {
+      haptic.success();
+      setState(prev => ({
+        ...prev,
+        activeSession: prev.activeSession ? { ...prev.activeSession, ...updates } : null,
+      }));
+    }
+  }, [user, state.activeSession]);
+
   const setProtocol = useCallback(async (protocolId: string) => {
     if (!user) return;
     const protocol = FASTING_PROTOCOLS.find(p => p.id === protocolId);
@@ -307,6 +322,7 @@ export function useFastingTracker() {
     startFast,
     endFast,
     deleteFast,
+    updateActiveSession,
     setProtocol,
     setCustomHours,
   };

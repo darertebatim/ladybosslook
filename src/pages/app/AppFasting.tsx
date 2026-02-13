@@ -8,10 +8,13 @@ import { FastingZonesSheet } from '@/components/fasting/FastingZonesSheet';
 import { FastingCompletionSheet } from '@/components/fasting/FastingCompletionSheet';
 import { FastingStatsSheet } from '@/components/fasting/FastingStatsSheet';
 import { FastingSettingsSheet } from '@/components/fasting/FastingSettingsSheet';
+import { FastingEditStartSheet } from '@/components/fasting/FastingEditStartSheet';
+import { FastingEditGoalSheet } from '@/components/fasting/FastingEditGoalSheet';
 import { useFastingTracker } from '@/hooks/useFastingTracker';
 import { FASTING_PROTOCOLS } from '@/lib/fastingZones';
 import { BackButton } from '@/components/app/BackButton';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function AppFasting() {
   const navigate = useNavigate();
@@ -31,6 +34,7 @@ export default function AppFasting() {
     startFast,
     endFast,
     deleteFast,
+    updateActiveSession,
     setProtocol,
     setCustomHours,
   } = useFastingTracker();
@@ -41,6 +45,8 @@ export default function AppFasting() {
   const [completionOpen, setCompletionOpen] = useState(false);
   const [completedSession, setCompletedSession] = useState<any>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [editStartOpen, setEditStartOpen] = useState(false);
+  const [editGoalOpen, setEditGoalOpen] = useState(false);
 
   const isFasting = mode === 'fasting';
   const isEating = mode === 'eating';
@@ -52,6 +58,18 @@ export default function AppFasting() {
       setCompletedSession(ended);
       setCompletionOpen(true);
     }
+  };
+
+  const handleEditStart = async (newStartedAt: string) => {
+    await updateActiveSession({ started_at: newStartedAt });
+    toast.success('Start time updated');
+    setEditStartOpen(false);
+  };
+
+  const handleEditGoal = async (newHours: number) => {
+    await updateActiveSession({ fasting_hours: newHours });
+    toast.success('Goal updated');
+    setEditGoalOpen(false);
   };
 
   if (isLoading) {
@@ -106,19 +124,31 @@ export default function AppFasting() {
 
         {/* Started / Goal timestamps */}
         {isFasting && activeSession && (
-          <div className="flex gap-8 text-center">
+          <div className="flex gap-12 text-center">
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Started</p>
-              <p className="text-sm font-medium">{format(new Date(activeSession.started_at), 'MMM d, h:mm a')}</p>
+              <p className="text-sm font-bold">{format(new Date(activeSession.started_at), 'EEE d, h:mm a')}</p>
+              <button
+                onClick={() => setEditStartOpen(true)}
+                className="text-xs text-amber-500 font-medium mt-0.5 active:opacity-70"
+              >
+                Edit start
+              </button>
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Goal</p>
-              <p className="text-sm font-medium">
+              <p className="text-sm font-bold">
                 {format(
                   new Date(new Date(activeSession.started_at).getTime() + activeSession.fasting_hours * 3600000),
-                  'MMM d, h:mm a'
+                  'EEE d, h:mm a'
                 )}
               </p>
+              <button
+                onClick={() => setEditGoalOpen(true)}
+                className="text-xs text-amber-500 font-medium mt-0.5 active:opacity-70"
+              >
+                Edit {activeSession.fasting_hours}h goal
+              </button>
             </div>
           </div>
         )}
@@ -200,6 +230,22 @@ export default function AppFasting() {
         open={settingsOpen}
         onOpenChange={setSettingsOpen}
       />
+      {activeSession && (
+        <>
+          <FastingEditStartSheet
+            open={editStartOpen}
+            onOpenChange={setEditStartOpen}
+            currentStartedAt={activeSession.started_at}
+            onSave={handleEditStart}
+          />
+          <FastingEditGoalSheet
+            open={editGoalOpen}
+            onOpenChange={setEditGoalOpen}
+            currentHours={activeSession.fasting_hours}
+            onSave={handleEditGoal}
+          />
+        </>
+      )}
     </div>
   );
 }
