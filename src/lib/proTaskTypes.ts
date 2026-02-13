@@ -168,7 +168,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     value: 'emotion',
     label: 'Name Your Emotion',
     icon: HeartHandshake,
-    badgeText: 'Feel',
+    badgeText: 'Name',
     color: 'violet',
     gradientClass: 'bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/40 dark:to-purple-900/40',
     iconColorClass: 'text-violet-600 dark:text-violet-400',
@@ -249,7 +249,7 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
     case 'period':
       return '/app/period';
     case 'emotion':
-      return '/app/emotion';
+      return '/app/emotion?step=select';
     case 'channel':
       return `/app/channels?channel=${linkValue}`;
     case 'program':
