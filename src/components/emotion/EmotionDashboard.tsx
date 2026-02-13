@@ -5,12 +5,11 @@ import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
-import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { CloseButton } from '@/components/app/CloseButton';
 import { EmotionLogCard } from './EmotionLogCard';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
 
 interface EmotionDashboardProps {
   onStartCheckIn: () => void;
@@ -30,7 +29,7 @@ const SYNTHETIC_EMOTION_TASK: RoutinePlanTask = {
   pro_link_type: 'emotion',
   pro_link_value: null,
   linked_playlist: null,
-  tag: 'pro', // Pro-linked tasks use 'pro' category
+  tag: 'pro',
 };
 
 export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
@@ -43,8 +42,6 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
   const addRoutinePlan = useAddRoutinePlan();
 
   const isAdded = existingTask || justAdded;
-
-  // handleClose removed - using CloseButton with referrer detection
 
   const handleViewHistory = () => {
     haptic.light();
@@ -82,10 +79,9 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
     onStartCheckIn();
   };
 
-  // Loading state
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-10 flex items-center justify-center bg-gradient-to-b from-violet-400 to-purple-300">
+      <div className="fixed inset-0 z-10 flex items-center justify-center" style={{ background: 'linear-gradient(145deg, #4c1d95 0%, #7c3aed 35%, #a78bfa 65%, #f5d0fe 100%)' }}>
         <Heart className="h-12 w-12 text-white animate-pulse" />
       </div>
     );
@@ -94,19 +90,26 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
   return (
     <>
       <div className="fixed inset-0 z-10 flex flex-col overflow-hidden">
-        {/* Violet gradient background */}
+        {/* Rich layered background */}
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'linear-gradient(180deg, #6366F1 0%, #8B5CF6 40%, #A78BFA 70%, #C4B5FD 100%)',
+            background: 'linear-gradient(145deg, #4c1d95 0%, #7c3aed 30%, #a78bfa 55%, #c4b5fd 75%, #f5d0fe 100%)',
+          }}
+        />
+        {/* Mesh-like overlay */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-40"
+          style={{
+            background: 'radial-gradient(ellipse at 20% 20%, rgba(236, 72, 153, 0.4) 0%, transparent 50%), radial-gradient(ellipse at 80% 60%, rgba(99, 102, 241, 0.5) 0%, transparent 50%), radial-gradient(ellipse at 50% 90%, rgba(244, 114, 182, 0.3) 0%, transparent 40%)',
           }}
         />
 
         {/* Floating decorative orbs */}
-        <div className="absolute top-24 left-8 w-12 h-12 bg-white/20 rounded-full blur-md pointer-events-none animate-float" />
-        <div className="absolute top-40 right-6 w-8 h-8 bg-violet-200/30 rounded-full blur-sm pointer-events-none animate-float-delayed" />
-        <div className="absolute top-32 right-20 w-6 h-6 bg-purple-300/25 rounded-full blur-sm pointer-events-none animate-float" />
-        <div className="absolute top-56 left-12 w-10 h-10 bg-indigo-200/20 rounded-full blur-md pointer-events-none animate-float-delayed" />
+        <div className="absolute top-24 left-8 w-16 h-16 bg-pink-300/20 rounded-full blur-xl pointer-events-none animate-float" />
+        <div className="absolute top-40 right-6 w-10 h-10 bg-fuchsia-200/25 rounded-full blur-lg pointer-events-none animate-float-delayed" />
+        <div className="absolute top-56 left-16 w-12 h-12 bg-indigo-300/20 rounded-full blur-xl pointer-events-none animate-float" />
+        <div className="absolute bottom-40 right-12 w-14 h-14 bg-violet-200/15 rounded-full blur-xl pointer-events-none animate-float-delayed" />
 
         {/* Header */}
         <header 
@@ -119,7 +122,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
           
           <button
             onClick={handleViewHistory}
-            className="w-10 h-10 rounded-full bg-black/20 flex items-center justify-center active:scale-95 transition-transform"
+            className="w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center active:scale-95 transition-transform"
           >
             <History className="h-5 w-5 text-white" />
           </button>
@@ -127,14 +130,20 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
 
         {/* Main content */}
         <div className="relative z-10 flex-1 flex flex-col px-5 overflow-hidden">
-          {/* Emoji cloud illustration */}
+          {/* 3D Fluent Emoji cloud */}
           <div className="flex justify-center py-6">
             <div className="relative">
-              <div className="w-32 h-20 bg-white/15 rounded-full blur-xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-              <div className="relative flex items-center gap-3 text-4xl">
-                <span className="transform -rotate-12 animate-pulse">⚡</span>
-                <span className="transform scale-110">💖</span>
-                <span className="transform rotate-12">😊</span>
+              <div className="w-40 h-24 bg-white/10 rounded-full blur-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+              <div className="relative flex items-center gap-4">
+                <div className="transform -rotate-12 hover:scale-110 transition-transform">
+                  <FluentEmoji emoji="🦋" size={42} />
+                </div>
+                <div className="transform scale-110 -translate-y-1">
+                  <FluentEmoji emoji="🫶" size={48} />
+                </div>
+                <div className="transform rotate-12 hover:scale-110 transition-transform">
+                  <FluentEmoji emoji="🌸" size={42} />
+                </div>
               </div>
             </div>
           </div>
@@ -151,7 +160,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
 
           {/* Today's check-ins */}
           {todayLogs.length > 0 && (
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 mb-4 max-h-36 overflow-y-auto">
+            <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 mb-4 max-h-36 overflow-y-auto border border-white/10">
               <p className="text-white/80 text-sm font-medium mb-2">Today's Check-ins</p>
               <div className="space-y-2">
                 {todayLogs.slice(0, 3).map((log) => (
@@ -166,34 +175,33 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
             </div>
           )}
 
-          {/* Stats pills - Strength-first: monthly presence, not streak */}
+          {/* Stats pills */}
           <div className="flex justify-center gap-3 mb-6">
-            <div className="flex flex-col items-center px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl min-w-[72px]">
+            <div className="flex flex-col items-center px-4 py-3 bg-white/15 backdrop-blur-md rounded-2xl min-w-[72px] border border-white/10">
               <div className="flex items-center gap-1 mb-1">
-                <Calendar className="h-4 w-4 text-violet-300" />
+                <Calendar className="h-4 w-4 text-pink-200" />
                 <span className="text-xl font-bold text-white">{thisMonthCount}</span>
               </div>
               <span className="text-white/70 text-xs">This Month</span>
             </div>
             
-            <div className="flex flex-col items-center px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl min-w-[72px]">
+            <div className="flex flex-col items-center px-4 py-3 bg-white/15 backdrop-blur-md rounded-2xl min-w-[72px] border border-white/10">
               <div className="flex items-center gap-1 mb-1">
-                <BarChart2 className="h-4 w-4 text-blue-300" />
+                <BarChart2 className="h-4 w-4 text-violet-200" />
                 <span className="text-xl font-bold text-white">{thisWeekCount}</span>
               </div>
               <span className="text-white/70 text-xs">This Week</span>
             </div>
             
-            <div className="flex flex-col items-center px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl min-w-[72px]">
+            <div className="flex flex-col items-center px-4 py-3 bg-white/15 backdrop-blur-md rounded-2xl min-w-[72px] border border-white/10">
               <div className="flex items-center gap-1 mb-1">
-                <Heart className="h-4 w-4 text-pink-300" />
+                <Heart className="h-4 w-4 text-fuchsia-200" />
                 <span className="text-xl font-bold text-white">{todayLogs.length}</span>
               </div>
               <span className="text-white/70 text-xs">Today</span>
             </div>
           </div>
 
-          {/* Spacer to push buttons to bottom */}
           <div className="flex-1" />
         </div>
 
@@ -202,7 +210,6 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
           className="relative z-10 px-5 space-y-3"
           style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
         >
-          {/* Check In button */}
           <button
             onClick={handleStartCheckIn}
             className="w-full h-14 rounded-full bg-white shadow-lg flex items-center justify-center gap-2 text-violet-600 font-semibold text-lg active:scale-[0.98] transition-transform"
@@ -210,11 +217,10 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
             Check In Now
           </button>
 
-          {/* Add to Routine button - custom styling for emotion page */}
           <div className="tour-emotion-add-routine flex items-center gap-2">
             <button
               onClick={() => isAdded ? navigate('/app/home') : handleRoutineClick()}
-              className="flex-1 h-12 rounded-full flex items-center justify-center gap-2 font-medium transition-all active:scale-[0.98] bg-success/30 text-white"
+              className="flex-1 h-12 rounded-full flex items-center justify-center gap-2 font-medium transition-all active:scale-[0.98] bg-white/15 backdrop-blur-sm text-white border border-white/10"
             >
               {isAdded ? (
                 <>
