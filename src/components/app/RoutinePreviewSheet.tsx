@@ -216,9 +216,6 @@ export function RoutinePreviewSheet({
   const WEEKDAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const getRepeatLabel = (task: RoutinePlanTask, pattern: string) => {
-    if (scheduleType === 'challenge' && (task as any).drip_day) {
-      return `Day ${(task as any).drip_day}`;
-    }
     switch (pattern) {
       case 'daily': return 'Repeats every day';
       case 'weekly': {
@@ -370,14 +367,28 @@ export function RoutinePreviewSheet({
             </SheetHeader>
 
             <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
-              {scheduleType === 'challenge' ? (
+            {scheduleType === 'challenge' ? (
                 <>
-                  <p className="text-base font-semibold text-foreground mb-3">
-                    Challenge actions
-                  </p>
-                  <div className="space-y-3">
-                    {tasks.map((task, index) => renderTaskCard(task, index))}
-                  </div>
+                  {(() => {
+                    // Group tasks by drip_day
+                    const dayGroups = new Map<number, { task: RoutinePlanTask; index: number }[]>();
+                    tasks.forEach((task, index) => {
+                      const day = (task as any).drip_day ?? 1;
+                      if (!dayGroups.has(day)) dayGroups.set(day, []);
+                      dayGroups.get(day)!.push({ task, index });
+                    });
+                    const sortedDays = Array.from(dayGroups.keys()).sort((a, b) => a - b);
+                    return sortedDays.map(day => (
+                      <div key={day} className="mb-4">
+                        <p className="text-base font-semibold text-foreground mb-3">
+                          Day {day}
+                        </p>
+                        <div className="space-y-3">
+                          {dayGroups.get(day)!.map(({ task, index }) => renderTaskCard(task, index))}
+                        </div>
+                      </div>
+                    ));
+                  })()}
                 </>
               ) : (
                 <>
