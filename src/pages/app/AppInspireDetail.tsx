@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, CalendarDays } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
@@ -73,9 +73,9 @@ export default function AppInspireDetail() {
   const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
   const isAdded = isAlreadyAdded || justAdded;
 
-  // Compute effective start date label
-  const startLabel = useMemo(() => {
-    if (!routine) return 'Starts today';
+  // Compute effective start date label + details
+  const startInfo = useMemo(() => {
+    if (!routine) return { label: 'Starts today', emoji: '🚀', isFuture: false };
     const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const startDate = (routine as any).challenge_start_date;
     const startDow = (routine as any).start_day_of_week as number | null;
@@ -84,13 +84,18 @@ export default function AppInspireDetail() {
       const d = new Date(startDate + 'T00:00:00');
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      if (d <= today) return 'Starts today';
-      return `Starts ${format(d, 'MMM d')}`;
+      if (d <= today) return { label: 'Ready to start today!', emoji: '🚀', isFuture: false };
+      const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      return { 
+        label: `Starts ${format(d, 'MMM d')} · in ${diffDays} day${diffDays !== 1 ? 's' : ''}`, 
+        emoji: '📅', 
+        isFuture: true 
+      };
     }
     if (startDow != null) {
-      return `Starts next ${WEEKDAY_NAMES[startDow]}`;
+      return { label: `Starts next ${WEEKDAY_NAMES[startDow]}`, emoji: '📅', isFuture: true };
     }
-    return 'Starts today';
+    return { label: 'Ready to start today!', emoji: '🚀', isFuture: false };
   }, [routine]);
 
   const handleAddClick = () => {
@@ -220,9 +225,23 @@ export default function AppInspireDetail() {
                   {routine.tasks.length} action{routine.tasks.length !== 1 ? 's' : ''}
                 </span>
               )}
-              <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                <CalendarDays className="w-3.5 h-3.5" />
-                {startLabel}
+            </div>
+
+            {/* Start date banner */}
+            <div className={cn(
+              'mt-4 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border',
+              startInfo.isFuture 
+                ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800'
+                : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800'
+            )}>
+              <span className="text-lg">{startInfo.emoji}</span>
+              <span className={cn(
+                'text-sm font-medium',
+                startInfo.isFuture 
+                  ? 'text-amber-800 dark:text-amber-300'
+                  : 'text-emerald-800 dark:text-emerald-300'
+              )}>
+                {startInfo.label}
               </span>
             </div>
           </div>
