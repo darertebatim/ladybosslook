@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Check, Pencil, Clock } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Check, Pencil, CalendarDays } from 'lucide-react';
+import { format } from 'date-fns';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -57,6 +58,8 @@ interface RoutinePreviewSheetProps {
   routineTitle: string;
   defaultTag?: string | null;
   scheduleType?: 'daily' | 'weekly' | 'challenge';
+  challengeStartDate?: string | null;
+  startDayOfWeek?: number | null;
   onSave: (selectedTaskIds: string[], editedTasks: EditedTask[]) => void;
   isSaving?: boolean;
 }
@@ -68,6 +71,8 @@ export function RoutinePreviewSheet({
   routineTitle,
   defaultTag,
   scheduleType = 'daily',
+  challengeStartDate,
+  startDayOfWeek,
   onSave,
   isSaving,
 }: RoutinePreviewSheetProps) {
@@ -291,6 +296,25 @@ export function RoutinePreviewSheet({
               <p className="text-sm text-muted-foreground">
                 Edit it to create your personalized ritual.
               </p>
+              {/* Start date info */}
+              {(() => {
+                const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                let label = 'Starts today';
+                if (challengeStartDate) {
+                  const d = new Date(challengeStartDate + 'T00:00:00');
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  label = d <= today ? 'Starts today' : `Starts ${format(d, 'MMM d')}`;
+                } else if (startDayOfWeek != null) {
+                  label = `Starts next ${WEEKDAY_NAMES[startDayOfWeek]}`;
+                }
+                return (
+                  <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
+                    <CalendarDays className="w-3.5 h-3.5" />
+                    {label}
+                  </p>
+                );
+              })()}
             </SheetHeader>
 
             <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
