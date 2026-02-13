@@ -4,10 +4,12 @@ import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, 
 import { usePresenceStats } from '@/hooks/usePresenceStats';
 import { useUserPresence } from '@/hooks/useUserPresence';
 import { useUserStreak, useSetStreakGoal } from '@/hooks/useTaskPlanner';
+import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { ACHIEVEMENTS, getAchievementStatus } from '@/lib/achievements';
 import { AchievementCard } from '@/components/app/AchievementCard';
 import { WeeklyPresenceGrid } from '@/components/app/WeeklyPresenceGrid';
 import { StreakChallengeCard } from '@/components/app/StreakChallengeCard';
+import { ChallengeRitualCard } from '@/components/app/ChallengeRitualCard';
 import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
 import { BackButton } from '@/components/app/BackButton';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,6 +22,7 @@ const AppPresence = () => {
   const { data: stats, isLoading } = usePresenceStats();
   const { data: presence } = useUserPresence();
   const { data: streak } = useUserStreak();
+  const { data: challenges } = useUserChallenges();
   const setStreakGoal = useSetStreakGoal();
   const [showGoalSelection, setShowGoalSelection] = useState(false);
   
@@ -143,6 +146,14 @@ const AppPresence = () => {
                 onLevelUp={() => setShowGoalSelection(true)}
               />
             )}
+            
+            {/* Challenge Ritual Cards */}
+            {challenges && challenges.length > 0 && challenges.map(challenge => (
+              <ChallengeRitualCard
+                key={challenge.routineId}
+                challenge={challenge}
+              />
+            ))}
             
             {/* Quick Stats Row */}
             <div className="grid grid-cols-3 gap-3">
