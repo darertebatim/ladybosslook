@@ -17,6 +17,7 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { isNativeApp } from '@/lib/platform';
 import { programImages } from '@/data/programs';
+import { IAPPlanPicker } from '@/components/app/IAPPlanPicker';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
@@ -345,7 +346,7 @@ const AppCourseDetail = () => {
 
   // Helper to get course page URL for non-Google Meet sessions
   const getCoursePageUrl = (programSlug: string): string => {
-    return `https://ladybosslook.com/app/courses/${programSlug}`;
+    return `https://ladybosslook.com/app/programs/${programSlug}`;
   };
 
   // Helper to get event location - uses Google Meet link if enabled, otherwise course page
@@ -1065,9 +1066,28 @@ const AppCourseDetail = () => {
                     </div>
                   )}
 
-                  {/* Free Enrollment */}
+                  {/* Purchase / Enrollment Section */}
                   <div className="border-t pt-6">
-                    {enrollment ? (
+                    {program.ios_product_id && isNativeApp() ? (
+                      /* IAP Subscription Plan Picker */
+                      <IAPPlanPicker program={program} />
+                    ) : program.ios_product_id && !isNativeApp() ? (
+                      /* Web fallback for IAP programs */
+                      <div className="text-center space-y-3">
+                        <p className="text-muted-foreground text-sm">
+                          This program is available for purchase in the Simora app.
+                        </p>
+                        {program.stripe_payment_link && (
+                          <Button 
+                            size="lg" 
+                            className="w-full"
+                            onClick={() => window.open(program.stripe_payment_link, '_blank')}
+                          >
+                            Purchase on Web
+                          </Button>
+                        )}
+                      </div>
+                    ) : enrollment ? (
                       <Button 
                         size="lg" 
                         className="w-full" 
@@ -1095,9 +1115,11 @@ const AppCourseDetail = () => {
                       </Button>
                     )}
 
-                    <p className="text-xs text-center text-muted-foreground mt-4">
-                      Free enrollment • Instant access
-                    </p>
+                    {!program.ios_product_id && (
+                      <p className="text-xs text-center text-muted-foreground mt-4">
+                        Free enrollment • Instant access
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>

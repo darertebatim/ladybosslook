@@ -66,7 +66,7 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
 
   return (
     <Link 
-      to={`/app/course/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
+      to={`/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
       onClick={onMarkViewed}
       className="block"
     >

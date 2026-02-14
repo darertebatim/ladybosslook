@@ -675,7 +675,7 @@ export default function AppPlaylistDetail() {
               <Button 
                 className="w-full" 
                 size="lg"
-                onClick={() => navigate(`/app/course/${playlist.program_slug}`)}
+                onClick={() => navigate(`/app/programs/${playlist.program_slug}`)}
               >
                 View Course Details
               </Button>

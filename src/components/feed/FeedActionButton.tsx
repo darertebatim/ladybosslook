@@ -28,7 +28,7 @@ export function FeedActionButton({ actionType, actionData }: FeedActionButtonPro
         break;
       case 'view_materials':
         if (actionData.courseSlug) {
-          navigate(`/app/course/${actionData.courseSlug}`);
+          navigate(`/app/programs/${actionData.courseSlug}`);
         } else if (actionData.url) {
           window.open(actionData.url, '_blank');
         }

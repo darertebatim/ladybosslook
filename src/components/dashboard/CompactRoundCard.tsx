@@ -46,7 +46,7 @@ export function CompactRoundCard({
 
   return (
     <Link 
-      to={`/app/course/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
+      to={`/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
       onClick={onView}
       className="block"
     >

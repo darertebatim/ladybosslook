@@ -278,7 +278,7 @@ const AppCourses = () => {
               <CarouselContent className="-ml-2 px-3">
                 {browsePrograms.map((program) => (
                   <CarouselItem key={program.slug} className="pl-2 basis-[100px]">
-                    <Link to={`/app/course/${program.slug}`}>
+                    <Link to={`/app/programs/${program.slug}`}>
                       <div className="relative aspect-[3/4] rounded-lg overflow-hidden">
                         <img 
                           src={program.image} 

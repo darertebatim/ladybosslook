@@ -296,7 +296,7 @@ const AppStore = () => {
                             language={(program as any).language}
                             isFree={program.isFree || program.priceAmount === 0}
                             isEnrolled={enrolled}
-                            onClick={() => navigate(`/app/course/${program.slug}`, { state: { from: location.pathname } })}
+                            onClick={() => navigate(`/app/programs/${program.slug}`, { state: { from: location.pathname } })}
                           />
                           {isEnrolling && (
                             <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">

@@ -204,7 +204,7 @@ export const SessionsManager = ({
           title: '📅 New Sessions Added',
           message: `${sessionCount} new session${sessionCount > 1 ? 's' : ''} added to ${programTitle}. Sync your calendar!`,
           targetRoundId: roundId,
-          destinationUrl: `/app/course/${programSlug}`,
+          destinationUrl: `/app/programs/${programSlug}`,
         },
       });
       toast.success('Push notification sent to enrolled users');
