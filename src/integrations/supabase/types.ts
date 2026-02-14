@@ -1892,6 +1892,10 @@ export type Database = {
       program_catalog: {
         Row: {
           android_product_id: string | null
+          annual_android_product_id: string | null
+          annual_ios_product_id: string | null
+          annual_price_amount: number | null
+          annual_stripe_price_id: string | null
           audio_playlist_id: string | null
           available_on_mobile: boolean | null
           available_on_web: boolean | null
@@ -1934,6 +1938,10 @@ export type Database = {
         }
         Insert: {
           android_product_id?: string | null
+          annual_android_product_id?: string | null
+          annual_ios_product_id?: string | null
+          annual_price_amount?: number | null
+          annual_stripe_price_id?: string | null
           audio_playlist_id?: string | null
           available_on_mobile?: boolean | null
           available_on_web?: boolean | null
@@ -1976,6 +1984,10 @@ export type Database = {
         }
         Update: {
           android_product_id?: string | null
+          annual_android_product_id?: string | null
+          annual_ios_product_id?: string | null
+          annual_price_amount?: number | null
+          annual_stripe_price_id?: string | null
           audio_playlist_id?: string | null
           available_on_mobile?: boolean | null
           available_on_web?: boolean | null
