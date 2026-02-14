@@ -84,6 +84,7 @@ export function ProgramsManager() {
     // Cover image
     cover_image_url: '',
     language: 'american',
+    trial_days: 0,
   });
 
   // Fetch playlists for dropdown
@@ -154,6 +155,7 @@ export function ProgramsManager() {
       stripe_price_id: '',
       cover_image_url: '',
       language: 'american',
+      trial_days: 0,
     });
     setEditingId(null);
     setShowForm(false);
@@ -234,6 +236,7 @@ export function ProgramsManager() {
       // Use cover_image_url from DB, or fallback to programImages mapping
       cover_image_url: program.cover_image_url || programImages[program.slug] || '',
       language: (program as any).language || 'american',
+      trial_days: (program as any).trial_days || 0,
     });
     setEditingId(program.id);
     setShowForm(true);
@@ -571,7 +574,7 @@ export function ProgramsManager() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="subscription_interval_count">Number of Payments (Auto-Cancel After)</Label>
+                      <Label htmlFor="subscription_interval_count">Auto-Cancel After</Label>
                       <Select 
                         value={String(formData.subscription_interval_count)} 
                         onValueChange={(value) => setFormData({ ...formData, subscription_interval_count: parseInt(value) })}
@@ -580,6 +583,7 @@ export function ProgramsManager() {
                           <SelectValue placeholder="Select count" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="0">Never (Ongoing)</SelectItem>
                           <SelectItem value="1">1</SelectItem>
                           <SelectItem value="3">3</SelectItem>
                           <SelectItem value="6">6</SelectItem>
@@ -588,7 +592,25 @@ export function ProgramsManager() {
                         </SelectContent>
                       </Select>
                       <p className="text-xs text-muted-foreground">
-                        Subscription auto-cancels after {formData.subscription_interval_count} {formData.subscription_interval}(s)
+                        {formData.subscription_interval_count === 0 
+                          ? 'Subscription runs until manually cancelled' 
+                          : `Subscription auto-cancels after ${formData.subscription_interval_count} ${formData.subscription_interval}(s)`}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="trial_days">Free Trial Days</Label>
+                      <Input
+                        id="trial_days"
+                        type="number"
+                        min="0"
+                        value={formData.trial_days}
+                        onChange={(e) => setFormData({ ...formData, trial_days: parseInt(e.target.value || '0') })}
+                        placeholder="e.g., 7"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {formData.trial_days > 0 
+                          ? `${formData.trial_days}-day free trial before first charge` 
+                          : 'No free trial'}
                       </p>
                     </div>
                   </>

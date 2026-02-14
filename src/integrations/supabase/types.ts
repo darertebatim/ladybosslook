@@ -1927,6 +1927,7 @@ export type Database = {
           subscription_interval: string | null
           subscription_interval_count: number | null
           title: string
+          trial_days: number | null
           type: string
           updated_at: string | null
           video_url: string | null
@@ -1968,6 +1969,7 @@ export type Database = {
           subscription_interval?: string | null
           subscription_interval_count?: number | null
           title: string
+          trial_days?: number | null
           type: string
           updated_at?: string | null
           video_url?: string | null
@@ -2009,6 +2011,7 @@ export type Database = {
           subscription_interval?: string | null
           subscription_interval_count?: number | null
           title?: string
+          trial_days?: number | null
           type?: string
           updated_at?: string | null
           video_url?: string | null
