@@ -1,106 +1,87 @@
 
+# Plan: Program Page Overhaul - Route Rename and IAP Purchase Buttons
 
-# Rename "Routine" to "Ritual" and "Task" to "Action" -- Full Project
+## Overview
+Two changes: (1) rename `/app/course/` routes to `/app/programs/`, and (2) when a program has iOS/annual product IDs, show proper subscription purchase buttons (monthly vs annual plan selector) instead of "Enroll Free."
 
-## Scope
+## 1. Route Rename: `/app/course` to `/app/programs`
 
-This covers **all user-facing text** across the entire project (app pages, admin pages, comments, labels, placeholders, toasts, tooltips). Internal code (variable names, database tables/columns, hook names) stays unchanged per the existing branding standard.
+Update all references from `/app/course/:slug` to `/app/programs/:slug`:
 
-## Summary of Changes
+**Files to update:**
+- `src/App.tsx` - Route definitions (add redirect from old `/app/course/*` for backward compat)
+- `src/pages/app/AppStore.tsx` - Navigation on program card click
+- `src/pages/app/AppPrograms.tsx` - Links to program detail
+- `src/pages/app/AppProfile.tsx` - Enrollment links
+- `src/pages/app/AppPlaylistDetail.tsx` - "View Course Details" link
+- `src/pages/app/AppCourseDetail.tsx` - BackButton destination, getCoursePageUrl helper
+- `src/components/app/EnrolledProgramCard.tsx` - Link to program
+- `src/components/dashboard/CompactRoundCard.tsx` - Link
+- `src/components/dashboard/ActiveRound.tsx` - Link
+- `src/components/feed/FeedActionButton.tsx` - Navigation
+- `src/components/admin/SessionsManager.tsx` - Notification URL
+- `src/components/admin/AnnouncementCreator.tsx` - SelectItem values
+- `src/lib/proTaskTypes.ts` - Program link builder
+- `src/hooks/useProgramEventNotificationScheduler.ts` - Notification URL
 
-### A. URL Path Changes (with redirects)
+Add backward-compatibility redirect in `App.tsx`:
+```
+<Route path="course/:slug" element={<Navigate to="/app/programs/:slug" replace />} />
+```
 
-| Old Path | New Path |
-|----------|----------|
-| `/app/routines` | `/app/rituals` |
-| `/app/routines/:planId` | `/app/rituals/:planId` |
+## 2. Purchase Buttons for IAP Programs
 
-Old paths get `<Navigate to="..." replace />` redirects for backward compatibility with older app versions.
+In `AppCourseDetail.tsx`, the "Purchase Landing Page" section (lines 983-1126) currently always shows "Enroll Free." This needs to be enhanced:
 
-### B. User-Facing Text: "Routine" to "Ritual"
+**Logic:**
+- If program has `ios_product_id` AND we're on native: show subscription plan picker
+- If program has `annual_ios_product_id` too: show both monthly and annual options
+- If neither (free program): keep current "Enroll Free" button
 
-Changes across ~25 files. Key examples:
+**UI Design (in the Purchase Card, replacing the current free enrollment section):**
 
-| File | What Changes |
-|------|-------------|
-| `src/pages/app/AppInspireDetail.tsx` | "Routine not found" -> "Ritual not found", "Back to Routines" -> "Back to Rituals", BackButtonCircle link |
-| `src/pages/app/AppInspire.tsx` | Navigation links |
-| `src/pages/app/AppHome.tsx` | Navigation links |
-| `src/pages/app/AppWater.tsx` | "Add to routine to track daily" -> "Add to ritual...", comments |
-| `src/pages/app/AppAudioPlayer.tsx` | "Add to Routine Button" comment, button label |
-| `src/pages/app/AppJournal.tsx` | "Add to Routine Button" comment |
-| `src/components/app/HomeMenu.tsx` | Route path update |
-| `src/components/app/PromoBanner.tsx` | Navigation links (3 occurrences) |
-| `src/components/app/TaskQuickStartSheet.tsx` | Navigation link |
-| `src/components/app/InspireBanner.tsx` | Navigation links |
-| `src/components/app/WaterTrackingScreen.tsx` | "Add to Routine button" comment |
-| `src/components/app/JournalReminderSettings.tsx` | Comment updates |
-| `src/components/breathe/BreathingExerciseCard.tsx` | "Add to routine button" comment |
-| `src/components/breathe/BreathingReminderSettings.tsx` | Comment updates |
-| `src/components/mood/MoodDashboard.tsx` | Comment updates |
-| `src/components/dashboard/SuggestedRoutineCard.tsx` | Link path |
-| `src/components/dashboard/QuickActionsGrid.tsx` | Link path |
-| `src/lib/toolsConfig.ts` | Route path |
-| `src/lib/proTaskTypes.ts` | Return URL |
-| `src/lib/localNotifications.ts` | Deep link return |
-| `src/hooks/useAudioRoutine.tsx` | Toast "Failed to add to routine" -> "Failed to add to ritual" |
-| `src/App.tsx` | Route definitions + redirect routes, comment update |
+```
++------------------------------------------+
+|  Choose Your Plan                        |
+|                                          |
+|  [Monthly]          [Annual - Save 40%]  |
+|  $13.99/mo          $99.99/yr            |
+|                                          |
+|  [ Subscribe Now ]                       |
+|                                          |
+|  Cancel anytime. Managed by Apple.       |
++------------------------------------------+
+```
 
-**Admin pages:**
+- Two selectable plan cards (monthly highlighted by default, annual shows savings badge)
+- Single "Subscribe Now" button below
+- On click: triggers RevenueCat purchase flow (placeholder for now -- logs selected product ID)
+- On web (non-native): show "Available in the App" message or link to web payment if Stripe price exists
 
-| File | What Changes |
-|------|-------------|
-| `src/components/admin/PromoBannerManager.tsx` | "Routine Plan (specific)" -> "Ritual Plan", "Routine Bank" -> "Ritual Bank", "Unknown Routine" -> "Unknown Ritual", "Select Routine Plan" -> "Select Ritual Plan", "Select Routine from Bank" -> "Select Ritual from Bank", "Tasks Bank Page" -> "Actions Bank Page", "Task Template" -> "Action Template", "Task Planner" -> "Action Planner", "Unknown Task" -> "Unknown Action", "Select Task Template" -> "Select Action Template" |
-| `src/components/admin/RoutineManagement.tsx` | "Organize routines into categories" -> "Organize rituals into categories" |
-| `src/components/admin/RoutineStatisticsManager.tsx` | "Routines added by users" -> "Rituals added by users", "Published routine templates" -> "Published ritual templates" |
-| `src/components/admin/RoutinesBank.tsx` | "Delete this routine?" -> "Delete this ritual?", "Search tasks..." -> "Search actions...", other labels |
-| `src/components/admin/AIAssistantPanel.tsx` | "Create routine" -> "Create ritual", "5 tasks" -> "5 actions" |
-| `src/components/admin/LeadsManager.tsx` | "Tasks, subtasks, and completions" -> "Actions, subtasks, and completions", "routine progress" -> "ritual progress" |
-| `src/pages/admin/System.tsx` | "clears tasks" -> "clears actions", "delete all your user data including tasks" -> "...including actions" |
-| `src/pages/admin/TasksBank.tsx` | "Create Routine from Selection" -> "Create Ritual from Selection" (already says "Create Ritual" in buttons) |
-| `src/pages/admin/NotificationAnalytics.tsx` | "Task Reminder" -> "Action Reminder" |
-| `src/pages/admin/PushNotifications.tsx` | "Task Reminders" -> "Action Reminders" |
-| `src/pages/admin/AppTest.tsx` | "Task completed!" -> "Action completed!", "completing this task" -> "completing this action" |
-
-### C. User-Facing Text: "Task" to "Action"
-
-| File | What Changes |
-|------|-------------|
-| `src/pages/app/AppTaskCreate.tsx` | placeholder "Task name" -> "Action name" |
-| `src/pages/admin/System.tsx` | User-facing descriptions mentioning "tasks" |
-| `src/pages/admin/NotificationAnalytics.tsx` | Filter label "Task Reminder" |
-| `src/pages/admin/PushNotifications.tsx` | "Task Reminders" label |
-| `src/pages/admin/AppTest.tsx` | Toast text |
-| `src/components/admin/PromoBannerManager.tsx` | Multiple select labels |
-| `src/components/admin/LeadsManager.tsx` | Reset data description |
-
-### D. What Does NOT Change
-
-- Database table/column names (e.g., `user_tasks`, `routines_bank`, `task_completions`)
-- Hook names (e.g., `useTaskPlanner`, `useRoutinesBank`)
-- Component file names (e.g., `RoutinePreviewSheet.tsx`, `TaskQuickStartSheet.tsx`)
-- Variable names in code
-- Edge function names (e.g., `send-task-reminders`)
-- Internal query keys
-- CSS class names (e.g., `.tour-tool-routines`)
+**Implementation details:**
+- Add state: `selectedPlan: 'monthly' | 'annual'`
+- Calculate savings percentage: `Math.round((1 - annualPrice / (monthlyPrice * 12)) * 100)`
+- The button calls a `handlePurchase()` function that will later integrate with RevenueCat
+- For now, `handlePurchase` shows a toast: "Purchase flow coming soon" (or initiates RevenueCat if SDK is available)
 
 ## Technical Details
 
-### Route Changes in `src/App.tsx`
+### Files Modified
+1. **`src/App.tsx`** -- Route paths + backward compat redirects
+2. **`src/pages/app/AppCourseDetail.tsx`** -- Purchase UI with plan selector when `ios_product_id` exists
+3. **`src/pages/app/AppStore.tsx`** -- Link update
+4. **`src/pages/app/AppPrograms.tsx`** -- Link update
+5. **`src/pages/app/AppProfile.tsx`** -- Link update
+6. **`src/pages/app/AppPlaylistDetail.tsx`** -- Link update
+7. **`src/components/app/EnrolledProgramCard.tsx`** -- Link update
+8. **`src/components/dashboard/CompactRoundCard.tsx`** -- Link update
+9. **`src/components/dashboard/ActiveRound.tsx`** -- Link update
+10. **`src/components/feed/FeedActionButton.tsx`** -- Link update
+11. **`src/components/admin/SessionsManager.tsx`** -- Link update
+12. **`src/components/admin/AnnouncementCreator.tsx`** -- Link update
+13. **`src/lib/proTaskTypes.ts`** -- Link update
+14. **`src/hooks/useProgramEventNotificationScheduler.ts`** -- Link update
+15. **`src/data/programs.ts`** -- Add `annual_ios_product_id` and `annual_price_amount` to Program interface
 
-```text
-// Change active routes
-path="routines"       -> path="rituals"
-path="routines/:planId" -> path="rituals/:planId"
-
-// Add redirect routes inside <Route path="/app">
-<Route path="routines" element={<Navigate to="/app/rituals" replace />} />
-<Route path="routines/:planId" element={<Navigate to="/app/rituals/:planId" replace />} />
-```
-
-Note: The `routines/:planId` redirect needs a small wrapper component to extract the `planId` param and redirect properly, since `<Navigate>` can't interpolate route params directly.
-
-### Estimated File Count
-
-Approximately 30 files need text/URL changes. No database migrations. No new components. All changes are string replacements in user-facing text and URL paths.
-
+### Data Flow for Purchase
+The program query in `AppCourseDetail.tsx` already uses `SELECT *` from `program_catalog`, so `ios_product_id`, `annual_ios_product_id`, `price_amount`, and `annual_price_amount` are already available in the `program` object.
