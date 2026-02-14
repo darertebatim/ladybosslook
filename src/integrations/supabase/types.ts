@@ -430,7 +430,6 @@ export type Database = {
           language: string
           name: string
           program_slug: string | null
-          requires_subscription: boolean
           sort_order: number
         }
         Insert: {
@@ -446,7 +445,6 @@ export type Database = {
           language?: string
           name: string
           program_slug?: string | null
-          requires_subscription?: boolean
           sort_order?: number
         }
         Update: {
@@ -462,7 +460,6 @@ export type Database = {
           language?: string
           name?: string
           program_slug?: string | null
-          requires_subscription?: boolean
           sort_order?: number
         }
         Relationships: []
@@ -1916,7 +1913,6 @@ export type Database = {
           original_price: number | null
           payment_type: string
           price_amount: number
-          requires_subscription: boolean
           slug: string
           stripe_payment_link: string | null
           stripe_price_id: string | null
@@ -1957,7 +1953,6 @@ export type Database = {
           original_price?: number | null
           payment_type: string
           price_amount?: number
-          requires_subscription?: boolean
           slug: string
           stripe_payment_link?: string | null
           stripe_price_id?: string | null
@@ -1998,7 +1993,6 @@ export type Database = {
           original_price?: number | null
           payment_type?: string
           price_amount?: number
-          requires_subscription?: boolean
           slug?: string
           stripe_payment_link?: string | null
           stripe_price_id?: string | null
@@ -2697,7 +2691,6 @@ export type Database = {
           is_active: boolean | null
           is_popular: boolean | null
           is_welcome_popup: boolean
-          requires_subscription: boolean
           schedule_type: string
           sort_order: number | null
           start_day_of_week: number | null
@@ -2721,7 +2714,6 @@ export type Database = {
           is_active?: boolean | null
           is_popular?: boolean | null
           is_welcome_popup?: boolean
-          requires_subscription?: boolean
           schedule_type?: string
           sort_order?: number | null
           start_day_of_week?: number | null
@@ -2745,7 +2737,6 @@ export type Database = {
           is_active?: boolean | null
           is_popular?: boolean | null
           is_welcome_popup?: boolean
-          requires_subscription?: boolean
           schedule_type?: string
           sort_order?: number | null
           start_day_of_week?: number | null
@@ -2894,42 +2885,6 @@ export type Database = {
         }
         Relationships: []
       }
-      subscription_products: {
-        Row: {
-          created_at: string
-          id: string
-          interval: string
-          ios_product_id: string | null
-          is_active: boolean
-          name: string
-          price_amount: number
-          stripe_price_id: string | null
-          trial_days: number
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          interval?: string
-          ios_product_id?: string | null
-          is_active?: boolean
-          name: string
-          price_amount?: number
-          stripe_price_id?: string | null
-          trial_days?: number
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          interval?: string
-          ios_product_id?: string | null
-          is_active?: boolean
-          name?: string
-          price_amount?: number
-          stripe_price_id?: string | null
-          trial_days?: number
-        }
-        Relationships: []
-      }
       subtask_completions: {
         Row: {
           completed_at: string
@@ -3055,33 +3010,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      tool_access_config: {
-        Row: {
-          created_at: string
-          free_usage_limit: number | null
-          id: string
-          requires_subscription: boolean
-          tool_id: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          free_usage_limit?: number | null
-          id?: string
-          requires_subscription?: boolean
-          tool_id: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          free_usage_limit?: number | null
-          id?: string
-          requires_subscription?: boolean
-          tool_id?: string
-          updated_at?: string
-        }
-        Relationships: []
       }
       user_admin_permissions: {
         Row: {
@@ -3383,59 +3311,6 @@ export type Database = {
         }
         Relationships: []
       }
-      user_subscriptions: {
-        Row: {
-          created_at: string
-          expires_at: string | null
-          id: string
-          platform: string
-          product_id: string | null
-          revenuecat_id: string | null
-          status: Database["public"]["Enums"]["subscription_status"]
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
-          trial_ends_at: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          expires_at?: string | null
-          id?: string
-          platform?: string
-          product_id?: string | null
-          revenuecat_id?: string | null
-          status?: Database["public"]["Enums"]["subscription_status"]
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          trial_ends_at?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          expires_at?: string | null
-          id?: string
-          platform?: string
-          product_id?: string | null
-          revenuecat_id?: string | null
-          status?: Database["public"]["Enums"]["subscription_status"]
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          trial_ends_at?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_subscriptions_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "subscription_products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_subtasks: {
         Row: {
           created_at: string
@@ -3677,7 +3552,6 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user"
       audio_category: "audiobook" | "course_supplement" | "podcast"
-      subscription_status: "active" | "expired" | "trial" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3807,7 +3681,6 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "user"],
       audio_category: ["audiobook", "course_supplement", "podcast"],
-      subscription_status: ["active", "expired", "trial", "cancelled"],
     },
   },
 } as const

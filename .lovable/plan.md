@@ -1,144 +1,106 @@
 
-# Subscription Model Activation Plan
 
-## Overview
-Build a complete subscription system using RevenueCat (iOS) and Stripe (web) that lets you control which tools, playlists, rituals, and programs require a subscription -- all manageable from the admin panel.
+# Rename "Routine" to "Ritual" and "Task" to "Action" -- Full Project
 
----
+## Scope
 
-## Phase 1: Database Foundation
+This covers **all user-facing text** across the entire project (app pages, admin pages, comments, labels, placeholders, toasts, tooltips). Internal code (variable names, database tables/columns, hook names) stays unchanged per the existing branding standard.
 
-### New Tables
+## Summary of Changes
 
-**`user_subscriptions`** - Track each user's subscription status
-- `user_id`, `status` (active, expired, trial, cancelled), `platform` (ios, web, stripe), `product_id`, `expires_at`, `trial_ends_at`, `revenuecat_id`, `stripe_subscription_id`, `created_at`, `updated_at`
+### A. URL Path Changes (with redirects)
 
-**`subscription_products`** - Define available subscription tiers
-- `id`, `name` (e.g. "Simora Premium Monthly"), `ios_product_id`, `stripe_price_id`, `interval` (monthly, yearly), `price_amount`, `trial_days`, `is_active`, `created_at`
+| Old Path | New Path |
+|----------|----------|
+| `/app/routines` | `/app/rituals` |
+| `/app/routines/:planId` | `/app/rituals/:planId` |
 
-### Schema Changes to Existing Tables
-- **`audio_playlists`**: Add `requires_subscription` (boolean, default false)
-- **`routines_bank`**: Add `requires_subscription` (boolean, default false)
-- **`program_catalog`**: Add `requires_subscription` (boolean, default false)
-- **New table `tool_access_config`**: `tool_id` (text, unique), `requires_subscription` (boolean), `free_usage_limit` (integer, nullable) -- to control which wellness tools (journal, breathe, water, etc.) need a subscription and optionally allow limited free usage
+Old paths get `<Navigate to="..." replace />` redirects for backward compatibility with older app versions.
 
-### RLS Policies
-- Users can read their own subscription record
-- Admins can read/write all subscriptions
-- `tool_access_config` readable by all authenticated users
+### B. User-Facing Text: "Routine" to "Ritual"
 
----
+Changes across ~25 files. Key examples:
 
-## Phase 2: Subscription Hook and Context
+| File | What Changes |
+|------|-------------|
+| `src/pages/app/AppInspireDetail.tsx` | "Routine not found" -> "Ritual not found", "Back to Routines" -> "Back to Rituals", BackButtonCircle link |
+| `src/pages/app/AppInspire.tsx` | Navigation links |
+| `src/pages/app/AppHome.tsx` | Navigation links |
+| `src/pages/app/AppWater.tsx` | "Add to routine to track daily" -> "Add to ritual...", comments |
+| `src/pages/app/AppAudioPlayer.tsx` | "Add to Routine Button" comment, button label |
+| `src/pages/app/AppJournal.tsx` | "Add to Routine Button" comment |
+| `src/components/app/HomeMenu.tsx` | Route path update |
+| `src/components/app/PromoBanner.tsx` | Navigation links (3 occurrences) |
+| `src/components/app/TaskQuickStartSheet.tsx` | Navigation link |
+| `src/components/app/InspireBanner.tsx` | Navigation links |
+| `src/components/app/WaterTrackingScreen.tsx` | "Add to Routine button" comment |
+| `src/components/app/JournalReminderSettings.tsx` | Comment updates |
+| `src/components/breathe/BreathingExerciseCard.tsx` | "Add to routine button" comment |
+| `src/components/breathe/BreathingReminderSettings.tsx` | Comment updates |
+| `src/components/mood/MoodDashboard.tsx` | Comment updates |
+| `src/components/dashboard/SuggestedRoutineCard.tsx` | Link path |
+| `src/components/dashboard/QuickActionsGrid.tsx` | Link path |
+| `src/lib/toolsConfig.ts` | Route path |
+| `src/lib/proTaskTypes.ts` | Return URL |
+| `src/lib/localNotifications.ts` | Deep link return |
+| `src/hooks/useAudioRoutine.tsx` | Toast "Failed to add to routine" -> "Failed to add to ritual" |
+| `src/App.tsx` | Route definitions + redirect routes, comment update |
 
-### `useSubscription` Hook
-- Fetches the current user's subscription from `user_subscriptions`
-- Exposes: `isSubscribed`, `subscriptionStatus`, `trialEndsAt`, `expiresAt`, `platform`
-- Cached with React Query, refreshed on app focus
-- A helper `hasAccess(featureId)` that cross-references `tool_access_config`, playlist/ritual/program `requires_subscription` flags
+**Admin pages:**
 
-### Paywall Component
-- A reusable `<PaywallGate>` wrapper component
-- Shows subscription prompt when user lacks access
-- Displays pricing, trial info, and subscribe buttons
-- Routes to RevenueCat (iOS) or Stripe Checkout (web) based on platform
+| File | What Changes |
+|------|-------------|
+| `src/components/admin/PromoBannerManager.tsx` | "Routine Plan (specific)" -> "Ritual Plan", "Routine Bank" -> "Ritual Bank", "Unknown Routine" -> "Unknown Ritual", "Select Routine Plan" -> "Select Ritual Plan", "Select Routine from Bank" -> "Select Ritual from Bank", "Tasks Bank Page" -> "Actions Bank Page", "Task Template" -> "Action Template", "Task Planner" -> "Action Planner", "Unknown Task" -> "Unknown Action", "Select Task Template" -> "Select Action Template" |
+| `src/components/admin/RoutineManagement.tsx` | "Organize routines into categories" -> "Organize rituals into categories" |
+| `src/components/admin/RoutineStatisticsManager.tsx` | "Routines added by users" -> "Rituals added by users", "Published routine templates" -> "Published ritual templates" |
+| `src/components/admin/RoutinesBank.tsx` | "Delete this routine?" -> "Delete this ritual?", "Search tasks..." -> "Search actions...", other labels |
+| `src/components/admin/AIAssistantPanel.tsx` | "Create routine" -> "Create ritual", "5 tasks" -> "5 actions" |
+| `src/components/admin/LeadsManager.tsx` | "Tasks, subtasks, and completions" -> "Actions, subtasks, and completions", "routine progress" -> "ritual progress" |
+| `src/pages/admin/System.tsx` | "clears tasks" -> "clears actions", "delete all your user data including tasks" -> "...including actions" |
+| `src/pages/admin/TasksBank.tsx` | "Create Routine from Selection" -> "Create Ritual from Selection" (already says "Create Ritual" in buttons) |
+| `src/pages/admin/NotificationAnalytics.tsx` | "Task Reminder" -> "Action Reminder" |
+| `src/pages/admin/PushNotifications.tsx` | "Task Reminders" -> "Action Reminders" |
+| `src/pages/admin/AppTest.tsx` | "Task completed!" -> "Action completed!", "completing this task" -> "completing this action" |
 
----
+### C. User-Facing Text: "Task" to "Action"
 
-## Phase 3: RevenueCat Integration (iOS)
+| File | What Changes |
+|------|-------------|
+| `src/pages/app/AppTaskCreate.tsx` | placeholder "Task name" -> "Action name" |
+| `src/pages/admin/System.tsx` | User-facing descriptions mentioning "tasks" |
+| `src/pages/admin/NotificationAnalytics.tsx` | Filter label "Task Reminder" |
+| `src/pages/admin/PushNotifications.tsx` | "Task Reminders" label |
+| `src/pages/admin/AppTest.tsx` | Toast text |
+| `src/components/admin/PromoBannerManager.tsx` | Multiple select labels |
+| `src/components/admin/LeadsManager.tsx` | Reset data description |
 
-### Edge Function: `revenuecat-webhook`
-- Receives RevenueCat webhook events (INITIAL_PURCHASE, RENEWAL, CANCELLATION, EXPIRATION)
-- Updates `user_subscriptions` table accordingly
-- Maps RevenueCat app_user_id to Supabase user_id
+### D. What Does NOT Change
 
-### Client-Side (Capacitor)
-- Initialize RevenueCat SDK with the existing `REVENUECAT_API_KEY` secret
-- On app launch, identify user with their Supabase user_id
-- Purchase flow: present RevenueCat paywall, handle purchase result, update local state
-- Restore purchases support
+- Database table/column names (e.g., `user_tasks`, `routines_bank`, `task_completions`)
+- Hook names (e.g., `useTaskPlanner`, `useRoutinesBank`)
+- Component file names (e.g., `RoutinePreviewSheet.tsx`, `TaskQuickStartSheet.tsx`)
+- Variable names in code
+- Edge function names (e.g., `send-task-reminders`)
+- Internal query keys
+- CSS class names (e.g., `.tour-tool-routines`)
 
----
+## Technical Details
 
-## Phase 4: Stripe Integration (Web)
+### Route Changes in `src/App.tsx`
 
-### Edge Function: `create-subscription-checkout`
-- Creates a Stripe Checkout session for subscription products
-- Uses existing `STRIPE_SECRET_KEY`
-- Returns checkout URL
+```text
+// Change active routes
+path="routines"       -> path="rituals"
+path="routines/:planId" -> path="rituals/:planId"
 
-### Stripe Webhook Updates
-- Extend existing `stripe-webhook` to handle `customer.subscription.updated`, `customer.subscription.deleted` events
-- Update `user_subscriptions` table on subscription lifecycle changes
+// Add redirect routes inside <Route path="/app">
+<Route path="routines" element={<Navigate to="/app/rituals" replace />} />
+<Route path="routines/:planId" element={<Navigate to="/app/rituals/:planId" replace />} />
+```
 
----
+Note: The `routines/:planId` redirect needs a small wrapper component to extract the `planId` param and redirect properly, since `<Navigate>` can't interpolate route params directly.
 
-## Phase 5: Access Control Integration
+### Estimated File Count
 
-### Tools (Journal, Breathe, Water, etc.)
-- Wrap tool routes with `<PaywallGate toolId="journal">` check
-- Read `tool_access_config` to determine if tool requires subscription
-- Option for "free_usage_limit" (e.g., 3 free journal entries per month)
+Approximately 30 files need text/URL changes. No database migrations. No new components. All changes are string replacements in user-facing text and URL paths.
 
-### Playlists
-- Extend existing `isPlaylistLocked` logic: locked if `requires_subscription = true` AND user is not subscribed
-- Show lock icon with "Subscribe" CTA instead of "Enroll"
-
-### Rituals
-- Check `requires_subscription` on `routines_bank` before allowing ritual activation
-- Show paywall prompt for premium rituals
-
-### Programs
-- Check `requires_subscription` on `program_catalog`
-- Premium programs show subscription CTA in course detail page
-
----
-
-## Phase 6: Admin Panel - Subscription Management
-
-### New Admin Page: "Subscriptions" (`/admin/subscriptions`)
-
-**Tab 1: Products**
-- Manage subscription products (name, price, iOS product ID, Stripe price ID, trial days)
-
-**Tab 2: Access Control**
-- **Tools section**: Toggle which tools require subscription, set free usage limits
-- **Playlists section**: List all playlists with a "Premium" toggle
-- **Rituals section**: List all rituals with a "Premium" toggle  
-- **Programs section**: List all programs with a "Premium" toggle
-
-**Tab 3: Subscribers**
-- View all active subscribers, their status, platform, expiry dates
-- Search/filter by user, status, platform
-
----
-
-## Phase 7: UI Polish
-
-- Add a "Premium" badge/crown icon on locked content throughout the app
-- Subscription status indicator in user profile
-- "Manage Subscription" option in profile settings (links to App Store / Stripe portal)
-- Graceful handling of expired subscriptions (grace period messaging)
-
----
-
-## Implementation Order
-
-1. Database migrations (tables + columns)
-2. `useSubscription` hook + `PaywallGate` component
-3. Admin "Access Control" page (so you can configure what's premium)
-4. RevenueCat webhook edge function
-5. RevenueCat client-side integration (iOS)
-6. Stripe subscription checkout + webhook updates (web)
-7. Wire access checks into tools, playlists, rituals, programs
-8. UI polish (badges, profile, manage subscription)
-
----
-
-## Technical Notes
-
-- The existing `REVENUECAT_API_KEY` secret is already configured
-- The existing `STRIPE_SECRET_KEY` and `stripe-webhook` function will be extended
-- RevenueCat Capacitor plugin (`@revenuecat/purchases-capacitor`) will need to be installed
-- Platform detection uses the existing `isNativeApp()` utility
-- The `tool_access_config` table decouples access rules from code, letting you toggle tools on/off from admin without code changes
