@@ -253,7 +253,7 @@ export function AnnouncementCreator() {
                         ── Course Pages ──
                       </SelectItem>
                       {programs.map((program) => (
-                        <SelectItem key={program.slug} value={`/app/course/${program.slug}`}>
+                        <SelectItem key={program.slug} value={`/app/programs/${program.slug}`}>
                           📚 {program.title}
                         </SelectItem>
                       ))}

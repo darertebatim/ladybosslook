@@ -38,6 +38,8 @@ export interface Program {
   stripe_payment_link?: string;
   ios_product_id?: string;
   android_product_id?: string;
+  annual_ios_product_id?: string;
+  annual_price_amount?: number;
   is_free_on_ios?: boolean;
 }
 

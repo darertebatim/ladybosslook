@@ -246,6 +246,12 @@ const RoutineRedirect = () => {
   return <Navigate to={`/app/rituals/${planId}`} replace />;
 };
 
+// Redirect component for old /app/course/:slug routes
+const CourseRedirect = () => {
+  const { slug, roundId } = useParams();
+  return <Navigate to={`/app/programs/${slug}${roundId ? `/${roundId}` : ''}`} replace />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <HelmetProvider>
@@ -345,8 +351,11 @@ const App = () => (
                     <Route path="programs" element={<AppPrograms />} />
                     <Route path="explore" element={<AppStore />} />
                     <Route path="browse" element={<Navigate to="/app/explore" replace />} />
-                    <Route path="course/:slug" element={<AppCourseDetail />} />
-                    <Route path="course/:slug/:roundId" element={<AppCourseDetail />} />
+                    <Route path="programs/:slug" element={<AppCourseDetail />} />
+                    <Route path="programs/:slug/:roundId" element={<AppCourseDetail />} />
+                    {/* Backward compat redirects for old /app/course/ URLs */}
+                    <Route path="course/:slug/:roundId" element={<CourseRedirect />} />
+                    <Route path="course/:slug" element={<CourseRedirect />} />
                     <Route path="player" element={<AppPlayer />} />
                     <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />
                     <Route path="player/:audioId" element={<AppAudioPlayer />} />

@@ -288,7 +288,7 @@ export function useProgramEventNotificationScheduler() {
                 type: 'content_unlock',
                 moduleId: module.id,
                 playlistId: round.audio_playlist_id,
-                url: `/app/course/${enrollment.program_slug}`,
+                url: `/app/programs/${enrollment.program_slug}`,
               },
             });
             scheduledIds.add(contentId);
