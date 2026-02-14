@@ -29,8 +29,10 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
     ? Math.round((1 - annualPrice / (monthlyPrice * 12)) * 100)
     : 0;
 
-  const formatPrice = (amount: number) => {
-    return `$${amount.toFixed(2)}`;
+  const formatPrice = (amountCents: number) => {
+    // IAP prices are stored in cents (e.g. 1399 = $13.99)
+    const dollars = amountCents / 100;
+    return `$${dollars.toFixed(2)}`;
   };
 
   const handlePurchase = async () => {
