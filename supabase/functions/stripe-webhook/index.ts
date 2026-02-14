@@ -355,6 +355,39 @@ serve(async (req) => {
       if (customerEmail) {
         await triggerMailchimpSubscription(supabase, { ...orderData, email: customerEmail }, programSlug);
       }
+
+      // Handle subscription checkout - create/update user_subscriptions
+      if (session.mode === 'subscription' && session.metadata?.subscription === 'true' && userId) {
+        const subscriptionId = typeof session.subscription === 'string' ? session.subscription : session.subscription?.id;
+        const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id;
+        
+        console.log('[WEBHOOK] Processing subscription checkout for user:', userId, 'subscription:', subscriptionId);
+
+        let trialEnd = null;
+        let periodEnd = null;
+        
+        if (subscriptionId) {
+          const sub = await stripe.subscriptions.retrieve(subscriptionId);
+          trialEnd = sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null;
+          periodEnd = sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null;
+        }
+
+        const { error: subError } = await supabase
+          .from('user_subscriptions')
+          .upsert({
+            user_id: userId,
+            status: trialEnd ? 'trial' : 'active',
+            platform: 'stripe',
+            stripe_subscription_id: subscriptionId || null,
+            stripe_customer_id: customerId || null,
+            expires_at: periodEnd,
+            trial_ends_at: trialEnd,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'user_id' });
+
+        if (subError) console.error('[WEBHOOK] Error creating user subscription:', subError);
+        else console.log('[WEBHOOK] user_subscriptions created for user:', userId);
+      }
     }
 
     // Handle invoice.paid (for recurring subscription payments)
@@ -452,6 +485,16 @@ serve(async (req) => {
       
       console.log('[WEBHOOK] Subscription ended:', subscription.id, 'Status:', subscription.status);
 
+      // Update user_subscriptions table
+      const subUserId = subscription.metadata?.supabase_user_id;
+      if (subUserId) {
+        await supabase
+          .from('user_subscriptions')
+          .update({ status: 'expired', updated_at: new Date().toISOString() })
+          .eq('user_id', subUserId);
+        console.log('[WEBHOOK] user_subscriptions marked expired for user:', subUserId);
+      }
+
       const programSlug = subscription.metadata?.program || null;
       
       if (programSlug) {
@@ -485,6 +528,37 @@ serve(async (req) => {
             }
           }
         }
+      }
+    }
+
+    // Handle customer.subscription.updated (status changes, renewals)
+    if (event.type === 'customer.subscription.updated') {
+      const subscription = event.data.object as Stripe.Subscription;
+      const subUserId = subscription.metadata?.supabase_user_id;
+      
+      console.log('[WEBHOOK] Subscription updated:', subscription.id, 'Status:', subscription.status, 'User:', subUserId);
+
+      if (subUserId) {
+        let status = 'active';
+        if (subscription.status === 'canceled' || subscription.status === 'unpaid') status = 'cancelled';
+        else if (subscription.status === 'past_due') status = 'expired';
+        else if (subscription.status === 'trialing') status = 'trial';
+
+        const { error } = await supabase
+          .from('user_subscriptions')
+          .upsert({
+            user_id: subUserId,
+            status,
+            platform: 'stripe',
+            stripe_subscription_id: subscription.id,
+            stripe_customer_id: typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id,
+            expires_at: subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : null,
+            trial_ends_at: subscription.trial_end ? new Date(subscription.trial_end * 1000).toISOString() : null,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'user_id' });
+
+        if (error) console.error('[WEBHOOK] Error upserting subscription:', error);
+        else console.log('[WEBHOOK] user_subscriptions updated for user:', subUserId, 'status:', status);
       }
     }
 

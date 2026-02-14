@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Crown } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,6 +18,7 @@ const menuItems = [
   { title: 'Push', url: '/admin/pn', icon: Bell, pageSlug: 'communications' },
   { title: 'Programs', url: '/admin/programs', icon: UserCog, pageSlug: 'programs' },
   { title: 'Payments', url: '/admin/payments', icon: CreditCard, pageSlug: 'payments' },
+  { title: 'Subscriptions', url: '/admin/subscriptions', icon: Crown, pageSlug: 'subscriptions' },
   { title: 'Support', url: '/admin/support', icon: MessageCircle, pageSlug: 'support' },
   { title: 'Tools', url: '/admin/tools', icon: Wrench, pageSlug: 'tools' },
   { title: 'System', url: '/admin/system', icon: Shield, pageSlug: 'system' },
