@@ -215,7 +215,7 @@ export function ProgramsManager() {
       delivery_method: program.delivery_method || 'on-demand',
       subscription_duration: (program as any).subscription_duration || '',
       subscription_interval: (program as any).subscription_interval || 'month',
-      subscription_interval_count: (program as any).subscription_interval_count || 1,
+      subscription_interval_count: (program as any).subscription_interval_count ?? 1,
       subscription_full_payment_price: (program as any).subscription_full_payment_price || 0,
       subscription_full_payment_discount: program.subscription_full_payment_discount || 0,
       description: program.description || '',
