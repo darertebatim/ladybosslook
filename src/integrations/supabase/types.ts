@@ -3390,6 +3390,7 @@ export type Database = {
           id: string
           platform: string
           product_id: string | null
+          program_slug: string | null
           revenuecat_id: string | null
           status: Database["public"]["Enums"]["subscription_status"]
           stripe_customer_id: string | null
@@ -3404,6 +3405,7 @@ export type Database = {
           id?: string
           platform?: string
           product_id?: string | null
+          program_slug?: string | null
           revenuecat_id?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
           stripe_customer_id?: string | null
@@ -3418,6 +3420,7 @@ export type Database = {
           id?: string
           platform?: string
           product_id?: string | null
+          program_slug?: string | null
           revenuecat_id?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
           stripe_customer_id?: string | null
