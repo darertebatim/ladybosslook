@@ -51,13 +51,13 @@ const AppStore = () => {
     return enrollments.includes(slug);
   };
 
-  // Filter to show free programs, free-on-iOS, or subscription programs (IAP handled by Apple)
+  // Filter to show free programs, free-on-iOS, or programs with iOS Product ID (IAP)
   const freePrograms = useMemo(() => {
     return programs.filter(p => 
       p.isFree || 
       p.priceAmount === 0 || 
       p.is_free_on_ios === true ||
-      p.type === 'subscription'
+      !!p.ios_product_id
     );
   }, [programs]);
 
