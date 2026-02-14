@@ -29,7 +29,7 @@ export interface Program {
   limitedSpots?: string;
   popular: boolean;
   link: string;
-  type: 'course' | 'group-coaching' | '1o1-session' | 'event' | 'webinar' | 'audiobook' | 'meditate' | 'workout' | 'soundscape' | 'affirmations';
+  type: 'course' | 'group-coaching' | '1o1-session' | 'event' | 'webinar' | 'audiobook' | 'meditate' | 'workout' | 'soundscape' | 'affirmations' | 'subscription';
   paymentType: 'one-time' | 'subscription' | 'free';
   isFree: boolean;
   subscriptionDuration?: string;

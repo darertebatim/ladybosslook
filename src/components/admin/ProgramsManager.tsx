@@ -527,6 +527,7 @@ export function ProgramsManager() {
                       <SelectItem value="workout">💪 Workout</SelectItem>
                       <SelectItem value="soundscape">🌊 Soundscape</SelectItem>
                       <SelectItem value="affirmations">✨ Affirmations</SelectItem>
+                      <SelectItem value="subscription">⭐ Subscription (Club)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

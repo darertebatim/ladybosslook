@@ -420,11 +420,46 @@ serve(async (req) => {
       }
     }
 
-    // Handle customer.subscription.created (set auto-cancellation if configured)
+    // Handle customer.subscription.created (set auto-cancellation if configured + track in user_subscriptions)
     if (event.type === 'customer.subscription.created') {
       const subscription = event.data.object as Stripe.Subscription;
       
       console.log('[WEBHOOK] Subscription created:', subscription.id);
+
+      // Track subscription in user_subscriptions table
+      const programSlug = subscription.metadata?.program || null;
+      if (programSlug) {
+        const customerId = typeof subscription.customer === 'string' 
+          ? subscription.customer 
+          : subscription.customer.id;
+        const customer = await stripe.customers.retrieve(customerId);
+        const customerEmail = (customer as Stripe.Customer).email;
+
+        if (customerEmail) {
+          const userId = await findOrCreateUser(supabase, customerEmail, '');
+          if (userId) {
+            const { error: subError } = await supabase
+              .from('user_subscriptions')
+              .upsert({
+                user_id: userId,
+                program_slug: programSlug,
+                status: 'active',
+                platform: 'stripe',
+                stripe_subscription_id: subscription.id,
+                stripe_customer_id: customerId,
+                expires_at: subscription.current_period_end 
+                  ? new Date(subscription.current_period_end * 1000).toISOString() 
+                  : null,
+              }, { onConflict: 'user_id,program_slug' } as any);
+
+            if (subError) {
+              console.error('[WEBHOOK] Error upserting user_subscription:', subError);
+            } else {
+              console.log('[WEBHOOK] user_subscription tracked for user:', userId, 'program:', programSlug);
+            }
+          }
+        }
+      }
 
       const autoCancelMonths = subscription.metadata?.auto_cancel_after_months;
       
@@ -472,6 +507,7 @@ serve(async (req) => {
             .single();
 
           if (profile) {
+            // Update enrollment status
             const { error: enrollmentError } = await supabase
               .from('course_enrollments')
               .update({ status: 'cancelled' })
@@ -482,6 +518,19 @@ serve(async (req) => {
               console.error('[WEBHOOK] Error updating enrollment status:', enrollmentError);
             } else {
               console.log('[WEBHOOK] Enrollment marked as cancelled for user:', profile.id, 'program:', programSlug);
+            }
+
+            // Update user_subscriptions status
+            const { error: subError } = await supabase
+              .from('user_subscriptions')
+              .update({ status: 'cancelled' })
+              .eq('user_id', profile.id)
+              .eq('program_slug', programSlug);
+
+            if (subError) {
+              console.error('[WEBHOOK] Error updating user_subscription:', subError);
+            } else {
+              console.log('[WEBHOOK] user_subscription cancelled for user:', profile.id, 'program:', programSlug);
             }
           }
         }

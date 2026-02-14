@@ -30,6 +30,7 @@ const typeConfig: Record<string, { label: string; icon: typeof BookOpen; color: 
   'affirmations': { label: 'Affirmations', icon: Heart, color: 'bg-pink-400' },
   'webinar': { label: 'Webinar', icon: Video, color: 'bg-green-500' },
   'event': { label: 'Event', icon: Calendar, color: 'bg-rose-500' },
+  'subscription': { label: 'Club', icon: Sparkles, color: 'bg-violet-500' },
 };
 
 export const ProgramCard = ({
