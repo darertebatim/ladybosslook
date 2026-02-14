@@ -1068,25 +1068,9 @@ const AppCourseDetail = () => {
 
                   {/* Purchase / Enrollment Section */}
                   <div className="border-t pt-6">
-                    {program.ios_product_id && isNativeApp() ? (
-                      /* IAP Subscription Plan Picker */
+                    {program.ios_product_id ? (
+                      /* IAP Subscription Plan Picker - shown on both native and web */
                       <IAPPlanPicker program={program} />
-                    ) : program.ios_product_id && !isNativeApp() ? (
-                      /* Web fallback for IAP programs */
-                      <div className="text-center space-y-3">
-                        <p className="text-muted-foreground text-sm">
-                          This program is available for purchase in the Simora app.
-                        </p>
-                        {program.stripe_payment_link && (
-                          <Button 
-                            size="lg" 
-                            className="w-full"
-                            onClick={() => window.open(program.stripe_payment_link, '_blank')}
-                          >
-                            Purchase on Web
-                          </Button>
-                        )}
-                      </div>
                     ) : enrollment ? (
                       <Button 
                         size="lg" 
