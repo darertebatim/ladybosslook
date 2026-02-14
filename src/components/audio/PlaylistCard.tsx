@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Music, Lock, CheckCircle2, ChevronRight } from "lucide-react";
+import { Clock, Music, Lock, CheckCircle2, ChevronRight, Crown } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { haptic } from '@/lib/haptics';
 
@@ -26,6 +26,7 @@ interface PlaylistCardProps {
   trackCount: number;
   completedTracks: number;
   totalDuration: number;
+  requiresSubscription?: boolean;
 }
 
 export const PlaylistCard = memo(function PlaylistCard({
@@ -41,6 +42,7 @@ export const PlaylistCard = memo(function PlaylistCard({
   trackCount,
   completedTracks,
   totalDuration,
+  requiresSubscription,
 }: PlaylistCardProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -115,6 +117,11 @@ export const PlaylistCard = memo(function PlaylistCard({
           {isFree && !isLocked && (
             <Badge className="bg-green-500 hover:bg-green-600 rounded-full">
               FREE
+            </Badge>
+          )}
+          {requiresSubscription && (
+            <Badge className="bg-primary/90 hover:bg-primary rounded-full flex items-center gap-1">
+              <Crown className="w-3 h-3" /> Premium
             </Badge>
           )}
         </div>

@@ -72,6 +72,7 @@ const TasksBank = lazy(() => import("@/pages/admin/TasksBank"));
 const AppTest = lazy(() => import("@/pages/admin/AppTest"));
 const NotificationAnalytics = lazy(() => import("@/pages/admin/NotificationAnalytics"));
 const PushNotifications = lazy(() => import("@/pages/admin/PushNotifications"));
+const Subscriptions = lazy(() => import("@/pages/admin/Subscriptions"));
 
 // Lazy load marketing/landing pages
 const Programs = lazy(() => import("@/pages/Programs"));
@@ -111,6 +112,8 @@ const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const SendTestEmail = lazy(() => import("@/pages/SendTestEmail"));
 const AppSupport = lazy(() => import("@/pages/AppSupport"));
 const AppMarketing = lazy(() => import("@/pages/AppMarketing"));
+
+import { ToolPaywallWrapper } from '@/components/subscription/ToolPaywallWrapper';
 
 // Eagerly imported (small, always needed)
 import CalendarRedirect from "@/components/CalendarRedirect";
@@ -277,6 +280,7 @@ const App = () => (
                       <Route path="pn" element={<ProtectedRoute requiredPage="communications"><PushNotifications /></ProtectedRoute>} />
                       <Route path="programs" element={<ProtectedRoute requiredPage="programs"><ProgramsAdmin /></ProtectedRoute>} />
                       <Route path="payments" element={<ProtectedRoute requiredPage="payments"><Payments /></ProtectedRoute>} />
+                      <Route path="subscriptions" element={<ProtectedRoute requiredPage="subscriptions"><Subscriptions /></ProtectedRoute>} />
                       <Route path="support" element={<ProtectedRoute requiredPage="support"><Support /></ProtectedRoute>} />
                       <Route path="system" element={<ProtectedRoute requiredPage="system"><System /></ProtectedRoute>} />
                       <Route path="app-icon" element={<ProtectedRoute requiredPage="system"><AppIconGenerator /></ProtectedRoute>} />
@@ -319,20 +323,20 @@ const App = () => (
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                   
                   {/* Full-screen pages - Outside of AppLayout so no tab bar */}
-                  <Route path="/app/journal/new" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
-                  <Route path="/app/journal/:entryId" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
+                  <Route path="/app/journal/new" element={<ProtectedRoute><ToolPaywallWrapper toolId="journal" featureName="Journal"><AppJournalEntry /></ToolPaywallWrapper></ProtectedRoute>} />
+                  <Route path="/app/journal/:entryId" element={<ProtectedRoute><ToolPaywallWrapper toolId="journal" featureName="Journal"><AppJournalEntry /></ToolPaywallWrapper></ProtectedRoute>} />
                   <Route path="/app/home/new" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
                   <Route path="/app/home/edit/:taskId" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
                   <Route path="/app/channels/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
-                  <Route path="/app/breathe" element={<ProtectedRoute><AppBreathe /></ProtectedRoute>} />
-                  <Route path="/app/water" element={<ProtectedRoute><AppWater /></ProtectedRoute>} />
-                  <Route path="/app/period" element={<ProtectedRoute><AppPeriod /></ProtectedRoute>} />
-                  <Route path="/app/emotion" element={<ProtectedRoute><AppEmotion /></ProtectedRoute>} />
-                  <Route path="/app/emotion/history" element={<ProtectedRoute><AppEmotionHistory /></ProtectedRoute>} />
-                  <Route path="/app/mood" element={<ProtectedRoute><AppMood /></ProtectedRoute>} />
-                  <Route path="/app/mood/history" element={<ProtectedRoute><AppMoodHistory /></ProtectedRoute>} />
+                  <Route path="/app/breathe" element={<ProtectedRoute><ToolPaywallWrapper toolId="breathe" featureName="Breathe"><AppBreathe /></ToolPaywallWrapper></ProtectedRoute>} />
+                  <Route path="/app/water" element={<ProtectedRoute><ToolPaywallWrapper toolId="water" featureName="Water Tracker"><AppWater /></ToolPaywallWrapper></ProtectedRoute>} />
+                  <Route path="/app/period" element={<ProtectedRoute><ToolPaywallWrapper toolId="period" featureName="Period Tracker"><AppPeriod /></ToolPaywallWrapper></ProtectedRoute>} />
+                  <Route path="/app/emotion" element={<ProtectedRoute><ToolPaywallWrapper toolId="mood" featureName="Emotion Check-in"><AppEmotion /></ToolPaywallWrapper></ProtectedRoute>} />
+                  <Route path="/app/emotion/history" element={<ProtectedRoute><ToolPaywallWrapper toolId="mood" featureName="Emotion History"><AppEmotionHistory /></ToolPaywallWrapper></ProtectedRoute>} />
+                  <Route path="/app/mood" element={<ProtectedRoute><ToolPaywallWrapper toolId="mood" featureName="Mood Check-in"><AppMood /></ToolPaywallWrapper></ProtectedRoute>} />
+                  <Route path="/app/mood/history" element={<ProtectedRoute><ToolPaywallWrapper toolId="mood" featureName="Mood History"><AppMoodHistory /></ToolPaywallWrapper></ProtectedRoute>} />
                   <Route path="/app/presence" element={<ProtectedRoute><AppPresence /></ProtectedRoute>} />
-                  <Route path="/app/fasting" element={<ProtectedRoute><AppFasting /></ProtectedRoute>} />
+                  <Route path="/app/fasting" element={<ProtectedRoute><ToolPaywallWrapper toolId="fasting" featureName="Fasting Tracker"><AppFasting /></ToolPaywallWrapper></ProtectedRoute>} />
                   <Route path="/app/support" element={<ProtectedRoute><AppAdminSupport /></ProtectedRoute>} />
                   <Route path="/app/channels/new" element={<ProtectedRoute><AppChannelPost /></ProtectedRoute>} />
                   {/* Redirect old feed post route */}
@@ -356,7 +360,7 @@ const App = () => (
                     <Route path="channels/:slug" element={<AppChannelDetail />} />
                     {/* Redirect old feed route */}
                     <Route path="feed" element={<Navigate to="/app/channels" replace />} />
-                    <Route path="journal" element={<AppJournal />} />
+                    <Route path="journal" element={<ToolPaywallWrapper toolId="journal" featureName="Journal"><AppJournal /></ToolPaywallWrapper>} />
                     <Route path="rituals" element={<AppInspire />} />
                     <Route path="rituals/:planId" element={<AppInspireDetail />} />
                     {/* Redirects for backward compatibility with older app versions */}
