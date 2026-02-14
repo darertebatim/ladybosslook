@@ -85,6 +85,10 @@ export function ProgramsManager() {
     cover_image_url: '',
     language: 'american',
     trial_days: 0,
+    annual_price_amount: 0,
+    annual_stripe_price_id: '',
+    annual_ios_product_id: '',
+    annual_android_product_id: '',
   });
 
   // Fetch playlists for dropdown
@@ -156,6 +160,10 @@ export function ProgramsManager() {
       cover_image_url: '',
       language: 'american',
       trial_days: 0,
+      annual_price_amount: 0,
+      annual_stripe_price_id: '',
+      annual_ios_product_id: '',
+      annual_android_product_id: '',
     });
     setEditingId(null);
     setShowForm(false);
@@ -237,6 +245,10 @@ export function ProgramsManager() {
       cover_image_url: program.cover_image_url || programImages[program.slug] || '',
       language: (program as any).language || 'american',
       trial_days: (program as any).trial_days || 0,
+      annual_price_amount: (program as any).annual_price_amount || 0,
+      annual_stripe_price_id: (program as any).annual_stripe_price_id || '',
+      annual_ios_product_id: (program as any).annual_ios_product_id || '',
+      annual_android_product_id: (program as any).annual_android_product_id || '',
     });
     setEditingId(program.id);
     setShowForm(true);
@@ -964,18 +976,74 @@ export function ProgramsManager() {
                     </div>
 
                     {formData.payment_type === 'subscription' && (
-                      <div className="space-y-2">
-                        <Label htmlFor="stripe_price_id">Stripe Price ID</Label>
-                        <Input
-                          id="stripe_price_id"
-                          value={formData.stripe_price_id}
-                          onChange={(e) => setFormData({ ...formData, stripe_price_id: e.target.value })}
-                          placeholder="price_xxx"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          For subscriptions. Find in Stripe Dashboard → Products → Pricing
-                        </p>
-                      </div>
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="stripe_price_id">Monthly Stripe Price ID</Label>
+                          <Input
+                            id="stripe_price_id"
+                            value={formData.stripe_price_id}
+                            onChange={(e) => setFormData({ ...formData, stripe_price_id: e.target.value })}
+                            placeholder="price_xxx"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Monthly recurring price. Stripe Dashboard → Products → Pricing
+                          </p>
+                        </div>
+
+                        <div className="col-span-2 grid grid-cols-2 gap-4 border-t pt-4 mt-2">
+                          <Label className="col-span-2 text-sm font-semibold">📅 Annual Plan (Optional)</Label>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="annual_price_amount">Annual Price ($)</Label>
+                            <Input
+                              id="annual_price_amount"
+                              type="number"
+                              value={formData.annual_price_amount / 100}
+                              onChange={(e) => setFormData({ ...formData, annual_price_amount: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                              placeholder="e.g., 99.99"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              Annual: ${(formData.annual_price_amount / 100).toFixed(2)}/year
+                              {formData.price_amount > 0 && formData.annual_price_amount > 0 && (
+                                <> — saves ${((formData.price_amount * 12 - formData.annual_price_amount) / 100).toFixed(2)} vs monthly</>
+                              )}
+                            </p>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="annual_stripe_price_id">Annual Stripe Price ID</Label>
+                            <Input
+                              id="annual_stripe_price_id"
+                              value={formData.annual_stripe_price_id}
+                              onChange={(e) => setFormData({ ...formData, annual_stripe_price_id: e.target.value })}
+                              placeholder="price_xxx"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              Yearly recurring price from Stripe
+                            </p>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="annual_ios_product_id">Annual iOS Product ID</Label>
+                            <Input
+                              id="annual_ios_product_id"
+                              value={formData.annual_ios_product_id}
+                              onChange={(e) => setFormData({ ...formData, annual_ios_product_id: e.target.value })}
+                              placeholder="com.ladybosslook.plus.annual"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="annual_android_product_id">Annual Android Product ID</Label>
+                            <Input
+                              id="annual_android_product_id"
+                              value={formData.annual_android_product_id}
+                              onChange={(e) => setFormData({ ...formData, annual_android_product_id: e.target.value })}
+                              placeholder="plus_annual"
+                            />
+                          </div>
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
