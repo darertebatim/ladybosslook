@@ -38,7 +38,7 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
   };
 
   return (
-    <div className="flex flex-col h-full bg-foreground text-primary-foreground">
+    <div className="flex flex-col h-full bg-[hsl(230,20%,8%)] text-white">
       {/* Hero */}
       {program.cover_image_url && (
         <div className="relative h-52 overflow-hidden">
@@ -47,14 +47,14 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
             alt={program.title}
             className="w-full h-full object-cover opacity-60"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-foreground to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[hsl(230,20%,8%)] to-transparent" />
         </div>
       )}
 
       <div className="flex-1 px-6 pt-6 pb-4 flex flex-col">
         <div className="flex items-center justify-center gap-2 mb-2">
           <img src={appIcon} alt="App icon" className="h-6 w-6 rounded-md" />
-          <span className="text-xs font-semibold tracking-widest uppercase text-secondary">Premium</span>
+          <span className="text-xs font-semibold tracking-widest uppercase text-primary">Premium</span>
         </div>
         <h2 className="text-3xl font-bold text-center">
           {program.title}
@@ -73,21 +73,21 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
               className={cn(
                 "relative w-full flex items-center justify-between rounded-xl border p-4 transition-all",
                 selectedPlan === 'annual'
-                  ? "border-secondary bg-secondary/10"
-                  : "border-primary-foreground/20"
+                  ? "border-primary bg-primary/10"
+                  : "border-white/20"
               )}
             >
               {savingsPercent > 0 && (
-                <Badge className="absolute -top-2.5 right-4 bg-secondary text-secondary-foreground text-[10px] px-2 border-0">
+                <Badge className="absolute -top-2.5 right-4 bg-primary text-primary-foreground text-[10px] px-2 border-0">
                   {savingsPercent}% OFF
                 </Badge>
               )}
               <div className="flex items-center gap-3">
                 <div className={cn(
                   "h-5 w-5 rounded-full border-2 flex items-center justify-center",
-                  selectedPlan === 'annual' ? "border-secondary bg-secondary" : "border-primary-foreground/40"
+                  selectedPlan === 'annual' ? "border-primary bg-primary" : "border-white/40"
                 )}>
-                  {selectedPlan === 'annual' && <div className="h-2 w-2 rounded-full bg-secondary-foreground" />}
+                  {selectedPlan === 'annual' && <div className="h-2 w-2 rounded-full bg-primary-foreground" />}
                 </div>
                 <div className="text-left">
                   <p className="font-semibold">Annual</p>
@@ -103,16 +103,16 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
             className={cn(
               "w-full flex items-center justify-between rounded-xl border p-4 transition-all",
               selectedPlan === 'monthly'
-                ? "border-secondary bg-secondary/10"
-                : "border-primary-foreground/20"
+                ? "border-primary bg-primary/10"
+                : "border-white/20"
             )}
           >
             <div className="flex items-center gap-3">
               <div className={cn(
                 "h-5 w-5 rounded-full border-2 flex items-center justify-center",
-                selectedPlan === 'monthly' ? "border-secondary bg-secondary" : "border-primary-foreground/40"
+                selectedPlan === 'monthly' ? "border-primary bg-primary" : "border-white/40"
               )}>
-                {selectedPlan === 'monthly' && <div className="h-2 w-2 rounded-full bg-secondary-foreground" />}
+                {selectedPlan === 'monthly' && <div className="h-2 w-2 rounded-full bg-primary-foreground" />}
               </div>
               <p className="font-semibold">Monthly</p>
             </div>
@@ -128,7 +128,7 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
         {/* CTA */}
         <Button
           size="lg"
-          className="w-full mt-4 rounded-xl h-12 bg-secondary text-secondary-foreground hover:bg-secondary/90"
+          className="w-full mt-4 rounded-xl h-12 bg-primary text-primary-foreground hover:bg-primary/90"
           onClick={handlePurchase}
           disabled={isPurchasing}
         >
