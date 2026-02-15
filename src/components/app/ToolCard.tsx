@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import type { ToolConfig } from '@/lib/toolsConfig';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
-  GraduationCap, User, HeartHandshake, LucideIcon
+  GraduationCap, User, HeartHandshake, Lock, LucideIcon
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -13,6 +16,9 @@ const iconMap: Record<string, LucideIcon> = {
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle,
   GraduationCap, User, HeartHandshake
 };
+
+// Tools that require simora+ subscription
+const LOCKED_TOOLS = ['fasting'];
 
 interface ToolCardProps {
   tool: ToolConfig;
@@ -22,7 +28,10 @@ interface ToolCardProps {
 
 export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
   const navigate = useNavigate();
+  const { isSubscribed } = useSubscription();
+  const [showPaywall, setShowPaywall] = useState(false);
   const IconComponent = iconMap[tool.icon] || Circle;
+  const isLocked = LOCKED_TOOLS.includes(tool.id) && !isSubscribed;
 
   const handleClick = () => {
     if (tool.comingSoon) {
@@ -30,6 +39,10 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
       return;
     }
     haptic.light();
+    if (isLocked) {
+      setShowPaywall(true);
+      return;
+    }
     navigate(tool.route);
   };
 
@@ -92,34 +105,42 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
 
   // Default size for Wellness Tools (2-column grid cards) - with pastel background
   return (
-    <button
-      onClick={handleClick}
-      disabled={tool.comingSoon}
-      className={cn(
-        'flex items-center gap-2.5 px-3 py-1.5 rounded-xl',
-        'shadow-sm border border-black/5',
-        'transition-transform active:scale-[0.97]',
-        tool.bgColor,
-        tool.comingSoon && 'opacity-60',
-        className
-      )}
-    >
-      <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-white/60">
-        <IconComponent className={cn('h-4.5 w-4.5', tool.iconColor)} />
-      </div>
-      <div className="flex flex-col items-start min-w-0">
-        <h3 className="font-semibold text-foreground text-[13px] leading-tight">
-          {tool.name}
-        </h3>
-        <p className="text-[11px] text-foreground/80 leading-tight truncate">
-          {tool.description}
-        </p>
-        {tool.comingSoon && (
-          <span className="text-[9px] font-medium text-muted-foreground">
-            Coming Soon
-          </span>
+    <>
+      <button
+        onClick={handleClick}
+        disabled={tool.comingSoon}
+        className={cn(
+          'relative flex items-center gap-2.5 px-3 py-1.5 rounded-xl',
+          'shadow-sm border border-black/5',
+          'transition-transform active:scale-[0.97]',
+          tool.bgColor,
+          tool.comingSoon && 'opacity-60',
+          className
         )}
-      </div>
-    </button>
+      >
+        <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-white/60">
+          <IconComponent className={cn('h-4.5 w-4.5', tool.iconColor)} />
+        </div>
+        <div className="flex flex-col items-start min-w-0">
+          <h3 className="font-semibold text-foreground text-[13px] leading-tight">
+            {tool.name}
+          </h3>
+          <p className="text-[11px] text-foreground/80 leading-tight truncate">
+            {tool.description}
+          </p>
+          {tool.comingSoon && (
+            <span className="text-[9px] font-medium text-muted-foreground">
+              Coming Soon
+            </span>
+          )}
+        </div>
+        {isLocked && (
+          <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-foreground/80 flex items-center justify-center">
+            <Lock className="h-3 w-3 text-background" />
+          </div>
+        )}
+      </button>
+      <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
+    </>
   );
 }
