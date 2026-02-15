@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink, HelpCircle } from "lucide-react";
+import { Play, CheckCircle2, Circle, Music, Clock, Lock, FileText, Video, ExternalLink, HelpCircle, Crown, Sparkles } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { SupplementViewer } from "@/components/app/SupplementViewer";
 import { BackButton } from "@/components/app/BackButton";
@@ -20,6 +20,8 @@ import { useQuickAddPlaylistTask } from "@/hooks/useTaskPlanner";
 import { RoutinePreviewSheet } from "@/components/app/RoutinePreviewSheet";
 import { AddedToRoutineButton } from "@/components/app/AddedToRoutineButton";
 import { PlaylistTour } from "@/components/app/tour";
+import { useSubscription } from "@/hooks/useSubscription";
+import { PaywallSheet } from "@/components/app/PaywallSheet";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 export default function AppPlaylistDetail() {
@@ -38,6 +40,7 @@ export default function AppPlaylistDetail() {
   } | null>(null);
   const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
 
   const handleTourReady = useCallback((tourStart: () => void) => {
@@ -268,11 +271,17 @@ export default function AppPlaylistDetail() {
   // Check if user came from planner (Pro Task navigation)
   const cameFromPlanner = (location.state as any)?.from === 'planner';
 
+  const { hasAccessToProgram } = useSubscription();
+
   const displayMode = (playlist as any)?.display_mode || 'tracks';
-  // Free playlists require activation (playlist_saves), paid playlists require enrollment
+  // Free playlists require activation (playlist_saves)
+  // requires_subscription playlists require Simora+ subscription
+  // Regular paid playlists require enrollment
   const hasAccess = playlist?.is_free 
     ? !!playlistSave 
-    : enrollments?.includes(playlist?.program_slug);
+    : playlist?.requires_subscription
+      ? hasAccessToProgram('simora-plus')
+      : enrollments?.includes(playlist?.program_slug);
 
   const getTrackProgress = (audioId: string) => {
     const progress = progressData?.find(p => p.audio_id === audioId);
@@ -613,6 +622,7 @@ export default function AppPlaylistDetail() {
   const showModules = displayMode === 'modules' || displayMode === 'both';
 
   return (
+    <>
     <div className="flex flex-col h-full bg-background overflow-hidden">
       {/* Fixed Header with safe area + visual padding */}
       <div 
@@ -661,7 +671,13 @@ export default function AppPlaylistDetail() {
                 <Badge variant="secondary">{getCategoryLabel()}</Badge>
               )}
               {playlist.is_free && <Badge className="bg-green-500">FREE</Badge>}
-              {!hasAccess && !playlist.is_free && <Badge variant="destructive">Locked</Badge>}
+              {playlist.requires_subscription && (
+                <Badge className="bg-amber-200 text-amber-700 gap-1">
+                  <Crown className="h-3 w-3" />
+                  PLUS
+                </Badge>
+              )}
+              {!hasAccess && !playlist.is_free && !playlist.requires_subscription && <Badge variant="destructive">Locked</Badge>}
             </div>
             <h1 className="text-2xl font-bold">{playlist.name}</h1>
             {playlist.description && (
@@ -721,7 +737,26 @@ export default function AppPlaylistDetail() {
           </div>
         )}
 
-        {!hasAccess && !playlist.is_free && (
+        {!hasAccess && !playlist.is_free && playlist.requires_subscription && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
+              <Crown className="h-5 w-5 text-amber-600" />
+              <p className="text-sm text-foreground">
+                This content is part of <strong>Simora+</strong>. Subscribe to unlock.
+              </p>
+            </div>
+            <Button 
+              className="w-full gap-2" 
+              size="lg"
+              onClick={() => setShowPaywall(true)}
+            >
+              <Sparkles className="h-4 w-4" />
+              Unlock with Simora+
+            </Button>
+          </div>
+        )}
+
+        {!hasAccess && !playlist.is_free && !playlist.requires_subscription && (
           <div className="space-y-3">
             <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
               <Lock className="h-5 w-5 text-muted-foreground" />
@@ -945,5 +980,8 @@ export default function AppPlaylistDetail() {
         <div className="pb-safe" />
       </div>
     </div>
+
+    <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
+    </>
   );
 }

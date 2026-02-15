@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Music, Lock, CheckCircle2, ChevronRight } from "lucide-react";
+import { Clock, Music, Lock, CheckCircle2, ChevronRight, Crown } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { haptic } from '@/lib/haptics';
 
@@ -23,6 +23,7 @@ interface PlaylistCardProps {
   isFree: boolean;
   isLocked: boolean;
   programSlug?: string;
+  requiresSubscription?: boolean;
   trackCount: number;
   completedTracks: number;
   totalDuration: number;
@@ -38,6 +39,7 @@ export const PlaylistCard = memo(function PlaylistCard({
   isFree,
   isLocked,
   programSlug,
+  requiresSubscription,
   trackCount,
   completedTracks,
   totalDuration,
@@ -71,6 +73,11 @@ export const PlaylistCard = memo(function PlaylistCard({
     haptic.light();
     // Free playlists always navigate to playlist detail (gate is inside)
     if (isFree) {
+      navigate(`/app/player/playlist/${id}`, { state: { from } });
+      return;
+    }
+    // Plus playlists navigate to detail (paywall gate is inside)
+    if (requiresSubscription) {
       navigate(`/app/player/playlist/${id}`, { state: { from } });
       return;
     }
@@ -110,7 +117,7 @@ export const PlaylistCard = memo(function PlaylistCard({
           </div>
         )}
         
-        {/* Top-right: language flag + FREE badge */}
+        {/* Top-right: language flag + FREE/PLUS badge */}
         <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
           {language && LANG_FLAGS[language] && (
             <span className="text-sm bg-white/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
@@ -123,6 +130,14 @@ export const PlaylistCard = memo(function PlaylistCard({
             </Badge>
           )}
         </div>
+
+        {/* Top-left: PLUS badge */}
+        {requiresSubscription && (
+          <Badge className="absolute -top-3 -left-2 z-20 bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-xs gap-1 shadow-sm">
+            <Crown className="h-3 w-3" />
+            PLUS
+          </Badge>
+        )}
         
         {category && (
           <Badge variant="secondary" className="absolute top-2 left-2 rounded-full">
