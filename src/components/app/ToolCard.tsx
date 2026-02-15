@@ -124,19 +124,19 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           <IconComponent className={cn('h-4.5 w-4.5', tool.iconColor)} />
         </div>
         <div className="flex flex-col items-start min-w-0">
-          <h3 className="font-semibold text-foreground text-[13px] leading-tight">
-            {tool.name}
-          </h3>
-          {isLocked && (
-            <span className="inline-flex items-center gap-0.5 text-[8px] font-semibold text-amber-600 bg-amber-100 px-1 py-px rounded-full">
-              <Crown className="h-2.5 w-2.5" /> PLUS
-            </span>
-          )}
-          {!isLocked && (
-            <p className="text-[11px] text-foreground/80 leading-tight truncate">
-              {tool.description}
-            </p>
-          )}
+          <div className="flex items-center gap-1">
+            <h3 className="font-semibold text-foreground text-[13px] leading-tight">
+              {tool.name}
+            </h3>
+            {isLocked && (
+              <span className="inline-flex items-center gap-0.5 text-[8px] font-semibold text-amber-600 bg-amber-100 px-1 py-px rounded-full">
+                <Crown className="h-2.5 w-2.5" /> PLUS
+              </span>
+            )}
+          </div>
+          <p className="text-[11px] text-foreground/80 leading-tight truncate">
+            {tool.description}
+          </p>
           {tool.comingSoon && (
             <span className="text-[9px] font-medium text-muted-foreground">
               Coming Soon
