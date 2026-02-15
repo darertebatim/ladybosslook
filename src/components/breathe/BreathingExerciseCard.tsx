@@ -90,8 +90,8 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
         )}
       >
         {isLocked && (
-          <div className="absolute -top-2 -left-1 z-10 inline-flex items-center gap-0.5 text-[8px] font-bold text-amber-700 bg-amber-200 px-1.5 py-0.5 rounded-full shadow-sm">
-            <Crown className="h-2.5 w-2.5" /> PLUS
+          <div className="absolute -top-3 -left-2 z-10 inline-flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-200 px-2.5 py-1 rounded-full shadow-sm">
+            <Crown className="h-4 w-4" /> PLUS
           </div>
         )}
         <div className="flex items-start gap-3">
