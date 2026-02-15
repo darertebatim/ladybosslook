@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Minus, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import simoraLogo from '@/assets/simora-logo.png';
 import type { PaywallProgramData } from './PaywallClassic';
 
 interface PaywallComparisonProps {
@@ -42,11 +41,17 @@ export function PaywallComparison({ program, onPurchase, onRestore, onClose, pre
 
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* Hero with logo */}
-      <div className="relative h-44 overflow-hidden bg-gradient-to-br from-[hsl(10,85%,55%)] via-[hsl(340,75%,50%)] to-[hsl(310,60%,45%)] flex items-center justify-center">
-        <img src={simoraLogo} alt="Simora" className="w-20 h-20 rounded-2xl shadow-lg relative z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-      </div>
+      {/* Hero Image */}
+      {program.cover_image_url && (
+        <div className="relative h-44 overflow-hidden">
+          <img
+            src={program.cover_image_url}
+            alt={program.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        </div>
+      )}
 
       <div className="flex-1 px-6 pt-4 pb-4 flex flex-col">
         <h2 className="text-2xl font-bold text-center text-foreground">
@@ -60,7 +65,7 @@ export function PaywallComparison({ program, onPurchase, onRestore, onClose, pre
             <span className="text-xs font-medium text-muted-foreground" />
             <span className="text-xs font-medium text-muted-foreground text-center">FREE</span>
             <span className="text-center">
-              <Badge className="bg-gradient-to-r from-[hsl(10,85%,55%)] to-[hsl(340,75%,50%)] text-white text-[10px] px-2 border-0">PLUS</Badge>
+              <Badge className="bg-primary text-primary-foreground text-[10px] px-2 border-0">PRO</Badge>
             </span>
           </div>
           {/* Rows */}
@@ -78,7 +83,7 @@ export function PaywallComparison({ program, onPurchase, onRestore, onClose, pre
                 )}
               </div>
               <div className="flex justify-center">
-                <Check className="h-4 w-4 text-[hsl(10,85%,55%)]" />
+                <Check className="h-4 w-4 text-primary" />
               </div>
             </div>
           ))}
@@ -88,7 +93,7 @@ export function PaywallComparison({ program, onPurchase, onRestore, onClose, pre
 
         {/* Price */}
         <p className="text-center text-sm text-muted-foreground mt-4">
-          Subscribe to Plus for just{' '}
+          Subscribe to Pro for just{' '}
           {originalPrice && originalPrice > monthlyPrice && (
             <span className="line-through text-muted-foreground">${originalPrice.toFixed(2)}/mo</span>
           )}{' '}
@@ -99,7 +104,7 @@ export function PaywallComparison({ program, onPurchase, onRestore, onClose, pre
 
         <Button
           size="lg"
-          className="w-full mt-3 rounded-xl h-12 bg-gradient-to-r from-[hsl(10,85%,55%)] to-[hsl(340,75%,50%)] text-white hover:opacity-90 border-0"
+          className="w-full mt-3 rounded-xl h-12"
           onClick={handlePurchase}
           disabled={isPurchasing}
         >

@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import simoraLogo from '@/assets/simora-logo.png';
 
 export interface PaywallProgramData {
   title: string;
@@ -50,13 +49,17 @@ export function PaywallClassic({ program, onPurchase, onRestore, onClose, previe
 
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* Hero with logo */}
-      <div className="relative h-48 overflow-hidden rounded-b-3xl bg-gradient-to-br from-[hsl(10,85%,55%)] via-[hsl(340,75%,50%)] to-[hsl(310,60%,45%)]">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <img src={simoraLogo} alt="Simora" className="w-24 h-24 rounded-2xl shadow-lg" />
+      {/* Hero Image */}
+      {program.cover_image_url && (
+        <div className="relative h-48 overflow-hidden rounded-b-3xl">
+          <img
+            src={program.cover_image_url}
+            alt={program.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-      </div>
+      )}
 
       {/* Content */}
       <div className="flex-1 px-6 pt-6 pb-4 flex flex-col">
@@ -74,8 +77,8 @@ export function PaywallClassic({ program, onPurchase, onRestore, onClose, previe
           <div className="mt-6 space-y-3">
             {program.features.map((feature, i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className="h-5 w-5 rounded-full bg-[hsl(10,85%,55%)]/15 flex items-center justify-center shrink-0">
-                  <Check className="h-3 w-3 text-[hsl(10,85%,55%)]" />
+                <div className="h-5 w-5 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                  <Check className="h-3 w-3 text-primary" />
                 </div>
                 <span className="text-sm text-foreground">{feature}</span>
               </div>
@@ -93,19 +96,19 @@ export function PaywallClassic({ program, onPurchase, onRestore, onClose, previe
               className={cn(
                 "relative w-full flex items-center justify-between rounded-xl border-2 p-4 transition-all",
                 selectedPlan === 'annual'
-                  ? "border-[hsl(10,85%,55%)] bg-[hsl(10,85%,55%)]/5"
+                  ? "border-primary bg-primary/5"
                   : "border-border"
               )}
             >
               {savingsPercent > 0 && (
-                <Badge className="absolute -top-2.5 left-4 bg-[hsl(40,95%,55%)] text-[hsl(230,15%,15%)] text-[10px] px-2 border-0">
+                <Badge className="absolute -top-2.5 left-4 bg-success text-success-foreground text-[10px] px-2 border-0">
                   SAVE {savingsPercent}%
                 </Badge>
               )}
               <div className="flex items-center gap-3">
                 <div className={cn(
                   "h-5 w-5 rounded-full border-2 flex items-center justify-center",
-                  selectedPlan === 'annual' ? "border-[hsl(10,85%,55%)] bg-[hsl(10,85%,55%)]" : "border-muted-foreground"
+                  selectedPlan === 'annual' ? "border-primary bg-primary" : "border-muted-foreground"
                 )}>
                   {selectedPlan === 'annual' && <div className="h-2 w-2 rounded-full bg-primary-foreground" />}
                 </div>
@@ -123,14 +126,14 @@ export function PaywallClassic({ program, onPurchase, onRestore, onClose, previe
             className={cn(
               "w-full flex items-center justify-between rounded-xl border-2 p-4 transition-all",
               selectedPlan === 'monthly'
-                ? "border-[hsl(10,85%,55%)] bg-[hsl(10,85%,55%)]/5"
+                ? "border-primary bg-primary/5"
                 : "border-border"
             )}
           >
             <div className="flex items-center gap-3">
               <div className={cn(
                 "h-5 w-5 rounded-full border-2 flex items-center justify-center",
-                selectedPlan === 'monthly' ? "border-[hsl(10,85%,55%)] bg-[hsl(10,85%,55%)]" : "border-muted-foreground"
+                selectedPlan === 'monthly' ? "border-primary bg-primary" : "border-muted-foreground"
               )}>
                 {selectedPlan === 'monthly' && <div className="h-2 w-2 rounded-full bg-primary-foreground" />}
               </div>
@@ -148,7 +151,7 @@ export function PaywallClassic({ program, onPurchase, onRestore, onClose, previe
         {/* CTA */}
         <Button
           size="lg"
-          className="w-full mt-4 rounded-xl h-12 bg-gradient-to-r from-[hsl(10,85%,55%)] to-[hsl(340,75%,50%)] text-white hover:opacity-90 border-0"
+          className="w-full mt-4 rounded-xl h-12"
           onClick={handlePurchase}
           disabled={isPurchasing}
         >

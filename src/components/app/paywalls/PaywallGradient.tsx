@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import simoraLogo from '@/assets/simora-logo.png';
 import type { PaywallProgramData } from './PaywallClassic';
 
 interface PaywallGradientProps {
@@ -38,10 +37,12 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-[hsl(10,85%,55%)]/20 via-background to-background">
+    <div className="flex flex-col h-full bg-gradient-to-b from-primary/20 via-background to-background">
       {/* Hero */}
       <div className="relative px-6 pt-10 pb-4 text-center">
-        <img src={simoraLogo} alt="Simora" className="mx-auto w-16 h-16 rounded-2xl shadow-md mb-4" />
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/15 flex items-center justify-center mb-4">
+          <Sparkles className="h-8 w-8 text-primary" />
+        </div>
         <h2 className="text-2xl font-bold text-foreground">
           {program.title}
         </h2>
@@ -70,7 +71,7 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
               className={cn(
                 "px-5 py-1.5 rounded-full text-sm font-medium transition-all",
                 selectedPlan === 'annual'
-                  ? "bg-gradient-to-r from-[hsl(10,85%,55%)] to-[hsl(340,75%,50%)] text-white shadow-sm"
+                  ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground"
               )}
             >
@@ -86,7 +87,7 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
           <div className="space-y-3">
             {program.features.map((feature, i) => (
               <div key={i} className="flex items-center gap-3">
-                <Check className="h-4 w-4 text-[hsl(10,85%,55%)] shrink-0" />
+                <Check className="h-4 w-4 text-primary shrink-0" />
                 <span className="text-sm text-foreground">{feature}</span>
               </div>
             ))}
@@ -102,7 +103,7 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
               <p className="text-3xl font-bold text-foreground">${annualPrice.toFixed(2)}<span className="text-lg font-normal text-muted-foreground">/year</span></p>
               <p className="text-sm text-muted-foreground">That's just ${annualMonthly}/month</p>
               {savingsPercent > 0 && (
-                <Badge variant="secondary" className="mt-1 bg-[hsl(40,95%,55%)]/15 text-[hsl(40,95%,45%)] border-0">
+                <Badge variant="secondary" className="mt-1 bg-success/15 text-success border-0">
                   Save {savingsPercent}% vs monthly
                 </Badge>
               )}
@@ -125,7 +126,7 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
 
         <Button
           size="lg"
-          className="w-full rounded-xl h-12 bg-gradient-to-r from-[hsl(10,85%,55%)] to-[hsl(340,75%,50%)] text-white hover:opacity-90 border-0"
+          className="w-full rounded-xl h-12 bg-primary hover:bg-primary/90"
           onClick={handlePurchase}
           disabled={isPurchasing}
         >
