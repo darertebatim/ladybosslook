@@ -18,33 +18,33 @@ const PAYWALL_VARIANTS = [
 const PLUS_FEATURES = [
   {
     category: 'Gating Logic',
-    description: 'How me+ restricts free users',
+    description: 'How simora+ restricts free users',
     items: [
       { icon: Unlock, label: 'Browse all rituals', detail: 'Free users can view and explore all ritual templates', free: true },
       { icon: Lock, label: 'Save rituals to planner', detail: 'Paywall opens when free user taps "Save" in Edit Ritual sheet', free: false },
-      { icon: CalendarPlus, label: 'Add actions to plan', detail: '"Add to My Rituals" buttons on tools trigger paywall for free users', free: false },
+      { icon: CalendarPlus, label: 'Add actions to plan', detail: '"Add to My Rituals" buttons on tools are available to all users', free: true },
     ],
   },
   {
     category: 'Wellness Tools',
-    description: 'Pro tools included with me+',
+    description: 'Tools available to all users',
     items: [
-      { icon: BookOpen, label: 'Journal', detail: 'Daily reflections & guided journaling', free: false },
-      { icon: Wind, label: 'Breathe', detail: 'Breathing exercises library', free: false },
-      { icon: Droplets, label: 'Water', detail: 'Hydration tracker', free: false },
-      { icon: Heart, label: 'Emotions', detail: 'Name your feelings — emotion logging', free: false },
-      { icon: Timer, label: 'Fasting', detail: 'Intermittent fasting tracker', free: false },
-      { icon: Moon, label: 'Meditate', detail: 'Guided meditation sessions', free: false },
-      { icon: Music, label: 'Sounds', detail: 'Ambient sounds library', free: false },
+      { icon: BookOpen, label: 'Journal', detail: 'Daily reflections & guided journaling', free: true },
+      { icon: Wind, label: 'Breathe', detail: 'Breathing exercises library', free: true },
+      { icon: Droplets, label: 'Water', detail: 'Hydration tracker', free: true },
+      { icon: Heart, label: 'Emotions', detail: 'Name your feelings — emotion logging', free: true },
+      { icon: Timer, label: 'Fasting', detail: 'Intermittent fasting tracker', free: true },
+      { icon: Moon, label: 'Meditate', detail: 'Guided meditation sessions', free: true },
+      { icon: Music, label: 'Sounds', detail: 'Ambient sounds library', free: true },
     ],
   },
   {
     category: 'Content & Programs',
-    description: 'Premium content access',
+    description: 'Content access',
     items: [
-      { icon: Sparkles, label: 'Rituals Library', detail: 'Full access to saving & customizing all ritual templates', free: false },
-      { icon: Brain, label: 'Premium Audio Library', detail: 'Subscription-only playlists & tracks', free: false },
-      { icon: BookOpen, label: 'Guided Programs', detail: 'Courses & coaching content', free: false },
+      { icon: Sparkles, label: 'Rituals Library', detail: 'Browse all ritual templates freely; saving requires simora+', free: true },
+      { icon: Brain, label: 'Premium Audio Library', detail: 'All playlists & tracks available', free: true },
+      { icon: BookOpen, label: 'Guided Programs', detail: 'Courses & coaching content', free: true },
     ],
   },
 ];
@@ -55,10 +55,9 @@ function PlanFeaturesTab() {
       <div className="rounded-xl border bg-primary/5 p-4 flex items-start gap-3">
         <Crown className="h-5 w-5 text-primary mt-0.5 shrink-0" />
         <div>
-          <p className="font-semibold text-foreground">me+ Subscription Gate</p>
+          <p className="font-semibold text-foreground">simora+ Subscription Gate</p>
           <p className="text-sm text-muted-foreground mt-1">
-            All content is <strong>browsable</strong> by free users. The paywall triggers when they attempt to <strong>save a ritual</strong> to their planner
-            or <strong>add a pro action</strong> to their daily plan.
+            All content and tools are <strong>free</strong> to use. The paywall only triggers when users attempt to <strong>save a ritual</strong> to their planner.
           </p>
         </div>
       </div>
@@ -80,7 +79,7 @@ function PlanFeaturesTab() {
                   <p className="text-xs text-muted-foreground">{item.detail}</p>
                 </div>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${item.free ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary'}`}>
-                  {item.free ? 'Free' : 'me+'}
+                  {item.free ? 'Free' : 'simora+'}
                 </span>
               </div>
             ))}
@@ -124,7 +123,7 @@ export default function Subscriptions() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Subscriptions & Paywalls</h2>
-        <p className="text-muted-foreground">me+ plan features and paywall previews</p>
+        <p className="text-muted-foreground">simora+ plan features and paywall previews</p>
       </div>
 
       <Tabs defaultValue="plan" className="space-y-6">
