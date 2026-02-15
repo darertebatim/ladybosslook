@@ -136,9 +136,11 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           )}
         </div>
         {isLocked && (
-          <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-foreground/80 flex items-center justify-center">
-            <Lock className="h-3 w-3 text-background" />
-          </div>
+          <img 
+            src={chainLockImg} 
+            alt="Locked" 
+            className="absolute -left-3 -bottom-3 w-12 h-16 object-contain pointer-events-none z-10 drop-shadow-md"
+          />
         )}
       </button>
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
