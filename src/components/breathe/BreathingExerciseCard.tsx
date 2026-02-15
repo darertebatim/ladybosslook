@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CalendarPlus, Check, Lock } from 'lucide-react';
+import { CalendarPlus, Check, Crown } from 'lucide-react';
 import { BreathingExercise } from '@/hooks/useBreathingExercises';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
@@ -94,8 +94,8 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
           <div className="relative flex-shrink-0">
             <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
             {isLocked && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-foreground/80 flex items-center justify-center">
-                <Lock className="h-2.5 w-2.5 text-background" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center">
+                <Crown className="h-2.5 w-2.5 text-white" />
               </div>
             )}
           </div>
