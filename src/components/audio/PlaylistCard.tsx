@@ -133,7 +133,7 @@ export const PlaylistCard = memo(function PlaylistCard({
 
         {/* Top-left: PLUS badge */}
         {requiresSubscription && (
-          <Badge className="absolute -top-3 -left-2 z-20 bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-xs gap-1 shadow-sm">
+          <Badge className="absolute top-2 left-2 z-20 bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-xs gap-1 shadow-sm">
             <Crown className="h-3 w-3" />
             PLUS
           </Badge>
