@@ -91,18 +91,18 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
       >
         <div className="flex items-start gap-3">
           {/* Emoji */}
-          <div className="relative flex-shrink-0">
-            <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
-            {isLocked && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center">
-                <Crown className="h-2.5 w-2.5 text-white" />
-              </div>
-            )}
-          </div>
+          <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} className="flex-shrink-0" />
           
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground text-lg">{exercise.name}</h3>
+            <div className="flex items-center gap-1.5">
+              <h3 className="font-semibold text-foreground text-lg">{exercise.name}</h3>
+              {isLocked && (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded-full">
+                  <Crown className="h-3 w-3" /> PLUS
+                </span>
+              )}
+            </div>
             <p className="text-muted-foreground text-sm line-clamp-2 mt-0.5">
               {exercise.description}
             </p>
