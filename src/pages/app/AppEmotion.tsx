@@ -6,6 +6,8 @@ import { EmotionContext } from '@/components/emotion/EmotionContext';
 import { EmotionComplete } from '@/components/emotion/EmotionComplete';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
 import type { Valence } from '@/lib/emotionData';
 
 type Step = 'dashboard' | 'select' | 'context' | 'complete';
@@ -21,6 +23,15 @@ const AppEmotion = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { createLog } = useEmotionLogs();
   const { autoCompleteEmotion } = useAutoCompleteProTask();
+  const { isSubscribed, isLoading: subLoading } = useSubscription();
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  // Show paywall for non-subscribers
+  useEffect(() => {
+    if (!subLoading && !isSubscribed) {
+      setShowPaywall(true);
+    }
+  }, [subLoading, isSubscribed]);
   
   const initialStep = searchParams.get('step') === 'select' ? 'select' : 'dashboard';
   const [step, setStep] = useState<Step>(initialStep);
@@ -82,37 +93,48 @@ const AppEmotion = () => {
   }, [step, navigate]);
 
   // Render current step
-  switch (step) {
-    case 'dashboard':
-      return <EmotionDashboard onStartCheckIn={handleStartCheckIn} />;
-    
-    case 'select':
-      return (
-        <EmotionSelector 
-          onComplete={handleEmotionComplete} 
-          onBack={handleBack} 
-        />
-      );
-    
-    case 'context':
-      if (!state.valence || !state.category || state.emotions.length === 0) return null;
-      return (
-        <EmotionContext
-          valence={state.valence}
-          category={state.category}
-          emotions={state.emotions}
-          onSave={handleSave}
-          onBack={handleBack}
-          isSaving={createLog.isPending}
-        />
-      );
-    
-    case 'complete':
-      return <EmotionComplete onDone={handleDone} />;
-    
-    default:
-      return null;
-  }
+  const renderStep = () => {
+    switch (step) {
+      case 'dashboard':
+        return <EmotionDashboard onStartCheckIn={handleStartCheckIn} />;
+      case 'select':
+        return (
+          <EmotionSelector 
+            onComplete={handleEmotionComplete} 
+            onBack={handleBack} 
+          />
+        );
+      case 'context':
+        if (!state.valence || !state.category || state.emotions.length === 0) return null;
+        return (
+          <EmotionContext
+            valence={state.valence}
+            category={state.category}
+            emotions={state.emotions}
+            onSave={handleSave}
+            onBack={handleBack}
+            isSaving={createLog.isPending}
+          />
+        );
+      case 'complete':
+        return <EmotionComplete onDone={handleDone} />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <>
+      {renderStep()}
+      <PaywallSheet
+        open={showPaywall}
+        onOpenChange={(open) => {
+          setShowPaywall(open);
+          if (!open && !isSubscribed) navigate('/app/home');
+        }}
+      />
+    </>
+  );
 };
 
 export default AppEmotion;
