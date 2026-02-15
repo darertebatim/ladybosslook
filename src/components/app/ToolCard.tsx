@@ -139,7 +139,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           <img 
             src={chainLockImg} 
             alt="Locked" 
-            className="absolute -left-3 -bottom-3 w-12 h-16 object-contain pointer-events-none z-10 drop-shadow-md"
+            className="absolute -left-2 -top-5 w-10 h-20 object-contain pointer-events-none z-10 drop-shadow-lg"
           />
         )}
       </button>
