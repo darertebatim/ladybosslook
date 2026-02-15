@@ -19,6 +19,7 @@ export function PaywallMinimal({ program, onPurchase, onRestore, onClose, previe
 
   const monthlyPrice = program.price_amount / 100;
   const annualPrice = (program.annual_price_amount || 0) / 100;
+  const originalPrice = program.original_price ? program.original_price / 100 : null;
   const hasAnnual = !!program.annual_ios_product_id && annualPrice > 0;
   const annualMonthly = hasAnnual ? (annualPrice / 12).toFixed(2) : '0';
 
@@ -120,7 +121,12 @@ export function PaywallMinimal({ program, onPurchase, onRestore, onClose, previe
               </div>
               <p className="font-semibold text-foreground">Monthly</p>
             </div>
-            <p className="font-semibold text-foreground">${monthlyPrice.toFixed(2)}/mo</p>
+            <div className="text-right">
+              {originalPrice && originalPrice > monthlyPrice && (
+                <p className="text-xs text-muted-foreground line-through">${originalPrice.toFixed(2)}/mo</p>
+              )}
+              <p className="font-semibold text-foreground">${monthlyPrice.toFixed(2)}/mo</p>
+            </div>
           </button>
         </div>
 

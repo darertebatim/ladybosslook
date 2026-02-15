@@ -19,6 +19,7 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
 
   const monthlyPrice = program.price_amount / 100;
   const annualPrice = (program.annual_price_amount || 0) / 100;
+  const originalPrice = program.original_price ? program.original_price / 100 : null;
   const hasAnnual = !!program.annual_ios_product_id && annualPrice > 0;
   const savingsPercent = hasAnnual && monthlyPrice > 0
     ? Math.round((1 - annualPrice / (monthlyPrice * 12)) * 100)
@@ -114,7 +115,12 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
               </div>
               <p className="font-semibold">Monthly</p>
             </div>
-            <p className="font-semibold">${monthlyPrice.toFixed(2)}/mo</p>
+            <div className="text-right">
+              {originalPrice && originalPrice > monthlyPrice && (
+                <p className="text-xs opacity-50 line-through">${originalPrice.toFixed(2)}/mo</p>
+              )}
+              <p className="font-semibold">${monthlyPrice.toFixed(2)}/mo</p>
+            </div>
           </button>
         </div>
 

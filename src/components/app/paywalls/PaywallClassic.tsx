@@ -9,6 +9,7 @@ export interface PaywallProgramData {
   cover_image_url?: string | null;
   price_amount: number;
   annual_price_amount?: number | null;
+  original_price?: number | null;
   ios_product_id?: string | null;
   annual_ios_product_id?: string | null;
   features?: string[];
@@ -29,6 +30,7 @@ export function PaywallClassic({ program, onPurchase, onRestore, onClose, previe
 
   const monthlyPrice = program.price_amount / 100;
   const annualPrice = (program.annual_price_amount || 0) / 100;
+  const originalPrice = program.original_price ? program.original_price / 100 : null;
   const hasAnnual = !!program.annual_ios_product_id && annualPrice > 0;
   const savingsPercent = hasAnnual && monthlyPrice > 0
     ? Math.round((1 - annualPrice / (monthlyPrice * 12)) * 100)
@@ -137,7 +139,12 @@ export function PaywallClassic({ program, onPurchase, onRestore, onClose, previe
               </div>
               <p className="font-semibold text-foreground">Monthly</p>
             </div>
-            <p className="font-semibold text-foreground">${monthlyPrice.toFixed(2)}/mo</p>
+            <div className="text-right">
+              {originalPrice && originalPrice > monthlyPrice && (
+                <p className="text-xs text-muted-foreground line-through">${originalPrice.toFixed(2)}/mo</p>
+              )}
+              <p className="font-semibold text-foreground">${monthlyPrice.toFixed(2)}/mo</p>
+            </div>
           </button>
         </div>
 

@@ -19,6 +19,7 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
 
   const monthlyPrice = program.price_amount / 100;
   const annualPrice = (program.annual_price_amount || 0) / 100;
+  const originalPrice = program.original_price ? program.original_price / 100 : null;
   const hasAnnual = !!program.annual_ios_product_id && annualPrice > 0;
   const savingsPercent = hasAnnual && monthlyPrice > 0
     ? Math.round((1 - annualPrice / (monthlyPrice * 12)) * 100)
@@ -108,7 +109,12 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
               )}
             </>
           ) : (
-            <p className="text-3xl font-bold text-foreground">${monthlyPrice.toFixed(2)}<span className="text-lg font-normal text-muted-foreground">/month</span></p>
+            <>
+              {originalPrice && originalPrice > monthlyPrice && (
+                <p className="text-lg text-muted-foreground line-through">${originalPrice.toFixed(2)}/month</p>
+              )}
+              <p className="text-3xl font-bold text-foreground">${monthlyPrice.toFixed(2)}<span className="text-lg font-normal text-muted-foreground">/month</span></p>
+            </>
           )}
         </div>
 
