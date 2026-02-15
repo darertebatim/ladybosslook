@@ -83,26 +83,24 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
           onClick();
         }}
         className={cn(
-          'w-full text-left p-4 rounded-2xl transition-all',
+          'relative w-full text-left p-4 rounded-2xl transition-all',
           'bg-card border border-border shadow-sm',
           'hover:shadow-md active:scale-[0.98]',
           className
         )}
       >
+        {isLocked && (
+          <div className="absolute -top-2 -left-1 z-10 inline-flex items-center gap-0.5 text-[8px] font-bold text-amber-700 bg-amber-200 px-1.5 py-0.5 rounded-full shadow-sm">
+            <Crown className="h-2.5 w-2.5" /> PLUS
+          </div>
+        )}
         <div className="flex items-start gap-3">
           {/* Emoji */}
           <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} className="flex-shrink-0" />
           
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <h3 className="font-semibold text-foreground text-lg">{exercise.name}</h3>
-              {isLocked && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded-full">
-                  <Crown className="h-3 w-3" /> PLUS
-                </span>
-              )}
-            </div>
+            <h3 className="font-semibold text-foreground text-lg">{exercise.name}</h3>
             <p className="text-muted-foreground text-sm line-clamp-2 mt-0.5">
               {exercise.description}
             </p>
