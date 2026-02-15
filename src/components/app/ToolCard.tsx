@@ -4,12 +4,11 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import type { ToolConfig } from '@/lib/toolsConfig';
 import { useSubscription } from '@/hooks/useSubscription';
-import fastingLockedImg from '@/assets/fasting-locked.png';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
-  GraduationCap, User, HeartHandshake, LucideIcon
+  GraduationCap, User, HeartHandshake, Lock, LucideIcon
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -104,28 +103,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
     );
   }
 
-  // If locked, render the pre-made locked image as the entire button
-  if (isLocked) {
-    return (
-      <>
-        <button
-          onClick={handleClick}
-          className={cn(
-            'relative transition-transform active:scale-[0.97]',
-            className
-          )}
-        >
-          <img 
-            src={fastingLockedImg} 
-            alt={`${tool.name} - Locked`}
-            className="w-full h-auto"
-          />
-        </button>
-        <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
-      </>
-    );
-  }
-
+  // Default size for Wellness Tools (2-column grid cards) - with pastel background
   return (
     <>
       <button
@@ -156,6 +134,11 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             </span>
           )}
         </div>
+        {isLocked && (
+          <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-foreground/80 flex items-center justify-center">
+            <Lock className="h-3 w-3 text-background" />
+          </div>
+        )}
       </button>
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
     </>
