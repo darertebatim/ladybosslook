@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Pencil, Trash2, GripVertical, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -35,6 +35,7 @@ const defaultFormData: FormData = {
   exhale_method: 'mouth',
   sort_order: 0,
   is_active: true,
+  is_premium: false,
 };
 
 export function BreathingExercisesManager() {
@@ -72,6 +73,7 @@ export function BreathingExercisesManager() {
       exhale_method: exercise.exhale_method,
       sort_order: exercise.sort_order,
       is_active: exercise.is_active,
+      is_premium: exercise.is_premium,
     });
     setIsDialogOpen(true);
   };
@@ -151,6 +153,11 @@ export function BreathingExercisesManager() {
                     <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded capitalize">
                       {exercise.category}
                     </span>
+                    {exercise.is_premium && (
+                      <span className="text-xs text-amber-600 bg-amber-100 px-2 py-0.5 rounded flex items-center gap-0.5">
+                        <Crown className="h-3 w-3" /> Plus
+                      </span>
+                    )}
                     {!exercise.is_active && (
                       <span className="text-xs text-red-500 bg-red-100 px-2 py-0.5 rounded">
                         Inactive
@@ -337,12 +344,22 @@ export function BreathingExercisesManager() {
               </div>
             </div>
 
-            {/* Active toggle */}
+            {/* Toggles */}
             <div className="flex items-center justify-between">
               <Label>Active</Label>
               <Switch
                 checked={formData.is_active}
                 onCheckedChange={(checked) => updateField('is_active', checked)}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Crown className="h-4 w-4 text-amber-500" />
+                <Label>simora+ Only</Label>
+              </div>
+              <Switch
+                checked={formData.is_premium}
+                onCheckedChange={(checked) => updateField('is_premium', checked)}
               />
             </div>
           </div>

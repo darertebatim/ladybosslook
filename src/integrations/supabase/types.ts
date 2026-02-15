@@ -529,6 +529,7 @@ export type Database = {
           inhale_method: string
           inhale_seconds: number
           is_active: boolean
+          is_premium: boolean
           name: string
           sort_order: number
           updated_at: string
@@ -546,6 +547,7 @@ export type Database = {
           inhale_method?: string
           inhale_seconds?: number
           is_active?: boolean
+          is_premium?: boolean
           name: string
           sort_order?: number
           updated_at?: string
@@ -563,6 +565,7 @@ export type Database = {
           inhale_method?: string
           inhale_seconds?: number
           is_active?: boolean
+          is_premium?: boolean
           name?: string
           sort_order?: number
           updated_at?: string

@@ -16,6 +16,7 @@ export interface BreathingExercise {
   exhale_method: 'nose' | 'mouth';
   sort_order: number;
   is_active: boolean;
+  is_premium: boolean;
   created_at: string;
   updated_at: string;
 }

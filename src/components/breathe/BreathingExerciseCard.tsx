@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { CalendarPlus, Check } from 'lucide-react';
+import { CalendarPlus, Check, Lock } from 'lucide-react';
 import { BreathingExercise } from '@/hooks/useBreathingExercises';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
@@ -17,8 +19,12 @@ interface BreathingExerciseCardProps {
 
 export function BreathingExerciseCard({ exercise, onClick, className }: BreathingExerciseCardProps) {
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const addRoutinePlan = useAddRoutinePlan();
+  const { isSubscribed } = useSubscription();
+  
+  const isLocked = exercise.is_premium && !isSubscribed;
   
   // Check if this specific exercise is already added
   const { data: existingTask } = useExistingProTask('breathe', exercise.id);
@@ -72,7 +78,10 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
   return (
     <>
       <button
-        onClick={onClick}
+        onClick={() => {
+          if (isLocked) { haptic.light(); setShowPaywall(true); return; }
+          onClick();
+        }}
         className={cn(
           'w-full text-left p-4 rounded-2xl transition-all',
           'bg-card border border-border shadow-sm',
@@ -82,7 +91,14 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
       >
         <div className="flex items-start gap-3">
           {/* Emoji */}
-          <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} className="flex-shrink-0" />
+          <div className="relative flex-shrink-0">
+            <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
+            {isLocked && (
+              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-foreground/80 flex items-center justify-center">
+                <Lock className="h-2.5 w-2.5 text-background" />
+              </div>
+            )}
+          </div>
           
           {/* Content */}
           <div className="flex-1 min-w-0">
@@ -133,6 +149,9 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
         onSave={handleSaveRoutine}
         isSaving={addRoutinePlan.isPending}
       />
+
+      {/* Paywall */}
+      <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
     </>
   );
 }
