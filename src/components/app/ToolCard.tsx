@@ -8,8 +8,9 @@ import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
-  GraduationCap, User, HeartHandshake, Lock, LucideIcon
+  GraduationCap, User, HeartHandshake, LucideIcon
 } from 'lucide-react';
+import chainLockImg from '@/assets/chain-lock.png';
 
 const iconMap: Record<string, LucideIcon> = {
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
