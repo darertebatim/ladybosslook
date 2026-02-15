@@ -124,16 +124,9 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           <IconComponent className={cn('h-4.5 w-4.5', tool.iconColor)} />
         </div>
         <div className="flex flex-col items-start min-w-0">
-          <div className="flex items-center gap-1">
-            <h3 className="font-semibold text-foreground text-[13px] leading-tight">
-              {tool.name}
-            </h3>
-            {isLocked && (
-              <span className="inline-flex items-center gap-0.5 text-[8px] font-semibold text-amber-600 bg-amber-100 px-1 py-px rounded-full">
-                <Crown className="h-2.5 w-2.5" /> PLUS
-              </span>
-            )}
-          </div>
+          <h3 className="font-semibold text-foreground text-[13px] leading-tight">
+            {tool.name}
+          </h3>
           <p className="text-[11px] text-foreground/80 leading-tight truncate">
             {tool.description}
           </p>
@@ -144,9 +137,14 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           )}
         </div>
         {isLocked && (
-          <div className="ml-auto flex-shrink-0 p-1.5 rounded-full bg-amber-100">
-            <FluentEmoji emoji="🔒" size={18} />
-          </div>
+          <>
+            <div className="absolute -top-2 -left-1 z-10 inline-flex items-center gap-0.5 text-[8px] font-bold text-amber-700 bg-amber-200 px-1.5 py-0.5 rounded-full shadow-sm">
+              <Crown className="h-2.5 w-2.5" /> PLUS
+            </div>
+            <div className="ml-auto flex-shrink-0 p-1.5 rounded-full bg-amber-100">
+              <FluentEmoji emoji="🔒" size={18} />
+            </div>
+          </>
         )}
       </button>
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
