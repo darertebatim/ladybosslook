@@ -5,10 +5,12 @@ import { haptic } from '@/lib/haptics';
 import type { ToolConfig } from '@/lib/toolsConfig';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { Crown } from 'lucide-react';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
-  GraduationCap, User, HeartHandshake, Lock, LucideIcon
+  GraduationCap, User, HeartHandshake, LucideIcon
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -125,9 +127,16 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           <h3 className="font-semibold text-foreground text-[13px] leading-tight">
             {tool.name}
           </h3>
-          <p className="text-[11px] text-foreground/80 leading-tight truncate">
-            {tool.description}
-          </p>
+          {isLocked && (
+            <span className="inline-flex items-center gap-0.5 text-[8px] font-semibold text-amber-600 bg-amber-100 px-1 py-px rounded-full">
+              <Crown className="h-2.5 w-2.5" /> PLUS
+            </span>
+          )}
+          {!isLocked && (
+            <p className="text-[11px] text-foreground/80 leading-tight truncate">
+              {tool.description}
+            </p>
+          )}
           {tool.comingSoon && (
             <span className="text-[9px] font-medium text-muted-foreground">
               Coming Soon
@@ -135,8 +144,8 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           )}
         </div>
         {isLocked && (
-          <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-foreground/80 flex items-center justify-center">
-            <Lock className="h-3 w-3 text-background" />
+          <div className="ml-auto flex-shrink-0 p-1.5 rounded-full bg-amber-100">
+            <FluentEmoji emoji="🔒" size={18} />
           </div>
         )}
       </button>
