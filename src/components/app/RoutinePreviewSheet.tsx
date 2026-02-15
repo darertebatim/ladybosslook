@@ -10,6 +10,8 @@ import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 // Color cycle for variety in planner (used when no specific color is set)
 export const ROUTINE_COLOR_CYCLE: TaskColor[] = [
@@ -89,6 +91,8 @@ export function RoutinePreviewSheet({
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingTaskIndex, setEditingTaskIndex] = useState<number>(0);
   const [showEditSheet, setShowEditSheet] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const { isSubscribed, isLoading: subLoading } = useSubscription();
 
   // Sync selectedTaskIds when tasks change (e.g., when data loads async)
   useEffect(() => {
@@ -209,6 +213,10 @@ export function RoutinePreviewSheet({
   };
 
   const handleSave = () => {
+    if (!isSubscribed) {
+      setShowPaywall(true);
+      return;
+    }
     const editedTasksList = Object.values(editedTasks);
     onSave(Array.from(selectedTaskIds), editedTasksList);
   };
@@ -469,6 +477,11 @@ export function RoutinePreviewSheet({
           onSaveSheet={handleTaskEditSave}
         />
       )}
+
+      <PaywallSheet
+        open={showPaywall}
+        onOpenChange={setShowPaywall}
+      />
     </>
   );
 }
