@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
 import appIcon from '@/assets/app-icon.png';
@@ -39,8 +39,13 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-primary/20 via-background to-background">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-3">
+        <button onClick={onClose} className="text-muted-foreground"><X className="h-5 w-5" /></button>
+        <button onClick={onRestore} className="text-sm text-muted-foreground hover:underline">Restore</button>
+      </div>
       {/* Hero */}
-      <div className="relative px-6 pt-10 pb-4 text-center">
+      <div className="relative px-6 pt-4 pb-4 text-center">
         <div className="mx-auto w-16 h-16 rounded-2xl overflow-hidden mb-4">
           <img src={appIcon} alt="App icon" className="w-full h-full object-cover" />
         </div>
@@ -135,7 +140,6 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
         </Button>
 
         <div className="flex items-center justify-center gap-4 mt-3 text-xs text-muted-foreground">
-          <button onClick={onRestore} className="hover:underline">Restore Purchases</button>
           <span>Terms</span>
           <span>Privacy</span>
         </div>

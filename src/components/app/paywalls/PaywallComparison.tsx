@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Minus, Loader2 } from 'lucide-react';
+import { Check, Minus, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
 
@@ -41,6 +41,11 @@ export function PaywallComparison({ program, onPurchase, onRestore, onClose, pre
 
   return (
     <div className="flex flex-col h-full bg-background">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-3">
+        <button onClick={onClose} className="text-muted-foreground"><X className="h-5 w-5" /></button>
+        <button onClick={onRestore} className="text-sm text-muted-foreground hover:underline">Restore</button>
+      </div>
       {/* Hero Image */}
       {program.cover_image_url && (
         <div className="relative h-44 overflow-hidden">
@@ -112,7 +117,6 @@ export function PaywallComparison({ program, onPurchase, onRestore, onClose, pre
         </Button>
 
         <div className="flex items-center justify-center gap-4 mt-3 text-xs text-muted-foreground">
-          <button onClick={onRestore} className="hover:underline">Restore Purchases</button>
           <span>Terms</span>
           <span>Privacy</span>
         </div>

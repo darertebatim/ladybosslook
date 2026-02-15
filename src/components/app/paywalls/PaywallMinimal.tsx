@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, Loader2 } from 'lucide-react';
+import { Star, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
 
@@ -42,6 +42,11 @@ export function PaywallMinimal({ program, onPurchase, onRestore, onClose, previe
 
   return (
     <div className="flex flex-col h-full bg-background">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-3">
+        <button onClick={onClose} className="text-muted-foreground"><X className="h-5 w-5" /></button>
+        <button onClick={onRestore} className="text-sm text-muted-foreground hover:underline">Restore</button>
+      </div>
       {/* Decorative top */}
       <div className="h-24 bg-gradient-to-b from-accent/40 to-transparent" />
 
@@ -141,7 +146,6 @@ export function PaywallMinimal({ program, onPurchase, onRestore, onClose, previe
         </Button>
 
         <div className="flex items-center justify-center gap-4 mt-3 pb-4 text-xs text-muted-foreground">
-          <button onClick={onRestore} className="hover:underline">Restore Purchases</button>
           <span>Terms</span>
           <span>Privacy</span>
         </div>
