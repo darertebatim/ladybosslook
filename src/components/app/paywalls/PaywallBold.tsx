@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
 import appIcon from '@/assets/app-icon.png';
@@ -39,6 +39,11 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
 
   return (
     <div className="flex flex-col h-full bg-[hsl(230,20%,8%)] text-white">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-3">
+        <button onClick={onClose} className="text-white/60"><X className="h-5 w-5" /></button>
+        <button onClick={onRestore} className="text-sm text-white/60 hover:underline">Restore</button>
+      </div>
       {/* Hero */}
       {program.cover_image_url && (
         <div className="relative h-52 overflow-hidden">
@@ -136,7 +141,6 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
         </Button>
 
         <div className="flex items-center justify-center gap-4 mt-3 text-xs opacity-50">
-          <button onClick={onRestore} className="hover:underline">Restore Purchases</button>
           <span>Terms</span>
           <span>Privacy</span>
         </div>

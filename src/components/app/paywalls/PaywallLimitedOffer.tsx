@@ -104,22 +104,22 @@ export function PaywallLimitedOffer({ program, onPurchase, onRestore, onClose, p
       <div className="flex-1" />
 
       {/* 3-column plan cards */}
-      <div className="px-4 mt-4">
+      <div className="px-3 mt-4">
         <div className="grid grid-cols-3 gap-2">
           {/* Monthly */}
           <button
             onClick={() => setSelectedPlan('monthly')}
             className={cn(
-              "relative rounded-xl border-2 p-3 pt-6 transition-all text-center",
+              "relative rounded-xl border-2 px-2 py-3 pt-7 transition-all text-center",
               selectedPlan === 'monthly'
                 ? "border-primary bg-primary/5"
                 : "border-border"
             )}
           >
-            <p className="font-bold text-foreground text-sm">1 month</p>
-            <p className="text-xs text-muted-foreground mt-1">${monthlyPrice.toFixed(2)}/mo.</p>
+            <p className="font-bold text-foreground text-base leading-tight">1 month</p>
+            <p className="text-[11px] text-muted-foreground mt-1">${monthlyPrice.toFixed(2)}/mo.</p>
             <div className="border-t border-border mt-2 pt-2">
-              <p className="font-bold text-foreground text-sm">${monthlyPrice.toFixed(2)}/mo</p>
+              <p className="font-bold text-foreground text-base">${monthlyPrice.toFixed(2)}/mo</p>
             </div>
           </button>
 
@@ -128,20 +128,19 @@ export function PaywallLimitedOffer({ program, onPurchase, onRestore, onClose, p
             <button
               onClick={() => setSelectedPlan('annual-offer')}
               className={cn(
-                "relative rounded-xl border-2 p-3 pt-6 transition-all text-center",
+                "relative rounded-xl border-2 px-2 py-3 pt-7 transition-all text-center",
                 selectedPlan === 'annual-offer'
                   ? "border-primary bg-primary/5"
                   : "border-border"
               )}
             >
-              {/* Badge */}
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-destructive text-destructive-foreground text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-destructive text-destructive-foreground text-[11px] font-bold px-3 py-0.5 rounded-full whitespace-nowrap">
                 50% OFF
               </span>
-              <p className="font-bold text-foreground text-sm">12 months</p>
-              <p className="text-xs text-muted-foreground mt-1">${offerMonthly}/mo.</p>
+              <p className="font-bold text-foreground text-base leading-tight">12 months</p>
+              <p className="text-[11px] text-muted-foreground mt-1">${offerMonthly}/mo.</p>
               <div className="border-t border-border mt-2 pt-2">
-                <p className="font-bold text-foreground text-sm">${offerAnnualPrice.toFixed(2)}/yr</p>
+                <p className="font-bold text-foreground text-base">${offerAnnualPrice.toFixed(2)}/yr</p>
               </div>
             </button>
           )}
@@ -151,19 +150,19 @@ export function PaywallLimitedOffer({ program, onPurchase, onRestore, onClose, p
             <button
               onClick={() => setSelectedPlan('annual-original')}
               className={cn(
-                "relative rounded-xl border-2 p-3 pt-6 transition-all text-center",
+                "relative rounded-xl border-2 px-2 py-3 pt-7 transition-all text-center",
                 selectedPlan === 'annual-original'
                   ? "border-primary bg-primary/5"
                   : "border-border"
               )}
             >
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-muted text-muted-foreground text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-muted text-muted-foreground text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
                 Original Price
               </span>
-              <p className="font-bold text-foreground text-sm">12 months</p>
-              <p className="text-xs text-muted-foreground mt-1">${originalMonthly}/mo.</p>
+              <p className="font-bold text-foreground text-base leading-tight">12 months</p>
+              <p className="text-[11px] text-muted-foreground mt-1">${originalMonthly}/mo.</p>
               <div className="border-t border-border mt-2 pt-2">
-                <p className="font-bold text-foreground text-sm">${annualPrice.toFixed(2)}/yr</p>
+                <p className="font-bold text-foreground text-base">${annualPrice.toFixed(2)}/yr</p>
               </div>
             </button>
           )}
