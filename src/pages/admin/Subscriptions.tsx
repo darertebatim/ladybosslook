@@ -35,6 +35,7 @@ export default function Subscriptions() {
     cover_image_url: activeProgram.cover_image_url,
     price_amount: activeProgram.price_amount,
     annual_price_amount: activeProgram.annual_price_amount,
+    original_price: activeProgram.original_price,
     ios_product_id: activeProgram.ios_product_id,
     annual_ios_product_id: activeProgram.annual_ios_product_id,
     features: Array.isArray(activeProgram.features) ? activeProgram.features : [],

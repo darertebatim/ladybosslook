@@ -26,6 +26,7 @@ export function PaywallComparison({ program, onPurchase, onRestore, onClose, pre
 
   const monthlyPrice = program.price_amount / 100;
   const annualPrice = (program.annual_price_amount || 0) / 100;
+  const originalPrice = program.original_price ? program.original_price / 100 : null;
   const hasAnnual = !!program.annual_ios_product_id && annualPrice > 0;
 
   const handlePurchase = async () => {
@@ -93,6 +94,9 @@ export function PaywallComparison({ program, onPurchase, onRestore, onClose, pre
         {/* Price */}
         <p className="text-center text-sm text-muted-foreground mt-4">
           Subscribe to Pro for just{' '}
+          {originalPrice && originalPrice > monthlyPrice && (
+            <span className="line-through text-muted-foreground">${originalPrice.toFixed(2)}/mo</span>
+          )}{' '}
           <span className="font-semibold text-foreground">
             ${hasAnnual ? annualPrice.toFixed(2) : monthlyPrice.toFixed(2)}/{hasAnnual ? 'yr' : 'mo'}
           </span>
