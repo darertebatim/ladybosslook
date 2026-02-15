@@ -1088,21 +1088,28 @@ const AppCourseDetail = () => {
                           <Button 
                             size="lg" 
                             className="w-full"
-                            onClick={() => enrollMutation.mutate()}
-                            disabled={enrollMutation.isPending}
+                            onClick={async () => {
+                              try {
+                                const { data, error } = await supabase.functions.invoke('create-payment', {
+                                  body: { program: program.slug },
+                                });
+                                if (error) throw error;
+                                if (data?.url) {
+                                  window.location.href = data.url;
+                                } else {
+                                  throw new Error('No checkout URL received');
+                                }
+                              } catch (err) {
+                                console.error('Payment error:', err);
+                                toast.error('Payment failed. Please try again.');
+                              }
+                            }}
                           >
-                            {enrollMutation.isPending ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Processing...
-                              </>
-                            ) : (
-                              `Enroll · ${(program.price_amount / 100).toLocaleString()} تومان`
-                            )}
+                            {`Enroll · $${(program.price_amount / 100).toFixed(0)}`}
                           </Button>
                           {program.original_price && program.original_price > program.price_amount && (
                             <p className="text-xs text-center text-muted-foreground mt-2 line-through">
-                              {(program.original_price / 100).toLocaleString()} تومان
+                              {`$${(program.original_price / 100).toFixed(0)}`}
                             </p>
                           )}
                         </>
