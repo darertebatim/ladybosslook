@@ -72,6 +72,7 @@ const TasksBank = lazy(() => import("@/pages/admin/TasksBank"));
 const AppTest = lazy(() => import("@/pages/admin/AppTest"));
 const NotificationAnalytics = lazy(() => import("@/pages/admin/NotificationAnalytics"));
 const PushNotifications = lazy(() => import("@/pages/admin/PushNotifications"));
+const Subscriptions = lazy(() => import("@/pages/admin/Subscriptions"));
 
 // Lazy load marketing/landing pages
 const Programs = lazy(() => import("@/pages/Programs"));
@@ -283,6 +284,7 @@ const App = () => (
                       <Route path="pn" element={<ProtectedRoute requiredPage="communications"><PushNotifications /></ProtectedRoute>} />
                       <Route path="programs" element={<ProtectedRoute requiredPage="programs"><ProgramsAdmin /></ProtectedRoute>} />
                       <Route path="payments" element={<ProtectedRoute requiredPage="payments"><Payments /></ProtectedRoute>} />
+                      <Route path="subscriptions" element={<ProtectedRoute requiredPage="payments"><Subscriptions /></ProtectedRoute>} />
                       <Route path="support" element={<ProtectedRoute requiredPage="support"><Support /></ProtectedRoute>} />
                       <Route path="system" element={<ProtectedRoute requiredPage="system"><System /></ProtectedRoute>} />
                       <Route path="app-icon" element={<ProtectedRoute requiredPage="system"><AppIconGenerator /></ProtectedRoute>} />
