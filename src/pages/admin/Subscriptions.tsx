@@ -3,8 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, type PaywallProgramData } from '@/components/app/paywalls';
-import { Crown, Lock, Unlock, BookOpen, Wind, Droplets, Heart, Brain, Moon, Music, Timer, Sparkles, CalendarPlus } from 'lucide-react';
+import { Crown, Lock, Unlock, BookOpen, Wind, Droplets, Heart, Brain, Moon, Music, Timer, Sparkles, CalendarPlus, Check } from 'lucide-react';
+import { useDefaultPaywall, useSetDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
+import { toast } from 'sonner';
 
 const PAYWALL_VARIANTS = [
   { id: 'classic', label: 'Classic', component: PaywallClassic },
@@ -92,6 +95,8 @@ function PlanFeaturesTab() {
 
 export default function Subscriptions() {
   const [selectedProgram, setSelectedProgram] = useState<string>('');
+  const { variant: defaultVariant } = useDefaultPaywall();
+  const setDefaultPaywall = useSetDefaultPaywall();
 
   const { data: programs = [] } = useQuery({
     queryKey: ['admin-subscription-programs'],
@@ -156,16 +161,37 @@ export default function Subscriptions() {
             <p className="text-muted-foreground">No subscription programs with iOS product IDs found.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {PAYWALL_VARIANTS.map(({ id, label, component: Component }) => (
-                <div key={id} className="space-y-2">
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{label}</h3>
-                  <div className="border rounded-2xl overflow-hidden bg-background shadow-sm" style={{ height: 620 }}>
-                    <div className="h-full overflow-y-auto">
-                      <Component program={programData} preview />
+              {PAYWALL_VARIANTS.map(({ id, label, component: Component }) => {
+                const isDefault = id === defaultVariant;
+                return (
+                  <div key={id} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{label}</h3>
+                      {isDefault ? (
+                        <Badge variant="default" className="text-[10px]">
+                          <Check className="h-3 w-3 mr-1" /> Default
+                        </Badge>
+                      ) : (
+                        <button
+                          className="text-xs text-primary hover:underline"
+                          onClick={() => {
+                            setDefaultPaywall.mutate(id as PaywallVariantId, {
+                              onSuccess: () => toast.success(`"${label}" set as default paywall`),
+                            });
+                          }}
+                        >
+                          Set as default
+                        </button>
+                      )}
+                    </div>
+                    <div className="border rounded-2xl overflow-hidden bg-background shadow-sm" style={{ height: 620 }}>
+                      <div className="h-full overflow-y-auto">
+                        <Component program={programData} preview />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </TabsContent>
