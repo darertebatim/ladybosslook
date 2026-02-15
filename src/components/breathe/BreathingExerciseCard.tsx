@@ -120,23 +120,33 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
             </div>
           </div>
 
-          {/* Add to routine button */}
-          <button
-            onClick={handleAddToRoutine}
-            className={cn(
-              "tour-add-to-routine flex-shrink-0 p-2.5 rounded-full transition-colors",
-              isAdded 
-                ? "bg-success hover:bg-success/90" 
-                : "bg-foreground hover:bg-foreground/90"
-            )}
-            aria-label={isAdded ? "Added to rituals" : "Add to rituals"}
-          >
-            {isAdded ? (
-              <Check className="h-5 w-5 text-white" />
-            ) : (
-              <CalendarPlus className="h-5 w-5 text-background" />
-            )}
-          </button>
+          {/* Add to routine / Lock button */}
+          {isLocked ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); haptic.light(); setShowPaywall(true); }}
+              className="flex-shrink-0 p-2 rounded-full bg-amber-100 hover:bg-amber-200 transition-colors"
+              aria-label="Unlock with simora+"
+            >
+              <FluentEmoji emoji="🔒" size={24} />
+            </button>
+          ) : (
+            <button
+              onClick={handleAddToRoutine}
+              className={cn(
+                "tour-add-to-routine flex-shrink-0 p-2.5 rounded-full transition-colors",
+                isAdded 
+                  ? "bg-success hover:bg-success/90" 
+                  : "bg-foreground hover:bg-foreground/90"
+              )}
+              aria-label={isAdded ? "Added to rituals" : "Add to rituals"}
+            >
+              {isAdded ? (
+                <Check className="h-5 w-5 text-white" />
+              ) : (
+                <CalendarPlus className="h-5 w-5 text-background" />
+              )}
+            </button>
+          )}
         </div>
       </button>
 
