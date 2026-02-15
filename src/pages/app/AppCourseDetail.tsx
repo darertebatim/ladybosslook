@@ -1071,6 +1071,42 @@ const AppCourseDetail = () => {
                     {program.ios_product_id ? (
                       /* IAP Subscription Plan Picker - shown on both native and web */
                       <IAPPlanPicker program={program} />
+                    ) : program.stripe_price_id && program.price_amount > 0 ? (
+                      /* Paid program via Stripe - show payment button */
+                      enrollment ? (
+                        <Button 
+                          size="lg" 
+                          className="w-full" 
+                          variant="secondary"
+                          disabled
+                        >
+                          <CheckCircle2 className="mr-2 h-5 w-5" />
+                          Enrolled
+                        </Button>
+                      ) : (
+                        <>
+                          <Button 
+                            size="lg" 
+                            className="w-full"
+                            onClick={() => enrollMutation.mutate()}
+                            disabled={enrollMutation.isPending}
+                          >
+                            {enrollMutation.isPending ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Processing...
+                              </>
+                            ) : (
+                              `Enroll · ${(program.price_amount / 100).toLocaleString()} تومان`
+                            )}
+                          </Button>
+                          {program.original_price && program.original_price > program.price_amount && (
+                            <p className="text-xs text-center text-muted-foreground mt-2 line-through">
+                              {(program.original_price / 100).toLocaleString()} تومان
+                            </p>
+                          )}
+                        </>
+                      )
                     ) : enrollment ? (
                       <Button 
                         size="lg" 
@@ -1099,7 +1135,7 @@ const AppCourseDetail = () => {
                       </Button>
                     )}
 
-                    {!program.ios_product_id && (
+                    {!program.ios_product_id && !program.stripe_price_id && (
                       <p className="text-xs text-center text-muted-foreground mt-4">
                         Free enrollment • Instant access
                       </p>
