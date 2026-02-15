@@ -8,8 +8,9 @@ import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
-  GraduationCap, User, HeartHandshake, Lock, LucideIcon
+  GraduationCap, User, HeartHandshake, LucideIcon
 } from 'lucide-react';
+import chainLockImg from '@/assets/chain-lock.png';
 
 const iconMap: Record<string, LucideIcon> = {
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
@@ -135,9 +136,11 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           )}
         </div>
         {isLocked && (
-          <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-foreground/80 flex items-center justify-center">
-            <Lock className="h-3 w-3 text-background" />
-          </div>
+          <img 
+            src={chainLockImg} 
+            alt="Locked" 
+            className="absolute -left-3 -bottom-3 w-10 h-14 pointer-events-none drop-shadow-md"
+          />
         )}
       </button>
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
