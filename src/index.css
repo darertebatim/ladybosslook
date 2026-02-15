@@ -90,10 +90,10 @@ html.native-app [data-scroll-container="true"] {
     --popover: 0 0% 100%;
     --popover-foreground: 230 15% 15%;
 
-    /* Primary - Empowerment Purple */
-    --primary: 280 60% 50%;
-    --primary-light: 285 65% 60%;
-    --primary-dark: 275 65% 35%;
+    /* Primary - Phoenix Coral (from logo) */
+    --primary: 10 80% 55%;
+    --primary-light: 15 85% 62%;
+    --primary-dark: 5 75% 42%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary - Luxe Gold */
@@ -131,15 +131,15 @@ html.native-app [data-scroll-container="true"] {
     /* Borders & Inputs */
     --border: 320 20% 90%;
     --input: 320 20% 90%;
-    --ring: 280 60% 50%;
+    --ring: 10 80% 55%;
 
     --radius: 0.75rem;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(280 60% 50%), hsl(320 65% 55%), hsl(45 90% 60%));
+    --gradient-hero: linear-gradient(135deg, hsl(340 70% 50%), hsl(10 80% 55%), hsl(40 90% 60%));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(320 20% 98%));
-    --gradient-accent: linear-gradient(120deg, hsl(330 50% 85%), hsl(285 40% 90%));
-    --gradient-text: linear-gradient(135deg, hsl(280 60% 50%), hsl(45 90% 60%));
+    --gradient-accent: linear-gradient(120deg, hsl(330 50% 85%), hsl(10 60% 85%));
+    --gradient-text: linear-gradient(135deg, hsl(340 70% 50%), hsl(40 90% 60%));
     
     /* Luxury Black & White Theme - Updated Clear Palette */
     --luxury-black: 240 15% 12%;
@@ -147,22 +147,22 @@ html.native-app [data-scroll-container="true"] {
     --luxury-silver: 240 5% 75%;
     --luxury-white: 0 0% 99%;
     --luxury-accent: 240 10% 35%;
-    --luxury-gold: 280 60% 55%;
-    --luxury-gold-dark: 280 65% 45%;
-    --luxury-gold-light: 280 50% 70%;
+    --luxury-gold: 10 80% 55%;
+    --luxury-gold-dark: 5 75% 42%;
+    --luxury-gold-light: 15 70% 65%;
     --pure-black: 0 0% 0%;
     --pure-white: 0 0% 100%;
     
     /* Conversion-Focused Colors - Clear and Vibrant */
-    --cta-primary: 280 70% 60%;
-    --cta-primary-hover: 280 75% 65%;
+    --cta-primary: 10 80% 58%;
+    --cta-primary-hover: 10 85% 63%;
     --cta-urgent: 345 85% 55%;
     --cta-urgent-hover: 345 90% 60%;
     
-    /* Secondary - Teal/Turquoise accent */
-    --secondary: 280 70% 60%;
-    --secondary-light: 280 75% 70%;
-    --secondary-dark: 280 75% 50%;
+    /* Secondary - warm magenta from logo */
+    --secondary: 340 70% 50%;
+    --secondary-light: 340 75% 60%;
+    --secondary-dark: 340 75% 40%;
     
     /* Luxury Gradients */
     --gradient-luxury: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 15%), hsl(0 0% 25%));
@@ -176,10 +176,10 @@ html.native-app [data-scroll-container="true"] {
     --shadow-luxury-glow: 0 0 50px hsl(0 0% 100% / 0.1);
 
     /* Shadows - Elegant Depth */
-    --shadow-soft: 0 2px 20px -2px hsl(280 60% 50% / 0.1);
-    --shadow-medium: 0 8px 30px -4px hsl(280 60% 50% / 0.15);
-    --shadow-bold: 0 20px 60px -10px hsl(280 60% 50% / 0.25);
-    --shadow-glow: 0 0 40px hsl(280 60% 50% / 0.3);
+    --shadow-soft: 0 2px 20px -2px hsl(10 80% 55% / 0.1);
+    --shadow-medium: 0 8px 30px -4px hsl(10 80% 55% / 0.15);
+    --shadow-bold: 0 20px 60px -10px hsl(10 80% 55% / 0.25);
+    --shadow-glow: 0 0 40px hsl(10 80% 55% / 0.3);
     --shadow-urgency: 0 8px 35px -5px hsl(15 90% 55% / 0.4);
     --shadow-cta: 0 10px 40px -8px hsl(15 90% 55% / 0.5);
 
@@ -232,14 +232,14 @@ html.native-app [data-scroll-container="true"] {
 
     --card: 230 20% 10%;
     --card-foreground: 0 0% 95%;
-    --card-elevated: 280 15% 12%;
+    --card-elevated: 10 15% 12%;
 
     --popover: 230 20% 10%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 285 70% 60%;
-    --primary-light: 290 75% 70%;
-    --primary-dark: 280 70% 45%;
+    --primary: 10 75% 58%;
+    --primary-light: 15 80% 65%;
+    --primary-dark: 5 70% 45%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 45 85% 65%;
@@ -262,19 +262,19 @@ html.native-app [data-scroll-container="true"] {
 
     --border: 230 20% 20%;
     --input: 230 20% 20%;
-    --ring: 285 70% 60%;
+    --ring: 10 75% 58%;
 
     /* Dark Mode Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(285 70% 60%), hsl(320 70% 65%), hsl(45 85% 65%));
-    --gradient-card: linear-gradient(145deg, hsl(230 20% 10%), hsl(280 15% 12%));
-    --gradient-accent: linear-gradient(120deg, hsl(330 40% 25%), hsl(285 35% 30%));
-    --gradient-text: linear-gradient(135deg, hsl(285 70% 60%), hsl(45 85% 65%));
+    --gradient-hero: linear-gradient(135deg, hsl(340 70% 50%), hsl(10 75% 58%), hsl(40 85% 60%));
+    --gradient-card: linear-gradient(145deg, hsl(230 20% 10%), hsl(10 15% 12%));
+    --gradient-accent: linear-gradient(120deg, hsl(330 40% 25%), hsl(10 35% 30%));
+    --gradient-text: linear-gradient(135deg, hsl(10 75% 58%), hsl(40 85% 60%));
 
     /* Dark Shadows */
     --shadow-soft: 0 2px 20px -2px hsl(0 0% 0% / 0.3);
     --shadow-medium: 0 8px 30px -4px hsl(0 0% 0% / 0.4);
     --shadow-bold: 0 20px 60px -10px hsl(0 0% 0% / 0.5);
-    --shadow-glow: 0 0 40px hsl(285 70% 60% / 0.4);
+    --shadow-glow: 0 0 40px hsl(10 75% 58% / 0.4);
   }
 
   /* ===== APP THEME - Black & White Design System ===== */
