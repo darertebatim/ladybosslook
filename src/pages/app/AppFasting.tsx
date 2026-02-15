@@ -15,6 +15,8 @@ import { FASTING_PROTOCOLS } from '@/lib/fastingZones';
 import { BackButton } from '@/components/app/BackButton';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 export default function AppFasting() {
   const navigate = useNavigate();
@@ -40,6 +42,9 @@ export default function AppFasting() {
     setCustomHours,
   } = useFastingTracker();
 
+  const { isSubscribed, isLoading: subLoading } = useSubscription();
+  const [showPaywall, setShowPaywall] = useState(!false);
+
   const [protocolOpen, setProtocolOpen] = useState(false);
   const [zonesOpen, setZonesOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
@@ -48,6 +53,13 @@ export default function AppFasting() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [editStartOpen, setEditStartOpen] = useState(false);
   const [editGoalOpen, setEditGoalOpen] = useState(false);
+
+  // Show paywall for non-subscribers
+  useEffect(() => {
+    if (!subLoading && !isSubscribed) {
+      setShowPaywall(true);
+    }
+  }, [subLoading, isSubscribed]);
 
   // Auto-open weight logging when navigated with ?weight=1
   useEffect(() => {
@@ -256,6 +268,15 @@ export default function AppFasting() {
           />
         </>
       )}
+      <PaywallSheet
+        open={showPaywall}
+        onOpenChange={(open) => {
+          setShowPaywall(open);
+          if (!open && !isSubscribed) {
+            navigate('/app/home');
+          }
+        }}
+      />
     </div>
   );
 }

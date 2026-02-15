@@ -39,7 +39,7 @@ const PLUS_FEATURES = [
       { icon: Wind, label: 'Breathe', detail: 'Breathing exercises library', free: true },
       { icon: Droplets, label: 'Water', detail: 'Hydration tracker', free: true },
       { icon: Heart, label: 'Emotions', detail: 'Name your feelings — emotion logging', free: true },
-      { icon: Timer, label: 'Fasting', detail: 'Intermittent fasting tracker', free: true },
+      { icon: Timer, label: 'Fasting', detail: 'Intermittent fasting tracker', free: false },
       { icon: Moon, label: 'Meditate', detail: 'Guided meditation sessions', free: true },
       { icon: Music, label: 'Sounds', detail: 'Ambient sounds library', free: true },
     ],
