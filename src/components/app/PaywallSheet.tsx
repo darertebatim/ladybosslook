@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
 import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, type PaywallProgramData } from '@/components/app/paywalls';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 const VARIANT_MAP: Record<PaywallVariantId, React.ComponentType<any>> = {
   classic: PaywallClassic,
@@ -57,8 +56,9 @@ export function PaywallSheet({ open, onOpenChange, onPurchase, onRestore }: Payw
   if (!programData) return null;
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl p-0" hideCloseButton>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden">
+        <VisuallyHidden><DialogTitle>Upgrade to simora+</DialogTitle></VisuallyHidden>
         <div className="h-full overflow-y-auto">
           <Component
             program={programData}
@@ -67,7 +67,7 @@ export function PaywallSheet({ open, onOpenChange, onPurchase, onRestore }: Payw
             onClose={() => onOpenChange(false)}
           />
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }
