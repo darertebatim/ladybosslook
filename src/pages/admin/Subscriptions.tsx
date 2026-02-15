@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, type PaywallProgramData } from '@/components/app/paywalls';
+import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, type PaywallProgramData } from '@/components/app/paywalls';
 
 const PAYWALL_VARIANTS = [
   { id: 'classic', label: 'Classic', component: PaywallClassic },
@@ -10,6 +10,7 @@ const PAYWALL_VARIANTS = [
   { id: 'minimal', label: 'Minimal', component: PaywallMinimal },
   { id: 'bold', label: 'Bold (Dark)', component: PaywallBold },
   { id: 'comparison', label: 'Comparison', component: PaywallComparison },
+  { id: 'limited-offer', label: 'Limited Offer (50% OFF)', component: PaywallLimitedOffer },
 ] as const;
 
 export default function Subscriptions() {

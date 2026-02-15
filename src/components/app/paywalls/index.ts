@@ -3,3 +3,4 @@ export { PaywallGradient } from './PaywallGradient';
 export { PaywallMinimal } from './PaywallMinimal';
 export { PaywallBold } from './PaywallBold';
 export { PaywallComparison } from './PaywallComparison';
+export { PaywallLimitedOffer } from './PaywallLimitedOffer';
