@@ -44,6 +44,7 @@ interface PlaylistFormData {
   description: string;
   program_slug: string;
   is_free: boolean;
+  requires_subscription: boolean;
   available_on_mobile: boolean;
   category: 'audiobook' | 'course' | 'podcast' | 'meditate' | 'workout' | 'soundscape' | 'affirmations';
   sort_order: number;
@@ -267,6 +268,15 @@ const PlaylistForm = ({
 
     <div className="flex items-center space-x-2">
       <Switch
+        id="playlist_requires_subscription"
+        checked={formData.requires_subscription}
+        onCheckedChange={(checked) => setFormData({ ...formData, requires_subscription: checked })}
+      />
+      <Label htmlFor="playlist_requires_subscription">Requires Simora+ (Plus plan)</Label>
+    </div>
+
+    <div className="flex items-center space-x-2">
+      <Switch
         id="playlist_available_mobile"
         checked={formData.available_on_mobile}
         onCheckedChange={(checked) => setFormData({ ...formData, available_on_mobile: checked })}
@@ -344,6 +354,7 @@ export const PlaylistManager = () => {
     description: "",
     program_slug: "",
     is_free: true,
+    requires_subscription: false,
     available_on_mobile: true,
     category: "audiobook",
     sort_order: 0,
@@ -357,6 +368,7 @@ export const PlaylistManager = () => {
     description: "",
     program_slug: "",
     is_free: true,
+    requires_subscription: false,
     available_on_mobile: true,
     category: "audiobook",
     sort_order: 0,
@@ -573,6 +585,7 @@ export const PlaylistManager = () => {
           category: createFormData.category,
           program_slug: createFormData.program_slug || null,
           is_free: createFormData.is_free,
+          requires_subscription: createFormData.requires_subscription,
           available_on_mobile: createFormData.available_on_mobile,
           sort_order: createFormData.sort_order,
           display_mode: createFormData.display_mode,
@@ -660,6 +673,7 @@ export const PlaylistManager = () => {
       description: "",
       program_slug: "",
       is_free: true,
+      requires_subscription: false,
       available_on_mobile: true,
       category: "audiobook",
       sort_order: 0,
@@ -675,6 +689,7 @@ export const PlaylistManager = () => {
       description: "",
       program_slug: "",
       is_free: true,
+      requires_subscription: false,
       available_on_mobile: true,
       category: "audiobook",
       sort_order: 0,
@@ -846,6 +861,7 @@ export const PlaylistManager = () => {
       description: playlist.description || "",
       program_slug: playlist.program_slug || "",
       is_free: playlist.is_free,
+      requires_subscription: playlist.requires_subscription ?? false,
       available_on_mobile: playlist.available_on_mobile ?? true,
       category: playlist.category || "audiobook",
       sort_order: playlist.sort_order,
@@ -879,6 +895,7 @@ export const PlaylistManager = () => {
         category: editFormData.category,
         program_slug: editFormData.program_slug || null,
         is_free: editFormData.is_free,
+        requires_subscription: editFormData.requires_subscription,
         available_on_mobile: editFormData.available_on_mobile,
         sort_order: editFormData.sort_order,
         display_mode: editFormData.display_mode,
@@ -975,6 +992,9 @@ export const PlaylistManager = () => {
                       <Badge variant="secondary">Free</Badge>
                     ) : (
                       <Badge>Premium</Badge>
+                    )}
+                    {playlist.requires_subscription && (
+                      <Badge className="bg-amber-200 text-amber-800">Plus</Badge>
                     )}
                     {playlist.is_hidden && (
                       <Badge variant="outline" className="text-muted-foreground">
