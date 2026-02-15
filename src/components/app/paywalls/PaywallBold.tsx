@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
+import appIcon from '@/assets/app-icon.png';
 
 interface PaywallBoldProps {
   program: PaywallProgramData;
@@ -52,7 +53,7 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
 
       <div className="flex-1 px-6 pt-6 pb-4 flex flex-col">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <Sparkles className="h-5 w-5 text-secondary" />
+          <img src={appIcon} alt="App icon" className="h-6 w-6 rounded-md" />
           <span className="text-xs font-semibold tracking-widest uppercase text-secondary">Premium</span>
         </div>
         <h2 className="text-3xl font-bold text-center">

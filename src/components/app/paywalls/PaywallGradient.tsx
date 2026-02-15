@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Loader2, Sparkles } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
+import appIcon from '@/assets/app-icon.png';
 
 interface PaywallGradientProps {
   program: PaywallProgramData;
@@ -40,8 +41,8 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
     <div className="flex flex-col h-full bg-gradient-to-b from-primary/20 via-background to-background">
       {/* Hero */}
       <div className="relative px-6 pt-10 pb-4 text-center">
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/15 flex items-center justify-center mb-4">
-          <Sparkles className="h-8 w-8 text-primary" />
+        <div className="mx-auto w-16 h-16 rounded-2xl overflow-hidden mb-4">
+          <img src={appIcon} alt="App icon" className="w-full h-full object-cover" />
         </div>
         <h2 className="text-2xl font-bold text-foreground">
           {program.title}
