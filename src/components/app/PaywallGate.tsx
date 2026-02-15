@@ -1,8 +1,7 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import { useSubscription } from '@/hooks/useSubscription';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { PaywallSheet } from './PaywallSheet';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import { Lock, Sparkles } from 'lucide-react';
 
 interface PaywallGateProps {
@@ -13,27 +12,11 @@ interface PaywallGateProps {
 
 export const PaywallGate = ({ programSlug, children, fallback }: PaywallGateProps) => {
   const { isSubscribed, hasAccessToProgram, isLoading } = useSubscription();
-  const [showPaywall, setShowPaywall] = useState(false);
-
-  // Fetch the program data for the paywall sheet
-  const { data: program } = useQuery({
-    queryKey: ['paywall-program', programSlug],
-    queryFn: async () => {
-      if (!programSlug) return null;
-      const { data, error } = await supabase
-        .from('program_catalog')
-        .select('title, ios_product_id, annual_ios_product_id, price_amount, annual_price_amount, subscription_interval, trial_days, features')
-        .eq('slug', programSlug)
-        .single();
-      if (error) return null;
-      return data;
-    },
-    enabled: !!programSlug,
-    staleTime: 1000 * 60 * 10,
-  });
+  const navigate = useNavigate();
 
   if (isLoading) return null;
 
+  // If a specific program slug is provided, check per-program access
   const hasAccess = programSlug 
     ? hasAccessToProgram(programSlug) 
     : isSubscribed;
@@ -47,34 +30,21 @@ export const PaywallGate = ({ programSlug, children, fallback }: PaywallGateProp
   }
 
   return (
-    <>
-      <button
-        onClick={() => setShowPaywall(true)}
-        className="flex flex-col items-center justify-center p-8 text-center space-y-3 w-full active:scale-95 transition-transform"
+    <div className="flex flex-col items-center justify-center p-8 text-center space-y-4">
+      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+        <Lock className="h-8 w-8 text-primary" />
+      </div>
+      <h3 className="text-lg font-semibold">Premium Content</h3>
+      <p className="text-muted-foreground text-sm max-w-xs">
+        This content requires an active subscription. Subscribe to unlock full access.
+      </p>
+      <Button 
+        onClick={() => navigate(programSlug ? `/${programSlug}` : '/app/explore')}
+        className="gap-2"
       >
-        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-          <Lock className="h-6 w-6 text-primary" />
-        </div>
-        <h3 className="text-base font-semibold">Premium Content</h3>
-        <p className="text-muted-foreground text-xs max-w-xs">
-          Tap to unlock with a subscription
-        </p>
-        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
-          <Sparkles className="h-3.5 w-3.5" />
-          View Plans
-        </span>
-      </button>
-
-      {program && (
-        <PaywallSheet
-          open={showPaywall}
-          onOpenChange={setShowPaywall}
-          program={{
-            ...program,
-            features: Array.isArray(program.features) ? program.features : [],
-          }}
-        />
-      )}
-    </>
+        <Sparkles className="h-4 w-4" />
+        View Plans
+      </Button>
+    </div>
   );
 };
