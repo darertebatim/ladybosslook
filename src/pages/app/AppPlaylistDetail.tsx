@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -23,6 +24,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -195,14 +197,48 @@ export default function AppPlaylistDetail() {
   // Use centralized enrollments hook - single source of truth
   const { data: enrollments } = useEnrollments();
 
+  // Check if user has activated this free playlist
+  const { data: playlistSave, isLoading: saveLoading } = useQuery({
+    queryKey: ['playlist-save', playlistId, user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from('playlist_saves')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('playlist_id', playlistId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!playlistId && !!user?.id,
+  });
+
+  // Mutation to activate free playlist
+  const activatePlaylistMutation = useMutation({
+    mutationFn: async () => {
+      if (!user || !playlistId) throw new Error('Not authenticated');
+      const { error } = await supabase
+        .from('playlist_saves')
+        .insert({ user_id: user.id, playlist_id: playlistId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['playlist-save', playlistId, user?.id] });
+      toast.success('Access granted! Enjoy listening 🎧');
+    },
+    onError: () => {
+      toast.error('Something went wrong. Please try again.');
+    },
+  });
+
   // Fetch user's round for this playlist (to get first_session_date and drip_offset_days for drip content)
   const { data: userRound } = useQuery({
     queryKey: ['user-round-for-playlist', playlistId],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) return null;
 
-      // Find the user's enrollment that has a round linked to this playlist
       const { data, error } = await supabase
         .from('course_enrollments')
         .select(`
@@ -217,7 +253,7 @@ export default function AppPlaylistDetail() {
             is_self_paced
           )
         `)
-        .eq('user_id', user.id)
+        .eq('user_id', authUser.id)
         .eq('program_rounds.audio_playlist_id', playlistId)
         .eq('status', 'active')
         .maybeSingle();
@@ -233,7 +269,10 @@ export default function AppPlaylistDetail() {
   const cameFromPlanner = (location.state as any)?.from === 'planner';
 
   const displayMode = (playlist as any)?.display_mode || 'tracks';
-  const hasAccess = playlist?.is_free || enrollments?.includes(playlist?.program_slug);
+  // Free playlists require activation (playlist_saves), paid playlists require enrollment
+  const hasAccess = playlist?.is_free 
+    ? !!playlistSave 
+    : enrollments?.includes(playlist?.program_slug);
 
   const getTrackProgress = (audioId: string) => {
     const progress = progressData?.find(p => p.audio_id === audioId);
@@ -622,7 +661,7 @@ export default function AppPlaylistDetail() {
                 <Badge variant="secondary">{getCategoryLabel()}</Badge>
               )}
               {playlist.is_free && <Badge className="bg-green-500">FREE</Badge>}
-              {!hasAccess && <Badge variant="destructive">Locked</Badge>}
+              {!hasAccess && !playlist.is_free && <Badge variant="destructive">Locked</Badge>}
             </div>
             <h1 className="text-2xl font-bold">{playlist.name}</h1>
             {playlist.description && (
@@ -663,7 +702,26 @@ export default function AppPlaylistDetail() {
           </div>
         )}
 
-        {!hasAccess && (
+        {!hasAccess && playlist.is_free && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 p-4 bg-primary/10 rounded-lg">
+              <Music className="h-5 w-5 text-primary" />
+              <p className="text-sm text-foreground">
+                This playlist is free! Tap below to start listening.
+              </p>
+            </div>
+            <Button 
+              className="w-full" 
+              size="lg"
+              onClick={() => activatePlaylistMutation.mutate()}
+              disabled={activatePlaylistMutation.isPending}
+            >
+              {activatePlaylistMutation.isPending ? 'Activating...' : 'Get Free Access'}
+            </Button>
+          </div>
+        )}
+
+        {!hasAccess && !playlist.is_free && (
           <div className="space-y-3">
             <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
               <Lock className="h-5 w-5 text-muted-foreground" />

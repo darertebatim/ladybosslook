@@ -1639,6 +1639,35 @@ export type Database = {
         }
         Relationships: []
       }
+      playlist_saves: {
+        Row: {
+          id: string
+          playlist_id: string
+          saved_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          playlist_id: string
+          saved_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          playlist_id?: string
+          saved_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_saves_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "audio_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       playlist_supplements: {
         Row: {
           audio_id: string | null

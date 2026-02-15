@@ -69,6 +69,11 @@ export const PlaylistCard = memo(function PlaylistCard({
 
   const handleClick = () => {
     haptic.light();
+    // Free playlists always navigate to playlist detail (gate is inside)
+    if (isFree) {
+      navigate(`/app/player/playlist/${id}`, { state: { from } });
+      return;
+    }
     if (isLocked && programSlug) {
       navigate(`/app/course/${programSlug}`, { state: { from } });
       return;
@@ -83,7 +88,7 @@ export const PlaylistCard = memo(function PlaylistCard({
   return (
     <Card 
       className={`overflow-hidden rounded-2xl border-border/50 cursor-pointer shadow-lg border-border transition-all active:scale-[0.98] ${
-        isLocked ? 'opacity-80' : ''
+        isLocked && !isFree ? 'opacity-80' : ''
       } ${tourClass}`}
       onClick={handleClick}
     >
@@ -99,7 +104,7 @@ export const PlaylistCard = memo(function PlaylistCard({
         {/* Bottom Gradient for Title Overlay */}
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         
-        {isLocked && (
+        {isLocked && !isFree && (
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
             <Lock className="h-8 w-8 text-muted-foreground" />
           </div>
@@ -131,7 +136,7 @@ export const PlaylistCard = memo(function PlaylistCard({
         </h3>
         
         {/* Progress overlay at bottom */}
-        {!isLocked && progressPercentage > 0 && (
+        {(!isLocked || isFree) && progressPercentage > 0 && (
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted/30 z-20">
             <div 
               className="h-full bg-primary transition-all duration-300"
@@ -158,7 +163,7 @@ export const PlaylistCard = memo(function PlaylistCard({
           </div>
         </div>
         
-        {!isLocked && progressPercentage > 0 && (
+        {(!isLocked || isFree) && progressPercentage > 0 && (
           <div className="flex items-center gap-2 text-xs">
             <div className="flex items-center gap-1 text-primary font-medium">
               <CheckCircle2 className="h-3 w-3" />
@@ -168,7 +173,7 @@ export const PlaylistCard = memo(function PlaylistCard({
           </div>
         )}
         
-        {isLocked && programSlug && (
+        {isLocked && !isFree && programSlug && (
           <div className="flex items-center justify-center gap-1.5 py-2 px-3 bg-black text-white rounded-lg text-xs font-medium">
             <span>Tap to enroll</span>
             <ChevronRight className="h-3.5 w-3.5" />
