@@ -4,10 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, type PaywallProgramData } from '@/components/app/paywalls';
-import { Crown, Lock, Unlock, BookOpen, Wind, Droplets, Heart, Brain, Moon, Music, Timer, Sparkles, CalendarPlus, Check } from 'lucide-react';
+import { Crown, Lock, Unlock, BookOpen, Wind, Droplets, Heart, Brain, Moon, Music, Timer, Sparkles, CalendarPlus, Check, Smartphone } from 'lucide-react';
 import { useDefaultPaywall, useSetDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 const PAYWALL_VARIANTS = [
   { id: 'classic', label: 'Classic', component: PaywallClassic },
@@ -95,6 +98,7 @@ function PlanFeaturesTab() {
 
 export default function Subscriptions() {
   const [selectedProgram, setSelectedProgram] = useState<string>('');
+  const [mobilePreview, setMobilePreview] = useState<string | null>(null);
   const { variant: defaultVariant } = useDefaultPaywall();
   const setDefaultPaywall = useSetDefaultPaywall();
 
@@ -166,12 +170,23 @@ export default function Subscriptions() {
                 return (
                   <div key={id} className="space-y-2">
                     <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
                       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{label}</h3>
-                      {isDefault ? (
+                      {isDefault && (
                         <Badge variant="default" className="text-[10px]">
                           <Check className="h-3 w-3 mr-1" /> Default
                         </Badge>
-                      ) : (
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="text-muted-foreground hover:text-foreground p-1"
+                        onClick={() => setMobilePreview(id)}
+                        title="Mobile preview"
+                      >
+                        <Smartphone className="h-4 w-4" />
+                      </button>
+                      {!isDefault && (
                         <button
                           className="text-xs text-primary hover:underline"
                           onClick={() => {
@@ -183,6 +198,7 @@ export default function Subscriptions() {
                           Set as default
                         </button>
                       )}
+                    </div>
                     </div>
                     <div className="border rounded-2xl overflow-hidden bg-background shadow-sm" style={{ height: 620 }}>
                       <div className="h-full overflow-y-auto">
@@ -196,6 +212,23 @@ export default function Subscriptions() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Mobile Preview Dialog */}
+      {programData && (
+        <Dialog open={!!mobilePreview} onOpenChange={(o) => !o && setMobilePreview(null)}>
+          <DialogContent className="max-w-[375px] h-[700px] p-0 rounded-[2.5rem] overflow-hidden border-[8px] border-foreground/80 [&>button]:hidden">
+            <VisuallyHidden><DialogTitle>Mobile Paywall Preview</DialogTitle></VisuallyHidden>
+            <div className="h-full overflow-y-auto bg-background">
+              {(() => {
+                const found = PAYWALL_VARIANTS.find(v => v.id === mobilePreview);
+                if (!found) return null;
+                const Comp = found.component;
+                return <Comp program={programData} preview onClose={() => setMobilePreview(null)} />;
+              })()}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
