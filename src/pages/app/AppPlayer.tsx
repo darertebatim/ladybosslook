@@ -213,7 +213,8 @@ export default function AppPlayer() {
               language={playlist.language}
               isFree={playlist.is_free}
               isLocked={isPlaylistLocked(playlist)}
-              programSlug={playlist.program_slug}
+               programSlug={playlist.program_slug}
+               requiresSubscription={playlist.requires_subscription}
               trackCount={stats.trackCount}
               completedTracks={stats.completedTracks}
               totalDuration={stats.totalDuration}
@@ -400,7 +401,8 @@ export default function AppPlayer() {
                       language={playlist.language}
                       isFree={playlist.is_free}
                       isLocked={isPlaylistLocked(playlist)}
-                      programSlug={playlist.program_slug}
+                       programSlug={playlist.program_slug}
+                       requiresSubscription={playlist.requires_subscription}
                       trackCount={stats.trackCount}
                       completedTracks={stats.completedTracks}
                       totalDuration={stats.totalDuration}
