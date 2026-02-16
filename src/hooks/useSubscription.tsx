@@ -28,6 +28,15 @@ export const useSubscription = () => {
         .eq('status', 'active') as any;
 
       if (error) throw error;
+      
+      // Filter out expired subscriptions (sandbox subscriptions expire quickly)
+      const now = new Date().toISOString();
+      return ((data || []) as UserSubscription[]).filter(sub => {
+        if (!sub.expires_at) return true; // No expiry = active
+        return sub.expires_at > now;
+      });
+
+      if (error) throw error;
       return (data || []) as UserSubscription[];
     },
     enabled: !!user?.id,
