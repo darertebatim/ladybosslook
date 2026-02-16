@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast, Globe, Crown } from "lucide-react";
+import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isNativeApp } from "@/lib/platform";
@@ -344,7 +345,7 @@ export default function AppPlayer() {
                   />
                   {isSoundscapeLocked && (
                     <div className="absolute -bottom-0.5 -right-0.5 z-10 w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center">
-                      <span className="text-[10px]">🔒</span>
+                      <FluentEmoji emoji="🔒" size={12} />
                     </div>
                   )}
                 </div>
