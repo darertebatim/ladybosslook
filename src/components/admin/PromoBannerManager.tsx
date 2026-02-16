@@ -12,7 +12,7 @@ import { Trash2, Plus, ExternalLink, Sparkles, Loader2, Pencil, Users, Copy } fr
 import { format } from 'date-fns';
 import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
-type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner';
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner' | 'rate';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
 type AspectRatio = '3:1' | '16:9' | '1:1';
 type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'all';
@@ -669,6 +669,7 @@ export function PromoBannerManager() {
                     <SelectItem value="channels">💬 Feed / Channels</SelectItem>
                     <SelectItem value="chat">🗨️ Chat / Support</SelectItem>
                     <SelectItem value="profile">👤 Profile / Settings</SelectItem>
+                    <SelectItem value="rate">⭐ Rate App</SelectItem>
                     <SelectItem value="custom_url">🔗 Custom URL (in-app)</SelectItem>
                     <SelectItem value="external_url">🌐 External URL (opens browser)</SelectItem>
                   </SelectContent>

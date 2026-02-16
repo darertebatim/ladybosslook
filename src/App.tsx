@@ -56,6 +56,7 @@ const AppPresence = lazy(() => import("@/pages/app/AppPresence"));
 const AppFasting = lazy(() => import("@/pages/app/AppFasting"));
 const AppAdminSupport = lazy(() => import("@/pages/app/AppAdminSupport"));
 const AppChannelPost = lazy(() => import("@/pages/app/AppChannelPost"));
+const AppRate = lazy(() => import("@/pages/app/AppRate"));
 
 // Lazy load admin pages
 const Users = lazy(() => import("@/pages/admin/Users"));
@@ -348,6 +349,7 @@ const App = () => (
                   <Route path="/app/fasting" element={<ProtectedRoute><AppFasting /></ProtectedRoute>} />
                   <Route path="/app/support" element={<ProtectedRoute><AppAdminSupport /></ProtectedRoute>} />
                   <Route path="/app/channels/new" element={<ProtectedRoute><AppChannelPost /></ProtectedRoute>} />
+                  <Route path="/app/rate" element={<ProtectedRoute><AppRate /></ProtectedRoute>} />
                   {/* Redirect old feed post route */}
                   <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
                   
