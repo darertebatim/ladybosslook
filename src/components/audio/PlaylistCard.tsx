@@ -25,6 +25,7 @@ interface PlaylistCardProps {
   isLocked: boolean;
   programSlug?: string;
   requiresSubscription?: boolean;
+  isSubscribed?: boolean;
   trackCount: number;
   completedTracks: number;
   totalDuration: number;
@@ -41,6 +42,7 @@ export const PlaylistCard = memo(function PlaylistCard({
   isLocked,
   programSlug,
   requiresSubscription,
+  isSubscribed,
   trackCount,
   completedTracks,
   totalDuration,
@@ -195,7 +197,7 @@ export const PlaylistCard = memo(function PlaylistCard({
           </div>
         )}
 
-        {requiresSubscription && (
+        {requiresSubscription && !isSubscribed && (
           <div className="absolute bottom-2 right-2 p-1.5 rounded-full bg-amber-100">
             <FluentEmoji emoji="🔒" size={18} />
           </div>
