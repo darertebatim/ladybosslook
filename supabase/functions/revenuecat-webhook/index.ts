@@ -81,10 +81,8 @@ serve(async (req) => {
 
     const status = isActive ? "active" : "expired";
 
-    // For each entitlement, upsert the subscription
-    for (const entitlementId of entitlementIds) {
-      const programSlug = entitlementId; // Entitlement ID = program slug
-
+    // Helper to upsert subscription + enrollment
+    async function upsertSubscription(programSlug: string) {
       const { error } = await supabase
         .from("user_subscriptions")
         .upsert(
@@ -106,13 +104,35 @@ serve(async (req) => {
       } else {
         console.log("[RC Webhook] ✓ Updated subscription:", programSlug, status);
       }
+
+      // Create enrollment for active subscriptions
+      if (isActive) {
+        await ensureEnrollment(supabase, userId, programSlug);
+      }
+      
+      // Update enrollment status for inactive subscriptions
+      if (isInactive) {
+        const { error: enrollError } = await supabase
+          .from("course_enrollments")
+          .update({ status: "expired" })
+          .eq("user_id", userId)
+          .eq("program_slug", programSlug);
+        
+        if (enrollError) {
+          console.error("[RC Webhook] Enrollment update error:", enrollError);
+        }
+      }
+    }
+
+    // For each entitlement, upsert the subscription
+    for (const entitlementId of entitlementIds) {
+      await upsertSubscription(entitlementId);
     }
 
     // If no entitlements but we have a product ID, try to map it
     if (entitlementIds.length === 0 && productId) {
       console.log("[RC Webhook] No entitlements, using product_id fallback:", productId);
       
-      // Look up the program by ios_product_id or annual_ios_product_id
       const { data: program } = await supabase
         .from("program_catalog")
         .select("slug")
@@ -120,27 +140,7 @@ serve(async (req) => {
         .maybeSingle();
 
       if (program) {
-        const { error } = await supabase
-          .from("user_subscriptions")
-          .upsert(
-            {
-              user_id: userId,
-              program_slug: program.slug,
-              status,
-              platform: "ios",
-              product_id: productId,
-              revenuecat_id: event.original_app_user_id || userId,
-              expires_at: expirationDate,
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: "user_id,program_slug" }
-          );
-
-        if (error) {
-          console.error("[RC Webhook] Fallback upsert error:", error);
-        } else {
-          console.log("[RC Webhook] ✓ Fallback updated:", program.slug, status);
-        }
+        await upsertSubscription(program.slug);
       }
     }
 
@@ -155,3 +155,54 @@ serve(async (req) => {
     });
   }
 });
+
+/**
+ * Ensure a course_enrollment exists for this subscription program
+ */
+async function ensureEnrollment(supabase: any, userId: string, programSlug: string) {
+  try {
+    // Check if enrollment already exists
+    const { data: existing } = await supabase
+      .from("course_enrollments")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("program_slug", programSlug)
+      .maybeSingle();
+
+    if (existing) {
+      // Reactivate if expired
+      await supabase
+        .from("course_enrollments")
+        .update({ status: "active" })
+        .eq("id", existing.id);
+      console.log("[RC Webhook] ✓ Reactivated enrollment for:", programSlug);
+      return;
+    }
+
+    // Look up the program title
+    const { data: program } = await supabase
+      .from("program_catalog")
+      .select("title")
+      .eq("slug", programSlug)
+      .maybeSingle();
+
+    const courseName = program?.title || programSlug;
+
+    const { error } = await supabase
+      .from("course_enrollments")
+      .insert({
+        user_id: userId,
+        course_name: courseName,
+        program_slug: programSlug,
+        status: "active",
+      });
+
+    if (error) {
+      console.error("[RC Webhook] Enrollment creation error:", error);
+    } else {
+      console.log("[RC Webhook] ✓ Created enrollment for:", programSlug);
+    }
+  } catch (error) {
+    console.error("[RC Webhook] Enrollment creation failed:", error);
+  }
+}
