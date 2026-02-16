@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, X } from 'lucide-react';
@@ -141,8 +142,8 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
         </Button>
 
         <div className="flex items-center justify-center gap-4 mt-3 text-xs opacity-50">
-          <span>Terms</span>
-          <span>Privacy</span>
+          <Link to="/sms-terms" className="hover:underline">Terms</Link>
+          <Link to="/privacy" className="hover:underline">Privacy</Link>
         </div>
       </div>
     </div>
