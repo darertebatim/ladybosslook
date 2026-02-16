@@ -14,6 +14,13 @@ interface Message {
     name: string;
     data: Record<string, any>;
   };
+  actionResults?: Array<{
+    success: boolean;
+    action: string;
+    message: string;
+    created?: Record<string, any>;
+    error?: string;
+  }>;
 }
 
 interface AIAssistantContextType {
