@@ -115,12 +115,12 @@ export const audioTools: ToolConfig[] = [
   },
   {
     id: 'soundscape',
-    name: 'Sounds',
+    name: 'Soundscapes',
     icon: 'Waves',
     bgColor: 'bg-[#D4F1F4]',
     iconColor: 'text-cyan-600',
     route: '/app/player?category=soundscape',
-    description: 'Ambient sounds',
+    description: 'Nature and Ambient',
   },
 ];
 
