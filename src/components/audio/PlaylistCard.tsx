@@ -125,13 +125,8 @@ export const PlaylistCard = memo(function PlaylistCard({
           </div>
         )}
         
-        {/* Top-right: language flag + FREE/PLUS badge */}
+        {/* Top-right: FREE badge */}
         <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
-          {language && LANG_FLAGS[language] && (
-            <span className="text-sm bg-white/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
-              {LANG_FLAGS[language]}
-            </span>
-          )}
           {isFree && !isLocked && (
             <Badge className="bg-green-500 hover:bg-green-600 rounded-full">
               FREE
@@ -146,9 +141,12 @@ export const PlaylistCard = memo(function PlaylistCard({
           </Badge>
         )}
         
-        {/* Title Overlay */}
-        <h3 className="absolute bottom-2 left-2 right-2 font-semibold text-sm text-white line-clamp-2 drop-shadow-md z-10">
-          {name}
+        {/* Title Overlay with language flag */}
+        <h3 className="absolute bottom-2 left-2 right-2 font-semibold text-sm text-white line-clamp-2 drop-shadow-md z-10 flex items-center gap-1">
+          {language && LANG_FLAGS[language] && (
+            <span className="text-sm flex-shrink-0">{LANG_FLAGS[language]}</span>
+          )}
+          <span>{name}</span>
         </h3>
         
         {/* Progress overlay at bottom */}
