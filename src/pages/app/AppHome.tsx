@@ -7,7 +7,7 @@ import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, M
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
-import { useTasksForDate, useCompletionsForDate, useCompletedDates, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate, useSetStreakGoal } from '@/hooks/useTaskPlanner';
+import { useTasksForDate, useCompletionsForDate, useCompletedDates, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate, useSetStreakGoal, useAllActiveTasks } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { useNewHomeData } from '@/hooks/useNewHomeData';
 import { TaskCard } from '@/components/app/TaskCard';
@@ -45,6 +45,8 @@ import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
 import { useGoldStreak, useGoldDatesThisWeek, useUpdateGoldStreak } from '@/hooks/useGoldStreak';
 import { useTodayMood } from '@/hooks/useMoodLogs';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
@@ -70,6 +72,7 @@ const AppHome = () => {
   const [showQuickStart, setShowQuickStart] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
   const [showNotificationFlow, setShowNotificationFlow] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
   
   // Goal input state
   const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
@@ -153,6 +156,20 @@ const AppHome = () => {
       navigate(`/app/home/new?name=${encodeURIComponent(taskName)}`);
     }
   }, [navigate]);
+
+  // Subscription & task limit
+  const { data: allActiveTasks = [] } = useAllActiveTasks();
+  const { hasAccessToProgram } = useSubscription();
+  const MAX_FREE_ACTIONS = 6;
+
+  const handleFabClick = useCallback(() => {
+    if (allActiveTasks.length >= MAX_FREE_ACTIONS && !hasAccessToProgram('simora-plus')) {
+      haptic.light();
+      setShowPaywall(true);
+      return;
+    }
+    setShowQuickStart(true);
+  }, [allActiveTasks.length, hasAccessToProgram]);
 
   // Data queries - Planner data
   const {
@@ -813,11 +830,14 @@ const AppHome = () => {
         )}
 
         {/* FAB - positioned above the fixed bottom dashboard */}
-        <button onClick={() => setShowQuickStart(true)} className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-violet-500 text-white shadow-lg flex items-center justify-center hover:bg-violet-600 active:scale-95 transition-all z-50" style={{
+        <button onClick={handleFabClick} className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-violet-500 text-white shadow-lg flex items-center justify-center hover:bg-violet-600 active:scale-95 transition-all z-50" style={{
         bottom: 'calc(100px + env(safe-area-inset-bottom))'
       }}>
           <Plus className="h-6 w-6" />
         </button>
+
+        {/* Paywall for action limit */}
+        <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
 
         {/* Quick Start Sheet */}
         <TaskQuickStartSheet open={showQuickStart} onOpenChange={setShowQuickStart} onContinue={handleQuickStartContinue} />
