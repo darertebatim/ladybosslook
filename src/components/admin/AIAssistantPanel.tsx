@@ -16,6 +16,7 @@ const QUICK_ACTIONS: Record<string, Array<{ label: string; prompt: string }>> = 
     { label: 'Create ritual', prompt: 'Create a "Morning Glow" ritual with sections and tasks for a calm morning start' },
     { label: 'Breathing exercise', prompt: 'Create a 4-7-8 relaxation breathing exercise' },
     { label: 'Self-care bundle', prompt: 'Create a complete self-care ritual with 6 tasks covering body, mind, and soul' },
+    { label: '🎨 Generate covers', prompt: 'Generate Simora-style cover images for all rituals that don\'t have covers yet' },
   ],
   default: [
     { label: 'Draft announcement', prompt: 'Help me write an announcement for my community' },

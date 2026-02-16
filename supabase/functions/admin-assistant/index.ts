@@ -84,6 +84,7 @@ serve(async (req) => {
       "delete_breathing_exercise",
       "add_tasks_to_ritual",
       "delete_ritual_task",
+      "generate_ritual_cover",
     ];
 
     const allTools = getToolDefinitions(currentPage);
@@ -286,6 +287,8 @@ async function executeToolAction(supabase: any, fnName: string, args: any): Prom
         return await addTasksToRitual(supabase, args);
       case "delete_ritual_task":
         return await deleteRitualTask(supabase, args);
+      case "generate_ritual_cover":
+        return await generateRitualCover(supabase, args);
       default:
         return { success: false, error: `Unknown tool: ${fnName}` };
     }
@@ -756,6 +759,147 @@ async function deleteRitualTask(supabase: any, args: any) {
   };
 }
 
+// ============= COVER GENERATION =============
+
+async function generateRitualCover(supabase: any, args: any) {
+  if (!args.ritual_id) {
+    return { success: false, error: "Missing ritual_id", action: "generate_ritual_cover" };
+  }
+
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY) {
+    return { success: false, error: "LOVABLE_API_KEY not configured", action: "generate_ritual_cover" };
+  }
+
+  // Fetch the ritual details
+  const { data: ritual, error: fetchError } = await supabase.from("routines_bank")
+    .select("id, title, subtitle, description, category, emoji")
+    .eq("id", args.ritual_id)
+    .single();
+
+  if (fetchError || !ritual) {
+    return { success: false, error: "Ritual not found", action: "generate_ritual_cover" };
+  }
+
+  // Fetch ritual tasks for icon context
+  const { data: tasks } = await supabase.from("routines_bank_tasks")
+    .select("title, emoji")
+    .eq("routine_id", args.ritual_id)
+    .order("task_order")
+    .limit(6);
+
+  const taskIcons = (tasks || []).map((t: any) => t.title).join(", ");
+
+  // Build Simora-style prompt using the user's design guide
+  const customDesc = args.description || "";
+  const prompt = `Square mobile app cover illustration for a wellness app called Simora.
+
+Style: soft pastel digital illustration, feminine self-care aesthetic,
+calming and uplifting mood, clean modern wellness design,
+gentle feminine wellness style, friendly digital illustration,
+soft glow and sparkles, modern wellness illustration, minimal but expressive objects.
+
+Main scene:
+${customDesc || `A cover representing "${ritual.title}"${ritual.description ? ` — ${ritual.description}` : ""}`}
+
+Floating around:
+${taskIcons ? `Soft illustrated icons representing: ${taskIcons}` : "Small floating hearts, stars, and gentle sparkle elements"}
+
+Character direction (if applicable):
+gentle confident woman, positive energy, soft athletic outfit,
+calm confidence, empowering feminine energy, warm expression.
+
+Background:
+dreamy pastel gradient sky (lavender, pastel pink, soft blue, warm sunrise gradients),
+soft sparkles, light nature elements, minimal but warm environment,
+gentle purple accents, soft glow lighting.
+
+Composition:
+centered hero element, balanced clean layout,
+designed as a mobile app ritual cover.
+The background gradient MUST extend to all edges — NO white borders or padding.
+
+ABSOLUTELY NO text, words, letters, or typography of any kind.
+Clean cover illustration only.`;
+
+  console.log(`[generate_ritual_cover] Generating for ritual: ${ritual.title}`);
+
+  try {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-pro-image-preview",
+        messages: [{ role: "user", content: prompt }],
+        modalities: ["image", "text"],
+      }),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("AI image generation error:", response.status, errText);
+      if (response.status === 429) {
+        return { success: false, error: "Rate limit exceeded. Try again in a moment.", action: "generate_ritual_cover" };
+      }
+      if (response.status === 402) {
+        return { success: false, error: "AI credits exhausted.", action: "generate_ritual_cover" };
+      }
+      return { success: false, error: `AI error: ${response.status}`, action: "generate_ritual_cover" };
+    }
+
+    const data = await response.json();
+    const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+    if (!imageData) {
+      console.error("No image in AI response");
+      return { success: false, error: "No image was generated", action: "generate_ritual_cover" };
+    }
+
+    // Upload to storage
+    const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
+    const imageBuffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
+    const fileName = `ritual-${args.ritual_id}-${Date.now()}.png`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("routine-covers")
+      .upload(fileName, imageBuffer, { contentType: "image/png", upsert: true });
+
+    if (uploadError) {
+      console.error("Upload error:", uploadError);
+      return { success: false, error: `Upload failed: ${uploadError.message}`, action: "generate_ritual_cover" };
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("routine-covers")
+      .getPublicUrl(fileName);
+
+    // Update the ritual with the cover URL
+    const { error: updateError } = await supabase.from("routines_bank")
+      .update({ cover_image_url: publicUrl })
+      .eq("id", args.ritual_id);
+
+    if (updateError) {
+      console.error("Update ritual cover error:", updateError);
+      return { success: false, error: `Cover uploaded but failed to update ritual: ${updateError.message}`, action: "generate_ritual_cover" };
+    }
+
+    console.log(`[generate_ritual_cover] Cover generated and saved: ${publicUrl}`);
+
+    return {
+      success: true,
+      action: "generate_ritual_cover",
+      message: `Generated and applied Simora-style cover for "${ritual.title}"`,
+      created: { title: ritual.title, emoji: ritual.emoji, coverUrl: publicUrl },
+    };
+  } catch (e) {
+    console.error("Cover generation error:", e);
+    return { success: false, error: e instanceof Error ? e.message : "Unknown error", action: "generate_ritual_cover" };
+  }
+}
+
 // ============= CONTEXT =============
 
 async function fetchContext(supabase: any, currentPage?: string) {
@@ -894,6 +1038,7 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 - **"Delete breathing exercise X"** → delete_breathing_exercise
 - **"Add tasks to ritual X"** → add_tasks_to_ritual (adds new tasks to an existing ritual)
 - **"Remove task Y from ritual"** → delete_ritual_task (removes a specific task from a ritual)
+- **"Generate a cover for ritual X"** → generate_ritual_cover (generates a Simora-style pastel cover image using AI and uploads it)
 
 ### SUBTASKS EXPLAINED:
 - **Subtasks** are smaller steps/checklist items that belong to an ACTION (admin_task_bank item).
@@ -922,6 +1067,7 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 13. When user says "delete", "remove" an action/ritual/exercise → use the appropriate delete tool. Always confirm what was deleted.
 14. When user asks to add tasks to an existing ritual → use add_tasks_to_ritual. Match the ritual by title to find its ID.
 15. When user asks to remove a task from a ritual → use delete_ritual_task with the task's ID from context.
+16. When user says "generate cover", "create cover image", "make a cover" for a ritual → use generate_ritual_cover. You can optionally pass a custom description to guide the image. The cover follows Simora's pastel feminine wellness aesthetic automatically.
 `;
   } else if (currentPage === "routines") {
     prompt += `
@@ -1297,6 +1443,23 @@ function getToolDefinitions(currentPage?: string) {
         },
       },
     );
+
+    // Cover generation tool
+    tools.push({
+      type: "function",
+      function: {
+        name: "generate_ritual_cover",
+        description: "Generate a beautiful Simora-style pastel cover image for a ritual using AI. The image is automatically uploaded and applied to the ritual. Use when user asks to create/generate a cover for a ritual.",
+        parameters: {
+          type: "object",
+          properties: {
+            ritual_id: { type: "string", description: "The ID of the ritual to generate a cover for (from context)" },
+            description: { type: "string", description: "Optional custom description to guide the image generation (e.g., 'woman meditating at sunrise with floating hearts')" },
+          },
+          required: ["ritual_id"],
+        },
+      },
+    });
   }
 
   // Existing form-fill tools for other pages
