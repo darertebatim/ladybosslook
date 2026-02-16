@@ -134,7 +134,7 @@ export function ImageUploader({
           <img
             src={value}
             alt="Preview"
-            className={cn('w-full object-cover', previewHeight)}
+            className="w-full max-h-64 object-contain"
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
             }}
