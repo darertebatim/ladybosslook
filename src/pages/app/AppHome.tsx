@@ -830,7 +830,7 @@ const AppHome = () => {
         )}
 
         {/* FAB - positioned above the fixed bottom dashboard */}
-        <button onClick={handleFabClick} className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:bg-primary/90 active:scale-95 transition-all z-50" style={{
+        <button onClick={handleFabClick} className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-urgency text-urgency-foreground shadow-cta flex items-center justify-center hover:bg-urgency-dark active:scale-95 transition-all z-50" style={{
         bottom: 'calc(100px + env(safe-area-inset-bottom))'
       }}>
           <Plus className="h-6 w-6" />
