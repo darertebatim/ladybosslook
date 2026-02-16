@@ -223,6 +223,7 @@ export default function AppPlayer() {
               isLocked={isPlaylistLocked(playlist)}
                programSlug={playlist.program_slug}
                requiresSubscription={playlist.requires_subscription}
+               isSubscribed={hasSoundscapeAccess}
               trackCount={stats.trackCount}
               completedTracks={stats.completedTracks}
               totalDuration={stats.totalDuration}
@@ -430,6 +431,7 @@ export default function AppPlayer() {
                       isLocked={isPlaylistLocked(playlist)}
                        programSlug={playlist.program_slug}
                        requiresSubscription={playlist.requires_subscription}
+                       isSubscribed={hasSoundscapeAccess}
                       trackCount={stats.trackCount}
                       completedTracks={stats.completedTracks}
                       totalDuration={stats.totalDuration}
