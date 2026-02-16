@@ -193,3 +193,6 @@ verify_jwt = false
 
 [functions.send-streak-challenges]
 verify_jwt = false
+
+[functions.revenuecat-webhook]
+verify_jwt = false

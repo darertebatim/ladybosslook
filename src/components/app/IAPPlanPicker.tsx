@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Crown } from 'lucide-react';
-import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useRevenueCat } from '@/hooks/useRevenueCat';
 
 interface IAPPlanPickerProps {
   program: {
@@ -20,7 +20,7 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>(
     program.annual_ios_product_id ? 'annual' : 'monthly'
   );
-  const [isPurchasing, setIsPurchasing] = useState(false);
+  const { handlePurchase, isPurchasing } = useRevenueCat();
 
   const hasAnnual = !!program.annual_ios_product_id && !!program.annual_price_amount;
   const monthlyPrice = program.price_amount;
@@ -30,36 +30,23 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
     : 0;
 
   const formatPrice = (amountCents: number) => {
-    // IAP prices are stored in cents (e.g. 1399 = $13.99)
     const dollars = amountCents / 100;
     return `$${dollars.toFixed(2)}`;
   };
 
-  const handlePurchase = async () => {
-    setIsPurchasing(true);
+  const onSubscribe = async () => {
     const productId = selectedPlan === 'annual' 
       ? program.annual_ios_product_id 
       : program.ios_product_id;
     
-    try {
-      // TODO: Integrate with RevenueCat SDK
-      console.log('[IAP] Purchase initiated:', { productId, plan: selectedPlan });
-      toast.info('Purchase flow coming soon', {
-        description: `Product: ${productId}`,
-      });
-    } catch (error) {
-      console.error('[IAP] Purchase error:', error);
-      toast.error('Purchase failed. Please try again.');
-    } finally {
-      setIsPurchasing(false);
-    }
+    if (!productId) return;
+    await handlePurchase(productId, selectedPlan);
   };
 
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg text-center">Choose Your Plan</h3>
       
-      {/* Plan Cards */}
       <div className={cn("grid gap-3", hasAnnual ? "grid-cols-2" : "grid-cols-1")}>
         {/* Monthly Plan */}
         <button
@@ -116,11 +103,10 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
         )}
       </div>
 
-      {/* Subscribe Button */}
       <Button
         size="lg"
         className="w-full"
-        onClick={handlePurchase}
+        onClick={onSubscribe}
         disabled={isPurchasing}
       >
         {isPurchasing ? (
@@ -133,7 +119,6 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
         )}
       </Button>
 
-      {/* Fine Print */}
       <p className="text-xs text-center text-muted-foreground">
         Cancel anytime. Managed by Apple.
       </p>

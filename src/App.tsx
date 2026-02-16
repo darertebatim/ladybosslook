@@ -12,6 +12,7 @@ import { initializeLocalNotificationHandlers } from "@/lib/localNotifications";
 import { supabase } from "@/integrations/supabase/client";
 import { Capacitor } from "@capacitor/core";
 import { useDeepLinks, checkInitialDeepLink } from "@/hooks/useDeepLinks";
+import { initializeRevenueCat } from "@/lib/revenueCat";
 import { initializeSocialLogin } from "@/lib/nativeSocialAuth";
 import AppLayout from "@/layouts/NativeAppLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
@@ -218,14 +219,16 @@ const NativeAppRedirect = () => {
       clearBadge();
       
       // Refresh device token on app startup
-      const refreshToken = async () => {
+      const refreshTokenAndInitRC = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           console.log('[App] Refreshing push notification token for user:', user.id);
           await refreshDeviceToken(user.id);
+          // Initialize RevenueCat with user ID
+          await initializeRevenueCat(user.id);
         }
       };
-      refreshToken();
+      refreshTokenAndInitRC();
       
       // Check if app was launched with a deep link (cold start)
       const handleInitialDeepLink = async () => {
