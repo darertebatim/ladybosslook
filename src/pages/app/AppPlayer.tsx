@@ -96,6 +96,7 @@ export default function AppPlayer() {
 
   const isPlaylistLocked = (playlist: any) => {
     if (playlist.is_free) return false;
+    if (playlist.requires_subscription) return false; // Plus playlists gate inside detail page
     if (!playlist.program_slug) return false;
     return !enrollments?.includes(playlist.program_slug);
   };
