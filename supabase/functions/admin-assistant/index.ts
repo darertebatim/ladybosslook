@@ -454,10 +454,12 @@ async function updateRitualInBank(supabase: any, args: any) {
   if (args.is_popular !== undefined) updates.is_popular = args.is_popular;
   if (args.is_active !== undefined) updates.is_active = args.is_active;
 
+  console.log(`[update_ritual] ID: ${args.id}, updates:`, JSON.stringify(updates));
+
   const { data, error } = await supabase.from("routines_bank")
     .update(updates)
     .eq("id", args.id)
-    .select("id, title, emoji, category")
+    .select("id, title, emoji, category, color")
     .single();
 
   if (error) {
@@ -465,10 +467,12 @@ async function updateRitualInBank(supabase: any, args: any) {
     return { success: false, error: error.message, action: "update_ritual_in_bank" };
   }
 
+  console.log(`[update_ritual] Result:`, JSON.stringify(data));
+
   return {
     success: true,
     action: "update_ritual_in_bank",
-    message: `Updated ritual "${data.title}"`,
+    message: `Updated ritual "${data.title}" â€” color is now ${data.color}`,
     created: data,
   };
 }
@@ -638,6 +642,8 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "ð
 6. For rituals, include tasks with relevant emojis and durations
 7. After creating/updating, confirm what was done with details
 8. To find the correct item ID for updates, match by title from the existing items lists above
+9. When asked to CHANGE a COLOR: you MUST pick a DIFFERENT hex color than the current one shown in context. Do NOT re-use the same color. Choose a visually distinct new color.
+10. If the user says "change color" without specifying which color, pick a beautiful new color that fits the item's theme.
 `;
   } else if (currentPage === "routines") {
     prompt += `
