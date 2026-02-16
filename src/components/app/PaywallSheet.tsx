@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
 import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, type PaywallProgramData } from '@/components/app/paywalls';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { useRevenueCat } from '@/hooks/useRevenueCat';
 
 const VARIANT_MAP: Record<PaywallVariantId, React.ComponentType<any>> = {
   classic: PaywallClassic,
@@ -19,12 +20,11 @@ const SIMORA_PLUS_SLUG = 'simora-plus';
 interface PaywallSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onPurchase?: (productId: string, plan: 'monthly' | 'annual') => void;
-  onRestore?: () => void;
 }
 
-export function PaywallSheet({ open, onOpenChange, onPurchase, onRestore }: PaywallSheetProps) {
+export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
   const { variant } = useDefaultPaywall();
+  const { handlePurchase, handleRestore } = useRevenueCat();
 
   const { data: programData } = useQuery({
     queryKey: ['paywall-program', SIMORA_PLUS_SLUG],
@@ -51,6 +51,16 @@ export function PaywallSheet({ open, onOpenChange, onPurchase, onRestore }: Payw
     staleTime: 1000 * 60 * 5,
   });
 
+  const onPurchaseComplete = async (productId: string, plan: 'monthly' | 'annual') => {
+    await handlePurchase(productId, plan);
+    onOpenChange(false);
+  };
+
+  const onRestoreComplete = async () => {
+    await handleRestore();
+    onOpenChange(false);
+  };
+
   const Component = VARIANT_MAP[variant] || PaywallClassic;
 
   if (!programData) return null;
@@ -62,8 +72,8 @@ export function PaywallSheet({ open, onOpenChange, onPurchase, onRestore }: Payw
         <div className="h-full overflow-y-auto">
           <Component
             program={programData}
-            onPurchase={onPurchase}
-            onRestore={onRestore}
+            onPurchase={onPurchaseComplete}
+            onRestore={onRestoreComplete}
             onClose={() => onOpenChange(false)}
           />
         </div>
