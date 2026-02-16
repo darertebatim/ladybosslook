@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { useTodayMood } from '@/hooks/useMoodLogs';
+import { useCreateJournalEntry } from '@/hooks/useJournal';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
@@ -74,6 +75,7 @@ export function MoodDashboard() {
   const navigate = useNavigate();
   const { autoCompleteMood } = useAutoCompleteProTask();
   const { data: todayMood } = useTodayMood();
+  const createJournalEntry = useCreateJournalEntry();
   const { data: existingTask } = useExistingProTask('mood');
   const addRoutinePlan = useAddRoutinePlan();
   
@@ -97,12 +99,19 @@ export function MoodDashboard() {
     haptic.medium();
     
     try {
+      // Save mood as a journal entry
+      const moodLabel = MOODS.find(m => m.value === selectedMood)?.label || selectedMood;
+      await createJournalEntry.mutateAsync({
+        content: `Feeling ${moodLabel.toLowerCase()} today.`,
+        mood: selectedMood,
+      });
+
       // Auto-complete any mood pro tasks for today
       await autoCompleteMood();
       
       haptic.success();
       
-      // Show celebration sheet instead of auto-saving to journal
+      // Show celebration sheet
       setShowCelebration(true);
       setIsSubmitting(false);
     } catch (error) {
