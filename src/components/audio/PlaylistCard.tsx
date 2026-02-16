@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, Music, Lock, CheckCircle2, ChevronRight, Crown } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { haptic } from '@/lib/haptics';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
@@ -160,7 +161,7 @@ export const PlaylistCard = memo(function PlaylistCard({
         )}
       </div>
       
-      <div className="p-3 space-y-2">
+      <div className="p-3 space-y-2 relative">
         
         {description && (
           <p className="text-xs text-black line-clamp-2">{description}</p>
@@ -191,6 +192,12 @@ export const PlaylistCard = memo(function PlaylistCard({
           <div className="flex items-center justify-center gap-1.5 py-2 px-3 bg-black text-white rounded-lg text-xs font-medium">
             <span>Tap to enroll</span>
             <ChevronRight className="h-3.5 w-3.5" />
+          </div>
+        )}
+
+        {requiresSubscription && (
+          <div className="absolute bottom-2 right-2 p-1.5 rounded-full bg-amber-100">
+            <FluentEmoji emoji="🔒" size={18} />
           </div>
         )}
       </div>
