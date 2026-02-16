@@ -19,7 +19,7 @@ export interface PaywallProgramData {
 
 interface PaywallProps {
   program: PaywallProgramData;
-  onPurchase?: (productId: string, plan: 'monthly' | 'annual') => void;
+  onPurchase?: (productId: string, plan: 'monthly' | 'annual') => Promise<void> | void;
   onRestore?: () => void;
   onClose?: () => void;
   preview?: boolean;
@@ -41,11 +41,14 @@ export function PaywallClassic({ program, onPurchase, onRestore, onClose, previe
   const handlePurchase = async () => {
     if (preview) return;
     setIsPurchasing(true);
-    const productId = selectedPlan === 'annual'
-      ? program.annual_ios_product_id!
-      : program.ios_product_id!;
-    onPurchase?.(productId, selectedPlan);
-    setIsPurchasing(false);
+    try {
+      const productId = selectedPlan === 'annual'
+        ? program.annual_ios_product_id!
+        : program.ios_product_id!;
+      await onPurchase?.(productId, selectedPlan);
+    } finally {
+      setIsPurchasing(false);
+    }
   };
 
   return (

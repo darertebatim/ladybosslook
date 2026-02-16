@@ -8,7 +8,7 @@ import type { PaywallProgramData } from './PaywallClassic';
 
 interface PaywallComparisonProps {
   program: PaywallProgramData;
-  onPurchase?: (productId: string, plan: 'monthly' | 'annual') => void;
+  onPurchase?: (productId: string, plan: 'monthly' | 'annual') => Promise<void> | void;
   onRestore?: () => void;
   onClose?: () => void;
   preview?: boolean;
@@ -33,11 +33,14 @@ export function PaywallComparison({ program, onPurchase, onRestore, onClose, pre
   const handlePurchase = async () => {
     if (preview) return;
     setIsPurchasing(true);
-    const productId = hasAnnual
-      ? program.annual_ios_product_id!
-      : program.ios_product_id!;
-    onPurchase?.(productId, hasAnnual ? 'annual' : 'monthly');
-    setIsPurchasing(false);
+    try {
+      const productId = hasAnnual
+        ? program.annual_ios_product_id!
+        : program.ios_product_id!;
+      await onPurchase?.(productId, hasAnnual ? 'annual' : 'monthly');
+    } finally {
+      setIsPurchasing(false);
+    }
   };
 
   return (
