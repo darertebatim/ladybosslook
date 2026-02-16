@@ -7,7 +7,7 @@ import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, M
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
-import { useTasksForDate, useCompletionsForDate, useCompletedDates, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate, useSetStreakGoal, useAllActiveTasks } from '@/hooks/useTaskPlanner';
+import { useTasksForDate, useCompletionsForDate, useCompletedDates, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate, useSetStreakGoal } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { useNewHomeData } from '@/hooks/useNewHomeData';
 import { TaskCard } from '@/components/app/TaskCard';
@@ -157,19 +157,9 @@ const AppHome = () => {
     }
   }, [navigate]);
 
-  // Subscription & task limit
-  const { data: allActiveTasks = [] } = useAllActiveTasks();
+  // Subscription & task limit (per-day, not total)
   const { hasAccessToProgram } = useSubscription();
-  const MAX_FREE_ACTIONS = 6;
-
-  const handleFabClick = useCallback(() => {
-    if (allActiveTasks.length >= MAX_FREE_ACTIONS && !hasAccessToProgram('simora-plus')) {
-      haptic.light();
-      setShowPaywall(true);
-      return;
-    }
-    setShowQuickStart(true);
-  }, [allActiveTasks.length, hasAccessToProgram]);
+  const MAX_FREE_ACTIONS_PER_DAY = 6;
 
   // Data queries - Planner data
   const {
@@ -183,6 +173,16 @@ const AppHome = () => {
   const {
     data: skippedTaskIds = new Set<string>()
   } = useSkipsForDate(selectedDate);
+
+  const handleFabClick = useCallback(() => {
+    if (tasks.length >= MAX_FREE_ACTIONS_PER_DAY && !hasAccessToProgram('simora-plus')) {
+      haptic.light();
+      setShowPaywall(true);
+      return;
+    }
+    setShowQuickStart(true);
+  }, [tasks.length, hasAccessToProgram]);
+
   // Streak data now comes from useNewHomeData (consolidated RPC)
   const {
     data: programEvents = [],
