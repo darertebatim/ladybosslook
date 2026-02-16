@@ -3476,15 +3476,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_subscriptions_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "subscription_products"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_subtasks: {
         Row: {
