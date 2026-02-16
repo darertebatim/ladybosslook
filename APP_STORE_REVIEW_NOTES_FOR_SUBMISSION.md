@@ -84,13 +84,50 @@ All program content is delivered in English.
 
 **Notes for Review:**
 - This is version 1.1.1 — all app features have been previously reviewed and approved in prior submissions
-- The only addition in this version is the Simora+ subscription plan (monthly & annual auto-renewable subscriptions)
-- No new permissions, no new background modes, no functionality changes — only the subscription paywall has been added
+- The main addition in this version is the Simora+ subscription plan (monthly & annual auto-renewable subscriptions)
+- No new permissions, no new background modes
 - Push notifications are used exclusively for educational purposes: course updates, announcements, and learning reminders
 - Users must explicitly opt-in to receive notifications via the initial prompt or Profile settings
 - All free features remain fully accessible without subscribing
 - No payment processing or subscription systems were present before — this version introduces In-App Purchase subscriptions managed entirely by Apple
 - The test account already has courses enrolled, but reviewers can also test the enrollment flow by enrolling in additional courses from the Browse tab
+
+**Simora+ Subscription (NEW in v1.1.1):**
+Simora+ is an optional auto-renewable subscription that unlocks premium features. All core functionality (courses, audio, community, journal) remains free.
+
+To test:
+1. **Log in** with the test account
+2. **Trigger the paywall** — try any gated action such as:
+   - Tap the Fasting tool on the Home screen
+   - Tap the Emotions tool on the Home screen
+   - Tap a playlist marked with a "Plus" badge
+   - Try saving more than 6 rituals to the daily planner
+3. **Paywall appears** — shows plan options (Monthly / Annual) with pricing
+4. **Compliance links** — at the bottom of every paywall variant: "Terms", "Privacy", and "Restore Purchases" are all functional
+5. **Restore** — tapping "Restore Purchases" calls RevenueCat to check for existing entitlements
+6. **Dismiss** — users can close the paywall and continue using all free features
+
+Premium features gated behind Simora+:
+- Fasting tracker tool
+- Emotions tracker tool
+- Soundscapes tool
+- Premium breathing exercises
+- Saving rituals to the daily planner
+- More than 6 active actions per calendar day
+- Select premium audio playlists
+
+Subscription plans:
+- **Monthly:** Auto-renewable, managed by Apple
+- **Annual:** Auto-renewable, managed by Apple (discounted rate shown on paywall)
+
+No external payment processing — all subscriptions are handled entirely through Apple's In-App Purchase system via RevenueCat SDK.
+
+**Rate App Feature (NEW in v1.1.1):**
+Users can now rate the app through multiple entry points:
+1. **Profile tab** → "Rate Simora" button (native only)
+2. **Promo banners** → Admin-configurable banners with "Rate App" destination
+3. **Deep link** → /app/rate route
+All paths show a soft pre-prompt before triggering Apple's native SKStoreReviewController.
 
 **Background Audio Feature (Guideline 2.5.4 - UIBackgroundModes audio):**
 The app includes persistent audio playback for educational content. This is the core learning feature. To locate and test:
@@ -107,8 +144,11 @@ The app includes persistent audio playback for educational content. This is the 
 
 This background audio capability is essential for users to listen to educational audio courses and podcasts while multitasking, driving, or exercising - a core use case for our learning platform.
 
-**What's New in Version 1.1.05:**
-- NEW: Mood Check-in tool — a daily wellness feature accessible from the Home screen
+**What's New in Version 1.1.1:**
+- NEW: Simora+ subscription — unlock premium tools (Fasting, Emotions, Soundscapes, premium playlists & breathing exercises) with monthly or annual plans
+- NEW: Rate Simora — rate the app from Profile settings, promo banners, or deep links
+- Paywall with multiple design variants, Terms/Privacy/Restore links for full App Store compliance
+- All existing features remain free — subscription is optional
 - NEW: Urgent task reminders using Time-Sensitive notifications
 
 **Mood Check-in Feature (Home → Mood emoji button):**
