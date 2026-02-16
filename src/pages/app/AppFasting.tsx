@@ -43,7 +43,7 @@ export default function AppFasting() {
   } = useFastingTracker();
 
   const { isSubscribed, isLoading: subLoading } = useSubscription();
-  const [showPaywall, setShowPaywall] = useState(!false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const [protocolOpen, setProtocolOpen] = useState(false);
   const [zonesOpen, setZonesOpen] = useState(false);
