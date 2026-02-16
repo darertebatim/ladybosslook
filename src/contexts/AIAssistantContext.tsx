@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 
 interface FormFillHandler {
@@ -27,7 +27,7 @@ interface AIAssistantContextType {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   messages: Message[];
-  addMessage: (message: Omit<Message, 'id'>) => string; // Returns the message ID
+  addMessage: (message: Omit<Message, 'id'>) => string;
   updateMessage: (id: string, updates: Partial<Omit<Message, 'id'>>) => void;
   clearMessages: () => void;
   isLoading: boolean;
@@ -41,15 +41,38 @@ interface AIAssistantContextType {
 
 const AIAssistantContext = createContext<AIAssistantContextType | null>(null);
 
+const STORAGE_KEY = 'ai-assistant-messages';
+
+function loadMessages(): Message[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveMessages(messages: Message[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  } catch {
+    // Storage full or unavailable
+  }
+}
+
 export function AIAssistantProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(loadMessages);
   const [isLoading, setIsLoading] = useState(false);
   const [formHandlers, setFormHandlers] = useState<Map<string, FormFillHandler['handler']>>(new Map());
   const location = useLocation();
 
-  // Extract current page from route
   const currentPage = location.pathname.split('/').pop() || 'overview';
+
+  // Persist messages to localStorage whenever they change
+  useEffect(() => {
+    saveMessages(messages);
+  }, [messages]);
 
   const addMessage = useCallback((message: Omit<Message, 'id'>): string => {
     const id = crypto.randomUUID();
@@ -65,6 +88,7 @@ export function AIAssistantProvider({ children }: { children: ReactNode }) {
 
   const clearMessages = useCallback(() => {
     setMessages([]);
+    localStorage.removeItem(STORAGE_KEY);
   }, []);
 
   const registerFormHandler = useCallback((formType: string, handler: (data: Record<string, any>) => void) => {

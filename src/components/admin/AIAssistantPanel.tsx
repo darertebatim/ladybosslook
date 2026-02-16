@@ -69,7 +69,7 @@ export function AIAssistantPanel() {
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+      setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [isOpen]);
 
@@ -131,7 +131,6 @@ export function AIAssistantPanel() {
       let toolCall: { name: string; data: Record<string, any> } | undefined;
       let toolCallBuffer = '';
       let assistantMessageId: string | null = null;
-
       let actionResults: ActionResult[] = [];
 
       const processLine = (line: string) => {
@@ -142,7 +141,6 @@ export function AIAssistantPanel() {
         try {
           const parsed = JSON.parse(jsonStr);
           
-          // Handle action results from direct-execution tools
           if (parsed.action_results) {
             actionResults = parsed.action_results;
             return;
@@ -164,7 +162,6 @@ export function AIAssistantPanel() {
             }
           }
           
-          // Handle tool calls (form-fill tools for other pages)
           if (delta?.tool_calls) {
             for (const tc of delta.tool_calls) {
               if (tc.function?.name) {
@@ -206,14 +203,12 @@ export function AIAssistantPanel() {
         }
       }
 
-      // Process any remaining buffer
       if (buffer) {
         for (const line of buffer.split('\n')) {
           processLine(line);
         }
       }
 
-      // Final update: ensure tool call and action results are attached
       if (assistantMessageId) {
         const updates: any = {};
         if (toolCall && toolCallBuffer) {
@@ -266,191 +261,205 @@ export function AIAssistantPanel() {
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed right-6 bottom-24 w-[420px] max-w-[calc(100vw-3rem)] h-[600px] bg-background border rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-muted/50">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="text-lg">✨</span>
-          </div>
-          <div>
-            <h3 className="font-semibold text-sm">AI Assistant</h3>
-            <p className="text-xs text-muted-foreground">Page: {currentPage}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={clearMessages} className="h-8 w-8">
-            <Trash2 className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="h-8 w-8">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+    <>
+      {/* Backdrop overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 z-40 transition-opacity"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
 
-      {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-        {messages.length === 0 ? (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground text-center">
-              How can I help you today?
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {(QUICK_ACTIONS[currentPage] || QUICK_ACTIONS.default).map((action) => (
-                <Button
-                  key={action.label}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                  onClick={() => handleSend(action.prompt)}
-                >
-                  {action.label}
-                </Button>
-              ))}
+      {/* Slide-in panel */}
+      <div
+        className={cn(
+          "fixed top-0 right-0 h-full w-[440px] max-w-[90vw] bg-background border-l shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-in-out",
+          isOpen ? "translate-x-0" : "translate-x-full"
+        )}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b bg-muted/50">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <span className="text-lg">✨</span>
+            </div>
+            <div>
+              <h3 className="font-semibold text-sm">AI Assistant</h3>
+              <p className="text-xs text-muted-foreground">Page: {currentPage}</p>
             </div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={cn(
-                  "flex",
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                )}
-              >
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={clearMessages} className="h-8 w-8" title="Clear history">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="h-8 w-8">
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Messages */}
+        <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+          {messages.length === 0 ? (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground text-center">
+                How can I help you today?
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {(QUICK_ACTIONS[currentPage] || QUICK_ACTIONS.default).map((action) => (
+                  <Button
+                    key={action.label}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => handleSend(action.prompt)}
+                  >
+                    {action.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {messages.map((message) => (
                 <div
+                  key={message.id}
                   className={cn(
-                    "max-w-[90%] rounded-lg px-3 py-2 overflow-hidden",
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
+                    "flex",
+                    message.role === 'user' ? 'justify-end' : 'justify-start'
                   )}
                 >
-                  {message.role === 'assistant' ? (
-                    <div className="prose prose-sm dark:prose-invert max-w-none break-words">
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
-                    </div>
-                  ) : (
-                    <p className="text-sm break-words">{message.content}</p>
-                  )}
-
-                  {/* Tool call card */}
-                  {message.toolCall && (
-                    <Card className="mt-3 p-3 bg-background">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium text-muted-foreground capitalize">
-                          {message.toolCall.name.replace(/_/g, ' ')}
-                        </span>
+                  <div
+                    className={cn(
+                      "max-w-[90%] rounded-lg px-3 py-2 overflow-hidden",
+                      message.role === 'user'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted'
+                    )}
+                  >
+                    {message.role === 'assistant' ? (
+                      <div className="prose prose-sm dark:prose-invert max-w-none break-words">
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
                       </div>
-                      <pre className="text-xs bg-muted p-2 rounded overflow-x-auto max-h-40 whitespace-pre-wrap break-words">
-                        {JSON.stringify(message.toolCall.data, null, 2)}
-                      </pre>
-                      <div className="flex gap-2 mt-2">
-                        <Button
-                          size="sm"
-                          variant="default"
-                          className="flex-1"
-                          onClick={() => handleApplyToForm(message.toolCall!)}
-                        >
-                          Apply to Form
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleCopy(JSON.stringify(message.toolCall!.data, null, 2), message.id)}
-                        >
-                          {copiedId === message.id ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                        </Button>
-                      </div>
-                    </Card>
-                  )}
+                    ) : (
+                      <p className="text-sm break-words">{message.content}</p>
+                    )}
 
-                  {/* Action results cards (direct DB actions) */}
-                  {message.actionResults && message.actionResults.length > 0 && (
-                    <div className="mt-3 space-y-2">
-                      {message.actionResults.map((result, idx) => (
-                        <Card key={idx} className={cn(
-                          "p-3",
-                          result.success ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800" : "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800"
-                        )}>
-                          <div className="flex items-center gap-2">
-                            {result.success ? (
-                              <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
-                            ) : (
-                              <XCircle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
+                    {/* Tool call card */}
+                    {message.toolCall && (
+                      <Card className="mt-3 p-3 bg-background">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-medium text-muted-foreground capitalize">
+                            {message.toolCall.name.replace(/_/g, ' ')}
+                          </span>
+                        </div>
+                        <pre className="text-xs bg-muted p-2 rounded overflow-x-auto max-h-40 whitespace-pre-wrap break-words">
+                          {JSON.stringify(message.toolCall.data, null, 2)}
+                        </pre>
+                        <div className="flex gap-2 mt-2">
+                          <Button
+                            size="sm"
+                            variant="default"
+                            className="flex-1"
+                            onClick={() => handleApplyToForm(message.toolCall!)}
+                          >
+                            Apply to Form
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleCopy(JSON.stringify(message.toolCall!.data, null, 2), message.id)}
+                          >
+                            {copiedId === message.id ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                          </Button>
+                        </div>
+                      </Card>
+                    )}
+
+                    {/* Action results cards */}
+                    {message.actionResults && message.actionResults.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        {message.actionResults.map((result, idx) => (
+                          <Card key={idx} className={cn(
+                            "p-3",
+                            result.success ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800" : "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800"
+                          )}>
+                            <div className="flex items-center gap-2">
+                              {result.success ? (
+                                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
+                              )}
+                              <span className="text-sm font-medium">
+                                {result.message || result.error}
+                              </span>
+                            </div>
+                            {result.created && (
+                              <p className="text-xs text-muted-foreground mt-1 ml-6">
+                                {result.created.emoji || '✨'} {result.created.title || result.created.name} 
+                                {result.created.category ? ` • ${result.created.category}` : ''}
+                                {result.created.taskCount != null ? ` • ${result.created.taskCount} tasks` : ''}
+                              </p>
                             )}
-                            <span className="text-sm font-medium">
-                              {result.message || result.error}
-                            </span>
-                          </div>
-                          {result.created && (
-                            <p className="text-xs text-muted-foreground mt-1 ml-6">
-                              {result.created.emoji || '✨'} {result.created.title || result.created.name} 
-                              {result.created.category ? ` • ${result.created.category}` : ''}
-                              {result.created.taskCount != null ? ` • ${result.created.taskCount} tasks` : ''}
-                            </p>
-                          )}
-                        </Card>
-                      ))}
-                    </div>
-                  )}
+                          </Card>
+                        ))}
+                      </div>
+                    )}
 
-                  {/* Copy button for assistant messages */}
-                  {message.role === 'assistant' && !message.toolCall && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="mt-2 h-6 text-xs"
-                      onClick={() => handleCopy(message.content, message.id)}
-                    >
-                      {copiedId === message.id ? (
-                        <><Check className="h-3 w-3 mr-1" /> Copied</>
-                      ) : (
-                        <><Copy className="h-3 w-3 mr-1" /> Copy</>
-                      )}
-                    </Button>
-                  )}
+                    {/* Copy button for assistant messages */}
+                    {message.role === 'assistant' && !message.toolCall && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mt-2 h-6 text-xs"
+                        onClick={() => handleCopy(message.content, message.id)}
+                      >
+                        {copiedId === message.id ? (
+                          <><Check className="h-3 w-3 mr-1" /> Copied</>
+                        ) : (
+                          <><Copy className="h-3 w-3 mr-1" /> Copy</>
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-muted rounded-lg px-3 py-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-muted rounded-lg px-3 py-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
-      </ScrollArea>
+              )}
+            </div>
+          )}
+        </ScrollArea>
 
-      {/* Input */}
-      <div className="p-4 border-t">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSend();
-          }}
-          className="flex gap-2"
-        >
-          <Input
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask me anything..."
-            disabled={isLoading}
-            className="flex-1"
-          />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
-            <Send className="h-4 w-4" />
-          </Button>
-        </form>
+        {/* Input */}
+        <div className="p-4 border-t">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSend();
+            }}
+            className="flex gap-2"
+          >
+            <Input
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask me anything..."
+              disabled={isLoading}
+              className="flex-1"
+            />
+            <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
