@@ -70,7 +70,7 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
       ]);
 
       const pref = (prefRes.data as any)?.[0];
-      setShowOnHome(pref?.show_on_home ?? true);
+      setShowOnHome(pref?.show_on_home ?? false);
       if (pref?.weight_unit) setWeightUnit(pref.weight_unit as 'lb' | 'kg');
 
       const active = (activeRes.data as any)?.[0] || null;
@@ -110,7 +110,7 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
         .limit(1)
         .then(({ data }) => {
           const pref = (data as any)?.[0];
-          setShowOnHome(pref?.show_on_home ?? true);
+          setShowOnHome(pref?.show_on_home ?? false);
         });
     }
   }, [settingsOpen, user]);
