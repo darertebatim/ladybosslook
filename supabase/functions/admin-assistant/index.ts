@@ -79,6 +79,11 @@ serve(async (req) => {
       "update_breathing_exercise",
       "add_subtasks_to_action",
       "delete_subtask",
+      "delete_action_from_bank",
+      "delete_ritual_from_bank",
+      "delete_breathing_exercise",
+      "add_tasks_to_ritual",
+      "delete_ritual_task",
     ];
 
     const allTools = getToolDefinitions(currentPage);
@@ -271,6 +276,16 @@ async function executeToolAction(supabase: any, fnName: string, args: any): Prom
         return await addSubtasksToAction(supabase, args);
       case "delete_subtask":
         return await deleteSubtask(supabase, args);
+      case "delete_action_from_bank":
+        return await deleteActionFromBank(supabase, args);
+      case "delete_ritual_from_bank":
+        return await deleteRitualFromBank(supabase, args);
+      case "delete_breathing_exercise":
+        return await deleteBreathingExerciseAction(supabase, args);
+      case "add_tasks_to_ritual":
+        return await addTasksToRitual(supabase, args);
+      case "delete_ritual_task":
+        return await deleteRitualTask(supabase, args);
       default:
         return { success: false, error: `Unknown tool: ${fnName}` };
     }
@@ -309,7 +324,6 @@ async function createActionInBank(supabase: any, args: any) {
 }
 
 async function createRitualInBank(supabase: any, args: any) {
-  // 1. Create the ritual
   const { data: ritual, error: ritualError } = await supabase.from("routines_bank").insert({
     title: args.title,
     subtitle: args.subtitle || null,
@@ -327,7 +341,6 @@ async function createRitualInBank(supabase: any, args: any) {
     return { success: false, error: ritualError.message, action: "create_ritual_in_bank" };
   }
 
-  // 2. Create sections if provided
   const sectionMap: Record<string, string> = {};
   if (args.sections?.length) {
     for (let i = 0; i < args.sections.length; i++) {
@@ -345,7 +358,6 @@ async function createRitualInBank(supabase: any, args: any) {
     }
   }
 
-  // 3. Create tasks if provided
   let taskCount = 0;
   if (args.tasks?.length) {
     for (let i = 0; i < args.tasks.length; i++) {
@@ -531,7 +543,6 @@ async function addSubtasksToAction(supabase: any, args: any) {
     return { success: false, error: "No subtasks provided", action: "add_subtasks_to_action" };
   }
 
-  // Get current max order_index for this task
   const { data: existing } = await supabase.from("admin_task_bank_subtasks")
     .select("order_index")
     .eq("task_id", args.task_id)
@@ -579,6 +590,172 @@ async function deleteSubtask(supabase: any, args: any) {
   };
 }
 
+// ============= DELETE FUNCTIONS =============
+
+async function deleteActionFromBank(supabase: any, args: any) {
+  if (!args.id) {
+    return { success: false, error: "Missing action ID", action: "delete_action_from_bank" };
+  }
+
+  // First get the action name for confirmation message
+  const { data: action } = await supabase.from("admin_task_bank")
+    .select("title")
+    .eq("id", args.id)
+    .single();
+
+  // Delete subtasks first
+  await supabase.from("admin_task_bank_subtasks")
+    .delete()
+    .eq("task_id", args.id);
+
+  // Delete the action
+  const { error } = await supabase.from("admin_task_bank")
+    .delete()
+    .eq("id", args.id);
+
+  if (error) {
+    console.error("Delete action error:", error);
+    return { success: false, error: error.message, action: "delete_action_from_bank" };
+  }
+
+  return {
+    success: true,
+    action: "delete_action_from_bank",
+    message: `Deleted action "${action?.title || args.id}"`,
+  };
+}
+
+async function deleteRitualFromBank(supabase: any, args: any) {
+  if (!args.id) {
+    return { success: false, error: "Missing ritual ID", action: "delete_ritual_from_bank" };
+  }
+
+  // Get the ritual name
+  const { data: ritual } = await supabase.from("routines_bank")
+    .select("title")
+    .eq("id", args.id)
+    .single();
+
+  // Delete tasks, sections, then the ritual
+  await supabase.from("routines_bank_tasks")
+    .delete()
+    .eq("routine_id", args.id);
+
+  await supabase.from("routines_bank_sections")
+    .delete()
+    .eq("routine_id", args.id);
+
+  const { error } = await supabase.from("routines_bank")
+    .delete()
+    .eq("id", args.id);
+
+  if (error) {
+    console.error("Delete ritual error:", error);
+    return { success: false, error: error.message, action: "delete_ritual_from_bank" };
+  }
+
+  return {
+    success: true,
+    action: "delete_ritual_from_bank",
+    message: `Deleted ritual "${ritual?.title || args.id}" and all its tasks/sections`,
+  };
+}
+
+async function deleteBreathingExerciseAction(supabase: any, args: any) {
+  if (!args.id) {
+    return { success: false, error: "Missing exercise ID", action: "delete_breathing_exercise" };
+  }
+
+  const { data: exercise } = await supabase.from("breathing_exercises")
+    .select("name")
+    .eq("id", args.id)
+    .single();
+
+  const { error } = await supabase.from("breathing_exercises")
+    .delete()
+    .eq("id", args.id);
+
+  if (error) {
+    console.error("Delete breathing error:", error);
+    return { success: false, error: error.message, action: "delete_breathing_exercise" };
+  }
+
+  return {
+    success: true,
+    action: "delete_breathing_exercise",
+    message: `Deleted breathing exercise "${exercise?.name || args.id}"`,
+  };
+}
+
+// ============= RITUAL TASK MANAGEMENT =============
+
+async function addTasksToRitual(supabase: any, args: any) {
+  if (!args.ritual_id) {
+    return { success: false, error: "Missing ritual_id", action: "add_tasks_to_ritual" };
+  }
+  if (!args.tasks?.length) {
+    return { success: false, error: "No tasks provided", action: "add_tasks_to_ritual" };
+  }
+
+  // Get current max task_order
+  const { data: existing } = await supabase.from("routines_bank_tasks")
+    .select("task_order")
+    .eq("routine_id", args.ritual_id)
+    .order("task_order", { ascending: false })
+    .limit(1);
+
+  let nextOrder = (existing?.[0]?.task_order ?? -1) + 1;
+
+  const inserted = [];
+  for (const task of args.tasks) {
+    const { data, error } = await supabase.from("routines_bank_tasks").insert({
+      routine_id: args.ritual_id,
+      section_id: task.section_id || null,
+      section_title: task.section_title || null,
+      title: task.title,
+      emoji: task.emoji || "✅",
+      duration_minutes: task.duration_minutes || null,
+      task_order: nextOrder++,
+      drip_day: task.drip_day || null,
+      schedule_days: task.schedule_days || null,
+    }).select("id, title, emoji, task_order").single();
+
+    if (!error && data) inserted.push(data);
+  }
+
+  return {
+    success: true,
+    action: "add_tasks_to_ritual",
+    message: `Added ${inserted.length} task(s) to ritual`,
+    created: inserted,
+  };
+}
+
+async function deleteRitualTask(supabase: any, args: any) {
+  if (!args.id) {
+    return { success: false, error: "Missing task ID", action: "delete_ritual_task" };
+  }
+
+  const { data: task } = await supabase.from("routines_bank_tasks")
+    .select("title")
+    .eq("id", args.id)
+    .single();
+
+  const { error } = await supabase.from("routines_bank_tasks")
+    .delete()
+    .eq("id", args.id);
+
+  if (error) {
+    return { success: false, error: error.message, action: "delete_ritual_task" };
+  }
+
+  return {
+    success: true,
+    action: "delete_ritual_task",
+    message: `Deleted task "${task?.title || args.id}" from ritual`,
+  };
+}
+
 // ============= CONTEXT =============
 
 async function fetchContext(supabase: any, currentPage?: string) {
@@ -611,12 +788,14 @@ async function fetchContext(supabase: any, currentPage?: string) {
       { data: recentRituals },
       { data: breathingExercises },
       { data: actionSubtasks },
+      { data: ritualTasks },
     ] = await Promise.all([
       supabase.from("routine_categories").select("id, name, slug, icon").eq("is_active", true).order("display_order"),
       supabase.from("admin_task_bank").select("id, title, emoji, category, color, description, time_period").eq("is_active", true).order("sort_order").limit(20),
       supabase.from("routines_bank").select("id, title, emoji, category, color, description").eq("is_active", true).order("sort_order").limit(10),
       supabase.from("breathing_exercises").select("id, name, emoji, category, description").eq("is_active", true).order("sort_order").limit(10),
       supabase.from("admin_task_bank_subtasks").select("id, task_id, title, order_index").order("order_index").limit(200),
+      supabase.from("routines_bank_tasks").select("id, routine_id, title, emoji, duration_minutes, task_order, section_title").order("task_order").limit(200),
     ]);
 
     context.categories = categories || [];
@@ -624,6 +803,7 @@ async function fetchContext(supabase: any, currentPage?: string) {
     context.existingRituals = recentRituals || [];
     context.breathingExercises = breathingExercises || [];
     context.actionSubtasks = actionSubtasks || [];
+    context.ritualTasks = ritualTasks || [];
   }
 
   if (currentPage === "routines") {
@@ -677,7 +857,7 @@ ${context.feedChannels?.map((c: any) => `- "${c.name}" (ID: ${c.id}, slug: ${c.s
     prompt += `
 ## Current Page: TOOLS (Actions Bank, Rituals Bank, Breathing Exercises)
 
-You can DIRECTLY CREATE items in the database. When the user asks you to create something, USE THE TOOLS to create it immediately.
+You can DIRECTLY CREATE, UPDATE, and DELETE items in the database. When the user asks you to do something, USE THE TOOLS to do it immediately.
 
 ### Available Categories
 ${context.categories?.map((c: any) => `- ${c.icon || "📌"} ${c.name} (slug: "${c.slug}")`).join("\n") || "None"}
@@ -690,28 +870,41 @@ ${context.existingActions?.slice(0, 20).map((a: any) => {
 }).join("\n") || "None"}
 
 ### Existing Rituals (${context.existingRituals?.length || 0} active)
-${context.existingRituals?.map((r: any) => `- ID: "${r.id}" | ${r.emoji || "🌟"} ${r.title} [${r.category}] color:${r.color || 'none'}`).join("\n") || "None"}
+${context.existingRituals?.map((r: any) => {
+  const tasks = (context.ritualTasks || []).filter((t: any) => t.routine_id === r.id);
+  const taskText = tasks.length ? ` | Tasks: ${tasks.map((t: any) => `"${t.emoji || '✅'} ${t.title}" (ID:${t.id})`).join(', ')}` : '';
+  return `- ID: "${r.id}" | ${r.emoji || "🌟"} ${r.title} [${r.category}] color:${r.color || 'none'}${taskText}`;
+}).join("\n") || "None"}
 
 ### Existing Breathing Exercises (${context.breathingExercises?.length || 0} active)
 ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "🌬️"} ${b.name} [${b.category}]`).join("\n") || "None"}
 
 ### What You Can Do (DIRECT DATABASE ACTIONS):
-- "Create a morning meditation action" → create_action_in_bank (CREATES IT NOW)
+- "Create a morning meditation action" → create_action_in_bank
 - "Add 5 self-care actions" → call create_action_in_bank multiple times
-- "Create a morning ritual with tasks" → create_ritual_in_bank (CREATES IT NOW with sections & tasks)
-- "Add a 4-7-8 breathing exercise" → create_breathing_exercise (CREATES IT NOW)
-- "Change the category of X" → update_action_in_bank / update_ritual_in_bank (UPDATES IT, does NOT create a duplicate)
+- "Create a morning ritual with tasks" → create_ritual_in_bank
+- "Add a 4-7-8 breathing exercise" → create_breathing_exercise
+- "Change the category of X" → update_action_in_bank / update_ritual_in_bank
 - "Rename X to Y" → use the update tool with the item's ID
 - "Deactivate X" → update tool with is_active: false
-- "Add subtasks to action X" → add_subtasks_to_action (adds subtasks like steps/checklist items)
-- "Remove subtask Y" → delete_subtask (removes a specific subtask by ID)
+- "Add subtasks to action X" → add_subtasks_to_action
+- "Remove subtask Y" → delete_subtask
+- **"Delete action X"** → delete_action_from_bank (deletes the action and its subtasks)
+- **"Delete ritual X"** → delete_ritual_from_bank (deletes the ritual, its tasks, and sections)
+- **"Delete breathing exercise X"** → delete_breathing_exercise
+- **"Add tasks to ritual X"** → add_tasks_to_ritual (adds new tasks to an existing ritual)
+- **"Remove task Y from ritual"** → delete_ritual_task (removes a specific task from a ritual)
 
 ### SUBTASKS EXPLAINED:
 - **Subtasks** are smaller steps/checklist items that belong to an ACTION (admin_task_bank item).
 - Each action can have multiple subtasks (e.g., "Workout" → subtasks: "20 leg rises", "10 heel touches", "1 min plank").
-- Subtasks are shown as a checklist inside the action detail modal.
 - Use add_subtasks_to_action to add them, delete_subtask to remove one.
-- The existing subtasks for each action are listed above in the "Existing Actions" section.
+
+### RITUAL TASKS EXPLAINED:
+- **Ritual tasks** are the individual activities within a RITUAL (routines_bank item).
+- Each ritual can have multiple tasks grouped by sections.
+- The existing tasks for each ritual are listed above in the "Existing Rituals" section.
+- Use add_tasks_to_ritual to add new tasks, delete_ritual_task to remove one.
 
 ### IMPORTANT RULES:
 1. When user says "create", "add", "make" → USE the create tool to create it directly in the database
@@ -720,12 +913,15 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 4. Pick appropriate emojis, categories, and colors
 5. Use existing categories from the list above (use the slug)
 6. For rituals, include tasks with relevant emojis and durations
-7. After creating/updating, confirm what was done with details
+7. After creating/updating/deleting, confirm what was done with details
 8. To find the correct item ID for updates, match by title from the existing items lists above
 9. When asked to CHANGE a COLOR: you MUST pick a DIFFERENT hex color than the current one shown in context. Do NOT re-use the same color. Choose a visually distinct new color.
 10. If the user says "change color" without specifying which color, pick a beautiful new color that fits the item's theme.
 11. When user mentions "subtasks", "steps", "checklist items" for an ACTION → use add_subtasks_to_action tool. Match the action by title to find its ID.
 12. When user asks to remove/delete a subtask → use delete_subtask with the subtask's ID from context.
+13. When user says "delete", "remove" an action/ritual/exercise → use the appropriate delete tool. Always confirm what was deleted.
+14. When user asks to add tasks to an existing ritual → use add_tasks_to_ritual. Match the ritual by title to find its ID.
+15. When user asks to remove a task from a ritual → use delete_ritual_task with the task's ID from context.
 `;
   } else if (currentPage === "routines") {
     prompt += `
@@ -769,11 +965,12 @@ ${context.programs?.map((p: any) => `- ${p.title} (${p.slug}) - ${p.type}`).join
 ## CRITICAL INSTRUCTIONS
 - When on the Tools page and user asks to CREATE something, ALWAYS use the direct-action create tools
 - When user asks to CHANGE, EDIT, UPDATE, MOVE, or RENAME something, ALWAYS use the UPDATE tools with the item's ID from the context. NEVER create a duplicate.
-- The IDs listed in "Existing Actions/Rituals/Exercises" above are real database IDs — use them for updates
+- When user asks to DELETE or REMOVE something, use the appropriate DELETE tool with the item's ID from context.
+- The IDs listed in "Existing Actions/Rituals/Exercises" above are real database IDs — use them for updates and deletes
 - Use appropriate emojis for each item
 - Match Ladyboss brand: warm, empowering, wellness-focused
 - For bilingual: English first, then Farsi if requested
-- After creating/updating items, summarize what was done clearly
+- After creating/updating/deleting items, summarize what was done clearly
 - If creating multiple items, call the tool multiple times
 `;
 
@@ -969,18 +1166,18 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "add_subtasks_to_action",
-          description: "Add subtasks (checklist steps) to an existing action in the Actions Bank. Subtasks are smaller steps within an action (e.g., 'Workout' action → subtasks: '20 leg rises', '10 heel touches', '1 min plank').",
+          description: "Add subtasks (checklist steps) to an existing action in the Actions Bank.",
           parameters: {
             type: "object",
             properties: {
-              task_id: { type: "string", description: "The ID of the action (from admin_task_bank) to add subtasks to" },
+              task_id: { type: "string", description: "The ID of the action to add subtasks to" },
               subtasks: {
                 type: "array",
                 description: "Array of subtasks to add",
                 items: {
                   type: "object",
                   properties: {
-                    title: { type: "string", description: "Subtask title (e.g., '20 leg rises')" },
+                    title: { type: "string", description: "Subtask title" },
                   },
                   required: ["title"],
                 },
@@ -998,7 +1195,102 @@ function getToolDefinitions(currentPage?: string) {
           parameters: {
             type: "object",
             properties: {
-              id: { type: "string", description: "The subtask ID to delete (from context)" },
+              id: { type: "string", description: "The subtask ID to delete" },
+            },
+            required: ["id"],
+          },
+        },
+      },
+    );
+
+    // Delete tools
+    tools.push(
+      {
+        type: "function",
+        function: {
+          name: "delete_action_from_bank",
+          description: "Permanently DELETE an action from the Actions Bank and all its subtasks. Use when user says 'delete', 'remove' an action.",
+          parameters: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "The ID of the action to delete (from context)" },
+            },
+            required: ["id"],
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "delete_ritual_from_bank",
+          description: "Permanently DELETE a ritual from the Rituals Bank including all its tasks and sections. Use when user says 'delete', 'remove' a ritual.",
+          parameters: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "The ID of the ritual to delete (from context)" },
+            },
+            required: ["id"],
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "delete_breathing_exercise",
+          description: "Permanently DELETE a breathing exercise. Use when user says 'delete', 'remove' a breathing exercise.",
+          parameters: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "The ID of the exercise to delete (from context)" },
+            },
+            required: ["id"],
+          },
+        },
+      },
+    );
+
+    // Ritual task management tools
+    tools.push(
+      {
+        type: "function",
+        function: {
+          name: "add_tasks_to_ritual",
+          description: "Add new tasks to an EXISTING ritual in the Rituals Bank. Use when user wants to add more tasks/activities to a ritual that already exists.",
+          parameters: {
+            type: "object",
+            properties: {
+              ritual_id: { type: "string", description: "The ID of the ritual to add tasks to (from context)" },
+              tasks: {
+                type: "array",
+                description: "Tasks to add to the ritual",
+                items: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string", description: "Task title" },
+                    emoji: { type: "string", description: "Task emoji" },
+                    duration_minutes: { type: "number", description: "Duration in minutes" },
+                    section_id: { type: "string", description: "Section ID if adding to a specific section" },
+                    section_title: { type: "string", description: "Section title for reference" },
+                    drip_day: { type: "number", description: "Day number for drip scheduling" },
+                    schedule_days: { type: "array", items: { type: "number" }, description: "Days of week (0=Sun)" },
+                  },
+                  required: ["title"],
+                },
+              },
+            },
+            required: ["ritual_id", "tasks"],
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "delete_ritual_task",
+          description: "Delete a specific task from a ritual. Use the task's ID from context.",
+          parameters: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "The task ID to delete (from context)" },
             },
             required: ["id"],
           },

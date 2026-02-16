@@ -74,6 +74,18 @@ export function AIAssistantProvider({ children }: { children: ReactNode }) {
     saveMessages(messages);
   }, [messages]);
 
+  // Cmd+J / Ctrl+J keyboard shortcut to toggle panel
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'j') {
+        e.preventDefault();
+        setIsOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
   const addMessage = useCallback((message: Omit<Message, 'id'>): string => {
     const id = crypto.randomUUID();
     setMessages(prev => [...prev, { ...message, id }]);
