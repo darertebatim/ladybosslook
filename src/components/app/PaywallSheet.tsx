@@ -5,6 +5,7 @@ import { useDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
 import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, type PaywallProgramData } from '@/components/app/paywalls';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
+import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
 
 const VARIANT_MAP: Record<PaywallVariantId, React.ComponentType<any>> = {
   classic: PaywallClassic,
@@ -24,7 +25,7 @@ interface PaywallSheetProps {
 
 export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
   const { variant } = useDefaultPaywall();
-  const { handlePurchase, handleRestore } = useRevenueCat();
+  const { handlePurchase, handleRestore, showCelebration, purchasedPlan, dismissCelebration } = useRevenueCat();
 
   const { data: programData } = useQuery({
     queryKey: ['paywall-program', SIMORA_PLUS_SLUG],
@@ -53,7 +54,7 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
 
   const onPurchaseComplete = async (productId: string, plan: 'monthly' | 'annual') => {
     await handlePurchase(productId, plan);
-    onOpenChange(false);
+    // Don't close dialog immediately - celebration will show
   };
 
   const onRestoreComplete = async () => {
@@ -65,19 +66,32 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
 
   if (!programData) return null;
 
+  const handleDismissCelebration = () => {
+    dismissCelebration();
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden">
-        <VisuallyHidden><DialogTitle>Upgrade to simora+</DialogTitle></VisuallyHidden>
-        <div className="h-full overflow-y-auto">
-          <Component
-            program={programData}
-            onPurchase={onPurchaseComplete}
-            onRestore={onRestoreComplete}
-            onClose={() => onOpenChange(false)}
-          />
-        </div>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={open && !showCelebration} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden">
+          <VisuallyHidden><DialogTitle>Upgrade to simora+</DialogTitle></VisuallyHidden>
+          <div className="h-full overflow-y-auto">
+            <Component
+              program={programData}
+              onPurchase={onPurchaseComplete}
+              onRestore={onRestoreComplete}
+              onClose={() => onOpenChange(false)}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <PurchaseCelebration
+        open={showCelebration}
+        onClose={handleDismissCelebration}
+        plan={purchasedPlan}
+      />
+    </>
   );
 }
