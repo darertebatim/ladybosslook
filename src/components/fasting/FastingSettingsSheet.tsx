@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Eye, Bell, Zap } from 'lucide-react';
+import { Eye, Bell, Zap, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { haptic } from '@/lib/haptics';
@@ -19,7 +19,7 @@ export const FastingSettingsSheet = ({ open, onOpenChange }: FastingSettingsShee
   const { user } = useAuth();
   const [showOnHome, setShowOnHome] = useState(true);
   const [reminderEnabled, setReminderEnabled] = useState(false);
-  const [reminderZone, setReminderZone] = useState<string | null>(null);
+  const [reminderZones, setReminderZones] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
   // Load current settings when sheet opens
@@ -35,11 +35,27 @@ export const FastingSettingsSheet = ({ open, onOpenChange }: FastingSettingsShee
       if (pref) {
         setShowOnHome(pref.show_on_home ?? true);
         setReminderEnabled(pref.reminder_enabled ?? false);
-        setReminderZone(pref.reminder_zone ?? null);
+        // Parse comma-separated zones or single zone for backward compatibility
+        const zoneStr = pref.reminder_zone as string | null;
+        if (zoneStr) {
+          setReminderZones(zoneStr.split(',').filter(Boolean));
+        } else {
+          setReminderZones([]);
+        }
       }
     };
     load();
   }, [open, user]);
+
+  const toggleZone = (zoneId: string) => {
+    haptic.light();
+    setReminderZones(prev => {
+      if (prev.includes(zoneId)) {
+        return prev.filter(z => z !== zoneId);
+      }
+      return [...prev, zoneId];
+    });
+  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -51,7 +67,7 @@ export const FastingSettingsSheet = ({ open, onOpenChange }: FastingSettingsShee
           user_id: user.id,
           show_on_home: showOnHome,
           reminder_enabled: reminderEnabled,
-          reminder_zone: reminderEnabled ? reminderZone : null,
+          reminder_zone: reminderEnabled && reminderZones.length > 0 ? reminderZones.join(',') : null,
         } as any, { onConflict: 'user_id' });
       haptic.success();
       toast.success('Fasting settings saved');
@@ -106,7 +122,7 @@ export const FastingSettingsSheet = ({ open, onOpenChange }: FastingSettingsShee
                 onCheckedChange={(checked) => {
                   haptic.light();
                   setReminderEnabled(checked);
-                  if (checked && !reminderZone) setReminderZone('fat-burning');
+                  if (checked && reminderZones.length === 0) setReminderZones(['fat-burning']);
                 }}
                 className="data-[state=checked]:bg-amber-500"
               />
@@ -115,33 +131,36 @@ export const FastingSettingsSheet = ({ open, onOpenChange }: FastingSettingsShee
             {reminderEnabled && (
               <div className="ml-6 space-y-2">
                 <p className="text-xs text-muted-foreground mb-2">Notify me when I reach:</p>
-                {FASTING_ZONES.filter(z => z.id !== 'anabolic').map((zone) => (
-                  <button
-                    key={zone.id}
-                    onClick={() => {
-                      haptic.light();
-                      setReminderZone(zone.id);
-                    }}
-                    className={cn(
-                      'w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-all',
-                      reminderZone === zone.id
-                        ? 'bg-amber-100 dark:bg-amber-900/40 ring-2 ring-amber-400'
-                        : 'bg-muted/50 hover:bg-muted'
-                    )}
-                  >
-                    <span className="text-lg">{zone.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-foreground">{zone.name}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">
-                        After {zone.minHours}h of fasting
-                      </p>
-                    </div>
-                    <Zap className={cn(
-                      'h-4 w-4 shrink-0',
-                      reminderZone === zone.id ? 'text-amber-500' : 'text-muted-foreground/40'
-                    )} />
-                  </button>
-                ))}
+                {FASTING_ZONES.filter(z => z.id !== 'anabolic').map((zone) => {
+                  const isSelected = reminderZones.includes(zone.id);
+                  return (
+                    <button
+                      key={zone.id}
+                      onClick={() => toggleZone(zone.id)}
+                      className={cn(
+                        'w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-all',
+                        isSelected
+                          ? 'bg-amber-100 dark:bg-amber-900/40 ring-2 ring-amber-400'
+                          : 'bg-muted/50 hover:bg-muted'
+                      )}
+                    >
+                      <span className="text-lg">{zone.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-foreground">{zone.name}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">
+                          After {zone.minHours}h of fasting
+                        </p>
+                      </div>
+                      {isSelected ? (
+                        <div className="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center shrink-0">
+                          <Check className="h-3 w-3 text-white" />
+                        </div>
+                      ) : (
+                        <Zap className="h-4 w-4 shrink-0 text-muted-foreground/40" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
