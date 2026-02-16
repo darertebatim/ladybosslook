@@ -74,6 +74,9 @@ serve(async (req) => {
       "create_action_in_bank",
       "create_ritual_in_bank",
       "create_breathing_exercise",
+      "update_action_in_bank",
+      "update_ritual_in_bank",
+      "update_breathing_exercise",
     ];
 
     const allTools = getToolDefinitions(currentPage);
@@ -256,6 +259,12 @@ async function executeToolAction(supabase: any, fnName: string, args: any): Prom
         return await createRitualInBank(supabase, args);
       case "create_breathing_exercise":
         return await createBreathingExercise(supabase, args);
+      case "update_action_in_bank":
+        return await updateActionInBank(supabase, args);
+      case "update_ritual_in_bank":
+        return await updateRitualInBank(supabase, args);
+      case "update_breathing_exercise":
+        return await updateBreathingExercise(supabase, args);
       default:
         return { success: false, error: `Unknown tool: ${fnName}` };
     }
@@ -390,6 +399,118 @@ async function createBreathingExercise(supabase: any, args: any) {
   };
 }
 
+// ============= UPDATE FUNCTIONS =============
+
+async function updateActionInBank(supabase: any, args: any) {
+  if (!args.id) {
+    return { success: false, error: "Missing action ID", action: "update_action_in_bank" };
+  }
+
+  const updates: Record<string, any> = {};
+  if (args.title !== undefined) updates.title = args.title;
+  if (args.emoji !== undefined) updates.emoji = args.emoji;
+  if (args.category !== undefined) updates.category = args.category;
+  if (args.color !== undefined) updates.color = args.color;
+  if (args.description !== undefined) updates.description = args.description;
+  if (args.duration_minutes !== undefined) updates.duration_minutes = args.duration_minutes;
+  if (args.time_period !== undefined) updates.time_period = args.time_period;
+  if (args.repeat_pattern !== undefined) updates.repeat_pattern = args.repeat_pattern;
+  if (args.tag !== undefined) updates.tag = args.tag;
+  if (args.is_popular !== undefined) updates.is_popular = args.is_popular;
+  if (args.is_active !== undefined) updates.is_active = args.is_active;
+
+  const { data, error } = await supabase.from("admin_task_bank")
+    .update(updates)
+    .eq("id", args.id)
+    .select("id, title, emoji, category")
+    .single();
+
+  if (error) {
+    console.error("Update action error:", error);
+    return { success: false, error: error.message, action: "update_action_in_bank" };
+  }
+
+  return {
+    success: true,
+    action: "update_action_in_bank",
+    message: `Updated action "${data.title}"`,
+    created: data,
+  };
+}
+
+async function updateRitualInBank(supabase: any, args: any) {
+  if (!args.id) {
+    return { success: false, error: "Missing ritual ID", action: "update_ritual_in_bank" };
+  }
+
+  const updates: Record<string, any> = {};
+  if (args.title !== undefined) updates.title = args.title;
+  if (args.subtitle !== undefined) updates.subtitle = args.subtitle;
+  if (args.description !== undefined) updates.description = args.description;
+  if (args.category !== undefined) updates.category = args.category;
+  if (args.emoji !== undefined) updates.emoji = args.emoji;
+  if (args.color !== undefined) updates.color = args.color;
+  if (args.schedule_type !== undefined) updates.schedule_type = args.schedule_type;
+  if (args.is_popular !== undefined) updates.is_popular = args.is_popular;
+  if (args.is_active !== undefined) updates.is_active = args.is_active;
+
+  const { data, error } = await supabase.from("routines_bank")
+    .update(updates)
+    .eq("id", args.id)
+    .select("id, title, emoji, category")
+    .single();
+
+  if (error) {
+    console.error("Update ritual error:", error);
+    return { success: false, error: error.message, action: "update_ritual_in_bank" };
+  }
+
+  return {
+    success: true,
+    action: "update_ritual_in_bank",
+    message: `Updated ritual "${data.title}"`,
+    created: data,
+  };
+}
+
+async function updateBreathingExercise(supabase: any, args: any) {
+  if (!args.id) {
+    return { success: false, error: "Missing exercise ID", action: "update_breathing_exercise" };
+  }
+
+  const updates: Record<string, any> = {};
+  if (args.name !== undefined) updates.name = args.name;
+  if (args.description !== undefined) updates.description = args.description;
+  if (args.category !== undefined) updates.category = args.category;
+  if (args.emoji !== undefined) updates.emoji = args.emoji;
+  if (args.inhale_seconds !== undefined) updates.inhale_seconds = args.inhale_seconds;
+  if (args.inhale_hold_seconds !== undefined) updates.inhale_hold_seconds = args.inhale_hold_seconds;
+  if (args.exhale_seconds !== undefined) updates.exhale_seconds = args.exhale_seconds;
+  if (args.exhale_hold_seconds !== undefined) updates.exhale_hold_seconds = args.exhale_hold_seconds;
+  if (args.inhale_method !== undefined) updates.inhale_method = args.inhale_method;
+  if (args.exhale_method !== undefined) updates.exhale_method = args.exhale_method;
+  if (args.is_premium !== undefined) updates.is_premium = args.is_premium;
+  if (args.is_active !== undefined) updates.is_active = args.is_active;
+
+  const { data, error } = await supabase.from("breathing_exercises")
+    .update(updates)
+    .eq("id", args.id)
+    .select("id, name, emoji, category")
+    .single();
+
+  if (error) {
+    console.error("Update breathing error:", error);
+    return { success: false, error: error.message, action: "update_breathing_exercise" };
+  }
+
+  return {
+    success: true,
+    action: "update_breathing_exercise",
+    message: `Updated breathing exercise "${data.name}"`,
+    created: data,
+  };
+}
+
 // ============= CONTEXT =============
 
 async function fetchContext(supabase: any, currentPage?: string) {
@@ -491,27 +612,32 @@ You can DIRECTLY CREATE items in the database. When the user asks you to create 
 ${context.categories?.map((c: any) => `- ${c.icon || "📌"} ${c.name} (slug: "${c.slug}")`).join("\n") || "None"}
 
 ### Existing Actions (${context.existingActions?.length || 0} active)
-${context.existingActions?.slice(0, 10).map((a: any) => `- ${a.emoji} ${a.title} [${a.category}]`).join("\n") || "None"}
+${context.existingActions?.slice(0, 20).map((a: any) => `- ID: "${a.id}" | ${a.emoji} ${a.title} [${a.category}]`).join("\n") || "None"}
 
 ### Existing Rituals (${context.existingRituals?.length || 0} active)
-${context.existingRituals?.map((r: any) => `- ${r.emoji || "🌟"} ${r.title} [${r.category}]`).join("\n") || "None"}
+${context.existingRituals?.map((r: any) => `- ID: "${r.id}" | ${r.emoji || "🌟"} ${r.title} [${r.category}]`).join("\n") || "None"}
 
 ### Existing Breathing Exercises (${context.breathingExercises?.length || 0} active)
-${context.breathingExercises?.map((b: any) => `- ${b.emoji || "🌬️"} ${b.name} [${b.category}]`).join("\n") || "None"}
+${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "🌬️"} ${b.name} [${b.category}]`).join("\n") || "None"}
 
 ### What You Can Do (DIRECT DATABASE ACTIONS):
 - "Create a morning meditation action" → create_action_in_bank (CREATES IT NOW)
 - "Add 5 self-care actions" → call create_action_in_bank multiple times
 - "Create a morning ritual with tasks" → create_ritual_in_bank (CREATES IT NOW with sections & tasks)
 - "Add a 4-7-8 breathing exercise" → create_breathing_exercise (CREATES IT NOW)
+- "Change the category of X" → update_action_in_bank / update_ritual_in_bank (UPDATES IT, does NOT create a duplicate)
+- "Rename X to Y" → use the update tool with the item's ID
+- "Deactivate X" → update tool with is_active: false
 
 ### IMPORTANT RULES:
-1. When user says "create", "add", "make" → USE the tool to create it directly in the database
-2. Don't just describe what you'd create — ACTUALLY create it
-3. Pick appropriate emojis, categories, and colors
-4. Use existing categories from the list above (use the slug)
-5. For rituals, include tasks with relevant emojis and durations
-6. After creating, confirm what was created with details
+1. When user says "create", "add", "make" → USE the create tool to create it directly in the database
+2. When user says "change", "update", "edit", "move", "rename", "modify" → USE the update tool with the existing item's ID from the context above. NEVER create a duplicate.
+3. Don't just describe what you'd create — ACTUALLY create/update it
+4. Pick appropriate emojis, categories, and colors
+5. Use existing categories from the list above (use the slug)
+6. For rituals, include tasks with relevant emojis and durations
+7. After creating/updating, confirm what was done with details
+8. To find the correct item ID for updates, match by title from the existing items lists above
 `;
   } else if (currentPage === "routines") {
     prompt += `
@@ -553,11 +679,13 @@ ${context.programs?.map((p: any) => `- ${p.title} (${p.slug}) - ${p.type}`).join
 
   prompt += `
 ## CRITICAL INSTRUCTIONS
-- When on the Tools page and user asks to create something, ALWAYS use the direct-action tools
+- When on the Tools page and user asks to CREATE something, ALWAYS use the direct-action create tools
+- When user asks to CHANGE, EDIT, UPDATE, MOVE, or RENAME something, ALWAYS use the UPDATE tools with the item's ID from the context. NEVER create a duplicate.
+- The IDs listed in "Existing Actions/Rituals/Exercises" above are real database IDs — use them for updates
 - Use appropriate emojis for each item
 - Match Ladyboss brand: warm, empowering, wellness-focused
 - For bilingual: English first, then Farsi if requested
-- After creating items, summarize what was created clearly
+- After creating/updating items, summarize what was done clearly
 - If creating multiple items, call the tool multiple times
 `;
 
@@ -664,6 +792,84 @@ function getToolDefinitions(currentPage?: string) {
               is_premium: { type: "boolean", description: "Whether this is a premium exercise" },
             },
             required: ["name"],
+          },
+        },
+      },
+    );
+
+    // Update tools
+    tools.push(
+      {
+        type: "function",
+        function: {
+          name: "update_action_in_bank",
+          description: "Update an EXISTING action in the Actions Bank. Use this when the user wants to change, edit, move category, rename, or modify an action. Do NOT create a new one.",
+          parameters: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "The ID of the existing action to update (from context)" },
+              title: { type: "string", description: "New title" },
+              emoji: { type: "string", description: "New emoji" },
+              category: { type: "string", description: "New category slug" },
+              color: { type: "string", description: "New hex color" },
+              description: { type: "string", description: "New description" },
+              duration_minutes: { type: "number", description: "New duration" },
+              time_period: { type: "string", enum: ["morning", "afternoon", "evening", "anytime"] },
+              repeat_pattern: { type: "string", enum: ["daily", "weekly", "custom"] },
+              tag: { type: "string", description: "New tag" },
+              is_popular: { type: "boolean" },
+              is_active: { type: "boolean", description: "Set false to deactivate" },
+            },
+            required: ["id"],
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "update_ritual_in_bank",
+          description: "Update an EXISTING ritual in the Rituals Bank. Use this when the user wants to change, edit, move category, rename, or modify a ritual. Do NOT create a new one.",
+          parameters: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "The ID of the existing ritual to update (from context)" },
+              title: { type: "string", description: "New title" },
+              subtitle: { type: "string" },
+              description: { type: "string" },
+              category: { type: "string", description: "New category slug" },
+              emoji: { type: "string" },
+              color: { type: "string" },
+              schedule_type: { type: "string", enum: ["daily", "weekly", "custom"] },
+              is_popular: { type: "boolean" },
+              is_active: { type: "boolean", description: "Set false to deactivate" },
+            },
+            required: ["id"],
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "update_breathing_exercise",
+          description: "Update an EXISTING breathing exercise. Use this when the user wants to change, edit, or modify an exercise. Do NOT create a new one.",
+          parameters: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "The ID of the existing exercise to update (from context)" },
+              name: { type: "string" },
+              description: { type: "string" },
+              category: { type: "string", enum: ["relaxation", "energy", "focus", "sleep"] },
+              emoji: { type: "string" },
+              inhale_seconds: { type: "number" },
+              inhale_hold_seconds: { type: "number" },
+              exhale_seconds: { type: "number" },
+              exhale_hold_seconds: { type: "number" },
+              inhale_method: { type: "string", enum: ["nose", "mouth"] },
+              exhale_method: { type: "string", enum: ["nose", "mouth"] },
+              is_premium: { type: "boolean" },
+              is_active: { type: "boolean" },
+            },
+            required: ["id"],
           },
         },
       },
