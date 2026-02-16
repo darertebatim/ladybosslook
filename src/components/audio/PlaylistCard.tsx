@@ -93,12 +93,20 @@ export const PlaylistCard = memo(function PlaylistCard({
   const tourClass = isFree && !isLocked ? 'tour-free-playlist' : isLocked ? 'tour-locked-playlist' : '';
 
   return (
-    <Card 
-      className={`overflow-hidden rounded-2xl border-border/50 cursor-pointer shadow-lg border-border transition-all active:scale-[0.98] ${
-        isLocked && !isFree ? 'opacity-80' : ''
-      } ${tourClass}`}
-      onClick={handleClick}
-    >
+    <div className={`relative ${tourClass}`}>
+      {/* PLUS badge - outside card overflow */}
+      {requiresSubscription && (
+        <Badge className="absolute -top-2.5 -left-2 z-30 bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-xs gap-1 shadow-sm">
+          <Crown className="h-3 w-3" />
+          PLUS
+        </Badge>
+      )}
+      <Card 
+        className={`overflow-hidden rounded-2xl border-border/50 cursor-pointer shadow-lg border-border transition-all active:scale-[0.98] ${
+          isLocked && !isFree ? 'opacity-80' : ''
+        }`}
+        onClick={handleClick}
+      >
       <div className="relative aspect-square">
         {coverImageUrl ? (
           <img src={coverImageUrl} alt={name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
@@ -131,13 +139,6 @@ export const PlaylistCard = memo(function PlaylistCard({
           )}
         </div>
 
-        {/* Top-left: PLUS badge */}
-        {requiresSubscription && (
-          <Badge className="absolute top-2 left-2 z-20 bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-xs gap-1 shadow-sm">
-            <Crown className="h-3 w-3" />
-            PLUS
-          </Badge>
-        )}
         
         {category && (
           <Badge variant="secondary" className="absolute top-2 left-2 rounded-full">
@@ -195,6 +196,7 @@ export const PlaylistCard = memo(function PlaylistCard({
           </div>
         )}
       </div>
-    </Card>
+      </Card>
+    </div>
   );
 });
