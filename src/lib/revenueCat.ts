@@ -153,8 +153,58 @@ async function syncSubscriptionToSupabase(customerInfo: any) {
       } else {
         console.log('[RC] ✓ Synced subscription:', programSlug);
       }
+
+      // Also create course enrollment so it appears in admin & profile
+      await ensureEnrollment(user.id, programSlug);
     }
   } catch (error) {
     console.error('[RC] Supabase sync failed:', error);
+  }
+}
+
+/**
+ * Ensure a course_enrollment exists for this subscription program
+ */
+async function ensureEnrollment(userId: string, programSlug: string) {
+  try {
+    // Check if enrollment already exists
+    const { data: existing } = await supabase
+      .from('course_enrollments')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('program_slug', programSlug)
+      .maybeSingle() as any;
+
+    if (existing) {
+      console.log('[RC] Enrollment already exists for:', programSlug);
+      return;
+    }
+
+    // Look up the program title
+    const { data: program } = await supabase
+      .from('program_catalog')
+      .select('title')
+      .eq('slug', programSlug)
+      .maybeSingle() as any;
+
+    const courseName = program?.title || programSlug;
+
+    // Create enrollment
+    const { error } = await supabase
+      .from('course_enrollments')
+      .insert({
+        user_id: userId,
+        course_name: courseName,
+        program_slug: programSlug,
+        status: 'active',
+      } as any);
+
+    if (error) {
+      console.error('[RC] Enrollment creation error:', error);
+    } else {
+      console.log('[RC] ✓ Created enrollment for:', programSlug);
+    }
+  } catch (error) {
+    console.error('[RC] Enrollment creation failed:', error);
   }
 }
