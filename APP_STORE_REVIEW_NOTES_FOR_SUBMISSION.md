@@ -83,12 +83,13 @@ All program content is delivered in English.
 - Telegram: @ladybosslook (optional, user-initiated)
 
 **Notes for Review:**
-- This is version 1.0.6 with improved chat and community features
+- This is version 1.1.1 — all app features have been previously reviewed and approved in prior submissions
+- The only addition in this version is the Simora+ subscription plan (monthly & annual auto-renewable subscriptions)
+- No new permissions, no new background modes, no functionality changes — only the subscription paywall has been added
 - Push notifications are used exclusively for educational purposes: course updates, announcements, and learning reminders
 - Users must explicitly opt-in to receive notifications via the initial prompt or Profile settings
-- All courses can be enrolled in at no cost - this is a completely free educational app
-- No payment processing or subscription systems are present in the app
-- Users simply sign up, browse courses, and enroll for free
+- All free features remain fully accessible without subscribing
+- No payment processing or subscription systems were present before — this version introduces In-App Purchase subscriptions managed entirely by Apple
 - The test account already has courses enrolled, but reviewers can also test the enrollment flow by enrolling in additional courses from the Browse tab
 
 **Background Audio Feature (Guideline 2.5.4 - UIBackgroundModes audio):**
