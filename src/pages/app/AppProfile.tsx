@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
   LogOut, User, Mail, Phone, MapPin, MessageCircle, Calendar, Lock, Send, Bell,
-  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, ChevronDown, Trash2, AlertTriangle, Settings, PlayCircle, Headset, Megaphone
+  BookOpen, Wallet, Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight, ChevronDown, Trash2, AlertTriangle, Settings, PlayCircle, Headset, Megaphone, Star
 } from 'lucide-react';
 import { NativeSettings, IOSSettings, AndroidSettings } from 'capacitor-native-settings';
 import {
@@ -1100,6 +1100,22 @@ const AppProfile = () => {
               </Card>
             </CollapsibleContent>
           </Collapsible>
+        )}
+
+        {/* Rate Simora - Native only */}
+        {showNativeSettings && (
+          <button
+            onClick={() => navigate('/app/rate')}
+            className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+              </div>
+              <span className="font-medium text-sm">Rate Simora</span>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
         )}
 
         {/* Push Notifications - Native only */}
