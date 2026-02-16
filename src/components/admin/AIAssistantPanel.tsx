@@ -343,7 +343,7 @@ export function AIAssistantPanel() {
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                       </div>
                     ) : (
-                      <p className="text-sm break-words">{message.content}</p>
+                      <p className="text-sm break-words whitespace-pre-wrap">{message.content}</p>
                     )}
 
                     {/* Tool call card */}
