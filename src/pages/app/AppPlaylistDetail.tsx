@@ -666,7 +666,7 @@ export default function AppPlaylistDetail() {
           </div>
 
           <div className="flex-1 space-y-2">
-            <div className="flex gap-2 flex-wrap items-center">
+            <div className="flex gap-2 flex-nowrap items-center overflow-x-auto">
               {playlist.category && (
                 <Badge variant="secondary">{getCategoryLabel()}</Badge>
               )}
