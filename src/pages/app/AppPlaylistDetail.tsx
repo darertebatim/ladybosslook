@@ -666,9 +666,14 @@ export default function AppPlaylistDetail() {
           </div>
 
           <div className="flex-1 space-y-2">
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap items-center">
               {playlist.category && (
                 <Badge variant="secondary">{getCategoryLabel()}</Badge>
+              )}
+              {playlist.language && ({'american':'🇺🇸','persian':'🇮🇷','turkish':'🇹🇷','spanish':'🇪🇸','all':'🌐'} as Record<string,string>)[playlist.language] && (
+                <Badge variant="outline" className="text-sm">
+                  {({'american':'🇺🇸','persian':'🇮🇷','turkish':'🇹🇷','spanish':'🇪🇸','all':'🌐'} as Record<string,string>)[playlist.language]}
+                </Badge>
               )}
               {playlist.is_free && <Badge className="bg-green-500">FREE</Badge>}
               {playlist.requires_subscription && (
