@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -197,9 +198,13 @@ export function PaywallLimitedOffer({ program, onPurchase, onRestore, onClose, p
       </div>
 
       {/* Legal */}
-      <p className="text-[10px] text-muted-foreground text-center px-6 pb-3 leading-tight">
+      <p className="text-[10px] text-muted-foreground text-center px-6 pb-1 leading-tight">
         Your Apple ID payment method will be automatically charged ${selectedPlan === 'monthly' ? `${monthlyPrice.toFixed(2)}/month` : `${(selectedPlan === 'annual-offer' ? offerAnnualPrice : annualPrice).toFixed(2)} for a year`}. Cancel the subscription at least 24 hours before the current subscription period.
       </p>
+      <div className="flex items-center justify-center gap-4 pb-3 text-xs text-muted-foreground">
+        <Link to="/sms-terms" className="hover:underline">Terms</Link>
+        <Link to="/privacy" className="hover:underline">Privacy</Link>
+      </div>
     </div>
   );
 }
