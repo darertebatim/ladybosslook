@@ -77,6 +77,8 @@ serve(async (req) => {
       "update_action_in_bank",
       "update_ritual_in_bank",
       "update_breathing_exercise",
+      "add_subtasks_to_action",
+      "delete_subtask",
     ];
 
     const allTools = getToolDefinitions(currentPage);
@@ -265,6 +267,10 @@ async function executeToolAction(supabase: any, fnName: string, args: any): Prom
         return await updateRitualInBank(supabase, args);
       case "update_breathing_exercise":
         return await updateBreathingExercise(supabase, args);
+      case "add_subtasks_to_action":
+        return await addSubtasksToAction(supabase, args);
+      case "delete_subtask":
+        return await deleteSubtask(supabase, args);
       default:
         return { success: false, error: `Unknown tool: ${fnName}` };
     }
@@ -515,6 +521,64 @@ async function updateBreathingExercise(supabase: any, args: any) {
   };
 }
 
+// ============= SUBTASK FUNCTIONS =============
+
+async function addSubtasksToAction(supabase: any, args: any) {
+  if (!args.task_id) {
+    return { success: false, error: "Missing task_id (action ID)", action: "add_subtasks_to_action" };
+  }
+  if (!args.subtasks?.length) {
+    return { success: false, error: "No subtasks provided", action: "add_subtasks_to_action" };
+  }
+
+  // Get current max order_index for this task
+  const { data: existing } = await supabase.from("admin_task_bank_subtasks")
+    .select("order_index")
+    .eq("task_id", args.task_id)
+    .order("order_index", { ascending: false })
+    .limit(1);
+
+  let nextOrder = (existing?.[0]?.order_index ?? -1) + 1;
+
+  const inserted = [];
+  for (const sub of args.subtasks) {
+    const { data, error } = await supabase.from("admin_task_bank_subtasks").insert({
+      task_id: args.task_id,
+      title: sub.title,
+      order_index: nextOrder++,
+    }).select("id, title, order_index").single();
+
+    if (!error && data) inserted.push(data);
+  }
+
+  return {
+    success: true,
+    action: "add_subtasks_to_action",
+    message: `Added ${inserted.length} subtask(s) to action`,
+    created: inserted,
+  };
+}
+
+async function deleteSubtask(supabase: any, args: any) {
+  if (!args.id) {
+    return { success: false, error: "Missing subtask ID", action: "delete_subtask" };
+  }
+
+  const { error } = await supabase.from("admin_task_bank_subtasks")
+    .delete()
+    .eq("id", args.id);
+
+  if (error) {
+    return { success: false, error: error.message, action: "delete_subtask" };
+  }
+
+  return {
+    success: true,
+    action: "delete_subtask",
+    message: `Deleted subtask`,
+  };
+}
+
 // ============= CONTEXT =============
 
 async function fetchContext(supabase: any, currentPage?: string) {
@@ -546,17 +610,20 @@ async function fetchContext(supabase: any, currentPage?: string) {
       { data: recentActions },
       { data: recentRituals },
       { data: breathingExercises },
+      { data: actionSubtasks },
     ] = await Promise.all([
       supabase.from("routine_categories").select("id, name, slug, icon").eq("is_active", true).order("display_order"),
       supabase.from("admin_task_bank").select("id, title, emoji, category, color, description, time_period").eq("is_active", true).order("sort_order").limit(20),
       supabase.from("routines_bank").select("id, title, emoji, category, color, description").eq("is_active", true).order("sort_order").limit(10),
       supabase.from("breathing_exercises").select("id, name, emoji, category, description").eq("is_active", true).order("sort_order").limit(10),
+      supabase.from("admin_task_bank_subtasks").select("id, task_id, title, order_index").order("order_index").limit(200),
     ]);
 
     context.categories = categories || [];
     context.existingActions = recentActions || [];
     context.existingRituals = recentRituals || [];
     context.breathingExercises = breathingExercises || [];
+    context.actionSubtasks = actionSubtasks || [];
   }
 
   if (currentPage === "routines") {
@@ -616,7 +683,11 @@ You can DIRECTLY CREATE items in the database. When the user asks you to create 
 ${context.categories?.map((c: any) => `- ${c.icon || "📌"} ${c.name} (slug: "${c.slug}")`).join("\n") || "None"}
 
 ### Existing Actions (${context.existingActions?.length || 0} active)
-${context.existingActions?.slice(0, 20).map((a: any) => `- ID: "${a.id}" | ${a.emoji} ${a.title} [${a.category}] color:${a.color || 'none'} ${a.time_period ? `time:${a.time_period}` : ''}`).join("\n") || "None"}
+${context.existingActions?.slice(0, 20).map((a: any) => {
+  const subs = (context.actionSubtasks || []).filter((s: any) => s.task_id === a.id);
+  const subText = subs.length ? ` | Subtasks: ${subs.map((s: any) => `"${s.title}" (ID:${s.id})`).join(', ')}` : '';
+  return `- ID: "${a.id}" | ${a.emoji} ${a.title} [${a.category}] color:${a.color || 'none'} ${a.time_period ? `time:${a.time_period}` : ''}${subText}`;
+}).join("\n") || "None"}
 
 ### Existing Rituals (${context.existingRituals?.length || 0} active)
 ${context.existingRituals?.map((r: any) => `- ID: "${r.id}" | ${r.emoji || "🌟"} ${r.title} [${r.category}] color:${r.color || 'none'}`).join("\n") || "None"}
@@ -632,6 +703,15 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 - "Change the category of X" → update_action_in_bank / update_ritual_in_bank (UPDATES IT, does NOT create a duplicate)
 - "Rename X to Y" → use the update tool with the item's ID
 - "Deactivate X" → update tool with is_active: false
+- "Add subtasks to action X" → add_subtasks_to_action (adds subtasks like steps/checklist items)
+- "Remove subtask Y" → delete_subtask (removes a specific subtask by ID)
+
+### SUBTASKS EXPLAINED:
+- **Subtasks** are smaller steps/checklist items that belong to an ACTION (admin_task_bank item).
+- Each action can have multiple subtasks (e.g., "Workout" → subtasks: "20 leg rises", "10 heel touches", "1 min plank").
+- Subtasks are shown as a checklist inside the action detail modal.
+- Use add_subtasks_to_action to add them, delete_subtask to remove one.
+- The existing subtasks for each action are listed above in the "Existing Actions" section.
 
 ### IMPORTANT RULES:
 1. When user says "create", "add", "make" → USE the create tool to create it directly in the database
@@ -644,6 +724,8 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 8. To find the correct item ID for updates, match by title from the existing items lists above
 9. When asked to CHANGE a COLOR: you MUST pick a DIFFERENT hex color than the current one shown in context. Do NOT re-use the same color. Choose a visually distinct new color.
 10. If the user says "change color" without specifying which color, pick a beautiful new color that fits the item's theme.
+11. When user mentions "subtasks", "steps", "checklist items" for an ACTION → use add_subtasks_to_action tool. Match the action by title to find its ID.
+12. When user asks to remove/delete a subtask → use delete_subtask with the subtask's ID from context.
 `;
   } else if (currentPage === "routines") {
     prompt += `
@@ -874,6 +956,49 @@ function getToolDefinitions(currentPage?: string) {
               exhale_method: { type: "string", enum: ["nose", "mouth"] },
               is_premium: { type: "boolean" },
               is_active: { type: "boolean" },
+            },
+            required: ["id"],
+          },
+        },
+      },
+    );
+
+    // Subtask tools
+    tools.push(
+      {
+        type: "function",
+        function: {
+          name: "add_subtasks_to_action",
+          description: "Add subtasks (checklist steps) to an existing action in the Actions Bank. Subtasks are smaller steps within an action (e.g., 'Workout' action → subtasks: '20 leg rises', '10 heel touches', '1 min plank').",
+          parameters: {
+            type: "object",
+            properties: {
+              task_id: { type: "string", description: "The ID of the action (from admin_task_bank) to add subtasks to" },
+              subtasks: {
+                type: "array",
+                description: "Array of subtasks to add",
+                items: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string", description: "Subtask title (e.g., '20 leg rises')" },
+                  },
+                  required: ["title"],
+                },
+              },
+            },
+            required: ["task_id", "subtasks"],
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "delete_subtask",
+          description: "Delete a specific subtask from an action. Use the subtask's ID from context.",
+          parameters: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "The subtask ID to delete (from context)" },
             },
             required: ["id"],
           },
