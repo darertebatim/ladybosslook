@@ -99,8 +99,8 @@ const AppHome = () => {
   const [showGoalSelection, setShowGoalSelection] = useState(false);
   const [isStreakUpgrade, setIsStreakUpgrade] = useState(false);
   const setStreakGoal = useSetStreakGoal();
-  
-  
+
+
   // Gold streak celebration state - use localStorage to prevent re-showing on navigation
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const goldCelebrationShownKey = `simora_gold_celebration_shown_${todayStr}`;
