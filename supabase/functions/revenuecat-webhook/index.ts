@@ -13,12 +13,17 @@ serve(async (req) => {
   }
 
   try {
-    // Verify authorization header matches our RevenueCat secret
-    const authHeader = req.headers.get("authorization");
-    const rcApiKey = Deno.env.get("REVENUECAT_API_KEY");
+    // Verify authorization header matches our RevenueCat webhook secret
+    const authHeader = req.headers.get("authorization") || "";
+    const rcApiKey = Deno.env.get("REVENUECAT_API_KEY") || "";
     
-    if (!authHeader || authHeader !== `Bearer ${rcApiKey}`) {
-      console.error("[RC Webhook] Unauthorized request");
+    // Support both "Bearer <key>" and raw "<key>" formats
+    const providedKey = authHeader.startsWith("Bearer ") 
+      ? authHeader.replace("Bearer ", "") 
+      : authHeader;
+    
+    if (!rcApiKey || !providedKey || providedKey !== rcApiKey) {
+      console.error("[RC Webhook] Unauthorized - provided:", providedKey?.substring(0, 8) + "...", "expected:", rcApiKey?.substring(0, 8) + "...");
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
