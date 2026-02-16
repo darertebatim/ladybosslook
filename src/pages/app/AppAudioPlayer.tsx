@@ -22,6 +22,8 @@ import {
 import { getTrackAvailabilityWithCountdown } from "@/lib/dripContent";
 import { useAudioPlayer, TrackInfo } from "@/contexts/AudioPlayerContext";
 import { useExistingAudioTask, useQuickAddAudioTask } from "@/hooks/useAudioRoutine";
+import { RoutinePreviewSheet, EditedTask } from "@/components/app/RoutinePreviewSheet";
+import { useAddRoutinePlan, RoutinePlanTask } from "@/hooks/useRoutinePlans";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 
@@ -30,6 +32,7 @@ export default function AppAudioPlayer() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   
   // Check if we're in module mode (navigated from modules list)
   const isModuleMode = searchParams.get('moduleMode') === 'true';
@@ -60,7 +63,7 @@ export default function AppAudioPlayer() {
 
   // Audio routine hook (replaces bookmarks)
   const { data: existingTask, isLoading: isCheckingTask } = useExistingAudioTask(audioId);
-  const addAudioTaskMutation = useQuickAddAudioTask();
+  const addRoutinePlan = useAddRoutinePlan();
 
   // Fetch audio content
   const { data: audio, isLoading } = useQuery({
@@ -540,20 +543,14 @@ export default function AppAudioPlayer() {
               className="h-10 w-10"
               onClick={() => {
                 if (existingTask) {
-                  // Already added - navigate to planner
                   haptic.light();
                   navigate('/app/home');
                 } else {
-                  // Add to routine
                   haptic.medium();
-                  addAudioTaskMutation.mutate({
-                    id: audio.id,
-                    title: audio.title,
-                    cover_image_url: audio.cover_image_url,
-                  });
+                  setShowRoutineSheet(true);
                 }
               }}
-              disabled={addAudioTaskMutation.isPending || isCheckingTask}
+              disabled={isCheckingTask}
               title={existingTask ? "Go to planner" : "Add to my rituals"}
             >
               {existingTask ? (
@@ -782,6 +779,60 @@ export default function AppAudioPlayer() {
           <div className="pb-safe" />
         </div>
       </div>
+
+      {/* Routine Preview Sheet for audio tasks */}
+      {audio && (
+        <RoutinePreviewSheet
+          open={showRoutineSheet}
+          onOpenChange={setShowRoutineSheet}
+          tasks={[{
+            id: `synthetic-audio-${audio.id}`,
+            plan_id: `synthetic-audio-${audio.id}`,
+            title: audio.title,
+            icon: '🎧',
+            color: 'sky',
+            task_order: 0,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            linked_playlist_id: null,
+            pro_link_type: 'audio',
+            pro_link_value: audio.id,
+            linked_playlist: null,
+            tag: 'pro',
+          } as RoutinePlanTask]}
+          routineTitle={audio.title}
+          onSave={async (selectedTaskIds, editedTasks) => {
+            try {
+              await addRoutinePlan.mutateAsync({
+                planId: `synthetic-audio-${audio.id}`,
+                selectedTaskIds,
+                editedTasks,
+                syntheticTasks: [{
+                  id: `synthetic-audio-${audio.id}`,
+                  plan_id: `synthetic-audio-${audio.id}`,
+                  title: audio.title,
+                  icon: '🎧',
+                  color: 'sky',
+                  task_order: 0,
+                  is_active: true,
+                  created_at: new Date().toISOString(),
+                  linked_playlist_id: null,
+                  pro_link_type: 'audio',
+                  pro_link_value: audio.id,
+                  linked_playlist: null,
+                  tag: 'pro',
+                } as RoutinePlanTask],
+              });
+              toast.success('Added to your rituals! 🎧');
+              setShowRoutineSheet(false);
+            } catch (error) {
+              console.error('Failed to add ritual:', error);
+              toast.error('Failed to add to ritual');
+            }
+          }}
+          isSaving={addRoutinePlan.isPending}
+        />
+      )}
     </div>
   );
 }
