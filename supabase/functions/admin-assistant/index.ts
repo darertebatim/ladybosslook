@@ -544,9 +544,9 @@ async function fetchContext(supabase: any, currentPage?: string) {
       { data: breathingExercises },
     ] = await Promise.all([
       supabase.from("routine_categories").select("id, name, slug, icon").eq("is_active", true).order("display_order"),
-      supabase.from("admin_task_bank").select("id, title, emoji, category").eq("is_active", true).order("sort_order").limit(20),
-      supabase.from("routines_bank").select("id, title, emoji, category").eq("is_active", true).order("sort_order").limit(10),
-      supabase.from("breathing_exercises").select("id, name, emoji, category").eq("is_active", true).order("sort_order").limit(10),
+      supabase.from("admin_task_bank").select("id, title, emoji, category, color, description, time_period").eq("is_active", true).order("sort_order").limit(20),
+      supabase.from("routines_bank").select("id, title, emoji, category, color, description").eq("is_active", true).order("sort_order").limit(10),
+      supabase.from("breathing_exercises").select("id, name, emoji, category, description").eq("is_active", true).order("sort_order").limit(10),
     ]);
 
     context.categories = categories || [];
@@ -612,10 +612,10 @@ You can DIRECTLY CREATE items in the database. When the user asks you to create 
 ${context.categories?.map((c: any) => `- ${c.icon || "📌"} ${c.name} (slug: "${c.slug}")`).join("\n") || "None"}
 
 ### Existing Actions (${context.existingActions?.length || 0} active)
-${context.existingActions?.slice(0, 20).map((a: any) => `- ID: "${a.id}" | ${a.emoji} ${a.title} [${a.category}]`).join("\n") || "None"}
+${context.existingActions?.slice(0, 20).map((a: any) => `- ID: "${a.id}" | ${a.emoji} ${a.title} [${a.category}] color:${a.color || 'none'} ${a.time_period ? `time:${a.time_period}` : ''}`).join("\n") || "None"}
 
 ### Existing Rituals (${context.existingRituals?.length || 0} active)
-${context.existingRituals?.map((r: any) => `- ID: "${r.id}" | ${r.emoji || "🌟"} ${r.title} [${r.category}]`).join("\n") || "None"}
+${context.existingRituals?.map((r: any) => `- ID: "${r.id}" | ${r.emoji || "🌟"} ${r.title} [${r.category}] color:${r.color || 'none'}`).join("\n") || "None"}
 
 ### Existing Breathing Exercises (${context.breathingExercises?.length || 0} active)
 ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "🌬️"} ${b.name} [${b.category}]`).join("\n") || "None"}
