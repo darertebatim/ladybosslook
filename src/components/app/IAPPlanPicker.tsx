@@ -5,6 +5,7 @@ import { Loader2, Crown, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
 import { useSubscription } from '@/hooks/useSubscription';
+import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
 
 interface IAPPlanPickerProps {
   program: {
@@ -22,7 +23,7 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>(
     program.annual_ios_product_id ? 'annual' : 'monthly'
   );
-  const { handlePurchase, handleRestore, isPurchasing, isRestoring } = useRevenueCat();
+  const { handlePurchase, handleRestore, isPurchasing, isRestoring, showCelebration, purchasedPlan, dismissCelebration } = useRevenueCat();
   const { hasAccessToProgram, getSubscriptionForProgram } = useSubscription();
 
   const isSubscribed = program.slug ? hasAccessToProgram(program.slug) : false;
@@ -160,6 +161,13 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
           {isRestoring ? 'Restoring...' : 'Restore'}
         </button>
       </div>
+
+
+      <PurchaseCelebration 
+        open={showCelebration} 
+        onClose={dismissCelebration} 
+        plan={purchasedPlan} 
+      />
     </div>
   );
 }

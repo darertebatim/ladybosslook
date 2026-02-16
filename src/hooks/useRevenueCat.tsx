@@ -7,6 +7,8 @@ import { haptic } from '@/lib/haptics';
 export function useRevenueCat() {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [purchasedPlan, setPurchasedPlan] = useState<'monthly' | 'annual'>('monthly');
   const queryClient = useQueryClient();
 
   const handlePurchase = useCallback(async (productId: string, plan: 'monthly' | 'annual') => {
@@ -19,9 +21,8 @@ export function useRevenueCat() {
 
       if (result.success) {
         haptic.success();
-        toast.success('Welcome to simora+! 🎉', {
-          description: 'Your premium features are now unlocked.',
-        });
+        setPurchasedPlan(plan);
+        setShowCelebration(true);
         // Invalidate subscription queries to refresh UI
         queryClient.invalidateQueries({ queryKey: ['user-subscriptions'] });
       } else if (result.error === 'cancelled') {
@@ -69,10 +70,17 @@ export function useRevenueCat() {
     }
   }, [isRestoring, queryClient]);
 
+  const dismissCelebration = useCallback(() => {
+    setShowCelebration(false);
+  }, []);
+
   return {
     handlePurchase,
     handleRestore,
     isPurchasing,
     isRestoring,
+    showCelebration,
+    purchasedPlan,
+    dismissCelebration,
   };
 }
