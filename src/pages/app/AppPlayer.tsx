@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast, Globe } from "lucide-react";
+import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast, Globe, Crown } from "lucide-react";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isNativeApp } from "@/lib/platform";
@@ -12,6 +12,9 @@ import { cn } from "@/lib/utils";
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { PlayerTour, TourHelpButton } from "@/components/app/tour";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useSubscription } from "@/hooks/useSubscription";
+import { PaywallSheet } from "@/components/app/PaywallSheet";
+import { haptic } from "@/lib/haptics";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
@@ -39,6 +42,9 @@ export default function AppPlayer() {
   const [showSearch, setShowSearch] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [progressFilter, setProgressFilter] = useState<"all" | "in_progress" | "completed">("all");
+  const [showPaywall, setShowPaywall] = useState(false);
+  const { hasAccessToProgram } = useSubscription();
+  const hasSoundscapeAccess = hasAccessToProgram('simora-plus');
   const [preferredLanguage, setPreferredLanguage] = useState(() => {
     return localStorage.getItem('player-language') || 'all';
   });
@@ -314,15 +320,34 @@ export default function AppPlayer() {
           <div className="flex gap-3 overflow-x-auto py-2 scrollbar-hide">
             {availableCategories.map((cat) => {
               const config = categoryConfig[cat] || { name: cat, icon: 'Sparkles', color: 'purple' };
+              const isSoundscapeLocked = cat === 'soundscape' && !hasSoundscapeAccess;
               return (
-                <CategoryCircle
-                  key={cat}
-                  name={config.name}
-                  icon={config.icon}
-                  color={config.color}
-                  isSelected={selectedCategory === cat}
-                  onClick={() => setSelectedCategory(cat)}
-                />
+                <div key={cat} className="relative">
+                  {isSoundscapeLocked && (
+                    <div className="absolute -top-2 -left-1 z-10 flex items-center gap-0.5 bg-amber-200 text-amber-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full">
+                      <Crown className="h-2.5 w-2.5" /> PLUS
+                    </div>
+                  )}
+                  <CategoryCircle
+                    name={config.name}
+                    icon={config.icon}
+                    color={config.color}
+                    isSelected={selectedCategory === cat}
+                    onClick={() => {
+                      if (isSoundscapeLocked) {
+                        haptic.light();
+                        setShowPaywall(true);
+                      } else {
+                        setSelectedCategory(cat);
+                      }
+                    }}
+                  />
+                  {isSoundscapeLocked && (
+                    <div className="absolute -bottom-0.5 -right-0.5 z-10 w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center">
+                      <span className="text-[10px]">🔒</span>
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -430,6 +455,9 @@ export default function AppPlayer() {
       
       {/* Feature Tour */}
       <PlayerTour isFirstVisit={true} onTourReady={handleTourReady} />
+
+      {/* Paywall for locked categories */}
+      <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
     </div>
   );
 }
