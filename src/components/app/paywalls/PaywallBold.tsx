@@ -9,7 +9,7 @@ import appIcon from '@/assets/app-icon.png';
 
 interface PaywallBoldProps {
   program: PaywallProgramData;
-  onPurchase?: (productId: string, plan: 'monthly' | 'annual') => void;
+  onPurchase?: (productId: string, plan: 'monthly' | 'annual') => Promise<void> | void;
   onRestore?: () => void;
   onClose?: () => void;
   preview?: boolean;
@@ -31,11 +31,14 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
   const handlePurchase = async () => {
     if (preview) return;
     setIsPurchasing(true);
-    const productId = selectedPlan === 'annual'
-      ? program.annual_ios_product_id!
-      : program.ios_product_id!;
-    onPurchase?.(productId, selectedPlan);
-    setIsPurchasing(false);
+    try {
+      const productId = selectedPlan === 'annual'
+        ? program.annual_ios_product_id!
+        : program.ios_product_id!;
+      await onPurchase?.(productId, selectedPlan);
+    } finally {
+      setIsPurchasing(false);
+    }
   };
 
   return (

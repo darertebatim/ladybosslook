@@ -7,7 +7,7 @@ import type { PaywallProgramData } from './PaywallClassic';
 
 interface PaywallLimitedOfferProps {
   program: PaywallProgramData;
-  onPurchase?: (productId: string, plan: 'monthly' | 'annual') => void;
+  onPurchase?: (productId: string, plan: 'monthly' | 'annual') => Promise<void> | void;
   onRestore?: () => void;
   onClose?: () => void;
   preview?: boolean;
@@ -62,12 +62,15 @@ export function PaywallLimitedOffer({ program, onPurchase, onRestore, onClose, p
   const handlePurchase = async () => {
     if (preview) return;
     setIsPurchasing(true);
-    const productId = selectedPlan === 'monthly'
-      ? program.ios_product_id!
-      : program.annual_ios_product_id!;
-    const plan = selectedPlan === 'monthly' ? 'monthly' : 'annual';
-    onPurchase?.(productId, plan);
-    setIsPurchasing(false);
+    try {
+      const productId = selectedPlan === 'monthly'
+        ? program.ios_product_id!
+        : program.annual_ios_product_id!;
+      const plan = selectedPlan === 'monthly' ? 'monthly' : 'annual';
+      await onPurchase?.(productId, plan);
+    } finally {
+      setIsPurchasing(false);
+    }
   };
 
   return (
