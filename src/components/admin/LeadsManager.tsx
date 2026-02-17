@@ -64,6 +64,7 @@ interface UserLead {
   }>;
   enrollments: Array<{
     id: string;
+    user_id: string;
     course_name: string;
     status: string;
     enrolled_at: string;
@@ -392,7 +393,7 @@ export function LeadsManager() {
     }
   };
 
-  const handleUnenroll = async (enrollmentId: string, courseName: string) => {
+  const handleUnenroll = async (enrollmentId: string, courseName: string, userId?: string, programSlug?: string) => {
     try {
       const { error } = await supabase
         .from('course_enrollments')
@@ -400,6 +401,15 @@ export function LeadsManager() {
         .eq('id', enrollmentId);
 
       if (error) throw error;
+
+      // Also expire matching subscription so paywall re-gates content
+      if (userId && programSlug) {
+        await supabase
+          .from('user_subscriptions')
+          .update({ status: 'expired' } as any)
+          .eq('user_id', userId)
+          .eq('program_slug', programSlug);
+      }
 
       toast({
         title: "Success",
@@ -1233,7 +1243,7 @@ export function LeadsManager() {
                                   <AlertDialogFooter>
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction
-                                      onClick={() => handleUnenroll(enrollment.id, enrollment.course_name)}
+                                      onClick={() => handleUnenroll(enrollment.id, enrollment.course_name, enrollment.user_id, enrollment.program_slug)}
                                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                     >
                                       Delete
