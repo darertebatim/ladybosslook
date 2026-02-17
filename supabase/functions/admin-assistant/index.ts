@@ -987,7 +987,6 @@ async function fetchContext(supabase: any, currentPage?: string) {
       { data: breathingExercises },
       { data: actionSubtasks },
       { data: ritualTasks },
-      { data: ritualSections },
     ] = await Promise.all([
       supabase.from("routine_categories").select("id, name, slug, icon").eq("is_active", true).order("display_order"),
       supabase.from("admin_task_bank").select("id, title, emoji, category, color, description, time_period").eq("is_active", true).order("sort_order").limit(20),
