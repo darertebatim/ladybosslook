@@ -617,386 +617,403 @@ export default function RoutinesBank() {
             </DialogDescription>
           </DialogHeader>
           
-          <ScrollArea className="flex-1 pr-4" style={{ maxHeight: 'calc(85vh - 200px)' }}>
-            <div className="space-y-4 py-2">
-              {/* Title */}
-              <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Morning Energy Boost"
-                />
-              </div>
+          <Tabs defaultValue="details" className="flex-1 flex flex-col min-h-0">
+            <TabsList className="w-full grid grid-cols-2 shrink-0">
+              <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="content">Content & Actions</TabsTrigger>
+            </TabsList>
 
-              {/* Subtitle */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="subtitle">Subtitle</Label>
-                  <AITextGenerator
-                    context={formData.title}
-                    fieldType="subtitle"
-                    onGenerate={(text) => setFormData({ ...formData, subtitle: text })}
-                    disabled={!formData.title.trim()}
-                  />
-                </div>
-                <Input
-                  id="subtitle"
-                  value={formData.subtitle}
-                  onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-                  placeholder="Start your day right"
-                />
-              </div>
-
-              {/* Row: Category, Color, Emoji */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-2">
-                  <Label>Category</Label>
-                  <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {routineCategories.map((cat) => (
-                        <SelectItem key={cat.slug} value={cat.slug}>
-                          <span className="flex items-center gap-2">
-                            <TaskIcon iconName={cat.icon || '📋'} size={14} />
-                            {cat.name}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Color</Label>
-                  <div className="flex gap-1 flex-wrap">
-                    {COLOR_OPTIONS.map((c) => (
-                      <button
-                        key={c.name}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, color: c.name })}
-                        className={cn(
-                          "w-6 h-6 rounded-full border-2 transition-all",
-                          formData.color === c.name ? "border-primary scale-110" : "border-transparent"
-                        )}
-                        style={{ backgroundColor: c.hex }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Icon</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setEmojiPickerOpen(true)}
-                    className="w-full justify-start gap-2"
-                  >
-                    <TaskIcon iconName={formData.emoji} size={18} />
-                    Change
-                  </Button>
-                </div>
-              </div>
-
-              {/* Cover Image */}
-              <ImageUploader
-                label="Cover Image"
-                value={formData.cover_image_url}
-                onChange={(url) => setFormData({ ...formData, cover_image_url: url })}
-                folder="routine-covers"
-              />
-
-              {/* Video URL */}
-              <div className="space-y-2">
-                <Label htmlFor="video_url">Video URL (YouTube, Vimeo, or MP4)</Label>
-                <Input
-                  id="video_url"
-                  value={formData.video_url}
-                  onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                  placeholder="https://youtube.com/watch?v=... or https://example.com/video.mp4"
-                />
-              </div>
-
-              {/* Description - Rich Text Editor */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label>Description</Label>
-                  <AITextGenerator
-                    context={`${formData.title} - ${formData.subtitle}`}
-                    fieldType="description"
-                    onGenerate={(text) => setFormData({ ...formData, description: text })}
-                    disabled={!formData.title.trim()}
-                  />
-                </div>
-                <RichTextEditor
-                  value={formData.description}
-                  onChange={(value) => setFormData({ ...formData, description: value })}
-                  placeholder="Write your ritual description... Add images, formatting, and rich content like a blog post."
-                />
-              </div>
-
-              {/* Schedule Type */}
-              <div className="space-y-2 border-t pt-4">
-                <Label>Ritual Type</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { value: 'daily', label: 'Normal', desc: 'Actions with their own repeat settings', icon: '☀️' },
-                    { value: 'challenge', label: 'Challenge', desc: 'Sequential drip (Day 1, 2...)', icon: '🔥' },
-                  ].map(opt => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, schedule_type: opt.value as any })}
-                      className={cn(
-                        "flex flex-col items-center gap-1 p-3 rounded-lg border-2 text-center transition-all",
-                        formData.schedule_type === opt.value 
-                          ? "border-primary bg-primary/5" 
-                          : "border-border hover:border-muted-foreground/30"
-                      )}
-                    >
-                      <span className="text-lg">{opt.icon}</span>
-                      <span className="text-xs font-medium">{opt.label}</span>
-                      <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Start Mode Selector */}
-                <div className="mt-3 space-y-2">
-                  <Label className="text-xs">When does it start?</Label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: 'none', label: 'Immediately', desc: 'Starts today' },
-                      { value: 'date', label: 'Specific date', desc: 'Pick a date' },
-                      { value: 'weekday', label: 'Day of week', desc: 'e.g. Next Monday' },
-                    ].map(opt => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, start_mode: opt.value as any })}
-                        className={cn(
-                          "flex flex-col items-center gap-0.5 p-2 rounded-lg border-2 text-center transition-all",
-                          formData.start_mode === opt.value
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-muted-foreground/30"
-                        )}
-                      >
-                        <span className="text-xs font-medium">{opt.label}</span>
-                        <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {formData.start_mode === 'date' && (
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn("w-full justify-start text-left font-normal", !formData.challenge_start_date && "text-muted-foreground")}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {formData.challenge_start_date ? format(formData.challenge_start_date, 'PPP') : <span>Pick a start date</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <CalendarComponent
-                          mode="single"
-                          selected={formData.challenge_start_date || undefined}
-                          onSelect={(date) => setFormData({ ...formData, challenge_start_date: date || null })}
-                          className={cn("p-3 pointer-events-auto")}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  )}
-
-                  {formData.start_mode === 'weekday' && (
-                    <div className="flex gap-1.5 justify-center">
-                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
-                        <button
-                          key={day}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, start_day_of_week: idx })}
-                          className={cn(
-                            "w-9 h-9 rounded-full text-xs font-medium transition-all",
-                            formData.start_day_of_week === idx
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                          )}
-                        >
-                          {day}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* End Mode Selector */}
-              <div className="space-y-2 border-t pt-4">
-                <Label className="text-xs">When does it end?</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { value: 'never', label: 'Never', desc: 'Runs forever' },
-                    { value: 'date', label: 'Specific date', desc: 'Pick an end date' },
-                    { value: 'after_days', label: 'After X days', desc: 'Auto-expire' },
-                  ].map(opt => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, end_mode: opt.value as any })}
-                      className={cn(
-                        "flex flex-col items-center gap-0.5 p-2 rounded-lg border-2 text-center transition-all",
-                        formData.end_mode === opt.value
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-muted-foreground/30"
-                      )}
-                    >
-                      <span className="text-xs font-medium">{opt.label}</span>
-                      <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
-                    </button>
-                  ))}
-                </div>
-
-                {formData.end_mode === 'date' && (
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn("w-full justify-start text-left font-normal", !formData.end_date && "text-muted-foreground")}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {formData.end_date ? format(formData.end_date, 'PPP') : <span>Pick an end date</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent
-                        mode="single"
-                        selected={formData.end_date || undefined}
-                        onSelect={(date) => setFormData({ ...formData, end_date: date || null })}
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                )}
-
-                {formData.end_mode === 'after_days' && (
-                  <div className="flex items-center gap-2">
+            {/* Tab 1: Details */}
+            <TabsContent value="details" className="flex-1 min-h-0 mt-2">
+              <ScrollArea className="h-full pr-4" style={{ maxHeight: 'calc(85vh - 260px)' }}>
+                <div className="space-y-4 py-2">
+                  {/* Title */}
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Title *</Label>
                     <Input
-                      type="number"
-                      min={1}
-                      value={formData.end_after_days ?? ''}
-                      onChange={(e) => setFormData({ ...formData, end_after_days: e.target.value ? parseInt(e.target.value) : null })}
-                      placeholder="Number of days"
-                      className="w-full"
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="Morning Energy Boost"
                     />
-                    <span className="text-sm text-muted-foreground whitespace-nowrap">days</span>
                   </div>
-                )}
-              </div>
 
-              {/* Actions (flat task list) */}
-              <div className="space-y-2 border-t pt-4">
-                <div className="flex items-center justify-between">
-                  <Label className="flex items-center gap-1">
-                    <Layers className="h-4 w-4" />
-                    Actions ({localTasks.length})
-                  </Label>
-                </div>
+                  {/* Subtitle */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="subtitle">Subtitle</Label>
+                      <AITextGenerator
+                        context={formData.title}
+                        fieldType="subtitle"
+                        onGenerate={(text) => setFormData({ ...formData, subtitle: text })}
+                        disabled={!formData.title.trim()}
+                      />
+                    </div>
+                    <Input
+                      id="subtitle"
+                      value={formData.subtitle}
+                      onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+                      placeholder="Start your day right"
+                    />
+                  </div>
 
-                <div className="space-y-1">
-                  {localTasks.map((task, idx) => (
-                    <div key={task.id} className="rounded bg-background border">
-                      <div className="flex items-center gap-2 p-2">
-                        <div className="flex flex-col">
+                  {/* Row: Category, Color, Emoji */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-2">
+                      <Label>Category</Label>
+                      <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {routineCategories.map((cat) => (
+                            <SelectItem key={cat.slug} value={cat.slug}>
+                              <span className="flex items-center gap-2">
+                                <TaskIcon iconName={cat.icon || '📋'} size={14} />
+                                {cat.name}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Color</Label>
+                      <div className="flex gap-1 flex-wrap">
+                        {COLOR_OPTIONS.map((c) => (
                           <button
+                            key={c.name}
                             type="button"
-                            onClick={() => moveTaskUp(idx)}
-                            disabled={idx === 0}
-                            className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                          >
-                            <ChevronUp className="h-3 w-3" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => moveTaskDown(idx)}
-                            disabled={idx === localTasks.length - 1}
-                            className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                          >
-                            <ChevronDown className="h-3 w-3" />
-                          </button>
-                        </div>
-                        <TaskIcon iconName={task.emoji} size={16} />
-                        <span className="flex-1 text-sm truncate">{task.title}</span>
-                        {renderTaskScheduleConfig(task)}
-                        <button
-                          type="button"
-                          onClick={() => removeTask(task.id)}
-                          className="p-1 text-destructive hover:bg-destructive/10 rounded"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
+                            onClick={() => setFormData({ ...formData, color: c.name })}
+                            className={cn(
+                              "w-6 h-6 rounded-full border-2 transition-all",
+                              formData.color === c.name ? "border-primary scale-110" : "border-transparent"
+                            )}
+                            style={{ backgroundColor: c.hex }}
+                          />
+                        ))}
                       </div>
                     </div>
-                  ))}
-                </div>
 
-                {/* Add task picker */}
-                {taskSearchOpen ? (
-                  <div className="border rounded p-2 space-y-2 bg-muted/30">
-                    <div className="relative">
-                      <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search actions..."
-                        value={taskSearch}
-                        onChange={(e) => setTaskSearch(e.target.value)}
-                        className="pl-8 h-8 text-sm"
-                        autoFocus
-                      />
+                    <div className="space-y-2">
+                      <Label>Icon</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setEmojiPickerOpen(true)}
+                        className="w-full justify-start gap-2"
+                      >
+                        <TaskIcon iconName={formData.emoji} size={18} />
+                        Change
+                      </Button>
                     </div>
-                    <ScrollArea className="h-32">
-                      <div className="space-y-1">
-                        {filteredTaskBank.map((task) => (
+                  </div>
+
+                  {/* Cover Image */}
+                  <ImageUploader
+                    label="Cover Image"
+                    value={formData.cover_image_url}
+                    onChange={(url) => setFormData({ ...formData, cover_image_url: url })}
+                    folder="routine-covers"
+                  />
+
+                  {/* Video URL */}
+                  <div className="space-y-2">
+                    <Label htmlFor="video_url">Video URL (YouTube, Vimeo, or MP4)</Label>
+                    <Input
+                      id="video_url"
+                      value={formData.video_url}
+                      onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                      placeholder="https://youtube.com/watch?v=... or https://example.com/video.mp4"
+                    />
+                  </div>
+
+                  {/* Schedule Type */}
+                  <div className="space-y-2 border-t pt-4">
+                    <Label>Ritual Type</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { value: 'daily', label: 'Normal', desc: 'Actions with their own repeat settings', icon: '☀️' },
+                        { value: 'challenge', label: 'Challenge', desc: 'Sequential drip (Day 1, 2...)', icon: '🔥' },
+                      ].map(opt => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, schedule_type: opt.value as any })}
+                          className={cn(
+                            "flex flex-col items-center gap-1 p-3 rounded-lg border-2 text-center transition-all",
+                            formData.schedule_type === opt.value 
+                              ? "border-primary bg-primary/5" 
+                              : "border-border hover:border-muted-foreground/30"
+                          )}
+                        >
+                          <span className="text-lg">{opt.icon}</span>
+                          <span className="text-xs font-medium">{opt.label}</span>
+                          <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Start Mode Selector */}
+                    <div className="mt-3 space-y-2">
+                      <Label className="text-xs">When does it start?</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { value: 'none', label: 'Immediately', desc: 'Starts today' },
+                          { value: 'date', label: 'Specific date', desc: 'Pick a date' },
+                          { value: 'weekday', label: 'Day of week', desc: 'e.g. Next Monday' },
+                        ].map(opt => (
                           <button
-                            key={task.id}
+                            key={opt.value}
                             type="button"
-                            onClick={() => addTask(task)}
-                            className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-accent text-left text-xs"
+                            onClick={() => setFormData({ ...formData, start_mode: opt.value as any })}
+                            className={cn(
+                              "flex flex-col items-center gap-0.5 p-2 rounded-lg border-2 text-center transition-all",
+                              formData.start_mode === opt.value
+                                ? "border-primary bg-primary/5"
+                                : "border-border hover:border-muted-foreground/30"
+                            )}
                           >
-                            <TaskIcon iconName={task.emoji} size={14} />
-                            <span className="flex-1 truncate">{task.title}</span>
+                            <span className="text-xs font-medium">{opt.label}</span>
+                            <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
                           </button>
                         ))}
                       </div>
-                    </ScrollArea>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => { setTaskSearchOpen(false); setTaskSearch(''); }}
-                      className="w-full h-7"
-                    >
-                      Cancel
-                    </Button>
+
+                      {formData.start_mode === 'date' && (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn("w-full justify-start text-left font-normal", !formData.challenge_start_date && "text-muted-foreground")}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {formData.challenge_start_date ? format(formData.challenge_start_date, 'PPP') : <span>Pick a start date</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                              mode="single"
+                              selected={formData.challenge_start_date || undefined}
+                              onSelect={(date) => setFormData({ ...formData, challenge_start_date: date || null })}
+                              className={cn("p-3 pointer-events-auto")}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      )}
+
+                      {formData.start_mode === 'weekday' && (
+                        <div className="flex gap-1.5 justify-center">
+                          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
+                            <button
+                              key={day}
+                              type="button"
+                              onClick={() => setFormData({ ...formData, start_day_of_week: idx })}
+                              className={cn(
+                                "w-9 h-9 rounded-full text-xs font-medium transition-all",
+                                formData.start_day_of_week === idx
+                                  ? "bg-primary text-primary-foreground"
+                                  : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                              )}
+                            >
+                              {day}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setTaskSearchOpen(true)}
-                    className="w-full gap-1"
-                  >
-                    <Plus className="h-3 w-3" />
-                    Add Action
-                  </Button>
-                )}
-              </div>
-            </div>
-          </ScrollArea>
+
+                  {/* End Mode Selector */}
+                  <div className="space-y-2 border-t pt-4">
+                    <Label className="text-xs">When does it end?</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: 'never', label: 'Never', desc: 'Runs forever' },
+                        { value: 'date', label: 'Specific date', desc: 'Pick an end date' },
+                        { value: 'after_days', label: 'After X days', desc: 'Auto-expire' },
+                      ].map(opt => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, end_mode: opt.value as any })}
+                          className={cn(
+                            "flex flex-col items-center gap-0.5 p-2 rounded-lg border-2 text-center transition-all",
+                            formData.end_mode === opt.value
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-muted-foreground/30"
+                          )}
+                        >
+                          <span className="text-xs font-medium">{opt.label}</span>
+                          <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    {formData.end_mode === 'date' && (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn("w-full justify-start text-left font-normal", !formData.end_date && "text-muted-foreground")}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {formData.end_date ? format(formData.end_date, 'PPP') : <span>Pick an end date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={formData.end_date || undefined}
+                            onSelect={(date) => setFormData({ ...formData, end_date: date || null })}
+                            className={cn("p-3 pointer-events-auto")}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    )}
+
+                    {formData.end_mode === 'after_days' && (
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          min={1}
+                          value={formData.end_after_days ?? ''}
+                          onChange={(e) => setFormData({ ...formData, end_after_days: e.target.value ? parseInt(e.target.value) : null })}
+                          placeholder="Number of days"
+                          className="w-full"
+                        />
+                        <span className="text-sm text-muted-foreground whitespace-nowrap">days</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            {/* Tab 2: Content & Actions */}
+            <TabsContent value="content" className="flex-1 min-h-0 mt-2">
+              <ScrollArea className="h-full pr-4" style={{ maxHeight: 'calc(85vh - 260px)' }}>
+                <div className="space-y-4 py-2">
+                  {/* Description - Rich Text Editor */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label>Description</Label>
+                      <AITextGenerator
+                        context={`${formData.title} - ${formData.subtitle}`}
+                        fieldType="description"
+                        onGenerate={(text) => setFormData({ ...formData, description: text })}
+                        disabled={!formData.title.trim()}
+                      />
+                    </div>
+                    <RichTextEditor
+                      value={formData.description}
+                      onChange={(value) => setFormData({ ...formData, description: value })}
+                      placeholder="Write your ritual description... Add images, formatting, and rich content like a blog post."
+                    />
+                  </div>
+
+                  {/* Actions (flat task list) */}
+                  <div className="space-y-2 border-t pt-4">
+                    <div className="flex items-center justify-between">
+                      <Label className="flex items-center gap-1">
+                        <Layers className="h-4 w-4" />
+                        Actions ({localTasks.length})
+                      </Label>
+                    </div>
+
+                    <div className="space-y-1">
+                      {localTasks.map((task, idx) => (
+                        <div key={task.id} className="rounded bg-background border">
+                          <div className="flex items-center gap-2 p-2">
+                            <div className="flex flex-col">
+                              <button
+                                type="button"
+                                onClick={() => moveTaskUp(idx)}
+                                disabled={idx === 0}
+                                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                              >
+                                <ChevronUp className="h-3 w-3" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => moveTaskDown(idx)}
+                                disabled={idx === localTasks.length - 1}
+                                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                              >
+                                <ChevronDown className="h-3 w-3" />
+                              </button>
+                            </div>
+                            <TaskIcon iconName={task.emoji} size={16} />
+                            <span className="flex-1 text-sm truncate">{task.title}</span>
+                            {renderTaskScheduleConfig(task)}
+                            <button
+                              type="button"
+                              onClick={() => removeTask(task.id)}
+                              className="p-1 text-destructive hover:bg-destructive/10 rounded"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Add task picker */}
+                    {taskSearchOpen ? (
+                      <div className="border rounded p-2 space-y-2 bg-muted/30">
+                        <div className="relative">
+                          <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            placeholder="Search actions..."
+                            value={taskSearch}
+                            onChange={(e) => setTaskSearch(e.target.value)}
+                            className="pl-8 h-8 text-sm"
+                            autoFocus
+                          />
+                        </div>
+                        <ScrollArea className="h-32">
+                          <div className="space-y-1">
+                            {filteredTaskBank.map((task) => (
+                              <button
+                                key={task.id}
+                                type="button"
+                                onClick={() => addTask(task)}
+                                className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-accent text-left text-xs"
+                              >
+                                <TaskIcon iconName={task.emoji} size={14} />
+                                <span className="flex-1 truncate">{task.title}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => { setTaskSearchOpen(false); setTaskSearch(''); }}
+                          className="w-full h-7"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setTaskSearchOpen(true)}
+                        className="w-full gap-1"
+                      >
+                        <Plus className="h-3 w-3" />
+                        Add Action
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </ScrollArea>
+            </TabsContent>
+          </Tabs>
 
           <DialogFooter className="pt-4 border-t">
             <Button variant="outline" onClick={closeDialog}>Cancel</Button>
