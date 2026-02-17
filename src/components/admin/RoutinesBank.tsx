@@ -674,7 +674,54 @@ export default function RoutinesBank() {
         </div>
       );
     }
-    return null;
+    // Normal mode: show weekday selector
+    const days = task.schedule_days || [];
+    const isWeekly = days.length > 0;
+    return (
+      <div className="flex items-center gap-1">
+        {isWeekly ? (
+          <div className="flex gap-0.5">
+            {WEEKDAYS.map((day, idx) => (
+              <button
+                key={day}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newDays = days.includes(idx)
+                    ? days.filter(d => d !== idx)
+                    : [...days, idx].sort();
+                  setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: newDays } : t));
+                }}
+                className={cn(
+                  "w-5 h-5 rounded-full text-[9px] font-medium transition-all",
+                  days.includes(idx)
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                )}
+              >
+                {day[0]}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <span className="text-[10px] text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">Daily</span>
+        )}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (isWeekly) {
+              setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [] } : t));
+            } else {
+              setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [1, 3, 5] } : t));
+            }
+          }}
+          className="text-[9px] text-muted-foreground hover:text-foreground underline"
+        >
+          {isWeekly ? '→ Daily' : '→ Weekly'}
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -1344,131 +1391,145 @@ export default function RoutinesBank() {
                     Add Section
                   </Button>
 
-                  {/* Uncategorized Tasks */}
-                  {(uncategorizedTasks.length > 0 || localSections.length === 0) && (
-                    <div className="border rounded-lg overflow-hidden border-dashed">
-                      <div className="flex items-center gap-2 p-3 bg-muted/30 border-b border-dashed">
-                        <h4 className="font-medium text-sm text-muted-foreground flex-1">
-                          {localSections.length === 0 ? 'Tasks' : 'Uncategorized Tasks'}
-                        </h4>
-                        <span className="text-xs text-muted-foreground">
-                          {uncategorizedTasks.length} task{uncategorizedTasks.length !== 1 ? 's' : ''}
-                        </span>
-                      </div>
-                      <div className="p-2 space-y-1">
-                        {uncategorizedTasks.map((task, tIdx) => (
-                          <div key={task.id} className="rounded bg-background border">
-                            <div className="flex items-center gap-2 p-2">
-                              <div className="flex flex-col">
-                                <button
-                                  type="button"
-                                  onClick={() => moveTaskUp(task.id, null)}
-                                  disabled={tIdx === 0}
-                                  className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                                >
-                                  <ChevronUp className="h-3 w-3" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => moveTaskDown(task.id, null)}
-                                  disabled={tIdx === uncategorizedTasks.length - 1}
-                                  className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                                >
-                                  <ChevronDown className="h-3 w-3" />
-                                </button>
-                              </div>
-                              <TaskIcon iconName={task.emoji} size={16} />
-                              <span className="flex-1 text-sm truncate">{task.title}</span>
-                              {renderTaskScheduleConfig(task)}
-                              {/* Move to section dropdown */}
-                              {localSections.length > 0 && (
-                                <Select
-                                  value=""
-                                  onValueChange={(sectionId) => {
-                                    setLocalTasks(localTasks.map(t =>
-                                      t.id === task.id ? { ...t, section_id: sectionId } : t
-                                    ));
-                                  }}
-                                >
-                                  <SelectTrigger className="w-[100px] h-7 text-xs">
-                                    <span className="text-muted-foreground">Move to...</span>
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {localSections.map((s) => (
-                                      <SelectItem key={s.id} value={s.id} className="text-xs">
-                                        {s.title}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              )}
-                              <button
-                                type="button"
-                                onClick={() => removeTask(task.id)}
-                                className="p-1 text-destructive hover:bg-destructive/10 rounded"
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
-                            </div>
+                  {/* Tasks grouped by schedule */}
+                  {(() => {
+                    const dailyTasks = uncategorizedTasks.filter(t => !t.schedule_days || t.schedule_days.length === 0);
+                    const weeklyTasks = uncategorizedTasks.filter(t => t.schedule_days && t.schedule_days.length > 0);
+                    const showGroups = formData.schedule_type !== 'challenge' && (dailyTasks.length > 0 || weeklyTasks.length > 0 || localSections.length === 0);
+
+                    if (!showGroups && uncategorizedTasks.length === 0 && localSections.length > 0) return null;
+
+                    const renderTaskRow = (task: LocalTask, tIdx: number, listLength: number, sectionId: string | null) => (
+                      <div key={task.id} className="rounded bg-background border">
+                        <div className="flex items-center gap-2 p-2">
+                          <div className="flex flex-col">
+                            <button type="button" onClick={() => moveTaskUp(task.id, sectionId)} disabled={tIdx === 0} className="text-muted-foreground hover:text-foreground disabled:opacity-30">
+                              <ChevronUp className="h-3 w-3" />
+                            </button>
+                            <button type="button" onClick={() => moveTaskDown(task.id, sectionId)} disabled={tIdx === listLength - 1} className="text-muted-foreground hover:text-foreground disabled:opacity-30">
+                              <ChevronDown className="h-3 w-3" />
+                            </button>
                           </div>
-                        ))}
-                        
-                        {/* Add uncategorized task */}
+                          <TaskIcon iconName={task.emoji} size={16} />
+                          <span className="flex-1 text-sm truncate">{task.title}</span>
+                          {renderTaskScheduleConfig(task)}
+                          {localSections.length > 0 && (
+                            <Select value="" onValueChange={(sid) => { setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, section_id: sid } : t)); }}>
+                              <SelectTrigger className="w-[100px] h-7 text-xs"><span className="text-muted-foreground">Move to...</span></SelectTrigger>
+                              <SelectContent>
+                                {localSections.map((s) => (
+                                  <SelectItem key={s.id} value={s.id} className="text-xs">{s.title}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                          <button type="button" onClick={() => removeTask(task.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+
+                    // For challenge mode, show flat list as before
+                    if (formData.schedule_type === 'challenge') {
+                      return (uncategorizedTasks.length > 0 || localSections.length === 0) && (
+                        <div className="border rounded-lg overflow-hidden border-dashed">
+                          <div className="flex items-center gap-2 p-3 bg-muted/30 border-b border-dashed">
+                            <h4 className="font-medium text-sm text-muted-foreground flex-1">
+                              {localSections.length === 0 ? 'Tasks' : 'Uncategorized Tasks'}
+                            </h4>
+                            <span className="text-xs text-muted-foreground">{uncategorizedTasks.length} task{uncategorizedTasks.length !== 1 ? 's' : ''}</span>
+                          </div>
+                          <div className="p-2 space-y-1">
+                            {uncategorizedTasks.map((task, tIdx) => renderTaskRow(task, tIdx, uncategorizedTasks.length, null))}
+                            {addingTaskToSection === 'uncategorized' ? (
+                              <div className="border rounded p-2 space-y-2 bg-muted/30">
+                                <div className="relative">
+                                  <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+                                  <Input placeholder="Search actions..." value={taskSearch} onChange={(e) => setTaskSearch(e.target.value)} className="pl-8 h-8 text-sm" autoFocus />
+                                </div>
+                                <ScrollArea className="h-32">
+                                  <div className="space-y-1">
+                                    {filteredTaskBank.map((task) => (
+                                      <button key={task.id} type="button" onClick={() => addTaskToSection(task, null)} className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-accent text-left text-xs">
+                                        <TaskIcon iconName={task.emoji} size={14} />
+                                        <span className="flex-1 truncate">{task.title}</span>
+                                      </button>
+                                    ))}
+                                  </div>
+                                </ScrollArea>
+                                <Button type="button" variant="ghost" size="sm" onClick={() => { setAddingTaskToSection(null); setTaskSearch(''); }} className="w-full h-7">Cancel</Button>
+                              </div>
+                            ) : (
+                              <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="w-full h-7 text-xs gap-1">
+                                <Plus className="h-3 w-3" /> Add Action
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // Normal mode: group by Daily / Weekly
+                    return (
+                      <div className="space-y-3">
+                        {/* Daily Tasks */}
+                        <div className="border rounded-lg overflow-hidden">
+                          <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/20 border-b">
+                            <span className="text-sm">☀️</span>
+                            <h4 className="font-medium text-sm flex-1">Daily tasks</h4>
+                            <span className="text-xs text-muted-foreground">{dailyTasks.length}</span>
+                          </div>
+                          <div className="p-2 space-y-1">
+                            {dailyTasks.length === 0 && (
+                              <p className="text-center text-muted-foreground text-xs py-2">No daily tasks</p>
+                            )}
+                            {dailyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, dailyTasks.length, null))}
+                          </div>
+                        </div>
+
+                        {/* Weekly Tasks */}
+                        <div className="border rounded-lg overflow-hidden">
+                          <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950/20 border-b">
+                            <span className="text-sm">📅</span>
+                            <h4 className="font-medium text-sm flex-1">Weekly tasks</h4>
+                            <span className="text-xs text-muted-foreground">{weeklyTasks.length}</span>
+                          </div>
+                          <div className="p-2 space-y-1">
+                            {weeklyTasks.length === 0 && (
+                              <p className="text-center text-muted-foreground text-xs py-2">No weekly tasks</p>
+                            )}
+                            {weeklyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, weeklyTasks.length, null))}
+                          </div>
+                        </div>
+
+                        {/* Add task button */}
                         {addingTaskToSection === 'uncategorized' ? (
                           <div className="border rounded p-2 space-y-2 bg-muted/30">
                             <div className="relative">
                               <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
-                              <Input
-                                placeholder="Search actions..."
-                                value={taskSearch}
-                                onChange={(e) => setTaskSearch(e.target.value)}
-                                className="pl-8 h-8 text-sm"
-                                autoFocus
-                              />
+                              <Input placeholder="Search actions..." value={taskSearch} onChange={(e) => setTaskSearch(e.target.value)} className="pl-8 h-8 text-sm" autoFocus />
                             </div>
                             <ScrollArea className="h-32">
                               <div className="space-y-1">
                                 {filteredTaskBank.map((task) => (
-                                  <button
-                                    key={task.id}
-                                    type="button"
-                                    onClick={() => addTaskToSection(task, null)}
-                                    className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-accent text-left text-xs"
-                                  >
+                                  <button key={task.id} type="button" onClick={() => addTaskToSection(task, null)} className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-accent text-left text-xs">
                                     <TaskIcon iconName={task.emoji} size={14} />
                                     <span className="flex-1 truncate">{task.title}</span>
                                   </button>
                                 ))}
                               </div>
                             </ScrollArea>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setAddingTaskToSection(null);
-                                setTaskSearch('');
-                              }}
-                              className="w-full h-7"
-                            >
-                              Cancel
-                            </Button>
+                            <Button type="button" variant="ghost" size="sm" onClick={() => { setAddingTaskToSection(null); setTaskSearch(''); }} className="w-full h-7">Cancel</Button>
                           </div>
                         ) : (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setAddingTaskToSection('uncategorized')}
-                            className="w-full h-7 text-xs gap-1"
-                          >
-                            <Plus className="h-3 w-3" />
-                            Add Action
+                          <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="w-full h-7 text-xs gap-1">
+                            <Plus className="h-3 w-3" /> Add Action
                           </Button>
                         )}
                       </div>
-                    </div>
-                )}
+                    );
+                  })()}
               </div>
             </TabsContent>
           </Tabs>
